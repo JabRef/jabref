@@ -38,7 +38,7 @@ class IsbnFetcherTest {
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
         bibEntry.setField(StandardField.YEAR, "2018");
         bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
-        bibEntry.setField(StandardField.DATE, "2018-01-11");
+        bibEntry.setField(StandardField.DATE, "2018-01-01");
         bibEntry.setField(new UnknownField("ean"), "9780134685991");
         bibEntry.setField(StandardField.ISBN, "0134685997");
         bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
@@ -51,7 +51,7 @@ class IsbnFetcherTest {
 
     @Test
     void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

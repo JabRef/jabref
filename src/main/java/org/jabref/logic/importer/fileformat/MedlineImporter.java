@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -74,6 +75,7 @@ import org.jabref.logic.importer.fileformat.medline.Sections;
 import org.jabref.logic.importer.fileformat.medline.Text;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -603,7 +605,10 @@ public class MedlineImporter extends Importer implements Parser {
         } else {
             fields.put(StandardField.YEAR, pubDate.getYear());
             if (pubDate.getMonth() != null) {
-                fields.put(StandardField.MONTH, pubDate.getMonth());
+                Optional<Month> month = Month.parse(pubDate.getMonth());
+                if (month.isPresent()) {
+                    fields.put(StandardField.MONTH, month.get().getJabRefFormat());
+                }
             } else if (pubDate.getSeason() != null) {
                 fields.put(new UnknownField("season"), pubDate.getSeason());
             }

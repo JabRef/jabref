@@ -21,8 +21,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.SaveOrderConfigDisplayView;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -33,6 +33,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     @FXML private VBox contentVbox;
     @FXML private ComboBox<Charset> encoding;
+    @FXML private ComboBox<String> databaseMode;
     @FXML private TextField generalFileDirectory;
     @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
@@ -79,13 +80,15 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         encoding.disableProperty().bind(viewModel.encodingDisableProperty());
         protect.disableProperty().bind(viewModel.protectDisableProperty());
 
+        databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
+        databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
+
         saveOrderConfigDisplayView = new SaveOrderConfigDisplayView();
         Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
         oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
 
         saveOrderConfigDisplayView.changeExportDescriptionToSave();
-        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
-                                                                      Cleanups.DEFAULT_SAVE_ACTIONS);
+        fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"));
         Label saveActions = new Label(Localization.lang("Save actions"));
         saveActions.getStyleClass().add("sectionHeader");
 
@@ -123,6 +126,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
                                       .orElse(preferencesService.getDefaultEncoding());
         Charset newEncoding = viewModel.selectedEncodingProperty().getValue();
         metaData.setEncoding(newEncoding);
+
+        BibDatabaseMode newMode = BibDatabaseMode.parse(viewModel.selectedDatabaseModeProperty().getValue());
+        metaData.setMode(newMode);
 
         String text = viewModel.generalFileDirectoryPropertyProperty().getValue().trim();
         if (text.isEmpty()) {

@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.cleanup.CleanupPreset;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
@@ -64,7 +63,7 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
-        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"), Cleanups.DEFAULT_SAVE_ACTIONS);
+        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"));
         formatterContainer.getChildren().setAll(cleanUpFormatters);
 
         String currentPattern = Localization.lang("Filename format pattern")
