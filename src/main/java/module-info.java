@@ -64,9 +64,7 @@ open module org.jabref {
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
-    requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.httpclient;
-    requires org.apache.commons.io;
     requires org.jsoup;
     requires commons.csv;
 }

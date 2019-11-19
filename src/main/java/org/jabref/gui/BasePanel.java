@@ -154,8 +154,6 @@ public class BasePanel extends StackPane {
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
-        EntryValidateDialog.setJabRefFrame(frame);
-        EntryValidateDialog.setBasePanel(this);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);

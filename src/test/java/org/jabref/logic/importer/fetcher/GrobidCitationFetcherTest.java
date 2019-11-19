@@ -1,7 +1,19 @@
-package org.jabref.logic.plaintextparser;
+package org.jabref.logic.importer.fetcher;
 
-import org.jabref.logic.importer.fetcher.Grobid;
-import org.junit.Test;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * Used to test the whole logic of the external parser anystyle.
@@ -9,7 +21,18 @@ import org.junit.Test;
  * tested in this class.
  */
 
-public class GrobidTest {
+public class GrobidCitationFetcherTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcherTest.class);
+
+    ImportFormatPreferences importFormatPreferences;
+    FileUpdateMonitor fileUpdateMonitor;
+
+    @BeforeEach
+    public void setup() {
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        fileUpdateMonitor = new DummyFileUpdateMonitor();
+    }
 
     /**
      * Tests the base functionality of the parser is working by taking some example
@@ -18,7 +41,13 @@ public class GrobidTest {
      */
     @Test
     public void singleTextResourceParseTest() {
-      Grobid.parsePlainRefCit("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.");
+        try {
+            List<BibEntry> s = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor)
+                    .performSearch("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.");
+            LOGGER.debug(s.get(0).getAuthorTitleYear(100));
+        } catch (FetcherException e) {
+            LOGGER.error("Does not work");
+        }
     }
 
     /**

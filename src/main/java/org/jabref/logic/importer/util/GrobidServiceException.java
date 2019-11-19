@@ -4,12 +4,12 @@ import org.jabref.JabRefException;
 
 public class GrobidServiceException extends JabRefException {
 
-    public GrobidServiceException() {
-        super("An error occurred while processing your query.");
-    }
-
     public GrobidServiceException(String message) {
         super(message);
+    }
+
+    public GrobidServiceException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     public static GrobidServiceException getNewGrobidClientExceptionByCode(int httpCode) {
