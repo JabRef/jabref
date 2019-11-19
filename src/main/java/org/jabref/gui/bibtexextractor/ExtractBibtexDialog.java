@@ -7,10 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.CheckBox;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entrybyplaintext.EntryByPlainTextViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;

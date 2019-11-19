@@ -1,11 +1,12 @@
-package org.jabref.gui.entrybyplaintext;
+package org.jabref.gui.bibtexextractor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextArea;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.bibtexextractor.BibtexExtractorViewModel;
-import org.jabref.gui.entrybyplaintext.EntryByPlainTextViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,7 +33,7 @@ public class FailedToParseDialog extends BaseDialog<Void> {
                  .setAsDialogPane(this);
         this.setTitle(Localization.lang("Extraction failed"));
         input.setText(oldInput);
-        
+
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
         buttonParse.setOnAction(event -> textViewModel.startParsing(directAddBox.isSelected()));
