@@ -1,4 +1,4 @@
-package org.jabref.gui.entrybyplaintext;
+package org.jabref.gui.bibtexextractor;
 
 import java.util.HashMap;
 import java.util.List;
