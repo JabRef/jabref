@@ -42,7 +42,7 @@ public class ParserPipeline {
             } else {
                 ArrayList<BibEntry> resultsList = new ArrayList<>();
                 for (String reference: plainReferences) {
-                    parseBibToBibEntry(parseTeiToBib(parseUsingGrobid(reference))).ifPresent(resultsList::add);
+                    parseBibToBibEntry(parseUsingGrobid(reference)).ifPresent(resultsList::add);
                 }
                 return resultsList;
             }
@@ -64,16 +64,18 @@ public class ParserPipeline {
         }
     }
 
+    /*
     private static String parseTeiToBib(String tei) {
         System.out.println(tei);
         //TODO: THIS IS A DUMMY METHOD RIGHT NOW, SHOULD BE IMPLEMENTED
+        //OR NOT, WHEN CUSTOM GROBID SERVER WORKS
         return "@BOOK{DUMMY:1,\n" +
                 "AUTHOR=\"John Doe\",\n" +
                 "TITLE=\"The Book without Title\",\n" +
                 "PUBLISHER=\"Dummy Publisher\",\n" +
                 "YEAR=\"2100\",\n" +
                 "}";
-    }
+    }*/
 
     private static Optional<BibEntry> parseBibToBibEntry(String bibtexString) throws ParserPipelineException {
         try {

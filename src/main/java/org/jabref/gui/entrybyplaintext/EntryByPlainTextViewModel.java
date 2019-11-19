@@ -13,6 +13,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.plaintextparser.ParserPipeline;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
@@ -54,8 +55,11 @@ public class EntryByPlainTextViewModel {
 
   public void executeParse(){
       if(extractedEntries.size() > 0){
+          BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
           for (BibEntry bibEntry: extractedEntries) {
               parsingSuccess(bibEntry);
+              bibtexKeyGenerator.generateAndSetKey(bibEntry);
+
           }
       } else{
           parsingFail(inputText.getValue());
