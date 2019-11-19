@@ -1,4 +1,4 @@
-package org.jabref.logic.net;
+package org.jabref.logic.importer.util;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -17,12 +17,12 @@ import java.util.Map;
  * The methods are structured to match the GROBID server api.
  * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
  */
-public class GrobidClient {
+public class GrobidService {
 
-    public static String processCitation(String rawCitation, int consolidateCitations) throws GrobidClientException {
+    public static String processCitation(String rawCitation, int consolidateCitations) throws GrobidServiceException {
         try {
             if (consolidateCitations < 0 || consolidateCitations > 2) {
-                throw new GrobidClientException("");
+                throw new GrobidServiceException("");
             }
             HttpEntity httpResponse = HttpPostService.sendPostAndWait(
                     Globals.prefs.get(JabRefPreferences.CUSTOM_GROBID_SERVER),
@@ -30,12 +30,12 @@ public class GrobidClient {
                     Map.of("citations", rawCitation, "consolidateCitations", String.valueOf(consolidateCitations))
                     ).getEntity();
             if (httpResponse == null) {
-                throw new GrobidClientException("The GROBID server response does not contain anything.");
+                throw new GrobidServiceException("The GROBID server response does not contain anything.");
             }
             InputStream serverResponseAsStream = httpResponse.getContent();
             return IOUtils.toString(serverResponseAsStream, StandardCharsets.UTF_8);
         } catch (HttpPostServiceException | IOException e) {
-            throw new GrobidClientException();
+            throw new GrobidServiceException();
         }
     }
 

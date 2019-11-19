@@ -3,7 +3,6 @@ package org.jabref.gui.bibtexextractor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -14,7 +13,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.plaintextparser.ParserPipeline;
+import org.jabref.logic.importer.fetcher.Grobid;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -48,7 +47,7 @@ public class EntryByPlainTextViewModel {
     this.directAdd = directAdd;
     this.extractedEntries = null;
     JabRefExecutorService.INSTANCE.execute(() -> {
-        this.extractedEntries = ParserPipeline.parsePlainRefCit(inputText.getValue());
+        this.extractedEntries = Grobid.parsePlainRefCit(inputText.getValue());
         Platform.runLater(this::executeParse);
     });
   }

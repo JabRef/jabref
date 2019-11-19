@@ -1,10 +1,10 @@
-package org.jabref.logic.plaintextparser;
+package org.jabref.logic.importer.fetcher;
 
 import org.jabref.Globals;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.net.GrobidClient;
-import org.jabref.logic.net.GrobidClientException;
+import org.jabref.logic.importer.util.GrobidService;
+import org.jabref.logic.importer.util.GrobidServiceException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
@@ -19,9 +19,9 @@ import java.util.TreeSet;
  * This class is used to help making new entries faster by parsing a String.
  * An external parser called grobid is being used for that.
  */
-public class ParserPipeline {
+public class Grobid {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParserPipeline.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Grobid.class);
 
     /**
      * Takes a whole String and filters the specific fields for the entry which is done
@@ -58,8 +58,8 @@ public class ParserPipeline {
      */
     private static String parseUsingGrobid(String plainText) throws ParserPipelineException {
         try {
-            return GrobidClient.processCitation(plainText, 1);
-        } catch (GrobidClientException e) {
+            return GrobidService.processCitation(plainText, 1);
+        } catch (GrobidServiceException e) {
             throw new ParserPipelineException("The Pipeline failed to get the results from the GROBID client");
         }
     }
