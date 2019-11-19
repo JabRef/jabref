@@ -5,10 +5,10 @@ import javax.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entrybyplaintext.EntryByPlainTextViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,6 +25,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML private TextArea input;
     @FXML private ButtonType extractButtonType;
     @FXML private ButtonType parseButtonType;
+    @FXML private CheckBox directAddBox;
     private BibtexExtractorViewModel viewModel;
     private EntryByPlainTextViewModel textViewModel;
     @Inject private StateManager stateManager;
@@ -39,10 +40,11 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
         buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-        buttonParse.setOnAction(event -> textViewModel.startParsing());
+        buttonParse.setOnAction(event -> textViewModel.startParsing(directAddBox.isSelected()));
         buttonExtract.setOnAction(e -> viewModel.startExtraction());
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
+
     }
 
     @FXML
