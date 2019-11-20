@@ -330,22 +330,22 @@ public class RepecNepImporter extends Importer {
             // skip keyword
             this.lastLine = "".equals(this.lastLine) ? "" : this.lastLine.substring(this.lastLine.indexOf(':') + 1).trim();
 
-            // parse keywords field
             if ("Keywords".equals(keyword)) {
+                // parse keywords field
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
                 be.addKeywords(Arrays.asList(keywords),
                         importFormatPreferences.getKeywordSeparator());
-                // parse JEL field
             } else if ("JEL".equals(keyword)) {
+                // parse JEL field
                 be.setField(new UnknownField("jel"), readMultipleLines(in));
 
             } else if (keyword.startsWith("Date")) {
                 // parse date field
                 String content = readMultipleLines(in);
                 Date.parse(content).ifPresent(be::setDate);
-                // parse URL field
             } else if (keyword.startsWith("URL")) {
+                // parse URL field
                 String content;
                 if (multilineUrlFieldAllowed) {
                     content = readMultipleLines(in);
@@ -354,10 +354,8 @@ public class RepecNepImporter extends Importer {
                     readLine(in);
                 }
                 be.setField(StandardField.URL, content);
-
-                // authors field
             } else if (keyword.startsWith("By")) {
-                // parse authors
+                // parse authors field
                 parseAuthors(be, in);
             } else {
                 readLine(in);

@@ -38,7 +38,6 @@ import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
-import org.jabref.gui.entrybyplaintext.EntryValidateDialog;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.WriteXMPAction;
@@ -155,8 +154,6 @@ public class BasePanel extends StackPane {
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
-        EntryValidateDialog.setJabRefFrame(frame);
-        EntryValidateDialog.setBasePanel(this);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);

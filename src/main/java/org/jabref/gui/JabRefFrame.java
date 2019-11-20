@@ -730,6 +730,7 @@ public class JabRefFrame extends BorderPane {
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAINTEX, new ExtractBibtexAction(stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -769,7 +770,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
-                factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
+                //factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
+
                 new SeparatorMenuItem(),
 
                 lookupIdentifiers,
