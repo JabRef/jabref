@@ -40,7 +40,6 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 * In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters.
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
 * Go to the newly created jabref folder: `cd jabref`
-* Update the submodules: `git submodule update --init`
 * Generate additional source code: `./gradlew assemble`
 * Start JabRef: `./gradlew run`
 
