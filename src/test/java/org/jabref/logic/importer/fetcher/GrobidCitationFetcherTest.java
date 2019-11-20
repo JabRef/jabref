@@ -50,46 +50,37 @@ public class GrobidCitationFetcherTest {
         }
     }
 
-    /**
-     * Takes a string which has some obvious parts in the text where have to be almost 100%
-     * allocated to the correct field of the corresponding entry.
-     */
-    @Test
-    public void correctParseWithObviousContentTest() {
+  /**
+   * Checks if the Grobid parser returns a String if the input is a text reference
+   * which should be able to be parsed.
+   */
+  @Test
+  public void passGrobidRequestTest() {
+  String plainTextExample = "M. C. Potter and R. Mackiewicz, Mechanical Vibration and "
+      + "Shock Analysis, 2nd ed. Upper Saddle River, NJ: Pearson Prentice Hall,"
+      + " 2015, pp. 17–19.";
 
-    }
+  }
 
-    /**
-     * Tests the teach functionality of the parser by testing the appropriate function of the parser which
-     * should remove that error from it in the further tries of parsing the exact same text.
-     */
-    @Test
-    public void teachTheParserToRecognizeFormatTest() {
 
-    }
+  /**
+   * Tests if multiple text references are parsed correctly if every input
+   * is valid.
+   */
+  @Test
+  public void grobidValidPerformSearchTest() {
 
-    /**
-     * Tests if the parser recognizes garbage text and reacts accordingly.
-     */
-    @Test
-    public void parseGarbageTextTest() {
+  }
 
-    }
+  /**
+   * TODO: Modify the performSearch Method -> add failed Results List
+   * Tests if multiple text references are parsed correctly and if some of
+   * them are failing that they are putted into the right list.
+   */
+  @Test
+  public void grobidPerformSearchWithFailsTest() {
 
-    /**
-     * If there is no text available for the parser then nothing should happen.
-     */
-    @Test
-    public void parseEmptyTextTest() {
+  }
 
-    }
-
-    /**
-     * The parser should skip / ignore characters which are not readable like symbols or asian signs for example.
-     */
-    @Test
-    public void parseInvalidCharacters() {
-
-    }
 
 }
