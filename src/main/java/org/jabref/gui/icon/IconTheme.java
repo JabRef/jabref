@@ -18,6 +18,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import javafx.scene.paint.Material;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.jensd.fx.glyphs.GlyphIcons;
@@ -298,7 +299,8 @@ public class IconTheme {
         OPEN_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_OUTLINE),
         REMOVE_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_REMOVE),
         ADD_ABBREVIATION(MaterialDesignIcon.PLAYLIST_PLUS),
-        REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS);
+        REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS),
+        GROBID_PARSE(MaterialDesignIcon.PLUS_BOX);
 
         private final JabRefIcon icon;
 
