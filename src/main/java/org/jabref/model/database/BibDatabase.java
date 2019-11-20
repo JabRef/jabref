@@ -29,10 +29,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-<<<<<<< HEAD
-import org.jabref.model.entry.event.EntriesEventSource;
-=======
->>>>>>> master
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;

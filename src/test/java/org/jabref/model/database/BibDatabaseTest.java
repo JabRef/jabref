@@ -74,27 +74,12 @@ public class BibDatabaseTest {
 
     @Test
     public void removeSomeEntriesRemovesThoseEntriesFromEntriesList() {
-<<<<<<< HEAD
-        List<BibEntry> allEntries = new ArrayList<>();
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = new BibEntry();
-        BibEntry entry3 = new BibEntry();
-        allEntries.add(entry1);
-        allEntries.add(entry2);
-        allEntries.add(entry3);
-        database.insertEntries(allEntries);
-        List<BibEntry> entriesToDelete = new ArrayList<>();
-        entriesToDelete.add(entry1);
-        entriesToDelete.add(entry3);
-
-=======
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         BibEntry entry3 = new BibEntry();
         List<BibEntry> allEntries = Arrays.asList(entry1, entry2, entry3);
         database.insertEntries(allEntries);
         List<BibEntry> entriesToDelete = Arrays.asList(entry1, entry3);
->>>>>>> master
         database.removeEntries(entriesToDelete);
         assertEquals(Collections.singletonList(entry2), database.getEntries());
         assertFalse(database.containsEntryWithId(entry1.getId()));
@@ -236,15 +221,10 @@ public class BibDatabaseTest {
     }
 
     @Test
-<<<<<<< HEAD
-    public void removeEntryPostsRemovedEntriesEvent() {
-        BibEntry expectedEntry = new BibEntry();
-=======
     public void removeEntriesPostsRemovedEntriesEvent() {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         List<BibEntry> expectedEntries = Arrays.asList(entry1, entry2);
->>>>>>> master
         TestEventListener tel = new TestEventListener();
         database.insertEntries(expectedEntries);
         database.registerListener(tel);

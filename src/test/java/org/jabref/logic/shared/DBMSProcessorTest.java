@@ -164,17 +164,22 @@ class DBMSProcessorTest {
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    void testRemoveEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
-        BibEntry bibEntry = getBibEntryExample();
-        dbmsProcessor.insertEntry(bibEntry);
-        dbmsProcessor.removeEntry(bibEntry);
+        BibEntry firstEntry = getBibEntryExample();
+        BibEntry secondEntry = getBibEntryExample();
+        List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, secondEntry);
+        dbmsProcessor.insertEntry(firstEntry);
+        dbmsProcessor.insertEntry(secondEntry);
+        dbmsProcessor.removeEntries(entriesToRemove);
 
         try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(resultSet.next());
         }
         clear(dbmsConnection);
     }
+
+    //Test here that only removes some entries
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")

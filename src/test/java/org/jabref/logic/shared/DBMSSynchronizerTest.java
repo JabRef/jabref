@@ -93,7 +93,6 @@ public class DBMSSynchronizerTest {
     public void testEntriesRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 
->>>>>>> master
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 

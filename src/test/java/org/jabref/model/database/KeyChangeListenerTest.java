@@ -1,10 +1,6 @@
 package org.jabref.model.database;
 
-<<<<<<< HEAD
-import java.util.ArrayList;
-=======
 import java.util.Arrays;
->>>>>>> master
 import java.util.List;
 import java.util.Optional;
 
