@@ -22,7 +22,7 @@ if not JABREF_PATH.exists():
 logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
 if not logging_dir.exists():
     logging_dir.mkdir(parents=True)
-logging.basicConfig(filename=logging_dir / "jabref_browser_extension.log")
+logging.basicConfig(filename=str(logging_dir / "jabref_browser_extension.log"))
 
 # Read a message from stdin and decode it.
 def get_message():
