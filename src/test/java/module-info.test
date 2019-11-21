@@ -40,3 +40,6 @@
 
 --add-reads
    org.jabref=io.github.classgraph
+
+--add-reads
+   org.jabref=org.assertj.core
