@@ -7,74 +7,75 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.Globals;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * An update monitor for a file-based library (.bib file). Has to be re-instantiated if the location of the bib file
+ * changes.
+ */
 public class DatabaseChangeMonitor implements FileUpdateListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
-    private final BibDatabaseContext database;
+    private BibDatabaseContext referenceDatabase;
+    private Path databaseToBeMonitored;
+
     private final FileUpdateMonitor fileMonitor;
-    private final List<DatabaseChangeListener> listeners;
-    private Path referenceFile;
+    private final List<DatabaseChangeListener> listeners = new ArrayList<>();
     private TaskExecutor taskExecutor;
 
     /**
-     * An update monitor for a file-based library (.bib file)
-     *
-     * @param database     The BibTeX database
-     * @param fileMonitor  The update monitor where to register to get notified about a change
-     * @param taskExecutor The scan for changes and notification is run with that task executor
+     * @param databaseToBeMonitored The BibTeX database to be monitored
+     * @param fileMonitor           The update monitor where to register to get notified about a change
+     * @param taskExecutor          The scan for changes and notification is run with that task executor
      */
-    public DatabaseChangeMonitor(BibDatabaseContext database, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
-        this.database = database;
+    public DatabaseChangeMonitor(BibDatabaseContext databaseToBeMonitored, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
         this.fileMonitor = fileMonitor;
         this.taskExecutor = taskExecutor;
-        this.listeners = new ArrayList<>();
 
-        this.database.getDatabasePath().ifPresent(path -> {
+        databaseToBeMonitored.getDatabasePath().ifPresentOrElse(path -> {
+            this.databaseToBeMonitored = path;
+            loadReferenceDatabaseFromDatabaseToBeMonitored();
             try {
+                // as last step, register this class
                 fileMonitor.addListenerForFile(path, this);
-                referenceFile = Files.createTempFile("jabref", ".bib");
-                referenceFile.toFile().deleteOnExit();
-                setAsReference(path);
             } catch (IOException e) {
                 LOGGER.error("Error while trying to monitor " + path, e);
             }
+        }, () -> {
+            throw new IllegalStateException("Path has to be present");
         });
     }
 
     @Override
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, referenceFile);
+
         BackgroundTask.wrap(() -> {
-            List<DatabaseChangeViewModel> changes;
+            BibDatabaseDiff differences;
             // no two threads may check for changes
-            synchronized (referenceFile) {
-                changes = scanner.scanForChanges();
-                if (!changes.isEmpty()) {
-                    this.database.getDatabasePath().ifPresent(currentFile -> {
-                        try {
-                            Files.copy(currentFile, referenceFile, StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            LOGGER.error("Could not copy current database to reference file", e);
-                        }
-                    });
-                }
+            synchronized (referenceDatabase) {
+                ParserResult result = OpenDatabase.loadDatabase(this.databaseToBeMonitored.toAbsolutePath().toString(), Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+                BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
+                differences = BibDatabaseDiff.compare(this.referenceDatabase, databaseOnDisk);
+                this.referenceDatabase = databaseOnDisk;
             }
-            return changes;
-        }).onSuccess(changes -> {
-            if (!changes.isEmpty()) {
-                listeners.forEach(listener -> listener.databaseChanged(changes));
-            }
+            return differences;
+        }).onSuccess(diff -> {
+            listeners.forEach(listener -> listener.databaseChanged(diff));
         }).executeWith(taskExecutor);
     }
 
@@ -83,18 +84,20 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     }
 
     public void unregister() {
-        database.getDatabasePath().ifPresent(file -> fileMonitor.removeListener(file, this));
+        fileMonitor.removeListener(this.databaseToBeMonitored, this);
     }
 
-    public void markExternalChangesAsResolved() {
-        markAsSaved();
+    private void loadReferenceDatabaseFromDatabaseToBeMonitored() {
+        // there is no clone of BibDatabaseContext - we do it "the hard way" und just reload the database
+        ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+        ParserResult result = OpenDatabase.loadDatabase(this.databaseToBeMonitored.toAbsolutePath().toString(), importFormatPreferences, new DummyFileUpdateMonitor());
+        this.referenceDatabase = result.getDatabaseContext();
     }
 
+    /**
+     * Call this if the database to monitor was saved
+     */
     public void markAsSaved() {
-        database.getDatabasePath().ifPresent(this::setAsReference);
-    }
-
-    private void setAsReference(Path file) {
-        FileUtil.copyFile(file, referenceFile, true);
+        loadReferenceDatabaseFromDatabaseToBeMonitored();
     }
 }

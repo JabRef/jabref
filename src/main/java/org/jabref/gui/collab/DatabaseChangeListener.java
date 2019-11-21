@@ -1,7 +1,7 @@
 package org.jabref.gui.collab;
 
-import java.util.List;
+import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 
 public interface DatabaseChangeListener {
-    void databaseChanged(List<DatabaseChangeViewModel> changes);
+    void databaseChanged(BibDatabaseDiff bibDatabaseDiff);
 }

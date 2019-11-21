@@ -34,7 +34,6 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
-import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
