@@ -6,8 +6,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.search.SearchParser.StartContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -122,7 +124,41 @@ public class GrobidCitationFetcherTest {
   }
 
 
+  /**
+   * Tests if the performSearch function correctly splits the plain reference text into the right parts!
+   */
+  @Test
+  public void grobidPerformSearchCorrectlySplitsStringTest()
+      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
+    String input = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :"
+        + " A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,"
+        + " R. (2003). Statutes and conventions on international trade law (4th ed.). London, "
+        + "England: Cavendish.";
+    Method performSearch = GrobidCitationFetcher.class.getDeclaredMethod("performSearch", String.class);
+    List<BibEntry> entries = (List<BibEntry>)performSearch.invoke(grobidCitationFetcher, input);
+    assertTrue(entries.get(0).hasField(StandardField.YEAR)); //it must have two entries!
+    assertTrue(entries.get(1).hasField(StandardField.YEAR));
+  }
 
+  /**
+   * Testing with two string examples if the values are parsed correctly into the right field
+   * of the specific bibentry.
+   */
+  @Test
+  public void grobidPerformSearchCorrectResultTest() {
+    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences,fileUpdateMonitor);
+    String input = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :"
+        + " A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,"
+        + " R. (2003). Statutes and conventions on international trade law (4th ed.). London, "
+        + "England: Cavendish.";
+    Method performSearch = GrobidCitationFetcher.class.getDeclaredMethod("performSearch", String.class);
+    List<BibEntry> entries =(List<BibEntry>)performSearch.invoke(grobidCitationFetcher, input);
+    assertEquals("2007", entries.get(0).getField(StandardField.YEAR).toString());
+    assertEquals(entries.get(1).getField(StandardField.YEAR).toString(), "2003");
+
+
+  }
 
 
   /**
