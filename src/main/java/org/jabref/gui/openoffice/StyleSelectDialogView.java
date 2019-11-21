@@ -26,6 +26,7 @@ import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -47,6 +48,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
+    JabRefPreferences prefs = JabRefPreferences.getInstance();
 
     public StyleSelectDialogView(StyleLoader loader) {
 
