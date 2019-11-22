@@ -63,7 +63,7 @@ public class BibtexExtractorViewModel {
         return null;
       }
     };
-    dialogService.showProgressDialogAndWait("123", "alles klar", parseUsingGrobid);
+    dialogService.showProgressDialogAndWait("Your text is being parsed..", "Please wait while we are parsing your text", parseUsingGrobid);
     Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
   }
 
@@ -86,11 +86,8 @@ public class BibtexExtractorViewModel {
             trackNewEntry(StandardEntryType.Article);
           }
       }
-    } else{
         if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
           dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
-        } else {
-          dialogService.showWarningDialogAndWait("Parsing failed", "No entries could be extracted from your request.");
         }
     }
     JabRefGUI.getMainFrame().getDialogService().notify("Successfully added a new entry.");
