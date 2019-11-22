@@ -186,6 +186,9 @@ class DBMSProcessorTest {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
         BibEntry thirdEntry = getBibEntryExample();
+
+        // Remove the first and third entries - the second should remain (SHARED_ID will be 2)
+
         List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, thirdEntry);
         dbmsProcessor.insertEntry(firstEntry);
         dbmsProcessor.insertEntry(secondEntry);
