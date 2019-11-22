@@ -162,10 +162,9 @@ public class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntry(expectedBibEntries.get(0));
-        dbmsProcessor.removeEntry(expectedBibEntries.get(1));
+        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.get(0)));
 
-        expectedBibEntries = new ArrayList<>();
+        expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 

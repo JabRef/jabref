@@ -27,7 +27,6 @@ public class TestEventListener {
         this.firstInsertedEntry = event.getBibEntry();
     }
 
-    // Not sure if this will work
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         this.removedEntries = event.getBibEntries();
