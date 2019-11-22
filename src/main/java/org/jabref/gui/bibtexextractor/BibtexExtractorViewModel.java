@@ -1,5 +1,6 @@
 package org.jabref.gui.bibtexextractor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
@@ -29,10 +31,12 @@ public class BibtexExtractorViewModel {
     private List<BibEntry> extractedEntries;
     private final BibDatabaseContext newDatabaseContext;
     private boolean directAdd;
+    private DialogService dialogService;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext) {
         this.bibdatabaseContext = bibdatabaseContext;
         newDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
+        dialogService = JabRefGUI.getMainFrame().getDialogService();
     }
 
     public StringProperty inputTextProperty() {
@@ -49,7 +53,7 @@ public class BibtexExtractorViewModel {
             Globals.getFileUpdateMonitor()
         ).performSearch(inputTextProperty.getValue());
       } catch (FetcherException e) {
-        //TODO
+          this.extractedEntries = new ArrayList<>();
       }
       directAdd = false;
       Platform.runLater(this::executeParse);
@@ -66,7 +70,7 @@ public class BibtexExtractorViewModel {
         ).performSearch(inputTextProperty.getValue());
         directAdd = true;
       } catch (FetcherException e) {
-        //TODO
+          this.extractedEntries = new ArrayList<>();
       }
       Platform.runLater(this::executeParse);
     });
@@ -85,7 +89,12 @@ public class BibtexExtractorViewModel {
         JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
 
       } else{
-        //TODO implement parsing fail
+          //TODO: Add localization
+          if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
+              dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
+          } else {
+              dialogService.showWarningDialogAndWait("Parsing failed", "No entries could be extracted from your request.");
+          }
       }
     } else{
 
