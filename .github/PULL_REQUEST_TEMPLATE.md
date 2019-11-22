@@ -5,12 +5,11 @@ If you fixed a koppor issue, link it with following pattern: [koppor#47](https:/
 The title of the PR must not reference an issue, because GitHub does not support autolinking there.
 -->
 
-## Checklist
 
 <!-- 
 - All items with `[ ]` are still a TODO.
 - All items checked with `[x]` are done.
-- Remove item not applicable
+- Remove items not applicable
 -->
 
 - [ ] Change in CHANGELOG.md described (if applicable)
