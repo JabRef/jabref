@@ -113,7 +113,7 @@ License: MIT
 Id:      io.github.java-diff-utils:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
-License: Apache-1.1
+License: Apache-2.0
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists

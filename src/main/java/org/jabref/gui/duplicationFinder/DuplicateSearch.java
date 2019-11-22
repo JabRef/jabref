@@ -2,7 +2,6 @@ package org.jabref.gui.duplicationFinder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolve
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -162,10 +161,8 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            for (BibEntry entry : result.getToRemove()) {
-                panel.getDatabase().removeEntry(entry);
-                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry));
-            }
+            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove()));
+            panel.getDatabase().removeEntries(result.getToRemove());
             panel.markBaseChanged();
         }
         // and adding merged entries:
@@ -196,8 +193,8 @@ public class DuplicateSearch extends SimpleCommand {
 
         private int duplicates = 0;
 
-        public synchronized Collection<BibEntry> getToRemove() {
-            return toRemove.values();
+        public synchronized List<BibEntry> getToRemove() {
+            return new ArrayList<>(toRemove.values());
         }
 
         public synchronized List<BibEntry> getToAdd() {

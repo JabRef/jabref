@@ -148,6 +148,9 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
         new MoveFieldCleanup(new UnknownField("adsurl"), StandardField.URL).cleanup(entry);
+        entry.getField(StandardField.ABSTRACT)
+             .filter(abstractText -> abstractText.equals("Not Available <P />"))
+             .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }

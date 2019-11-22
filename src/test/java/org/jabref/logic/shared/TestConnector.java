@@ -15,7 +15,6 @@ public class TestConnector {
     }
 
     public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
-
         if (dbmsType == DBMSType.MYSQL) {
             return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "", false, "");
         }

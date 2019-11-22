@@ -410,7 +410,6 @@ public class JabRefFrame extends BorderPane {
         head.setCenter(createToolbar());
         setTop(head);
 
-        SplitPane.setResizableWithParent(sidePane, Boolean.FALSE);
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
@@ -423,6 +422,8 @@ public class JabRefFrame extends BorderPane {
 
                     EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
                         if (visible) {
+                            // Run SplitPane.setResizableWithParent later to avoid miscalculation during initial layouting
+                            Platform.runLater(() -> SplitPane.setResizableWithParent(sidePane, Boolean.FALSE));
                             if (!splitPane.getItems().contains(sidePane)) {
                                 splitPane.getItems().add(0, sidePane);
                                 setDividerPosition();

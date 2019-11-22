@@ -6,7 +6,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -40,7 +40,7 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(memEntry);
-        undoEdit.addEdit(new UndoableRemoveEntry(database.getDatabase(), memEntry));
+        undoEdit.addEdit(new UndoableRemoveEntries(database.getDatabase(), memEntry));
     }
 
     @Override

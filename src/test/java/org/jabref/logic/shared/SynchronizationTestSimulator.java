@@ -1,15 +1,12 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.Collection;
 
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -17,11 +14,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,23 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DatabaseTest
 public class SynchronizationTestSimulator {
 
-    @Parameter
-    public DBMSType dbmsType;
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
-    private DBMSConnection dbmsConnection;
+    private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
-    @Parameters(name = "Test with {0} database system")
-    public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return TestManager.getDBMSTypeTestParameter();
-    }
-
-    @BeforeEach
-    public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
-        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
-
-        GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+    public void setUp(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
@@ -62,8 +45,10 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
     }
 
-    @Test
-    public void simulateEntryInsertionAndManualPull() {
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    public void simulateEntryInsertionAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        setUp(dbmsType, dbmsConnection, dbmsProcessor);
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
         //client A inserts another entry
@@ -72,10 +57,15 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+
+        clear(dbmsConnection);
     }
 
-    @Test
-    public void simulateEntryUpdateAndManualPull() {
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    public void simulateEntryUpdateAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        setUp(dbmsType, dbmsConnection, dbmsProcessor);
+
         BibEntry bibEntry = getBibEntryExample(1);
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -87,10 +77,15 @@ public class SynchronizationTestSimulator {
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
+
+        clear(dbmsConnection);
     }
 
-    @Test
-    public void simulateEntryDelitionAndManualPull() {
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    public void simulateEntryDelitionAndManualPull(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        setUp(dbmsType, dbmsConnection, dbmsProcessor);
+
         BibEntry bibEntry = getBibEntryExample(1);
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -108,10 +103,15 @@ public class SynchronizationTestSimulator {
 
         assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
         assertTrue(clientContextB.getDatabase().getEntries().isEmpty());
+
+        clear(dbmsConnection);
     }
 
-    @Test
-    public void simulateUpdateOnNoLongerExistingEntry() {
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    public void simulateUpdateOnNoLongerExistingEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        setUp(dbmsType, dbmsConnection, dbmsProcessor);
+
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -126,18 +126,23 @@ public class SynchronizationTestSimulator {
         clientContextA.getDatabase().removeEntry(bibEntryOfClientA);
 
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
-        assertNull(eventListenerB.getSharedEntryNotPresentEvent());
+        assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
         //client B tries to update the entry
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 
         // here a new SharedEntryNotPresentEvent has been thrown. In this case the user B would get an pop-up window.
-        assertNotNull(eventListenerB.getSharedEntryNotPresentEvent());
-        assertEquals(bibEntryOfClientB, eventListenerB.getSharedEntryNotPresentEvent().getBibEntry());
+        assertNotNull(eventListenerB.getSharedEntriesNotPresentEvent());
+        assertEquals(bibEntryOfClientB, eventListenerB.getSharedEntriesNotPresentEvent().getBibEntries());
+
+        clear(dbmsConnection);
     }
 
-    @Test
-    public void simulateEntryChangeConflicts() {
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    public void simulateEntryChangeConflicts(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+        setUp(dbmsType, dbmsConnection, dbmsProcessor);
+
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         //client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
@@ -160,6 +165,8 @@ public class SynchronizationTestSimulator {
         // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
         assertNotNull(eventListenerB.getUpdateRefusedEvent());
+
+        clear(dbmsConnection);
     }
 
     private BibEntry getBibEntryExample(int index) {
@@ -172,8 +179,7 @@ public class SynchronizationTestSimulator {
         return bibEntry;
     }
 
-    @AfterEach
-    public void clear() throws SQLException {
+    public void clear(DBMSConnection dbmsConnection) throws SQLException {
         TestManager.clearTables(dbmsConnection);
     }
 }
