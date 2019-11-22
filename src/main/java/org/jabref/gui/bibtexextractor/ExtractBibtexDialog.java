@@ -26,6 +26,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML private ButtonType parseButtonType;
     @FXML private ButtonType parseToNewLibraryType;
     private BibtexExtractorViewModel viewModel;
+    private boolean directAdd;
     @Inject private StateManager stateManager;
 
     public ExtractBibtexDialog() {
@@ -38,8 +39,12 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
 
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
         buttonToNewLib = (Button) getDialogPane().lookupButton(parseToNewLibraryType);
-        buttonParse.setOnAction(event -> viewModel.startParsing());
-        buttonToNewLib.setOnAction(event -> viewModel.startParsingToNewLibrary());
+        buttonParse.setOnAction(event -> {
+            directAdd = false;
+            viewModel.startParsing(directAdd);});
+        buttonToNewLib.setOnAction(event ->{
+          directAdd = true;
+          viewModel.startParsing(directAdd);});
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
         buttonToNewLib.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
 

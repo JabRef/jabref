@@ -45,83 +45,53 @@ public class BibtexExtractorViewModel {
     }
 
 
-  public void startParsing(){
+  public void startParsing(boolean directAdd){
+    this.directAdd = directAdd;
     this.extractedEntries = null;
-    JabRefExecutorService.INSTANCE.execute(() -> {
-      try {
-        this.extractedEntries = new GrobidCitationFetcher(
-            JabRefPreferences.getInstance().getImportFormatPreferences(),
-            Globals.getFileUpdateMonitor()
-        ).performSearch(inputTextProperty.getValue());
-      } catch (FetcherException e) {
-          this.extractedEntries = new ArrayList<>();
+    Task<Void> parseUsingGrobid = new Task<Void>() {
+      @Override
+      protected Void call() throws Exception {
+        try {
+          extractedEntries = new GrobidCitationFetcher(
+              JabRefPreferences.getInstance().getImportFormatPreferences(),
+              Globals.getFileUpdateMonitor()
+          ).performSearch(inputTextProperty.getValue());
+        } catch (FetcherException e) {
+          extractedEntries = new ArrayList<>();
+        }
+        Platform.runLater(() -> executeParse());
+        return null;
       }
-      directAdd = false;
-      Platform.runLater(this::executeParse);
-    });
+    };
+    dialogService.showProgressDialogAndWait("123", "alles klar", parseUsingGrobid);
+    Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
   }
 
-  public void startParsingToNewLibrary(){
-      this.extractedEntries = null;
-      Task<Void> parseUsingGrobid = new Task<Void>() {
-          @Override
-          protected Void call() throws Exception {
-                  try {
-                      extractedEntries = new GrobidCitationFetcher(
-                              JabRefPreferences.getInstance().getImportFormatPreferences(),
-                              Globals.getFileUpdateMonitor()
-                      ).performSearch(inputTextProperty.getValue());
-                  } catch (FetcherException e) {
-                      extractedEntries = new ArrayList<>();
-                  }
-                  directAdd = false;
-                  Platform.runLater(() -> executeParse());
-                  return null;
-              }
-      };
-      dialogService.showProgressDialogAndWait("123", "alles klar", parseUsingGrobid);
-      Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
-      /*JabRefExecutorService.INSTANCE.execute(() -> {
-      try {
-        this.extractedEntries = new GrobidCitationFetcher(
-            JabRefPreferences.getInstance().getImportFormatPreferences(),
-            Globals.getFileUpdateMonitor()
-        ).performSearch(inputTextProperty.getValue());
-        directAdd = true;
-      } catch (FetcherException e) {
-          this.extractedEntries = new ArrayList<>();
-      }
-      Platform.runLater(this::executeParse);
-    });*/
-  }
 
   public void executeParse(){
 
-    if(directAdd){
       if(extractedEntries.size() > 0){
-        BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
-        for(BibEntry bibEntries: extractedEntries) {
-          bibtexKeyGenerator.generateAndSetKey(bibEntries);
-          newDatabaseContext.getDatabase().insertEntry(bibEntries);
-        }
-        newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
-        JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
-
-      } else{
-          //TODO: Add localization
-          if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
-              dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
-          } else {
-              dialogService.showWarningDialogAndWait("Parsing failed", "No entries could be extracted from your request.");
+        if(directAdd){
+          BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
+          for(BibEntry bibEntries: extractedEntries) {
+            bibtexKeyGenerator.generateAndSetKey(bibEntries);
+            newDatabaseContext.getDatabase().insertEntry(bibEntries);
+          }
+          newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+          JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
+        } else{
+          for(BibEntry bibEntry: extractedEntries) {
+            this.bibdatabaseContext.getDatabase().insertEntry(bibEntry);
+            JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
+            trackNewEntry(StandardEntryType.Article);
           }
       }
     } else{
-
-      for(BibEntry bibEntry: extractedEntries) {
-        this.bibdatabaseContext.getDatabase().insertEntry(bibEntry);
-        JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
-        trackNewEntry(StandardEntryType.Article);
-      }
+        if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
+          dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
+        } else {
+          dialogService.showWarningDialogAndWait("Parsing failed", "No entries could be extracted from your request.");
+        }
     }
     JabRefGUI.getMainFrame().getDialogService().notify("Successfully added a new entry.");
 
