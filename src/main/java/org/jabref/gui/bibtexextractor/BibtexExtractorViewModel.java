@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import javafx.concurrent.Task;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
@@ -62,7 +63,25 @@ public class BibtexExtractorViewModel {
 
   public void startParsingToNewLibrary(){
       this.extractedEntries = null;
-      JabRefExecutorService.INSTANCE.execute(() -> {
+      Task<Void> parseUsingGrobid = new Task<Void>() {
+          @Override
+          protected Void call() throws Exception {
+                  try {
+                      extractedEntries = new GrobidCitationFetcher(
+                              JabRefPreferences.getInstance().getImportFormatPreferences(),
+                              Globals.getFileUpdateMonitor()
+                      ).performSearch(inputTextProperty.getValue());
+                  } catch (FetcherException e) {
+                      extractedEntries = new ArrayList<>();
+                  }
+                  directAdd = false;
+                  Platform.runLater(() -> executeParse());
+                  return null;
+              }
+      };
+      dialogService.showProgressDialogAndWait("123", "alles klar", parseUsingGrobid);
+      Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
+      /*JabRefExecutorService.INSTANCE.execute(() -> {
       try {
         this.extractedEntries = new GrobidCitationFetcher(
             JabRefPreferences.getInstance().getImportFormatPreferences(),
@@ -73,7 +92,7 @@ public class BibtexExtractorViewModel {
           this.extractedEntries = new ArrayList<>();
       }
       Platform.runLater(this::executeParse);
-    });
+    });*/
   }
 
   public void executeParse(){
@@ -110,7 +129,6 @@ public class BibtexExtractorViewModel {
   }
 
     public void startExtraction() {
-
         BibtexExtractor extractor = new BibtexExtractor();
         BibEntry entity = extractor.extract(inputTextProperty.getValue());
         this.bibdatabaseContext.getDatabase().insertEntry(entity);
