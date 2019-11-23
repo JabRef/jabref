@@ -77,6 +77,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         return "GROBID";
     }
 
+  /**
+   * This method is only used for testing purposes.
+   */
+  public void setGrobidService(GrobidService grobidService) {
+    this.grobidService = grobidService;
+    }
+
     public static ArrayList<String> getFailedEntries() {
         return failedEntries;
     }
