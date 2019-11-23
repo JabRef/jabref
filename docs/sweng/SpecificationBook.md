@@ -30,22 +30,21 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * /O10/ Jabref is implemented with java.
 * /O20/ There is already an existing parser from .bib files to Jabref entries.
 * /O30/ There is an existing UI where the feature should be accessible.
-* /O40/ The external parser must be added to the Jabref project as git submodule.
-
+* /O40/ The external parser is accessible via client-server communication.
 ## 4. Functional Requirements
 
 * /F10/ The feature must be accessible over the GUI.
 * /F20/ The feature must start when the user presses on a context menu button.
-* /F21/ The button should be found under the 'tools' drop-down-items it the Jabref toolbar.
+* /F21/ The button should be found under the 'library' drop-down-items it the Jabref toolbar.
 * /F30/ The feature must give the user the possibility to add one or multiple .bib-entries to Jabref.
 * /F40/ The feature must inform the user when an entry was successfully added.
-* /F41/ This should be realized with a pop-up information window.
+* /F41/ This should be realized via JabRefs Dialog Service notifier.
 * /F50/ The feature must give the user the possibility to cancel the process while entering the plain text reference.
 * /F60/ The feature must inform the user when a text could not be parsed.
 * /F70/ The feature must give the user the possibility to change the parsed entry attributes.
 * /F80/ The feature must give the user the possibility to overthrow the generated entry.
 * /F90/ The feature must give the user the possibility to add another entry after successfully adding an entry.
-* /F91/ This should be realized by a button on the success window described in /F41/.
+* /F91/ This should be done by pressing the context button or the toolbar button. 
 * /F100/ The feature must use an external parser to extract the entry attributes.
 * /F110/ The feature must convert the output of the external parser into a .bib-entry.
 * /F120/ The feature must display the parsed .bib-entry with its attributes to the user.
@@ -54,11 +53,13 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * /F140/ The feature must use Jabrefs internal .bib-entry parser in order to create a new BibEntry.
 * /F141/ The BibEntry is updated when the user makes changes as specified in /F70/.
 * /F150/ The feature must add the created BibEntry correctly to the currently opened library.
+* /F151/ By belongings the user can also add it to a new library
 * /F160/ The feature should run only once at a time.
 * /F161/ Therewith the windows the feature uses are displayed only once at a time.
 * /F170/ Jabref should show an appropriate error message when the feature crashes.
 * /F171/ Jabref should not save anything in the library when the feature unpredictably crashes.
-* /F180/ The feature must be accessible again after it was closed.
+* /F180/ The feature must be accessible again after it was closed
+* /F190/ The user should be able to use a custom grobid server. 
 
 ## 5. Quality Requirements 
 
@@ -92,12 +93,11 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *A plain text reference is available*
 * Common process: 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
     * Insert the plain text reference
-    * Press the "parse" button on the GUI (pop-up window)
+    * Press the "Add to new library" button or "Add to current library button" on the GUI (dialog window)
     * Check if the parser results are correct
     * (Change bibtex entry if needed)
-    * Accept or decline bibtex entry
 * Postcondition success: *The entry (with the correct attributes) has been successfully added to the library*
 * Postcondition failure: *No entry has been added to the library. User can restart the process if needed*
 
@@ -106,9 +106,9 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *A plain text reference is available*
 * Common process:
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
     * Insert the plain text (which is not a reference)
-    * Press the "parse" button on the GUI (pop-up window)
+    * Press the "parse" button on the GUI (dialog window)
 * Postcondition success: *Show error message to the user that the text is invalid*
 * Postcondition failure: *An entry with garbage value is being added*
 
@@ -117,9 +117,9 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *None*
 *  Common process
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
     * (Insert nothing / empty text)
-    * Press the "parse" button on the GUI (pop-up window)
+    * Press the "parse" button on the GUI (dialog window)
 * Postcondition success: *A warning is shown to the user, input window stays open*
 * Postcondition failure: *An entry is being added with empty fields*
 
@@ -128,13 +128,12 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *A plain text with multiple valid references is available, one entry on each line*
 * Common process 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
-    * Insert the plain text with multiple references
-    * Press the "parse" button on the GUI (pop-up window)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
+    * Insert the plain text with multiple references (split them by two ;;) 
+    * Press the "Add to new library" button or "Add to current library button" on the GUI (dialog window)
     * Check if the parser results are correct
     * (Change bibtex entry if needed)
-    * Accept or decline bibtex entry
-    * Repeat steps 3-6 until all entries are parsed
+    * Repeat steps 3-5 until all entries are parsed
 * Postcondition success: *The accepted entries have been successfully added to the library*
 * Postcondition failure: *Too many or too little entries or entries with wrongly parsed attributes were added to the library*
 
@@ -143,13 +142,12 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *A plain text with some valid and some invalid references is available*
 * Common process 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
     * Insert the plain text with multiple references
-    * Press the "parse" button on the GUI (pop-up window)
+    * Press the "Add to new library" button or "Add to current library button" on the GUI (dialog window)
     * If the current reference is valid:
         * Check if the parser results are correct
         * (Change bibtex entry if needed)
-        * Accept or decline bibtex entry
         * Repeat step 4 until all entries are parsed
     * If the current reference is invalid:
         * Repeat steps 4 until all entries are parsed
@@ -161,9 +159,9 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *A plain text with multiple invalid references is available*
 * Common process 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
-    * Insert the plain text with multiple invalid references
-    * Press the "parse" button on the GUI (pop-up window)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu)
+    * Insert the plain text with multiple invalid references (by splitting them with two ;;)
+    * Press the "Add to new library" button or "Add to current library button" on the GUI (dialog window)
 * Postcondition success: *An error message is displayed to the user that the entries were invalid*
 * Postcondition failure: *Several entries have been added with garbage values*
 
@@ -172,13 +170,11 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *Two valid plain text references are available*
 * Common process 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
     * Insert one plain text reference
-    * Press the "parse" button on the GUI (pop-up window)
+    * Press the "Add to new library" button or "Add to current library button" on the GUI (dialog window)
     * Check if the parser results are correct
     * (Change bibtex entry if needed)
-    * Accept or decline bibtex entry
-    * Press "Add another entry" button on success dialog
     * Repeat steps 2-6
     * Press "close" button on success dialog
 * Postcondition success: *The two accepted entries have been successfully added to the library*
@@ -189,7 +185,7 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * Agents: *Jabref user*
 * Preconditions: *The "add entry from plain text" button shows up in the GUI*
 * Common process 
-    * Pressing "Add entry from plain text" button on the GUI (Jabref context menu)
-    * Press the "cancel" button on the popup window
+    * Pressing "New entry from plain text" button on the GUI (Jabref context menu) or the toolbar button
+    * Press the "cancel" button on the dialog window
 * Postcondition success: *No entry was added to the library and the pop-up window is closed*
-* Postcondition failure: *Pop-up window is not closed or a garbage entry was added to the library*
+* Postcondition failure: *Dialog window is not closed or a garbage entry was added to the library*

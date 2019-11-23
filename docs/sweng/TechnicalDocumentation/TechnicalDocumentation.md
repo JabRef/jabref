@@ -25,7 +25,7 @@ In case you stumble over an unfamiliar term, please refer to the glossary.
 ## **2 Project overview**
 The feature is an expansion to the existing open source reference manager called **JabRef**. The main goal of the feature is to make it possible for the user to add a new plain text reference (citation) to his existing database. To do so, the user has to:
 
-- Press on the corresponding button in the drop-down context menu. (A pop-up window opens)
+- Press on the corresponding button in the drop-down context menu or the toolbar button. (A pop-up window opens)
 - Paste the plain text reference into the pop-up window.
 - Press on the "Parse"-button.
     - The user also has the option to parse multiple text references.

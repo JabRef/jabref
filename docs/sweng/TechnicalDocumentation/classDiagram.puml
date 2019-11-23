@@ -5,6 +5,7 @@ package gui {
 package bibtexparser {
   class ExtractBibtexDialog{
     {field} -Button buttonParse
+    {field} -Button buttonParseToNewLib
     {field} -StateManager stateManager
     {field} -EntryByPlainTextViewModel textViewModel
     {field} -BibDatabaseContext database
@@ -15,59 +16,34 @@ package bibtexparser {
     {method} +ViewLoader.view
 
   }
+  class BibtextExtractorViewModel{
+      {field} -BibDatabaseContext bibDatabaseContext
+      {field} -StringProperty inputText
+      {field} -BibEntry bibEntry
+      {field} -BibDatabaseContext newDatabaseContext
+      {field} -boolean directAdd
+      {field} -List<BibEntry> extractedEntries
+      {method} +startParsing(boolean directAdd)
+      {method} +parsingFail()
+      {method} -trackNewEntry(EntryType type)
+      {method} +executeParse
+      {method} +inputTextProperty
+
+
+
+  }
 
   class ExtractBibtexDialog.fxml
 
   ExtractBibtexDialog *-- ExtractBibtexDialog.fxml
 
-}
-
-package entrybyplaintext {
-
-    class EntryValidateDialog{
-
-  this class is not in use right now.
-
+  }
   }
 
-  class EntryValidateDialog.fxml
-
-  EntryValidateDialog *-- EntryValidateDialog.fxml
 
 
-  class EntryByPlainTextViewModel{
 
 
-    {field} -BibDatabaseContext bibDatabaseContext
-    {field} -StringProperty inputText
-    {field} -BibEntry bibEntry
-
-    {method} +startParsing()
-    {method} +parsingFail()
-    {method} -trackNewEntry(EntryType type)
-  }
-
-  class FailedToParseDialog{
-
-    {field} -Button buttonParse
-    {field} -StateManager stateManager
-    {field} -EntryByPlainTextViewModel textViewModel
-    {field} -BibDatabaseContext database
-
-    {method} +buttonParse.setOnAction --> textViewModel.startParsing();
-    {method} +FailedToParseDialog()
-    {method} -initialize()
-    {method} +ViewLoader.view
-
-  }
-
-  class FailedToParseDialog.fxml
-
-  FailedToParseDialog *-- FailedToParseDialog.fxml
-
-  EntryByPlainTextViewModel <-- ExtractBibtexDialog
-}
-}
 
 package logic{
 package plaintextparser{
@@ -93,15 +69,12 @@ package plaintextparser{
 
 package net{
 
-  class HttpPostService{
-    
-    {field} {static} -HttpClient httpclient
-    {field}          -URI url
+  class URLDOWNLOAD{
 
-    {method} {static} +HttpPostService(String url)
-    {method}          +HttpPostService(URL url)
-    {method}          -prepareHttpPost(Map<String, String> params)
 
+    {method}  +URLDOWNLOAD(String url)
+    {method}  +setPostData(String params)
+    {method}  +asString()
 
   }
 
@@ -120,10 +93,8 @@ package importer {
 
 }
 
-ParserPipeline *-- HttpPostService
 ParserPipeline *-- BibtexParser
 ParserPipelineException --- ParserPipeline
-EntryByPlainTextViewModel o-- ParserPipeline
 
 
 @enduml
