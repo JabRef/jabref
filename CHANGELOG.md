@@ -68,7 +68,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 - We removed some obsolete notifications. [#5555](https://github.com/JabRef/jabref/issues/5555)
 - We removed an internal step in the [ISBN-to-BibTeX fetcher](https://docs.jabref.org/import-using-publication-identifiers/isbntobibtex): The [ISBN to BibTeX Converter](https://manas.tungare.name/software/isbn-to-bibtex) by [@manastungare](https://github.com/manastungare) is not used anymore, because it is offline: "people using this tool have not been generating enough sales for Amazon."
-
+- We removed the option to control the default drag and drop behaviour. You can use the modifier keys (like CtrL or Alt) instead.
 
 
 
