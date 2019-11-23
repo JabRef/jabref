@@ -309,7 +309,7 @@ public class BibDatabase {
      * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
-        if (hasStringLabel(string.getName())) {
+        if (hasStringByName(string.getName())) {
             throw new KeyCollisionException("A string with that label already exists");
         }
 
@@ -393,7 +393,7 @@ public class BibDatabase {
     /**
      * Returns true if a string with the given label already exists.
      */
-    public synchronized boolean hasStringLabel(String label) {
+    public synchronized boolean hasStringByName(String label) {
         return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
