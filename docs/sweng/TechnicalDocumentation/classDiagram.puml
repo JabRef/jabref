@@ -36,9 +36,12 @@ package bibtexparser {
   class ExtractBibtexDialog.fxml
 
   ExtractBibtexDialog *-- ExtractBibtexDialog.fxml
+  ExtractBibtexDialog --> BibtextExtractorViewModel
+  BibtextExtractorViewModel --> GrobidCitationFetcher
 
-  }
-  }
+    }
+   }
+
 
 
 
@@ -46,24 +49,27 @@ package bibtexparser {
 
 
 package logic{
-package plaintextparser{
-  class ParserPipeline{
+  package plaintextparser{
 
-    {field} {static}  -Logger logger
-    {field} {static}  -String GROBID_PROCESS_CITATIONS_URL
-    {field} {static}  -HttpPostService grobidPostService
-    {field} {static}  -BibEntry bibEntry
 
-    {method} {static} +parsePlainRefCit(String plainText)
-    {method} {static} +parseUsingGrobid(String plainText)
-    {method} {static} +parseTeiToBib(String tei)
-    {method} {static} -parseBibToBibEntry(String bibtexString)
+
+  class GrobidCitationFetcherException{
+
+  {method} +GrobidCitationFetcherException(String reason)
+
+
   }
+   class GrobidCitationFetcher{
 
-  class ParserPipelineException{
+      {field} {static}  -Logger logger
+      {field} {static}  -String GROBID_PROCESS_CITATIONS_URL
+      {field} {static}  -HttpPostService grobidPostService
+      {field} {static}  -BibEntry bibEntry
 
-  {method} +ParserPipelineException(String reason)
-
+      {method} {static} +parsePlainRefCit(String plainText)
+      {method} {static} +parseUsingGrobid(String plainText)
+      {method} {static} +parseTeiToBib(String tei)
+      {method} {static} -parseBibToBibEntry(String bibtexString)
   }
 }
 
@@ -93,8 +99,8 @@ package importer {
 
 }
 
-ParserPipeline *-- BibtexParser
-ParserPipelineException --- ParserPipeline
+GrobidCitationFetcher *-- BibtexParser
+GrobidCitationFetcherException --- GrobidCitationFetcher
 
 
 @enduml

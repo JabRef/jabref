@@ -1,0 +1,31 @@
+@startuml
+hide footbox
+participant ExtractBibtexDialog order 10
+participant GrobidCitationFetcher order 20
+participant Server order 30
+participant BibTexParser order 40
+
+activate ExtractBibtexDialog
+ExtractBibtexDialog -> GrobidCitationFetcher: referenceText
+
+activate GrobidCitationFetcher
+GrobidCitationFetcher -> Server: send referenceText
+
+Server-> GrobidCitationFetcher: Tei to Bib
+GrobidCitationFetcher -> BibTexParser: send Bib
+
+
+activate BibTexParser
+BibTexParser -> BibTexParser: Bib to BibEntry
+BibTexParser -> GrobidCitationFetcher: return BibEntry
+deactivate BibTexParser
+
+
+
+
+
+
+GrobidCitationFetcher-> ExtractBibtexDialog: Return BibEntry
+
+
+@enduml
