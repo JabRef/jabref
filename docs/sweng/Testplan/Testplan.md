@@ -49,21 +49,21 @@ As mentioned before the testing focuses on the logic component of the system sin
 #### **3.1.1 Functional Requirements**
 
 **logic**:
-- The user gets notification if the parser fails **(F60)**
-- The user can overthrow parser results **(F80)**
-- The user can *chain* his entries without having to start over again from the beginning of the process **(F90)**
-- Working functionality of the external parser **(F110)**
-- The feature considers duplication issues with the internal jabref duplication checker **(F130)**
-- Successfully creating a new bibentry corresponding to the results of an reference test **(F140)**
-- No saving after an unexpected system crash **(171)**
-- The feature can never be runned multiple times at the same time, but it can be opened again after it is closed in the current session. **(F160, F180)**
+- The feature must be accessible over the GUI **F(10)**
+- The feature can either be opened by pressing a button or clicking on the library tab and then on the button "New entry from plain text" **(F20)**
+- Multiple raw citations can be send to the parser at once. **(F30)**
+- All raw citations where the parser failed are being showed up in a window after the parsing is done. **(F60)**
+- The external parser returns the results in bibentry format so they can be added into the specific library. **(F110)**
+- The parsing to bibentry format is done by the with the internal parser in order to create new entries. **(F140)**
+- If the button "Add to current library" / "Add to new library" is pressed the created entries have to be put into the current / new library. **(F150, 151)**
+- The window of the parser cannot be opened multiple times **(F160)**
 
 **net**:
 - Communication to the external parser which is hosted by a server is possible **(F100)**
 
 ### **3.2 Not to be tested**
 
-The whole functionality of the gui is not being tested.
+The gui is only being tested with function tests. So there are no unit tests for the gui.
 
 ## **4. Procedure**
 
@@ -74,7 +74,7 @@ For all the tests Junit is going to be used.
 
 ### **4.2 Function tests**
 
-To make sure that alle the functionalities are working properly all the tests are going to be tested by the developers / implementers of this feature.
+The whole gui is going to be tested with function tests. All functions are being tested by starting jabref on different pc's where the whole process of parsing a plain text reference is done in every possible way.
 
 ## **5. Hardware and Software Requirements**
 - It is required that an internet connection is available:
