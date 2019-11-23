@@ -44,7 +44,6 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
-import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -353,9 +352,6 @@ public class JabRefPreferences implements PreferencesService {
 
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
-
-    // File linking Options for entry editor
-    public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
 
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
@@ -765,7 +761,6 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
 
-        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.MOVE.name());
         setLanguageDependentDefaultValues();
     }
 
@@ -2002,15 +1997,6 @@ public class JabRefPreferences implements PreferencesService {
             map.put(columns.get(i), sortTypes.get(i));
         }
         return map;
-    }
-
-    @Override
-    public FileDragDropPreferenceType getEntryEditorFileLinkPreference() {
-        return FileDragDropPreferenceType.valueOf(get(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE));
-    }
-
-    public void storeEntryEditorFileLinkPreference(FileDragDropPreferenceType type) {
-        put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, type.name());
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -101,8 +100,6 @@ public interface PreferencesService {
     void saveCustomEntryTypes();
 
     boolean getAllowIntegerEdition();
-
-    FileDragDropPreferenceType getEntryEditorFileLinkPreference();
 
     EntryEditorPreferences getEntryEditorPreferences();
 }
