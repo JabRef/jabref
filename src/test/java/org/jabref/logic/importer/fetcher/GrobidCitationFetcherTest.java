@@ -146,7 +146,8 @@ public class GrobidCitationFetcherTest {
    * of the specific bibentry.
    */
   @Test
-  public void grobidPerformSearchCorrectResultTest() {
+  public void grobidPerformSearchCorrectResultTest() throws NoSuchMethodException, IllegalAccessException,
+      InvocationTargetException {
     GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences,fileUpdateMonitor);
     String input = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :"
         + " A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,"
@@ -170,6 +171,7 @@ public class GrobidCitationFetcherTest {
   public void grobidPerformSearchWithFailsTest() {
 
   }
+
 
 
 }
