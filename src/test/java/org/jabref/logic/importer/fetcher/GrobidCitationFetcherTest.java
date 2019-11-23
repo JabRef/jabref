@@ -13,6 +13,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.search.SearchParser.StartContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,19 +97,6 @@ public class GrobidCitationFetcherTest {
     }
 
     /**
-     * Tests the base functionality of the parser is working by taking some example
-     * strings and parses them with the external parser and checks if the corresponding fields
-     * are filled in correctly.
-     */
-    @Test
-    public void singleTextResourceParseTest() throws FetcherException {
-        List<BibEntry> s = grobidCitationFetcher
-                .performSearch(example1);
-        //assertTrue();
-        //LOGGER.debug(s.get(0).getAuthorTitleYear(100));
-    }
-
-    /**
      * Checks if the Grobid parser returns a String if the input is a text reference
      * which should be able to be parsed. The result should either be empty or not empty but
      * not null.
@@ -177,42 +165,49 @@ public class GrobidCitationFetcherTest {
     }
 
 
-  /**
-   * Tests if the performSearch function correctly splits the plain reference text into the right parts!
-   */
-  @Test
-  public void grobidPerformSearchCorrectlySplitsStringTest()
-      throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    Method performSearch = GrobidCitationFetcher.class.getDeclaredMethod("performSearch", String.class);
-    List<BibEntry> entries = (List<BibEntry>)performSearch.invoke(grobidCitationFetcher, example3);
-    assertTrue(entries.get(0).hasField(StandardField.YEAR)); //it must have two entries!
-    assertTrue(entries.get(1).hasField(StandardField.YEAR));
-  }
+    /**
+     * Tests if the performSearch function correctly splits the plain reference text into the right parts.
+     */
+    @Test
+    public void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example3 + ";;" + example4);
+        assertTrue(entries.size() == 2);
+        assertTrue(entries.get(0) != null);
+        assertTrue(entries.get(1) != null);
+    }
 
-  /**
-   * Testing with two string examples if the values are parsed correctly into the right field
-   * of the specific bibentry.
-   */
-  @Test
-  public void grobidPerformSearchCorrectResultTest() throws NoSuchMethodException, IllegalAccessException,
-      InvocationTargetException {
-    Method performSearch = GrobidCitationFetcher.class.getDeclaredMethod("performSearch", String.class);
-    List<BibEntry> entries =(List<BibEntry>)performSearch.invoke(grobidCitationFetcher, example3);
-    assertEquals("2007", entries.get(0).getField(StandardField.YEAR).toString());
-    assertEquals(entries.get(1).getField(StandardField.YEAR).toString(), "2003");
-
-
-  }
+    /**
+     * Testing with two string examples if the values are parsed correctly into the right field
+     * of the specific bibentry.
+     */
+    @Test
+    public void grobidPerformSearchCorrectResultTest() throws FetcherException {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example2 + ";;" + example3);
+        assertTrue(entries.get(0).getField(StandardField.TITLE).get().equals("Child and adolescent psychiatry : A developmental approach")
+            || entries.get(1).getField(StandardField.TITLE).get().equals("Child and adolescent psychiatry : A developmental approach"));
+        assertTrue(entries.get(0).getField(StandardField.YEAR).get().equals("2004")
+            || entries.get(1).getField(StandardField.YEAR).get().equals("2004"));
+    }
 
 
-  /**
-   * Tests if failed parsing result are added to the failedEntries ArrayList.
-   */
-  @Test
-  public void grobidPerformSearchWithFailsTest() {
+    /**
+     * Tests if empty Strings throw FetcherException
+     */
+    @Test
+    public void grobidPerformSearchWithEmptyStringsTest() {
+        Assertions.assertThrows(FetcherException.class, () -> {
+            grobidCitationFetcher.performSearch("   ;;   ");
+        });
+    }
 
-  }
-
-
+    /**
+     * Tests if failed parsing result are added to the failedEntries ArrayList.
+     */
+    @Test
+    public void grobidPerformSearchWithFailsTest() throws FetcherException {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput1 + ";;" + invalidInput2);
+        assertEquals(entries.get(0).toString(), defaultReturnValue);
+        assertEquals(entries.get(1).toString(), defaultReturnValue);
+    }
 
 }
