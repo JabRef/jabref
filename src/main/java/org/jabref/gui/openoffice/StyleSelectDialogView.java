@@ -26,7 +26,6 @@ import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
@@ -48,7 +47,6 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    JabRefPreferences prefs = JabRefPreferences.getInstance();
 
     public StyleSelectDialogView(StyleLoader loader) {
 
@@ -80,8 +78,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
-        previewArticle.setTheme(prefs.get(JabRefPreferences.FX_THEME));
-        previewBook.setTheme(prefs.get(JabRefPreferences.FX_THEME));
+        previewArticle.setTheme(preferencesService.getTheme());
+        previewBook.setTheme(preferencesService.getTheme());
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

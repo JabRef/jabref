@@ -90,6 +90,8 @@ public interface PreferencesService {
 
     String getUser();
 
+    String getTheme();
+
     SaveOrderConfig loadExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
