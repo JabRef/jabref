@@ -79,10 +79,6 @@ The following diagrams allow some deeper insights into the working principle of 
 
 ![image](SequenceDiagramPipeLine.PNG)
 
-**Client-side http POST request**: <br>
-
-![image](SequenceDiagramHttpClass.PNG)
-
 **GUI interaction process**: <br>
 
 ![image](StateDiagramGUI.PNG)
@@ -91,7 +87,7 @@ The following diagrams allow some deeper insights into the working principle of 
 
 ![image](ActivityDiagramTrackPlainEntry.PNG)
 
-### **5.3 Logic**
+### **5.3 Logic** (THESE OCL CONSTRAINS ARE OUT OF DATE)
 To explain the logic some further, we formulated 8 logic constrains:
 
 - **context** ParserPipeline::parseUsingGrobid **post:** self.grobidPostService != null
@@ -99,6 +95,6 @@ To explain the logic some further, we formulated 8 logic constrains:
 - **context** ParserPipelineException **inv:** self.detailMessage != null
 - **context** ExtractBibtexDialog **inv:** stateManager != null and stateManager.getActiveDatabase() != null
 - **context** ExtractBibtexDialog::initialize **post:** self.viewModel != null and self.textViewModel != null
-- **context** EntryByPlainTextViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
-- **context** EntryByPlainTextViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
-- **context** EntryByPlainTextViewModel::inputTextProperty **pre:** self.inputText != null
+- **context** BibtexExtractorViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
+- **context** BibtexExtractortViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
+- **context** BibtexExtractorViewModel::inputTextProperty **pre:** self.inputText != null

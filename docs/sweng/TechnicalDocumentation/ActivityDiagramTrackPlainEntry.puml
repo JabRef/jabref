@@ -1,13 +1,13 @@
 @startuml
 |SuccessLane|
 start
-:Pass plain citation to ParserPipeline    ;
+:Pass plain citation to GrobidCitationFetcher    ;
 :Pass plain citation to external parser (GROBID)       ;
 :Get the parsing results    ;
-if (parsing successful?     ) then (yes)
+if (parsing successful       ) then (yes)
 else (no)
     |FailLane|
-    :Show error Dialog  ;
+    :Show Error Dialog  ;
     stop
 endif
 |SuccessLane|
@@ -15,7 +15,7 @@ endif
 if (parsing successful?     ) then (yes)
 else (no)
     |FailLane|
-    :Show error Dialog  ;
+    :Show Error Dialog  ;
     stop
 endif
 |SuccessLane|
@@ -23,7 +23,7 @@ endif
 if (parsing successful?     ) then (yes)
 else (no)
     |FailLane|
-    :Show error Dialog  ;
+    :Show Error Dialog  ;
     stop
 endif
 |SuccessLane|
