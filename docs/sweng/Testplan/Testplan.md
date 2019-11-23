@@ -86,17 +86,18 @@ The whole gui is going to be tested with function tests. All functions are being
 
 | Class           | Test    |
 |-------          |------   |
-| GrobidService  | parserFailsNotification|
-| GrobidService  | parserFailsNotification|
-| GrobidCitationFetcher  | parserFailsNotification|
-| GrobidCitationFetcher  | userCanOverthrowResults|
-| GrobidCitationFetcher  | parseTeiToBibSuccess|
-| GrobidCitationFetcher  | grobidParseRequestWorks|
-| GrobidCitationFetcher  | parsePlainReferenceText|
-| GrobidCitationFetcher    | serverRequestSucceed|
-| GrobidCitationFetcher | TODO |
-| GrobidCitationFetcher | TODO |
-| GrobidCitationFetcher  | TODO |
+| GrobidService  | processValidCitationTest|
+| GrobidService  | processEmptyStringTest|
+| GrobidService  | processInvalidCitationTest|
+| GrobidCitationFetcher  | passGrobidRequestTest|
+| GrobidCitationFetcher  | failingGrobidRequestTest|
+| GrobidCitationFetcher  | grobidParseBibToBibEntryTest|
+| GrobidCitationFetcher  | grobidParseBibToBibEntryReturnsEmptyOptionalWhenFailedTest|
+| GrobidCitationFetcher  | grobidParseBibToBibEntryReturnsNoBibEntryWhenPassingInvalidInputTest |
+| GrobidCitationFetcher    | grobidPerformSearchCorrectlySplitsStringTest |
+| GrobidCitationFetcher | grobidPerformSearchCorrectResultTest |
+| GrobidCitationFetcher | grobidPerformSearchWithEmptyStringsTest |
+| GrobidCitationFetcher  | grobidPerformSearchWithFailsTest |
 
 
 ### **6.2 Function tests**
