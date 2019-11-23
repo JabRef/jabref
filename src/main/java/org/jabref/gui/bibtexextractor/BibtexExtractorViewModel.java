@@ -54,7 +54,8 @@ public class BibtexExtractorViewModel {
         try {
           extractedEntries = new GrobidCitationFetcher(
               JabRefPreferences.getInstance().getImportFormatPreferences(),
-              Globals.getFileUpdateMonitor()
+              Globals.getFileUpdateMonitor(),
+              Globals.prefs
           ).performSearch(inputTextProperty.getValue());
         } catch (FetcherException e) {
           extractedEntries = new ArrayList<>();

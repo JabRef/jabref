@@ -5,10 +5,12 @@ import org.apache.logging.log4j.util.Assert;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.search.SearchParser.StartContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +39,13 @@ public class GrobidCitationFetcherTest {
 
     ImportFormatPreferences importFormatPreferences;
     FileUpdateMonitor fileUpdateMonitor;
+    GrobidCitationFetcher grobidCitationFetcher;
 
     @BeforeEach
     public void setup() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         fileUpdateMonitor = new DummyFileUpdateMonitor();
+        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, JabRefPreferences.getInstance());
     }
 
     /**
@@ -52,7 +56,7 @@ public class GrobidCitationFetcherTest {
     @Test
     public void singleTextResourceParseTest() {
         try {
-            List<BibEntry> s = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor)
+            List<BibEntry> s = grobidCitationFetcher
                     .performSearch("Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching " +
                             "native speakers to listen to foreign-accented speech. Journal of Multilingual and " +
                             "Multicultural Development, 23(4), 245-259.");
@@ -69,7 +73,6 @@ public class GrobidCitationFetcherTest {
    */
   @Test
   public void passGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
     String plainTextExample = "M. C. Potter and R. Mackiewicz, Mechanical Vibration and "
       + "Shock Analysis, 2nd ed. Upper Saddle River, NJ: Pearson Prentice Hall," + " 2015, pp. 17–19.";
     Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
@@ -84,7 +87,6 @@ public class GrobidCitationFetcherTest {
    */
   @Test
   public void failingGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
     String invalidInput = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________"; // should not be a valid input for the grobid parser
     Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
     parseUsingGrobid.setAccessible(true);
@@ -98,7 +100,6 @@ public class GrobidCitationFetcherTest {
    */
   @Test
   public void grobidParseBibToBibEntryTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
     String input = "@article{mrx05, \n"
         + "auTHor = \"Mr. X\", \n"
         + "Title = {Something Great}, \n"
@@ -116,7 +117,6 @@ public class GrobidCitationFetcherTest {
    */
   @Test
   public void grobidParseBibToBibEntryThrowsExceptionWhenFailTest() throws NoSuchMethodException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
     String failInput = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
     Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
     assertThrows(ParseException.class,
@@ -130,7 +130,6 @@ public class GrobidCitationFetcherTest {
   @Test
   public void grobidPerformSearchCorrectlySplitsStringTest()
       throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor);
     String input = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :"
         + " A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,"
         + " R. (2003). Statutes and conventions on international trade law (4th ed.). London, "
@@ -148,7 +147,6 @@ public class GrobidCitationFetcherTest {
   @Test
   public void grobidPerformSearchCorrectResultTest() throws NoSuchMethodException, IllegalAccessException,
       InvocationTargetException {
-    GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences,fileUpdateMonitor);
     String input = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :"
         + " A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,"
         + " R. (2003). Statutes and conventions on international trade law (4th ed.). London, "

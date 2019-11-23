@@ -18,13 +18,19 @@ import java.io.IOException;
  */
 public class GrobidService {
 
-    public static String processCitation(String rawCitation, int consolidateCitations) throws GrobidServiceException {
+    private static JabRefPreferences jabRefPreferences;
+
+    public GrobidService(JabRefPreferences jabRefPreferences) {
+        GrobidService.jabRefPreferences = jabRefPreferences;
+    }
+
+    public String processCitation(String rawCitation, int consolidateCitations) throws GrobidServiceException {
         if (consolidateCitations < 0 || consolidateCitations > 2) {
             throw new GrobidServiceException("");
         }
 
         try {
-            URLDownload urlDownload = new URLDownload(Globals.prefs.get(JabRefPreferences.CUSTOM_GROBID_SERVER)
+            URLDownload urlDownload = new URLDownload(jabRefPreferences.get(JabRefPreferences.CUSTOM_GROBID_SERVER)
                     + "/api/processCitation");
             urlDownload.setPostData("citations=" + rawCitation + "&consolidateCitations=" + consolidateCitations);
             String httpResponse = urlDownload.asString();
