@@ -6,6 +6,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GrobidService;
+import org.jabref.logic.importer.util.GrobidServiceException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -38,40 +39,60 @@ import static org.mockito.Mockito.when;
 
 public class GrobidCitationFetcherTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcherTest.class);
-
-    ImportFormatPreferences importFormatPreferences;
-    FileUpdateMonitor fileUpdateMonitor;
-    GrobidCitationFetcher grobidCitationFetcher;
-    GrobidService grobidService;
-    String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching \" +\n"
-        + "                            \"native speakers to listen to foreign-accented speech. Journal of Multilingual and \" +\n"
-        + "                            \"Multicultural Development, 23(4), 245-259.";
-    String example2 = "M. C. Potter and R. Mackiewicz, Mechanical Vibration and \"\n"
-        + "      + \"Shock Analysis, 2nd ed. Upper Saddle River, NJ: Pearson Prentice Hall,\" + \" 2015, pp. 17–19.";
-    String example3 = "\"Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry :\"\n"
-        + "      + \" A developmental approach. Oxford, England: Oxford University Press. ;; Carr, I., & Kidner,\"\n"
-        + "      + \" R. (2003). Statutes and conventions on international trade law (4th ed.). London, \"\n"
-        + "      + \"England: Cavendish.\"";
-  String bibEntryexample = "@article{mrx05, \n"
-      + "auTHor = \"Mr. X\", \n"
-      + "Title = {Something Great}, \n"
-      + "publisher = \"nob\" # \"ody\"}, \n"
-      + "YEAR = 2005, \n"
-      + "} ";
-  String invalidInput1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________";
-  String invalidInput2 = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
-
-
+    static ImportFormatPreferences importFormatPreferences;
+    static FileUpdateMonitor fileUpdateMonitor;
+    static GrobidCitationFetcher grobidCitationFetcher;
+    static GrobidService grobidService;
+    static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
+    static String example1AsBibtex = "@article{-1,\n" +
+            "author\t=\t\"T Derwing and M Rossiter and M Munro\",\n" +
+            "title\t=\t\"Teaching native speakers to listen to foreign-accented speech\",\n" +
+            "journal\t=\t\"Journal of Multilingual and Multicultural Development\",\n" +
+            "year\t=\t\"2002\",\n" +
+            "pages\t=\t\"245--259\",\n" +
+            "volume\t=\t\"23\",\n" +
+            "number\t=\t\"4\"\n" +
+            "}";
+    static String example2 = "Thomas, H. K. (2004). Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation). University of Colorado, Boulder.";
+    static String example2AsBibtex = "@misc{-1,\n" +
+            "author\t=\t\"H Thomas\",\n" +
+            "title\t=\t\"Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)\",\n" +
+            "year\t=\t\"2004\",\n" +
+            "address\t=\t\"Boulder\"\n" +
+            "}";
+    static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
+    static String example3AsBibtex = "@misc{-1,\n" +
+            "author\t=\t\"J Turk and P Graham and F Verhulst\",\n" +
+            "title\t=\t\"Child and adolescent psychiatry : A developmental approach\",\n" +
+            "publisher\t=\t\"Oxford University Press\",\n" +
+            "year\t=\t\"2007\",\n" +
+            "address\t=\t\"Oxford, England\"\n" +
+            "}";
+    static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
+    static String example4AsBibtex = "@article{-1,\n" +
+            "author\t=\t\"I Carr and R Kidner\",\n" +
+            "booktitle\t=\t\"Statutes and conventions on international trade law\",\n" +
+            "publisher\t=\t\"Cavendish\",\n" +
+            "year\t=\t\"2003\",\n" +
+            "address\t=\t\"London, England\"\n" +
+            "}";
+    static String invalidInput1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________";
+    static String invalidInput2 = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
+    static String defaultReturnValue = "@misc{-1,\n\n}";
 
     @BeforeAll
-    public void setup() {
+    public static void setup() throws GrobidServiceException {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         fileUpdateMonitor = new DummyFileUpdateMonitor();
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, JabRefPreferences.getInstance());
         grobidService = mock(GrobidService.class, Answers.RETURNS_DEEP_STUBS);
         grobidCitationFetcher.setGrobidService(grobidService);
-        //when(grobidService.processCitation(example1)).thenReturn();
+        when(grobidService.processCitation(example1, 1)).thenReturn(example1AsBibtex);
+        when(grobidService.processCitation(example2, 1)).thenReturn(example2AsBibtex);
+        when(grobidService.processCitation(example3, 1)).thenReturn(example3AsBibtex);
+        when(grobidService.processCitation(example4, 1)).thenReturn(example4AsBibtex);
+        when(grobidService.processCitation(invalidInput1, 1)).thenReturn(defaultReturnValue);
+        when(grobidService.processCitation(invalidInput2, 1)).thenReturn(defaultReturnValue);
     }
 
     /**
@@ -80,62 +101,80 @@ public class GrobidCitationFetcherTest {
      * are filled in correctly.
      */
     @Test
-    public void singleTextResourceParseTest() {
-        try {
-            List<BibEntry> s = grobidCitationFetcher
-                    .performSearch(example1);
-            LOGGER.debug(s.get(0).getAuthorTitleYear(100));
-        } catch (FetcherException e) {
-            LOGGER.error("Does not work");
-        }
+    public void singleTextResourceParseTest() throws FetcherException {
+        List<BibEntry> s = grobidCitationFetcher
+                .performSearch(example1);
+        //assertTrue();
+        //LOGGER.debug(s.get(0).getAuthorTitleYear(100));
     }
 
-  /**
-   * Checks if the Grobid parser returns a String if the input is a text reference
-   * which should be able to be parsed. The result should either be empty or not empty but
-   * not null.
-   */
-  @Test
-  public void passGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
-    parseUsingGrobid.setAccessible(true);
-    String output = (String)parseUsingGrobid.invoke(grobidCitationFetcher, example2);
-    assertNotSame(null, output);
-  }
+    /**
+     * Checks if the Grobid parser returns a String if the input is a text reference
+     * which should be able to be parsed. The result should either be empty or not empty but
+     * not null.
+     */
+    @Test
+    public void passGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+      Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
+      parseUsingGrobid.setAccessible(true);
+      assertEquals(example1AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example1));
+      assertEquals(example2AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example2));
+      assertEquals(example3AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example3));
+      assertEquals(example4AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example4));
+    }
 
-  /**
-   * Giving an invalid string as a request to the grobid parser should faild and return an
-   * empty string.
-   */
-  @Test
-  public void failingGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
-    parseUsingGrobid.setAccessible(true);
-    String emptyOutput = (String)parseUsingGrobid.invoke(grobidCitationFetcher, invalidInput1);
-    assertEquals("", emptyOutput);
-  }
+    /**
+     * Giving an invalid string as a request to the grobid parser, should fail and return an
+     * empty bibtex String.
+     */
+    @Test
+    public void failingGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
+        parseUsingGrobid.setAccessible(true);
+        assertEquals(defaultReturnValue, parseUsingGrobid.invoke(grobidCitationFetcher, invalidInput1));
+        assertEquals(defaultReturnValue, parseUsingGrobid.invoke(grobidCitationFetcher, invalidInput2));
+    }
 
+    /**
+     * Tests if the Optional<BibEntry> is filled correctly with the extracted fields from bibtex string..
+     */
+    @Test
+    public void grobidParseBibToBibEntryTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
+        parseBibToBibEntry.setAccessible(true);
+        Optional<BibEntry> bibEntry = (Optional<BibEntry>)parseBibToBibEntry.invoke(grobidCitationFetcher, example1AsBibtex);
+        assertTrue(bibEntry.isPresent());
+        assertEquals(bibEntry.get().getField(StandardField.AUTHOR).get(), "T Derwing and M Rossiter and M Munro");
+        assertEquals(bibEntry.get().getField(StandardField.TITLE).get(), "Teaching native speakers to listen to foreign-accented speech");
+        assertEquals(bibEntry.get().getField(StandardField.JOURNAL).get(), "Journal of Multilingual and Multicultural Development");
+        assertEquals(bibEntry.get().getField(StandardField.YEAR).get(), "2002");
+    }
 
-  /**
-   * Tests if the Optional<BibEntry> is filled correctly with the extracted fields from bibtex string..
-   */
-  @Test
-  public void grobidParseBibToBibEntryTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
-    parseBibToBibEntry.setAccessible(true);
-    Optional<BibEntry> abc = (Optional<BibEntry>)parseBibToBibEntry.invoke(grobidCitationFetcher, bibEntryexample);
-    assertTrue(abc.isPresent());
-  }
+    /**
+     * Checks if parseBibToBibEntry creates a empty BibEntry on empty response
+     */
+    @Test
+    public void grobidParseBibToBibEntryReturnsEmptyOptionalWhenFailedTest() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
+        parseBibToBibEntry.setAccessible(true);
+        Optional<BibEntry> bibEntry = (Optional<BibEntry>)parseBibToBibEntry.invoke(grobidCitationFetcher, defaultReturnValue);
+        assertTrue(bibEntry.isPresent());
+        assertFalse(bibEntry.get().getField(StandardField.AUTHOR).isPresent());
+        assertFalse(bibEntry.get().getField(StandardField.TITLE).isPresent());
+        assertFalse(bibEntry.get().getField(StandardField.YEAR).isPresent());
+        assertFalse(bibEntry.get().getField(StandardField.JOURNAL).isPresent());
+    }
 
-  /**
-   * Checks if parseBibToBibEntry successfully throws an exception if the parsing fails.
-   */
-  @Test
-  public void grobidParseBibToBibEntryThrowsExceptionWhenFailTest() throws NoSuchMethodException {
-    Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
-    assertThrows(ParseException.class,
-        () -> parseBibToBibEntry.invoke(grobidCitationFetcher, invalidInput2));
-  }
+    /**
+     * When the user runs the program without passing anything, no BibEntry is generated (The Optional should be empty)
+     */
+    @Test
+    public void grobidParseBibToBibEntryReturnsNoBibEntryWhenPassingInvalidInputTest() throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Method parseBibToBibEntry = GrobidCitationFetcher.class.getDeclaredMethod("parseBibToBibEntry", String.class);
+        parseBibToBibEntry.setAccessible(true);
+        Optional<BibEntry> bibEntry = (Optional<BibEntry>)parseBibToBibEntry.invoke(grobidCitationFetcher, "");
+        assertFalse(bibEntry.isPresent());
+    }
 
 
   /**
