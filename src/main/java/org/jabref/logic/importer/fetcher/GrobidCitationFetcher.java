@@ -22,10 +22,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
     private ImportFormatPreferences importFormatPreferences;
     private FileUpdateMonitor fileUpdateMonitor;
+    private static ArrayList<String> failedEntries = new ArrayList<>();
 
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        failedEntries = new ArrayList<>();
     }
 
     /**
@@ -62,7 +64,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         } else {
             ArrayList<BibEntry> resultsList = new ArrayList<>();
             for (String reference: plainReferences) {
-                parseBibToBibEntry(parseUsingGrobid(reference)).ifPresent(resultsList::add);
+                parseBibToBibEntry(parseUsingGrobid(reference)).ifPresentOrElse(resultsList::add, () -> failedEntries.add(reference));
             }
             return resultsList;
         }
@@ -71,5 +73,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public String getName() {
         return "GROBID";
+    }
+
+    public static ArrayList<String> getFailedEntries() {
+        return failedEntries;
     }
 }

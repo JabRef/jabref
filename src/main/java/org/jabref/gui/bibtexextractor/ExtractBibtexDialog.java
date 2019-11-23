@@ -20,14 +20,13 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class ExtractBibtexDialog extends BaseDialog<Void> {
 
-    private final Button buttonExtract;
     private final Button buttonParse;
+    private final Button buttonToNewLib;
     @FXML private TextArea input;
-    @FXML private ButtonType extractButtonType;
     @FXML private ButtonType parseButtonType;
-    @FXML private CheckBox directAddBox;
+    @FXML private ButtonType parseToNewLibraryType;
     private BibtexExtractorViewModel viewModel;
-    private EntryByPlainTextViewModel textViewModel;
+    private boolean directAdd;
     @Inject private StateManager stateManager;
 
     public ExtractBibtexDialog() {
@@ -38,12 +37,16 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         input.setPromptText(Localization.lang("Please enter the text to extract from."));
         input.selectAll();
 
-        buttonExtract = (Button) getDialogPane().lookupButton(extractButtonType);
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
-        buttonParse.setOnAction(event -> textViewModel.startParsing(directAddBox.isSelected()));
-        buttonExtract.setOnAction(e -> viewModel.startExtraction());
+        buttonToNewLib = (Button) getDialogPane().lookupButton(parseToNewLibraryType);
+        buttonParse.setOnAction(event -> {
+            directAdd = false;
+            viewModel.startParsing(directAdd);});
+        buttonToNewLib.setOnAction(event ->{
+          directAdd = true;
+          viewModel.startParsing(directAdd);});
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
-        buttonExtract.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
+        buttonToNewLib.disableProperty().bind(viewModel.inputTextProperty().isEmpty());
 
     }
 
@@ -51,8 +54,6 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         this.viewModel = new BibtexExtractorViewModel(database);
-        this.textViewModel = new EntryByPlainTextViewModel(database);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
-        input.textProperty().bindBidirectional(textViewModel.inputTextProperty());
     }
 }
