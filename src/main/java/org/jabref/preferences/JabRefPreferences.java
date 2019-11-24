@@ -916,6 +916,7 @@ public class JabRefPreferences implements PreferencesService {
             return get(DEFAULT_OWNER);
         }
     }
+
     @Override
     public String getTheme() {
         return get(FX_THEME);
