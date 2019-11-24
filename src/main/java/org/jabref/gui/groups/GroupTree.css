@@ -29,14 +29,6 @@
     -fx-fill: -jr-group-hits-fg;
 }
 
-.numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
-}
-
-.numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
-}
-
 .disclosureNodeColumn {
     -fx-alignment: top-right;
 }

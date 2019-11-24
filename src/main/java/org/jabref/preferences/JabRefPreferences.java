@@ -912,6 +912,11 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
+    public String getTheme() {
+        return get(FX_THEME);
+    }
+
     /**
      * Get a Map of default tab names to deafult tab fields.
      * The fields are returned as a String with fields separated by ;
