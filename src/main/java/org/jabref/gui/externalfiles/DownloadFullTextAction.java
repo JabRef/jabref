@@ -30,16 +30,16 @@ import org.slf4j.LoggerFactory;
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
-public class FindFullTextAction extends SimpleCommand {
+public class DownloadFullTextAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FindFullTextAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFullTextAction.class);
     // The minimum number of selected entries to ask the user for confirmation
     private static final int WARNING_LIMIT = 5;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
-    public FindFullTextAction(BasePanel basePanel) {
+    public DownloadFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
         this.dialogService = basePanel.frame().getDialogService();
     }
@@ -54,14 +54,14 @@ public class FindFullTextAction extends SimpleCommand {
 
         if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             boolean confirmDownload = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Look up full text documents"),
+                    Localization.lang("Download full text documents"),
                     Localization.lang(
-                            "You are about to look up full text documents for %0 entries.",
+                            "You are about to download full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
                             + Localization.lang("JabRef will send at least one request per entry to a publisher.")
                             + "\n"
                             + Localization.lang("Do you still want to continue?"),
-                    Localization.lang("Look up full text documents"),
+                    Localization.lang("Download full text documents"),
                     Localization.lang("Cancel"));
 
             if (!confirmDownload) {
@@ -87,7 +87,7 @@ public class FindFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value -> downloadFullTexts(findFullTextsTask.getValue()));
 
         dialogService.showProgressDialogAndWait(
-                Localization.lang("Look up full text documents"),
+                Localization.lang("Download full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
 
@@ -100,17 +100,15 @@ public class FindFullTextAction extends SimpleCommand {
             Optional<URL> result = download.getValue();
             if (result.isPresent()) {
                 Optional<Path> dir = basePanel.getBibDatabaseContext().getFirstExistingFileDir(Globals.prefs.getFilePreferences());
-
-                if (!dir.isPresent()) {
-
+                if (dir.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
                                     + " -> " + Localization.lang("File"));
                     return;
                 }
-                //Download and link full text
-                addLinkedFileFromURL(result.get(), entry, dir.get());
 
+                // Download and link full text
+                addLinkedFileFromURL(result.get(), entry, dir.get());
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
@@ -130,7 +128,6 @@ public class FindFullTextAction extends SimpleCommand {
         LinkedFile newLinkedFile = new LinkedFile(url, "");
 
         if (!entry.getFiles().contains(newLinkedFile)) {
-
             LinkedFileViewModel onlineFile = new LinkedFileViewModel(
                     newLinkedFile,
                     entry,
@@ -138,7 +135,7 @@ public class FindFullTextAction extends SimpleCommand {
                     Globals.TASK_EXECUTOR,
                     dialogService,
                     JabRefPreferences.getInstance().getXMPPreferences(),
-                    JabRefPreferences.getInstance().getFilePreferences(), 
+                    JabRefPreferences.getInstance().getFilePreferences(),
                     ExternalFileTypes.getInstance());
 
             try {
