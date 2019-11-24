@@ -399,7 +399,7 @@ public abstract class DBMSProcessor {
     /**
      * Removes the shared bibEntry.
      *
-     * @param bibEntry {@link BibEntry} to be deleted
+     * @param bibEntries {@link BibEntry} to be deleted
      */
     public void removeEntries(List<BibEntry> bibEntries) {
         StringBuilder query = new StringBuilder()
@@ -408,9 +408,7 @@ public abstract class DBMSProcessor {
                 .append(" WHERE ")
                 .append(escape("SHARED_ID"))
                 .append(" IN (");
-        for (int i = 0; i < bibEntries.size() - 1; i++) {
-            query.append("?, ");
-        }
+        query.append("?, ".repeat(bibEntries.size() - 1));
         query.append("?)");
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {

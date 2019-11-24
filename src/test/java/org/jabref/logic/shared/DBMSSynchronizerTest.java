@@ -1,7 +1,6 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
