@@ -22,11 +22,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
     private ImportFormatPreferences importFormatPreferences;
     private FileUpdateMonitor fileUpdateMonitor;
-    private static ArrayList<String> failedEntries = new ArrayList<>();
+    private GrobidService grobidService;
+    private static List<String> failedEntries = new ArrayList<>();
 
-    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
+    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        grobidService = new GrobidService(jabRefPreferences);
         failedEntries = new ArrayList<>();
     }
 
@@ -34,9 +36,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * Passes request to grobid server, using consolidateCitations option to improve result.
      * Takes a while, since the server has to look up the entry.
      */
-    private static String parseUsingGrobid(String plainText) throws FetcherException {
+    private String parseUsingGrobid(String plainText) throws FetcherException {
         try {
-            return GrobidService.processCitation(plainText, 1);
+            return grobidService.processCitation(plainText, 1);
         } catch (GrobidServiceException e) {
             throw new FetcherException("The Pipeline failed to get the results from the GROBID client", e);
         }
@@ -75,7 +77,14 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         return "GROBID";
     }
 
-    public static ArrayList<String> getFailedEntries() {
+  /**
+   * This method is only used for testing purposes.
+   */
+  public void setGrobidService(GrobidService grobidService) {
+    this.grobidService = grobidService;
+    }
+
+    public static List<String> getFailedEntries() {
         return failedEntries;
     }
 }
