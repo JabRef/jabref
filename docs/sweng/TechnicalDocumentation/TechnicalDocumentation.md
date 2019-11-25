@@ -70,7 +70,7 @@ The design, which is created in awareness of the goals specified [here](3-Design
 
 ### **5.1 Static**
 This diagram shows the java classes involved in the feature with their respective links.
-![image](classDiagram.png)
+![image](classDiagram.PNG)
 
 ### **5.2 Dynamic**
 The following diagrams allow some deeper insights into the working principle of the feature. <br>
