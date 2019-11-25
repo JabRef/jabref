@@ -70,22 +70,22 @@ The design, which is created in awareness of the goals specified [here](3-Design
 
 ### **5.1 Static**
 This diagram shows the java classes involved in the feature with their respective links.
-![image](classDiagram.PNG)
+![image](classDiagram.png)
 
 ### **5.2 Dynamic**
 The following diagrams allow some deeper insights into the working principle of the feature. <br>
 
 **The parsing process**: <br>
 
-![image](SequenceDiagramGrobid.PNG)
+![image](SequenceDiagramGrobid.png)
 
 **GUI interaction process**: <br>
 
-![image](StateDiagramGUI.PNG)
+![image](StateDiagramGUI.png)
 
 **Track plain reference to BibEntry**: <br>
 
-![image](ActivityDiagramTrackPlainEntry.PNG)
+![image](ActivityDiagramTrackPlainEntry.png)
 
 ### **5.3 Logic** (THESE OCL CONSTRAINS ARE OUT OF DATE)
 To explain the logic some further, we formulated 8 logic constrains:
