@@ -77,7 +77,7 @@ The following diagrams allow some deeper insights into the working principle of 
 
 **The parsing process**: <br>
 
-![image](SequenceDiagramPipeLine.PNG)
+![image](SequenceDiagramGrobid.PNG)
 
 **GUI interaction process**: <br>
 

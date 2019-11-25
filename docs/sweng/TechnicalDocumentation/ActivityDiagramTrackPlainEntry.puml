@@ -11,13 +11,7 @@ else (no)
     stop
 endif
 |SuccessLane|
-:Parse TEI to BIB  ;
-if (parsing successful?     ) then (yes)
-else (no)
-    |FailLane|
-    :Show Error Dialog  ;
-    stop
-endif
+
 |SuccessLane|
 :Parse BIB to BibEntry   ;
 if (parsing successful?     ) then (yes)
