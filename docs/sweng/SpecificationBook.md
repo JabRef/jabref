@@ -59,7 +59,8 @@ Developers: Luka Obser, Guenes Aydin, Joey Zgraggen, Nikodem Kernbach
 * /F170/ Jabref should show an appropriate error message when the feature crashes.
 * /F171/ Jabref should not save anything in the library when the feature unpredictably crashes.
 * /F180/ The feature must be accessible again after it was closed
-* /F190/ The user should be able to use a custom grobid server. 
+* /F190/ The user should be able to use a custom grobid server.
+* /F191/ The user can activate the custom grobid server in the preferences menu (advanced tab).  
 
 ## 5. Quality Requirements 
 
