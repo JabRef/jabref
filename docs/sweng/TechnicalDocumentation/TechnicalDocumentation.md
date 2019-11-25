@@ -25,7 +25,7 @@ In case you stumble over an unfamiliar term, please refer to the glossary.
 ## **2 Project overview**
 The feature is an expansion to the existing open source reference manager called **JabRef**. The main goal of the feature is to make it possible for the user to add a new plain text reference (citation) to his existing database. To do so, the user has to:
 
-- Press on the corresponding button in the drop-down context menu. (A pop-up window opens)
+- Press on the corresponding button in the drop-down context menu or the toolbar button. (A pop-up window opens)
 - Paste the plain text reference into the pop-up window.
 - Press on the "Parse"-button.
     - The user also has the option to parse multiple text references.
@@ -77,21 +77,17 @@ The following diagrams allow some deeper insights into the working principle of 
 
 **The parsing process**: <br>
 
-![image](SequenceDiagramPipeLine.PNG)
-
-**Client-side http POST request**: <br>
-
-![image](SequenceDiagramHttpClass.PNG)
+![image](SequenceDiagramGrobid.png)
 
 **GUI interaction process**: <br>
 
-![image](StateDiagramGUI.PNG)
+![image](StateDiagramGUI.png)
 
 **Track plain reference to BibEntry**: <br>
 
-![image](ActivityDiagramTrackPlainEntry.PNG)
+![image](ActivityDiagramTrackPlainEntry.png)
 
-### **5.3 Logic**
+### **5.3 Logic** (THESE OCL CONSTRAINS ARE OUT OF DATE)
 To explain the logic some further, we formulated 8 logic constrains:
 
 - **context** ParserPipeline::parseUsingGrobid **post:** self.grobidPostService != null
@@ -99,6 +95,6 @@ To explain the logic some further, we formulated 8 logic constrains:
 - **context** ParserPipelineException **inv:** self.detailMessage != null
 - **context** ExtractBibtexDialog **inv:** stateManager != null and stateManager.getActiveDatabase() != null
 - **context** ExtractBibtexDialog::initialize **post:** self.viewModel != null and self.textViewModel != null
-- **context** EntryByPlainTextViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
-- **context** EntryByPlainTextViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
-- **context** EntryByPlainTextViewModel::inputTextProperty **pre:** self.inputText != null
+- **context** BibtexExtractorViewModel::startParsing **pre:** self.inputText.getValue() != null and self.bibDatabaseContext.getDatabase() != null
+- **context** BibtexExtractortViewModel::startParsing **post:** !self.bibDatabaseContext.getDatabase().getEntries().isEmpty()
+- **context** BibtexExtractorViewModel::inputTextProperty **pre:** self.inputText != null

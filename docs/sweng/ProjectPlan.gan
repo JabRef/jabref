@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2019-10-20" view-index="0" gantt-divider-location="475" resource-divider-location="300" version="2.8.10" locale="en_US">
+<?xml version="1.0" encoding="UTF-8"?><project name="Untitled Gantt Project" company="" webLink="http://" view-date="2019-10-20" view-index="0" gantt-divider-location="908" resource-divider-location="300" version="2.8.10" locale="en_US">
     <description/>
     <view zooming-state="default:2" id="gantt-chart">
-        <field id="tpd3" name="Name" width="223" order="0"/>
-        <field id="tpd4" name="Begin date" width="124" order="1"/>
-        <field id="tpd5" name="End date" width="124" order="2"/>
-        <option id="taskLabelLeft" value="name"/>
-        <option id="taskLabelRight" value="advancement"/>
+        <field id="tpd3" name="Name" width="367" order="0"/>
+        <field id="tpd4" name="Begin date" width="269" order="1"/>
+        <field id="tpd5" name="End date" width="268" order="2"/>
         <option id="color.recent">
             <![CDATA[#0000cc #009933 #00cc00 #ff6666 #000000]]>
         </option>
@@ -81,7 +79,7 @@ Time cost was: 2h]]>
                 <task id="69" name="Final version milestone 1" color="#8cb6ce" meeting="true" start="2019-11-05" duration="0" complete="100" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
             </task>
         </task>
-        <task id="90" name="Milestone 2" color="#000000" meeting="false" start="2019-10-28" duration="19" complete="59" thirdDate="2019-10-28" thirdDate-constraint="0" expand="true">
+        <task id="90" name="Milestone 2" color="#000000" meeting="false" start="2019-10-28" duration="19" complete="67" thirdDate="2019-10-28" thirdDate-constraint="0" expand="true">
             <task id="247" name="Work on backend" color="#8cb6ce" meeting="false" start="2019-10-28" duration="12" complete="100" thirdDate="2019-10-28" thirdDate-constraint="0" expand="true">
                 <task id="150" name="Select parser for project" color="#8cb6ce" meeting="false" start="2019-10-28" duration="1" complete="100" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
@@ -119,11 +117,10 @@ Time cost was: 4h]]>
 Time cost was: 1h]]>
                     </notes>
                     <depend id="45" type="2" difference="0" hardness="Strong"/>
-                    <depend id="167" type="2" difference="0" hardness="Strong"/>
                     <depend id="168" type="2" difference="0" hardness="Strong"/>
                 </task>
             </task>
-            <task id="216" name="Work on GUI" color="#8cb6ce" meeting="false" start="2019-10-28" duration="7" complete="50" thirdDate="2019-10-28" thirdDate-constraint="0" expand="true">
+            <task id="216" name="Work on GUI" color="#8cb6ce" meeting="false" start="2019-10-28" duration="7" complete="80" thirdDate="2019-10-28" thirdDate-constraint="0" expand="true">
                 <task id="217" name="Add context menu button" color="#8cb6ce" meeting="false" start="2019-10-28" duration="1" complete="100" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
                         <![CDATA[Estimated time cost: 1h
@@ -137,24 +134,18 @@ Time cost was: 2h]]>
 Time cost was: 4h]]>
                     </notes>
                 </task>
-                <task id="223" name="Add verify window" color="#8cb6ce" meeting="false" start="2019-10-31" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
-                    <notes>
-                        <![CDATA[Estimated time cost: 5h]]>
-                    </notes>
-                </task>
-                <task id="218" name="Add success window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <task id="218" name="Add success notifier" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
                         <![CDATA[Estimated time cost: 1h]]>
                     </notes>
                 </task>
                 <task id="219" name="Add failure window" color="#8cb6ce" meeting="false" start="2019-11-04" duration="1" complete="100" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
-                        <![CDATA[Estimated time cost: 1h
-Time cost was: 2h]]>
+                        <![CDATA[Estimated time cost: 1h]]>
                     </notes>
                 </task>
             </task>
-            <task id="127" name="Deadlines" color="#ff6666" meeting="false" start="2019-11-11" duration="7" complete="0" thirdDate="2019-11-12" thirdDate-constraint="0" expand="true">
+            <task id="127" name="Deadlines" color="#ff6666" meeting="false" start="2019-11-11" duration="7" complete="0" thirdDate="2019-11-12" thirdDate-constraint="0" expand="false">
                 <task id="45" name="Milestone 2 deadline" color="#ff6666" meeting="true" start="2019-11-11" duration="0" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true"/>
                 <task id="74" name="Milestone 2 conference" color="#8cb6ce" meeting="true" start="2019-11-13" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
                 <task id="70" name="Final version milestone 2" color="#8cb6ce" meeting="true" start="2019-11-19" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
@@ -162,46 +153,19 @@ Time cost was: 2h]]>
         </task>
         <task id="97" name="Milestone 3" color="#000000" meeting="false" start="2019-11-11" duration="19" complete="0" thirdDate="2019-11-08" thirdDate-constraint="0" expand="true">
             <task id="166" name="Write unit tests" color="#0000cc" meeting="false" start="2019-11-11" duration="4" complete="0" thirdDate="2019-11-06" thirdDate-constraint="0" expand="true">
-                <task id="167" name="pipeline-windows interaction tests" color="#8cb6ce" meeting="false" start="2019-11-11" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
-                    <notes>
-                        <![CDATA[Estimated time cost: 5h]]>
-                    </notes>
-                </task>
                 <task id="168" name="string converter tests" color="#8cb6ce" meeting="false" start="2019-11-11" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
                         <![CDATA[3h]]>
                     </notes>
                 </task>
             </task>
-            <task id="196" name="Write unit tests" color="#0000cc" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="false">
-                <depend id="55" type="2" difference="0" hardness="Strong"/>
-                <task id="197" name="GUI tests" color="#8cb6ce" meeting="false" start="2019-11-20" duration="4" complete="0" thirdDate="2019-10-22" thirdDate-constraint="0" expand="true">
-                    <notes>
-                        <![CDATA[Estimated time cost: 4h]]>
-                    </notes>
-                </task>
-            </task>
-            <task id="177" name="Implement pipeline-windows interaction" color="#8cb6ce" meeting="false" start="2019-11-11" duration="8" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
-                <depend id="196" type="2" difference="0" hardness="Strong"/>
+            <task id="177" name="Implement pipeline-windows interaction" color="#8cb6ce" meeting="false" start="2019-11-11" duration="4" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                 <task id="178" name="Implement pipeline call" color="#8cb6ce" meeting="false" start="2019-11-11" duration="1" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
                         <![CDATA[Estimated time cost: 1h]]>
                     </notes>
                 </task>
-                <task id="179" name="Implement BibtexEntry display" color="#8cb6ce" meeting="false" start="2019-11-12" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
-                    <notes>
-                        <![CDATA[Estimated time cost: 2h]]>
-                    </notes>
-                    <depend id="180" type="2" difference="0" hardness="Strong"/>
-                    <depend id="181" type="2" difference="0" hardness="Strong"/>
-                </task>
-                <task id="180" name="Implement BibtexEntry update" color="#8cb6ce" meeting="false" start="2019-11-15" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
-                    <notes>
-                        <![CDATA[Estimated time cost: 5h]]>
-                    </notes>
-                    <depend id="181" type="2" difference="0" hardness="Strong"/>
-                </task>
-                <task id="181" name="Implement BibtexEntry save" color="#8cb6ce" meeting="false" start="2019-11-18" duration="2" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+                <task id="179" name="Show entryeditor if entry is added" color="#8cb6ce" meeting="false" start="2019-11-12" duration="3" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
                     <notes>
                         <![CDATA[Estimated time cost: 2h]]>
                     </notes>
@@ -230,7 +194,7 @@ Time cost was: 2h]]>
                 <task id="71" name="Final version milestone 3" color="#8cb6ce" meeting="true" start="2019-12-03" duration="0" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true"/>
             </task>
         </task>
-        <task id="100" name="Milestone 4" color="#000000" meeting="false" start="2019-11-25" duration="20" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="true">
+        <task id="100" name="Milestone 4" color="#000000" meeting="false" start="2019-11-25" duration="20" complete="0" thirdDate="2019-10-23" thirdDate-constraint="0" expand="false">
             <task id="311" name="Debugging" color="#8cb6ce" meeting="false" start="2019-11-25" duration="5" complete="0" thirdDate="2019-11-23" thirdDate-constraint="0" expand="true">
                 <notes>
                     <![CDATA[Estimated time cost: 10h]]>
@@ -270,26 +234,18 @@ Time cost was: 2h]]>
         <allocation task-id="133" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="23" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="217" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="223" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="219" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="197" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="178" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="179" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="180" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="311" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="10" resource-id="0" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="23" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="224" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="223" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="218" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="179" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="180" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="181" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="68" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="197" resource-id="1" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="26" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="117" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
-        <allocation task-id="167" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="150" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="153" resource-id="2" function="Default:0" responsible="false" load="100.0"/>
         <allocation task-id="152" resource-id="2" function="Default:0" responsible="false" load="100.0"/>

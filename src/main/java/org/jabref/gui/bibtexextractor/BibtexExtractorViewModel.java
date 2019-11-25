@@ -91,7 +91,7 @@ public class BibtexExtractorViewModel {
           dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
         }
     }
-    JabRefGUI.getMainFrame().getDialogService().notify("Successfully added a new entry.");
+    dialogService.notify("Successfully added a new entry.");
 
 
   }
