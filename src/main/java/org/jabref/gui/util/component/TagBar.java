@@ -30,6 +30,7 @@ public class TagBar<T> extends HBox {
     @FXML private TextField inputTextField;
     @FXML private HBox tagList;
     private BiConsumer<T, MouseEvent> onTagClicked;
+    private Boolean allowsMultiple;
 
     public TagBar() {
         tags = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -62,8 +63,10 @@ public class TagBar<T> extends HBox {
         while (change.next()) {
             if (change.wasRemoved()) {
                 tagList.getChildren().subList(change.getFrom(), change.getFrom() + change.getRemovedSize()).clear();
+                if(!allowsMultiple) { inputTextField.setDisable(false);}
             } else if (change.wasAdded()) {
                 tagList.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::createTag).collect(Collectors.toList()));
+                if(!allowsMultiple) { inputTextField.setDisable(true);}
             }
         }
     }
@@ -81,7 +84,7 @@ public class TagBar<T> extends HBox {
     @FXML
     private void addTextAsNewTag(ActionEvent event) {
         String inputText = inputTextField.getText();
-        if (StringUtil.isNotBlank(inputText)) {
+        if (StringUtil.isNotBlank(inputText)&&(tags.isEmpty()||this.allowsMultiple)) {
             T newTag = stringConverter.fromString(inputText);
             if ((newTag != null) && !tags.contains(newTag)) {
                 tags.add(newTag);
@@ -97,4 +100,6 @@ public class TagBar<T> extends HBox {
     public void setOnTagClicked(BiConsumer<T, MouseEvent> onTagClicked) {
         this.onTagClicked = onTagClicked;
     }
+
+    public void allowsMultipleEntries(Boolean isMultiple) { this.allowsMultiple=isMultiple; }
 }

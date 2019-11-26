@@ -84,8 +84,10 @@ public class FieldEditors {
             } else {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             }
-        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);
+        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers,false);
+        } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers,true);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isSingleLine);
         } else if (StandardField.KEYWORDS.equals(field)) {
