@@ -33,7 +33,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        this.setTitle(Localization.lang("Jabref Parser"));
+        this.setTitle(Localization.lang("JabRef Parser"));
         input.setPromptText(Localization.lang("Please enter the text to extract from."));
         input.selectAll();
 
