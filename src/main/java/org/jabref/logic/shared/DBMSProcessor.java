@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -402,6 +403,10 @@ public abstract class DBMSProcessor {
      * @param bibEntries {@link BibEntry} to be deleted
      */
     public void removeEntries(List<BibEntry> bibEntries) {
+        Objects.requireNonNull(bibEntries);
+        if (bibEntries.isEmpty()) {
+            return;
+        }
         StringBuilder query = new StringBuilder()
                 .append("DELETE FROM ")
                 .append(escape("ENTRY"))

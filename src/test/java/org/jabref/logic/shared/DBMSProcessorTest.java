@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +204,43 @@ class DBMSProcessorTest {
 
         clear(dbmsConnection);
     }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveSingleEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        BibEntry entryToRemove = getBibEntryExample();
+        dbmsProcessor.insertEntry(entryToRemove);
+        dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertFalse(entryResultSet.next());
+        }
+
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveEntriesOnNullThrows(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveEmptyEntryList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        dbmsProcessor.removeEntries(Collections.emptyList());
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertFalse(entryResultSet.next());
+        }
+
+        clear(dbmsConnection);
+    }
+
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
