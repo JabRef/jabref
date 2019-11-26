@@ -17,6 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -64,7 +65,7 @@ public class BibtexExtractorViewModel {
         return null;
       }
     };
-    dialogService.showProgressDialogAndWait("Your text is being parsed..", "Please wait while we are parsing your text", parseUsingGrobid);
+    dialogService.showProgressDialogAndWait(Localization.lang("Your text is being parsed.."),Localization.lang( "Please wait while we are parsing your text"), parseUsingGrobid);
     Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
   }
 
@@ -88,10 +89,10 @@ public class BibtexExtractorViewModel {
           }
       }
         if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
-          dialogService.showWarningDialogAndWait("Grobid failed to parse the following Entries:", String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
+          dialogService.showWarningDialogAndWait(Localization.lang("Grobid failed to parse the following entries:"), String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
         }
     }
-    dialogService.notify("Successfully added a new entry.");
+    dialogService.notify(Localization.lang("Successfully added a new entry."));
 
 
   }
