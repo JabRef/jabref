@@ -66,7 +66,7 @@ public abstract class DBMSProcessor {
      *
      * @return <code>true</code> if the structure is old, else <code>false</code>.
      */
-    public boolean checkForPare3Dot6Integrity() throws SQLException {
+    public boolean databaseIsAtMostJabRef35() throws SQLException {
         return checkTableAvailability(
                 "ENTRIES",
                 "ENTRY_GROUP",
@@ -439,7 +439,14 @@ public abstract class DBMSProcessor {
         return Optional.empty();
     }
 
+    /**
+     * Queries the database for shared entries. Optionally, they are filtered by the given list of sharedIds
+     *
+     * @param sharedIDs the list of Ids to filter. If list is empty, then no filter is applied
+     */
     public List<BibEntry> getSharedEntries(List<Integer> sharedIDs) {
+        Objects.requireNonNull(sharedIDs);
+
         List<BibEntry> sharedEntries = new ArrayList<>();
 
         StringBuilder query = new StringBuilder();

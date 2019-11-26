@@ -6,6 +6,9 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
+/**
+ * Stores the credentials for the test systems
+ */
 @DatabaseTest
 public class TestConnector {
 
@@ -15,18 +18,15 @@ public class TestConnector {
     }
 
     public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
-        if (dbmsType == DBMSType.MYSQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "", false, "");
+        switch (dbmsType) {
+            case MYSQL:
+                return new DBMSConnectionProperties(dbmsType, "127.0.0.1", 3800, "jabref", "root", "root", false, "");
+            case POSTGRESQL:
+                return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "postgres", "postgres", "postgres", false, "");
+            case ORACLE:
+                return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis", false, "");
+            default:
+                return new DBMSConnectionProperties();
         }
-
-        if (dbmsType == DBMSType.POSTGRESQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "postgres", "", false, "");
-        }
-
-        if (dbmsType == DBMSType.ORACLE) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis", false, "");
-        }
-
-        return new DBMSConnectionProperties();
     }
 }

@@ -19,8 +19,11 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,33 +32,44 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @DatabaseTest
+@Execution(ExecutionMode.SAME_THREAD)
 class DBMSProcessorTest {
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testCheckBaseIntegrity(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    private DBMSConnection dbmsConnection;
+    private DBMSProcessor dbmsProcessor;
+    private DBMSType dbmsType;
+
+    @BeforeEach
+    public void setup() throws Exception {
+        this.dbmsType = TestManager.getDBMSTypeTestParameter();
+        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType));
+        TestManager.clearTables(this.dbmsConnection);
+    }
+
+    @AfterEach
+    public void clear() throws SQLException {
+        this.dbmsConnection.getConnection().close();
+    }
+
+    @Test
+    void testCheckBaseIntegrity() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
-        clear(dbmsConnection);
+        TestManager.clearTables(this.dbmsConnection);
         assertFalse(dbmsProcessor.checkBaseIntegrity());
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testSetUpSharedDatabase(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testSetUpSharedDatabase() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
-        clear(dbmsConnection);
+        clear();
         dbmsProcessor.setupSharedDatabase();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testInsertEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testInsertEntry() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
 
@@ -84,12 +98,10 @@ class DBMSProcessorTest {
         Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
 
         assertEquals(expectedFieldMap, actualFieldMap);
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testUpdateEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+    @Test
+    void testUpdateEntry() throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(expectedEntry);
@@ -101,14 +113,11 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(expectedEntry);
 
         Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
-        assertEquals(expectedEntry, actualEntry.get());
-
-        clear(dbmsConnection);
+        assertEquals(Optional.of(expectedEntry), actualEntry);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetEntriesByIdList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+    @Test
+    void testGetEntriesByIdList() throws Exception {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
@@ -120,16 +129,11 @@ class DBMSProcessorTest {
 
         List<BibEntry> sharedEntriesByIdList = dbmsProcessor.getSharedEntries(Arrays.asList(1, 2));
 
-        clear(dbmsConnection);
-
-        assertEquals(firstEntry, sharedEntriesByIdList.get(0));
-        assertEquals(secondEntry, sharedEntriesByIdList.get(1));
-
+        assertEquals(List.of(firstEntry, secondEntry), sharedEntriesByIdList);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testUpdateNewerEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+    @Test
+    void testUpdateNewerEntry() throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry bibEntry = getBibEntryExample();
 
@@ -140,13 +144,10 @@ class DBMSProcessorTest {
         bibEntry.setField(StandardField.YEAR, "1993");
 
         assertThrows(OfflineLockException.class, () -> dbmsProcessor.updateEntry(bibEntry));
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testUpdateEqualEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+    @Test
+    void testUpdateEqualEntry() throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedBibEntry = getBibEntryExample();
 
@@ -156,16 +157,13 @@ class DBMSProcessorTest {
         dbmsProcessor.updateEntry(expectedBibEntry);
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor
-                                                                 .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
+                .getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
-        assertEquals(expectedBibEntry, actualBibEntryOptional.get());
-
-        clear(dbmsConnection);
+        assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveAllEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testRemoveAllEntries() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
@@ -177,12 +175,10 @@ class DBMSProcessorTest {
         try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(resultSet.next());
         }
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveSomeEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testRemoveSomeEntries() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
@@ -201,13 +197,10 @@ class DBMSProcessorTest {
             assertEquals(2, entryResultSet.getInt("SHARED_ID"));
             assertFalse(entryResultSet.next());
         }
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveSingleEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testRemoveSingleEntry() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry entryToRemove = getBibEntryExample();
         dbmsProcessor.insertEntry(entryToRemove);
@@ -216,49 +209,38 @@ class DBMSProcessorTest {
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());
         }
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveEntriesOnNullThrows(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testRemoveEntriesOnNullThrows() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveEmptyEntryList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testRemoveEmptyEntryList() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         dbmsProcessor.removeEntries(Collections.emptyList());
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());
         }
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetSharedEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testGetSharedEntries() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
 
-        List<BibEntry> expectedEntries = Arrays.asList(bibEntry);
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
-        assertEquals(expectedEntries, actualEntries);
-        clear(dbmsConnection);
+        assertEquals(List.of(bibEntry), actualEntries);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetSharedEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testGetSharedEntry() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
 
@@ -266,23 +248,18 @@ class DBMSProcessorTest {
 
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(expectedBibEntry.getSharedBibEntryData().getSharedID());
 
-        assertEquals(expectedBibEntry, actualBibEntryOptional.get());
-        clear(dbmsConnection);
+        assertEquals(Optional.of(expectedBibEntry), actualBibEntryOptional);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetNotExistingSharedEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testGetNotExistingSharedEntry() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetSharedIDVersionMapping(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws OfflineLockException, SQLException {
+    @Test
+    void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
         dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
@@ -298,13 +275,10 @@ class DBMSProcessorTest {
         Map<Integer, Integer> actualIDVersionMap = dbmsProcessor.getSharedIDVersionMapping();
 
         assertEquals(expectedIDVersionMap, actualIDVersionMap);
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testGetSharedMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testGetSharedMetaData() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
@@ -315,12 +289,10 @@ class DBMSProcessorTest {
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMetaData, actualMetaData);
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("getTestingDatabaseSystems")
-    void testSetSharedMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    @Test
+    void testSetSharedMetaData() throws SQLException {
         dbmsProcessor.setupSharedDatabase();
         Map<String, String> expectedMetaData = getMetaDataExample();
         dbmsProcessor.setSharedMetaData(expectedMetaData);
@@ -328,7 +300,6 @@ class DBMSProcessorTest {
         Map<String, String> actualMetaData = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMetaData, actualMetaData);
-        clear(dbmsConnection);
     }
 
     private Map<String, String> getMetaDataExample() {
@@ -343,22 +314,21 @@ class DBMSProcessorTest {
     }
 
     private BibEntry getBibEntryExampleWithEmptyFields() {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.AUTHOR, "Author");
-        bibEntry.setField(StandardField.TITLE, "");
-        bibEntry.setField(StandardField.YEAR, "");
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Author")
+                .withField(StandardField.TITLE, "")
+                .withField(StandardField.YEAR, "");
         bibEntry.getSharedBibEntryData().setSharedID(1);
         return bibEntry;
     }
 
     private BibEntry getBibEntryExample() {
-        BibEntry bibEntry = new BibEntry(StandardEntryType.InProceedings);
-        bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L");
-        bibEntry.setField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor");
-        bibEntry.setField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on");
-        bibEntry.setField(StandardField.YEAR, "1994");
-        bibEntry.setCiteKey("nanoproc1994");
-        return bibEntry;
+        return new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L")
+                .withField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor")
+                .withField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on")
+                .withField(StandardField.YEAR, "1994")
+                .withCiteKey("nanoproc1994");
     }
 
     private ResultSet selectFrom(String table, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
@@ -375,8 +345,8 @@ class DBMSProcessorTest {
     private void insertMetaData(String key, String value, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) {
         try {
             dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA", dbmsProcessor) + "("
-                                                                           + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
-                                                                           + escapeValue(key) + ", " + escapeValue(value) + ")");
+                    + escape("KEY", dbmsProcessor) + ", " + escape("VALUE", dbmsProcessor) + ") VALUES("
+                    + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
             fail(e.getMessage());
         }
@@ -388,9 +358,5 @@ class DBMSProcessorTest {
 
     private String escapeValue(String value) {
         return "'" + value + "'";
-    }
-
-    void clear(DBMSConnection dbmsConnection) throws SQLException {
-        TestManager.clearTables(dbmsConnection);
     }
 }

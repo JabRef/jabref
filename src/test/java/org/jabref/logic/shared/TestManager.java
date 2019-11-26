@@ -1,13 +1,8 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.Objects;
 
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.database.shared.DBMSType;
 
 /**
@@ -16,21 +11,15 @@ import org.jabref.model.database.shared.DBMSType;
  */
 public class TestManager {
 
-    public static Collection<DBMSType> getDBMSTypeTestParameter() {
-
-        Set<DBMSType> dbmsTypes = new HashSet<>();
-        for (DBMSType dbmsType : DBMSType.values()) {
-            try {
-                TestConnector.getTestDBMSConnection(dbmsType);
-                dbmsTypes.add(dbmsType);
-            } catch (SQLException | InvalidDBMSConnectionPropertiesException e) {
-                // skip parameter
-            }
-        }
-        return dbmsTypes;
+    /**
+     * Determine the DBMSType to test from the environment variable "DMBS". In case that variable is not set, use "PostgreSQL" as default
+     */
+    public static DBMSType getDBMSTypeTestParameter() {
+        return DBMSType.fromString(System.getenv("DBMS")).orElse(DBMSType.POSTGRESQL);
     }
 
     public static void clearTables(DBMSConnection dbmsConnection) throws SQLException {
+        Objects.requireNonNull(dbmsConnection);
         DBMSType dbmsType = dbmsConnection.getProperties().getType();
 
         if (dbmsType == DBMSType.MYSQL) {
@@ -51,14 +40,4 @@ public class TestManager {
         }
     }
 
-    static Stream<Object[]> getTestingDatabaseSystems() throws InvalidDBMSConnectionPropertiesException, SQLException {
-        Collection<Object[]> result = new ArrayList<>();
-        for (DBMSType dbmsType : getDBMSTypeTestParameter()) {
-            result.add(new Object[]{
-                    dbmsType,
-                    TestConnector.getTestDBMSConnection(dbmsType),
-                    DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType))});
-        }
-        return result.stream();
-    }
 }

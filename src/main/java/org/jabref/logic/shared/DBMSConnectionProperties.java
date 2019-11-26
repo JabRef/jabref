@@ -117,7 +117,13 @@ public class DBMSConnectionProperties implements DatabaseConnectionProperties {
     }
 
     public String getUrl() {
-        return type.getUrl(host, port, database);
+        String url = type.getUrl(host, port, database);
+        if (this.type == DBMSType.MYSQL) {
+            // quickfix - see https://mysqlconnector.net/troubleshooting/retrieval-public-key/
+            url += "?allowPublicKeyRetrieval=true";
+            url += "&useSSL=" + this.isUseSSL();
+        }
+        return url;
     }
 
     @Override

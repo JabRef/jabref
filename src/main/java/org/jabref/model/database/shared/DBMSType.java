@@ -51,11 +51,15 @@ public enum DBMSType {
     }
 
     public static Optional<DBMSType> fromString(String typeName) {
-        try {
-            return Optional.of(Enum.valueOf(DBMSType.class, typeName.toUpperCase(Locale.ENGLISH)));
-        } catch (IllegalArgumentException exception) {
+        if (typeName == null) {
             return Optional.empty();
+        } else {
+            try {
+                return Optional.of(Enum.valueOf(DBMSType.class, typeName.toUpperCase(Locale.ENGLISH)));
+            } catch (IllegalArgumentException exception) {
+                // IllegalArgumentException is thrown if "typename" is not covered by the Enum
+                return Optional.empty();
+            }
         }
     }
-
 }
