@@ -3,6 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,15 +165,79 @@ class DBMSProcessorTest {
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    void testRemoveEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+    void testRemoveAllEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
         dbmsProcessor.setupSharedDatabase();
-        BibEntry bibEntry = getBibEntryExample();
-        dbmsProcessor.insertEntry(bibEntry);
-        dbmsProcessor.removeEntry(bibEntry);
+        BibEntry firstEntry = getBibEntryExample();
+        BibEntry secondEntry = getBibEntryExample();
+        List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, secondEntry);
+        dbmsProcessor.insertEntry(firstEntry);
+        dbmsProcessor.insertEntry(secondEntry);
+        dbmsProcessor.removeEntries(entriesToRemove);
 
         try (ResultSet resultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(resultSet.next());
         }
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveSomeEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        BibEntry firstEntry = getBibEntryExample();
+        BibEntry secondEntry = getBibEntryExample();
+        BibEntry thirdEntry = getBibEntryExample();
+
+        // Remove the first and third entries - the second should remain (SHARED_ID will be 2)
+
+        List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, thirdEntry);
+        dbmsProcessor.insertEntry(firstEntry);
+        dbmsProcessor.insertEntry(secondEntry);
+        dbmsProcessor.insertEntry(thirdEntry);
+        dbmsProcessor.removeEntries(entriesToRemove);
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertTrue(entryResultSet.next());
+            assertEquals(2, entryResultSet.getInt("SHARED_ID"));
+            assertFalse(entryResultSet.next());
+        }
+
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveSingleEntry(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        BibEntry entryToRemove = getBibEntryExample();
+        dbmsProcessor.insertEntry(entryToRemove);
+        dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertFalse(entryResultSet.next());
+        }
+
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveEntriesOnNullThrows(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
+        clear(dbmsConnection);
+    }
+
+    @ParameterizedTest
+    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
+    void testRemoveEmptyEntryList(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
+        dbmsProcessor.setupSharedDatabase();
+        dbmsProcessor.removeEntries(Collections.emptyList());
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertFalse(entryResultSet.next());
+        }
+
         clear(dbmsConnection);
     }
 

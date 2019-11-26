@@ -1,7 +1,6 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -90,7 +89,7 @@ public class DBMSSynchronizerTest {
 
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
+    public void testEntriesRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
         setUp(dbmsConnection);
 
         BibEntry bibEntry = getBibEntryExample(1);
@@ -162,10 +161,9 @@ public class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntry(expectedBibEntries.get(0));
-        dbmsProcessor.removeEntry(expectedBibEntries.get(1));
+        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.get(0)));
 
-        expectedBibEntries = new ArrayList<>();
+        expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
