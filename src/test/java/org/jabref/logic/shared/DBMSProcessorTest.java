@@ -241,7 +241,6 @@ class DBMSProcessorTest {
         clear(dbmsConnection);
     }
 
-
     @ParameterizedTest
     @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
     void testGetSharedEntries(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws SQLException {
