@@ -130,7 +130,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("Medline", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-online-bibliographic-database/medline", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

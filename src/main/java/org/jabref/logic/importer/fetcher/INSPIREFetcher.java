@@ -8,8 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -28,6 +26,10 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Fetches data from the INSPIRE database.
@@ -73,11 +75,14 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
 
             List<BibEntry> entries = new ArrayList<>();
             BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
-            Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
-            Matcher matcher = pattern.matcher(response);
-            while (matcher.find()) {
-                String bibtexEntryString = matcher.group(1);
-                entries.addAll(bibtexParser.parseEntries(bibtexEntryString));
+
+            Document doc = Jsoup.parse(response);
+            Elements preElements = doc.getElementsByTag("pre");
+
+            for (Element elem : preElements) {
+                //TODO: Second and third entry are not parsed
+                List<BibEntry> entry = bibtexParser.parseEntries(elem.wholeText());
+                entries.addAll(entry);
             }
             return entries;
         };

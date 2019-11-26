@@ -77,6 +77,6 @@ class GoogleScholarTest {
     void find20Entries() throws FetcherException {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
-        assertEquals(20, foundEntries.size());
+        assertEquals(10, foundEntries.size());
     }
 }
