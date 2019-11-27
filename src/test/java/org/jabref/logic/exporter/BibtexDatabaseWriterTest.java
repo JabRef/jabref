@@ -287,6 +287,38 @@ class BibtexDatabaseWriterTest {
                         + "@Comment{jabref-entrytype: customizedtype: req[author;date;title] opt[month;publisher;year]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
+    
+    @Test
+    void writeCustomizedTypesInAlphabeticalOrder() throws Exception {
+        EntryType customizedType = new UnknownEntryType("customizedType");
+        EntryType otherCustomizedType = new UnknownEntryType("otherCustomizedType");
+        BibEntryType customizedBibType = new BibEntryType(
+                customizedType,
+                Collections.singletonList(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
+                Collections.singletonList(new OrFields(StandardField.TITLE)));
+        BibEntryType otherCustomizedBibType = new BibEntryType(
+                otherCustomizedType,
+                Collections.singletonList(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
+                Collections.singletonList(new OrFields(StandardField.TITLE)));
+        entryTypesManager.addCustomOrModifiedType(otherCustomizedBibType, BibDatabaseMode.BIBTEX);
+        entryTypesManager.addCustomOrModifiedType(customizedBibType, BibDatabaseMode.BIBTEX);
+        BibEntry entry = new BibEntry(customizedType);
+        BibEntry otherEntry = new BibEntry(otherCustomizedType);
+        database.insertEntry(otherEntry);
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, Arrays.asList(entry, otherEntry));
+
+        assertEquals(
+                OS.NEWLINE
+                        + "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Othercustomizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-meta: databaseType:bibtex;}"
+                        + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype: customizedtype: req[title] opt[]}" + OS.NEWLINE + OS.NEWLINE
+                        + "@Comment{jabref-entrytype: othercustomizedtype: req[title] opt[]}" + OS.NEWLINE,
+                stringWriter.toString());
+    }
 
     @Test
     void roundtripWithArticleMonths() throws Exception {
