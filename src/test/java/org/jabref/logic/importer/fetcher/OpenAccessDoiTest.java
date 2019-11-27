@@ -29,7 +29,7 @@ class OpenAccessDoiTest {
     void findByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1038/nature12373");
 
-        assertEquals(Optional.of(new URL("https://dash.harvard.edu/bitstream/1/12285462/Nanometer-Scale%20Thermometry.pdf?sequence=1")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://dash.harvard.edu/bitstream/1/12285462/1/Nanometer-Scale%20Thermometry.pdf")), finder.findFullText(entry));
     }
 
     @Test
