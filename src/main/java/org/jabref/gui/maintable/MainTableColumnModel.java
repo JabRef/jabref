@@ -67,9 +67,9 @@ public class MainTableColumnModel {
         }
     }
 
-    private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
-    private final StringProperty qualifierProperty = new SimpleStringProperty("");
-    private final DoubleProperty widthProperty = new SimpleDoubleProperty(ColumnPreferences.DEFAULT_WIDTH);
+    private final ObjectProperty<Type> typeProperty;
+    private final StringProperty qualifierProperty;
+    private final DoubleProperty widthProperty;
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
@@ -77,10 +77,19 @@ public class MainTableColumnModel {
      * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
-    public MainTableColumnModel(Type type, String qualifier) {
+    public MainTableColumnModel(Type type, String qualifier, double width) {
         Objects.requireNonNull(type);
-        this.typeProperty.setValue(type);
-        this.qualifierProperty.setValue(qualifier);
+        typeProperty = new SimpleObjectProperty<>(type);
+        qualifierProperty = new SimpleStringProperty(qualifier);
+        widthProperty = new SimpleDoubleProperty(width);
+    }
+
+    public MainTableColumnModel(Type type, String qualifier) {
+        this(type, qualifier, ColumnPreferences.DEFAULT_WIDTH);
+    }
+
+    public MainTableColumnModel(Type type, double width) {
+        this(type, "", width);
     }
 
     public MainTableColumnModel(Type type) {
@@ -111,6 +120,10 @@ public class MainTableColumnModel {
     }
 
     public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
+
+    public double getWidth() {
+        return widthProperty.get();
+    }
 
     public DoubleProperty widthProperty() { return widthProperty; }
 
