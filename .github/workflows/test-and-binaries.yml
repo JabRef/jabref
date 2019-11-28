@@ -127,6 +127,7 @@ jobs:
         env:
           DBMS: "mysql"
   testpostgres:
+    name: Test on PostgreSQL
     runs-on: ubuntu-latest
     needs: build
     services:
