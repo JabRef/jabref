@@ -42,6 +42,21 @@ jobs:
          ref=${ref%/merge}
          echo "##[set-output name=branch;]${ref}"
       id: extract_branch
+    - name: Fetch tags and master for GitVersion
+      run: |
+          git fetch --tags
+          git branch --create-reflog master origin/master
+    - name: Install GitVersion
+      uses: gittools/use-gitversion/setup@v0.2
+      with:
+          versionSpec: '5.1.x'
+    - name: Run GitVersion
+      id: gitversion
+      uses: gittools/use-gitversion/execute@v0.2
+    - name: Test GitVersion
+      run: |
+        echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+        echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
