@@ -56,7 +56,8 @@ jobs:
     - name: Test GitVersion
       run: |
         echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
-        echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+        echo "AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}"
+        echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
