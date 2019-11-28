@@ -1,5 +1,6 @@
 package org.jabref.model.database.shared;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -51,15 +52,6 @@ public enum DBMSType {
     }
 
     public static Optional<DBMSType> fromString(String typeName) {
-        if (typeName == null) {
-            return Optional.empty();
-        } else {
-            try {
-                return Optional.of(Enum.valueOf(DBMSType.class, typeName.toUpperCase(Locale.ENGLISH)));
-            } catch (IllegalArgumentException exception) {
-                // IllegalArgumentException is thrown if "typename" is not covered by the Enum
-                return Optional.empty();
-            }
-        }
+        return Arrays.stream(DBMSType.values()).filter(dbmsType -> dbmsType.type.equalsIgnoreCase(typeName)).findAny();
     }
 }

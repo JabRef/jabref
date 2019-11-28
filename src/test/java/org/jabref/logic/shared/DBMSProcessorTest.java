@@ -45,32 +45,27 @@ class DBMSProcessorTest {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(TestConnector.getTestDBMSConnection(dbmsType));
         TestManager.clearTables(this.dbmsConnection);
+        dbmsProcessor.setupSharedDatabase();
     }
 
     @AfterEach
-    public void clear() throws SQLException {
+    public void closeDbmsConnection() throws SQLException {
         this.dbmsConnection.getConnection().close();
     }
 
     @Test
-    void testCheckBaseIntegrity() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void databaseIntegrityFullFiledAfterSetup() throws SQLException {
         assertTrue(dbmsProcessor.checkBaseIntegrity());
+    }
+
+    @Test
+    void databaseIntegrityBrokenAfterClearedTables() throws SQLException {
         TestManager.clearTables(this.dbmsConnection);
         assertFalse(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
-    void testSetUpSharedDatabase() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
-        clear();
-        dbmsProcessor.setupSharedDatabase();
-        assertTrue(dbmsProcessor.checkBaseIntegrity());
-    }
-
-    @Test
     void testInsertEntry() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedEntry);
@@ -102,7 +97,6 @@ class DBMSProcessorTest {
 
     @Test
     void testUpdateEntry() throws Exception {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry expectedEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -118,7 +112,6 @@ class DBMSProcessorTest {
 
     @Test
     void testGetEntriesByIdList() throws Exception {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
@@ -133,8 +126,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testUpdateNewerEntry() throws OfflineLockException, SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testUpdateNewerEntry() {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -148,7 +140,6 @@ class DBMSProcessorTest {
 
     @Test
     void testUpdateEqualEntry() throws OfflineLockException, SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -164,7 +155,6 @@ class DBMSProcessorTest {
 
     @Test
     void testRemoveAllEntries() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
         List<BibEntry> entriesToRemove = Arrays.asList(firstEntry, secondEntry);
@@ -179,7 +169,6 @@ class DBMSProcessorTest {
 
     @Test
     void testRemoveSomeEntries() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
         BibEntry thirdEntry = getBibEntryExample();
@@ -201,7 +190,6 @@ class DBMSProcessorTest {
 
     @Test
     void testRemoveSingleEntry() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry entryToRemove = getBibEntryExample();
         dbmsProcessor.insertEntry(entryToRemove);
         dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
@@ -212,14 +200,12 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testRemoveEntriesOnNullThrows() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testRemoveEntriesOnNullThrows() {
         assertThrows(NullPointerException.class, () -> dbmsProcessor.removeEntries(null));
     }
 
     @Test
     void testRemoveEmptyEntryList() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         dbmsProcessor.removeEntries(Collections.emptyList());
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
@@ -228,8 +214,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedEntries() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testGetSharedEntries() {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -240,8 +225,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedEntry() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testGetSharedEntry() {
         BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -252,15 +236,13 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetNotExistingSharedEntry() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testGetNotExistingSharedEntry() {
         Optional<BibEntry> actualBibEntryOptional = dbmsProcessor.getSharedEntry(1);
         assertFalse(actualBibEntryOptional.isPresent());
     }
 
     @Test
     void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
-        dbmsProcessor.setupSharedDatabase();
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
 
@@ -278,8 +260,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void testGetSharedMetaData() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
+    void testGetSharedMetaData() {
         insertMetaData("databaseType", "bibtex;", dbmsConnection, dbmsProcessor);
         insertMetaData("protectedFlag", "true;", dbmsConnection, dbmsProcessor);
         insertMetaData("saveActions", "enabled;\nauthor[capitalize,html_to_latex]\ntitle[title_case]\n;", dbmsConnection, dbmsProcessor);
@@ -293,7 +274,6 @@ class DBMSProcessorTest {
 
     @Test
     void testSetSharedMetaData() throws SQLException {
-        dbmsProcessor.setupSharedDatabase();
         Map<String, String> expectedMetaData = getMetaDataExample();
         dbmsProcessor.setSharedMetaData(expectedMetaData);
 
@@ -302,7 +282,7 @@ class DBMSProcessorTest {
         assertEquals(expectedMetaData, actualMetaData);
     }
 
-    private Map<String, String> getMetaDataExample() {
+    private static Map<String, String> getMetaDataExample() {
         Map<String, String> expectedMetaData = new HashMap<>();
 
         expectedMetaData.put("databaseType", "bibtex;");
@@ -313,7 +293,7 @@ class DBMSProcessorTest {
         return expectedMetaData;
     }
 
-    private BibEntry getBibEntryExampleWithEmptyFields() {
+    private static BibEntry getBibEntryExampleWithEmptyFields() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.AUTHOR, "Author")
                 .withField(StandardField.TITLE, "")
@@ -322,7 +302,7 @@ class DBMSProcessorTest {
         return bibEntry;
     }
 
-    private BibEntry getBibEntryExample() {
+    private static BibEntry getBibEntryExample() {
         return new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L")
                 .withField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor")
@@ -352,11 +332,11 @@ class DBMSProcessorTest {
         }
     }
 
-    private String escape(String expression, DBMSProcessor dbmsProcessor) {
+    private static String escape(String expression, DBMSProcessor dbmsProcessor) {
         return dbmsProcessor.escape(expression);
     }
 
-    private String escapeValue(String value) {
+    private static String escapeValue(String value) {
         return "'" + value + "'";
     }
 }

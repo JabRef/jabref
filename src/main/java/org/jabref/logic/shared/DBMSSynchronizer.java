@@ -167,8 +167,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a {@link
-     * BibEntry}.
+     * Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
+     * {@link BibEntry}.
      */
     @Override
     public void synchronizeLocalDatabase() {
@@ -217,9 +217,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
             // in case entries should be added into the local database, insert them
-            for (BibEntry bibEntry : dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase)) {
-                bibDatabase.insertEntry(bibEntry, EntriesEventSource.SHARED);
-            }
+            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 
@@ -255,7 +253,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
