@@ -30,30 +30,30 @@ public class ChangeScanner {
     public List<DatabaseChangeViewModel> scanForChanges() {
         if (database.getDatabasePath().isEmpty()) {
             return Collections.emptyList();
-        } else {
-            try {
-                List<DatabaseChangeViewModel> changes = new ArrayList<>();
+        }
 
-                // Parse the modified file
-                ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-                ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())
-                        .importDatabase(database.getDatabasePath().get(), importFormatPreferences.getEncoding());
-                BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
+        try {
+            List<DatabaseChangeViewModel> changes = new ArrayList<>();
 
-                // Start looking at changes.
-                BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
-                differences.getMetaDataDifferences().ifPresent(diff -> {
-                    changes.add(new MetaDataChangeViewModel(diff));
-                    diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
-                });
-                differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
-                differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
-                differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
-                return changes;
-            } catch (IOException e) {
-                LOGGER.warn("Error while parsing changed file.", e);
-                return Collections.emptyList();
-            }
+            // Parse the modified file
+            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
+            ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())
+                    .importDatabase(database.getDatabasePath().get(), importFormatPreferences.getEncoding());
+            BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
+
+            // Start looking at changes.
+            BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
+            differences.getMetaDataDifferences().ifPresent(diff -> {
+                changes.add(new MetaDataChangeViewModel(diff));
+                diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
+            });
+            differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
+            differences.getBibStringDifferences().forEach(diff -> changes.add(createBibStringDiff(diff)));
+            differences.getEntryDifferences().forEach(diff -> changes.add(createBibEntryDiff(diff)));
+            return changes;
+        } catch (IOException e) {
+            LOGGER.warn("Error while parsing changed file.", e);
+            return Collections.emptyList();
         }
     }
 
