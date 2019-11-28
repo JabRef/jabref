@@ -20,13 +20,13 @@ public class TestConnector {
     public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
         switch (dbmsType) {
             case MYSQL:
-                return new DBMSConnectionProperties(dbmsType, "127.0.0.1", 3800, "jabref", "root", "root", false, "");
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("127.0.0.1").setPort(3800).setDatabase("jabref").setUser("root").setPassword("root").setUseSSL(false).setAllowPublicKeyRetrieval(true).createDBMSConnectionProperties();
             case POSTGRESQL:
-                return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "postgres", "postgres", "postgres", false, "");
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("postgres").setUser("postgres").setPassword("postgres").setUseSSL(false).createDBMSConnectionProperties();
             case ORACLE:
-                return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis", false, "");
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("xe").setUser("travis").setPassword("travis").setUseSSL(false).createDBMSConnectionProperties();
             default:
-                return new DBMSConnectionProperties();
+                return new DBMSConnectionPropertiesBuilder().createDBMSConnectionProperties();
         }
     }
 }

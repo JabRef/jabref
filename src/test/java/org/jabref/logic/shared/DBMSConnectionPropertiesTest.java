@@ -10,7 +10,7 @@ class DBMSConnectionPropertiesTest {
 
     @Test
     void urlForMySqlIncludesSslConfig() {
-        DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties(DBMSType.MYSQL, "localhost", 3108, "jabref", "user", "password", false, "");
-        assertEquals("jdbc:mariadb://localhost:3108/jabref?allowPublicKeyRetrieval=true&useSSL=false", connectionProperties.getUrl());
+        DBMSConnectionProperties connectionProperties = new DBMSConnectionPropertiesBuilder().setType(DBMSType.MYSQL).setHost("localhost").setPort(3108).setDatabase("jabref").setUser("user").setPassword("password").setUseSSL(false).setAllowPublicKeyRetrieval(true).setServerTimezone("").createDBMSConnectionProperties();
+        assertEquals("jdbc:mariadb://localhost:3108/jabref", connectionProperties.getUrl());
     }
 }
