@@ -149,8 +149,8 @@ public class BibDatabaseTest {
     public void hasStringLabelFindsString() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
-        assertTrue(database.hasStringLabel("DSP"));
-        assertFalse(database.hasStringLabel("VLSI"));
+        assertTrue(database.hasStringByName("DSP"));
+        assertFalse(database.hasStringByName("VLSI"));
     }
 
     @Test

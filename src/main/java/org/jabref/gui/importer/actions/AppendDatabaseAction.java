@@ -83,7 +83,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         if (importStrings) {
             for (BibtexString bs : fromDatabase.getStringValues()) {
-                if (!database.hasStringLabel(bs.getName())) {
+                if (!database.hasStringByName(bs.getName())) {
                     database.addString(bs);
                     ce.addEdit(new UndoableInsertString(database, bs));
                 }
@@ -170,7 +170,7 @@ public class AppendDatabaseAction implements BaseAction {
                               .onFailure(exception -> {
                                   LOGGER.warn("Could not open database", exception);
                                   dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);})
-                              .executeWith(Globals.TASK_EXECUTOR);;
+                              .executeWith(Globals.TASK_EXECUTOR);
             }
         }
     }
