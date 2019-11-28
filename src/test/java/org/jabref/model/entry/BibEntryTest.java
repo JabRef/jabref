@@ -75,6 +75,17 @@ class BibEntryTest {
     }
 
     @Test
+    public void newBibEntryIsUnchanged() {
+        assertFalse(entry.hasChanged());
+    }
+
+    @Test
+    public void setFieldLeadsToAChangedEntry() throws Exception {
+        entry.setField(StandardField.AUTHOR, "value");
+        assertTrue(entry.hasChanged());
+    }
+
+    @Test
     public void setFieldWorksWithBibFieldAsWell() throws Exception {
         entry.setField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField(), "value");
         assertEquals(Optional.of("value"), entry.getField(StandardField.AUTHOR));

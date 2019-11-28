@@ -28,7 +28,7 @@ public class AutosaveUIManager {
         try {
             new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
-            LOGGER.error("Problem occured while saving.", e);
+            LOGGER.error("Problem occurred while saving.", e);
         }
     }
 }

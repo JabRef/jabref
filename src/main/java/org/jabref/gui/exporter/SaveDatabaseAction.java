@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for save operations
  * when closing a database or quitting the applications.
- *
+ * <p>
  * The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
  * operation was canceled, or whether it was successful.
  */
@@ -69,12 +69,10 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        try {
-            SavePreferences preferences = prefs.loadForSaveFromPreferences()
-                                               .withEncoding(encoding)
-                                               .withSaveType(saveType);
-
-            AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup());
+        SavePreferences preferences = prefs.loadForSaveFromPreferences()
+                                           .withEncoding(encoding)
+                                           .withSaveType(saveType);
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {
@@ -148,7 +146,7 @@ public class SaveDatabaseAction {
 
                 // Reset title of tab
                 frame.setTabTitle(panel, panel.getTabTitle(),
-                                  panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                        panel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
                 frame.setWindowTitle();
                 frame.updateAllTabTitles();
             }
