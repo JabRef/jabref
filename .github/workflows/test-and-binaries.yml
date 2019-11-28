@@ -12,10 +12,6 @@ jobs:
         with:
           depth: 1
           submodules: false
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
@@ -24,6 +20,10 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
       - name: Build classes
         run: ./gradlew -Pdev=true classes
       - name: Upload build
@@ -44,6 +44,10 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: build
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
@@ -75,6 +79,10 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
       - name: Build runtime image
         run: ./gradlew checkstyleJmh checkstyleMain checkstyleTest
   testmysql:
@@ -93,10 +101,6 @@ jobs:
           mysql version: '8.0'
           mysql database: 'jabref'
           mysql root password: 'root'
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
       - name: Checkout source
         uses: actions/checkout@v1
         with:
@@ -114,6 +118,10 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
       - name: Run database test
         run: ./gradlew databaseTest
         env:
@@ -142,10 +150,6 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: build
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
       - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
@@ -154,6 +158,10 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
       - name: Run database test
         run: ./gradlew databaseTest
         env:
@@ -202,10 +210,6 @@ jobs:
          ref=${ref%/merge}
          echo "##[set-output name=branch;]${ref}"
       id: extract_branch
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 13
     - uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
@@ -236,6 +240,10 @@ jobs:
           zip.extractall()
           zip.close()
       shell: python
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 13
     - name: Build runtime image
       run: ./gradlew -Pdev=true jlinkZip
     - name: Build installer
