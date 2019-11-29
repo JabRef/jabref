@@ -3,7 +3,8 @@ name: Tests
 on: [push]
 
 jobs:
-  databasetest:
+  test:
+    name: Tests
     runs-on: ubuntu-latest
     services:
       postgres:

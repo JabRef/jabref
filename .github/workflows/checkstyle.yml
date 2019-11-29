@@ -1,9 +1,10 @@
-name: checkstyle
+name: Checkstyle
 
 on: [push]
 
 jobs:
   test:
+    name: Checkstyle
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source
