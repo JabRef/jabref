@@ -80,8 +80,5 @@ jobs:
       - name: Format failed test results
         if: failure()
         run: |
-          sudo apt-get install -qq -y --force-yes xml-twig-tools xsltproc
+          sudo apt-get install -qq -y xml-twig-tools xsltproc
           scripts/after-failure.sh
-          ls -la reports/
-          sudo apt-get install -y html2text
-          html2text reports/*.html
