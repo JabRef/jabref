@@ -51,6 +51,12 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
+      - name: Update test coverage metrics (in case of failure)
+        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
+        if: failure()
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          DBMS: "postgresql"
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
       - name: Start custom MySQL
