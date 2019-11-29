@@ -41,7 +41,7 @@ apply plugin: LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = "5.0.0"
+version = "5.0-beta"
 
 sourceCompatibility = 13
 targetCompatibility = 13
