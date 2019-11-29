@@ -101,6 +101,7 @@ class IEEETest {
         expected.setField(StandardField.DOI, "10.1049/iet-rpg.2018.5648");
         expected.setField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8636659:PDF");
         expected.setField(StandardField.ISSUE, "3");
+        expected.setField(StandardField.ISSN, "1752-1424");
         expected.setField(StandardField.JOURNALTITLE, "IET Renewable Power Generation");
         expected.setField(StandardField.PAGES, "418--426");
         expected.setField(StandardField.PUBLISHER, "IET");
@@ -125,6 +126,8 @@ class IEEETest {
         expected.setField(StandardField.DOI, "10.1145/2884781.2884806");
         expected.setField(StandardField.JOURNALTITLE, "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)");
         expected.setField(StandardField.PAGES, "273--284");
+        expected.setField(StandardField.ISBN, "978-1-5090-2071-3");
+        expected.setField(StandardField.ISSN, "1558-1225");
         expected.setField(StandardField.PUBLISHER, "IEEE");
         expected.setField(StandardField.KEYWORDS, "Portals, Documentation, Computer bugs, Joining processes, Industries, Open source software, Newcomers, Newbies, Novices, Beginners, Open Source Software, Barriers, Obstacles, Onboarding, Joining Process");
         expected.setField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
