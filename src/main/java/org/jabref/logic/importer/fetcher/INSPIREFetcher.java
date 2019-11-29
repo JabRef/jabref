@@ -74,14 +74,14 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
 
             Document doc = Jsoup.parse(response);
             Elements preElements = doc.getElementsByTag("pre");
 
             for (Element elem : preElements) {
-                //TODO: Second and third entry are not parsed
-                List<BibEntry> entry = bibtexParser.parseEntries(elem.wholeText());
+                //We have to use a new instance here, because otherwise only the first entry gets parsed
+                BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+                List<BibEntry> entry = bibtexParser.parseEntries(elem.text());
                 entries.addAll(entry);
             }
             return entries;

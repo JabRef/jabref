@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class INSPIREFetcherTest {
+
     private INSPIREFetcher fetcher;
 
     @BeforeEach
@@ -31,18 +32,38 @@ class INSPIREFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.MastersThesis);
-        expected.setCiteKey("Diez:2014ppa");
-        expected.setField(StandardField.AUTHOR, "Diez, Tobias");
-        expected.setField(StandardField.TITLE, "Slice theorem for Fr\\'echet group actions and covariant symplectic field theory");
-        expected.setField(StandardField.SCHOOL, "Leipzig U.");
-        expected.setField(StandardField.YEAR, "2013");
-        expected.setField(StandardField.URL, "https://inspirehep.net/record/1295621/files/arXiv:1405.2249.pdf");
-        expected.setField(StandardField.EPRINT, "1405.2249");
-        expected.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        expected.setField(new UnknownField("primaryClass"), "math-ph");
+
+        BibEntry phd = new BibEntry(StandardEntryType.PhdThesis);
+        phd.setCiteKey("Diez:2019pkg");
+        phd.setField(StandardField.AUTHOR, "Diez, Tobias");
+        phd.setField(StandardField.TITLE, "Normal Form of Equivariant Maps and Singular Symplectic Reduction in Infinite Dimensions with Applications to Gauge Field Theory");
+        phd.setField(StandardField.YEAR, "2019");
+        phd.setField(StandardField.EPRINT, "1909.00744");
+        phd.setField(new UnknownField("reportnumber"), "urn:nbn:de:bsz:15-qucosa2-352179");
+        phd.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+        phd.setField(new UnknownField("primaryClass"), "math.SG");
+
+        BibEntry article = new BibEntry(StandardEntryType.Article);
+        article.setCiteKey("Diez:2018gjz");
+        article.setField(StandardField.AUTHOR, "Diez, Tobias and Rudolph, Gerd");
+        article.setField(StandardField.TITLE, "Singular symplectic cotangent bundle reduction of gauge field theory");
+        article.setField(StandardField.YEAR, "2018");
+        article.setField(StandardField.EPRINT, "1812.04707");
+        article.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+        article.setField(new UnknownField("primaryClass"), "math-ph");
+
+        BibEntry master = new BibEntry(StandardEntryType.MastersThesis);
+        master.setCiteKey("Diez:2014ppa");
+        master.setField(StandardField.AUTHOR, "Diez, Tobias");
+        master.setField(StandardField.TITLE, "Slice theorem for Fr\\'echet group actions and covariant symplectic field theory");
+        master.setField(StandardField.SCHOOL, "Leipzig U.");
+        master.setField(StandardField.YEAR, "2013");
+        master.setField(StandardField.EPRINT, "1405.2249");
+        master.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+        master.setField(new UnknownField("primaryClass"), "math-ph");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field");
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+
+        assertEquals(Arrays.asList(phd, article, master), fetchedEntries);
     }
 }
