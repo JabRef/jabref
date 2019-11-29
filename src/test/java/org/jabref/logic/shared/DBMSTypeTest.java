@@ -1,5 +1,7 @@
 package org.jabref.logic.shared;
 
+import java.util.Optional;
+
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -16,6 +18,31 @@ public class DBMSTypeTest {
         assertEquals("MySQL", DBMSType.MYSQL.toString());
         assertEquals("Oracle", DBMSType.ORACLE.toString());
         assertEquals("PostgreSQL", DBMSType.POSTGRESQL.toString());
+    }
+
+    @Test
+    public void fromStringWorksForMySQL() {
+        assertEquals(Optional.of(DBMSType.MYSQL), DBMSType.fromString("MySQL"));
+    }
+
+    @Test
+    public void fromStringWorksForPostgreSQL() {
+        assertEquals(Optional.of(DBMSType.POSTGRESQL), DBMSType.fromString("PostgreSQL"));
+    }
+
+    @Test
+    public void fromStringWorksForNullString() {
+        assertEquals(Optional.empty(), DBMSType.fromString(null));
+    }
+
+    @Test
+    public void fromStringWorksForEmptyString() {
+        assertEquals(Optional.empty(), DBMSType.fromString(""));
+    }
+
+    @Test
+    public void fromStringWorksForUnkownString() {
+        assertEquals(Optional.empty(), DBMSType.fromString("unknown"));
     }
 
     @Test

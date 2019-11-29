@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
@@ -146,15 +147,17 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             if (!dbmsProcessor.checkBaseIntegrity()) {
                 LOGGER.info("Integrity check failed. Fixing...");
-                dbmsProcessor.setupSharedDatabase();
 
                 // This check should only be performed once on initial database setup.
-                // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
-                if (dbmsProcessor.checkForPare3Dot6Integrity()) {
+                if (dbmsProcessor.databaseIsAtMostJabRef35()) {
                     throw new DatabaseNotSupportedException();
                 }
+
+                // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
+                dbmsProcessor.setupSharedDatabase();
             }
         } catch (SQLException e) {
+            LOGGER.error("Could not check intergrity", e);
             throw new IllegalStateException(e);
         }
 
@@ -164,8 +167,8 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     }
 
     /**
-     * Synchronizes the local database with shared one. Possible update types are removal, update or insert of a {@link
-     * BibEntry}.
+     * Synchronizes the local database with shared one. Possible update types are: removal, update, or insert of a
+     * {@link BibEntry}.
      */
     @Override
     public void synchronizeLocalDatabase() {
@@ -178,13 +181,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
 
         // remove old entries locally
         removeNotSharedEntries(localEntries, idVersionMap.keySet());
-        List<Integer> entriesToDrag = new ArrayList<>();
+        List<Integer> entriesToInsertIntoLocalDatabase = new ArrayList<>();
         // compare versions and update local entry if needed
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
-            boolean match = false;
+            boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey() == localEntry.getSharedBibEntryData().getSharedID()) {
-                    match = true;
+                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedID())) {
+                    remoteEntryMatchingOneLocalEntryFound = true;
                     if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
                         if (sharedEntry.isPresent()) {
@@ -193,7 +196,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                             localEntry.getSharedBibEntryData()
                                       .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             sharedEntry.get().getFieldMap().forEach(
-                            // copy remote values to local entry
+                                    // copy remote values to local entry
                                     (field, value) -> localEntry.setField(field, value, EntriesEventSource.SHARED)
                             );
 
@@ -207,13 +210,14 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                     }
                 }
             }
-            if (!match) {
-                entriesToDrag.add(idVersionEntry.getKey());
+            if (!remoteEntryMatchingOneLocalEntryFound) {
+                entriesToInsertIntoLocalDatabase.add(idVersionEntry.getKey());
             }
         }
 
-        for (BibEntry bibEntry : dbmsProcessor.getSharedEntries(entriesToDrag)) {
-            bibDatabase.insertEntry(bibEntry, EntriesEventSource.SHARED);
+        if (!entriesToInsertIntoLocalDatabase.isEmpty()) {
+            // in case entries should be added into the local database, insert them
+            bibDatabase.insertEntries(dbmsProcessor.getSharedEntries(entriesToInsertIntoLocalDatabase), EntriesEventSource.SHARED);
         }
     }
 
@@ -224,23 +228,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @param sharedIDs    Set of all IDs which are present on shared database
      */
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
-        List<BibEntry> entriesToRemove = new ArrayList<>();
-        for (BibEntry localEntry : localEntries) {
-            boolean match = false;
-            for (int sharedID : sharedIDs) {
-                if (localEntry.getSharedBibEntryData().getSharedID() == sharedID) {
-                    match = true;
-                    break;
-                }
-            }
-            if (!match) {
-                entriesToRemove.add(localEntry);
-            }
-        }
+        List<BibEntry> entriesToRemove =
+                localEntries.stream()
+                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedID()))
+                            .collect(Collectors.toList());
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
+            // remove all non-shared entries without triggering listeners
+            bibDatabase.removeEntries(entriesToRemove, EntriesEventSource.SHARED);
         }
-        bibDatabase.removeEntries(entriesToRemove, EntriesEventSource.SHARED); // Should not reach the listeners above.
     }
 
     /**
@@ -257,7 +253,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
