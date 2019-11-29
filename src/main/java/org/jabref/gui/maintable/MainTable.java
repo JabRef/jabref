@@ -217,17 +217,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
 
         if (!entriesToAdd.isEmpty()) {
-            // Add new entries
-            NamedCompound ce = new NamedCompound((entriesToAdd.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
+            database.getDatabase().insertEntries(entriesToAdd);
+            // TODO because of this line, when implementing batch undo insert entries, model constructor after batch remove entries with a boolean for paste
+            undoManager.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd, true));
             for (BibEntry entryToAdd : entriesToAdd) {
                 UpdateField.setAutomaticFields(entryToAdd, Globals.prefs.getUpdateFieldPreferences());
-
-                database.getDatabase().insertEntry(entryToAdd);
-
-                ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entryToAdd));
             }
-            ce.end();
-            undoManager.addEdit(ce);
 
             // Show editor if user want us to do this
             BibEntry firstNewEntry = entriesToAdd.get(0);

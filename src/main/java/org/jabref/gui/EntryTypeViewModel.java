@@ -161,7 +161,7 @@ public class EntryTypeViewModel {
                 } else {
                     // Regenerate CiteKey of imported BibEntry
                     new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
-                    basePanel.insertEntry(entry);
+                    basePanel.insertEntry(entry); // Should this be basePanel.getDatabase().insertEntry(entry);?
                 }
                 searchSuccesfulProperty.set(true);
 

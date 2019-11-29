@@ -124,17 +124,21 @@ public class DefaultAuxParser implements AuxParser {
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
      */
     private void resolveTags(AuxParserResult result) {
+        List<BibEntry> entriesToInsert = new ArrayList<>();
+
         for (String key : result.getUniqueKeys()) {
             if (!result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
                 Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
                 if (entry.isPresent()) {
-                    insertEntry(entry.get(), result);
+                    entriesToInsert.add(entry.get);
                     resolveCrossReferences(entry.get(), result);
                 } else {
                     result.getUnresolvedKeys().add(key);
                 }
             }
         }
+        insertEntries(entriesToInsert, result);
+        resolveCrossReferences(entriesToInsert, result);
 
         // Copy database definitions
         if (result.getGeneratedBibDatabase().hasEntries()) {
@@ -146,26 +150,33 @@ public class DefaultAuxParser implements AuxParser {
     /*
      * Resolves and adds CrossRef entries
      */
-    private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
-        entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
-            if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
-                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
+    private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
+        List<BibEntry> entriesToInsert = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
+                if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
+                    Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
-                if (refEntry.isPresent()) {
-                    insertEntry(refEntry.get(), result);
-                    result.increaseCrossRefEntriesCounter();
-                } else {
-                    result.getUnresolvedKeys().add(crossref);
+                    if (refEntry.isPresent()) {
+                        entriesToInsert.add(refEntry.get())
+                        result.increaseCrossRefEntriesCounter();
+                    } else {
+                        result.getUnresolvedKeys().add(crossref);
+                    }
                 }
-            }
-        });
+            });
+        }
+        insertEntries(entriesToInsert);
     }
 
     /*
-     * Insert a clone of the given entry. The clone is given a new unique ID.
+     * Insert a clone of each given entry. The clones are each given a new unique ID.
      */
-    private void insertEntry(BibEntry entry, AuxParserResult result) {
-        BibEntry clonedEntry = (BibEntry) entry.clone();
-        result.getGeneratedBibDatabase().insertEntry(clonedEntry);
+    private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
+        List<BibEntry> clonedEntries = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            clonedEntries.add((BibEntry) entry.clone());
+        }
+        result.getGeneratedBibDatabase().insertEntries(clonedEntries);
     }
 }

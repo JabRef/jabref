@@ -610,6 +610,8 @@ public class BasePanel extends StackPane {
      *
      * @param bibEntry The new entry.
      */
+
+    // The Javadoc appears to be incorrect here
     public void insertEntry(final BibEntry bibEntry) {
         if (bibEntry != null) {
             try {
