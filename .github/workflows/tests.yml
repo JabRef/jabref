@@ -107,7 +107,7 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Run tests on PostgreSQL
-        run: ./gradlew databaseTest
+        run: ./gradlew databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "postgresql"
@@ -230,7 +230,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}  
       - name: Update test coverage metrics
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
-        if: failure()
         env:
           CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
