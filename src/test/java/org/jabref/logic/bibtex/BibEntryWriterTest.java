@@ -175,7 +175,7 @@ class BibEntryWriterTest {
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -430,6 +430,8 @@ class BibEntryWriterTest {
     void constantMonthApril() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.MONTH, "#apr#");
+        // enable writing
+        entry.setChanged(true);
 
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
@@ -445,6 +447,8 @@ class BibEntryWriterTest {
     void monthApril() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.MONTH, "apr");
+        // enable writing
+        entry.setChanged(true);
 
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);

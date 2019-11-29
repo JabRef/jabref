@@ -9,11 +9,14 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.JabRefPreferences;
@@ -32,7 +35,6 @@ public class PreferencesMigrations {
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
     public static void runMigrations() {
-
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -307,19 +309,47 @@ public class PreferencesMigrations {
      * wired columns need to be added.
      */
     static void upgradeColumnPreferences(JabRefPreferences preferences) {
-        String columnNames = preferences.get(JabRefPreferences.COLUMN_NAMES);
+        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<Double> columnWidths = preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS)
+                                               .stream()
+                                               .map(string -> {
+                                                   try {
+                                                       return Double.parseDouble(string);
+                                                   } catch (NumberFormatException e) {
+                                                       return ColumnPreferences.DEFAULT_WIDTH;
+                                                   }
+                                               })
+                                               .collect(Collectors.toList());
 
-        if (!columnNames.isEmpty() &&
-                !columnNames.contains(MainTableColumnModel.Type.NORMALFIELD.getName() // "field:"
-                    + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER)) {
+        // "field:"
+        String normalFieldTypeString = MainTableColumnModel.Type.NORMALFIELD.getName() + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER;
 
-            String columnWidths = preferences.get(JabRefPreferences.COLUMN_WIDTHS);
+        if (!columnNames.isEmpty() && columnNames.stream().noneMatch(name -> name.contains(normalFieldTypeString))) {
+            List<MainTableColumnModel> columns = new ArrayList<>();
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS, 28));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES, 28));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER, 28));
 
-            columnNames = "groups;linked_id;" + columnNames;
-            columnWidths = "28;28;" + columnWidths;
+            for (int i = 0; i < columnNames.size(); i++) {
+                String name = columnNames.get(i);
+                MainTableColumnModel.Type type = SpecialField.fromName(name)
+                                                             .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
+                                                             .orElse(MainTableColumnModel.Type.NORMALFIELD);
+                if (i < columnWidths.size()) {
+                    columns.add(new MainTableColumnModel(type, name, columnWidths.get(i)));
+                } else {
+                    columns.add(new MainTableColumnModel(type, name));
+                }
+            }
 
-            preferences.put(JabRefPreferences.COLUMN_NAMES, columnNames);
-            preferences.put(JabRefPreferences.COLUMN_WIDTHS,columnWidths);
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
+                                                                             .map(MainTableColumnModel::getName)
+                                                                             .collect(Collectors.toList()));
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columns.stream()
+                                                                              .map(MainTableColumnModel::getWidth)
+                                                                              .map(Double::intValue)
+                                                                              .map(Object::toString)
+                                                                              .collect(Collectors.toList()));
         }
     }
 }

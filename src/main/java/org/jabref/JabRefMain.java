@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JabRef MainClass
+ * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
 
@@ -45,7 +45,7 @@ public class JabRefMain extends Application {
     }
 
     @Override
-    public void start(Stage mainStage) throws Exception {
+    public void start(Stage mainStage) {
         try {
             // Fail on unsupported Java versions
             ensureCorrectJavaVersion();

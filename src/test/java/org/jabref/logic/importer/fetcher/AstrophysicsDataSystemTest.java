@@ -49,7 +49,6 @@ public class AstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2018arXiv181204698D");
         diezSliceTheoremEntry.setField(StandardField.ABSTRACT,
                 "We establish a general slice theorem for the action of a locally convex         Lie group on a locally convex manifold, which generalizes the         classical slice theorem of Palais to infinite dimensions. We         discuss two important settings under which the assumptions of         this theorem are fulfilled. First, using Gl{\\\"o}ckner's inverse         function theorem, we show that the linear action of a compact         Lie group on a Fr{\\'e}chet space admits a slice. Second, using         the Nash--Moser theorem, we establish a slice theorem for the         tame action of a tame Fr{\\'e}chet Lie group on a tame         Fr{\\'e}chet manifold. For this purpose, we develop the concept         of a graded Riemannian metric, which allows the construction of         a path-length metric compatible with the manifold topology and         of a local addition. Finally, generalizing a classical result in         finite dimensions, we prove that the existence of a slice         implies that the decomposition of the manifold into orbit types         of the group action is a stratification.");
-        diezSliceTheoremEntry.setField(StandardField.ABSTRACT, "Not Available <P />");
 
         famaeyMcGaughEntry = new BibEntry();
         famaeyMcGaughEntry.setType(StandardEntryType.Article);
@@ -97,7 +96,6 @@ public class AstrophysicsDataSystemTest {
         xiongSunEntry.setField(StandardField.VOLUME, "45");
         xiongSunEntry.setField(StandardField.YEAR, "2007");
         xiongSunEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2007ITGRS..45..879X");
-        xiongSunEntry.setField(StandardField.ABSTRACT, "Not Available <P />");
 
         ingersollPollardEntry = new BibEntry();
         ingersollPollardEntry.setType(StandardEntryType.Article);
@@ -129,7 +127,6 @@ public class AstrophysicsDataSystemTest {
         luceyPaulEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2000JGR...10520297L");
         luceyPaulEntry.setField(StandardField.MONTH, "Jan");
         luceyPaulEntry.setField(StandardField.NUMBER, "E8");
-        luceyPaulEntry.setField(StandardField.ABSTRACT, "Not Available <P />");
     }
 
     @Test

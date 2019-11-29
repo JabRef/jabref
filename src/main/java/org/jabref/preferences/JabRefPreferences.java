@@ -44,7 +44,6 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
-import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -354,9 +353,6 @@ public class JabRefPreferences implements PreferencesService {
     // Id Entry Generator Preferences
     public static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
 
-    // File linking Options for entry editor
-    public static final String ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE = "DragDropPreferenceType";
-
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
@@ -525,8 +521,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey");
-        defaults.put(COLUMN_WIDTHS, "28;28;75;300;470;60;130;100");
+        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey");
+        defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;100");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -765,7 +761,6 @@ public class JabRefPreferences implements PreferencesService {
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
 
-        defaults.put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, FileDragDropPreferenceType.MOVE.name());
         setLanguageDependentDefaultValues();
     }
 
@@ -915,6 +910,11 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.debug("Hostname not found.", ex);
             return get(DEFAULT_OWNER);
         }
+    }
+
+    @Override
+    public String getTheme() {
+        return get(FX_THEME);
     }
 
     /**
@@ -1884,7 +1884,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-
         putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
                                                      .map(MainTableColumnModel::getName)
                                                      .collect(Collectors.toList()));
@@ -2002,15 +2001,6 @@ public class JabRefPreferences implements PreferencesService {
             map.put(columns.get(i), sortTypes.get(i));
         }
         return map;
-    }
-
-    @Override
-    public FileDragDropPreferenceType getEntryEditorFileLinkPreference() {
-        return FileDragDropPreferenceType.valueOf(get(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE));
-    }
-
-    public void storeEntryEditorFileLinkPreference(FileDragDropPreferenceType type) {
-        put(ENTRY_EDITOR_DRAG_DROP_PREFERENCE_TYPE, type.name());
     }
 
     @Override

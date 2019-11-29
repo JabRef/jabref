@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -151,13 +151,13 @@ public abstract class BibDatabaseWriter {
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-
         if (sharedDatabaseIDOptional.isPresent()) {
+            // may throw an IOException. Thus, we do not use "ifPresent", but the "old" isPresent way
             writeDatabaseID(sharedDatabaseIDOptional.get());
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Set<BibEntryType> typesToWrite = new HashSet<>();
+        Set<BibEntryType> typesToWrite = new TreeSet<>();
 
         // Some file formats write something at the start of the file (like the encoding)
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {

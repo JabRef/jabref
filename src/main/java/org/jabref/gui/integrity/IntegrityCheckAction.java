@@ -48,7 +48,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
                 Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
-        Task<List<IntegrityMessage>> task = new Task<List<IntegrityMessage>>() {
+        Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
             protected List<IntegrityMessage> call() {
                 List<IntegrityMessage> result = new ArrayList<>();

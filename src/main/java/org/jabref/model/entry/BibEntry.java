@@ -81,7 +81,7 @@ public class BibEntry implements Cloneable {
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
-     * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
+     * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
 
@@ -317,6 +317,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withCiteKey(String newCiteKey) {
         setCiteKey(newCiteKey);
+        this.setChanged(false);
         return this;
     }
 
@@ -797,6 +798,7 @@ public class BibEntry implements Cloneable {
 
     public BibEntry withField(Field field, String value) {
         setField(field, value);
+        this.setChanged(false);
         return this;
     }
 

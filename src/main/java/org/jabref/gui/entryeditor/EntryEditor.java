@@ -134,25 +134,21 @@ public class EntryEditor extends BorderPane {
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
-                    LOGGER.debug("Mode MOVE");
-                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
+                switch (event.getTransferMode()) {
+                    case COPY:
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                        break;
+                    case MOVE:
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                        break;
+                    case LINK:
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                        break;
                 }
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
-                    LOGGER.debug("Mode COPY");
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
-                }
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
-                    LOGGER.debug("Mode LINK");
-                    fileLinker.addFilesToEntry(entry, files);
-                    success = true;
-                }
+                success = true;
             }
 
             event.setDropCompleted(success);

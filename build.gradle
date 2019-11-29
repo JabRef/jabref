@@ -128,7 +128,7 @@ dependencies {
     //compile "org.libreoffice:ridl:6.2.3"
     //compile "org.libreoffice:unoil:6.2.3"
 
-    compile 'io.github.java-diff-utils:java-diff-utils:4.5-SNAPSHOT'
+    compile 'io.github.java-diff-utils:java-diff-utils:4.5'
     compile 'info.debatty:java-string-similarity:1.2.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
@@ -137,7 +137,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.1'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.2'
 
     compile 'org.postgresql:postgresql:42.2.8'
 
@@ -203,7 +203,7 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.53'
+    testCompile 'io.github.classgraph:classgraph:4.8.54'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
@@ -218,8 +218,9 @@ dependencies {
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.12.0'
     //testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.11.0'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.12.0'
-    testCompile "org.testfx:testfx-core:4.0.15-alpha"
-    testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
+    testCompile "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
+    testCompile "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
+    testCompile "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
@@ -618,7 +619,8 @@ jlink {
                     '--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres/windows"
+                    '--resource-dir', "${projectDir}/buildres/windows",
+                    '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
 
@@ -635,7 +637,8 @@ jlink {
                     '--linux-rpm-license-type', 'MIT',
                     // '--license-file', "${projectDir}/LICENSE.md",
                     '--description', 'JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.',
-                    '--linux-shortcut'
+                    '--linux-shortcut',
+                    '--file-associations', "${projectDir}/buildres/linux/bibtexAssociations.properties"
             ]
         }
 
@@ -645,7 +648,8 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.version}"
+                    '--app-version', "${project.version}",
+                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
             ]
         }
     }
@@ -666,7 +670,7 @@ if (OperatingSystem.current().isLinux()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/linux") {
-                include "org.jabref.jabref.json", "jabrefHost.py"
+                include "native-messaging-host/**", "jabrefHost.py"
             }
             into "$buildDir/distribution/JabRef/lib"
         }
