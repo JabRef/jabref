@@ -124,7 +124,7 @@ jobs:
           mysql database: 'jabref'
           mysql root password: 'root'
       - name: Run tests on MySQL
-        run: ./gradlew databaseTest
+        run: ./gradlew databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "mysql"
