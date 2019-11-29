@@ -77,11 +77,15 @@ jobs:
           zip.close()
       shell: python
     - name: Build runtime image
-      run: ./gradlew -Pdev={{ !contains('tags', github.ref) }} jlinkZip
+      env:
+        IS_DEV_VERSION: ${{ !contains(github.ref, 'tags') }}
+      run: ./gradlew -Pdev="$IS_DEV_VERSION" jlinkZip
     - name: Build installer
+      env:
+        IS_DEV_VERSION: ${{ !contains(github.ref, 'tags') }}
       run: |
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-        ./gradlew -Pdev={{ !contains('tags', github.ref) }} jpackage
+        ./gradlew -Pdev="$IS_DEV_VERSION" jpackage
       shell: bash
     - name: Add installer as artifact
       uses: actions/upload-artifact@master
