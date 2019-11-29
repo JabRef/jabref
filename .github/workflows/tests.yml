@@ -1,4 +1,4 @@
-name: database tests
+name: Tests
 
 on: [push]
 
@@ -17,7 +17,7 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: shutdown Ubuntu MySQL
+      - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
       - uses: mirromutth/mysql-action@v1.1
         with:
@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 13
-      - name: checkout source
+      - name: Checkout source
         uses: actions/checkout@v1
         with:
           depth: 1
@@ -45,12 +45,22 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
-      - name: test (include PostgreSQL and update code coverage metrics)
+      - name: Run basic tests (without checkstyle)
+        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
+      - name: Run fetcher tests
+        run: ./gradlew fetcherTest
+      - name: Run GUI tests
+        run: xvfb-run --auto-servernum ./gradlew guiTest
+      - name: Run tests on PostgreSQL
+        run: ./gradlew databaseTest
+        env:
+          DBMS: "postgresql"
+      - name: Run tests on MySQL
+        run: ./gradlew databaseTest
+        env:
+          DBMS: "mysql"
+      - name: Update test coverage metrics
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
-      - name: test on MySQL
-        run: ./gradlew databaseTest
-        env:
-          DBMS: "mysql"
