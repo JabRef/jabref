@@ -1,10 +1,12 @@
-name: Check outdated Dependencies
+name: Check dependencies
 
-on: [push]
+on: 
+  schedule:
+    - cron:  '0 0 * * 0' # Run every Sunday
 
 jobs:
-  check:
-    name: Check outdated Dependencies
+  checkDependencies:
+    name: Check dependencies
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source
@@ -16,18 +18,12 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 13
-    - uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: |
-          ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-          ${{ runner.OS }}-gradle-
-          ${{ runner.OS }}-
-    - uses: actions/cache@v1
-      name: Cache gradle wrapper
-      with:
-        path: ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-    - name: Run check
+    - name: Look for outdated dependencies
       run: ./gradlew -q checkOutdatedDependencies
+    - name: Report issues
+      if: failure()
+      uses: JasonEtco/create-an-issue@master
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        filename: .github/outdatedDependencies.md
