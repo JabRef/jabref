@@ -1,0 +1,77 @@
+name: database tests
+
+on: [push]
+
+jobs:
+  mysql:
+    name: "MySQL"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3800
+          container port: 3307
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mysql version: '8.0'
+          mysql database: 'jabref'
+          mysql root password: 'root'
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - name: Checkout source
+        uses: actions/checkout@v1
+        with:
+          depth: 1
+          submodules: false
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - name: Run database test
+        run: ./gradlew databaseTest
+        env:
+          DBMS: "mysql"
+  postgres:
+    name: "PostgreSQL"
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+        with:
+          depth: 1
+          submodules: false
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - name: Run database test
+        run: ./gradlew databaseTest
+        env:
+          DBMS: "postgresql"
