@@ -455,7 +455,7 @@ test {
 }
 
 testlogger {
-    theme 'mocha-parallel'
+    showPassed false
 }
 
 task databaseTest(type: Test) {
