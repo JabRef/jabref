@@ -24,6 +24,9 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.16.4'
+
+    // nicer test outputs during running and completion
+    id 'com.adarshr.test-logger' version '2.0.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -438,7 +441,6 @@ javadoc {
 
 localization.script = 'scripts/syncLang.py'
 
-// Test tasks
 test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
@@ -496,6 +498,7 @@ task copyTestResources(type: Copy) {
 processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
+    reports.csv.destination = file("${reporting.baseDir}/${name}")
     reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
@@ -524,8 +527,9 @@ jacocoTestReport {
     dependsOn jacocoMerge
 
     reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
+        csv.enabled = true
         html.enabled = true
+        xml.enabled = true // coveralls plugin depends on xml format report
     }
 }
 
