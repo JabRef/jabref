@@ -47,12 +47,12 @@ jobs:
           git fetch --tags
           git branch --create-reflog master origin/master
     - name: Install GitVersion
-      uses: gittools/use-gitversion/setup@v0.2
+      uses: gittools/actions/setup-gitversion@v0.3
       with:
           versionSpec: '5.1.x'
     - name: Run GitVersion
       id: gitversion
-      uses: gittools/use-gitversion/execute@v0.2
+      uses: gittools/actions/execute-gitversion@v0.3
     - name: Test GitVersion
       run: |
         echo "Major: ${{ steps.gitversion.outputs.Major }}"
