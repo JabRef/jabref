@@ -454,6 +454,10 @@ test {
     }
 }
 
+testlogger {
+    theme 'mocha-parallel'
+}
+
 task databaseTest(type: Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
