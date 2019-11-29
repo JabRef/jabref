@@ -719,7 +719,7 @@ task bundleLibreOffice(type: Jar) {
 
 // Returns the value of project.version in production and a string of the format VERSION-dev--DATE--BRANCH--GIT_HASH for development versions
 def createVersionString() {
-    if (hasProperty('dev')) {
+    if (property('dev')) {
         String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
         String commitInfo
         if (OperatingSystem.current().isWindows()) {
