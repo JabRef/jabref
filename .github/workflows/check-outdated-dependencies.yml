@@ -1,0 +1,28 @@
+name: Check outdated Dependencies
+
+on: [push]
+
+jobs:
+  check:
+    name: Check outdated Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v1
+      with:
+        depth: 1
+        submodules: false
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 13
+    - uses: actions/cache@v1
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+        restore-keys: |
+          ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+          ${{ runner.OS }}-gradle-
+          ${{ runner.OS }}-
+    - name: Run check
+      run: ./gradlew -q checkOutdatedDependencies

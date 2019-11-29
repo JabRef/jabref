@@ -33,6 +33,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 13
+      - name: Set up test result helpers
+        - run: sudo apt-get install -qq -y --force-yes xml-twig-tools xsltproc
       - name: Checkout source
         uses: actions/checkout@v1
         with:
@@ -48,20 +50,35 @@ jobs:
             ${{ runner.OS }}-
       - name: Run basic tests (without checkstyle)
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
-      - name: Run fetcher tests
-        run: ./gradlew fetcherTest
-      - name: Run GUI tests
-        run: xvfb-run --auto-servernum ./gradlew guiTest
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest
         env:
           DBMS: "postgresql"
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
       - name: Run tests on MySQL
         run: ./gradlew databaseTest
         env:
           DBMS: "mysql"
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
       - name: Update test coverage metrics
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
+      - name: Run fetcher tests
+        run: ./gradlew fetcherTest
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
+      - name: Run GUI tests
+        run: xvfb-run --auto-servernum ./gradlew guiTest
+      - name: Format failed test results
+        if: failure()
+        run: scripts/after-failure.sh
