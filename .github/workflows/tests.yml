@@ -83,3 +83,5 @@ jobs:
           sudo apt-get install -qq -y --force-yes xml-twig-tools xsltproc
           scripts/after-failure.sh
           ls -la reports/
+          sudo apt-get install -y html2text
+          html2text reports/*.html
