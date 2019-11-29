@@ -18,10 +18,6 @@ env:
     - TEST_SUITE=check
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=guiTest
-    # codecov may fail by itself (see gradle build file)
-    # The codecov test itself fails only in case there is an issue with the codecov update.
-    # Thus, a decrease in the testing coverage does not lead to a failure in Travis
-    - TEST_SUITE=codecov
     - DEPENDENCY_UPDATES=check
 
 matrix:
@@ -42,7 +38,6 @@ install: true
 script:
   - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "codecov" ]; then ./gradlew $TEST_SUITE $OPTIONS -x checkstyleJmh -x checkstyleMain -x checkstyleTest; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
-  - if [ "$TEST_SUITE" == "codecov" ]; then ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash); fi
   - if [ "$DEPENDENCY_UPDATES" == "check" ]; then ./gradlew -q checkOutdatedDependencies; fi
 
 after_failure:
