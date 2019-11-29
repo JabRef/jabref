@@ -32,7 +32,6 @@ class INSPIREFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-
         BibEntry phd = new BibEntry(StandardEntryType.PhdThesis);
         phd.setCiteKey("Diez:2019pkg");
         phd.setField(StandardField.AUTHOR, "Diez, Tobias");
