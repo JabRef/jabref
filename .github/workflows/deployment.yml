@@ -1,4 +1,4 @@
-name: deployment
+name: Deployment
 
 on: [push]
 
@@ -26,15 +26,15 @@ jobs:
            archivePortable: tar -czf build/distribution/JabRef-portable_macos.tar.gz -C build/distribution JabRef.app && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
-    name: deploy on ${{ matrix.displayName }}
+    name: Deploy on ${{ matrix.displayName }}
 
     steps:
-    - name: checkout source
+    - name: Checkout source
       uses: actions/checkout@v1
       with:
         depth: 1
         submodules: false
-    - name: extract branch name
+    - name: Extract branch name
       shell: bash
       run: |
          ref=${GITHUB_REF#refs/heads/}
@@ -54,7 +54,7 @@ jobs:
           ${{ runner.OS }}-gradle-${{ env.cache-name }}-
           ${{ runner.OS }}-gradle-
           ${{ runner.OS }}-
-    - name: download jpackage
+    - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
         import tarfile
@@ -76,22 +76,22 @@ jobs:
           zip.extractall()
           zip.close()
       shell: python
-    - name: build runtime image
+    - name: Build runtime image
       run: ./gradlew -Pdev=true jlinkZip
-    - name: build installer
+    - name: Build installer
       run: |
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
         ./gradlew -Pdev=true jpackage
       shell: bash
-    - name: add installer as artifact
+    - name: Add installer as artifact
       uses: actions/upload-artifact@master
       with:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
-    - name: package application image
+    - name: Package application image
       run: ${{ matrix.archivePortable }}
       shell: bash
-    - name: build and publish snap
+    - name: Build and publish snap
       if: matrix.os == 'ubuntu-latest' && steps.extract_branch.outputs.branch == 'master'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
@@ -99,7 +99,7 @@ jobs:
           mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
           docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
       shell: bash
-    - name: upload to builds.jabref.org
+    - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
         local: build/distribution
