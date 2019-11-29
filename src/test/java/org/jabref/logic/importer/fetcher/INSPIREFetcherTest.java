@@ -41,7 +41,7 @@ class INSPIREFetcherTest {
         phd.setField(StandardField.EPRINT, "1909.00744");
         phd.setField(new UnknownField("reportnumber"), "urn:nbn:de:bsz:15-qucosa2-352179");
         phd.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        phd.setField(new UnknownField("primaryClass"), "math.SG");
+        phd.setField(StandardField.PRIMARYCLASS, "math.SG");
 
         BibEntry article = new BibEntry(StandardEntryType.Article);
         article.setCiteKey("Diez:2018gjz");
@@ -50,7 +50,7 @@ class INSPIREFetcherTest {
         article.setField(StandardField.YEAR, "2018");
         article.setField(StandardField.EPRINT, "1812.04707");
         article.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        article.setField(new UnknownField("primaryClass"), "math-ph");
+        article.setField(StandardField.PRIMARYCLASS, "math-ph");
 
         BibEntry master = new BibEntry(StandardEntryType.MastersThesis);
         master.setCiteKey("Diez:2014ppa");
@@ -60,7 +60,7 @@ class INSPIREFetcherTest {
         master.setField(StandardField.YEAR, "2013");
         master.setField(StandardField.EPRINT, "1405.2249");
         master.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        master.setField(new UnknownField("primaryClass"), "math-ph");
+        master.setField(StandardField.PRIMARYCLASS, "math-ph");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field");
 
