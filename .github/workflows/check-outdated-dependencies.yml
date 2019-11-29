@@ -24,5 +24,10 @@ jobs:
           ${{ runner.OS }}-gradle-${{ env.cache-name }}-
           ${{ runner.OS }}-gradle-
           ${{ runner.OS }}-
+    - uses: actions/cache@v1
+      name: Cache gradle wrapper
+      with:
+        path: ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
     - name: Run check
       run: ./gradlew -q checkOutdatedDependencies
