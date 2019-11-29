@@ -45,15 +45,12 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
+      - name: test (include PostgreSQL and update code coverage metrics)
+        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          DBMS: "postgresql"
       - name: test on MySQL
         run: ./gradlew databaseTest
         env:
           DBMS: "mysql"
-      - name: test on PostgreSQL
-        run: ./gradlew databaseTest
-        env:
-          DBMS: "postgresql"
-      - name: update code coverage
-        run: ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
