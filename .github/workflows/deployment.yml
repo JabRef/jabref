@@ -44,7 +44,7 @@ jobs:
       id: extract_branch
     - name: Reattach head, fetch tags and master for GitVersion
       run: |
-          git checkout "${GITHUB_REF:11}"
+          git checkout "${{ steps.extract_branch.outputs.branch }}"
           git branch --create-reflog master origin/master
           git fetch --tags origin
     - name: Install GitVersion
@@ -121,11 +121,11 @@ jobs:
           zip.close()
       shell: python
     - name: Build runtime image
-      run: ./gradlew -Pdev=true jlinkZip
+      run: ./gradlew -Pdev=true -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
     - name: Build installer
       run: |
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-        ./gradlew -Pdev=true jpackage
+        ./gradlew -Pdev=true -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
       shell: bash
     - name: Add installer as artifact
       uses: actions/upload-artifact@master
