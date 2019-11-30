@@ -1,0 +1,55 @@
+name: Test on Oracle XE
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+        with:
+          depth: 1
+          submodules: false
+      - name: Cache Oracle XE downloads
+        uses: actions/cache@v1
+        with:
+          path: ~/oracle-xe
+          key: ${{ runner.os }}-oracle-${{ hashFiles('.github/workflows/test-on-oracle-xe.yml') }}
+      - name: Cache built docker image
+        uses: actions/cache@v1
+        with:
+          path: /var/lib/docker/graph/
+          key: ${{ runner.os }}-oracle-${{ hashFiles('.github/workflows/test-on-oracle-xe.yml') }}
+      - name: Start Oracle XE
+        run: |
+          mkdir ~/oracle-xe || true
+          cd ~/oracle-xe
+          wget -qN https://github.com/deusaquilus/docker-oracle-xe/archive/master.zip
+          unzip master.zip
+          cd docker-oracle-xe-master
+          wget -qN http://ccrypt.sourceforge.net/download/1.11/ccrypt-1.11.linux-x86_64.tar.gz
+          wget -qN -O files/oracle-database-xe-18c-1.0-1.x86_64.rpm.cpt https://files.jabref.org/thing.cpt
+          pwd
+          tar xzf ccrypt-1.11.linux-x86_64.tar.gz
+          ccrypt-1.11.linux-x86_64/ccrypt -d -E CCRYPT files/oracle-database-xe-18c-1.0-1.x86_64.rpm.cpt
+          docker build -t oracle-xe:18c .
+          docker run -d -p 32118:1521 -p 35518:5500 --name=oracle-xe oracle-xe:18c
+        env:
+          CCRYPT: ${{ secrets.CCRYPT }}
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - name: Run database test
+        run: ./gradlew databaseTest
+        env:
+          DBMS: "oracle"
