@@ -111,18 +111,11 @@ jobs:
           mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
           docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
       shell: bash
-    - name: Rename files (Linux & MacOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        sudo apt-get install rename
-        rename 's/${{ steps.gitversion.outputs.AssemblySemVer }}/${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}/' build/distribution/*
-        rename 's/portable/${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable/' build/distribution/*
-    - name: Rename files (Windows)
-      if: matrix.os == 'windows-latest'
+    - name: Rename files
       run: |
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
-      shell: powershell
+      shell: pwsh
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
