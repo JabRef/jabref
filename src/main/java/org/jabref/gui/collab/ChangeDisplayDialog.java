@@ -11,7 +11,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
+import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -24,8 +26,10 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
     private final ListView<DatabaseChangeViewModel> tree;
     private final BorderPane infoPanel = new BorderPane();
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
+    private final BibDatabaseContext database;
 
     public ChangeDisplayDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
+        this.database = database;
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
 
@@ -43,9 +47,8 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         infoPanel.setCenter(rootInfo);
 
         getDialogPane().getButtonTypes().setAll(
-                new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                ButtonType.CANCEL
-        );
+                                                new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
+                                                ButtonType.CANCEL);
 
         setResultConverter(button -> {
             if (button == ButtonType.CANCEL) {
@@ -66,7 +69,7 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         });
 
         EasyBind.subscribe(cb.selectedProperty(), selected -> {
-            if (selected != null && tree.getSelectionModel().getSelectedItem() != null) {
+            if ((selected != null) && (tree.getSelectionModel().getSelectedItem() != null)) {
                 tree.getSelectionModel().getSelectedItem().setAccepted(selected);
             }
         });
@@ -74,7 +77,20 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
         if (currentChange != null) {
-            infoPanel.setCenter(currentChange.description());
+
+            if (currentChange instanceof EntryChangeViewModel) {
+
+                EntryChangeViewModel entryChange = (EntryChangeViewModel) currentChange;
+
+                MergeEntries entries = new MergeEntries(entryChange.getFirst(), entryChange.getSecond(), database.getMode());
+                VBox desc = (VBox) currentChange.description();
+                desc.getChildren().add(entries);
+
+                infoPanel.setCenter(desc);
+            } else {
+                infoPanel.setCenter(currentChange.description());
+            }
+
             cb.setSelected(currentChange.isAccepted());
         }
     }
