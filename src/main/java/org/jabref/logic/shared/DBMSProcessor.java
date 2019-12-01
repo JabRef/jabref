@@ -38,7 +38,6 @@ public abstract class DBMSProcessor {
 
     public static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
-
     protected static final Logger LOGGER = LoggerFactory.getLogger(DBMSProcessor.class);
 
     protected final Connection connection;
@@ -123,7 +122,7 @@ public abstract class DBMSProcessor {
     protected abstract void setUp() throws SQLException;
 
     /**
-     * Escapes parts of SQL expressions like table or field name to match the conventions
+     * Escapes parts of SQL expressions such as a table name or a field name to match the conventions
      * of the database system using the current dbmsType.
      *
      * This method is package private, because of DBMSProcessorTest
@@ -480,6 +479,8 @@ public abstract class DBMSProcessor {
             BibEntry bibEntry = null;
             int lastId = -1;
             while (selectEntryResultSet.next()) {
+                // We get a list of field values of bib entries "grouped" by bib entries
+                // Thus, the first change in the shared id leads to a new BibEntry
                 if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
                     bibEntry = new BibEntry();
                     bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
@@ -489,12 +490,14 @@ public abstract class DBMSProcessor {
                     lastId = selectEntryResultSet.getInt("SHARED_ID");
                 }
 
+                // In all cases, we set the field value of the newly created BibEntry object
                 String value = selectEntryResultSet.getString("VALUE");
                 if (value != null) {
                     bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntriesEventSource.SHARED);
                 }
             }
         } catch (SQLException e) {
+            LOGGER.error("Executed >{}<", query.toString());
             LOGGER.error("SQL Error", e);
         }
 
