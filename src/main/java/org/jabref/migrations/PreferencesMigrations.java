@@ -11,6 +11,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.TableColumn;
+
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -316,10 +318,16 @@ public class PreferencesMigrations {
                                                    try {
                                                        return Double.parseDouble(string);
                                                    } catch (NumberFormatException e) {
-                                                       return ColumnPreferences.DEFAULT_WIDTH;
+                                                       return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
                                                    }
                                                })
                                                .collect(Collectors.toList());
+
+        List<TableColumn.SortType> sortTypes = preferences.getStringList(JabRefPreferences.COLUMN_SORT_TYPES)
+                .stream()
+                .map(TableColumn.SortType::valueOf)
+                .collect(Collectors.toList());
+
 
         // "field:"
         String normalFieldTypeString = MainTableColumnModel.Type.NORMALFIELD.getName() + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER;
@@ -332,24 +340,37 @@ public class PreferencesMigrations {
 
             for (int i = 0; i < columnNames.size(); i++) {
                 String name = columnNames.get(i);
+                Double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                TableColumn.SortType columnSortType = TableColumn.SortType.ASCENDING;
+
+
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
                                                              .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
                                                              .orElse(MainTableColumnModel.Type.NORMALFIELD);
+
                 if (i < columnWidths.size()) {
-                    columns.add(new MainTableColumnModel(type, name, columnWidths.get(i)));
-                } else {
-                    columns.add(new MainTableColumnModel(type, name));
+                    columnWidth = columnWidths.get(i);
                 }
+
+                if (i < sortTypes.size()) {
+                    columnSortType = sortTypes.get(i);
+                }
+
+                columns.add(new MainTableColumnModel(type, name, columnWidth, columnSortType));
             }
 
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
-                                                                             .map(MainTableColumnModel::getName)
-                                                                             .collect(Collectors.toList()));
+                    .map(MainTableColumnModel::getName)
+                    .collect(Collectors.toList()));
             preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columns.stream()
-                                                                              .map(MainTableColumnModel::getWidth)
-                                                                              .map(Double::intValue)
-                                                                              .map(Object::toString)
-                                                                              .collect(Collectors.toList()));
+                    .map(MainTableColumnModel::getWidth)
+                    .map(Double::intValue)
+                    .map(Object::toString)
+                    .collect(Collectors.toList()));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columns.stream()
+                    .map(MainTableColumnModel::getSortType)
+                    .map(TableColumn.SortType::toString)
+                    .collect(Collectors.toList()));
         }
     }
 }

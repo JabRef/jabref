@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.logic.l10n.Localization;
@@ -70,26 +71,29 @@ public class MainTableColumnModel {
     private final ObjectProperty<Type> typeProperty;
     private final StringProperty qualifierProperty;
     private final DoubleProperty widthProperty;
+    private final ObjectProperty<TableColumn.SortType> sortTypeProperty;
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
      * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
+     * @param sortType the stored sortType of the column, e.g. "ASCENDING"
      */
-    public MainTableColumnModel(Type type, String qualifier, double width) {
+    public MainTableColumnModel(Type type, String qualifier, double width, TableColumn.SortType sortType) {
         Objects.requireNonNull(type);
         typeProperty = new SimpleObjectProperty<>(type);
         qualifierProperty = new SimpleStringProperty(qualifier);
         widthProperty = new SimpleDoubleProperty(width);
+        sortTypeProperty = new SimpleObjectProperty<>(sortType);
     }
 
     public MainTableColumnModel(Type type, String qualifier) {
-        this(type, qualifier, ColumnPreferences.DEFAULT_WIDTH);
+        this(type, qualifier, ColumnPreferences.DEFAULT_COLUMN_WIDTH, TableColumn.SortType.ASCENDING);
     }
 
     public MainTableColumnModel(Type type, double width) {
-        this(type, "", width);
+        this(type, "", width, TableColumn.SortType.ASCENDING);
     }
 
     public MainTableColumnModel(Type type) {
@@ -122,10 +126,14 @@ public class MainTableColumnModel {
     public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
 
     public double getWidth() {
-        return widthProperty.get();
+        return widthProperty.getValue();
     }
 
     public DoubleProperty widthProperty() { return widthProperty; }
+
+    public TableColumn.SortType getSortType() { return sortTypeProperty.getValue(); }
+
+    public ObjectProperty<TableColumn.SortType> sortTypeProperty() { return sortTypeProperty; }
 
     public boolean equals(Object o) {
         if (this == o) {
@@ -153,12 +161,15 @@ public class MainTableColumnModel {
      *
      * @param rawColumnName the stored name of the column, e.g. "field:author"
      * @param width the stored width of the column
+     * @param sortType the stored sortType of the column, e.g. "ASCENDING"
      */
-    public static MainTableColumnModel parse(String rawColumnName, Double width) {
+    public static MainTableColumnModel parse(String rawColumnName, Double width, TableColumn.SortType sortType) {
         MainTableColumnModel columnModel = parse(rawColumnName);
 
         Objects.requireNonNull(width);
+        Objects.requireNonNull(sortType);
         columnModel.widthProperty().setValue(width);
+        columnModel.sortTypeProperty().setValue(sortType);
         return columnModel;
     }
 
