@@ -50,7 +50,11 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
-      - name: Run database test
-        run: ./gradlew databaseTest
-        env:
-          DBMS: "oracle"
+      - name: Test connection
+        run: 
+          sqlcl sys/Oracle18@localhost:32118/XE as sysdba
+          sqlcl jdbc:oracle:thin:@localhost:1521/xe
+      #- name: Run database test
+      #  run: ./gradlew databaseTest
+      #  env:
+      #    DBMS: "oracle"
