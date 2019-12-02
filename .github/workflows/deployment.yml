@@ -50,7 +50,7 @@ jobs:
     - name: Install GitVersion
       uses: gittools/actions/setup-gitversion@v0.3
       with:
-          versionSpec: '5.1.x'
+          versionSpec: '5.1.2'
     - name: Run GitVersion
       id: gitversion
       uses: gittools/actions/execute-gitversion@v0.3
