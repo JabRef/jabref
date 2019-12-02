@@ -589,7 +589,7 @@ public class BibDatabase {
      *
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
-     *   - {@link EntryRemovedEvent}
+     *   - {@link EntriesRemovedEvent}
      *   - {@link AllInsertsFinishedEvent}
      *
      * @param listener listener (subscriber) to add
