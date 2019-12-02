@@ -2,7 +2,6 @@ package org.jabref.logic.bst;
 
 import java.nio.file.Paths;
 
-import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

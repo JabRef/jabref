@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jabref.Globals;
 import org.jabref.logic.PreviewLayout;
-import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
 
 public class PreviewPreferences {
 
