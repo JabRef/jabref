@@ -157,8 +157,10 @@ public class DefaultAuxParser implements AuxParser {
                     Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
                     if (refEntry.isPresent()) {
-                        entriesToInsert.add(refEntry.get());
-                        result.increaseCrossRefEntriesCounter();
+                        if (!entriesToInsert.contains(refEntry.get())) {
+                            entriesToInsert.add(refEntry.get());
+                            result.increaseCrossRefEntriesCounter();
+                        }
                     } else {
                         result.getUnresolvedKeys().add(crossref);
                     }
