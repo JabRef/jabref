@@ -80,8 +80,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -1121,17 +1121,16 @@ public class BasePanel extends StackPane {
     private class GroupTreeListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
+        public void listen(EntriesAddedEvent addedEntriesEvent) {
+            // if the event is an undo, don't add it to the current group
+            if (addedEntriesEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
                 return;
             }
 
-            // Automatically add new entry to the selected group (or set of groups)
+            // Automatically add new entries to the selected group (or set of groups)
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
-                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+                        selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
         }
     }
@@ -1151,8 +1150,8 @@ public class BasePanel extends StackPane {
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry()));
+        public void listen(EntriesAddedEvent addedEntriesEvent) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> addedEntriesEvent.getBibEntries().forEach(entry -> searchAutoCompleter.indexEntry(entry)));
         }
 
         @Subscribe
@@ -1168,7 +1167,7 @@ public class BasePanel extends StackPane {
     private class SearchListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
+        public void listen(EntriesAddedEvent addedEntryEvent) {
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 

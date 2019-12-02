@@ -40,7 +40,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -129,8 +129,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     @Subscribe
-    public void listen(AllInsertsFinishedEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getBibEntry()));
+    public void listen(EntriesAddedEvent event) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {

@@ -21,9 +21,8 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
@@ -236,15 +235,15 @@ public class BibDatabase {
             internalIDs.add(id);
             entry.registerListener(this);
 
-            eventBus.post(new EntryAddedEvent(entry, eventSource));
-
             if (firstEntry == null) {
                 firstEntry = entry;
             }
         }
         entries.addAll(newEntries);
-        if (firstEntry != null) {
-            eventBus.post(new AllInsertsFinishedEvent(firstEntry, eventSource));
+        if (firstEntry == null) {
+            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
+        } else {
+            eventBus.post(new EntriesAddedEvent(newEntries, firstEntry, eventSource));
         }
     }
 
@@ -590,7 +589,6 @@ public class BibDatabase {
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
      *   - {@link EntriesRemovedEvent}
-     *   - {@link AllInsertsFinishedEvent}
      *
      * @param listener listener (subscriber) to add
      */
