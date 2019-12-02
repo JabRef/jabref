@@ -54,7 +54,3 @@ jobs:
         run: ./gradlew databaseTest
         env:
           DBMS: "oracle"
-      - name: Test connection
-        run:
-          sqlcl sys/Oracle18@localhost:32118/XE as sysdba
-          sqlcl jdbc:oracle:thin:@localhost:1521/xe
