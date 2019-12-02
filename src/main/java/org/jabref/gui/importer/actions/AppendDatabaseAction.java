@@ -15,7 +15,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;

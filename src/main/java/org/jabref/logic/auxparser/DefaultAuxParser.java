@@ -130,8 +130,7 @@ public class DefaultAuxParser implements AuxParser {
             if (!result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
                 Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
                 if (entry.isPresent()) {
-                    entriesToInsert.add(entry.get);
-                    resolveCrossReferences(entry.get(), result);
+                    entriesToInsert.add(entry.get());
                 } else {
                     result.getUnresolvedKeys().add(key);
                 }
@@ -158,7 +157,7 @@ public class DefaultAuxParser implements AuxParser {
                     Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
                     if (refEntry.isPresent()) {
-                        entriesToInsert.add(refEntry.get())
+                        entriesToInsert.add(refEntry.get());
                         result.increaseCrossRefEntriesCounter();
                     } else {
                         result.getUnresolvedKeys().add(crossref);
@@ -166,7 +165,7 @@ public class DefaultAuxParser implements AuxParser {
                 }
             });
         }
-        insertEntries(entriesToInsert);
+        insertEntries(entriesToInsert, result);
     }
 
     /*
