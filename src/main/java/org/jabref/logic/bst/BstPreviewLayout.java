@@ -1,0 +1,80 @@
+package org.jabref.logic.bst;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.jabref.logic.PreviewLayout;
+import org.jabref.logic.cleanup.ConvertToBiblatexCleanup;
+import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.layout.format.RemoveWhitespace;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+
+import org.antlr.runtime.RecognitionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class BstPreviewLayout implements PreviewLayout {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BstPreviewLayout.class);
+
+    private final String name;
+
+    private VM vm;
+    private String error;
+
+    public BstPreviewLayout(String filename) {
+        this(Paths.get(filename));
+    }
+
+    public BstPreviewLayout(Path path) {
+        name = path.getFileName().toString();
+        if (!Files.exists(path)) {
+            LOGGER.error("File {} not found", path.toAbsolutePath());
+            error = Localization.lang("Error opening file '%0'.", path.toString());
+            return;
+        }
+        try {
+            vm = new VM(path.toFile());
+        } catch (Exception e) {
+            LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
+            error = Localization.lang("Error opening file '%0'.", path.toString());
+        }
+    }
+
+    @Override
+    public String generatePreview(BibEntry entry, BibDatabase database) {
+        if (error != null) {
+            return error;
+        }
+        // ensure that the entry is of BibTeX format (and do not modify the original entry)
+        entry = (BibEntry) entry.clone();
+        new ConvertToBibtexCleanup().cleanup(entry);
+        String result = vm.run(List.of(entry));
+        result = new RemoveNewlinesFormatter().format(result);
+        // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
+        result = result.replace("\\begin{thebibliography}{1}", "");
+        result = result.replace("\\end{thebibliography}", "");
+        // The RemoveLatexCommandsFormatter keeps the word inside the latex command, but we want to remove that completely
+        result = result.replaceAll("\\\\bibitem[{].*[}]", "");
+        // We want to replace \newblock by a space instead of completely removing it
+        result = result.replace("\\newblock", " ");
+        // Final cleanup
+        result = new RemoveLatexCommandsFormatter().format(result);
+        result = new RemoveTilde().format(result);
+        result = result.trim().replaceAll("  +", " ");
+        return result;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+}
