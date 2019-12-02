@@ -26,7 +26,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;

@@ -23,7 +23,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;

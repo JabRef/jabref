@@ -21,7 +21,7 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;

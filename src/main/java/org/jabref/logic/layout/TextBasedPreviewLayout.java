@@ -1,12 +1,10 @@
-package org.jabref.logic.citationstyle;
+package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
 
+import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 

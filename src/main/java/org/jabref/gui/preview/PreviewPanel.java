@@ -23,7 +23,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

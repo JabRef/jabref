@@ -16,7 +16,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
