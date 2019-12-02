@@ -205,7 +205,7 @@ public class BibDatabaseTest {
         TestEventListener tel = new TestEventListener();
         database.registerListener(tel);
         database.insertEntry(expectedEntry);
-        assertEquals(expectedEntry, tel.getAddedEntry());
+        assertEquals(Collections.singletonList(expectedEntry), tel.getAddedEntries());
         assertEquals(expectedEntry, tel.getFirstInsertedEntry());
     }
 
@@ -217,7 +217,7 @@ public class BibDatabaseTest {
         database.registerListener(tel);
         database.insertEntries(firstEntry, secondEntry);
         assertEquals(firstEntry, tel.getFirstInsertedEntry());
-        assertEquals(secondEntry, tel.getAddedEntry());
+        assertEquals(Arrays.asList(firstEntry, secondEntry), tel.getAddedEntries());
     }
 
     @Test

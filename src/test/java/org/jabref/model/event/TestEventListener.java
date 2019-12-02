@@ -2,7 +2,6 @@ package org.jabref.model.event;
 
 import java.util.List;
 
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -33,7 +32,7 @@ public class TestEventListener {
         this.changedEntry = event.getBibEntry();
     }
 
-    public List<BibEntry> getAddedEntry() {
+    public List<BibEntry> getAddedEntries() {
         return addedEntries;
     }
 
