@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: 13
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
