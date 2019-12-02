@@ -109,7 +109,7 @@ public class ImportHandler {
 
     public void importEntries(List<BibEntry> entries) {
         //TODO: Add undo/redo
-        //ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+        //undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
 
         database.getDatabase().insertEntries(entries);
 
