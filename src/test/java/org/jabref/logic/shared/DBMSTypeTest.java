@@ -63,7 +63,7 @@ public class DBMSTypeTest {
     @Test
     public void testGetUrl() {
         assertEquals("jdbc:mariadb://localhost:3306/xe", DBMSType.MYSQL.getUrl("localhost", 3306, "xe"));
-        assertEquals("jdbc:oracle:thin:@localhost:1521:xe", DBMSType.ORACLE.getUrl("localhost", 1521, "xe"));
+        assertEquals("jdbc:oracle:thin:@localhost:1521/xe", DBMSType.ORACLE.getUrl("localhost", 1521, "xe"));
         assertEquals("jdbc:postgresql://localhost:5432/xe", DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe"));
     }
 
