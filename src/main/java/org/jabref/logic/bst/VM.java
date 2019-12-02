@@ -32,14 +32,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * A Bibtex Virtual machine that can execute .bst files.
+ * A BibTeX Virtual machine that can execute .bst files.
  *
  * Documentation can be found in the original bibtex distribution:
  *
  * https://www.ctan.org/pkg/bibtex
  *
  */
-
 public class VM implements Warn {
 
     public static final Integer FALSE = 0;
@@ -74,7 +73,6 @@ public class VM implements Warn {
 
         public final String name;
 
-
         public Identifier(String name) {
             this.name = name;
         }
@@ -87,7 +85,6 @@ public class VM implements Warn {
     public static class Variable {
 
         public final String name;
-
 
         public Variable(String name) {
             this.name = name;
@@ -102,7 +99,6 @@ public class VM implements Warn {
     public interface BstFunction {
         void execute(BstEntry context);
     }
-
 
     public VM(File f) throws RecognitionException, IOException {
         this(new ANTLRFileStream(f.getPath()));
