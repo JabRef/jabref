@@ -105,10 +105,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
      *
-     * @param event {@link EntryRemovedEvent} object
+     * @param event {@link EntriesRemovedEvent} object
      */
 
-    // This has not been made parallel yet - hence the for loop - that will take more effort
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
