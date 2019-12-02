@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
