@@ -153,7 +153,7 @@ jobs:
           docker build -t oracle-xe:18c .
           docker run -d -p 32118:1521 -p 35518:5500 --name=oracle-xe oracle-xe:18c
           # give oracle some time to start
-          sleep 30
+          sleep 90
           docker logs oracle-xe
           # path `/opt/oracle/product/18c/dbhomeXE` is taken from the `Dockerfile` used to build "oracle-xe"
           docker exec -i oracle-xe bash -c "source /home/oracle/.bashrc; /bin/bash -c '/opt/oracle/product/18c/dbhomeXE/bin/sqlplus sys/Oracle18@localhost/jabref as sysdba'" < $GITHUB_WORKSPACE/buildres/setup-test-oracle.sql
