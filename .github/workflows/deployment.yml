@@ -31,9 +31,8 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v2-beta
-    - name: Fetch tags for GitVersion
+    - name: Fetch tags and master for GitVersion
       run: |
-        git fetch --unshallow
         git branch --create-reflog master origin/master
         git fetch --tags origin
     - name: Install GitVersion
