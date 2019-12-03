@@ -56,7 +56,7 @@ public class DoiFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("DOItoBibTeX", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-publication-identifiers/doitobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

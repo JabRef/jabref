@@ -34,7 +34,7 @@ class ZbMATHTest {
         donaldsonEntry = new BibEntry();
         donaldsonEntry.setType(StandardEntryType.Article);
         donaldsonEntry.setCiteKey("zbMATH03800580");
-        donaldsonEntry.setField(StandardField.AUTHOR, "S.K. {Donaldson}");
+        donaldsonEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
         donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
         donaldsonEntry.setField(StandardField.ISSN, "0022-040X; 1945-743X/e");
         donaldsonEntry.setField(StandardField.LANGUAGE, "English");
