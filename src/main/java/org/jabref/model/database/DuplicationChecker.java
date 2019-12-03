@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;

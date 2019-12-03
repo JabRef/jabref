@@ -1,6 +1,5 @@
 package org.jabref.model.database.event;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;

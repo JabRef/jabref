@@ -2,8 +2,8 @@ package org.jabref.model.event;
 
 import java.util.List;
 
-import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 

@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
