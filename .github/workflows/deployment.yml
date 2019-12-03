@@ -34,6 +34,7 @@ jobs:
     - name: Fetch tags for GitVersion
       run: |
         git fetch --unshallow
+        git branch --create-reflog master origin/master
         git fetch --tags origin
     - name: Install GitVersion
       uses: gittools/actions/setup-gitversion@v0.3
