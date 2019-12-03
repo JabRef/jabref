@@ -32,7 +32,9 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v2-beta
     - name: Fetch tags for GitVersion
-      run: git fetch --tags origin
+      run: |
+        git fetch --unshallow
+        git fetch --tags origin
     - name: Install GitVersion
       uses: gittools/actions/setup-gitversion@v0.3
       with:
