@@ -38,7 +38,7 @@ class BstPreviewLayoutTest {
     public void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Paths.get(ClassLoader.getSystemResource("bst/IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabase);
-        assertEquals("T. Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. #may# 2014.", preview);
+        assertEquals("T. Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" #may# 2014.", preview);
     }
 
     private static BibEntry getSliceTheoremPaper() {

@@ -9,6 +9,7 @@ import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
 import org.jabref.model.database.BibDatabase;
@@ -54,7 +55,9 @@ public class BstPreviewLayout implements PreviewLayout {
         entry = (BibEntry) entry.clone();
         new ConvertToBibtexCleanup().cleanup(entry);
         String result = vm.run(List.of(entry));
-        result = new RemoveNewlinesFormatter().format(result);
+        // Remove all comments
+        result = result.replaceAll("%.*", "");
+        // Remove all LaTeX comments
         // The RemoveLatexCommandsFormatter keeps the words inside latex environments. Therefore, we remove them manually
         result = result.replace("\\begin{thebibliography}{1}", "");
         result = result.replace("\\end{thebibliography}", "");
@@ -62,7 +65,16 @@ public class BstPreviewLayout implements PreviewLayout {
         result = result.replaceAll("\\\\bibitem[{].*[}]", "");
         // We want to replace \newblock by a space instead of completely removing it
         result = result.replace("\\newblock", " ");
+        // remove all latex commands statements - assumption: command in a separate line
+        result = result.replaceAll("(?m)^\\\\.*$", "");
+        // remove some IEEEtran.bst output (resulting from a multiline \providecommand)
+        result = result.replace("#2}}", "");
+        // Have quotes right - and more
+        result = new LatexToUnicodeFormatter().format(result);
+        result = result.replace("``", "\"");
+        result = result.replace("''", "\"");
         // Final cleanup
+        result = new RemoveNewlinesFormatter().format(result);
         result = new RemoveLatexCommandsFormatter().format(result);
         result = new RemoveTilde().format(result);
         result = result.trim().replaceAll("  +", " ");
