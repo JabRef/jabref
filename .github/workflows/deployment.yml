@@ -31,9 +31,6 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v2-beta
-      with:
-        depth: 1
-        submodules: false
     - name: Fetch tags for GitVersion
       run: git fetch --tags origin
     - name: Install GitVersion
