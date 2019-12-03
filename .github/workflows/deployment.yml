@@ -30,23 +30,12 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2-beta
       with:
         depth: 1
         submodules: false
-    - name: Extract branch name
-      shell: bash
-      run: |
-         ref=${GITHUB_REF#refs/heads/}
-         ref=${ref#refs/pull/}
-         ref=${ref%/merge}
-         echo "##[set-output name=branch;]${ref}"
-      id: extract_branch
-    - name: Reattach head, fetch tags and master for GitVersion
-      run: |
-          git checkout "${{ steps.extract_branch.outputs.branch }}"
-          git branch --create-reflog master origin/master
-          git fetch --tags origin
+    - name: Fetch tags for GitVersion
+      run: git fetch --tags origin
     - name: Install GitVersion
       uses: gittools/actions/setup-gitversion@v0.3
       with:
@@ -104,7 +93,7 @@ jobs:
       run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Build and publish snap
-      if: matrix.os == 'ubuntu-latest' && steps.extract_branch.outputs.branch == 'master'
+      if: matrix.os == 'ubuntu-latest' && steps.gitversion.outputs.branchName == 'master'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
@@ -120,7 +109,7 @@ jobs:
       uses: garygrossgarten/github-action-scp@release
       with:
         local: build/distribution
-        remote: www/${{ steps.extract_branch.outputs.branch }}
+        remote: www/${{ steps.gitversion.outputs.branchName }}
         host: builds.jabref.org
         username: builds_jabref_org
         privateKey: ${{ secrets.buildJabRefPrivateKey }}
