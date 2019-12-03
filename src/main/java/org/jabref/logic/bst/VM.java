@@ -904,7 +904,7 @@ public class VM implements Warn {
                     macro(child);
                     break;
                 default:
-                    LOGGER.info("Unknown type: " + child.getType());
+                    LOGGER.info("Unknown type: {}", child.getType());
                     break;
             }
         }
