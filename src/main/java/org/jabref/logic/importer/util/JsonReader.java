@@ -24,6 +24,9 @@ public class JsonReader {
             while ((inputStr = streamReader.readLine()) != null) {
                 responseStrBuilder.append(inputStr);
             }
+            if (responseStrBuilder.toString().isBlank()) {
+                throw new ParseException("Empty input!");
+            }
             return new JSONObject(responseStrBuilder.toString());
         } catch (IOException e) {
             throw new ParseException(e);

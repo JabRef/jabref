@@ -24,6 +24,9 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.16.4'
+
+    // nicer test outputs during running and completion
+    id 'com.adarshr.test-logger' version '2.0.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -99,7 +102,7 @@ configurations {
 }
 
 javafx {
-    version = "13"
+    version = "13.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -128,7 +131,7 @@ dependencies {
     //compile "org.libreoffice:ridl:6.2.3"
     //compile "org.libreoffice:unoil:6.2.3"
 
-    compile 'io.github.java-diff-utils:java-diff-utils:4.0'
+    compile 'io.github.java-diff-utils:java-diff-utils:4.5'
     compile 'info.debatty:java-string-similarity:1.2.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
@@ -137,7 +140,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.7.2'
     compile 'org.antlr:antlr4-runtime:4.7.2'
 
-    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.1'
+    compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.2'
 
     compile 'org.postgresql:postgresql:42.2.8'
 
@@ -160,13 +163,13 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.10.2'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.3'
     compile group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     compile 'com.jfoenix:jfoenix:9.0.9'
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.konghq:unirest-java:3.1.04'
+    compile 'com.konghq:unirest-java:3.2.00'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -203,26 +206,25 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.53'
+    testCompile 'io.github.classgraph:classgraph:4.8.58'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
-
-
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.3'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.4'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testCompile 'org.mockito:mockito-core:3.1.0'
+    testCompile 'org.mockito:mockito-core:3.2.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.12.0'
     //testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.11.0'
     testCompile 'com.tngtech.archunit:archunit-junit5-api:0.12.0'
-    testCompile "org.testfx:testfx-core:4.0.15-alpha"
-    testCompile "org.testfx:testfx-junit5:4.0.15-alpha"
+    testCompile "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
+    testCompile "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
+    testCompile "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.27'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
@@ -438,7 +440,6 @@ javadoc {
 
 localization.script = 'scripts/syncLang.py'
 
-// Test tasks
 test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
@@ -452,6 +453,10 @@ test {
     }
 }
 
+testlogger {
+    showPassed false
+}
+
 task databaseTest(type: Test) {
     useJUnitPlatform {
         includeTags 'DatabaseTest'
@@ -459,7 +464,7 @@ task databaseTest(type: Test) {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        events = ["FAILED"]
         exceptionFormat "full"
     }
 }
@@ -471,7 +476,7 @@ task fetcherTest(type: Test) {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        events = ["FAILED"]
         exceptionFormat "full"
     }
 }
@@ -483,7 +488,7 @@ task guiTest(type: Test) {
 
     testLogging {
         // set options for log level LIFECYCLE
-        events = ["FAILED", "STANDARD_OUT", "STANDARD_ERROR"]
+        events = ["FAILED"]
         exceptionFormat "full"
     }
 }
@@ -524,8 +529,9 @@ jacocoTestReport {
     dependsOn jacocoMerge
 
     reports {
-        xml.enabled = true // coveralls plugin depends on xml format report
+        csv.enabled = true
         html.enabled = true
+        xml.enabled = true // coveralls plugin depends on xml format report
     }
 }
 
@@ -616,11 +622,11 @@ jlink {
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
-                    // temporarily disabled due to conflict with Jpackage update
-                    //'--win-dir-chooser',
+                    '--win-dir-chooser',
                     '--win-shortcut',
                     '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres/windows"
+                    '--resource-dir', "${projectDir}/buildres/windows",
+                    '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
         }
 
@@ -637,7 +643,8 @@ jlink {
                     '--linux-rpm-license-type', 'MIT',
                     // '--license-file', "${projectDir}/LICENSE.md",
                     '--description', 'JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.',
-                    '--linux-shortcut'
+                    '--linux-shortcut',
+                    '--file-associations', "${projectDir}/buildres/linux/bibtexAssociations.properties"
             ]
         }
 
@@ -647,7 +654,8 @@ jlink {
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
-                    '--app-version', "${project.version}"
+                    '--app-version', "${project.version}",
+                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
             ]
         }
     }
@@ -657,7 +665,7 @@ if (OperatingSystem.current().isWindows()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/windows") {
-                include "jabref.json", "JabRefHost.bat", "JabRefHost.ps1"
+                include "jabref.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
             }
             into "$buildDir/distribution/JabRef"
         }
@@ -668,7 +676,7 @@ if (OperatingSystem.current().isLinux()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/linux") {
-                include "org.jabref.jabref.json", "jabrefHost.py"
+                include "native-messaging-host/**", "jabrefHost.py"
             }
             into "$buildDir/distribution/JabRef/lib"
         }

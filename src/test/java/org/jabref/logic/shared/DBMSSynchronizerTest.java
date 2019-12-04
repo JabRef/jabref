@@ -1,7 +1,6 @@
 package org.jabref.logic.shared;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,38 +24,59 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.DatabaseTest;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DatabaseTest
+@Execution(ExecutionMode.SAME_THREAD)
 public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
     private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+    private DBMSConnection dbmsConnection;
+    private DBMSProcessor dbmsProcessor;
+    private DBMSType dbmsType;
 
-    public void setUp(DBMSConnection dbmsConnection) throws Exception {
-        clear(dbmsConnection);
+    private BibEntry createExampleBibEntry(int index) {
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.AUTHOR, "Wirthlin, Michael J" + index)
+                .withField(StandardField.TITLE, "The nano processor" + index);
+        bibEntry.getSharedBibEntryData().setSharedID(index);
+        return bibEntry;
+    }
+
+    @BeforeEach
+    public void setup() throws Exception {
+        this.dbmsType = TestManager.getDBMSTypeTestParameter();
+        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
+        TestManager.clearTables(this.dbmsConnection);
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
 
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern, new DummyFileUpdateMonitor());
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testEntryAddedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
+    @AfterEach
+    public void clear() throws SQLException {
+        this.dbmsConnection.getConnection().close();
+    }
 
-        BibEntry expectedEntry = getBibEntryExample(1);
-        BibEntry furtherEntry = getBibEntryExample(1);
+    @Test
+    public void testEntryAddedEventListener() throws Exception {
+        BibEntry expectedEntry = createExampleBibEntry(1);
+        BibEntry furtherEntry = createExampleBibEntry(1);
 
         bibDatabase.insertEntry(expectedEntry);
         // should not add into shared database.
@@ -64,36 +84,43 @@ public class DBMSSynchronizerTest {
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
 
-        assertEquals(1, actualEntries.size());
-        assertEquals(expectedEntry, actualEntries.get(0));
-
-        clear(dbmsConnection);
+        assertEquals(List.of(expectedEntry), actualEntries);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testFieldChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
-
-        BibEntry expectedEntry = getBibEntryExample(1);
+    @Test
+    public void twoLocalFieldChangesAreSynchronizedCorrectly() throws Exception {
+        BibEntry expectedEntry = createExampleBibEntry(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
         expectedEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
-        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer", EntriesEventSource.SHARED);
+        expectedEntry.setField(StandardField.TITLE, "The micro multiplexer");
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(Collections.singletonList(expectedEntry), actualEntries);
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testEntryRemovedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
+    @Test
+    public void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() throws Exception {
+        BibEntry exampleBibEntry = createExampleBibEntry(1);
+        exampleBibEntry.registerListener(dbmsSynchronizer);
 
-        BibEntry bibEntry = getBibEntryExample(1);
+        bibDatabase.insertEntry(exampleBibEntry);
+        exampleBibEntry.setField(StandardField.AUTHOR, "Brad L and Gilson");
+        // shared updates are not synchronized back to the remote database
+        exampleBibEntry.setField(StandardField.TITLE, "The micro multiplexer", EntriesEventSource.SHARED);
+
+        List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
+
+        BibEntry expectedBibEntry = createExampleBibEntry(1)
+                .withField(StandardField.AUTHOR, "Brad L and Gilson");
+
+        assertEquals(Collections.singletonList(expectedBibEntry), actualEntries);
+    }
+
+    @Test
+    public void testEntriesRemovedEventListener() throws Exception {
+        BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
@@ -111,15 +138,10 @@ public class DBMSSynchronizerTest {
         actualEntries = dbmsProcessor.getSharedEntries();
         assertEquals(1, actualEntries.size());
         assertEquals(bibEntry, actualEntries.get(0));
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testMetaDataChangedEventListener(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
-
+    @Test
+    public void testMetaDataChangedEventListener() throws Exception {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -129,29 +151,19 @@ public class DBMSSynchronizerTest {
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         assertEquals(expectedMap, actualMap);
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testInitializeDatabases(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
-
-        clear(dbmsConnection);
+    @Test
+    public void testInitializeDatabases() throws Exception {
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testSynchronizeLocalDatabaseWithEntryRemoval(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
-
-        List<BibEntry> expectedBibEntries = Arrays.asList(getBibEntryExample(1), getBibEntryExample(2));
+    @Test
+    public void testSynchronizeLocalDatabaseWithEntryRemoval() throws Exception {
+        List<BibEntry> expectedBibEntries = Arrays.asList(createExampleBibEntry(1), createExampleBibEntry(2));
 
         dbmsProcessor.insertEntry(expectedBibEntries.get(0));
         dbmsProcessor.insertEntry(expectedBibEntries.get(1));
@@ -162,46 +174,54 @@ public class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntry(expectedBibEntries.get(0));
-        dbmsProcessor.removeEntry(expectedBibEntries.get(1));
+        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.get(0)));
 
-        expectedBibEntries = new ArrayList<>();
+        expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
-
-        clear(dbmsConnection);
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testSynchronizeLocalDatabaseWithEntryUpdate(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
-
-        BibEntry bibEntry = getBibEntryExample(1);
+    @Test
+    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws Exception {
+        BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
-        assertEquals(1, bibDatabase.getEntries().size());
+        assertEquals(List.of(bibEntry), bibDatabase.getEntries());
 
-        BibEntry modifiedBibEntry = getBibEntryExample(1);
-        modifiedBibEntry.setField(new UnknownField("custom"), "custom value");
+        BibEntry modifiedBibEntry = createExampleBibEntry(1)
+                .withField(new UnknownField("custom"), "custom value");
         modifiedBibEntry.clearField(StandardField.TITLE);
         modifiedBibEntry.setType(StandardEntryType.Article);
 
         dbmsProcessor.updateEntry(modifiedBibEntry);
-        //testing point
+        assertEquals(1, modifiedBibEntry.getSharedBibEntryData().getSharedID());
         dbmsSynchronizer.synchronizeLocalDatabase();
 
-        assertEquals(bibDatabase.getEntries(), dbmsProcessor.getSharedEntries());
-        clear(dbmsConnection);
+        assertEquals(List.of(modifiedBibEntry), bibDatabase.getEntries());
+        assertEquals(List.of(modifiedBibEntry), dbmsProcessor.getSharedEntries());
     }
 
-    @ParameterizedTest
-    @MethodSource("org.jabref.logic.shared.TestManager#getTestingDatabaseSystems")
-    public void testApplyMetaData(DBMSType dbmsType, DBMSConnection dbmsConnection, DBMSProcessor dbmsProcessor) throws Exception {
-        setUp(dbmsConnection);
+    @Test
+    public void updateEntryDoesNotModifyLocalDatabase() throws Exception {
+        BibEntry bibEntry = createExampleBibEntry(1);
+        bibDatabase.insertEntry(bibEntry);
+        assertEquals(List.of(bibEntry), bibDatabase.getEntries());
 
-        BibEntry bibEntry = getBibEntryExample(1);
+        BibEntry modifiedBibEntry = createExampleBibEntry(1)
+                .withField(new UnknownField("custom"), "custom value");
+        modifiedBibEntry.clearField(StandardField.TITLE);
+        modifiedBibEntry.setType(StandardEntryType.Article);
+
+        dbmsProcessor.updateEntry(modifiedBibEntry);
+
+        assertEquals(List.of(bibEntry), bibDatabase.getEntries());
+        assertEquals(List.of(modifiedBibEntry), dbmsProcessor.getSharedEntries());
+    }
+
+    @Test
+    public void testApplyMetaData() throws Exception {
+        BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
@@ -211,20 +231,5 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.applyMetaData();
 
         assertEquals("wirthlin, michael j1", bibEntry.getField(StandardField.AUTHOR).get());
-
-        clear(dbmsConnection);
-    }
-
-    private BibEntry getBibEntryExample(int index) {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setField(StandardField.AUTHOR, "Wirthlin, Michael J" + index);
-        bibEntry.setField(StandardField.TITLE, "The nano processor" + index);
-        bibEntry.getSharedBibEntryData().setSharedID(index);
-        return bibEntry;
-    }
-
-    public void clear(DBMSConnection dbmsConnection) throws SQLException {
-        TestManager.clearTables(dbmsConnection);
     }
 }

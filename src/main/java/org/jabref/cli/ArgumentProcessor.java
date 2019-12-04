@@ -524,7 +524,7 @@ public class ArgumentProcessor {
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
-        if ((fetchCommand == null) || !fetchCommand.contains(":") || (fetchCommand.split(":").length != 2)) {
+        if ((fetchCommand == null) || !fetchCommand.contains(":")) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
             return Optional.empty();

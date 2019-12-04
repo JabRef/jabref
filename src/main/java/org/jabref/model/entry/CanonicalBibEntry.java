@@ -56,6 +56,9 @@ public class CanonicalBibEntry {
             String line = String.format("  %s = {%s}", fieldName, String.valueOf(mapFieldToValue.get(fieldName)).replaceAll("\\r\\n", "\n"));
             sj.add(line);
         }
+
+        sj.add(String.format("  _jabref_shared = {sharedId: %d, version: %d}", entry.getSharedBibEntryData().getSharedID(), entry.getSharedBibEntryData().getVersion()));
+
         sb.append(sj);
 
         // append the closing entry bracket

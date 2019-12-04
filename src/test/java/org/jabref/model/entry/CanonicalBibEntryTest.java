@@ -14,7 +14,8 @@ class CanonicalBibEntryTest {
         BibEntry entry = new BibEntry();
         entry.setMonth(Month.MAY);
         assertEquals("@misc{,\n" +
-                "  month = {#may#}\n" +
+                "  month = {#may#},\n" +
+                "  _jabref_shared = {sharedId: -1, version: 1}\n" +
                 "}", CanonicalBibEntry.getCanonicalRepresentation(entry));
     }
 
@@ -26,7 +27,7 @@ class CanonicalBibEntryTest {
         e.setField(StandardField.TITLE, "def");
         e.setField(StandardField.JOURNAL, "hij");
         String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
-        assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def}\n}",
+        assertEquals("@article{key,\n  author = {abc},\n  journal = {hij},\n  title = {def},\n  _jabref_shared = {sharedId: -1, version: 1}\n}",
                 canonicalRepresentation);
     }
 
@@ -36,6 +37,6 @@ class CanonicalBibEntryTest {
         e.setCiteKey("key");
         e.setField(StandardField.ABSTRACT, "line 1\nline 2");
         String canonicalRepresentation = CanonicalBibEntry.getCanonicalRepresentation(e);
-        assertEquals("@article{key,\n  abstract = {line 1\nline 2}\n}", canonicalRepresentation);
+        assertEquals("@article{key,\n  abstract = {line 1\nline 2},\n  _jabref_shared = {sharedId: -1, version: 1}\n}", canonicalRepresentation);
     }
 }

@@ -21,6 +21,7 @@ public enum Language {
     DUTCH("Nederlands", "nl"),
     NORWEGIAN("Norsk", "no"),
     PERSIAN("Persian (فارسی)", "fa"),
+    PORTUGUESE("Português","pt"),
     RUSSIAN("Russian", "ru"),
     SIMPLIFIED_CHINESE("Simplified Chinese", "zh"),
     SVENSKA("Svenska", "sv"),

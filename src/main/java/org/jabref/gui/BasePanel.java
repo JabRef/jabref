@@ -41,7 +41,7 @@ import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.WriteXMPAction;
-import org.jabref.gui.externalfiles.FindFullTextAction;
+import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
@@ -372,7 +372,7 @@ public class BasePanel extends StackPane {
         actions.put(Actions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(this, AbbreviationType.SHORTEST_UNIQUE));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
     }
 
     /**

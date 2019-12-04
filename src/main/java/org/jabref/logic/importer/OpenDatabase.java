@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class OpenDatabase {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
 
     private OpenDatabase() {
     }

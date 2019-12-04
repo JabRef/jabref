@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -201,7 +202,7 @@ class RegExpBasedFileFinder implements FileFinder {
     }
 
     private List<Path> collectFilesWithMatcher(Path actualDirectory, BiPredicate<Path, BasicFileAttributes> matcher) {
-        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher)) {
+        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
             return pathStream.collect(Collectors.toList());
         } catch (UncheckedIOException | IOException ioe) {
             return Collections.emptyList();

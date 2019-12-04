@@ -1,5 +1,7 @@
 package org.jabref.migrations;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
@@ -118,11 +120,11 @@ class PreferencesMigrationsTest {
 
     @Test
     void testUpgradeColumnPreferencesAlreadyMigrated() {
-        String columnNames = "groups;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey";
-        String columnWidths = "28;28;75;300;470;60;130;100";
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
-        when(prefs.get(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(prefs.get(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
         PreferencesMigrations.upgradeColumnPreferences(prefs);
 
@@ -132,17 +134,17 @@ class PreferencesMigrationsTest {
 
     @Test
     void testUpgradeColumnPreferencesFromWithoutTypes() {
-        String columnNames = "entrytype;author/editor;title;year;journal/booktitle;bibtexkey";
-        String columnWidths = "75;300;470;60;130;100";
-        String updatedNames = "groups;linked_id;entrytype;author/editor;title;year;journal/booktitle;bibtexkey";
-        String updatedWidths = "28;28;75;300;470;60;130;100";
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
+        List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
 
-        when(prefs.get(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
-        when(prefs.get(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
 
         PreferencesMigrations.upgradeColumnPreferences(prefs);
 
-        verify(prefs).put(JabRefPreferences.COLUMN_NAMES, updatedNames);
-        verify(prefs).put(JabRefPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_NAMES, updatedNames);
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_WIDTHS, updatedWidths);
     }
 }

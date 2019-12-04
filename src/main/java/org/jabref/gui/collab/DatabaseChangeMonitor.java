@@ -46,7 +46,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     @Override
     public void fileUpdated() {
         // File on disk has changed, thus look for notable changes and notify listeners in case there are such changes
-        ChangeScanner scanner = new ChangeScanner(database, referenceFile);
+        ChangeScanner scanner = new ChangeScanner(database);
         BackgroundTask.wrap(scanner::scanForChanges)
                       .onSuccess(changes -> {
                           if (!changes.isEmpty()) {

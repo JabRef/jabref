@@ -1,14 +1,14 @@
 package org.jabref.gui.collab;
 
+import java.util.Objects;
+
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.undo.UndoableStringChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 
 import org.slf4j.Logger;
@@ -18,44 +18,31 @@ class StringNameChangeViewModel extends DatabaseChangeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StringNameChangeViewModel.class);
     private final BibtexString string;
-    private final String mem;
-    private final String disk;
-    private final String content;
+    private final BibtexString newString;
 
-    public StringNameChangeViewModel(BibtexString string, BibtexString tmpString, String mem, String disk) {
-        super(Localization.lang("Renamed string") + ": '" + tmpString.getName() + '\'');
-        this.string = string;
-        this.content = tmpString.getContent();
-        this.mem = mem;
-        this.disk = disk;
+    public StringNameChangeViewModel(BibtexString string, BibtexString newString) {
+        super(Localization.lang("Renamed string") + ": '" + string.getName() + '\'');
+        this.string = Objects.requireNonNull(string);
+        this.newString = Objects.requireNonNull(newString);
     }
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        if (database.getDatabase().hasStringLabel(disk)) {
+        if (database.getDatabase().hasStringByName(newString.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            LOGGER.info("Cannot rename string '" + mem + "' to '" + disk + "' because the name "
+            LOGGER.info("Cannot rename string '" + string.getName() + "' to '" + newString.getName() + "' because the name "
                     + "is already in use.");
         }
 
-        if (string == null) {
-            // The string was removed or renamed locally. We guess that it was removed.
-            BibtexString bs = new BibtexString(disk, content);
-            try {
-                database.getDatabase().addString(bs);
-                undoEdit.addEdit(new UndoableInsertString(database.getDatabase(), bs));
-            } catch (KeyCollisionException ex) {
-                LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
-            }
-        } else {
-            string.setName(disk);
-            undoEdit.addEdit(new UndoableStringChange(string, true, mem, disk));
-        }
+        String currentName = string.getName();
+        String newName = newString.getName();
+        string.setName(newName);
+        undoEdit.addEdit(new UndoableStringChange(string, true, currentName, newName));
     }
 
     @Override
     public Node description() {
-        return new Label(disk + " : " + content);
+        return new Label(newString.getName() + " : " + string.getContent());
     }
 
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -28,7 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
+@Execution(CONCURRENT)
 class BibEntryTest {
     private BibEntry entry;
 
@@ -69,6 +72,17 @@ class BibEntryTest {
     public void getFieldWorksWithBibFieldAsWell() throws Exception {
         entry.setField(StandardField.AUTHOR, "value");
         assertEquals(Optional.of("value"), entry.getField(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT).getField()));
+    }
+
+    @Test
+    public void newBibEntryIsUnchanged() {
+        assertFalse(entry.hasChanged());
+    }
+
+    @Test
+    public void setFieldLeadsToAChangedEntry() throws Exception {
+        entry.setField(StandardField.AUTHOR, "value");
+        assertTrue(entry.hasChanged());
     }
 
     @Test
@@ -615,5 +629,17 @@ class BibEntryTest {
         KeywordList actual = entry.getResolvedKeywords(',', database);
 
         assertEquals(new KeywordList(new Keyword("kw"), new Keyword("kw2"), new Keyword("kw3")), actual);
+    }
+
+    @Test
+    public void settingTitleFieldsLeadsToChangeFlagged() {
+        entry.setField(StandardField.AUTHOR, "value");
+        assertTrue(entry.hasChanged());
+    }
+
+    @Test
+    public void builderReturnsABibEntryNotChangedFlagged() {
+        entry = new BibEntry().withField(StandardField.AUTHOR, "value");
+        assertFalse(entry.hasChanged());
     }
 }
