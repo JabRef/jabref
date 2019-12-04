@@ -30,7 +30,7 @@ public class TagBar<T> extends HBox {
     @FXML private TextField inputTextField;
     @FXML private HBox tagList;
     private BiConsumer<T, MouseEvent> onTagClicked;
-    private Boolean allowsMultiple;
+    private Boolean allowsMultiple=true;
 
     public TagBar() {
         tags = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -84,9 +84,9 @@ public class TagBar<T> extends HBox {
     @FXML
     private void addTextAsNewTag(ActionEvent event) {
         String inputText = inputTextField.getText();
-        if (StringUtil.isNotBlank(inputText)&&(tags.isEmpty()||this.allowsMultiple)) {
+        if (StringUtil.isNotBlank(inputText)) {
             T newTag = stringConverter.fromString(inputText);
-            if ((newTag != null) && !tags.contains(newTag)) {
+            if ((newTag != null) && !tags.contains(newTag)&&(tags.isEmpty()||this.allowsMultiple)) {
                 tags.add(newTag);
                 inputTextField.clear();
             }
