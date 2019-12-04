@@ -133,11 +133,6 @@ jobs:
         with:
           path: ~/oracle-xe
           key: ${{ runner.os }}-oraclexe-rpm-${{ hashFiles('.github/workflows/tests.yml') }}
-      - name: Cache built docker image
-        uses: actions/cache@v1
-        with:
-          path: /var/lib/docker/graph/
-          key: ${{ runner.os }}-oraclexe-docker-${{ hashFiles('.github/workflows/tests.yml') }}
       - name: Start Oracle XE
         run: |
           mkdir ~/oracle-xe || true
