@@ -486,7 +486,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_PASSWORD, "");
 
         defaults.put(USE_CUSTOM_GROBID_SERVER, Boolean.FALSE);
-        defaults.put(CUSTOM_GROBID_SERVER, "http://localhost:8070");
+        defaults.put(CUSTOM_GROBID_SERVER, "http://grobid.cm.in.tum.de:8070");
 
         defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
         defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
