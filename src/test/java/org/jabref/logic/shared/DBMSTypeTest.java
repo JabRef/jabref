@@ -107,10 +107,12 @@ public class DBMSTypeTest {
     public void getDefaultPortForMysqlHasCorrectValue() {
         assertEquals(3306, DBMSType.MYSQL.getDefaultPort());
     }
+
     @Test
     public void getDefaultPortForOracleHasCorrectValue() {
         assertEquals(1521, DBMSType.ORACLE.getDefaultPort());
     }
+
     @Test
     public void getDefaultPortForPostgresHasCorrectValue() {
         assertEquals(5432, DBMSType.POSTGRESQL.getDefaultPort());

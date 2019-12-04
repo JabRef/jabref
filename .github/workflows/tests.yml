@@ -128,36 +128,6 @@ jobs:
         env:
           CI: "true"
           DBMS: "mysql"
-      - name: Cache Oracle XE downloads
-        uses: actions/cache@v1
-        with:
-          path: ~/oracle-xe
-          key: ${{ runner.os }}-oraclexe-rpm-${{ hashFiles('.github/workflows/tests.yml') }}
-      - name: Start Oracle XE
-        run: |
-          mkdir ~/oracle-xe || true
-          cd ~/oracle-xe
-          wget -qN https://github.com/deusaquilus/docker-oracle-xe/archive/master.zip
-          unzip master.zip
-          cd docker-oracle-xe-master
-          wget -qN http://ccrypt.sourceforge.net/download/1.11/ccrypt-1.11.linux-x86_64.tar.gz
-          wget -qN -O files/oracle-database-xe-18c-1.0-1.x86_64.rpm.cpt https://files.jabref.org/thing.cpt
-          pwd
-          tar xzf ccrypt-1.11.linux-x86_64.tar.gz
-          ccrypt-1.11.linux-x86_64/ccrypt -d -E CCRYPT files/oracle-database-xe-18c-1.0-1.x86_64.rpm.cpt
-          docker build -t oracle-xe:18c .
-          docker run -d -p 32118:1521 -p 35518:5500 --name=oracle-xe oracle-xe:18c
-          # give oracle some time to start
-          sleep 300
-          docker logs oracle-xe
-          # path `/opt/oracle/product/18c/dbhomeXE` is taken from the `Dockerfile` used to build "oracle-xe"
-          docker exec -i oracle-xe bash -c "source /home/oracle/.bashrc; /bin/bash -c '/opt/oracle/product/18c/dbhomeXE/bin/sqlplus sys/Oracle18@localhost/XE as sysdba'" < $GITHUB_WORKSPACE/buildres/setup-test-oracle.sql
-        env:
-          CCRYPT: ${{ secrets.CCRYPT }}
-      - name: Run database test
-        run: ./gradlew databaseTest --rerun-tasks
-        env:
-          DBMS: "oracle"
   fetchertests:
     name: Fetcher tests
     runs-on: ubuntu-latest

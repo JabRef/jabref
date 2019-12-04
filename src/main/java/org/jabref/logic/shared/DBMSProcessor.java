@@ -478,7 +478,7 @@ public abstract class DBMSProcessor {
                 preparedStatement.setInt(i + 1, sharedIDs.get(i));
             }
         } catch (SQLException e) {
-            LOGGER.error("Executed >{}<", query.toString());
+            LOGGER.debug("Executed >{}<", query.toString());
             LOGGER.error("SQL Error", e);
             return Collections.emptyList();
         }
