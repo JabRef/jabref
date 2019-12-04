@@ -145,7 +145,6 @@ public class BasePanel extends StackPane {
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
     private JabRefExecutorService executorService;
 
-
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
