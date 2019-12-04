@@ -102,7 +102,7 @@ configurations {
 }
 
 javafx {
-    version = "13"
+    version = "13.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -163,13 +163,13 @@ dependencies {
     compile 'de.saxsys:mvvmfx:1.8.0'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
     compile 'org.fxmisc.flowless:flowless:0.6.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.10.2'
+    compile 'org.fxmisc.richtext:richtextfx:0.10.3'
     compile group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     compile 'com.jfoenix:jfoenix:9.0.9'
     compile 'org.controlsfx:controlsfx:11.0.0'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.konghq:unirest-java:3.1.04'
+    compile 'com.konghq:unirest-java:3.2.00'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -206,15 +206,15 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.54'
+    testCompile 'io.github.classgraph:classgraph:4.8.58'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
     testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.3'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.4'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testCompile 'org.mockito:mockito-core:3.1.0'
+    testCompile 'org.mockito:mockito-core:3.2.0'
     //testCompile 'com.github.tomakehurst:wiremock:2.24.1'
     testCompile 'org.xmlunit:xmlunit-core:2.6.3'
     testCompile 'org.xmlunit:xmlunit-matchers:2.6.3'
@@ -225,7 +225,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testCompile "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.27'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }

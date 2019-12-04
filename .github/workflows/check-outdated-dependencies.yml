@@ -2,7 +2,7 @@ name: Check dependencies
 
 on: 
   schedule:
-    - cron:  '0 0 * * 0' # Run every Sunday
+    - cron:  '0 0 * * TUE' # Run every Tuesday (after dependabot, which runs Monday)
 
 jobs:
   checkDependencies:

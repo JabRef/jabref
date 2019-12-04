@@ -49,9 +49,6 @@ public class BracketedPattern {
         this.pattern = null;
     }
 
-    /**
-     * @param bibentry
-     */
     public BracketedPattern(String pattern) {
         this.pattern = pattern;
     }
