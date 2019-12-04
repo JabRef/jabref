@@ -41,7 +41,7 @@ apply plugin: LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = project.findProperty('projVersion') ?: '0.0.1'
+version = project.findProperty('projVersion') ?: '100.0.0'
 
 sourceCompatibility = 13
 targetCompatibility = 13
@@ -280,7 +280,7 @@ processResources {
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
-        expand(version: project.findProperty('projVersionInfo') ?: '0.0.1',
+        expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
