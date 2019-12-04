@@ -36,7 +36,11 @@ jobs:
     - name: Fetch tags and master for GitVersion
       run: |
         git fetch --tags origin
-        git branch --force --create-reflog master origin/master
+        git rev-parse --verify master
+        if (-not $?) {
+          git branch --force --create-reflog master origin/master
+        }
+      shell: pwsh
     - name: Install GitVersion
       uses: gittools/actions/setup-gitversion@v0.3
       with:
