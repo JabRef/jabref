@@ -39,11 +39,6 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Cache Oracle XE downloads
-        uses: actions/cache@v1
-        with:
-          path: ~/oracle-xe
-          key: ${{ runner.os }}-oraclexe-rpm-${{ hashFiles('.github/workflows/tests-oracle.yml') }}
       - name: Start Oracle XE
         run: |
           mkdir ~/oracle-xe || true
