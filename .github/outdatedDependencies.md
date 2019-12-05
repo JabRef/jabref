@@ -2,5 +2,4 @@
 title: Outdated dependencies
 labels: code-quality, dependencies
 ---
-There are outdated dependencies! 
-See https://github.com/JabRef/jabref/actions?query=is%3Afailure for details.
+[There are outdated dependencies!](https://github.com/JabRef/jabref/actions?query=is%3Afailure+workflow%3A%22Check+dependencies%22) 
