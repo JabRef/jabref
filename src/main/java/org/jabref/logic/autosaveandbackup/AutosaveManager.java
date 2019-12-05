@@ -2,7 +2,10 @@ package org.jabref.logic.autosaveandbackup;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
@@ -44,7 +47,7 @@ public class AutosaveManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if(scheduledSaveAction != null) {
+        if (scheduledSaveAction != null) {
             scheduledSaveAction.cancel(false);
         }
         scheduledSaveAction = executor.schedule(() -> {
