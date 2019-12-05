@@ -1,0 +1,2 @@
+assembly-versioning-format: '{major}.{minor}.{buildmetadata}'
+assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
