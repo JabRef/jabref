@@ -24,7 +24,7 @@ public class TestConnector {
             case POSTGRESQL:
                 return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("postgres").setUser("postgres").setPassword("postgres").setUseSSL(false).createDBMSConnectionProperties();
             case ORACLE:
-                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("xe").setUser("travis").setPassword("travis").setUseSSL(false).createDBMSConnectionProperties();
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("jabref").setUser("jabref").setPassword("jabref").setUseSSL(false).setPort(32118).createDBMSConnectionProperties();
             default:
                 return new DBMSConnectionPropertiesBuilder().createDBMSConnectionProperties();
         }

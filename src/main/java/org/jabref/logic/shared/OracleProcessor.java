@@ -62,7 +62,7 @@ public class OracleProcessor extends DBMSProcessor {
 
     @Override
     String escape(String expression) {
-        return "\"" + expression + "\"";
+        return expression;
     }
 
     @Override
