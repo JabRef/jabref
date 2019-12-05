@@ -34,6 +34,7 @@ public class BibtexExtractorViewModel {
     private final BibDatabaseContext newDatabaseContext;
     private boolean directAdd;
     private DialogService dialogService;
+    private GrobidCitationFetcher currentCitationfetcher;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext) {
         this.bibdatabaseContext = bibdatabaseContext;
@@ -53,11 +54,12 @@ public class BibtexExtractorViewModel {
       @Override
       protected Void call() throws Exception {
         try {
-          extractedEntries = new GrobidCitationFetcher(
+           currentCitationfetcher = new GrobidCitationFetcher(
               JabRefPreferences.getInstance().getImportFormatPreferences(),
               Globals.getFileUpdateMonitor(),
               Globals.prefs
-          ).performSearch(inputTextProperty.getValue());
+          );
+          extractedEntries = currentCitationfetcher.performSearch(inputTextProperty.getValue());
         } catch (FetcherException e) {
           extractedEntries = new ArrayList<>();
         }
@@ -88,8 +90,8 @@ public class BibtexExtractorViewModel {
             trackNewEntry(StandardEntryType.Article);
           }
       }
-        if (GrobidCitationFetcher.getFailedEntries().size() > 0) {
-          dialogService.showWarningDialogAndWait(Localization.lang("Grobid failed to parse the following entries:"), String.join("\n;;\n", GrobidCitationFetcher.getFailedEntries()));
+        if (currentCitationfetcher.getFailedEntries().size() > 0) {
+          dialogService.showWarningDialogAndWait(Localization.lang("Grobid failed to parse the following entries:"), String.join("\n;;\n", currentCitationfetcher.getFailedEntries()));
         }
     }
     dialogService.notify(Localization.lang("Successfully added a new entry."));

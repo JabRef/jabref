@@ -23,13 +23,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private ImportFormatPreferences importFormatPreferences;
     private FileUpdateMonitor fileUpdateMonitor;
     private GrobidService grobidService;
-    private static List<String> failedEntries = new ArrayList<>();
+    private List<String> failedEntries = new ArrayList<>();
 
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         grobidService = new GrobidService(jabRefPreferences);
-        failedEntries = new ArrayList<>();
     }
 
     /**
@@ -84,7 +83,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     this.grobidService = grobidService;
     }
 
-    public static List<String> getFailedEntries() {
+    public List<String> getFailedEntries() {
         return failedEntries;
     }
 }
