@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" name-delimiter="," et-al-subsequent-min="3" et-al-subsequent-use-first="1" initialize-with="." demote-non-dropping-particle="never" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
   <info>
     <title>Urban Geography</title>
     <id>http://www.zotero.org/styles/urban-geography</id>
@@ -15,7 +15,7 @@
     <issn>0272-3638</issn>
     <eissn>1938-2847</eissn>
     <summary>Style for Urban Geography as per the style revision of 15 March 2017.</summary>
-    <updated>2018-06-28T14:10:22+00:00</updated>
+    <updated>2019-11-08T09:23:45+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -44,7 +44,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="webpage">
+      <if type="webpage post post-weblog" match="any">
         <group delimiter=" ">
           <text term="retrieved" text-case="capitalize-first"/>
           <text term="from"/>
@@ -248,7 +248,7 @@
       </if>
     </choose>
   </macro>
-  <citation disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year" cite-group-delimiter="">
+  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year" cite-group-delimiter="">
     <sort>
       <key macro="issued-sort"/>
       <key macro="author-short"/>
@@ -308,7 +308,7 @@
           <text macro="event"/>
           <text macro="publisher"/>
         </group>
-        <text macro="access" prefix=" "/>
+        <text macro="access" prefix=". "/>
       </group>
     </layout>
   </bibliography>

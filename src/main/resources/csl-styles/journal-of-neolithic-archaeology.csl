@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" delimiter-precedes-et-al="never" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" demote-non-dropping-particle="sort-only">
   <!-- Polyglot; journal publishes in English, German, and occasionally in other languages -->
   <info>
     <title>Journal of Neolithic Archaeology</title>
@@ -16,13 +16,16 @@
       <name>Journal of Neolithic Archaeology</name>
       <email>jna@ufg.uni-kiel.de</email>
     </contributor>
-    <category citation-format="note"/>
+    <contributor>
+      <name>Nils Müller-Scheeßel</name>
+      <email>nils.mueller-scheessel@ufg.uni-kiel.de</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
     <issn>2364-3676</issn>
     <eissn>2197-649X</eissn>
-    <summary>New author-date style meant to meet citation specifications provided by JNA. Based on the DAI style.</summary>
-    <updated>2018-04-19T12:54:34+00:00</updated>
+    <summary>Author-date style meeting citation specifications provided by JNA. Based on the DAI style.</summary>
+    <updated>2019-11-10T12:54:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -131,7 +134,7 @@
   <macro name="contributors-short-citation">
     <choose>
       <if variable="author">
-        <names variable="author" font-variant="small-caps">
+        <names variable="author">
           <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
         </names>
       </if>
@@ -336,7 +339,7 @@
     <choose>
       <if match="any" variable="DOI">
         <group display="block" prefix=".&amp;#10;">
-          <text value="doi: " font-variant="small-caps"/>
+          <text value="doi: "/>
           <text variable="DOI"/>
         </group>
       </if>
@@ -395,7 +398,7 @@
       <key variable="issued"/>
       <key macro="contributors-short-citation"/>
     </sort>
-    <layout delimiter="; ">
+    <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">
           <text macro="contributors-short-citation"/>

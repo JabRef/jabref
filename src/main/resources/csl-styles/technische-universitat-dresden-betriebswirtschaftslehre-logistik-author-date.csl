@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-logistik-author-date</id>
     <link href="http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-logistik-author-date" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="template"/>
-    <link href="https://tu-dresden.de/die_tu_dresden/fakultaeten/fakultaet_wirtschaftswissenschaften/bwllog/dateien/Zitierhinweise.pdf" rel="documentation"/>
+    <link href="https://tu-dresden.de/bu/wirtschaft/bwllog/ressourcen/dateien/studium/studienarbeiten/dateien_studienarbeiten/20180619_Homepage_Hinweise-zu-Zitierungen.pdf?lang=de" rel="documentation"/>
     <author>
       <name>Jens Mittelbach</name>
       <email>jens.mittelbach@slub-dresden.de</email>
@@ -15,21 +15,35 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <summary>Zitierstil entsprechend den Zitierrichtlinien des Lehrstuhls  Betriebswirtschaftslehre, insbesondere Logistik,der Fakultät Wirtschaftswissenschaften, Technische Universität Dresden.</summary>
-    <updated>2016-02-18T19:50:20+00:00</updated>
+    <updated>2019-11-08T13:17:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <style-options punctuation-in-quote="false"/>
+    <terms>
+      <term name="open-quote">‘</term>
+      <term name="close-quote">’</term>
+      <term name="open-inner-quote">“</term>
+      <term name="close-inner-quote">”</term>
+    </terms>
+  </locale>
   <locale xml:lang="de">
     <terms>
       <term name="anonymous" form="short">o.&#8201;V.</term>
-      <term name="accessed" form="verb">abgerufen am</term>
+      <term name="accessed" form="verb">abgerufen</term>
       <term name="presented at">gehalten auf</term>
       <term name="et-al">et al.</term>
+      <term name="available at">verfügbar unter</term>
+      <term name="open-quote">,</term>
+      <term name="close-quote">‘</term>
+      <term name="open-inner-quote">„</term>
+      <term name="close-inner-quote">“</term>
     </terms>
   </locale>
   <macro name="editor">
     <names variable="editor" delimiter=", " prefix=" ">
-      <name delimiter=" / " initialize-with=". " name-as-sort-order="all"/>
-      <label form="short" prefix=" [" suffix="]"/>
+      <name initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
   <macro name="anon">
@@ -37,7 +51,7 @@
   </macro>
   <macro name="author">
     <names variable="author" font-variant="normal">
-      <name delimiter=" / " delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <name delimiter="; " delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
       <label form="short" prefix=" [" suffix="]"/>
       <substitute>
         <names variable="editor"/>
@@ -58,17 +72,16 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text variable="DOI" prefix="&lt;https://doi.org/" suffix="&gt;"/>
-        <group delimiter=" " prefix=", ">
-          <text term="accessed" form="verb"/>
-          <date form="text" variable="accessed"/>
-        </group>
+        <text variable="DOI" prefix="doi: "/>
       </if>
       <else-if variable="URL">
-        <text variable="URL" prefix="&lt;" suffix="&gt;"/>
-        <group delimiter=" " prefix=", ">
+        <group delimiter=": " suffix=" ">
+          <text term="available at" text-case="capitalize-first"/>
+          <text variable="URL"/>
+        </group>
+        <group delimiter=": " prefix="(" suffix=")">
           <text term="accessed" form="verb"/>
-          <date form="text" variable="accessed"/>
+          <date form="numeric" variable="accessed"/>
         </group>
       </else-if>
     </choose>
@@ -76,18 +89,17 @@
   <macro name="title">
     <choose>
       <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
-        <text variable="title" font-style="normal"/>
+        <text variable="title" font-style="italic"/>
       </if>
       <else>
-        <text variable="title"/>
+        <text variable="title" strip-periods="true" quotes="true"/>
       </else>
     </choose>
   </macro>
   <macro name="publisher">
     <group delimiter=" ">
       <text variable="publisher-place" suffix=":"/>
-      <text variable="publisher" suffix=","/>
-      <date date-parts="year" form="numeric" variable="issued"/>
+      <text variable="publisher"/>
     </group>
   </macro>
   <macro name="year-date">
@@ -121,7 +133,11 @@
       <text variable="page"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true">
+  <citation and="text" et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true">
+    <sort>
+      <key macro="year-date"/>
+      <key macro="author-short"/>
+    </sort>
     <layout delimiter="; " prefix=" (" suffix=")">
       <group delimiter=", ">
         <group delimiter=", ">
@@ -135,7 +151,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true">
+  <bibliography and="text" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="title"/>
@@ -157,11 +173,11 @@
           <text macro="publisher" prefix=" "/>
         </if>
         <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
-          <text macro="title" prefix=" " suffix="."/>
-          <group prefix=" ">
-            <text term="in" text-case="capitalize-first" suffix=":"/>
+          <text macro="title" prefix=" "/>
+          <group prefix=", ">
+            <text term="in" suffix=":"/>
             <text macro="editor"/>
-            <text variable="container-title" font-style="normal" prefix=": " suffix="."/>
+            <text variable="container-title" font-style="italic" prefix=": " suffix="."/>
             <group delimiter=", " suffix=".">
               <text variable="collection-title" prefix=" "/>
               <number variable="collection-number"/>
@@ -180,11 +196,11 @@
           </group>
         </else-if>
         <else>
-          <group suffix=". ">
+          <group suffix=", ">
             <text macro="title" prefix=" "/>
             <text macro="editor" prefix=" "/>
           </group>
-          <group>
+          <group delimiter=", ">
             <choose>
               <if type="interview" match="any">
                 <text term="in" text-case="capitalize-first" suffix=": "/>
@@ -195,35 +211,27 @@
                 <text variable="container-title" suffix=", "/>
               </else-if>
               <else-if type="speech" match="any">
-                <text term="presented at" text-case="capitalize-first" suffix=": "/>
-                <text variable="event" suffix=", "/>
-                <text variable="event-place" suffix=", "/>
+                <group>
+                  <text term="presented at" suffix=": "/>
+                  <text variable="event" font-style="italic"/>
+                </group>
+                <text variable="event-place" font-style="normal"/>
               </else-if>
               <else>
-                <group delimiter=": " suffix=", ">
-                  <text term="in" text-case="capitalize-first"/>
-                  <text variable="container-title"/>
+                <group delimiter=": ">
+                  <text variable="container-title" font-style="italic"/>
                 </group>
               </else>
             </choose>
-            <group delimiter=", ">
+            <group>
               <group delimiter=" ">
-                <text term="volume" form="symbol"/>
-                <text variable="volume" suffix=","/>
+                <text variable="volume"/>
               </group>
-              <group delimiter="-">
+              <group prefix="(" suffix=")">
                 <text variable="issue" form="short"/>
-                <choose>
-                  <if type="article-newspaper interview speech" match="any">
-                    <date form="numeric" variable="issued"/>
-                  </if>
-                  <else>
-                    <text macro="year-date"/>
-                  </else>
-                </choose>
               </group>
             </group>
-            <group prefix=", ">
+            <group>
               <label plural="never" suffix=" " variable="page" form="short"/>
               <text variable="page"/>
             </group>

@@ -16,7 +16,7 @@
     <category field="psychology"/>
     <category field="generic-base"/>
     <summary>Le style UQAM est une adaptation canadienne-française de la norme APA 6th (2010) conforme au Guide de présentation des mémoires et des thèses de l'Université du Québec à Montréal</summary>
-    <updated>2019-10-17T19:54:00+00:00</updated>
+    <updated>2019-11-13T20:36:26+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -150,12 +150,12 @@
           <if variable="DOI">
             <text variable="DOI" prefix="doi: "/>
           </if>
-          <else-if variable="source" match="any">
+          <else-if variable="archive" match="any">
             <group>
               <text term="retrieved" text-case="capitalize-first" suffix=" "/>
               <text term="from" suffix=" "/>
-              <text variable="source" suffix="."/>
-              <text variable="call-number" prefix=" (" suffix=")"/>
+              <text variable="archive" suffix="."/>
+              <text variable="archive_location" prefix=" (" suffix=")"/>
             </group>
           </else-if>
           <else>
@@ -289,7 +289,6 @@
       <else-if type="thesis" match="any">
         <group delimiter=", ">
           <text variable="publisher"/>
-          <text variable="publisher-place"/>
         </group>
       </else-if>
       <else-if type="speech" match="any">
@@ -608,7 +607,7 @@
     <choose>
       <if type="article-journal article-magazine review-book interview article" match="any">
         <group prefix=", " delimiter=", ">
-          <group delimiter=" ">
+          <group>
             <text variable="volume" font-style="italic"/>
             <text variable="issue" prefix="(" suffix=")"/>
           </group>
@@ -655,7 +654,7 @@
               <text variable="genre"/>
               <text variable="medium"/>
             </group>
-             <text variable="number" prefix=". "/>
+            <text variable="number" prefix=". "/>
           </if>
           <else-if type="musical_score" match="all" variable="container-title">
             <text variable="medium" prefix=" [" suffix="]"/>
@@ -827,6 +826,10 @@
             <text variable="genre" prefix="[" suffix="]"/>
           </if>
         </choose>
+        <group delimiter=" " prefix="(" suffix=")">
+          <text term="version"/>
+          <text variable="version"/>
+        </group>
       </else-if>
       <else-if type="report" match="any">
         <group delimiter=" " prefix="[" suffix="]">
