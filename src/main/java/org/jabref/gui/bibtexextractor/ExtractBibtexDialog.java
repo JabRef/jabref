@@ -5,7 +5,6 @@ import javax.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 
 import org.jabref.gui.StateManager;
@@ -42,7 +41,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
         buttonParse.setOnAction(event -> {
             directAdd = false;
             viewModel.startParsing(directAdd);});
-        buttonToNewLib.setOnAction(event ->{
+        buttonToNewLib.setOnAction(event -> {
           directAdd = true;
           viewModel.startParsing(directAdd);});
         buttonParse.disableProperty().bind(viewModel.inputTextProperty().isEmpty());

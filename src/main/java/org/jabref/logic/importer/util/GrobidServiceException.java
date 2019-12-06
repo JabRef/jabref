@@ -13,7 +13,7 @@ public class GrobidServiceException extends JabRefException {
     }
 
     public static GrobidServiceException getNewGrobidClientExceptionByCode(int httpCode) {
-        switch(httpCode) {
+        switch (httpCode) {
             case 204:
                 return new GrobidServiceException("The GROBID service could not extract any Information from this String.");
             case 400:

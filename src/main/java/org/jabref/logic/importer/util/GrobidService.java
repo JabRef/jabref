@@ -1,10 +1,9 @@
 package org.jabref.logic.importer.util;
 
-import org.jabref.Globals;
+import java.io.IOException;
+
 import org.jabref.logic.net.URLDownload;
 import org.jabref.preferences.JabRefPreferences;
-
-import java.io.IOException;
 
 /**
  * Implements an API to a GROBID server, as described at

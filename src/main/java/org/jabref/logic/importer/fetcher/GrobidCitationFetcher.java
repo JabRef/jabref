@@ -1,21 +1,23 @@
 package org.jabref.logic.importer.fetcher;
 
-import org.jabref.Globals;
-import org.jabref.logic.importer.*;
-import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.util.GrobidService;
-import org.jabref.logic.importer.util.GrobidServiceException;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.GrobidService;
+import org.jabref.logic.importer.util.GrobidServiceException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 

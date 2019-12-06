@@ -1,6 +1,5 @@
 package org.jabref.gui.logging;
 
-import org.apache.logging.log4j.core.config.plugins.PluginBuilderFactory;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.logging.LogMessages;
 

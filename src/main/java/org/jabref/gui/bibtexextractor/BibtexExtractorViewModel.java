@@ -8,10 +8,9 @@ import java.util.Map;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
 import javafx.concurrent.Task;
+
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -46,58 +45,53 @@ public class BibtexExtractorViewModel {
         return this.inputTextProperty;
     }
 
-
-  public void startParsing(boolean directAdd){
-    this.directAdd = directAdd;
-    this.extractedEntries = null;
-    Task<Void> parseUsingGrobid = new Task<Void>() {
-      @Override
-      protected Void call() throws Exception {
-        try {
-           currentCitationfetcher = new GrobidCitationFetcher(
-              JabRefPreferences.getInstance().getImportFormatPreferences(),
-              Globals.getFileUpdateMonitor(),
-              Globals.prefs
-          );
-          extractedEntries = currentCitationfetcher.performSearch(inputTextProperty.getValue());
-        } catch (FetcherException e) {
-          extractedEntries = new ArrayList<>();
-        }
-        Platform.runLater(() -> executeParse());
-        return null;
-      }
-    };
-    dialogService.showProgressDialogAndWait(Localization.lang("Your text is being parsed.."),Localization.lang( "Please wait while we are parsing your text"), parseUsingGrobid);
-    Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
-  }
-
-
-  public void executeParse(){
-
-      if(extractedEntries.size() > 0){
-        if(directAdd){
-          BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
-          for(BibEntry bibEntries: extractedEntries) {
-            bibtexKeyGenerator.generateAndSetKey(bibEntries);
-            newDatabaseContext.getDatabase().insertEntry(bibEntries);
-          }
-          newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
-          JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
-        } else{
-          for(BibEntry bibEntry: extractedEntries) {
-            this.bibdatabaseContext.getDatabase().insertEntry(bibEntry);
-            JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
-            trackNewEntry(StandardEntryType.Article);
-          }
-      }
-        if (currentCitationfetcher.getFailedEntries().size() > 0) {
-          dialogService.showWarningDialogAndWait(Localization.lang("Grobid failed to parse the following entries:"), String.join("\n;;\n", currentCitationfetcher.getFailedEntries()));
-        }
+    public void startParsing(boolean directAdd) {
+        this.directAdd = directAdd;
+        this.extractedEntries = null;
+        Task<Void> parseUsingGrobid = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    currentCitationfetcher = new GrobidCitationFetcher(
+                        JabRefPreferences.getInstance().getImportFormatPreferences(),
+                        Globals.getFileUpdateMonitor(),
+                        Globals.prefs
+                    );
+                    extractedEntries = currentCitationfetcher.performSearch(inputTextProperty.getValue());
+                } catch (FetcherException e) {
+                    extractedEntries = new ArrayList<>();
+                }
+                Platform.runLater(() -> executeParse());
+                return null;
+            }
+        };
+        dialogService.showProgressDialogAndWait(Localization.lang("Your text is being parsed.."),Localization.lang( "Please wait while we are parsing your text"), parseUsingGrobid);
+        Globals.TASK_EXECUTOR.execute(parseUsingGrobid);
     }
-    dialogService.notify(Localization.lang("Successfully added a new entry."));
 
-
-  }
+    public void executeParse() {
+        if (extractedEntries.size() > 0) {
+            if (directAdd) {
+                BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
+                for (BibEntry bibEntries: extractedEntries) {
+                    bibtexKeyGenerator.generateAndSetKey(bibEntries);
+                    newDatabaseContext.getDatabase().insertEntry(bibEntries);
+                }
+                newDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+                JabRefGUI.getMainFrame().addTab(newDatabaseContext,true);
+            } else {
+                for (BibEntry bibEntry: extractedEntries) {
+                    this.bibdatabaseContext.getDatabase().insertEntry(bibEntry);
+                    JabRefGUI.getMainFrame().getCurrentBasePanel().showAndEdit(bibEntry);
+                    trackNewEntry(StandardEntryType.Article);
+                }
+            }
+            if (currentCitationfetcher.getFailedEntries().size() > 0) {
+                dialogService.showWarningDialogAndWait(Localization.lang("Grobid failed to parse the following entries:"), String.join("\n;;\n", currentCitationfetcher.getFailedEntries()));
+            }
+        }
+        dialogService.notify(Localization.lang("Successfully added a new entry."));
+    }
 
     public void startExtraction() {
         BibtexExtractor extractor = new BibtexExtractor();
@@ -105,7 +99,6 @@ public class BibtexExtractorViewModel {
         this.bibdatabaseContext.getDatabase().insertEntry(entity);
         trackNewEntry(StandardEntryType.Article);
     }
-
 
     private void trackNewEntry(EntryType type) {
         Map<String, String> properties = new HashMap<>();
