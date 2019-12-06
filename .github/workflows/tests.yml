@@ -17,7 +17,7 @@ jobs:
         with:
           java-version: 13
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -67,7 +67,7 @@ jobs:
         if: failure()
         run: |
           sudo apt-get install -qq -y xml-twig-tools xsltproc
-          scripts/after-failure.sh  
+          scripts/after-failure.sh
   databasetests:
     name: Database tests
     runs-on: ubuntu-latest
@@ -227,7 +227,7 @@ jobs:
         name: Restore gradle wrapper
         with:
           path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}  
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Update test coverage metrics
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
