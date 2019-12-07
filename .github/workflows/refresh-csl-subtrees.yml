@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2-beta
+        with:
+          ref: master
       - name: Add csl-styles remote
         run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
       - name: Update csl-styles
