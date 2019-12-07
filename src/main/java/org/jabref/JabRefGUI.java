@@ -3,8 +3,8 @@ package org.jabref;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -97,6 +97,13 @@ public class JabRefGUI {
             openLastEditedDatabases();
         }
 
+        // Remove invalid databases
+        List<ParserResult> invalidDatabases = bibDatabases.stream()
+                                                          .filter(ParserResult::isInvalid)
+                                                          .collect(Collectors.toList());
+        failed.addAll(invalidDatabases);
+        bibDatabases.removeAll(invalidDatabases);
+
         // passed file (we take the first one) should be focused
         String focusedFile = bibDatabases.stream()
                                          .findFirst()
@@ -106,40 +113,34 @@ public class JabRefGUI {
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
-        if (!bibDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
-                ParserResult pr = parserResultIterator.next();
-                // Define focused tab
-                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
-                    first = true;
-                }
+        for (ParserResult pr : bibDatabases) {
+            // Define focused tab
+            if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
+                first = true;
+            }
 
-                if (pr.isInvalid()) {
-                    failed.add(pr);
-                    parserResultIterator.remove();
-                } else if (pr.getDatabase().isShared()) {
-                    try {
-                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                            NotASharedDatabaseException e) {
-                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
-                        pr.getDatabase().clearSharedDatabaseID();
+            if (pr.getDatabase().isShared()) {
+                try {
+                    new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                        NotASharedDatabaseException e) {
+                    pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                    pr.getDatabase().clearSharedDatabaseID();
 
-                        LOGGER.error("Connection error", e);
-                        mainFrame.getDialogService().showErrorDialogAndWait(
-                                Localization.lang("Connection error"),
-                                Localization.lang("A local copy will be opened."),
-                                e);
-                    }
-                    toOpenTab.add(pr);
-                } else if (pr.toOpenTab()) {
-                    // things to be appended to an opened tab should be done after opening all tabs
-                    // add them to the list
-                    toOpenTab.add(pr);
-                } else {
-                    mainFrame.addParserResult(pr, first);
-                    first = false;
+                    LOGGER.error("Connection error", e);
+                    mainFrame.getDialogService().showErrorDialogAndWait(
+                            Localization.lang("Connection error"),
+                            Localization.lang("A local copy will be opened."),
+                            e);
                 }
+                toOpenTab.add(pr);
+            } else if (pr.toOpenTab()) {
+                // things to be appended to an opened tab should be done after opening all tabs
+                // add them to the list
+                toOpenTab.add(pr);
+            } else {
+                mainFrame.addParserResult(pr, first);
+                first = false;
             }
         }
 

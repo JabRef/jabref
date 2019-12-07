@@ -972,37 +972,35 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            // add tab
-            Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
-            tabbedPane.getTabs().add(newTab);
-            newTab.setOnCloseRequest(event -> {
-                closeTab((BasePanel) newTab.getContent());
-                event.consume();
-            });
-
-            // update all tab titles
-            updateAllTabTitles();
-
-            if (raisePanel) {
-                tabbedPane.getSelectionModel().select(newTab);
-            }
-
-            // Register undo/redo listener
-            basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
-
-            BibDatabaseContext context = basePanel.getBibDatabaseContext();
-
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUIManager(basePanel));
-            }
-
-            BackupManager.start(context, Globals.entryTypesManager, prefs);
-
-            // Track opening
-            trackOpenNewDatabase(basePanel);
+        // add tab
+        Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
+        tabbedPane.getTabs().add(newTab);
+        newTab.setOnCloseRequest(event -> {
+            closeTab((BasePanel) newTab.getContent());
+            event.consume();
         });
+
+        // update all tab titles
+        updateAllTabTitles();
+
+        if (raisePanel) {
+            tabbedPane.getSelectionModel().select(newTab);
+        }
+
+        // Register undo/redo listener
+        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+
+        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+
+        if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(basePanel));
+        }
+
+        BackupManager.start(context, Globals.entryTypesManager, prefs);
+
+        // Track opening
+        trackOpenNewDatabase(basePanel);
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
