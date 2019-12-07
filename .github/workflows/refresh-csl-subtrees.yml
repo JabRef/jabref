@@ -2,7 +2,7 @@ name: Refresh Citation Style Language Files
 
 on:
   schedule:
-    # run on 1th and 15th of each month
+    # run on 1st and 15th of each month
     - cron: '1 2 1,15 * *'
 
 jobs:
