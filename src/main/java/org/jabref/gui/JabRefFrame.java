@@ -422,8 +422,6 @@ public class JabRefFrame extends BorderPane {
 
                     EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
                         if (visible) {
-                            // Run SplitPane.setResizableWithParent later to avoid miscalculation during initial layouting
-                            Platform.runLater(() -> SplitPane.setResizableWithParent(sidePane, Boolean.FALSE));
                             if (!splitPane.getItems().contains(sidePane)) {
                                 splitPane.getItems().add(0, sidePane);
                                 setDividerPosition();
@@ -452,6 +450,7 @@ public class JabRefFrame extends BorderPane {
 
     private Node createToolbar() {
         Pane leftSpacer = new Pane();
+        leftSpacer.setMinWidth(50);
         HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
         Pane rightSpacer = new Pane();
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
@@ -471,9 +470,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
                 leftSpacer
         );
-        leftSide.setMinWidth(100);
-        leftSide.prefWidthProperty().bind(sidePane.widthProperty());
-        leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
