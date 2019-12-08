@@ -34,7 +34,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
                     .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                     .orElse(Localization.lang("Modified entry"));
 
-        mergePanel = new MergeEntries(firstEntry, secondEntry, database.getMode());
+        mergePanel = new MergeEntries(firstEntry, null, database.getMode());
     }
 
     @Override

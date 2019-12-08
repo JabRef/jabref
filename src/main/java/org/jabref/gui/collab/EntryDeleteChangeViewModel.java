@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class EntryDeleteChangeViewModel extends DatabaseChangeViewModel   {
+class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryDeleteChangeViewModel.class);
     private final BibEntry entry;

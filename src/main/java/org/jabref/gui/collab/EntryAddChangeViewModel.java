@@ -11,7 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-class EntryAddChangeViewModel extends DatabaseChangeViewModel  {
+class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     private final BibEntry diskEntry;
 
