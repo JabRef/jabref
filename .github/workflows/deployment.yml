@@ -94,11 +94,6 @@ jobs:
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
         ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
       shell: bash
-    - name: Add installer as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/distribution
     - name: Package application image
       run: ${{ matrix.archivePortable }}
       shell: bash
@@ -115,6 +110,11 @@ jobs:
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       shell: pwsh
+    - name: Upload to GitHub workflow artifacts store
+      uses: actions/upload-artifact@master
+      with:
+        name: JabRef-${{ matrix.displayName }}
+        path: build/distribution
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
