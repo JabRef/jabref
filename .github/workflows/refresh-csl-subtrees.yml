@@ -2,7 +2,7 @@ name: Refresh Citation Style Language Files
 
 on:
   schedule:
-    # run on 1th and 15th of each month
+    # run on 1st and 15th of each month
     - cron: '1 2 1,15 * *'
 
 jobs:
@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2-beta
+        with:
+          ref: master
       - name: Add csl-styles remote
         run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
       - name: Update csl-styles
@@ -23,3 +25,10 @@ jobs:
       - uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Report issues
+        if: failure()
+        uses: JasonEtco/create-an-issue@master
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: .github/failure-csl-update.md

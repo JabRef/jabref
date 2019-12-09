@@ -30,18 +30,24 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2-beta
       with:
-        depth: 1
-        submodules: false
-    - name: Extract branch name
-      shell: bash
+        fetch-depth: 0
+    - name: Fetch tags and master for GitVersion
       run: |
-         ref=${GITHUB_REF#refs/heads/}
-         ref=${ref#refs/pull/}
-         ref=${ref%/merge}
-         echo "##[set-output name=branch;]${ref}"
-      id: extract_branch
+        git fetch --tags origin
+        git rev-parse --verify master
+        if (-not $?) {
+          git branch --force --create-reflog master origin/master
+        }
+      shell: pwsh
+    - name: Install GitVersion
+      uses: gittools/actions/setup-gitversion@v0.3
+      with:
+          versionSpec: '5.1.2'
+    - name: Run GitVersion
+      id: gitversion
+      uses: gittools/actions/execute-gitversion@v0.3
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
@@ -82,33 +88,38 @@ jobs:
           zip.close()
       shell: python
     - name: Build runtime image
-      run: ./gradlew -Pdev=true jlinkZip
+      run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
     - name: Build installer
       run: |
         export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-        ./gradlew -Pdev=true jpackage
+        ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
       shell: bash
-    - name: Add installer as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/distribution
     - name: Package application image
       run: ${{ matrix.archivePortable }}
       shell: bash
     - name: Build and publish snap
-      if: matrix.os == 'ubuntu-latest' && steps.extract_branch.outputs.branch == 'master'
+      if: matrix.os == 'ubuntu-latest' && steps.gitversion.outputs.branchName == 'master'
       env:
         SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
       run: |
           mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
           docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
       shell: bash
+    - name: Rename files
+      run: |
+        get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
+        get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
+      shell: pwsh
+    - name: Upload to GitHub workflow artifacts store
+      uses: actions/upload-artifact@master
+      with:
+        name: JabRef-${{ matrix.displayName }}
+        path: build/distribution
     - name: Upload to builds.jabref.org
       uses: garygrossgarten/github-action-scp@release
       with:
         local: build/distribution
-        remote: www/${{ steps.extract_branch.outputs.branch }}
+        remote: www/${{ steps.gitversion.outputs.branchName }}
         host: builds.jabref.org
         username: builds_jabref_org
         privateKey: ${{ secrets.buildJabRefPrivateKey }}
