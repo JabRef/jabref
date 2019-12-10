@@ -1,5 +1,7 @@
 package org.jabref.gui.maintable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import javafx.beans.property.DoubleProperty;
@@ -36,6 +38,8 @@ public class MainTableColumnModel {
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special"));
 
+        public static List<Type> ICON_COLUMNS = Arrays.asList(EXTRAFILE,FILES,GROUPS,LINKED_IDENTIFIER);
+
         private String name;
         private String displayName;
 
@@ -68,36 +72,52 @@ public class MainTableColumnModel {
         }
     }
 
-    private final ObjectProperty<Type> typeProperty;
-    private final StringProperty qualifierProperty;
-    private final DoubleProperty widthProperty;
-    private final ObjectProperty<TableColumn.SortType> sortTypeProperty;
+    private final ObjectProperty<Type> typeProperty = new SimpleObjectProperty<>();
+    private final StringProperty qualifierProperty = new SimpleStringProperty();
+    private final DoubleProperty widthProperty = new SimpleDoubleProperty();
+    private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
-     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
+     * @param type the {@code MainTableColumnType} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
-     * @param sortType the stored sortType of the column, e.g. "ASCENDING"
      */
-    public MainTableColumnModel(Type type, String qualifier, double width, TableColumn.SortType sortType) {
-        Objects.requireNonNull(type);
-        typeProperty = new SimpleObjectProperty<>(type);
-        qualifierProperty = new SimpleStringProperty(qualifier);
-        widthProperty = new SimpleDoubleProperty(width);
-        sortTypeProperty = new SimpleObjectProperty<>(sortType);
-    }
-
     public MainTableColumnModel(Type type, String qualifier) {
-        this(type, qualifier, ColumnPreferences.DEFAULT_COLUMN_WIDTH, TableColumn.SortType.ASCENDING);
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(qualifier);
+
+        this.typeProperty.setValue(type);
+        this.qualifierProperty.setValue(qualifier);
+        this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
+
+        if (Type.ICON_COLUMNS.contains(type)) {
+            this.widthProperty.setValue(ColumnPreferences.ICON_COLUMN_WIDTH);
+        } else {
+            this.widthProperty.setValue(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+        }
     }
 
-    public MainTableColumnModel(Type type, double width) {
-        this(type, "", width, TableColumn.SortType.ASCENDING);
-    }
-
+    /**
+     * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
+     *
+     * @param type the {@code MainTableColumnType} of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
+     */
     public MainTableColumnModel(Type type) {
         this(type, "");
+    }
+
+    /**
+     * This is used by the preference migrations.
+     *
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
+     * @param qualifier the stored qualifier of the column, e.g. "author/editor"
+     * @param width the stored width of the column
+     */
+    public MainTableColumnModel(Type type, String qualifier, double width) {
+        this(type, qualifier);
+
+        this.widthProperty.setValue(width);
     }
 
     public Type getType() { return typeProperty.getValue(); }
@@ -113,10 +133,7 @@ public class MainTableColumnModel {
     }
 
     public String getDisplayName() {
-        if ((typeProperty.getValue() == Type.GROUPS
-                || typeProperty.getValue() == Type.FILES
-                || typeProperty.getValue() == Type.LINKED_IDENTIFIER)
-                && qualifierProperty.getValue().isBlank()) {
+        if (Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank()) {
             return typeProperty.getValue().getDisplayName();
         } else {
             return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
@@ -125,9 +142,7 @@ public class MainTableColumnModel {
 
     public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
 
-    public double getWidth() {
-        return widthProperty.getValue();
-    }
+    public double getWidth() { return widthProperty.getValue(); }
 
     public DoubleProperty widthProperty() { return widthProperty; }
 
@@ -157,26 +172,11 @@ public class MainTableColumnModel {
     }
 
     /**
-     * This is used by JabRefPreferences, to create a new ColumnModel out ouf the stored preferences.
+     * This creates a new {@code MainTableColumnModel} out of a given string
      *
-     * @param rawColumnName the stored name of the column, e.g. "field:author"
-     * @param width the stored width of the column
-     * @param sortType the stored sortType of the column, e.g. "ASCENDING"
-     */
-    public static MainTableColumnModel parse(String rawColumnName, Double width, TableColumn.SortType sortType) {
-        MainTableColumnModel columnModel = parse(rawColumnName);
-
-        Objects.requireNonNull(width);
-        Objects.requireNonNull(sortType);
-        columnModel.widthProperty().setValue(width);
-        columnModel.sortTypeProperty().setValue(sortType);
-        return columnModel;
-    }
-
-    /**
-     * This is used by the preferences dialog, to allow the user to type in a field he wants to add to the table.
+     * @param rawColumnName the name of the column, e.g. "field:author", or "author"
      *
-     * @param rawColumnName the stored name of the column, e.g. "field:author", or "author"
+     * @return A new {@code MainTableColumnModel}
      */
     public static MainTableColumnModel parse(String rawColumnName) {
         Objects.requireNonNull(rawColumnName);
@@ -185,7 +185,9 @@ public class MainTableColumnModel {
         Type type = Type.fromString(splittedName[0]);
         String qualifier = "";
 
-        if (type == Type.NORMALFIELD || type == Type.SPECIALFIELD || type == Type.EXTRAFILE) {
+        if (type == Type.NORMALFIELD
+                || type == Type.SPECIALFIELD
+                || type == Type.EXTRAFILE) {
             if (splittedName.length == 1) {
                 qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {

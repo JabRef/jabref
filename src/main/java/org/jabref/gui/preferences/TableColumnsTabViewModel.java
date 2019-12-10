@@ -113,14 +113,16 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
         availableColumnsProperty.clear();
 
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName()));
+        availableColumnsProperty.addAll(
+                new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
+                new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
+                new MainTableColumnModel(MainTableColumnModel.Type.FILES),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName())
+        );
 
         EnumSet.allOf(StandardField.class).stream()
                .map(Field::getName)

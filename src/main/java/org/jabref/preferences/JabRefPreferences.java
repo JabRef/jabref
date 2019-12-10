@@ -1871,18 +1871,17 @@ public class JabRefPreferences implements PreferencesService {
 
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
-            Double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
-            SortType columnSortType = SortType.ASCENDING;
+            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
 
             if (i < columnWidths.size()) {
-                columnWidth = columnWidths.get(i);
+                columnModel.widthProperty().setValue(columnWidths.get(i));
             }
 
             if (i < columnSortTypes.size()) {
-                columnSortType = columnSortTypes.get(i);
+                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
             }
 
-            columns.add(MainTableColumnModel.parse(columnNames.get(i), columnWidth, columnSortType));
+            columns.add(columnModel);
         }
 
         return columns;

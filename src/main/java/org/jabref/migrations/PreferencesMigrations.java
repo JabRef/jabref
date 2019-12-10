@@ -323,26 +323,18 @@ public class PreferencesMigrations {
                                                })
                                                .collect(Collectors.toList());
 
-        List<TableColumn.SortType> sortTypes = preferences.getStringList(JabRefPreferences.COLUMN_SORT_TYPES)
-                .stream()
-                .map(TableColumn.SortType::valueOf)
-                .collect(Collectors.toList());
-
-
         // "field:"
         String normalFieldTypeString = MainTableColumnModel.Type.NORMALFIELD.getName() + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER;
 
         if (!columnNames.isEmpty() && columnNames.stream().noneMatch(name -> name.contains(normalFieldTypeString))) {
             List<MainTableColumnModel> columns = new ArrayList<>();
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS, 28));
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES, 28));
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER, 28));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
 
             for (int i = 0; i < columnNames.size(); i++) {
                 String name = columnNames.get(i);
                 Double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
-                TableColumn.SortType columnSortType = TableColumn.SortType.ASCENDING;
-
 
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
                                                              .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
@@ -352,11 +344,7 @@ public class PreferencesMigrations {
                     columnWidth = columnWidths.get(i);
                 }
 
-                if (i < sortTypes.size()) {
-                    columnSortType = sortTypes.get(i);
-                }
-
-                columns.add(new MainTableColumnModel(type, name, columnWidth, columnSortType));
+                columns.add(new MainTableColumnModel(type, name, columnWidth));
             }
 
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
