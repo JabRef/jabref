@@ -24,7 +24,8 @@ public class GrobidService {
     }
 
     public String processCitation(String rawCitation, int consolidateCitations) throws GrobidServiceException {
-        if (consolidateCitations < 0 || consolidateCitations > 2) {
+      rawCitation = rawCitation.replace("&", "and");
+      if (consolidateCitations < 0 || consolidateCitations > 2) {
             throw new GrobidServiceException("");
         }
 
