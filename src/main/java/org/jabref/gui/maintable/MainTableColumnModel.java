@@ -80,7 +80,7 @@ public class MainTableColumnModel {
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
-     * @param type the {@code MainTableColumnType} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
     public MainTableColumnModel(Type type, String qualifier) {
@@ -101,7 +101,7 @@ public class MainTableColumnModel {
     /**
      * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
      *
-     * @param type the {@code MainTableColumnType} of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
+     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
      */
     public MainTableColumnModel(Type type) {
         this(type, "");
