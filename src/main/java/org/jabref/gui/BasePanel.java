@@ -20,7 +20,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
@@ -42,11 +41,12 @@ import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.WriteXMPAction;
-import org.jabref.gui.externalfiles.FindFullTextAction;
+import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
+import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -60,7 +60,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
@@ -80,15 +80,15 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -366,11 +366,12 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
-        actions.put(Actions.ABBREVIATE_ISO, new AbbreviateAction(this, true));
-        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, false));
+        actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
+        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
+        actions.put(Actions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(this, AbbreviationType.SHORTEST_UNIQUE));
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this)::execute);
+        actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
     }
 
     /**
@@ -407,19 +408,9 @@ public class BasePanel extends StackPane {
             return;
         }
 
-        NamedCompound compound;
-        if (cut) {
-            compound = new NamedCompound((entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
-        } else {
-            compound = new NamedCompound((entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
-        }
-        for (BibEntry entry : entries) {
-            compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry));
-            bibDatabaseContext.getDatabase().removeEntry(entry);
-            ensureNotShowingBottomPanel(entry);
-        }
-        compound.end();
-        getUndoManager().addEdit(compound);
+        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, cut));
+        bibDatabaseContext.getDatabase().removeEntries(entries);
+        ensureNotShowingBottomPanel(entries);
 
         markBaseChanged();
         this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
@@ -629,7 +620,6 @@ public class BasePanel extends StackPane {
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
-                output(Localization.lang("Added new '%0' entry.", bibEntry.getType().getDisplayName()));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
@@ -745,10 +735,7 @@ public class BasePanel extends StackPane {
 
         createMainTable();
 
-        ScrollPane pane = mainTable.getPane();
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-        splitPane.getItems().add(pane);
+        splitPane.getItems().add(mainTable);
 
         // Set up name autocompleter for search:
         setupAutoCompletion();
@@ -895,10 +882,13 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * Closes the entry editor if it is showing the given entry.
+     * Closes the entry editor if it is showing any of the given entries.
      */
-    private void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (entryEditor.getEntry() == entry))) {
+    private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
+
+        // This method is not able to close the bottom pane currently
+
+        if ((mode == BasePanelMode.SHOWING_EDITOR) && (entriesToCheck.contains(entryEditor.getEntry()))) {
             closeBottomPane();
         }
     }
@@ -912,10 +902,6 @@ public class BasePanel extends StackPane {
 
     public void markBaseChanged() {
         baseChanged = true;
-        markBasedChangedInternal();
-    }
-
-    private void markBasedChangedInternal() {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
@@ -1089,11 +1075,6 @@ public class BasePanel extends StackPane {
         mainTable.cut();
     }
 
-    @Subscribe
-    public void listen(EntryChangedEvent entryChangedEvent) {
-        this.markBaseChanged();
-    }
-
     private static class SearchAndOpenFile {
 
         private final BibEntry entry;
@@ -1140,7 +1121,7 @@ public class BasePanel extends StackPane {
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
+            if (addedEntryEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
                 return;
             }
 
@@ -1156,8 +1137,8 @@ public class BasePanel extends StackPane {
     private class EntryRemovedListener {
 
         @Subscribe
-        public void listen(EntryRemovedEvent entryRemovedEvent) {
-            ensureNotShowingBottomPanel(entryRemovedEvent.getBibEntry());
+        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
+            ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
         }
     }
 
@@ -1195,7 +1176,7 @@ public class BasePanel extends StackPane {
         }
 
         @Subscribe
-        public void listen(EntryRemovedEvent removedEntryEvent) {
+        public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }

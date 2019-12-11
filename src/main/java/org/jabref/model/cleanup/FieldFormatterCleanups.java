@@ -2,11 +2,12 @@ package org.jabref.model.cleanup;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.TreeMap;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -61,7 +62,7 @@ public class FieldFormatterCleanups {
         if (enabled) {
             return applyAllActions(entry);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -91,7 +92,7 @@ public class FieldFormatterCleanups {
 
     private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newline) {
         //first, group all formatters by the field for which they apply
-        Map<Field, List<String>> groupedByField = new HashMap<>();
+        Map<Field, List<String>> groupedByField = new TreeMap<>(Comparator.comparing(Field::getName));
         for (FieldFormatterCleanup cleanup : actionList) {
             Field key = cleanup.getField();
 

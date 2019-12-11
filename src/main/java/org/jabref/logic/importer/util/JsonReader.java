@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.ParseException;
 
-import org.json.JSONObject;
+import kong.unirest.json.JSONObject;
 
 /**
  * Converts an {@link InputStream} into a {@link JSONObject}.
@@ -23,6 +23,9 @@ public class JsonReader {
             String inputStr;
             while ((inputStr = streamReader.readLine()) != null) {
                 responseStrBuilder.append(inputStr);
+            }
+            if (responseStrBuilder.toString().isBlank()) {
+                throw new ParseException("Empty input!");
             }
             return new JSONObject(responseStrBuilder.toString());
         } catch (IOException e) {

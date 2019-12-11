@@ -4,16 +4,22 @@ import java.util.Objects;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class Abbreviation implements Comparable<Abbreviation> {
+import org.jabref.model.strings.StringUtil;
 
-    private static final String SPLITTER = ";"; // elements after SPLITTER are not used at the moment
+public class Abbreviation implements Comparable<Abbreviation> {
 
     private final SimpleStringProperty name = new SimpleStringProperty("");
     private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
+    private final SimpleStringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
 
     public Abbreviation(String name, String abbreviation) {
+        this(name, abbreviation, StringUtil.EMPTY);
+    }
+
+    public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
         this.name.set(Objects.requireNonNull(name).trim());
         this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
+        this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation.trim());
     }
 
     public String getName() {
@@ -29,7 +35,7 @@ public class Abbreviation implements Comparable<Abbreviation> {
     }
 
     public String getAbbreviation() {
-        return this.abbreviation.get();
+        return abbreviation.get();
     }
 
     public void setAbbreviation(String abbreviation) {
@@ -40,16 +46,24 @@ public class Abbreviation implements Comparable<Abbreviation> {
         return abbreviation;
     }
 
-    public String getIsoAbbreviation() {
-        if (getAbbreviation().contains(SPLITTER)) {
-            String[] restParts = getAbbreviation().split(SPLITTER);
-            return restParts[0].trim();
+    public String getShortestUniqueAbbreviation() {
+        String result = shortestUniqueAbbreviation.get();
+        if (result.isEmpty()) {
+            return getAbbreviation();
         }
-        return getAbbreviation();
+        return result;
+    }
+
+    public void setShortestUniqueAbbreviation(String shortestUniqueAbbreviation) {
+        this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation);
+    }
+
+    public SimpleStringProperty shortestUniqueAbbreviationProperty() {
+        return shortestUniqueAbbreviation;
     }
 
     public String getMedlineAbbreviation() {
-        return getIsoAbbreviation().replace(".", " ").replace("  ", " ").trim();
+        return getAbbreviation().replace(".", " ").replace("  ", " ").trim();
     }
 
     @Override
@@ -61,9 +75,11 @@ public class Abbreviation implements Comparable<Abbreviation> {
         String currentTrimmed = current.trim();
 
         if (getMedlineAbbreviation().equals(currentTrimmed)) {
+            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
+        } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {
-            return getIsoAbbreviation();
+            return getAbbreviation();
         } else {
             return getMedlineAbbreviation();
         }
@@ -71,23 +87,30 @@ public class Abbreviation implements Comparable<Abbreviation> {
 
     @Override
     public String toString() {
-        return String.format("Abbreviation{name=%s, iso=%s, medline=%s}", getName(), getIsoAbbreviation(), getMedlineAbbreviation());
+        return String.format("Abbreviation{name=%s, abbreviation=%s, medlineAbbreviation=%s, shortestUniqueAbbreviation=%s}",
+                this.name,
+                this.abbreviation,
+                this.getMedlineAbbreviation(),
+                this.shortestUniqueAbbreviation);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o instanceof Abbreviation) {
-            Abbreviation that = (Abbreviation) o;
-            return Objects.equals(getName(), that.getName());
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
-        return false;
+
+        Abbreviation that = (Abbreviation) obj;
+
+        return Objects.equals(getName(), that.getName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getName());
+        return Objects.hash(getName());
     }
 }

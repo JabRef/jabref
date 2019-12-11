@@ -11,7 +11,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
@@ -33,9 +32,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeAbbreviatedProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
-    private final BooleanProperty dndCopyFileProperty = new SimpleBooleanProperty();
-    private final BooleanProperty dndLinkFileProperty = new SimpleBooleanProperty();
-    private final BooleanProperty dndCopyRenameLinkFileProperty = new SimpleBooleanProperty();
 
     private AutoCompletePreferences autoCompletePreferences;
 
@@ -78,15 +74,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 firstNameModeBothProperty.setValue(true);
                 break;
         }
-
-        FileDragDropPreferenceType dragDropPreferenceType = preferences.getEntryEditorFileLinkPreference();
-        if (dragDropPreferenceType == FileDragDropPreferenceType.COPY) {
-            dndCopyFileProperty.setValue(true);
-        } else if (dragDropPreferenceType == FileDragDropPreferenceType.LINK) {
-            dndLinkFileProperty.setValue(true);
-        } else {
-            dndCopyRenameLinkFileProperty.setValue(true);
-        }
     }
 
     @Override
@@ -119,14 +106,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             autoCompletePreferences.setFirstNameMode(ONLY_FULL);
         } else {
             autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
-        }
-
-        if (dndCopyFileProperty.getValue()) {
-            preferences.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.COPY);
-        } else if (dndLinkFileProperty.getValue()) {
-            preferences.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.LINK);
-        } else {
-            preferences.storeEntryEditorFileLinkPreference(FileDragDropPreferenceType.MOVE);
         }
 
         preferences.storeAutoCompletePreferences(autoCompletePreferences);
@@ -169,10 +148,4 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty firstNameModeFullProperty() { return firstNameModeFullProperty; }
 
     public BooleanProperty firstNameModeBothProperty() { return firstNameModeBothProperty; }
-
-    public BooleanProperty dndCopyFileProperty() { return dndCopyFileProperty; }
-
-    public BooleanProperty dndLinkFileProperty() { return dndLinkFileProperty; }
-
-    public BooleanProperty dndCopyRenameLinkFileProperty() { return dndCopyRenameLinkFileProperty; }
 }

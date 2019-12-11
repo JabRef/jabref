@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JabRef MainClass
+ * JabRef's main class to process command line options and to start the UI
  */
 public class JabRefMain extends Application {
 
@@ -45,7 +45,7 @@ public class JabRefMain extends Application {
     }
 
     @Override
-    public void start(Stage mainStage) throws Exception {
+    public void start(Stage mainStage) {
         try {
             // Fail on unsupported Java versions
             ensureCorrectJavaVersion();
@@ -85,13 +85,13 @@ public class JabRefMain extends Application {
             Platform.exit();
         }
     }
-  
+
     @Override
     public void stop() {
         Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
     }
-  
+
     /**
      * Tests if we are running an acceptable Java and terminates JabRef when we are sure the version is not supported.
      * This test uses the requirements for the Java version as specified in <code>gradle.build</code>. It is possible to
@@ -166,7 +166,7 @@ public class JabRefMain extends Application {
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
-        Globals.entryTypesManager.addCustomizedEntryTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+        Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
 

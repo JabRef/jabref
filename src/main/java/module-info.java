@@ -55,14 +55,17 @@ open module org.jabref {
     requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
-    requires httpclient;
     requires com.github.tomtung.latex2unicode;
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires commons.lang3;
+    requires org.graalvm.js;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
     requires unirest.java;
+    requires org.apache.httpcomponents.httpclient;
+    requires org.jsoup;
+    requires commons.csv;
+    requires io.github.javadiffutils;
 }

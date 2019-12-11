@@ -1,13 +1,12 @@
 package org.jabref.model.cleanup;
 
 /**
- * The Formatter is used for a Filter design-pattern. Extending classes have to accept a String and returned a
- * formatted version of it. Implementations have to reside in the logic package.
- *
+ * The Formatter is used for a Filter design-pattern. Extending classes have to accept a String and returned a formatted
+ * version of it. Implementations have to reside in the logic package.
+ * <p>
  * Example:
- *
+ * <p>
  * "John von Neumann" => "von Neumann, John"
- *
  */
 public abstract class Formatter {
 
@@ -20,13 +19,14 @@ public abstract class Formatter {
 
     /**
      * Returns a unique key for the formatter that can be used for its identification
+     *
      * @return the key of the formatter, always not null
      */
     public abstract String getKey();
 
     /**
      * Formats a field value by with a particular formatter transformation.
-     *
+     * <p>
      * Calling this method with a null argument results in a NullPointerException.
      *
      * @param value the input String
@@ -42,8 +42,8 @@ public abstract class Formatter {
     public abstract String getDescription();
 
     /**
-     * Returns an example input string of the formatter.
-     * This example is used as input to the formatter to demonstrate its functionality
+     * Returns an example input string of the formatter. This example is used as input to the formatter to demonstrate
+     * its functionality
      *
      * @return the example input string, always non empty
      */
@@ -68,7 +68,7 @@ public abstract class Formatter {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Formatter) {
-            return getKey().equals(((Formatter)obj).getKey());
+            return getKey().equals(((Formatter) obj).getKey());
         } else {
             return false;
         }

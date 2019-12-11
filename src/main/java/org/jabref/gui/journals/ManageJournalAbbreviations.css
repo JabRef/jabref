@@ -1,5 +1,5 @@
 .abbreviations-table {
-	-fx-table-cell-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
 }
 
 .custom-header {
@@ -8,10 +8,7 @@
     -fx-spacing: 5px;
 }
 
-.table-row-cell:empty {
-    visibility: hidden;
-}
-
-.table-row-cell:selected > .table-cell > .icon, .table-row-cell:pressed > .table-cell > .icon {
-   -fx-fill: white;
+.icon {
+    -fx-font-size: 1.5em;
+    -fx-padding: 0.1em 0.2em 0.1em 0.2em;
 }

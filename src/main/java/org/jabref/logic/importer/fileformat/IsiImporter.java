@@ -143,7 +143,7 @@ public class IsiImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
 
-        List<BibEntry> bibitems = new ArrayList<>();
+        List<BibEntry> bibEntries = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
         // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
@@ -233,7 +233,6 @@ public class IsiImporter extends Importer {
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
                     hm.put(StandardField.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
-
                     value = EOL_PATTERN.matcher(value).replaceAll(" ");
                     String existingKeywords = hm.get(StandardField.KEYWORDS);
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
@@ -242,7 +241,6 @@ public class IsiImporter extends Importer {
                         existingKeywords += ", " + value;
                     }
                     hm.put(StandardField.KEYWORDS, existingKeywords);
-
                 } else if ("AB".equals(beg)) {
                     hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
@@ -271,12 +269,10 @@ public class IsiImporter extends Importer {
                 } else if ("DI".equals(beg)) {
                     hm.put(StandardField.DOI, value);
                 } else if ("PD".equals(beg)) {
-
                     String month = IsiImporter.parseMonth(value);
                     if (month != null) {
                         hm.put(StandardField.MONTH, month);
                     }
-
                 } else if ("DT".equals(beg)) {
                     if ("Review".equals(value)) {
                         type = StandardEntryType.Article; // set "Review" in Note/Comment?
@@ -327,17 +323,19 @@ public class IsiImporter extends Importer {
 
             b.setField(hm);
 
-            bibitems.add(b);
+            bibEntries.add(b);
         }
-        return new ParserResult(bibitems);
+        return new ParserResult(bibEntries);
     }
 
     private static String parsePages(String value) {
         return value.replace("-", "--");
     }
 
-    public static String parseMonth(String value) {
-
+    /**
+     * Parses the month and returns it in the JabRef format
+     */
+    static String parseMonth(String value) {
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
             Optional<Month> month = Month.getMonthByShortName(part1.toLowerCase(Locale.ROOT));

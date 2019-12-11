@@ -184,7 +184,7 @@ public class XmpExporterTest {
 
     @Test
     public void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Collections.singletonList(StandardField.AUTHOR));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Collections.singleton(StandardField.AUTHOR));
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");

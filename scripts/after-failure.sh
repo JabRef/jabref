@@ -1,12 +1,8 @@
 #!/bin/bash
-# taken from https://github.com/lhotari/travis-gradle-test-failures-to-console/blob/master/travis/junit-errors-to-stdout.sh
+# based on https://github.com/lhotari/travis-gradle-test-failures-to-console/blob/master/travis/junit-errors-to-stdout.sh
 IFS='
 '
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-if [ "$TRAVIS" = "true" ]; then
-	#echo 'Installing xml-twig-tools and xsltproc....'
-	sudo apt-get install -qq -y --force-yes xml-twig-tools xsltproc > /dev/null
-fi
 ROOTDIR="$1"
 if [ -z "$ROOTDIR" ]; then
 	ROOTDIR="."

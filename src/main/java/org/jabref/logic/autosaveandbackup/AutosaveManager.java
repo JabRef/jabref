@@ -2,11 +2,9 @@ package org.jabref.logic.autosaveandbackup;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,24 +19,27 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
- * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while saving and rejects all redundant save tasks.
+ * An intelligent {@link ScheduledThreadPoolExecutor} prevents a high load while saving and rejects all redundant save tasks.
+ * The scheduled action is stored and canceled if a newer save action is proposed.
  */
 public class AutosaveManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
+    private static final int AUTO_SAVE_DELAY = 200;
 
     private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final BlockingQueue<Runnable> workerQueue;
-    private final ExecutorService executor;
+    private final ScheduledExecutorService executor;
     private final EventBus eventBus;
     private final CoarseChangeFilter changeFilter;
+    private Future<?> scheduledSaveAction;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.workerQueue = new ArrayBlockingQueue<>(1);
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+        executor.setRemoveOnCancelPolicy(true); // This prevents memory leaks
+        this.executor = executor;
         this.eventBus = new EventBus();
         this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -46,13 +47,12 @@ public class AutosaveManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        try {
-            executor.submit(() -> {
-                eventBus.post(new AutosaveEvent());
-            });
-        } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting autosave while another save process is already running.");
+        if (scheduledSaveAction != null) {
+            scheduledSaveAction.cancel(false);
         }
+        scheduledSaveAction = executor.schedule(() -> {
+            eventBus.post(new AutosaveEvent());
+        }, AUTO_SAVE_DELAY, TimeUnit.MILLISECONDS);
     }
 
     private void shutdown() {

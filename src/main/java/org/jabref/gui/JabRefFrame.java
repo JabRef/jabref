@@ -410,7 +410,6 @@ public class JabRefFrame extends BorderPane {
         head.setCenter(createToolbar());
         setTop(head);
 
-        SplitPane.setResizableWithParent(sidePane, Boolean.FALSE);
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
@@ -451,6 +450,7 @@ public class JabRefFrame extends BorderPane {
 
     private Node createToolbar() {
         Pane leftSpacer = new Pane();
+        leftSpacer.setMinWidth(50);
         HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
         Pane rightSpacer = new Pane();
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
@@ -470,9 +470,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
                 leftSpacer
         );
-        leftSide.setMinWidth(100);
-        leftSide.prefWidthProperty().bind(sidePane.widthProperty());
-        leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
@@ -783,8 +780,9 @@ public class JabRefFrame extends BorderPane {
                 pushToApplicationMenuItem,
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_ISO, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_ISO, this, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, stateManager))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_DEFAULT, this, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_SHORTEST_UNIQUE, this, stateManager))),
 
                 factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, stateManager))
         );
@@ -974,37 +972,35 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            // add tab
-            Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
-            tabbedPane.getTabs().add(newTab);
-            newTab.setOnCloseRequest(event -> {
-                closeTab((BasePanel) newTab.getContent());
-                event.consume();
-            });
-
-            // update all tab titles
-            updateAllTabTitles();
-
-            if (raisePanel) {
-                tabbedPane.getSelectionModel().select(newTab);
-            }
-
-            // Register undo/redo listener
-            basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
-
-            BibDatabaseContext context = basePanel.getBibDatabaseContext();
-
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUIManager(basePanel));
-            }
-
-            BackupManager.start(context, Globals.entryTypesManager, prefs);
-
-            // Track opening
-            trackOpenNewDatabase(basePanel);
+        // add tab
+        Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
+        tabbedPane.getTabs().add(newTab);
+        newTab.setOnCloseRequest(event -> {
+            closeTab((BasePanel) newTab.getContent());
+            event.consume();
         });
+
+        // update all tab titles
+        updateAllTabTitles();
+
+        if (raisePanel) {
+            tabbedPane.getSelectionModel().select(newTab);
+        }
+
+        // Register undo/redo listener
+        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+
+        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+
+        if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(basePanel));
+        }
+
+        BackupManager.start(context, Globals.entryTypesManager, prefs);
+
+        // Track opening
+        trackOpenNewDatabase(basePanel);
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {
@@ -1164,7 +1160,6 @@ public class JabRefFrame extends BorderPane {
             panel.cleanUp();
             tabbedPane.getTabs().remove(getTab(panel));
             setWindowTitle();
-            dialogService.notify(Localization.lang("Closed library") + '.');
             // update tab titles
             updateAllTabTitles();
         });

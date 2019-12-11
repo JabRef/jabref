@@ -1,6 +1,6 @@
 package org.jabref.model.database.shared;
 
-import java.util.Locale;
+import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -9,7 +9,7 @@ import java.util.Optional;
 public enum DBMSType {
 
     MYSQL("MySQL", "org.mariadb.jdbc.Driver", "jdbc:mariadb://%s:%d/%s", 3306),
-    ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@%s:%d:%s", 1521),
+    ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@%s:%d/%s", 1521),
     POSTGRESQL("PostgreSQL", "org.postgresql.Driver", "jdbc:postgresql://%s:%d/%s", 5432);
 
     private final String type;
@@ -51,11 +51,6 @@ public enum DBMSType {
     }
 
     public static Optional<DBMSType> fromString(String typeName) {
-        try {
-            return Optional.of(Enum.valueOf(DBMSType.class, typeName.toUpperCase(Locale.ENGLISH)));
-        } catch (IllegalArgumentException exception) {
-            return Optional.empty();
-        }
+        return Arrays.stream(DBMSType.values()).filter(dbmsType -> dbmsType.type.equalsIgnoreCase(typeName)).findAny();
     }
-
 }

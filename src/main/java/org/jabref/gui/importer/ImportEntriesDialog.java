@@ -119,6 +119,14 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                         }
                     }).executeWith(Globals.TASK_EXECUTOR);
 
+                    /*
+                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    also tried to move it to the end of the initialize method, but it did not select the entry.
+                    */
+                    if (entriesListView.getItems().size() == 1) {
+                        selectAllNewEntries();
+                      }
+
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))

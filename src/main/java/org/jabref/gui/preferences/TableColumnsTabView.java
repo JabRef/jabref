@@ -14,13 +14,12 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -28,15 +27,10 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsTabViewModel> implements PreferencesTab {
 
-    @FXML private TableView<TableColumnsItemModel> columnsList;
-    @FXML private TableColumn<TableColumnsItemModel, Field> nameColumn;
-    @FXML private TableColumn<TableColumnsItemModel, Field> actionsColumn;
-    @FXML private ComboBox<Field> addColumnName;
-    @FXML private CheckBox showFileColumn;
-    @FXML private CheckBox showUrlColumn;
-    @FXML private RadioButton urlFirst;
-    @FXML private RadioButton doiFirst;
-    @FXML private CheckBox showEPrintColumn;
+    @FXML private TableView<MainTableColumnModel> columnsList;
+    @FXML private TableColumn<MainTableColumnModel, String> nameColumn;
+    @FXML private TableColumn<MainTableColumnModel, String> actionsColumn;
+    @FXML private ComboBox<MainTableColumnModel> addColumnName;
     @FXML private CheckBox specialFieldsEnable;
     @FXML private Button specialFieldsHelp;
     @FXML private RadioButton specialFieldsSyncKeywords;
@@ -73,15 +67,17 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     private void setupTable() {
         nameColumn.setSortable(false);
         nameColumn.setReorderable(false);
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        new ValueTableCellFactory<TableColumnsItemModel, Field>().withText(FieldsUtil::getNameWithType).install(nameColumn);
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        new ValueTableCellFactory<MainTableColumnModel, String>()
+                .withText(name -> name)
+                .install(nameColumn);
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
-        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().fieldProperty());
-        new ValueTableCellFactory<TableColumnsItemModel, Field>()
+        actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        new ValueTableCellFactory<MainTableColumnModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove column") + " " + name.getDisplayName())
+                .withTooltip(name -> Localization.lang("Remove column") + " " + name)
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeColumn(columnsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
@@ -95,23 +91,24 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
 
         columnsList.itemsProperty().bind(viewModel.columnsListProperty());
 
-        new ViewModelListCellFactory<Field>()
-                .withText(FieldsUtil::getNameWithType)
+        new ViewModelListCellFactory<MainTableColumnModel>()
+                .withText(MainTableColumnModel::getDisplayName)
                 .install(addColumnName);
         addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
-        addColumnName.setConverter(FieldsUtil.fieldStringConverter);
+        addColumnName.setConverter(TableColumnsTabViewModel.columnNameStringConverter);
+        addColumnName.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.insertColumnInList();
+                event.consume();
+            }
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.columnsListValidationStatus(), columnsList));
     }
 
     private void setupBindings() {
-        showFileColumn.selectedProperty().bindBidirectional(viewModel.showFileColumnProperty());
-        showUrlColumn.selectedProperty().bindBidirectional(viewModel.showUrlColumnProperty());
-        urlFirst.selectedProperty().bindBidirectional(viewModel.preferUrlProperty());
-        doiFirst.selectedProperty().bindBidirectional(viewModel.preferDoiProperty());
-        showEPrintColumn.selectedProperty().bindBidirectional(viewModel.showEPrintColumnProperty());
         specialFieldsEnable.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
         specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
         specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());

@@ -11,13 +11,3 @@ update_configs:
       - match:
          dependency_type: "all"
          update_type: "semver:minor"
-            
-  - package_manager: "submodules"
-    directory: "/"
-    update_schedule: "weekly"
-    default_labels:
-      - "dependencies"
-    automerged_updates:
-      - match:
-         dependency_type: "all"
-         update_type: "all"

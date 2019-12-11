@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -56,7 +55,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final BasePanel panel;
 
-    private final ScrollPane pane;
     private final BibDatabaseContext database;
     private final UndoManager undoManager;
 
@@ -118,11 +116,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.panel = panel;
 
-        pane = new ScrollPane(this);
-        pane.setFitToHeight(true);
-        pane.setFitToWidth(true);
-
-        this.pane.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
+        this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
         new PersistenceVisualStateTable(this, Globals.prefs);
@@ -235,8 +229,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             ce.end();
             undoManager.addEdit(ce);
 
-            panel.output(panel.formatOutputMessage(Localization.lang("Pasted"), entriesToAdd.size()));
-
             // Show editor if user want us to do this
             BibEntry firstNewEntry = entriesToAdd.get(0);
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
@@ -333,10 +325,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void addSelectionListener(ListChangeListener<? super BibEntryTableViewModel> listener) {
         getSelectionModel().getSelectedItems().addListener(listener);
-    }
-
-    public ScrollPane getPane() {
-        return pane;
     }
 
     public MainTableDataModel getTableModel() {

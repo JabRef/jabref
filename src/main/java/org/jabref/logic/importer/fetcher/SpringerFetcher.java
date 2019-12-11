@@ -22,9 +22,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
     private static final String API_URL = "http://api.springernature.com/meta/v1/json?q=";
-    private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
+    private static final String API_KEY = "a98b4a55181ffcd27259bea45edad12e";
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry

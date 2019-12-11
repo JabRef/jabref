@@ -2,7 +2,7 @@
 
 ## Context and Problem Statement
 
-The feature [search for citations](https://github.com/JabRef/help.jabref.org/issues/210) displays the content of LaTeX files.
+The feature [search for citations](https://github.com/JabRef/user-documentation/issues/210) displays the content of LaTeX files.
 The LaTeX files are text files and might be encoded arbitrarily.
 
 ## Considered Options

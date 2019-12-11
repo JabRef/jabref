@@ -67,13 +67,11 @@ public class DublinCoreExtractor {
 
     /**
      * Year in BibTex - Date in DublinCore is only the year information, because dc interprets empty months as January.
-     * Tries to extract the month as well.
-     * In JabRef the bibtex/month/value is prioritized.
-     * <br/>
-     * The problem is the default value of the calendar, which is always January, also if there is no month information in
-     * the xmp metdata. The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef
-     * the month property filled with jan will override this behavior and no data is lost. In the cases, where xmp
-     * is written by another service, the assumption is, that the 1st January is not a publication date at all.
+     * Tries to extract the month as well. In JabRef the bibtex/month/value is prioritized. <br/> The problem is the
+     * default value of the calendar, which is always January, also if there is no month information in the xmp metdata.
+     * The idea is, to reject all information with YYYY-01-01. In cases, where xmp is written with JabRef the month
+     * property filled with jan will override this behavior and no data is lost. In the cases, where xmp is written by
+     * another service, the assumption is, that the 1st January is not a publication date at all.
      */
     private void extractYearAndMonth() {
         List<String> dates = dcSchema.getUnqualifiedSequenceValueList("date");
@@ -87,12 +85,11 @@ public class DublinCoreExtractor {
             }
             if (calender != null) {
                 bibEntry.setField(StandardField.YEAR, String.valueOf(calender.get(Calendar.YEAR)));
+                int monthNumber = calender.get(Calendar.MONTH) + 1;
                 // not the 1st of January
-                if (!((calender.get(Calendar.MONTH) == 0) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
-                    Optional<Month> month = Month.getMonthByNumber(calender.get(Calendar.MONTH) + 1);
-                    if (month.isPresent()) {
-                        bibEntry.setField(StandardField.MONTH, month.get().getShortName());
-                    }
+                if (!((monthNumber == 1) && (calender.get(Calendar.DAY_OF_MONTH) == 1))) {
+                    Month.getMonthByNumber(monthNumber)
+                         .ifPresent(month -> bibEntry.setMonth(month));
                 }
             }
         }
@@ -129,15 +126,13 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * This method sets all fields, which are custom in bibtext and therefore supported by jabref, but which are not included in the DublinCore format.
-     * <p/>
+     * This method sets all fields, which are custom in BibTeX and therefore supported by JabRef, but which are not
+     * included in the DublinCore format.
+     * <p>
      * The relation attribute of DublinCore is abused to insert these custom fields.
      */
     private void extractBibTexFields() {
-        List<String> relationships = dcSchema.getRelations();
-
         Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
-
         Consumer<String> splitBibTeXElement = s -> {
             // the default pattern is bibtex/key/value, but some fields contains url etc.
             // so the value property contains additional slashes, which makes the usage of
@@ -154,15 +149,15 @@ public class DublinCoreExtractor {
                 // see also DublinCoreExtractor#extractYearAndMonth
                 if (StandardField.MONTH.equals(key)) {
                     Optional<Month> parsedMonth = Month.parse(value);
-                    parsedMonth.ifPresent(month -> bibEntry.setField(key, month.getShortName()));
+                    parsedMonth.ifPresent(bibEntry::setMonth);
                 }
             }
-
         };
+        List<String> relationships = dcSchema.getRelations();
         if (relationships != null) {
             relationships.stream()
-                    .filter(isBibTeXElement)
-                    .forEach(splitBibTeXElement);
+                         .filter(isBibTeXElement)
+                         .forEach(splitBibTeXElement);
         }
     }
 
@@ -220,26 +215,27 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * Helper function for retrieving a BibEntry from the DublinCore metadata
-     * in a PDF file.
+     * Helper function for retrieving a BibEntry from the DublinCore metadata in a PDF file.
+     * <p>
+     * To understand how to get hold of a DublinCore have a look in the test cases for XMPUtil.
+     * <p>
+     * The BibEntry is build by mapping individual fields in the dublin core (like creator, title, subject) to fields in
+     * a bibtex bibEntry. In case special "bibtex/" entries are contained, the normal dublin core fields take
+     * precedence. For instance, the dublin core date takes precedence over bibtex/month.
      *
-     * To understand how to get hold of a DublinCore have a look in the
-     * test cases for XMPUtil.
-     *
-     * The BibEntry is build by mapping individual fields in the dublin core
-     * (like creator, title, subject) to fields in a bibtex bibEntry.
-     *
-     * @return The bibtex bibEntry found in the document information.
+     * @return The bibEntry extracted from the document information.
      */
     public Optional<BibEntry> extractBibtexEntry() {
+        // first extract "bibtex/" entries
+        this.extractBibTexFields();
 
+        // then extract all "standard" dublin core entries
         this.extractEditor();
         this.extractAuthor();
         this.extractYearAndMonth();
         this.extractAbstract();
         this.extractDOI();
         this.extractPublisher();
-        this.extractBibTexFields();
         this.extractRights();
         this.extractSource();
         this.extractSubject();
@@ -347,13 +343,11 @@ public class DublinCoreExtractor {
     public void fillDublinCoreSchema() {
         // Query privacy filter settings
         boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
-        // Fields for which not to write XMP data later on:
-        Set<Field> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
         Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());
         for (Entry<Field, String> field : fieldValues) {
-            if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
+            if (useXmpPrivacyFilter && xmpPreferences.getXmpPrivacyFilter().contains(field.getKey())) {
                 continue;
             }
 

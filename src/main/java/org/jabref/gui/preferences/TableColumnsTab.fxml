@@ -26,7 +26,7 @@
         <VBox spacing="4.0" HBox.hgrow="SOMETIMES">
             <TableView fx:id="columnsList" editable="true" prefHeight="300.0" prefWidth="220.0">
                 <columns>
-                    <TableColumn fx:id="nameColumn" prefWidth="160.0" text="Name"/>
+                    <TableColumn fx:id="nameColumn" prefWidth="160.0" text="%Name"/>
                     <TableColumn fx:id="actionsColumn" maxWidth="40.0" minWidth="40.0" resizable="false"/>
                 </columns>
                 <columnResizePolicy>
@@ -79,16 +79,6 @@
             <padding>
                 <Insets left="20.0"/>
             </padding>
-            <CheckBox fx:id="showFileColumn" text="%Show file column"/>
-            <CheckBox fx:id="showUrlColumn" text="%Show URL/DOI column"/>
-            <VBox spacing="10.0">
-                <padding>
-                    <Insets left="20.0"/>
-                </padding>
-                <RadioButton fx:id="urlFirst" text="%Show URL first" toggleGroup="$urlDoiShownFirst"/>
-                <RadioButton fx:id="doiFirst" text="%Show DOI first" toggleGroup="$urlDoiShownFirst"/>
-            </VBox>
-            <CheckBox fx:id="showEPrintColumn" text="%Show ArXiv column"/>
             <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <padding>
                     <Insets bottom="-5.0"/>

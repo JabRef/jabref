@@ -7,51 +7,61 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
 
     @Override
     public String format(String field) {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder cleanedField = new StringBuilder();
         StringBuilder currentCommand = null;
-        char c;
+        char currentCharacter;
         boolean escaped = false;
         boolean incommand = false;
-        int i;
-        for (i = 0; i < field.length(); i++) {
-            c = field.charAt(i);
-            if (escaped && (c == '\\')) {
-                sb.append('\\');
+        int currentFieldPosition;
+        for (currentFieldPosition = 0; currentFieldPosition < field.length(); currentFieldPosition++) {
+            currentCharacter = field.charAt(currentFieldPosition);
+            if (escaped && (currentCharacter == '\\')) {
+                cleanedField.append('\\');
                 escaped = false;
-            } else if (c == '\\') {
+                // \\ --> first \ begins the command, second \ ends the command
+                // \latexommand\\ -> \latexcommand is the command, terminated by \, which begins a new command
+                incommand = false;
+            } else if (currentCharacter == '\\') {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();
-            } else if (!incommand && ((c == '{') || (c == '}'))) {
+            } else if (!incommand && ((currentCharacter == '{') || (currentCharacter == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (Character.isLetter(currentCharacter) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(currentCharacter))) {
                 escaped = false;
                 if (incommand) {
-                    currentCommand.append(c);
+                    currentCommand.append(currentCharacter);
                     if ((currentCommand.length() == 1)
                             && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type \^o or \~{n}
                         incommand = false;
                         escaped = false;
-
                     }
                 } else {
-                    sb.append(c);
+                    cleanedField.append(currentCharacter);
                 }
-            } else if (Character.isLetter(c)) {
+            } else if (Character.isLetter(currentCharacter)) {
                 escaped = false;
                 if (incommand) {
                     // We are in a command, and should not keep the letter.
-                    currentCommand.append(c);
+                    currentCommand.append(currentCharacter);
                 } else {
-                    sb.append(c);
+                    cleanedField.append(currentCharacter);
                 }
             } else {
-                if (!incommand || (!Character.isWhitespace(c) && (c != '{'))) {
-                    sb.append(c);
+                if (!incommand || (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{'))) {
+                    cleanedField.append(currentCharacter);
                 } else {
-                    if (c != '{') {
-                        sb.append(c);
+                    if (!Character.isWhitespace(currentCharacter) && (currentCharacter != '{')) {
+                        // do not append the opening brace of a command parameter
+                        // do not append the whitespace character
+                        cleanedField.append(currentCharacter);
+                    }
+                    if (incommand) {
+                        // eat up all whitespace characters
+                        while ((currentFieldPosition + 1 < field.length() && Character.isWhitespace(field.charAt(currentFieldPosition + 1)))) {
+                            currentFieldPosition++;
+                        }
                     }
                 }
                 incommand = false;
@@ -59,7 +69,6 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
             }
         }
 
-        return sb.toString();
+        return cleanedField.toString();
     }
-
 }
