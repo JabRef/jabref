@@ -1,7 +1,6 @@
 package org.jabref.gui.maintable;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.EnumSet;
 import java.util.Objects;
 
 import javafx.beans.property.DoubleProperty;
@@ -38,7 +37,7 @@ public class MainTableColumnModel {
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special"));
 
-        public static List<Type> ICON_COLUMNS = Arrays.asList(EXTRAFILE,FILES,GROUPS,LINKED_IDENTIFIER);
+        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE,FILES,GROUPS,LINKED_IDENTIFIER);
 
         private String name;
         private String displayName;
