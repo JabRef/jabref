@@ -244,6 +244,7 @@ public class BasePanel extends StackPane {
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
+
         CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
 
         actions.put(Actions.UNDO, undoAction);
@@ -258,6 +259,7 @@ public class BasePanel extends StackPane {
         actions.put(Actions.SAVE_AS, saveAction::saveAs);
 
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
+
 
         // The action for copying selected entries.
         actions.put(Actions.COPY, this::copy);
