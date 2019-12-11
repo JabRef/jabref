@@ -1,5 +1,6 @@
 package org.jabref;
 
+import java.awt.*;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,12 +41,14 @@ public class JabRefGUI {
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
+    private boolean correctedWindowPos;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
     public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
+        this.correctedWindowPos = false;
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
@@ -62,12 +65,21 @@ public class JabRefGUI {
         // Restore window location and/or maximised state
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else if (numberOfMonitors() == 1 && testExternalCoordinates()) {
+            //corrects the
+            LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
+            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X_CORE));
+            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y_CORE));
+            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X_CORE));
+            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y_CORE));
+            correctedWindowPos = true;
         } else {
             mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
             mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
             mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
+        printWindowState(mainStage);
 
         // We create a decoration pane ourselves for performance reasons
         // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
@@ -188,6 +200,52 @@ public class JabRefGUI {
         Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
+        printWindowState(mainStage);
+    }
+
+    /**
+     * outprints the Data from the Screen
+     * @param mainStage
+     */
+    private void printWindowState(Stage mainStage) {
+        StringBuilder bob = new StringBuilder();
+        bob.append("SCREEN DATA:");
+        bob.append("JabRefPreferences.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+        bob.append("JabRefPreferences.POS_X: " + mainStage.getX() + "\n");
+        bob.append("JabRefPreferences.POS_Y: " + mainStage.getY() + "\n");
+        bob.append("JabRefPreferences.SIZE_X: " + mainStage.getWidth() + "\n");
+        bob.append("JabRefPreferences.SIZE_Y: " + mainStage.getHeight() + "\n");
+        LOGGER.debug(bob.toString());
+    }
+
+    /**
+     * Tests if the Coordinates are out of the mainscreen
+     * @return outbounds
+     */
+    private boolean testExternalCoordinates(){
+        boolean outbounds = false;
+        if(Globals.prefs.getDouble(JabRefPreferences.POS_X)>Globals.prefs.getDouble(JabRefPreferences.SIZE_X)) outbounds = true;
+        if(Globals.prefs.getDouble(JabRefPreferences.POS_Y)>Globals.prefs.getDouble(JabRefPreferences.SIZE_Y)) outbounds = true;
+        if(Globals.prefs.getDouble(JabRefPreferences.POS_X)<0) outbounds = true;
+        if(Globals.prefs.getDouble(JabRefPreferences.POS_Y)<0) outbounds = true;
+        return outbounds;
+    }
+
+    /**
+     * returns the number of Monitors connected to the Computer
+     * @return numberOfmonitors
+     */
+    private int numberOfMonitors(){
+        //this following part is from the Internet:
+        //https://stackoverflow.com/questions/20966385/in-java-is-it-possible-to-listen-for-the-connection-disconnection-of-an-externa (from 17.11.2019
+        //TODO: proof if we can use this codepiece
+        int numberOfmonitors = 0;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();
+        for (int j = 0; j < gs.length; j++) {
+            numberOfmonitors++;
+        }
+        return numberOfmonitors;
     }
 
     private void openLastEditedDatabases() {
