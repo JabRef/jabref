@@ -42,7 +42,7 @@
                 </buttons>
             </ButtonBar>
             <Region prefWidth="20.0" HBox.hgrow="ALWAYS"/>
-            <CustomTextField fx:id="searchField" promptText="Filter groups"/>
+            <CustomTextField fx:id="searchField" promptText="%Filter groups"/>
         </HBox>
     </bottom>
 </BorderPane>
