@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" et-al-min="4" et-al-use-first="3" page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>Tissue Engineering</title>
-    <id>http://www.zotero.org/styles/tissue-engineering</id>
-    <link href="http://www.zotero.org/styles/tissue-engineering" rel="self"/>
+    <title>Nutrition Research Reviews</title>
+    <title-short>NRR</title-short>
+    <id>http://www.zotero.org/styles/nutrition-research-reviews</id>
+    <link href="http://www.zotero.org/styles/nutrition-research-reviews" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="https://home.liebertpub.com/publications/tissue-engineering-parts-a-b-and-c/595/for-authors" rel="documentation"/>
-    <author>
-      <name>Charles Parnot</name>
-      <email>charles.parnot@gmail.com</email>
-    </author>
+    <link href="https://www.cambridge.org/core/journals/nutrition-research-reviews/information/instructions-contributors#detailedmanuscriptpreparation" rel="documentation"/>
     <category citation-format="numeric"/>
+    <category field="biology"/>
     <category field="medicine"/>
-    <issn>2152-4947</issn>
-    <eissn>2152-4955</eissn>
-    <summary>A style for the journal Tissue Engineering, Parts A, B &amp; C, published by Mary Ann Liebert, Inc.</summary>
-    <updated>2019-12-04T12:33:25+00:00</updated>
+    <issn>0954-4224</issn>
+    <eissn>1475-2700</eissn>
+    <summary>NLM (Vancouver) style modified for parenthetical superscript and et al. for more than 3 authors</summary>
+    <updated>2019-12-05T14:54:10+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
+    <date form="text" delimiter=" ">
+      <date-part name="year"/>
+      <date-part name="month" form="short" strip-periods="true"/>
+      <date-part name="day"/>
+    </date>
     <terms>
       <term name="retrieved">available</term>
       <term name="section" form="short">sect.</term>
@@ -26,8 +29,8 @@
   </locale>
   <macro name="author">
     <names variable="author">
-      <name delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
-      <label form="short" prefix=", "/>
+      <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+      <label form="long" prefix=", "/>
       <substitute>
         <names variable="editor"/>
       </substitute>
@@ -41,13 +44,13 @@
         </if>
       </choose>
       <names variable="editor" suffix=".">
-        <name delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
-        <label form="short" prefix=", "/>
+        <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+        <label form="long" prefix=", "/>
       </names>
     </group>
   </macro>
   <macro name="publisher">
-    <group delimiter=": " suffix=",">
+    <group delimiter=": " suffix=";">
       <choose>
         <if type="thesis">
           <text variable="publisher-place" prefix="[" suffix="]"/>
@@ -77,11 +80,7 @@
       <if variable="URL">
         <group prefix="[" suffix="]" delimiter=" ">
           <text term="cited"/>
-          <date variable="accessed">
-            <date-part name="year"/>
-            <date-part name="month" prefix=" " form="short" strip-periods="true"/>
-            <date-part name="day" prefix=" "/>
-          </date>
+          <date variable="accessed" form="text"/>
         </group>
       </if>
     </choose>
@@ -90,7 +89,7 @@
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
         <group suffix="." delimiter=" ">
-          <text variable="container-title" form="short" strip-periods="true"/>
+          <text variable="container-title" form="short"/>
           <choose>
             <if variable="URL">
               <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
@@ -150,10 +149,8 @@
   <macro name="date">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <group delimiter=" ">
-          <date variable="issued" delimiter=" ">
-            <date-part name="year"/>
-          </date>
+        <group suffix=";" delimiter=" ">
+          <date variable="issued" form="text"/>
           <text macro="accessed-date"/>
         </group>
       </if>
@@ -187,11 +184,11 @@
   <macro name="pages">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <text variable="page-first"/>
+        <text variable="page" prefix=":"/>
       </if>
       <else>
-        <group delimiter=" ">
-          <label variable="page" form="short"/>
+        <group prefix=" " delimiter=" ">
+          <label variable="page" form="short" plural="never"/>
           <text variable="page"/>
         </group>
       </else>
@@ -200,7 +197,8 @@
   <macro name="journal-location">
     <choose>
       <if type="article-journal article-magazine" match="any">
-        <text variable="volume" font-weight="bold"/>
+        <text variable="volume"/>
+        <text variable="issue" prefix="(" suffix=")"/>
       </if>
     </choose>
   </macro>
@@ -215,11 +213,11 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout vertical-align="sup" delimiter=",">
+    <layout vertical-align="sup" delimiter="," prefix="(" suffix=")">
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography and="text" et-al-min="7" et-al-use-first="6" second-field-align="flush" line-spacing="2">
+  <bibliography second-field-align="flush" entry-spacing="0">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=". ">
@@ -230,10 +228,10 @@
         <text macro="editor"/>
         <text macro="container-title"/>
         <text macro="publisher"/>
-        <group delimiter=", ">
+        <group>
+          <text macro="date"/>
           <text macro="journal-location"/>
           <text macro="pages"/>
-          <text macro="date"/>
         </group>
       </group>
       <text macro="report-details" suffix=". "/>

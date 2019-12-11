@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml-model href="schema-master/csl.rnc" type="application/relax-ng-compact-syntax"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" default-locale="de-DE">
-  <!--
-================================================================================
-INFORMATIONEN ZUM ZITIERSTIL
-================================================================================
--->
- <info>
-    <title>zeitschrift-fuer-digitale-geisteswissenschaften</title>
+  <info>
+    <title>Zeitschrift für digitale Geisteswissenschaften (German)</title>
     <title-short>ZfdG</title-short>
-    <!-- hier zoterodaten ergänzen -->
-    <id>http://www.zotero.org/styles/zeitschrift-fuer-digitale-geisteswissenschaften</id>
-    <link href="http://www.zotero.org/styles/zeitschrift-fuer-digitale-geisteswissenschaften" rel="self"/>
+    <id>http://www.zotero.org/styles/zeitschrift-fur-digitale-geisteswissenschaften</id>
+    <link href="http://www.zotero.org/styles/zeitschrift-fur-digitale-geisteswissenschaften" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-note-bibliography" rel="template"/>
-    <!-- URI of the style from which the current style is derived -->   
     <link href="http://www.zfdg.de/s-wie-style" rel="documentation"/>
     <author>
       <name>Timo Steyer</name>
@@ -30,17 +22,16 @@ INFORMATIONEN ZUM ZITIERSTIL
     </contributor>
     <category citation-format="note"/>
     <category field="humanities"/>
-    <category field="generic-base"/>   
+    <issn>2510-1358</issn>
+    <summary>Style for Zeitschrift für digitale Geisteswissenschaften (ZfdG).</summary>
     <published>2019-05-28T14:00:00+00:00</published>
     <updated>2019-11-01T02:36:13+00:00</updated>
-    <issn>2510-1358</issn>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
-  <summary>Style for Zeitschrift für digitale Geisteswissenschaften (ZfdG).</summary>
   </info>
   <locale xml:lang="de">
     <terms>
       <term name="et-al">et al.</term>
-    <!--  <term name="accessed">gesehen am</term>-->
+      <!--  <term name="accessed">gesehen am</term>-->
       <term name="editor" form="short">Hg.</term>
       <term name="editor" form="verb-short">Hg.&#160;von</term>
       <term name="translator" form="short">Übers.</term>
@@ -49,7 +40,6 @@ INFORMATIONEN ZUM ZITIERSTIL
       <term name="volume" form="long">Bde.</term>
     </terms>
   </locale>
-
   <macro name="contributors-long">
     <choose>
       <if variable="author">
@@ -70,7 +60,7 @@ INFORMATIONEN ZUM ZITIERSTIL
         <choose>
           <if type="book">
             <names variable="editor">
-              <name form="short" delimiter=" / "  delimiter-precedes-last="always"/>
+              <name form="short" delimiter=" / " delimiter-precedes-last="always"/>
             </names>
           </if>
         </choose>
@@ -122,17 +112,9 @@ INFORMATIONEN ZUM ZITIERSTIL
       </else-if>
     </choose>
   </macro>
-    <!--
-  <macro name="translatedby">
-    <names variable="translator">
-      <label form="verb-short" text-case="lowercase" suffix=". "/>
-      <name delimiter=", " delimiter-precedes-last="always"/>
-    </names>
-  </macro>
-  -->
   <macro name="editor">
     <names variable="editor">
-      <label form="verb-short"  prefix=". " suffix=" "/>
+      <label form="verb-short" prefix=". " suffix=" "/>
       <name delimiter=" / " delimiter-precedes-last="always"/>
     </names>
   </macro>
@@ -140,21 +122,21 @@ INFORMATIONEN ZUM ZITIERSTIL
     <group>
       <choose>
         <if type="book">
-          <text variable="title" form="long"></text>
-              <text macro="editor"/>
-        </if>
-          <else-if type="webpage">
           <text variable="title" form="long"/>
-          </else-if>
-          <else-if  type="personal_communication">
-        <text variable="title" form="long"/>
-      </else-if>
-          <else-if type="post-weblog">
-        <text variable="title" form="long"/>
-          </else-if>
-          <else-if  type="chapter">
-        <text variable="title" form="long"/>
-          </else-if>
+          <text macro="editor"/>
+        </if>
+        <else-if type="webpage">
+          <text variable="title" form="long"/>
+        </else-if>
+        <else-if type="personal_communication">
+          <text variable="title" form="long"/>
+        </else-if>
+        <else-if type="post-weblog">
+          <text variable="title" form="long"/>
+        </else-if>
+        <else-if type="chapter">
+          <text variable="title" form="long"/>
+        </else-if>
       </choose>
       <choose>
         <if type="article-journal">
@@ -179,21 +161,21 @@ INFORMATIONEN ZUM ZITIERSTIL
   <macro name="container">
     <choose>
       <if type="post-weblog">
-        <text prefix=" In: "  variable="container-title"/>
+        <text prefix=" In: " variable="container-title"/>
       </if>
     </choose>
+    <choose>
+      <if type="chapter">
         <choose>
-          <if type="chapter">
-            <choose>
-              <if variable="container-author editor" match="any">
-                <text variable="container-title" prefix="In: " suffix="."/>
-                <text macro="container-contributors"/>
-              </if>
-            </choose>
+          <if variable="container-author editor" match="any">
+            <text variable="container-title" prefix="In: " suffix="."/>
+            <text macro="container-contributors"/>
+          </if>
+        </choose>
         <choose>
           <if variable="number-of-volumes">
             <text prefix=". " variable="number-of-volumes" suffix=" "/>
-            <text term="volume" form="long"/>  
+            <text term="volume" form="long"/>
           </if>
         </choose>
         <text prefix=" / " macro="secondary-container-contributors"/>
@@ -203,27 +185,6 @@ INFORMATIONEN ZUM ZITIERSTIL
       </else-if>
     </choose>
   </macro>
-    <!--
-  <macro name="collection">
-    <text variable="collection-title"/>
-    <choose>
-      <if is-numeric="collection-number">
-        <group delimiter=" ">
-          <text prefix=" " variable="collection-number"/>
-        </group>
-      </if>
-      <else>
-        <text prefix=", " variable="collection-number"/>
-      </else>
-    </choose>
-    <choose>
-      <if variable="collection-editor">
-        <text prefix=" / " term="editor" form="verb-short" text-case="lowercase" suffix=". "/>
-        <text macro="secondary-collection-contributors"/>
-      </if>
-    </choose>
-  </macro>
-  -->
   <macro name="edition">
     <choose>
       <if is-numeric="edition">
@@ -239,7 +200,7 @@ INFORMATIONEN ZUM ZITIERSTIL
   <macro name="issued">
     <choose>
       <if type="book">
-        <text prefix=". " suffix=" Bde"  variable="number-of-volumes"/>
+        <text prefix=". " suffix=" Bde" variable="number-of-volumes"/>
         <text prefix=". " macro="edition"/>
         <text prefix=" (" suffix=")" variable="collection-title"/>
         <text prefix=". " variable="publisher-place"/>
@@ -275,9 +236,11 @@ INFORMATIONEN ZUM ZITIERSTIL
       </else-if>
       <else-if type="article-journal article-magazine article-newspaper" match="any">
         <group prefix=" ">
-          <text variable="collection-title" prefix=" In: "></text>
+          <text variable="collection-title" prefix=" In: "/>
           <text variable="volume" prefix=" "/>
-          <date variable="issued" form="numeric" prefix=" ("   suffix=")"><date-part name="year"></date-part></date>
+          <date variable="issued" form="numeric" prefix=" (" suffix=")">
+            <date-part name="year"/>
+          </date>
           <text variable="issue" prefix=", &#160;"/>
         </group>
         <text prefix=", " macro="secondary-container-contributors"/>
@@ -287,7 +250,7 @@ INFORMATIONEN ZUM ZITIERSTIL
             <if variable="URL">
               <text value="dort datiert"/>
             </if>
-          </choose>    
+          </choose>
         </group>
       </else-if>
       <else>
@@ -309,9 +272,10 @@ INFORMATIONEN ZUM ZITIERSTIL
       </if>
     </choose>
   </macro>
-  <macro name="access">    <choose>
+  <macro name="access">
+    <choose>
       <if variable="URL">
-        <text prefix=" " variable="URL" suffix="."/>    
+        <text prefix=" " variable="URL" suffix="."/>
       </if>
     </choose>
   </macro>
@@ -323,9 +287,10 @@ INFORMATIONEN ZUM ZITIERSTIL
       <key variable="citation-number"/>
     </sort>
     <layout suffix=".">
-      <text macro="contributors-short"  />
- <date variable="issued" form="numeric" prefix=" ">
-        <date-part name="year"/></date>   
+      <text macro="contributors-short"/>
+      <date variable="issued" form="numeric" prefix=" ">
+        <date-part name="year"/>
+      </date>
       <choose>
         <if variable="page" type="chapter" match="all">
           <text prefix=", S. " macro="citation-locator" suffix="."/>
@@ -339,8 +304,7 @@ INFORMATIONEN ZUM ZITIERSTIL
         <else-if variable="page" type="article-newspaper" match="all">
           <text prefix=", S. " macro="citation-locator" suffix="."/>
         </else-if>
-        <else-if variable="page" position="ibid">
-        </else-if>
+        <else-if variable="page" position="ibid"/>
       </choose>
     </layout>
   </citation>
@@ -359,7 +323,7 @@ ERSTELLUNG DES LITERATURVERZEICHNISSES
       <text macro="container" prefix=". "/>
       <text macro="issued"/>
       <text macro="pages" prefix=", S. "/>
-    <text macro="access" prefix=". "/>
+      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>
