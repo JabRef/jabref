@@ -1,6 +1,7 @@
 package org.jabref;
 
-import java.awt.*;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class JabRefGUI {
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
         } else if (numberOfMonitors() == 1 && testExternalCoordinates()) {
-            //corrects the
+            //corrects the Window, if its outside of the mainscreen
             LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
             mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X_CORE));
             mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y_CORE));
@@ -94,7 +95,11 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            saveWindowState(mainStage);
+            if (!correctedWindowPos) {
+                //saves the window position only if its not  corrected -> the window will rest at the old Position,
+                //if the external Screen is connected again.
+                saveWindowState(mainStage);
+            }
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -205,6 +210,7 @@ public class JabRefGUI {
 
     /**
      * outprints the Data from the Screen
+     * (only in debug mode)
      * @param mainStage
      */
     private void printWindowState(Stage mainStage) {
@@ -219,15 +225,23 @@ public class JabRefGUI {
     }
 
     /**
-     * Tests if the Coordinates are out of the mainscreen
+     * Tests if the window coordinates are out of the mainscreen
      * @return outbounds
      */
-    private boolean testExternalCoordinates(){
+    private boolean testExternalCoordinates() {
         boolean outbounds = false;
-        if(Globals.prefs.getDouble(JabRefPreferences.POS_X)>Globals.prefs.getDouble(JabRefPreferences.SIZE_X)) outbounds = true;
-        if(Globals.prefs.getDouble(JabRefPreferences.POS_Y)>Globals.prefs.getDouble(JabRefPreferences.SIZE_Y)) outbounds = true;
-        if(Globals.prefs.getDouble(JabRefPreferences.POS_X)<0) outbounds = true;
-        if(Globals.prefs.getDouble(JabRefPreferences.POS_Y)<0) outbounds = true;
+        if (Globals.prefs.getDouble(JabRefPreferences.POS_X) > Globals.prefs.getDouble(JabRefPreferences.SIZE_X)) {
+            outbounds = true;
+        }
+        if (Globals.prefs.getDouble(JabRefPreferences.POS_Y) > Globals.prefs.getDouble(JabRefPreferences.SIZE_Y)) {
+            outbounds = true;
+        }
+        if (Globals.prefs.getDouble(JabRefPreferences.POS_X) < 0) {
+            outbounds = true;
+        }
+        if (Globals.prefs.getDouble(JabRefPreferences.POS_Y) < 0) {
+            outbounds = true;
+        }
         return outbounds;
     }
 
@@ -235,10 +249,9 @@ public class JabRefGUI {
      * returns the number of Monitors connected to the Computer
      * @return numberOfmonitors
      */
-    private int numberOfMonitors(){
-        //this following part is from the Internet:
-        //https://stackoverflow.com/questions/20966385/in-java-is-it-possible-to-listen-for-the-connection-disconnection-of-an-externa (from 17.11.2019
-        //TODO: proof if we can use this codepiece
+    private int numberOfMonitors() {
+        //this following part (this method) is from the Internet:
+        //https://stackoverflow.com/questions/20966385/in-java-is-it-possible-to-listen-for-the-connection-disconnection-of-an-externa (from 17.11.2019)
         int numberOfmonitors = 0;
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
