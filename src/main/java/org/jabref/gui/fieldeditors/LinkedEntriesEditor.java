@@ -18,15 +18,17 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedEntriesEditorViewModel viewModel;
-    @FXML private TagBar<ParsedEntryLink> linkedEntriesBar;
+    @FXML
+    private final LinkedEntriesEditorViewModel viewModel;
+    @FXML
+    private TagBar<ParsedEntryLink> linkedEntriesBar;
 
     public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, Boolean isMultiple) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         linkedEntriesBar.allowsMultipleEntries(isMultiple);
         linkedEntriesBar.setStringConverter(viewModel.getStringConverter());

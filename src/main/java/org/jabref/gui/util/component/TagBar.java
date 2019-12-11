@@ -27,10 +27,12 @@ public class TagBar<T> extends HBox {
 
     private final ListProperty<T> tags;
     private StringConverter<T> stringConverter;
-    @FXML private TextField inputTextField;
-    @FXML private HBox tagList;
+    @FXML
+    private TextField inputTextField;
+    @FXML
+    private HBox tagList;
     private BiConsumer<T, MouseEvent> onTagClicked;
-    private Boolean allowsMultiple=true;
+    private boolean allowsMultiple = true;
 
     public TagBar() {
         tags = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -38,8 +40,8 @@ public class TagBar<T> extends HBox {
 
         // Load FXML
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
         getStylesheets().add(0, TagBar.class.getResource("TagBar.css").toExternalForm());
     }
 
@@ -63,11 +65,12 @@ public class TagBar<T> extends HBox {
         while (change.next()) {
             if (change.wasRemoved()) {
                 tagList.getChildren().subList(change.getFrom(), change.getFrom() + change.getRemovedSize()).clear();
-                if(!allowsMultiple) { inputTextField.setDisable(false);}
             } else if (change.wasAdded()) {
                 tagList.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::createTag).collect(Collectors.toList()));
-                if(!allowsMultiple) { inputTextField.setDisable(true);}
             }
+        }
+        if (!allowsMultiple) {
+            inputTextField.setDisable(!tags.isEmpty());
         }
     }
 
@@ -86,7 +89,7 @@ public class TagBar<T> extends HBox {
         String inputText = inputTextField.getText();
         if (StringUtil.isNotBlank(inputText)) {
             T newTag = stringConverter.fromString(inputText);
-            if ((newTag != null) && !tags.contains(newTag)&&(tags.isEmpty()||this.allowsMultiple)) {
+            if ((newTag != null) && !tags.contains(newTag) && (tags.isEmpty() || this.allowsMultiple)) {
                 tags.add(newTag);
                 inputTextField.clear();
             }
@@ -101,5 +104,7 @@ public class TagBar<T> extends HBox {
         this.onTagClicked = onTagClicked;
     }
 
-    public void allowsMultipleEntries(Boolean isMultiple) { this.allowsMultiple=isMultiple; }
+    public void allowsMultipleEntries(Boolean isMultiple) {
+        this.allowsMultiple = isMultiple;
+    }
 }
