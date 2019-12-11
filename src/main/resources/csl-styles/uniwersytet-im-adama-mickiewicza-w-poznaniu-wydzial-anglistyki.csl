@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="en-US" version="1.0" demote-non-dropping-particle="sort-only">
-  <!--This minimalist style file is developed to support, in the first place, the most typical reference types for WA Stylesheet users: Book, Journal Article, Book section, Edited Collection, and perhaps a basic Internet source. The first four reference types are now supported - for basic formatting features (e.g. excluding info about editions, series, additional contributors, etc.)  Many comments are left inside this for ease of later editing, PK 2010-03-03-->
+  <!--This minimalist style file is developed to support, in the first place, the most typical reference types for WA Stylesheet users: Book, Journal Article, Book section, Edited Collection, and perhaps a basic Internet source. The first four reference types are now supported - for basic formatting features (e.g. excluding info about editions, series, additional contributors, etc.)  Many comments are left inside this for ease of later editing, PK 2010-03-03 - 2019-11-20 -->
   <!--Special requirements from the database: 1. Subtitles must be properly set: colon + capitalised letter; 2. Only one place of publication filled in . Advice - any additional info, like additional places of publication etc, may be placed into some unwanted fields or into User notes.. -->
   <info>
     <title>Uniwersytet im. Adama Mickiewicza w Poznaniu - Wydział Anglistyki (English)</title>
@@ -9,24 +9,27 @@
     <link href="http://www.zotero.org/styles/uniwersytet-im-adama-mickiewicza-w-poznaniu-wydzial-anglistyki" rel="self"/>
     <link href="http://wa.amu.edu.pl/wa/stylesheet" rel="documentation"/>
     <category citation-format="author-date"/>
-    <!-- changed category term "numeric" to "author-date" (PK, 2010-02-27)-->
     <category field="linguistics"/>
     <category field="literature"/>
     <summary>WA UAM bibliographic format compatible with WA Stylesheet 1.4 and above</summary>
-    <updated>2014-02-07T13:00:00+01:00</updated>
+    <updated>2019-11-20T17:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!--TERMS-->
-  <!--Added terms, and will be experimenting, commenting them for the time being, PK 2010-02-27; terms can be localised, so perhaps I should NOT use them? 2010-03-15. This to be experimented with now we have CSL 1.0 (PK 2012-02-04) -->
   <!--CSL 1.0 specification says locale should override the terms below (PK 2010-02-27). Would the GB locale, which I tried earlier in 2010, be OK, and desirable for us now ?, PK 2012-02-04 -->
   <!--<locale xml:lang="en-GB" xmlns="http://purl.org/net/xbiblio/csl">-->
   <locale xml:lang="en">
     <!-- Adding option below to force punctuation outside of closing quote; first tested on local copy of the style in Zotero editor, PK 2018-12-17 21:01 -->
     <style-options punctuation-in-quote="false"/>
     <terms>
-      <term name="no date" form="short">[n.d.]</term>
+      <!-- <term name="no date"  form="short">[n.d.]</term> -->
+      <!-- Did not work with either citations or refs, 2019-11-20 16:08 -->
+      <term name="no date">[n.d.]</term>
+      <!-- Works in both citations and references now via macro , 2019-11-20 16:08  -->
       <term name="in">in</term>
       <term name="and" form="long">and</term>
+      <term name="page-range-delimiter">-</term>
+      <!-- override n-dash in page ranges, PK 2019-11-20 -->
     </terms>
   </locale>
   <!--MACROS BEGIN: editor, author, author-short, access, title, publisher, year-date, edition-->
@@ -34,29 +37,27 @@
     <!--This macro is called in refs of book sections, 2010-03-15-->
     <names variable="editor">
       <name and="text" delimiter=", " delimiter-precedes-last="never"/>
-      <!--removed delimiter=", " PK 2010-02-27 -->
       <label form="short" text-case="lowercase" prefix=" (" suffix=".)" strip-periods="true"/>
       <!--No subtitute rules = editor must always be provided; is this stylesheet compatible?, 2010-03-15-->
     </names>
   </macro>
   <macro name="editor-refs">
-    <!-- Macro formatting of direct refs of edited collections, where 2010-03-15-->
+    <!-- Macro formatting direct references for edited collections, 2010-03-15 -->
     <names variable="editor">
       <name name-as-sort-order="first" and="text" sort-separator=", " delimiter=", " delimiter-precedes-last="never"/>
-      <!--removed delimiter=", " PK 2010-02-27 -->
       <label form="short" text-case="lowercase" prefix=" (" suffix=".)" strip-periods="true"/>
       <!--produces (ed.) or (eds.), hence "label"-->
       <!--No substitute rules = editor must always be provided; is this stylesheet compatible?, 2010-03-15-->
     </names>
   </macro>
   <macro name="editor-short">
-    <!--Macro formatting direct in-text citations of edited collections, 2010-03-15-->
+    <!--Macro formatting direct in-text citations to edited collections, 2010-03-15-->
     <names variable="editor">
       <name form="short" and="text" delimiter="" initialize-with=". "/>
       <!--removed delimiter=", " PK 2010-02-27-->
       <!--short form = "only the family name and the non-dropping-particle" are included, good for in-text citations-->
       <label form="short" text-case="lowercase" prefix=" " suffix="." strip-periods="true"/>
-      <!--produces "ed." or "eds.", hence "label"; removed prefix=" (" suffix=".)"-->
+      <!--produces "ed." or "eds.", hence "label" -->
       <substitute>
         <text variable="title"/>
         <!--if editor field missing, put in title, just in case-->
@@ -136,7 +137,7 @@
         </if>
         <else>
           <text term="no date"/>
-          <!--Not sure I want that localised term here.. (PK 2010-03-16). Maybe this to be experimented with now (PK 2012-02-04)-->
+          <!--Not sure I want that localised term here.. (PK 2010-03-16). Maybe this to be experimented with now (PK 2012-02-04); OK, keeping it and applying the same macro and term now to both citations and references, PK 2019-11-20 16:55 -->
         </else>
       </choose>
     </group>
@@ -185,10 +186,8 @@
     <layout>
       <text macro="author" suffix="."/>
       <!--Always begin with author; if author not there -> see the called procedures in macro=author above-->
-      <date variable="issued" prefix=" " suffix=".">
-        <!-- tried changed variable="issued" to macro=year-date to allow [n.d.], but no success, PK 2010-02-27 -->
-        <date-part name="year"/>
-      </date>
+      <text macro="year-date" prefix=" " suffix="."/>
+      <!-- Using macro to insert term no date if missing, cf. citations, PK 2019-11-20 16:57 -->
       <choose>
         <if type="bill book graphic legal_case motion_picture report song" match="any">
           <!--BOOK-->
@@ -222,27 +221,24 @@
               <text macro="publisher"/>
               <group prefix=", ">
                 <text variable="page"/>
-                <!--Removed prefix="p. ", PK 2010-02-27-->
               </group>
             </group>
           </group>
         </else-if>
         <else>
-          <!--Other types, incl Journal article-->
-          <group prefix=" " delimiter=" ">
-            <!-- removed group suffix, PK 2010-02-27-->
+          <!--Other types, incl Journal article , version beyond suggested by POBrien333 , PK 2019-11-20 -->
+          <group prefix=" " delimiter=", ">
             <text macro="title" quotes="true"/>
-            <!--<text macro="editor" />-->
-          </group>
-          <group suffix=".">
-            <text prefix=", " variable="container-title" font-style="italic"/>
-            <!-- 2014-02-07 13:11 - changed text prefix from " , " to ", " : CSL 1 does better at localisation and appears to require this workaround precaution no longer: following comma does NOT go under article title's end quote -->
-            <group prefix=" ">
-              <text variable="volume"/>
-              <text variable="issue" prefix=", " suffix=""/>
-              <!--Changed Prefix and suffix, PK 2010-02-27-->
+            <group delimiter=" " suffix=".">
+              <text variable="container-title" font-style="italic"/>
+              <group delimiter=": ">
+                <group delimiter=", ">
+                  <text variable="volume"/>
+                  <text variable="issue"/>
+                </group>
+                <text variable="page"/>
+              </group>
             </group>
-            <text variable="page" prefix=": "/>
           </group>
         </else>
       </choose>
