@@ -23,7 +23,7 @@
                     <TableColumn fx:id="formatterStringColumn"
                                  minWidth="50.0" prefWidth="368" sortable="false" text="%Format string"/>
                     <TableColumn fx:id="actionsColumn" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"
-                                 editable="false" resizable="false"/>
+                                 editable="false" resizable="false" reorderable="false"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -36,7 +36,7 @@
         </VBox>
         <VBox>
             <Button fx:id="formatterHelp" prefHeight="25.0" prefWidth="25.0"/>
-            <VBox VBox.vgrow="ALWAYS"/>
+            <VBox VBox.vgrow="ALWAYS" />
             <Button styleClass="icon-button,narrow" onAction="#addFormatter"
                     prefHeight="25.0" prefWidth="25.0">
                 <graphic>
