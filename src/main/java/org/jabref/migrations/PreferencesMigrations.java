@@ -334,7 +334,7 @@ public class PreferencesMigrations {
 
             for (int i = 0; i < columnNames.size(); i++) {
                 String name = columnNames.get(i);
-                Double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
 
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
                                                              .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
@@ -350,11 +350,14 @@ public class PreferencesMigrations {
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
                     .map(MainTableColumnModel::getName)
                     .collect(Collectors.toList()));
+
             preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columns.stream()
                     .map(MainTableColumnModel::getWidth)
                     .map(Double::intValue)
                     .map(Object::toString)
                     .collect(Collectors.toList()));
+
+            // ASCENDING by default
             preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columns.stream()
                     .map(MainTableColumnModel::getSortType)
                     .map(TableColumn.SortType::toString)
