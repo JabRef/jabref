@@ -17,7 +17,9 @@ jobs:
       - name: Add csl-styles remote
         run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
       - name: Update csl-styles
-        run: git subtree pull --prefix src/main/resources/csl-styles csl-styles master --squash
+        run: | 
+          git checkout master
+          git subtree pull --prefix src/main/resources/csl-styles csl-styles master --squash
       - name: Add csl-locales remote
         run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
       - name: Update csl-locales
