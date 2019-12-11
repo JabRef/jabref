@@ -36,14 +36,14 @@ JabRef supports you in every step of your research work.
 - Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
 - Automatically rename and move associated documents according to customizable rules
 - Keep track of what you read: ranking, priority, printed, quality-assured 
-	
+
 #### Cite
 
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
 - Format references in one of the many thousand built-in citation styles or create your style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
-	
+
 #### Share
 
 - Many built-in export options or create your export format
