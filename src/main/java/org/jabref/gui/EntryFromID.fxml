@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="476.0" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="org.jabref.gui.EntryFromIDView">
+
+    <buttonTypes>
+        <ButtonType fx:id="lookupButton" buttonData="OK_DONE" text="%LookUp"/>
+        <ButtonType fx:id="generateButton" buttonData="OK_DONE" text="%Generate"/>
+        <ButtonType fx:constant="CANCEL"/>
+    </buttonTypes>
+
+    <content>
+        <VBox prefHeight="200.0" prefWidth="400.0">
+
+                <GridPane alignment="CENTER">
+                    <children>
+                        <Label text="%FromID" GridPane.rowIndex="1" />
+                        <TextField fx:id="idTextField" onAction="#runFetcherWorker" prefHeight="30.0" prefWidth="300.0"
+                                   GridPane.rowIndex="2"/>
+
+                        <Label text="%LookUp" GridPane.rowIndex="3" />
+
+                        <TextArea fx:id="lookUpField"
+                              GridPane.rowIndex="4"/>
+
+                    </children>
+
+                </GridPane>
+        </VBox>
+    </content>
+</DialogPane>
+

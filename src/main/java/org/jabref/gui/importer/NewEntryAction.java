@@ -5,10 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.EntryTypeView;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.StateManager;
+import org.jabref.gui.*;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
@@ -28,6 +25,8 @@ public class NewEntryAction extends SimpleCommand {
      * The type of the entry to create.
      */
     private Optional<EntryType> type;
+    private boolean fromID;
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
@@ -37,6 +36,7 @@ public class NewEntryAction extends SimpleCommand {
         this.preferences = preferences;
 
         this.type = Optional.empty();
+        this.fromID = false;
 
         this.executable.bind(needsDatabase(stateManager));
     }
@@ -44,6 +44,16 @@ public class NewEntryAction extends SimpleCommand {
     public NewEntryAction(JabRefFrame jabRefFrame, EntryType type, DialogService dialogService, JabRefPreferences preferences, StateManager stateManager) {
         this(jabRefFrame, dialogService, preferences, stateManager);
         this.type = Optional.of(type);
+        this.fromID = false;
+    }
+
+    public NewEntryAction(JabRefFrame jabRefFrame, boolean fromID, DialogService dialogService, JabRefPreferences preferences, StateManager stateManager) {
+        this.jabRefFrame = jabRefFrame;
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+
+        this.type = Optional.empty();
+        this.fromID = fromID;
     }
 
     @Override
@@ -53,17 +63,26 @@ public class NewEntryAction extends SimpleCommand {
             return;
         }
 
-        if (type.isPresent()) {
-            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(type.get()));
-        } else {
-            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
-            EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
+        if (fromID){
+            EntryFromIDView idDialog = new EntryFromIDView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
+            EntryType selectedType = idDialog.showAndWait().orElse(null);
             if (selectedType == null) {
                 return;
             }
 
-            trackNewEntry(selectedType);
-            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
+        } else {
+            if (type.isPresent()) {
+                jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(type.get()));
+            } else {
+                EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
+                EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
+                if (selectedType == null) {
+                    return;
+                }
+
+                trackNewEntry(selectedType);
+                jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
+            }
         }
     }
 

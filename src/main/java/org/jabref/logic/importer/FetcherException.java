@@ -4,7 +4,6 @@ import org.jabref.JabRefException;
 
 public class FetcherException extends JabRefException {
 
-
     public FetcherException(String errorMessage, Throwable cause) {
         super(errorMessage, cause);
     }

@@ -148,6 +148,7 @@ public class IconTheme {
         ADD_NOBOX(MaterialDesignIcon.PLUS),
         ADD_ARTICLE(MaterialDesignIcon.PLUS),
         ADD_ENTRY(MaterialDesignIcon.PLAYLIST_PLUS),
+        ADD_ENTRY_FROM_ID(MaterialDesignIcon.NEWSPAPER),
         EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignIcon.TOOLTIP_TEXT),
         FOLDER(MaterialDesignIcon.FOOD_FORK_DRINK),
