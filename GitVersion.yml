@@ -1,2 +1,2 @@
-assembly-versioning-format: '{major}.{minor}.{buildmetadata}'
+assembly-versioning-format: '{major}.{minor}.{buildmetadata ?? patch}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
