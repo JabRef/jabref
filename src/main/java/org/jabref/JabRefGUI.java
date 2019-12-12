@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
@@ -40,12 +41,14 @@ public class JabRefGUI {
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
+    private boolean correctedWindowPos;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
     public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
+        this.correctedWindowPos = false;
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
@@ -62,12 +65,21 @@ public class JabRefGUI {
         // Restore window location and/or maximised state
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else if (Screen.getScreens().size() == 1 && isWindowPositionOutOfBounds()) {
+            //corrects the Window, if its outside of the mainscreen
+            LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
+            mainStage.setX(0);
+            mainStage.setY(0);
+            mainStage.setWidth(1024);
+            mainStage.setHeight(768);
+            correctedWindowPos = true;
         } else {
             mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
             mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
             mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
+        printWindowState(mainStage);
 
         // We create a decoration pane ourselves for performance reasons
         // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
@@ -82,7 +94,11 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            saveWindowState(mainStage);
+            if (!correctedWindowPos) {
+                //saves the window position only if its not  corrected -> the window will rest at the old Position,
+                //if the external Screen is connected again.
+                saveWindowState(mainStage);
+            }
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -188,6 +204,33 @@ public class JabRefGUI {
         Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
+        printWindowState(mainStage);
+    }
+
+    /**
+     * outprints the Data from the Screen
+     * (only in debug mode)
+     * @param mainStage
+     */
+    private void printWindowState(Stage mainStage) {
+        StringBuilder bob = new StringBuilder();
+        bob.append("SCREEN DATA:");
+        bob.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+        bob.append("mainStage.POS_X: " + mainStage.getX() + "\n");
+        bob.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
+        bob.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
+        bob.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
+        LOGGER.debug(bob.toString());
+    }
+
+    /**
+     * Tests if the window coordinates are out of the mainscreen
+     * @return outbounds
+     */
+    private boolean isWindowPositionOutOfBounds() {
+
+       return  !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X) , Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+
     }
 
     private void openLastEditedDatabases() {
