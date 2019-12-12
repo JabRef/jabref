@@ -65,13 +65,13 @@ public class JabRefGUI {
         // Restore window location and/or maximised state
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
-        } else if (Screen.getScreens().size() == 1 && testExternalCoordinates()) {
+        } else if (Screen.getScreens().size() == 1 && isWindowPositionOutOfBounds()) {
             //corrects the Window, if its outside of the mainscreen
             LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
-            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X_CORE));
-            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y_CORE));
-            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X_CORE));
-            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y_CORE));
+            mainStage.setX(0);
+            mainStage.setY(0);
+            mainStage.setWidth(1024);
+            mainStage.setHeight(768);
             correctedWindowPos = true;
         } else {
             mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
@@ -215,11 +215,11 @@ public class JabRefGUI {
     private void printWindowState(Stage mainStage) {
         StringBuilder bob = new StringBuilder();
         bob.append("SCREEN DATA:");
-        bob.append("JabRefPreferences.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
-        bob.append("JabRefPreferences.POS_X: " + mainStage.getX() + "\n");
-        bob.append("JabRefPreferences.POS_Y: " + mainStage.getY() + "\n");
-        bob.append("JabRefPreferences.SIZE_X: " + mainStage.getWidth() + "\n");
-        bob.append("JabRefPreferences.SIZE_Y: " + mainStage.getHeight() + "\n");
+        bob.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+        bob.append("mainStage.POS_X: " + mainStage.getX() + "\n");
+        bob.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
+        bob.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
+        bob.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
         LOGGER.debug(bob.toString());
     }
 
@@ -227,11 +227,10 @@ public class JabRefGUI {
      * Tests if the window coordinates are out of the mainscreen
      * @return outbounds
      */
-    private boolean testExternalCoordinates() {
+    private boolean isWindowPositionOutOfBounds() {
 
-        boolean outbounds = !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X) , Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+       return  !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X) , Globals.prefs.getDouble(JabRefPreferences.POS_Y));
 
-        return outbounds;
     }
 
     private void openLastEditedDatabases() {

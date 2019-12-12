@@ -172,10 +172,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIZE_X = "mainWindowSizeX";
     public static final String POS_Y = "mainWindowPosY";
     public static final String POS_X = "mainWindowPosX";
-    public static final String SIZE_Y_CORE = "mainWindowSizeYCore";
-    public static final String SIZE_X_CORE = "mainWindowSizeXCore";
-    public static final String POS_Y_CORE = "mainWindowPosYCore";
-    public static final String POS_X_CORE = "mainWindowPosXCore";
     public static final String STRINGS_SIZE_Y = "stringsSizeY";
     public static final String STRINGS_SIZE_X = "stringsSizeX";
     public static final String STRINGS_POS_Y = "stringsPosY";
@@ -495,10 +491,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
         defaults.put(SIZE_Y, 768);
-        defaults.put(POS_X_CORE, 0);
-        defaults.put(POS_Y_CORE, 0);
-        defaults.put(SIZE_X_CORE, 1024);
-        defaults.put(SIZE_Y_CORE, 768);
         defaults.put(WINDOW_MAXIMISED, Boolean.TRUE);
         defaults.put(AUTO_RESIZE_MODE, Boolean.TRUE);
         defaults.put(ENTRY_EDITOR_HEIGHT, 0.65);
