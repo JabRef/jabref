@@ -9,7 +9,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [5.0-beta] – 2019-11-29
+## [5.0-beta] – 2019-12-12
 
 ### Changed
 
