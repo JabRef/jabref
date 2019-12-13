@@ -120,8 +120,10 @@ public class DefaultAuxParser implements AuxParser {
         }
     }
 
-    /*
+    /**
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
+     *
+     * @param AUX file
      */
     private void resolveTags(AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
@@ -146,8 +148,11 @@ public class DefaultAuxParser implements AuxParser {
         }
     }
 
-    /*
-     * Resolves and adds CrossRef entries
+    /**
+     * Resolves and adds CrossRef entries to insert them in addition to the original entries
+     *
+     * @param entries Entries to check for CrossRefs
+     * @param result AUX file
      */
     private void resolveCrossReferences(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();
@@ -170,8 +175,11 @@ public class DefaultAuxParser implements AuxParser {
         insertEntries(entriesToInsert, result);
     }
 
-    /*
+    /**
      * Insert a clone of each given entry. The clones are each given a new unique ID.
+     *
+     * @param entries Entries to be cloned
+     * @param result AUX file
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();

@@ -61,7 +61,6 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
     public void undo() {
         super.undo();
 
-        // Revert the change.
         try {
             base.removeEntries(entries);
         } catch (Throwable ex) {

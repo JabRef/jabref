@@ -20,8 +20,8 @@ public class AutoCompleteUpdater {
     }
 
     @Subscribe
-    public void listen(EntriesAddedEvent addedEntryEvent) {
-        List<BibEntry> entries = addedEntryEvent.getBibEntries();
+    public void listen(EntriesAddedEvent entryAddedEvent) {
+        List<BibEntry> entries = entryAddedEvent.getBibEntries();
         for (BibEntry entry : entries) {
             suggestionProviders.indexEntry(entry);
         }
