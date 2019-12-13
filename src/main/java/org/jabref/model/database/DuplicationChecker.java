@@ -95,13 +95,7 @@ public class DuplicationChecker {
     @Subscribe
     public void listen(EntriesRemovedEvent entriesRemovedEvent) {
         List<BibEntry> entries = entriesRemovedEvent.getBibEntries();
-        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citeKey -> addKeyToSet(citeKey));
-        for (BibEntry entry : entries) {
-            Optional<String> citeKey = entry.getCiteKeyOptional();
-            if (citeKey.isPresent()) {
-                removeKeyFromSet(citeKey.get());
-            }
-        }
+        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citeKey -> removeKeyFromSet(citeKey));
     }
 
     @Subscribe
