@@ -67,8 +67,8 @@ License: MIT
 
 Id:      com.oracle.ojdbc:ojdbc10
 Project: Oracle's JDBC drivers
-URL:     https://medium.com/oracledevs/oracle-jdbc-drivers-on-maven-central-64fcf724d8b
-License: Proprietary
+URL:     https://repo1.maven.org/maven2/com/oracle/ojdbc/ojdbc10/19.3.0.0/ojdbc10-19.3.0.0.pom
+License: Oracle Free Use Terms and Conditions (FUTC)
 
 Id:      com.sibvisions.external.jvxfx:DnDTabPane
 Project: Drag'n'Drop TabPane
