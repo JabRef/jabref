@@ -621,7 +621,7 @@ public class BasePanel extends StackPane {
                 UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), Collections.singletonList(bibEntry)));
+                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), bibEntry));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {

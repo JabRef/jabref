@@ -59,7 +59,7 @@ public class MergeEntriesAction extends SimpleCommand {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableInsertEntries(basePanel.getDatabase(), Collections.singletonList(mergedEntry.get())));
+            ce.addEdit(new UndoableInsertEntries(basePanel.getDatabase(), mergedEntry.get()));
             List<BibEntry> entriesToRemove = Arrays.asList(one, two);
             ce.addEdit(new UndoableRemoveEntries(basePanel.getDatabase(), entriesToRemove));
             basePanel.getDatabase().removeEntries(entriesToRemove);

@@ -25,7 +25,7 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().insertEntry(diskEntry);
-        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), Collections.singletonList(diskEntry)));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), diskEntry));
     }
 
     @Override
