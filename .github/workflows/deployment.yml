@@ -1,6 +1,6 @@
 name: Deployment
 
-on: [push]
+on: [create, push]
 
 jobs:
   deploy:
