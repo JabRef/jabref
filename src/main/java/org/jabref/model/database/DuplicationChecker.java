@@ -106,7 +106,7 @@ public class DuplicationChecker {
     @Subscribe
     public void listen(EntriesAddedEvent entriesAddedEvent) {
         List<BibEntry> entries = entriesAddedEvent.getBibEntries();
-        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citekey -> addKeyToSet(citekey);
+        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citekey -> addKeyToSet(citekey));
     }
 
 }
