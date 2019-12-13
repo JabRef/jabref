@@ -104,7 +104,7 @@ public class TagBar<T> extends HBox {
         this.onTagClicked = onTagClicked;
     }
 
-    public void allowsMultipleEntries(Boolean isMultiple) {
+    public void allowsMultipleEntries(boolean isMultiple) {
         this.allowsMultiple = isMultiple;
     }
 }

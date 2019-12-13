@@ -15,6 +15,7 @@ import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jabref.model.entry.field.FieldProperty;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
@@ -23,14 +24,14 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @FXML
     private TagBar<ParsedEntryLink> linkedEntriesBar;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, Boolean isMultiple) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
 
         ViewLoader.view(this)
                 .root(this)
                 .load();
 
-        linkedEntriesBar.allowsMultipleEntries(isMultiple);
+        linkedEntriesBar.allowsMultipleEntries(field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK));
         linkedEntriesBar.setStringConverter(viewModel.getStringConverter());
         linkedEntriesBar.setOnTagClicked((parsedEntryLink, mouseEvent) -> viewModel.jumpToEntry(parsedEntryLink));
 
