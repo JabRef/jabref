@@ -32,8 +32,8 @@ abstract class DatabaseChangeViewModel {
     }
 
     /**
-     * This method returns a JComponent detailing the nature of the change.
-     * @return JComponent
+     * This method returns a {@link Node} detailing the nature and look of the change, e.g. how it is displayed
+     * @return Node the Node with the layout of the change
      */
     public abstract Node description();
 
