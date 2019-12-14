@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -232,14 +233,18 @@ public class GroupTreeView {
 
                 if (dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
+                    List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
                         Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
+                            changedGroups.add(source.get());
                             success = true;
                         }
                     }
+                    groupTree.getSelectionModel().clearSelection();
+                    changedGroups.forEach(value -> selectNode(value, true));
                 }
 
                 if (localDragboard.hasBibEntries()) {
@@ -268,8 +273,21 @@ public class GroupTreeView {
     }
 
     private void selectNode(GroupNodeViewModel value) {
+        selectNode(value, false);
+    }
+
+    private void selectNode(GroupNodeViewModel value, boolean expandParents) {
         getTreeItemByValue(value)
-                .ifPresent(treeItem -> groupTree.getSelectionModel().select(treeItem));
+                .ifPresent(treeItem -> {
+                    if (expandParents) {
+                        TreeItem<GroupNodeViewModel> parent = treeItem.getParent();
+                        while (parent != null) {
+                            parent.setExpanded(true);
+                            parent = parent.getParent();
+                        }
+                    }
+                    groupTree.getSelectionModel().select(treeItem);
+                });
     }
 
     private Optional<TreeItem<GroupNodeViewModel>> getTreeItemByValue(GroupNodeViewModel value) {
@@ -281,7 +299,16 @@ public class GroupTreeView {
         if (root.getValue().equals(value)) {
             return Optional.of(root);
         }
-        return root.getChildren().stream().filter(child -> getTreeItemByValue(child, value).isPresent()).findFirst();
+
+        Optional<TreeItem<GroupNodeViewModel>> node = Optional.empty();
+        for (TreeItem<GroupNodeViewModel> child : root.getChildren()) {
+            node = getTreeItemByValue(child, value);
+            if (node.isPresent()) {
+                break;
+            }
+        }
+
+        return node;
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {

@@ -7,7 +7,7 @@
     <id>http://www.zotero.org/styles/wirtschaftsuniversitat-wien-handel-und-marketing</id>
     <link href="http://www.zotero.org/styles/wirtschaftsuniversitat-wien-handel-und-marketing" rel="self"/>
     <link href="https://learn.wu.ac.at/bibliothek/literaturverwaltung" rel="documentation"/>
-    <link href="https://www.wu.ac.at/fileadmin/wu/d/i/retail/PDF_Dokumente/Bachelor/HM_Zitiervorschriften_Juni2016.pdf" rel="documentation"/>
+    <link href="https://www.wu.ac.at/fileadmin/wu/d/i/retail/PDF_Dokumente/Bachelor/HM_Zitiervorschriften_Juni.2017.pdf" rel="documentation"/>
     <author>
       <name>Georg Mayr-Duffner</name>
       <email>bibliothek@wu.ac.at</email>
@@ -15,7 +15,7 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <summary>Citation style for WU Vienna’s Institute for Retailing &amp; Marketing.</summary>
-    <updated>2019-09-11T18:54:03+00:00</updated>
+    <updated>2019-11-27T09:55:57+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -55,9 +55,9 @@
               <text variable="collection-title"/>
             </group>
           </group>
-          <group>
+          <group delimiter=" ">
             <text variable="volume"/>
-            <text variable="issue" prefix=" (" suffix=")"/>
+            <text variable="issue" prefix="(" suffix=")"/>
           </group>
           <text variable="page"/>
         </group>
@@ -193,7 +193,7 @@
       <choose>
         <if is-numeric="edition">
           <number variable="edition" form="ordinal"/>
-          <text term="edition" form="short"/>
+          <text term="edition"/>
         </if>
         <else>
           <text variable="edition"/>
@@ -286,10 +286,8 @@
     <layout suffix=".">
       <group delimiter=". ">
         <text macro="author-year-title"/>
-        <group>
-          <text macro="container"/>
-          <text macro="locators"/>
-        </group>
+        <text macro="container"/>
+        <text macro="locators"/>
       </group>
       <text macro="access" prefix=". "/>
     </layout>

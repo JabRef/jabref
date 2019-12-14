@@ -79,7 +79,7 @@ public class FileUtil {
 
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
-            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
             LOGGER.info(String.format("Truncated the too long filename '%s' (%d characters) to '%s'.", fileName, fileName.length(), shortName));
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
