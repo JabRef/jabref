@@ -1,3 +1,4 @@
+assembly-versioning-format: '{major}.{minor}.{patch}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
 
 branches:
@@ -5,3 +6,4 @@ branches:
     mode: ContinuousDelivery
     regex: ^master
     is-mainline: true
+    increment: patch
