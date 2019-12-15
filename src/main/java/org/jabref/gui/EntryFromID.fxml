@@ -19,7 +19,8 @@
 <?import javafx.scene.layout.VBox?>
 
 
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="476.0" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="org.jabref.gui.EntryFromIDView">
+<?import javafx.geometry.Insets?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="org.jabref.gui.EntryFromIDView">
 
     <buttonTypes>
         <ButtonType fx:id="lookupButton" buttonData="OK_DONE" text="%LookUp"/>
@@ -28,22 +29,35 @@
     </buttonTypes>
 
     <content>
-        <VBox prefHeight="200.0" prefWidth="400.0">
-
+        <VBox prefHeight="400.0" prefWidth="850.0">
+            <children>
                 <GridPane alignment="CENTER">
                     <children>
                         <Label text="%FromID" GridPane.rowIndex="1" />
-                        <TextField fx:id="idTextField" onAction="#runFetcherWorker" prefHeight="30.0" prefWidth="300.0"
+                        <TextField fx:id="idTextField" onAction="#runFetcherWorker" prefHeight="30.0" prefWidth="400.0"
                                    GridPane.rowIndex="2"/>
 
                         <Label text="%LookUp" GridPane.rowIndex="3" />
 
-                        <TextArea fx:id="lookUpField"
+                        <Label fx:id="lookUpField"
                               GridPane.rowIndex="4"/>
 
                     </children>
 
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="850.0" minWidth="10.0" prefWidth="850.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="150.0" />
+                    </columnConstraints>
+                    <opaqueInsets>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                    </opaqueInsets>
+                    <rowConstraints>
+                        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+
                 </GridPane>
+            </children>
         </VBox>
     </content>
 </DialogPane>

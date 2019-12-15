@@ -7,6 +7,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import java.util.regex.Pattern;
+import java.util.HashMap;
+import  java.util.function.Predicate;
+
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
@@ -122,8 +126,65 @@ public class WebFetchers {
     }
 
     /**
-     * @return sorted set containing entry based fetchers
+     * @return an Hashmap containing predicate from id type and their id based fetchers
      */
+    public static HashMap<Predicate<String>,IdBasedFetcher> getHashMapPredicateIdBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+
+        HashMap <Predicate<String>,IdBasedFetcher> fetcherMatchPattern = new HashMap<Predicate<String>,IdBasedFetcher>();
+
+        //DOI validate
+        Pattern pdoi = Pattern.compile("(https://doi\\.org/)?10\\.[0-9]{4}/([0-9]{13}|[a-zA-Z]+\\.[0-9]{4}\\.[0-9]{2}|[-_0-9]+)");
+        fetcherMatchPattern.put(pdoi.asPredicate(), new DoiFetcher(importFormatPreferences));
+
+        //ISBN validate
+        Pattern pisbn = Pattern.compile("^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$");
+        fetcherMatchPattern.put(pisbn.asPredicate(), new IsbnFetcher(importFormatPreferences));
+        //Rajouter pour long isbn
+
+        //DIVA Validate
+        Pattern pdiva = Pattern.compile("diva2:[0-9]{6}");
+        fetcherMatchPattern.put(pdiva.asPredicate(), new DiVA(importFormatPreferences));
+
+        //MedlineFetcher Validate
+        Pattern pmd = Pattern.compile("[0-9]{8}");
+        fetcherMatchPattern.put(pmd.asPredicate(), new MedlineFetcher());
+
+        //MathSciNetId validate
+        Pattern pMathSciNetId = Pattern.compile("[0-9]{7}");
+        fetcherMatchPattern.put(pMathSciNetId.asPredicate(), new MathSciNet(importFormatPreferences));
+
+        //LibraryOfCongress validate
+        Pattern pLibraryOfCongress = Pattern.compile("[0-9]{10}");
+        fetcherMatchPattern.put(pLibraryOfCongress.asPredicate(), new LibraryOfCongress(importFormatPreferences));
+
+        //RfcFetcher validate
+        Pattern pRfcFetcher = Pattern.compile("([rR][fF][cC])?[0-9]{4}");
+        fetcherMatchPattern.put(pRfcFetcher.asPredicate(), new RfcFetcher(importFormatPreferences));
+
+        //IacrEprintFetcher validate
+        Pattern pIacr = Pattern.compile("[a-zA-Z]*[0-9]{4}/[0-9]{4}");
+        fetcherMatchPattern.put(pIacr.asPredicate(), new IacrEprintFetcher(importFormatPreferences));
+
+        //Arxiv validate
+        Pattern parxiv = Pattern.compile("(http[s]?://arxiv\\.org/(abs/)?)?(arXiv:)?[0-9][0-9](0[1-9]|1[0-2])\\.[0-9]{4,5}([v][0-9]+)?");
+        fetcherMatchPattern.put(parxiv.asPredicate(), new ArXiv(importFormatPreferences));
+
+        //AstrophysicsDataSystem
+        Pattern pads = Pattern.compile("10\\.[0-9]{4,5}/[-)(.a-zA-Z_0-9]+");
+        fetcherMatchPattern.put(pads.asPredicate(), new AstrophysicsDataSystem(importFormatPreferences));
+
+        //TitleFetcher
+        Pattern pTitleFetcher = Pattern.compile("[-)(.a-zA-Z_0-9]+");
+        fetcherMatchPattern.put(pTitleFetcher.asPredicate(), new TitleFetcher(importFormatPreferences));
+
+        //CrossRef -> DOI
+
+        return fetcherMatchPattern;
+    }
+
+        /**
+         * @return sorted set containing entry based fetchers
+         */
     public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
