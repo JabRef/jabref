@@ -1,6 +1,7 @@
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
-mode: mainline
 
 branches:
   master:
-    tag: ''
+    mode: ContinuousDelivery
+    regex: ^master
+    is-mainline: true
