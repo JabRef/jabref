@@ -422,8 +422,6 @@ public class JabRefFrame extends BorderPane {
 
                     EasyBind.subscribe(sidePane.visibleProperty(), visible -> {
                         if (visible) {
-                            // Run SplitPane.setResizableWithParent later to avoid miscalculation during initial layouting
-                            Platform.runLater(() -> SplitPane.setResizableWithParent(sidePane, Boolean.FALSE));
                             if (!splitPane.getItems().contains(sidePane)) {
                                 splitPane.getItems().add(0, sidePane);
                                 setDividerPosition();
@@ -452,6 +450,7 @@ public class JabRefFrame extends BorderPane {
 
     private Node createToolbar() {
         Pane leftSpacer = new Pane();
+        leftSpacer.setMinWidth(50);
         HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
         Pane rightSpacer = new Pane();
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
@@ -471,9 +470,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
                 leftSpacer
         );
-        leftSide.setMinWidth(100);
-        leftSide.prefWidthProperty().bind(sidePane.widthProperty());
-        leftSide.maxWidthProperty().bind(sidePane.widthProperty());
 
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
@@ -976,37 +972,35 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            // add tab
-            Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
-            tabbedPane.getTabs().add(newTab);
-            newTab.setOnCloseRequest(event -> {
-                closeTab((BasePanel) newTab.getContent());
-                event.consume();
-            });
-
-            // update all tab titles
-            updateAllTabTitles();
-
-            if (raisePanel) {
-                tabbedPane.getSelectionModel().select(newTab);
-            }
-
-            // Register undo/redo listener
-            basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
-
-            BibDatabaseContext context = basePanel.getBibDatabaseContext();
-
-            if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUIManager(basePanel));
-            }
-
-            BackupManager.start(context, Globals.entryTypesManager, prefs);
-
-            // Track opening
-            trackOpenNewDatabase(basePanel);
+        // add tab
+        Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
+        tabbedPane.getTabs().add(newTab);
+        newTab.setOnCloseRequest(event -> {
+            closeTab((BasePanel) newTab.getContent());
+            event.consume();
         });
+
+        // update all tab titles
+        updateAllTabTitles();
+
+        if (raisePanel) {
+            tabbedPane.getSelectionModel().select(newTab);
+        }
+
+        // Register undo/redo listener
+        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+
+        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+
+        if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(basePanel));
+        }
+
+        BackupManager.start(context, Globals.entryTypesManager, prefs);
+
+        // Track opening
+        trackOpenNewDatabase(basePanel);
     }
 
     private void trackOpenNewDatabase(BasePanel basePanel) {

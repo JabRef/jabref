@@ -44,7 +44,7 @@ apply plugin: LocalizationPlugin
 apply from: 'eclipse.gradle'
 
 group = "org.jabref"
-version = "5.0.0"
+version = project.findProperty('projVersion') ?: '100.0.0'
 
 sourceCompatibility = 13
 targetCompatibility = 13
@@ -116,7 +116,7 @@ dependencies {
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 
-    compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
+    compile group: 'org.apache.tika', name: 'tika-core', version: '1.23'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.64'
@@ -142,7 +142,7 @@ dependencies {
 
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.2'
 
-    compile 'org.postgresql:postgresql:42.2.8'
+    compile 'org.postgresql:postgresql:42.2.9'
 
     compile ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -166,10 +166,10 @@ dependencies {
     compile 'org.fxmisc.richtext:richtextfx:0.10.3'
     compile group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     compile 'com.jfoenix:jfoenix:9.0.9'
-    compile 'org.controlsfx:controlsfx:11.0.0'
+    compile 'org.controlsfx:controlsfx:11.0.1'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.konghq:unirest-java:3.2.00'
+    compile 'com.konghq:unirest-java:3.3.00'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -283,7 +283,7 @@ processResources {
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
-        expand(version: createVersionString(),
+        expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
@@ -722,36 +722,4 @@ task bundleLibreOffice(type: Jar) {
 
     destinationDir = file('lib')
     archiveName = 'libreoffice.jar'
-}
-
-// Returns the value of project.version in production and a string of the format VERSION-dev--DATE--BRANCH--GIT_HASH for development versions
-def createVersionString() {
-    if (hasProperty('dev')) {
-        String command = "git log --pretty=format:%cd--%h -n 1 --date=short"
-        String commitInfo
-        if (OperatingSystem.current().isWindows()) {
-            commitInfo = "cmd /c $command".execute().in.text
-        } else {
-            commitInfo = command.execute().in.text
-        }
-
-        // determine branch
-        command = "git symbolic-ref -q --short HEAD"
-        String branchName
-        if (OperatingSystem.current().isWindows()) {
-            branchName = "cmd /c $command".execute().in.text
-        } else {
-            branchName = command.execute().in.text
-        }
-        // A newline is returned. Remove it. (trim())
-        // In the context of github, the branch name could be something like "pull/277"
-        // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
-        // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
-        branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
-
-        // first the date (%cd), then the branch name, and finally the commit id (%h)
-        return project.version + "-dev--" + commitInfo.substring(0, 10) + "--" + branchName + "--" + commitInfo.substring(12)
-    } else {
-        return project.version
-    }
 }

@@ -61,6 +61,7 @@ class MathSciNetTest {
     }
 
     @Test
+    @DisabledOnCIServer("CI server has no subscription to MathSciNet and thus gets 401 response")
     void searchByIdInEntryFindsEntry() throws Exception {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.MR_NUMBER, "3537908");
