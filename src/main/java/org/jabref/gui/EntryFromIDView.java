@@ -21,17 +21,22 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.preferences.JabRefPreferences;
 
+/**
+ * Dialog that prompts the user to enter an id for an entry.
+ * Returns null if canceled.
+ */
 public class EntryFromIDView extends BaseDialog<EntryType> {
 
     @FXML private ButtonType generateButton;
     @FXML private ButtonType lookupButton;
     @FXML private TextField idTextField;
-    @FXML private TextArea lookUpField;
+    @FXML private Label lookUpField;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
 
+    private EntryType type;
     private EntryFromIDViewModel viewModel;
 
     public EntryFromIDView(BasePanel basePanel, DialogService dialogService, JabRefPreferences preferences) {
@@ -40,7 +45,14 @@ public class EntryFromIDView extends BaseDialog<EntryType> {
         this.prefs = preferences;
 
         this.setTitle(Localization.lang("Select entry type from ID"));
-        ViewLoader.view(this).load().setAsDialogPane(this);
+        ViewLoader.view(this)
+                .load()
+                .setAsDialogPane(this);
+
+        setResultConverter(button -> {
+            //The buttonType will always be cancel, even if we pressed one of the entry type buttons
+            return type;
+        });
 
         ControlHelper.setAction(lookupButton, this.getDialogPane(), event -> viewModel.runFetcherWorkerForLookUp(lookUpField));
 

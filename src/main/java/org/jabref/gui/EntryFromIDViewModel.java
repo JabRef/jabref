@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.HashMap;
 import  java.util.function.Predicate;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -47,7 +48,7 @@ public class EntryFromIDViewModel {
     private  String fetcherName;
     private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
-    private HashMap <Predicate<String>,IdBasedFetcher> fetcherMatchPattern = new HashMap<>();
+    private HashMap <Predicate<String>,IdBasedFetcher> fetcherMatchPattern = new HashMap<Predicate<String>,IdBasedFetcher>();
     private final BasePanel basePanel;
     private final DialogService dialogService;
 
@@ -56,54 +57,7 @@ public class EntryFromIDViewModel {
         this.prefs = preferences;
         this.dialogService = dialogService;
 
-        //DOI validate hors http
-        Pattern pdoi = Pattern.compile("10\\.[0-9]{4}/([0-9]{13}|[a-zA-Z]+\\.[0-9]{4}\\.[0-9]{2}|[-_0-9]+)");
-        fetcherMatchPattern.put(pdoi.asPredicate(),new DoiFetcher(preferences.getImportFormatPreferences()));
-
-        //HTTPDOI
-        Pattern pHTTPdoi = Pattern.compile("10\\.[0-9]{4}/([0-9]{13}|[a-zA-Z]+\\.[0-9]{4}\\.[0-9]{2}|[-_0-9]+)");
-        fetcherMatchPattern.put(pHTTPdoi.asPredicate(),new DoiFetcher(preferences.getImportFormatPreferences()));
-
-        //ISBN validate
-        Pattern pisbn = Pattern.compile("^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$");
-        fetcherMatchPattern.put(pisbn.asPredicate(),new IsbnFetcher(preferences.getImportFormatPreferences()));
-        //Rajouter pour long isbn
-
-        //DIVA Validate
-        Pattern pdiva = Pattern.compile("diva2:[0-9]{6}");
-        fetcherMatchPattern.put(pdiva.asPredicate(), new DiVA(preferences.getImportFormatPreferences()));
-
-        //MedlineFetcher Validate
-        Pattern pmd = Pattern.compile("[0-9]{8}");
-        fetcherMatchPattern.put(pmd.asPredicate(), new MedlineFetcher());
-
-        //MathSciNetId validate
-        Pattern pMathSciNetId = Pattern.compile("[0-9]{7}");
-        fetcherMatchPattern.put(pMathSciNetId.asPredicate(), new MathSciNet(preferences.getImportFormatPreferences()));
-
-        //LibraryOfCongress validate
-        Pattern pLibraryOfCongress= Pattern.compile("[0-9]{10}");
-        fetcherMatchPattern.put(pLibraryOfCongress.asPredicate(), new LibraryOfCongress(preferences.getImportFormatPreferences()));
-
-        //RfcFetcher validate
-        Pattern pRfcFetcher = Pattern.compile("[rR]*[fF]*[cC]*[0-9]{4}");
-        fetcherMatchPattern.put(pRfcFetcher.asPredicate(),new RfcFetcher(preferences.getImportFormatPreferences()));
-
-        //Arxiv
-        Pattern parxiv = Pattern.compile("[arXiv:]*[0-9][0-9](0[1-9]|1[0-2])\\.[0-9]{4}([v][0-9]+)*");
-        fetcherMatchPattern.put(parxiv.asPredicate(), new ArXiv(preferences.getImportFormatPreferences()));
-
-        //AstrophysicsDataSystem
-        Pattern pads = Pattern.compile("10\\.[0-9]{5}/([0-9]{13}|[a-zA-Z]+\\.[0-9]{4}\\.[0-9]{2}|[-_0-9]+)");
-        fetcherMatchPattern.put(pads.asPredicate(),new AstrophysicsDataSystem(preferences.getImportFormatPreferences()));
-
-        //TitleFetcher
-        //CrossRef -> DOI
-
-        //IacrEprintFetcher "Report 2017/1118 "
-        Pattern pIacr = Pattern.compile("[a-zA-Z]*\\s*[0-9]{4}/[0-9]{4}");
-        fetcherMatchPattern.put(pIacr.asPredicate(),new IacrEprintFetcher(preferences.getImportFormatPreferences()));
-
+        fetcherMatchPattern.putAll(WebFetchers.getHashMapPredicateIdBasedFetchers(preferences.getImportFormatPreferences()));
 
     }
 
@@ -141,8 +95,7 @@ public class EntryFromIDViewModel {
                     .filter(e -> e.getKey().test(id))
                     .map(e -> e.getValue())
                     .findFirst()
-                    .orElseThrow(()-> new NoFetcherFoundException("Can't find fetcher for this id :" + id));
-
+                    .orElseThrow(()-> new NoFetcherFoundException(Localization.lang("Error while searching fetcher from %0", id)));
         }
 
         @Override
@@ -161,7 +114,6 @@ public class EntryFromIDViewModel {
                 } catch (NoFetcherFoundException e) {
                     dialogService.showErrorDialogAndWait(Localization.lang("No fetcher found."), Localization.lang("Error while searching fetcher from %0", searchID));
                 }
-
             }
             return bibEntry;
         }
@@ -229,7 +181,7 @@ public class EntryFromIDViewModel {
         });
     }
 
-    public void runFetcherWorkerForLookUp(TextArea lookUpField) {
+    public void runFetcherWorkerForLookUp(Label lookUpField) {
         searchSuccesfulProperty.set(false);
         fetcherWorker.run();
         fetcherWorker.setOnFailed(event -> {
@@ -257,8 +209,8 @@ public class EntryFromIDViewModel {
 
                 final BibEntry entry = result.get();
 
-                String entryString = "Found with : " + fetcherName + " Title : " + entry.getTitle();
-                lookUpField.setText(entryString);
+                String entryString = "Found with : \n" + fetcherName + "\n\n with ID : \n" + entry.getId() + "\n\n Title : \n" + entry.getTitle() + "\n\n Publication date : \n" + entry.getPublicationDate();
+                lookUpField.setText(entry.toString());
 
                 searchSuccesfulProperty.set(true);
 
