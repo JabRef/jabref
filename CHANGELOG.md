@@ -19,7 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - A custom Open/LibreOffice jstyle file now requires a layout line for the entry type `default` [#5452](https://github.com/JabRef/jabref/issues/5452)
 - The entry editor is now open by default when JabRef starts up. [#5460](https://github.com/JabRef/jabref/issues/5460)
 - Customized entry types are now serialized in alphabetical order in the bib file.
-- We added a new ADS fetcher to use the new ADS API [#4949](https://github.com/JabRef/jabref/issues/4949)
+- We added a new ADS fetcher to use the new ADS API. [#4949](https://github.com/JabRef/jabref/issues/4949)
 - We added support of the [X11 primary selection](https://unix.stackexchange.com/a/139193/18033) [#2389](https://github.com/JabRef/jabref/issues/2389)
 - We added support to switch between biblatex and bibtex library types. [#5550](https://github.com/JabRef/jabref/issues/5550)
 - We changed the save action buttons to be easier to understand. [#5565](https://github.com/JabRef/jabref/issues/5565)
