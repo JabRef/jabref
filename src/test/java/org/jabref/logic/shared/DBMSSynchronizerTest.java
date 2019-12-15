@@ -71,6 +71,7 @@ public class DBMSSynchronizerTest {
 
     @AfterEach
     public void clear() throws SQLException {
+        dbmsSynchronizer.closeSharedDatabase();
         this.dbmsConnection.getConnection().close();
     }
 
