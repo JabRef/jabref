@@ -58,6 +58,7 @@ public class DBMSSynchronizerTest {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
         TestManager.clearTables(this.dbmsConnection);
+        this.dbmsProcessor.setupSharedDatabase();
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
