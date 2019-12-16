@@ -597,7 +597,7 @@ jlink {
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses javax.xml.bind.JAXBContextFactory
+        uses 'javax.xml.bind.JAXBContextFactory'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl'
