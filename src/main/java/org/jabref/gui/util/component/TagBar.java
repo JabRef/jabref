@@ -1,8 +1,8 @@
 package org.jabref.gui.util.component;
 
 import java.util.Collection;
-import java.util.function.BiConsumer;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
