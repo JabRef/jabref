@@ -1,0 +1,36 @@
+name: Refresh Citation Style Language Files
+
+on:
+  schedule:
+    # run on 1st and 15th of each month
+    - cron: '2 20 1,15 * *'
+  push:
+
+jobs:
+  publish:
+    name: Refresh Journal List Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2-beta
+        with:
+          ref: master
+      - name: Update journal lists
+        run: |
+          cd /tmp
+          git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
+          cd abbrv.jabref.org
+          ./combine_journal_lists.py $GITHUB_WORKSPACE/src/main/resources/journals/journalList.csv journals/*.csv
+          cd $GITHUB_WORKSPACE
+          git add .
+          git commit -m"Update journalList.csv"
+#      - uses: ad-m/github-push-action@master
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Report issues
+#        if: failure()
+#        uses: JasonEtco/create-an-issue@master
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          filename: .github/failure-journal-list-update.md
