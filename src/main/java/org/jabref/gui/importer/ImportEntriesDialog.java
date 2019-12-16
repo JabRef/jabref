@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
@@ -49,6 +48,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
     public Label totalItems;
+    public Label selectedItems;
     private final BackgroundTask<List<BibEntry>> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -88,7 +88,8 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
-
+        totalItems.setText("0");
+        selectedItems.setText("0");
         PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()
                 .withGraphic(entry -> {
@@ -102,6 +103,19 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     });
                     addToggle.getStyleClass().add("addEntryButton");
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
+                    addToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                        if(observable.getValue()){
+                            ++numberOfSelectedItems;
+                            selectedItems.setText(String.valueOf(numberOfSelectedItems));
+                        }else
+                            if(numberOfSelectedItems == 0){
+                                return;
+                            }
+                             else{
+                                --numberOfSelectedItems;
+                                selectedItems.setText(String.valueOf(numberOfSelectedItems));
+                            }
+                    });
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = getEntryNode(entry);
@@ -126,12 +140,9 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                         selectAllNewEntries();
                     }
                     totalItems.textProperty().setValue(String.valueOf(entriesListView.getItems().size()));
-
                     return container;
                 })
-                .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
-                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
-                .install(entriesListView);
+                .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry)).withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty).install(entriesListView);
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
