@@ -40,6 +40,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
@@ -405,9 +406,10 @@ public class JabRefFrame extends BorderPane {
     private void initLayout() {
         setProgressBarVisible(false);
 
-        BorderPane head = new BorderPane();
-        head.setTop(createMenu());
-        head.setCenter(createToolbar());
+        setId("frame");
+
+        VBox head = new VBox(createMenu(),createToolbar());
+        head.setSpacing(0d);
         setTop(head);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
