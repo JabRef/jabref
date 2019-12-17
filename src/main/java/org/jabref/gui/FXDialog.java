@@ -64,8 +64,6 @@ public class FXDialog extends Alert {
                 dialogWindow.close();
             }
         });
-
-        getDialogPane().getStyleClass().add("dialog-pane");
     }
 
     public FXDialog(AlertType type) {
