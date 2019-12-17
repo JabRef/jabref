@@ -59,6 +59,10 @@
     color : #7d8591; /* -fx-mid-text-color*/
 }
 
+.table-view .groupColumnBackground {
+    -fx-stroke: -jr-gray-4;
+}
+
 .code-area .lineno {
     -fx-background-color: -jr-background-alt;
     -fx-text-fill: -fx-mid-text-color;

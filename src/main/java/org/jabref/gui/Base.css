@@ -573,7 +573,7 @@
 }
 
 .table-view .groupColumnBackground {
-    -fx-stroke: -fx-mid-text-color;
+    -fx-stroke: -jr-gray-2;
 }
 
 .scroll-pane:focused,
