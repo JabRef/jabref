@@ -159,10 +159,10 @@ class MainTableColumnFactory {
 
             for (Color groupColor : groupColors) {
                 Rectangle groupRectangle = new Rectangle();
+                groupRectangle.getStyleClass().add("groupColumnBackground");
                 groupRectangle.setWidth(3);
                 groupRectangle.setHeight(18);
                 groupRectangle.setFill(groupColor);
-                groupRectangle.setStroke(Color.DARKGRAY);
                 groupRectangle.setStrokeWidth(1);
 
                 container.getChildren().add(groupRectangle);
