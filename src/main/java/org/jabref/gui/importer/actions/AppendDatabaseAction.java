@@ -179,7 +179,7 @@ public class AppendDatabaseAction implements BaseAction {
                         boolean importSelectorWords) throws IOException, KeyCollisionException {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
             // Should this be done _after_ we know it was successfully opened?
-            ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
+        ParserResult parserResult = OpenDatabase.loadDatabase(file,
                     Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
             AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
                     importSelectorWords);
