@@ -26,7 +26,7 @@ jobs:
            archivePortable: tar -c -C build/distribution JabRef.app | gzip --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
-    name: Deploy on ${{ matrix.displayName }}
+    name: Build for ${{ matrix.displayName }}
 
     steps:
     - name: Checkout source
