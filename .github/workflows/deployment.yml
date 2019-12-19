@@ -3,9 +3,9 @@ name: Deployment
 on: [push]
 
 jobs:
-  deploy:
+  build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
@@ -110,21 +110,58 @@ jobs:
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
         get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       shell: pwsh
-    - name: Upload to GitHub workflow artifacts store
-      uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@master
       with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/distribution
-    - name: Deploy to builds.jabref.org
-      uses: Pendect/action-rsyncer@v1.1.0
-      env:
-        DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
-        BRANCH: ${{ steps.gitversion.outputs.branchName }}
-      with:
-        flags: -vr --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
-        options: ''
-        ssh_options: '-p 9922'
-        src: 'build/distribution/'
-        dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-    - name: Display status from deploy
-      run: echo "${{ steps.deploy.outputs.status }}"
+        name: ${{ matrix.os }}-distribution
+        path: build/distribution/
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+      - name: Fetch tags and master for GitVersion
+        run: |
+          git fetch --tags origin
+          git rev-parse --verify master
+          if (-not $?) {
+            git branch --force --create-reflog master origin/master
+          }
+        shell: pwsh
+      - name: Install GitVersion
+        uses: gittools/actions/setup-gitversion@v0.3
+        with:
+            versionSpec: '5.1.2'
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/execute-gitversion@v0.3
+      - name: get linux binaries
+        uses: actions/download-artifact@master
+        with:
+          name: ubuntu-latest-distribution
+          path: build/distribution/
+      - name: get windows binaries
+        uses: actions/download-artifact@master
+        with:
+          name: windows-latest-distribution
+          path: build/distribution/
+      - name: get mac os binaries
+        uses: actions/download-artifact@master
+        with:
+          name: macOS-latest-distribution
+          path: build/distribution/
+      - name: Deploy to builds.jabref.org
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
+          BRANCH: ${{ steps.gitversion.outputs.branchName }}
+        with:
+          flags: -vr --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
+          options: ''
+          ssh_options: '-p 9922'
+          src: 'build/distribution/'
+          dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+      - name: Display status from deploy
+        run: echo "${{ steps.deploy.outputs.status }}"
