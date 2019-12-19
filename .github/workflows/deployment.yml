@@ -55,14 +55,12 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ~/.gradle/caches
-        key: gradle-${{ hashFiles('**/*.gradle') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
     - uses: actions/cache@v1
       name: Cache gradle wrapper
-      # cache at Mac OS X is 2 GB (too large)
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
       with:
         path: ~/.gradle/wrapper
-        key: gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
     - name: Download jpackage
       # We need to download jpackage from https://jdk.java.net/jpackage/
       run: |
