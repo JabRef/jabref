@@ -116,7 +116,11 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
                 container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
             }
 
-            container.getChildren().add(new Label(Localization.lang("Current value") + ": " + value));
+            if (StringUtil.isNotBlank(value)) {
+                container.getChildren().add(new Label(Localization.lang("Current value") + ": " + value));
+            } else {
+                container.getChildren().add(new Label(Localization.lang("Current value") + ": " + Localization.lang("empty")));
+            }
 
             return container;
         }
