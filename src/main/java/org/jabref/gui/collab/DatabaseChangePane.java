@@ -30,14 +30,12 @@ public class DatabaseChangePane extends NotificationPane {
     private void onDatabaseChanged(List<DatabaseChangeViewModel> changes) {
         this.getActions().setAll(
                 new Action(Localization.lang("Dismiss changes"), event -> {
-                    monitor.markExternalChangesAsResolved();
                     this.hide();
                 }),
                 new Action(Localization.lang("Review changes"), event -> {
                     ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(database, changes);
                     changeDialog.showAndWait();
 
-                    monitor.markExternalChangesAsResolved();
                     this.hide();
                 }));
         this.show();
