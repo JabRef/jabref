@@ -157,7 +157,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
           BRANCH: ${{ steps.gitversion.outputs.branchName }}
         with:
-          flags: -vaz --itemize-changes --progress --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
+          flags: -vaz --itemize-changes --progress --stats --block-size=1024 --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
           options: ''
           ssh_options: '-p 9922'
           src: 'build/distribution/'
