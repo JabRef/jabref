@@ -35,11 +35,10 @@ public class DatabaseChangePane extends NotificationPane {
                 }),
                 new Action(Localization.lang("Review changes"), event -> {
                     ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(database, changes);
-                    boolean changesHandled = changeDialog.showAndWait().orElse(false);
-                    if (changesHandled) {
-                        monitor.markExternalChangesAsResolved();
-                        this.hide();
-                    }
+                    changeDialog.showAndWait();
+
+                    monitor.markExternalChangesAsResolved();
+                    this.hide();
                 }));
         this.show();
     }
