@@ -150,7 +150,7 @@ jobs:
       - uses: actions/upload-artifact@master
         if: matrix.displayName == 'linux'
         with:
-          name: portable jar
+          name: jar
           path: ${{ steps.portablejar.outputs.file }}
   deploy:
     runs-on: ubuntu-latest
@@ -178,22 +178,22 @@ jobs:
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
-          name: linux-distribution
+          name: linux
           path: build/distribution/
       - name: Get windows binaries
         uses: actions/download-artifact@master
         with:
-          name: windows-distribution
+          name: windows
           path: build/distribution/
       - name: Get macOS binaries
         uses: actions/download-artifact@master
         with:
-          name: macOS-distribution
+          name: macOS
           path: build/distribution/
       - name: Get portable JAR
         uses: actions/download-artifact@master
         with:
-          name: portable JAR
+          name: jar
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
