@@ -111,6 +111,9 @@ jobs:
       - name: Post-process build
         # Extract fat jar, remove obsolete jar, update timestamps
         run: |
+          ls -la build/distribution
+          find . -name "JabRef.merged*.jar"
+          find . -name "JabRef*.jar"
           mv build/distribution/JabRef/app/mods/JabRef.merged*.jar build/
           rm build/distribtuion/JabRef/app/mods/JabRef*jar
           find build/distribution/JabRef -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
