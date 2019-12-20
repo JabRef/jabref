@@ -3,7 +3,27 @@ name: Deployment
 on: [push]
 
 jobs:
+  # In case the timestamp changes, much data is synched by rsync
+  # Thus, we set the timestamp to something "OKish" (not confiusing users that hard)
+  # We use "last monday", 00:00 as time stamp
+  gettimestampforbuild:
+    steps:
+      - id: timestampforbuild
+        run: |
+          from natty import DateParser
+          from datetime import datetime
+          import os
+          dp = DateParser('last monday')
+          timestamp = dp.strftime("%Y%m00")
+          print(f"::set-output name=timestamp::{timestamp}")
+        shell: python
+      - id: test
+        run: |
+          touch -t -m ${{ steps.timestampforbuild.outputs.timestamp }}0000 /tmp/test
+          ls -la /tmp/test
+        shell: bash
   build:
+    needs: [gettimestampforbuild]
     strategy:
       fail-fast: true
       matrix:
