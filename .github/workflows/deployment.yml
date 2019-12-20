@@ -3,31 +3,7 @@ name: Deployment
 on: [push]
 
 jobs:
-  # In case the timestamp of a file changes, the tar archive changes, because tar also stores file meta such as the file name and the file creation date.
-  # Therefore, the gzip file changes.
-  # Therefore, data needs to be synced by rsync.
-  # To prevent that, we set the timestamp to something "OKish" (not confiusing users that hard)
-  # We use "last monday", 00:00 as time stamp
-  gettimestampforbuild:
-    runs-on: ubuntu-latest
-    steps:
-      - id: timestampforbuild
-        run: |
-          from datetime import datetime
-          from datetime import date
-          from datetime import timedelta
-          lastmonday = date.today().toordinal()
-          lastmonday = lastmonday - (lastmonday % 7) + 1
-          timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
-          print("::set-output name=timestamp::" + timestamp)
-        shell: python
-      - id: test
-        run: |
-          touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 /tmp/test
-          ls -la /tmp/test
-        shell: bash
   build:
-    needs: [gettimestampforbuild]
     strategy:
       fail-fast: true
       matrix:
@@ -53,6 +29,31 @@ jobs:
     name: Build for ${{ matrix.displayName }}
 
     steps:
+      # In case the timestamp of a file changes, the tar archive changes, because tar also stores file meta such as the file name and the file creation date.
+      # Therefore, the gzip file changes.
+      # Therefore, data needs to be synced by rsync.
+      # To prevent that, we set the timestamp to something "OKish" (not confiusing users that hard)
+      # We use "last monday", 00:00 as time stamp
+      - id: timestampforbuild
+        name: Determine timestamp for build
+        run: |
+          from datetime import datetime
+          from datetime import date
+          from datetime import timedelta
+          lastmonday = date.today().toordinal()
+          lastmonday = lastmonday - (lastmonday % 7) + 1
+          timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
+          print("::set-output name=timestamp::" + timestamp)
+        shell: python
+      - name: Update timestamps
+        run: |
+          mkdir /tmp/test
+          touch /tmp/test/a
+          touch /tmp/test/b
+          touch /tmp/test/c
+          find /tmp/test -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
+          ls -la /tmp/test
+        shell: bash
       - name: Checkout source
         uses: actions/checkout@v2-beta
         with:
@@ -115,6 +116,10 @@ jobs:
         run: |
           export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
           ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        shell: bash
+      - name: Update timestamps
+        run: |
+          find build/distribution -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {}\;
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
