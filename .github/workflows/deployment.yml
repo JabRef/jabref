@@ -75,7 +75,7 @@ jobs:
       - uses: actions/cache@v1
         name: Cache gradle wrapper
         # cache at Mac OS X is 2 GB (too large)
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
+        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
@@ -110,13 +110,12 @@ jobs:
         shell: bash
       - name: Update timestamps
         run: |
-          find build/distribution -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
       - name: Build and publish snap
-        if: matrix.os == 'ubuntu-latest' && steps.gitversion.outputs.branchName == 'master'
+        if: matrix.os == 'ubuntu-latest' && github.ref == 'refs/heads/master'
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
         run: |
@@ -135,6 +134,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build]
+    if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout source
         uses: actions/checkout@v2-beta
