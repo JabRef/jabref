@@ -38,6 +38,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We made the columns for groups, files and uri in the main table reorderable and merged the clickable icon columns for uri, url, doi and eprint. [#5544](https://github.com/JabRef/jabref/pull/5544)
 - We reduced the number of write actions performed when autosave is enabled [#5679](https://github.com/JabRef/jabref/issues/5679)
 - We made the column sort order in the main table persistent [#5730](https://github.com/JabRef/jabref/pull/5730)
+- When an entry is modified on disk, the change dialog now shows the merge dialog to highlight the changes [#5688](https://github.com/JabRef/jabref/pull/5688)
 
 ### Fixed
 
