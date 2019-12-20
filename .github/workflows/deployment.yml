@@ -18,7 +18,7 @@ jobs:
           import os
           dp = DateParser('last monday')
           timestamp = dp.strftime("%Y%m00")
-          print(f"::set-output name=timestamp::{timestamp}")
+          print("::set-output name=timestamp::" + timestamp)
         shell: python
       - id: test
         run: |
