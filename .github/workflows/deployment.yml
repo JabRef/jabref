@@ -14,10 +14,11 @@ jobs:
       - id: timestampforbuild
         run: |
           from datetime import datetime
-          from os import os
-          today = datetime.date.today()
-          lastmonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
-          timestamp = lastmonday.strftime("%Y%m00")
+          from datetime import date
+          from datetime import timedelta
+          lastmonday = date.today().toordinal()
+          lastmonday = lastmonday - (lastmonday % 7) + 1
+          timestamp = datetime.fromordinal(lastmonday).strftime("%Y%m%d")
           print("::set-output name=timestamp::" + timestamp)
         shell: python
       - id: test
