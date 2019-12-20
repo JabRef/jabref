@@ -13,11 +13,11 @@ jobs:
     steps:
       - id: timestampforbuild
         run: |
-          from natty import DateParser
           from datetime import datetime
-          import os
-          dp = DateParser('last monday')
-          timestamp = dp.strftime("%Y%m00")
+          from os import os
+          today = datetime.date.today()
+          lastmonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
+          timestamp = lastmonday.strftime("%Y%m00")
           print("::set-output name=timestamp::" + timestamp)
         shell: python
       - id: test
