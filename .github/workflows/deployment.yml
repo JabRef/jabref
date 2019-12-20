@@ -108,18 +108,19 @@ jobs:
           timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
           print("::set-output name=timestamp::" + timestamp)
         shell: python
-      - name: Post-process build
-        # Extract fat jar, remove obsolete jar, update timestamps
+      - name: Save portable jar, fix and output filename of portable jar
+        id: portablejar
+        if: matrix.displayName == 'linux'
         run: |
-          ls -la build/distribution
-          find . -name "JabRef.merged*.jar"
-          find . -name "JabRef*.jar"
-          mv build/distribution/JabRef/lib/app/mods/JabRef.merged*.jar build/
-          rm build/distribution/JabRef/lib/app/mods/JabRef*jar
-          find build/distribution/JabRef -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
-          find . -name "JabRef.merged*.jar"
-          find . -name "JabRef*.jar"
-          ls -la build/
+          mv build/distribution/JabRef/lib/app/mods/JabRef.merged*.jar JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.jar
+          echo "::set-output name=file::$(ls JabRef*.jar)"
+        shell: bash
+      - name: Post-process build
+        # Remove obsolete jar, update timestamps
+        run: |
+          find build -name "JabRef.merged*.jar" | xargs rm
+          find build -name "JabRef*.jar" | xargs rm
+          find build -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
@@ -141,13 +142,10 @@ jobs:
         with:
           name: ${{ matrix.displayName }}
           path: build/distribution/
-      - name: Get portable JAR
-        id: portablejar
-        run: echo "::set-output name=file::$(ls build/JabRef*.jar)"
       - uses: actions/upload-artifact@master
         if: matrix.displayName == 'linux'
         with:
-          name: portable JAR
+          name: portable jar
           path: ${{ steps.portablejar.outputs.file }}
   deploy:
     runs-on: ubuntu-latest
