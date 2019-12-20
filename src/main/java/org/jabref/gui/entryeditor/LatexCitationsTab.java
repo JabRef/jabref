@@ -62,6 +62,7 @@ public class LatexCitationsTab extends EntryEditorTab {
 
         searchPane.getColumnConstraints().setAll(column);
         searchPane.getRowConstraints().setAll(mainRow, bottomRow);
+        searchPane.setId("citationsPane");
         setContent(searchPane);
 
         EasyBind.subscribe(viewModel.statusProperty(), status -> {
@@ -86,11 +87,9 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private HBox getLatexDirectoryBox() {
         Text latexDirectoryText = new Text(Localization.lang("Current search directory:"));
-        latexDirectoryText.setStyle("-fx-font-size: 0.9em;-fx-padding: 0;");
         Text latexDirectoryPath = new Text(viewModel.directoryProperty().get().toString());
-        latexDirectoryPath.setStyle("-fx-font-family: 'Courier New', Courier, monospace;-fx-font-size: 0.9em;-fx-font-weight: bold;");
+        latexDirectoryPath.setStyle("-fx-font-family:monospace;-fx-font-weight: bold;");
         Button latexDirectoryButton = new Button(Localization.lang("Set LaTeX file directory"));
-        latexDirectoryButton.setStyle("-fx-border-width: 1;-fx-font-size: 0.85em;-fx-padding: 0.2em;");
         latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());
         latexDirectoryButton.setOnAction(event -> viewModel.setLatexDirectory());
         HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);
@@ -106,8 +105,11 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     private VBox getNotFoundPane() {
         Label titleLabel = new Label(Localization.lang("No citations found"));
-        titleLabel.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -jr-theme-text;");
+        titleLabel.getStyleClass().add("heading");
+
         Text notFoundText = new Text(Localization.lang("No LaTeX files containing this entry were found."));
+        notFoundText.getStyleClass().add("description");
+
         VBox notFoundBox = new VBox(30, titleLabel, notFoundText);
         notFoundBox.setStyle("-fx-padding: 30 0 0 30;");
         return notFoundBox;

@@ -79,7 +79,7 @@ public class JabRefGUI {
             mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
-        printWindowState(mainStage);
+        debugLogWindowState(mainStage);
 
         // We create a decoration pane ourselves for performance reasons
         // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
@@ -204,33 +204,34 @@ public class JabRefGUI {
         Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
-        printWindowState(mainStage);
+        debugLogWindowState(mainStage);
     }
 
     /**
-     * outprints the Data from the Screen
-     * (only in debug mode)
+     * outprints the Data from the Screen (only in debug mode)
+     *
      * @param mainStage
      */
-    private void printWindowState(Stage mainStage) {
-        StringBuilder bob = new StringBuilder();
-        bob.append("SCREEN DATA:");
-        bob.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
-        bob.append("mainStage.POS_X: " + mainStage.getX() + "\n");
-        bob.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
-        bob.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
-        bob.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
-        LOGGER.debug(bob.toString());
+    private void debugLogWindowState(Stage mainStage) {
+        if (LOGGER.isDebugEnabled()) {
+            StringBuilder debugLogString = new StringBuilder();
+            debugLogString.append("SCREEN DATA:");
+            debugLogString.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+            debugLogString.append("mainStage.POS_X: " + mainStage.getX() + "\n");
+            debugLogString.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
+            debugLogString.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
+            debugLogString.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
+            LOGGER.debug(debugLogString.toString());
+        }
     }
 
     /**
      * Tests if the window coordinates are out of the mainscreen
+     *
      * @return outbounds
      */
     private boolean isWindowPositionOutOfBounds() {
-
-       return  !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X) , Globals.prefs.getDouble(JabRefPreferences.POS_Y));
-
+        return !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X), Globals.prefs.getDouble(JabRefPreferences.POS_Y));
     }
 
     private void openLastEditedDatabases() {
