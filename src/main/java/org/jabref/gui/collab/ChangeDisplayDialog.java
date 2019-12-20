@@ -26,7 +26,6 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
 
     public ChangeDisplayDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
-        this.database = database;
         this.setTitle(Localization.lang("External changes"));
         this.getDialogPane().setPrefSize(800, 600);
 
