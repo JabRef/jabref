@@ -135,14 +135,12 @@ public class SaveDatabaseAction {
                     SavePreferences.DatabaseSaveType.ALL);
 
             if (success) {
-                panel.updateTimeStamp();
                 panel.getUndoManager().markUnchanged();
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:
                 panel.setNonUndoableChange(false);
                 panel.setBaseChanged(false);
-                panel.markExternalChangesAsResolved();
 
                 // Reset title of tab
                 frame.setTabTitle(panel, panel.getTabTitle(),

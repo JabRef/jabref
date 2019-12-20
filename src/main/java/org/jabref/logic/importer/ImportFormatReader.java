@@ -170,7 +170,7 @@ public class ImportFormatReader {
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult parserResult = OpenDatabase.loadDatabase(filePath.toFile(), importFormatPreferences, fileMonitor);
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 parserResult.setFile(filePath.toFile());
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
