@@ -29,22 +29,6 @@ jobs:
     name: Build for ${{ matrix.displayName }}
 
     steps:
-      # In case the timestamp of a file changes, the tar archive changes, because tar also stores file meta such as the file name and the file creation date.
-      # Therefore, the gzip file changes.
-      # Therefore, data needs to be synced by rsync.
-      # To prevent that, we set the timestamp to something "OKish" (not confiusing users that hard)
-      # We use "last monday", 00:00 as time stamp
-      - id: timestampforbuild
-        name: Determine timestamp for build
-        run: |
-          from datetime import datetime
-          from datetime import date
-          from datetime import timedelta
-          lastmonday = date.today().toordinal()
-          lastmonday = lastmonday - (lastmonday % 7) + 1
-          timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
-          print("::set-output name=timestamp::" + timestamp)
-        shell: python
       - name: Checkout source
         uses: actions/checkout@v2-beta
         with:
@@ -108,8 +92,28 @@ jobs:
           export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
           ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
-      - name: Update timestamps
+      # In case the timestamp of a file changes, the tar archive changes, because tar also stores file meta such as the file name and the file creation date.
+      # Therefore, the gzip file changes.
+      # Therefore, data needs to be synced by rsync.
+      # To prevent that, we set the timestamp to something "OKish" (not confiusing users that hard)
+      # We use "last monday", 00:00 as time stamp
+      - name: Determine timestamp for build
+        id: timestampforbuild
         run: |
+          from datetime import datetime
+          from datetime import date
+          from datetime import timedelta
+          lastmonday = date.today().toordinal()
+          lastmonday = lastmonday - (lastmonday % 7) + 1
+          timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
+          print("::set-output name=timestamp::" + timestamp)
+        shell: python
+      - name: Post-process build
+        # Extract fat jar, remove obsolete jar, update timestamps
+        run: |
+          mv build/distribution/app/mods/JabRef.merged*.jar build/
+          rm build/distribtuion/app/mods/JabRef*jar
+          find build/distribution -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
@@ -131,10 +135,15 @@ jobs:
         with:
           name: ${{ matrix.displayName }}
           path: build/distribution/
+      - uses: actions/upload-artifact@master
+        if: matrix.displayName == 'linux'
+        with:
+          name: portable JAR
+          path: build/JabRef*.jar
   deploy:
     runs-on: ubuntu-latest
     needs: [build]
-    if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
+    if: matrix.displayName == 'linux' && ( github.ref == 'refs/heads/master' || github.ref == 'change-upload-back-to-script' )
     steps:
       - name: Checkout source
         uses: actions/checkout@v2-beta
@@ -169,6 +178,11 @@ jobs:
         uses: actions/download-artifact@master
         with:
           name: macOS-distribution
+          path: build/distribution/
+      - name: Get portable JAR
+        uses: actions/download-artifact@master
+        with:
+          name: portable JAR
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
