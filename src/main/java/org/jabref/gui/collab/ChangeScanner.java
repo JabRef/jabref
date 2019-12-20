@@ -10,8 +10,8 @@ import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -36,9 +36,9 @@ public class ChangeScanner {
             List<DatabaseChangeViewModel> changes = new ArrayList<>();
 
             // Parse the modified file
+            // Important: apply all post-load actions
             ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor())
-                    .importDatabase(database.getDatabasePath().get(), importFormatPreferences.getEncoding());
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.

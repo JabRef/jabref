@@ -44,12 +44,14 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         Label rootInfo = new Label(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
         infoPanel.setCenter(rootInfo);
 
+        ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss changes"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().setAll(
-                                                new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                                                ButtonType.CANCEL);
+                new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
+                dismissChanges
+        );
 
         setResultConverter(button -> {
-            if (button == ButtonType.CANCEL) {
+            if (button == dismissChanges) {
                 return false;
             } else {
                 // Perform all accepted changes

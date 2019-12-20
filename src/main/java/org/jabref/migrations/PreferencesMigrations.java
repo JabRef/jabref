@@ -11,6 +11,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.TableColumn;
+
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -316,7 +318,7 @@ public class PreferencesMigrations {
                                                    try {
                                                        return Double.parseDouble(string);
                                                    } catch (NumberFormatException e) {
-                                                       return ColumnPreferences.DEFAULT_WIDTH;
+                                                       return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
                                                    }
                                                })
                                                .collect(Collectors.toList());
@@ -326,30 +328,40 @@ public class PreferencesMigrations {
 
         if (!columnNames.isEmpty() && columnNames.stream().noneMatch(name -> name.contains(normalFieldTypeString))) {
             List<MainTableColumnModel> columns = new ArrayList<>();
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS, 28));
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES, 28));
-            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER, 28));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
 
             for (int i = 0; i < columnNames.size(); i++) {
                 String name = columnNames.get(i);
+                double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
                                                              .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
                                                              .orElse(MainTableColumnModel.Type.NORMALFIELD);
+
                 if (i < columnWidths.size()) {
-                    columns.add(new MainTableColumnModel(type, name, columnWidths.get(i)));
-                } else {
-                    columns.add(new MainTableColumnModel(type, name));
+                    columnWidth = columnWidths.get(i);
                 }
+
+                columns.add(new MainTableColumnModel(type, name, columnWidth));
             }
 
             preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
-                                                                             .map(MainTableColumnModel::getName)
-                                                                             .collect(Collectors.toList()));
+                    .map(MainTableColumnModel::getName)
+                    .collect(Collectors.toList()));
+
             preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columns.stream()
-                                                                              .map(MainTableColumnModel::getWidth)
-                                                                              .map(Double::intValue)
-                                                                              .map(Object::toString)
-                                                                              .collect(Collectors.toList()));
+                    .map(MainTableColumnModel::getWidth)
+                    .map(Double::intValue)
+                    .map(Object::toString)
+                    .collect(Collectors.toList()));
+
+            // ASCENDING by default
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columns.stream()
+                    .map(MainTableColumnModel::getSortType)
+                    .map(TableColumn.SortType::toString)
+                    .collect(Collectors.toList()));
         }
     }
 }

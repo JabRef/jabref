@@ -16,4 +16,4 @@ AUTHORS text eol=lf
 *.bib text !eol
 
 # disable after a release
-# CHANGELOG.md merge=union
+CHANGELOG.md merge=union
