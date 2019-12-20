@@ -23,7 +23,7 @@ jobs:
         shell: python
       - id: test
         run: |
-          touch -t -m ${{ steps.timestampforbuild.outputs.timestamp }}0000 /tmp/test
+          touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 /tmp/test
           ls -la /tmp/test
         shell: bash
   build:
