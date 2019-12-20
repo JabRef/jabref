@@ -3,10 +3,13 @@ name: Deployment
 on: [push]
 
 jobs:
-  # In case the timestamp changes, much data is synched by rsync
-  # Thus, we set the timestamp to something "OKish" (not confiusing users that hard)
+  # In case the timestamp of a file changes, the tar archive changes, because tar also stores file meta such as the file name and the file creation date.
+  # Therefore, the gzip file changes.
+  # Therefore, data needs to be synced by rsync.
+  # To prevent that, we set the timestamp to something "OKish" (not confiusing users that hard)
   # We use "last monday", 00:00 as time stamp
   gettimestampforbuild:
+    runs-on: ubuntu-latest
     steps:
       - id: timestampforbuild
         run: |
@@ -130,7 +133,7 @@ jobs:
         shell: pwsh
       - uses: actions/upload-artifact@master
         with:
-          name: ${{ matrix.os }}-distribution
+          name: ${{ matrix.displayName }}
           path: build/distribution/
   deploy:
     runs-on: ubuntu-latest
@@ -155,20 +158,20 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/execute-gitversion@v0.3
-      - name: get linux binaries
+      - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
-          name: ubuntu-latest-distribution
+          name: linux-distribution
           path: build/distribution/
-      - name: get windows binaries
+      - name: Get windows binaries
         uses: actions/download-artifact@master
         with:
-          name: windows-latest-distribution
+          name: windows-distribution
           path: build/distribution/
-      - name: get mac os binaries
+      - name: Get macOS binaries
         uses: actions/download-artifact@master
         with:
-          name: macOS-latest-distribution
+          name: macOS-distribution
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
