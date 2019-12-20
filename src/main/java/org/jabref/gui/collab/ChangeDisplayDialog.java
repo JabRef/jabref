@@ -24,7 +24,6 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
     private final ListView<DatabaseChangeViewModel> tree;
     private final BorderPane infoPanel = new BorderPane();
     private final CheckBox cb = new CheckBox(Localization.lang("Accept change"));
-    private final BibDatabaseContext database;
 
     public ChangeDisplayDialog(BibDatabaseContext database, List<DatabaseChangeViewModel> changes) {
         this.database = database;

@@ -20,37 +20,36 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     private final BibEntry firstEntry;
     private final BibEntry secondEntry;
-    private final MergeEntries mergePanel;
+    private MergeEntries mergePanel;
+
+    private BibDatabaseContext database;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, BibDatabaseContext database) {
         super();
 
         this.firstEntry = entry;
         this.secondEntry = newEntry;
+        this.database = database;
 
         name = entry.getCiteKeyOptional()
                     .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                     .orElse(Localization.lang("Modified entry"));
 
-        mergePanel = new MergeEntries(firstEntry, secondEntry, database.getMode());
     }
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
+        database.getDatabase().removeEntry(firstEntry);
         database.getDatabase().insertEntry(mergePanel.getMergeEntry());
+        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), firstEntry));
         undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), mergePanel.getMergeEntry()));
-    }
-
-    public BibEntry getFirst() {
-        return this.firstEntry;
-    }
-
-    public BibEntry getSecond() {
-        return this.secondEntry;
     }
 
     @Override
     public Node description() {
+
+        mergePanel = new MergeEntries(firstEntry, secondEntry, database.getMode());
+
         VBox container = new VBox(10);
         Label header = new Label(name);
         header.getStyleClass().add("sectionHeader");
