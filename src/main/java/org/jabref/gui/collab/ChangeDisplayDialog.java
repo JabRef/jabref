@@ -35,7 +35,11 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
 
         SplitPane pane = new SplitPane();
         pane.setDividerPositions(0.25);
-        pane.getItems().addAll(new ScrollPane(tree), infoPanel);
+        ScrollPane scroll = new ScrollPane(tree);
+        scroll.setFitToHeight(true);
+        scroll.setFitToWidth(true);
+        pane.getItems().addAll(scroll, infoPanel);
+
         getDialogPane().setContent(pane);
 
         infoPanel.setBottom(cb);

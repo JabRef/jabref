@@ -1,5 +1,6 @@
 package org.jabref.gui.collab;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -55,6 +56,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
         container.getChildren().add(mergePanel);
+        container.setMargin(mergePanel, new Insets(5, 5, 5, 5));
         return container;
     }
 }
