@@ -45,15 +45,6 @@ jobs:
           timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
           print("::set-output name=timestamp::" + timestamp)
         shell: python
-      - name: Update timestamps
-        run: |
-          mkdir /tmp/test
-          touch /tmp/test/a
-          touch /tmp/test/b
-          touch /tmp/test/c
-          find /tmp/test -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
-          ls -la /tmp/test
-        shell: bash
       - name: Checkout source
         uses: actions/checkout@v2-beta
         with:
@@ -119,7 +110,7 @@ jobs:
         shell: bash
       - name: Update timestamps
         run: |
-          find build/distribution -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {}\;
+          find build/distribution -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
