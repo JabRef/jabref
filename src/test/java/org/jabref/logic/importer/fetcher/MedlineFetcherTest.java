@@ -25,8 +25,8 @@ public class MedlineFetcherTest {
 
     @BeforeEach
     public void setUp() throws InterruptedException {
-        // pause between runs to avoid 403 at Medline
-        Thread.sleep(470);
+        // pause between runs to avoid 403 and 429 at Medline
+        Thread.sleep(1000);
 
         fetcher = new MedlineFetcher();
 
