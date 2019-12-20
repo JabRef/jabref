@@ -19,9 +19,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
 
     private final BibEntry firstEntry;
-
     private final BibEntry secondEntry;
-
     private final MergeEntries mergePanel;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, BibDatabaseContext database) {
@@ -34,7 +32,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
                     .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                     .orElse(Localization.lang("Modified entry"));
 
-        mergePanel = new MergeEntries(firstEntry, null, database.getMode());
+        mergePanel = new MergeEntries(firstEntry, secondEntry, database.getMode());
     }
 
     @Override
