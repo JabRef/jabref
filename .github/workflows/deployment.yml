@@ -18,7 +18,7 @@ jobs:
           from datetime import timedelta
           lastmonday = date.today().toordinal()
           lastmonday = lastmonday - (lastmonday % 7) + 1
-          timestamp = datetime.fromordinal(lastmonday).strftime("%Y%m%d")
+          timestamp = datetime.fromordinal(lastmonday).strftime("%y%m%d")
           print("::set-output name=timestamp::" + timestamp)
         shell: python
       - id: test
