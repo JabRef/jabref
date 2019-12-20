@@ -143,7 +143,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build]
-    if: matrix.displayName == 'linux' && ( github.ref == 'refs/heads/master' || github.ref == 'change-upload-back-to-script' )
     steps:
       - name: Checkout source
         uses: actions/checkout@v2-beta
