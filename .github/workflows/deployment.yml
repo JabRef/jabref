@@ -114,8 +114,8 @@ jobs:
           ls -la build/distribution
           find . -name "JabRef.merged*.jar"
           find . -name "JabRef*.jar"
-          mv build/distribution/JabRef/app/mods/JabRef.merged*.jar build/
-          rm build/distribtuion/JabRef/app/mods/JabRef*jar
+          mv build/distribution/JabRef/lib/app/mods/JabRef.merged*.jar build/
+          rm build/distribution/JabRef/lib/app/mods/JabRef*jar
           find build/distribution/JabRef -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
       - name: Package application image
