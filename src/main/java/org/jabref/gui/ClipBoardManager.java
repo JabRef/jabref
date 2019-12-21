@@ -66,11 +66,13 @@ public class ClipBoardManager {
      * @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer text over clipboards</a>
      */
     public static void addX11Support(TextInputControl input) {
+        /*
         input.selectedTextProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty() && primary != null) {
                 primary.setContents(new StringSelection(newValue), null);
             }
         });
+         */
         input.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.MIDDLE) {
                 input.insertText(input.getCaretPosition(), getContentsPrimary());
