@@ -120,6 +120,7 @@ jobs:
         name: JabRef-${{ matrix.displayName }}
         path: build/distribution
   deploy:
+    name: Deploy binaries on builds.jabref.org
     runs-on: ubuntu-latest
     needs: [build]
     steps:
@@ -164,10 +165,8 @@ jobs:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
           BRANCH: ${{ steps.gitversion.outputs.branchName }}
         with:
-          flags: -vaz --itemize-changes --progress --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
           options: ''
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-      - name: Display status from deploy
-        run: echo "${{ steps.deploy.outputs.status }}"
