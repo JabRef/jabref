@@ -124,6 +124,7 @@ jobs:
       - name: Post-process build
         # Remove obsolete jar, update timestamps
         run: |
+          find build -name "JabRef*.jar"
           find build -name "JabRef*.jar" | xargs rm
           find build -type f -exec touch -t ${{ steps.timestampforbuild.outputs.timestamp }}0000 {} \;
         shell: bash
