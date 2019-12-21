@@ -128,7 +128,7 @@ public class MergeEntries extends BorderPane {
         ColumnConstraints columnLabel = new ColumnConstraints();
         columnLabel.setHgrow(Priority.NEVER);
         ColumnConstraints columnValues = new ColumnConstraints();
-        columnValues.setHgrow(Priority.ALWAYS);
+        columnValues.setHgrow(Priority.NEVER);
         columnValues.setPercentWidth(40);
         ColumnConstraints columnSelect = new ColumnConstraints();
         columnSelect.setHgrow(Priority.NEVER);
@@ -233,7 +233,9 @@ public class MergeEntries extends BorderPane {
     private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
         for (int i = 0; i < 6; i++) {
-            mergePanel.add(new Label(columnHeadings.get(i)), i, 0);
+            Label colHeading = new Label(columnHeadings.get(i));
+            colHeading.setMinWidth(USE_PREF_SIZE);
+            mergePanel.add(colHeading, i, 0);
         }
     }
 

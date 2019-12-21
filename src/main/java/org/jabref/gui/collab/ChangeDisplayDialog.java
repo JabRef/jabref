@@ -30,15 +30,16 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         this.getDialogPane().setPrefSize(800, 600);
 
         tree = new ListView<>(FXCollections.observableArrayList(changes));
-        tree.setPrefWidth(190);
+        tree.setPrefWidth(160);
         EasyBind.subscribe(tree.getSelectionModel().selectedItemProperty(), this::selectedChangeChanged);
 
         SplitPane pane = new SplitPane();
-        pane.setDividerPositions(0.25);
+        pane.setDividerPositions(0.2);
         ScrollPane scroll = new ScrollPane(tree);
         scroll.setFitToHeight(true);
         scroll.setFitToWidth(true);
         pane.getItems().addAll(scroll, infoPanel);
+        pane.setResizableWithParent(scroll, false);
 
         getDialogPane().setContent(pane);
 
