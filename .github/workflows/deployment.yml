@@ -26,7 +26,7 @@ jobs:
            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
-    name: Build for ${{ matrix.displayName }}
+    name: Create installer and portable version for ${{ matrix.displayName }}
 
     steps:
     - name: Checkout source
