@@ -15,10 +15,10 @@ jobs:
       run: echo "##[set-output name=branch;](echo{GITHUB_REF#refs/heads/})"
       id: extract_branch
     - name: Delete folder on builds.jabref.org
-      uses: appleboy/ssh-action@v0.0.3
+      uses: appleboy/ssh-action@v0.0.6
       with:
-        script: rm -rf www/${{ steps.extract_branch.outputs.branch }}
+        script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }}
         host: builds.jabref.org
-        username: builds_jabref_org
-        key: ${{ secrets.buildJabRefPrivateKey }}
         port: 9922
+        username: jrrsync
+        key: ${{ secrets.buildJabRefPrivateKey }}
