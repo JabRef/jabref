@@ -72,17 +72,12 @@ public class ClipBoardManager {
     public static void addX11Support(TextInputControl input) {
         input.selectedTextProperty().addListener(
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
-                new InvalidationListener() {
-                    @Override
-                    public void invalidated(Observable observable) {
-                        Platform.runLater(() -> {
-                            String newValue = observable.toString();
-                            if (!newValue.isEmpty() && primary != null) {
-                                primary.setContents(new StringSelection(newValue), null);
-                            }
-                        });
+                observable -> Platform.runLater(() -> {
+                    String newValue = ((TextInputControl) observable).getSelectedText();
+                    if (!newValue.isEmpty() && primary != null) {
+                        primary.setContents(new StringSelection(newValue), null);
                     }
-                });
+                }));
         input.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.MIDDLE) {
                 input.insertText(input.getCaretPosition(), getContentsPrimary());
