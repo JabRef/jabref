@@ -11,9 +11,9 @@ jobs:
     
     steps:
     - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
+      run: |
+        echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
     - name: Delete folder on builds.jabref.org
       uses: appleboy/ssh-action@v0.0.6
       with:
