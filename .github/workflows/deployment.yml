@@ -93,6 +93,10 @@ jobs:
         shell: python
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+      - name: Debug state after build
+        run: |
+          find build -name "JabRef*.jar"
+        shell: bash
       - name: Build installer
         run: |
           export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
