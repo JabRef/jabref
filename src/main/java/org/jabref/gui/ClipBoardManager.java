@@ -15,6 +15,7 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -73,7 +74,7 @@ public class ClipBoardManager {
         input.selectedTextProperty().addListener(
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
                 observable -> Platform.runLater(() -> {
-                    String newValue = ((TextInputControl) observable).getSelectedText();
+                    String newValue = input.getSelectedText();
                     if (!newValue.isEmpty() && primary != null) {
                         primary.setContents(new StringSelection(newValue), null);
                     }
