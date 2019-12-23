@@ -239,12 +239,12 @@ public class BibDatabase {
                 firstEntry = entry;
             }
         }
-        entries.addAll(newEntries);
         if (firstEntry == null) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
             eventBus.post(new EntriesAddedEvent(newEntries, firstEntry, eventSource));
         }
+        entries.addAll(newEntries);
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
