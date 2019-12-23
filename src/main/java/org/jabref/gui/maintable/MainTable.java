@@ -96,15 +96,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .setOnMouseDragEntered(this::handleOnDragEntered)
                 .install(this);
 
-        /*for (Entry<String, SortType> entries : preferences.getColumnPreferences().getSortTypesForColumns().entrySet()) {
-            Optional<TableColumn<BibEntryTableViewModel, ?>> column = this.getColumns().stream().filter(col -> entries.getKey().equals(col.getText())).findFirst();
-            column.ifPresent(col -> {
-                col.setSortType(entries.getValue());
-                this.getSortOrder().add(col);
-            });
-        }*/
+        this.getSortOrder().clear();
+        preferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+                this.getColumns().stream()
+                        .map(column -> (MainTableColumn<?>) column)
+                        .filter(column -> column.getModel().equals(columnModel))
+                        .findFirst()
+                        .ifPresent(column -> this.getSortOrder().add(column)));
 
-        if (preferences.resizeColumnsToFit()) {
+        if (preferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

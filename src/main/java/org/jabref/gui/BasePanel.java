@@ -993,10 +993,6 @@ public class BasePanel extends StackPane {
         return this.bibDatabaseContext;
     }
 
-    public void markExternalChangesAsResolved() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::markExternalChangesAsResolved);
-    }
-
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
     }
@@ -1059,10 +1055,6 @@ public class BasePanel extends StackPane {
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
         this.getChildren().setAll(changePane);
-    }
-
-    public void updateTimeStamp() {
-        changeMonitor.ifPresent(DatabaseChangeMonitor::markAsSaved);
     }
 
     public void copy() {
