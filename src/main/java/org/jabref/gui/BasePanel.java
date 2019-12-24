@@ -168,7 +168,7 @@ public class BasePanel extends StackPane {
         setupActions();
 
         this.getDatabase().registerListener(new SearchListener());
-        this.getDatabase().registerListener(new EntryRemovedListener());
+        this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -1135,7 +1135,7 @@ public class BasePanel extends StackPane {
         }
     }
 
-    private class EntryRemovedListener {
+    private class EntriesRemovedListener {
 
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {

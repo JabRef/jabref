@@ -12,11 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class represents the removal of an entry. The constructor needs
- * references to the database, the entry, and the map of open entry editors.
- * TODO is this map still being used?
- * The latter to be able to close the entry's editor if it is opened before
- * the insert is undone.
+ * This class represents the removal of entries. The constructor needs
+ * references to the database, entries, and a boolean marked true if the undo
+ * is from a call to paste().
  */
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
