@@ -18,6 +18,7 @@ import de.undercouch.citeproc.ItemDataProvider;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;
 import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.output.Bibliography;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
@@ -97,6 +98,7 @@ public class CSLAdapter {
             for (Field key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
+                        .map(LatexToUnicodeAdapter::format)
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
                             if (StandardField.MONTH.equals(key)) {
