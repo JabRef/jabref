@@ -605,6 +605,12 @@ public class BasePanel extends StackPane {
         }
     }
 
+    public void insertEntry(final BibEntry bibEntry) {
+        if (bibEntry != null) {
+            insertEntries(Collections.singletonList(bibEntry));
+        }
+    }
+
     /**
      * This method is called from JabRefFrame when the user wants to create a new entry.
      *
@@ -612,24 +618,25 @@ public class BasePanel extends StackPane {
      */
 
     // The Javadoc appears to be incorrect here
-    public void insertEntry(final BibEntry bibEntry) {
-        if (bibEntry != null) {
+    public void insertEntries(final List<BibEntry> entries) {
+        if (!entries.isEmpty()) {
             try {
-                bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+                bibDatabaseContext.getDatabase().insertEntries(entries);
 
                 // Set owner and timestamp
-                UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
-
+                for (BibEntry entry : entries) {
+                    UpdateField.setAutomaticFields(entry, true, true, Globals.prefs.getUpdateFieldPreferences());
+                }
                 // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), bibEntry));
+                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(bibEntry);
+                    showAndEdit(entries.get(0));
                 }
-                clearAndSelect(bibEntry);
+                clearAndSelect(entries.get(0));
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + bibEntry.getId(), ex);
+                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
             }
         }
     }

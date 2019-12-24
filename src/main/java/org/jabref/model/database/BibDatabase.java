@@ -227,7 +227,7 @@ public class BibDatabase {
         for (BibEntry entry : newEntries) {
             String id = entry.getId();
             if (containsEntryWithId(id)) {
-                throw new KeyCollisionException("ID is already in use, please choose another");
+                throw new KeyCollisionException("ID is already in use, please choose another", id);
             }
 
             internalIDs.add(id);
@@ -302,15 +302,17 @@ public class BibDatabase {
      * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
+        String id = string.getId();
+        
         if (hasStringByName(string.getName())) {
-            throw new KeyCollisionException("A string with that label already exists");
+            throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibTeX string id.");
+        if (bibtexStrings.containsKey(id)) {
+            throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(string.getId(), string);
+        bibtexStrings.put(id, string);
     }
 
     /**

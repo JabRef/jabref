@@ -214,23 +214,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void paste() {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
-
+        panel.insertEntries(entriesToAdd);
         if (!entriesToAdd.isEmpty()) {
-            database.getDatabase().insertEntries(entriesToAdd);
-            // TODO because of this line, when implementing batch undo insert entries, model constructor after batch remove entries with a boolean for paste
-            undoManager.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd, true));
-            for (BibEntry entryToAdd : entriesToAdd) {
-                UpdateField.setAutomaticFields(entryToAdd, Globals.prefs.getUpdateFieldPreferences());
-            }
-
-            // Show editor if user want us to do this
-            BibEntry firstNewEntry = entriesToAdd.get(0);
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                panel.showAndEdit(firstNewEntry);
-            }
-
-            // Select and focus first new entry
-            clearAndSelect(firstNewEntry);
             this.requestFocus();
         }
     }
