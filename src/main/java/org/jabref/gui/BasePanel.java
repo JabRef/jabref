@@ -612,12 +612,13 @@ public class BasePanel extends StackPane {
     }
 
     /**
-     * This method is called from JabRefFrame when the user wants to create a new entry.
+     * This method is called from JabRefFrame when the user wants to create a new entry or entries.
+     * It is necessary when the user would expect the added entry or one of the added entries
+     * to be selected in the entry editor
      *
      * @param entries The new entries.
      */
-
-    // The Javadoc appears to be incorrect here
+    
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
             try {
