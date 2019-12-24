@@ -224,8 +224,6 @@ public class BibDatabase {
 
     public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
-
-        BibEntry firstEntry = null;
         for (BibEntry entry : newEntries) {
             String id = entry.getId();
             if (containsEntryWithId(id)) {
@@ -234,15 +232,11 @@ public class BibDatabase {
 
             internalIDs.add(id);
             entry.registerListener(this);
-
-            if (firstEntry == null) {
-                firstEntry = entry;
-            }
         }
-        if (firstEntry == null) {
+        if (newEntries.isEmpty()) {
             eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, firstEntry, eventSource));
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
     }
