@@ -21,20 +21,20 @@ import org.slf4j.LoggerFactory;
 public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UndoableInsertEntries.class);
-    private final BibDatabase base;
+    private final BibDatabase database;
     private final List<BibEntry> entries;
     private final boolean paste;
 
-    public UndoableInsertEntries(BibDatabase base, BibEntry entry) {
-        this(base, Collections.singletonList(entry));
+    public UndoableInsertEntries(BibDatabase database, BibEntry entry) {
+        this(database, Collections.singletonList(entry));
     }
 
-    public UndoableInsertEntries(BibDatabase base, List<BibEntry> entries) {
-        this(base, entries, false);
+    public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries) {
+        this(database, entries, false);
     }
 
-    public UndoableInsertEntries(BibDatabase base, List<BibEntry> entries, boolean paste) {
-        this.base = base;
+    public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries, boolean paste) {
+        this.database = database;
         this.entries = entries;
         this.paste = paste;
     }
@@ -67,7 +67,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
         super.undo();
 
         try {
-            base.removeEntries(entries);
+            database.removeEntries(entries);
         } catch (Throwable ex) {
             LOGGER.warn("Problem undoing `insert entries`", ex);
         }
@@ -76,7 +76,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
     @Override
     public void redo() {
         super.redo();
-        base.insertEntries(entries);
+        database.insertEntries(entries);
     }
 
 }

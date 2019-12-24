@@ -20,10 +20,10 @@ public class BibDatabases {
      * @param bibEntries a collection that contains {@link BibEntry}
      * @return BibDatabase that contains the entries
      */
-    public static BibDatabase createDatabase(Collection<BibEntry> bibEntries) {
+    public static BibDatabase createDatabase(Collection<BibEntry> entries) {
         BibDatabase database = new BibDatabase();
 
-        for (BibEntry entry : bibEntries) {
+        for (BibEntry entry : entries) {
             entry.setId(IdGenerator.next());
         }
         database.insertEntries(new ArrayList<>(bibEntries));

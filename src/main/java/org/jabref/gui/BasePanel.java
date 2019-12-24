@@ -618,7 +618,7 @@ public class BasePanel extends StackPane {
      *
      * @param entries The new entries.
      */
-    
+
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
             try {
