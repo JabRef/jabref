@@ -614,7 +614,7 @@ public class BasePanel extends StackPane {
     /**
      * This method is called from JabRefFrame when the user wants to create a new entry.
      *
-     * @param bibEntry The new entry.
+     * @param entries The new entries.
      */
 
     // The Javadoc appears to be incorrect here

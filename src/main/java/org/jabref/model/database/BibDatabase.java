@@ -303,7 +303,7 @@ public class BibDatabase {
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
         String id = string.getId();
-        
+
         if (hasStringByName(string.getName())) {
             throw new KeyCollisionException("A string with that label already exists", id);
         }
