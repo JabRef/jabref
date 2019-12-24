@@ -14,10 +14,10 @@ public class BibDatabases {
     }
 
     /**
-     * Gets a collection of bibEntries and sets an ID for every entry. After that
-     * all entries will be inserted into a new BibDatabase.
+     * Gets a collection of entries and sets an ID for every entry. After that
+     * all entries are inserted into a new BibDatabase.
      *
-     * @param bibEntries a collection that contains {@link BibEntry}
+     * @param entries a collection that contains {@link BibEntry}
      * @return BibDatabase that contains the entries
      */
     public static BibDatabase createDatabase(Collection<BibEntry> entries) {
@@ -26,7 +26,7 @@ public class BibDatabases {
         for (BibEntry entry : entries) {
             entry.setId(IdGenerator.next());
         }
-        database.insertEntries(new ArrayList<>(bibEntries));
+        database.insertEntries(new ArrayList<>(entries));
 
         return database;
     }
