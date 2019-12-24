@@ -43,7 +43,7 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
 
         getDialogPane().setContent(pane);
 
-        infoPanel.setBottom(cb);
+
         Label rootInfo = new Label(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
         infoPanel.setCenter(rootInfo);
 
@@ -81,7 +81,10 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
         if (currentChange != null) {
             infoPanel.setCenter(currentChange.description());
-            cb.setSelected(currentChange.isAccepted());
+            if (!(currentChange instanceof EntryChangeViewModel)) {
+                infoPanel.setBottom(cb);
+                cb.setSelected(currentChange.isAccepted());
+            }
         }
     }
 }
