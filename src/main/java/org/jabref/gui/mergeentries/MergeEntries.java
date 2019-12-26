@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -159,6 +160,8 @@ public class MergeEntries extends BorderPane {
         columnValues.setPercentWidth(40);
         ColumnConstraints columnSelect = new ColumnConstraints();
         columnSelect.setHgrow(Priority.NEVER);
+        columnSelect.setHalignment(HPos.CENTER);
+        // See columnHeadings variable for the headings: 1) field, 2) left content, 3) left arrow, 4) "none", 5) right arrow, 6) right content
         mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
 
         setupHeadingRows(mergePanel);
