@@ -383,7 +383,6 @@ public class MergeEntries extends BorderPane {
     }
 
     public enum DiffMode {
-
         PLAIN,
         WORD,
         CHARACTER,
