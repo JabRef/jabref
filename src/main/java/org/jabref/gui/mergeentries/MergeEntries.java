@@ -74,10 +74,9 @@ public class MergeEntries extends BorderPane {
      * @param entryRight   Right entry
      * @param headingLeft  Heading for left entry
      * @param headingRight Heading for right entry
-     * @param type         Bib database mode
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type, DefaultRadioButtonSelectionMode defaultRadioButtonSelectMode) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectMode) {
         this.leftEntry = entryLeft;
         this.rightEntry = entryRight;
         this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectMode;
@@ -94,10 +93,9 @@ public class MergeEntries extends BorderPane {
      * @param entryRight   Right entry
      * @param headingLeft  Heading for left entry
      * @param headingRight Heading for right entry
-     * @param type         Bib database mode
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
-        this(entryLeft, entryRight, headingLeft, headingRight, type, DefaultRadioButtonSelectionMode.LEFT);
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight) {
+        this(entryLeft, entryRight, headingLeft, headingRight, DefaultRadioButtonSelectionMode.LEFT);
     }
 
     /**
@@ -105,10 +103,9 @@ public class MergeEntries extends BorderPane {
      *
      * @param entryLeft Left entry
      * @param entryRight Right entry
-     * @param type Bib database mode
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, BibDatabaseMode type, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
         leftEntry = entryLeft;
         rightEntry = entryRight;
         this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
@@ -120,10 +117,9 @@ public class MergeEntries extends BorderPane {
      *
      * @param entryLeft Left entry
      * @param entryRight Right entry
-     * @param type Bib database mode
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, BibDatabaseMode type) {
-        this(entryLeft, entryRight, type, DefaultRadioButtonSelectionMode.LEFT);
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight) {
+        this(entryLeft, entryRight, DefaultRadioButtonSelectionMode.LEFT);
 
     }
 

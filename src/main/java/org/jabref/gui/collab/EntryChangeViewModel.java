@@ -50,7 +50,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public Node description() {
 
-        mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), database.getMode(), DefaultRadioButtonSelectionMode.RIGHT);
+        mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), DefaultRadioButtonSelectionMode.RIGHT);
 
         VBox container = new VBox(10);
         Label header = new Label(name);
