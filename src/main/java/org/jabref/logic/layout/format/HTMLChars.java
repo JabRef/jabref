@@ -16,7 +16,7 @@ public class HTMLChars implements LayoutFormatter {
     @Override
     public String format(String inField) {
         int i;
-        String field = inField
+        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
                 .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                 .replace("\n", "<br>") // Replace single line breaks with <br>
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
