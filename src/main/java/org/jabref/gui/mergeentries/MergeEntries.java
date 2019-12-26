@@ -33,7 +33,6 @@ import org.jabref.Globals;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
