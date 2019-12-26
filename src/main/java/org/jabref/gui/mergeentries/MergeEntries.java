@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -33,7 +34,6 @@ import org.jabref.Globals;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -50,9 +50,9 @@ public class MergeEntries extends BorderPane {
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
                                                               Localization.lang("Left entry"),
-                                                              Localization.lang("Left"),
+                                                              "\uD83E\uDC44",
                                                               Localization.lang("None"),
-                                                              Localization.lang("Right"),
+                                                              "\uD83E\uDC46",
                                                               Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
@@ -76,10 +76,10 @@ public class MergeEntries extends BorderPane {
      * @param headingRight Heading for right entry
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectMode) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
         this.leftEntry = entryLeft;
         this.rightEntry = entryRight;
-        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectMode;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
 
         initialize();
         setLeftHeaderText(headingLeft);
@@ -160,6 +160,8 @@ public class MergeEntries extends BorderPane {
         columnValues.setPercentWidth(40);
         ColumnConstraints columnSelect = new ColumnConstraints();
         columnSelect.setHgrow(Priority.NEVER);
+        columnSelect.setHalignment(HPos.CENTER);
+        // See columnHeadings variable for the headings: 1) field, 2) left content, 3) left arrow, 4) "none", 5) right arrow, 6) right content
         mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
 
         setupHeadingRows(mergePanel);
@@ -383,7 +385,6 @@ public class MergeEntries extends BorderPane {
     }
 
     public enum DiffMode {
-
         PLAIN,
         WORD,
         CHARACTER,
