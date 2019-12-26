@@ -50,9 +50,9 @@ public class MergeEntries extends BorderPane {
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
                                                               Localization.lang("Left entry"),
-                                                              Localization.lang("Left"),
+                                                              Localization.lang("\uD83E\uDC44"),
                                                               Localization.lang("None"),
-                                                              Localization.lang("Right"),
+                                                              Localization.lang("\uD83E\uDC46"),
                                                               Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
