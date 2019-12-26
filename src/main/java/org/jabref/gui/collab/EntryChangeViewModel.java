@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.MergeEntries.DefaultRadioButtonSelectionMode;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.l10n.Localization;
@@ -19,17 +20,17 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
 
-    private final BibEntry firstEntry;
-    private final BibEntry secondEntry;
+    private final BibEntry oldEntry;
+    private final BibEntry newEntry;
     private MergeEntries mergePanel;
 
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
 
     public EntryChangeViewModel(BibEntry entry, BibEntry newEntry, BibDatabaseContext database) {
         super();
 
-        this.firstEntry = entry;
-        this.secondEntry = newEntry;
+        this.oldEntry = entry;
+        this.newEntry = newEntry;
         this.database = database;
 
         name = entry.getCiteKeyOptional()
@@ -40,16 +41,16 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        database.getDatabase().removeEntry(firstEntry);
+        database.getDatabase().removeEntry(oldEntry);
         database.getDatabase().insertEntry(mergePanel.getMergeEntry());
-        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), firstEntry));
+        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), oldEntry));
         undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), mergePanel.getMergeEntry()));
     }
 
     @Override
     public Node description() {
 
-        mergePanel = new MergeEntries(firstEntry, secondEntry, database.getMode());
+        mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On Disk"), database.getMode(), DefaultRadioButtonSelectionMode.RIGHT);
 
         VBox container = new VBox(10);
         Label header = new Label(name);
