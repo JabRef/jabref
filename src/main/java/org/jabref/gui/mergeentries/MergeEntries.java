@@ -76,10 +76,10 @@ public class MergeEntries extends BorderPane {
      * @param headingRight Heading for right entry
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectMode) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
         this.leftEntry = entryLeft;
         this.rightEntry = entryRight;
-        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectMode;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
 
         initialize();
         setLeftHeaderText(headingLeft);
