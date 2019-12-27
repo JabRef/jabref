@@ -120,9 +120,8 @@ public enum StandardActions implements Action {
     SELECT_ALL(Localization.lang("Select all"), KeyBinding.SELECT_ALL),
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
-    PARSE_GROBID(Localization.lang("Parse with Grobid"), JabRefIcons.GROBID_PARSE),
     NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),
-    NEW_ENTRY_FROM_PLAINTEX(Localization.lang("New entry from plain text"), KeyBinding.NEW_FROM_PLAIN_TEXT),
+    NEW_ENTRY_FROM_PLAINTEX(Localization.lang("New entry from plain text"), JabRefIcons.NEW_ENTRY_FROM_PLAINTEX),
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     EDIT_PREAMBLE(Localization.lang("Edit preamble")),
     EDIT_STRINGS(Localization.lang("Edit string constants"), IconTheme.JabRefIcons.EDIT_STRINGS, KeyBinding.EDIT_STRINGS),
