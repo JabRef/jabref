@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.util;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.net.URLDownload;
 import org.jabref.preferences.JabRefPreferences;
@@ -17,18 +19,27 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class GrobidService {
 
+  public enum ConsolidateCitations {
+      NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);
+      private int code;
+
+      ConsolidateCitations(int code) {
+          this.code = code;
+      }
+
+        public int getCode() {
+            return this.code;
+        }
+    }
+
     private static JabRefPreferences jabRefPreferences;
 
     public GrobidService(JabRefPreferences jabRefPreferences) {
         GrobidService.jabRefPreferences = jabRefPreferences;
     }
 
-    public String processCitation(String rawCitation, int consolidateCitations) throws GrobidServiceException {
-      rawCitation = rawCitation.replace("&", "and");
-      if (consolidateCitations < 0 || consolidateCitations > 2) {
-            throw new GrobidServiceException("");
-        }
-
+    public String processCitation(String rawCitation, ConsolidateCitations consolidateCitations) throws GrobidServiceException {
+      rawCitation = URLEncoder.encode(rawCitation, StandardCharsets.UTF_8);
         try {
             URLDownload urlDownload = new URLDownload(jabRefPreferences.get(JabRefPreferences.CUSTOM_GROBID_SERVER)
                     + "/api/processCitation");

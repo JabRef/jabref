@@ -43,7 +43,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      */
     private String parseUsingGrobid(String plainText) throws FetcherException {
         try {
-            return grobidService.processCitation(plainText, 1);
+            return grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA);
         } catch (GrobidServiceException e) {
             throw new FetcherException("The Pipeline failed to get the results from the GROBID client", e);
         }
