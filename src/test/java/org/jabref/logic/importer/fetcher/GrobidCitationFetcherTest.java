@@ -79,7 +79,7 @@ public class GrobidCitationFetcherTest {
     public static void setup() throws GrobidServiceException {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         fileUpdateMonitor = new DummyFileUpdateMonitor();
-        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, JabRefPreferences.getInstance(), grobidService);
+        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, grobidService);
         grobidService = mock(GrobidService.class, Answers.RETURNS_DEEP_STUBS);
         when(grobidService.processCitation(example1, 1)).thenReturn(example1AsBibtex);
         when(grobidService.processCitation(example2, 1)).thenReturn(example2AsBibtex);

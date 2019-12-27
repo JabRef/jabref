@@ -25,7 +25,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private GrobidService grobidService;
     private List<String> failedEntries = new ArrayList<>();
 
-    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences, GrobidService grobidService) {
+    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, GrobidService grobidService) {
       this.importFormatPreferences = importFormatPreferences;
       this.fileUpdateMonitor = fileUpdateMonitor;
       this.grobidService = grobidService;
