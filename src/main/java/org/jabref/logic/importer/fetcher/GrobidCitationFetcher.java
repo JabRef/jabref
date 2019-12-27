@@ -63,7 +63,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         }
         plainReferences.remove("");
         if (plainReferences.size() == 0) {
-            throw new FetcherException("Your entered References are empty.");
+            throw new FetcherException("Your entered references are empty.");
         } else {
             ArrayList<BibEntry> resultsList = new ArrayList<>();
             for (String reference: plainReferences) {
