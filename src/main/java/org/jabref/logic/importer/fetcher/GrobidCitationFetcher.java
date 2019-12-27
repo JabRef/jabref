@@ -25,6 +25,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private GrobidService grobidService;
     private List<String> failedEntries = new ArrayList<>();
 
+    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences, GrobidService grobidService) {
+      this.importFormatPreferences = importFormatPreferences;
+      this.fileUpdateMonitor = fileUpdateMonitor;
+      this.grobidService = grobidService;
+    }
+
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -71,13 +77,6 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public String getName() {
         return "GROBID";
-    }
-
-  /**
-   * This method is only used for testing purposes.
-   */
-  public void setGrobidService(GrobidService grobidService) {
-    this.grobidService = grobidService;
     }
 
     public List<String> getFailedEntries() {
