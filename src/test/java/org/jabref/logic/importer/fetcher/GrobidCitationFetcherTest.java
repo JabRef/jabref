@@ -79,15 +79,14 @@ public class GrobidCitationFetcherTest {
     public static void setup() throws GrobidServiceException {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         fileUpdateMonitor = new DummyFileUpdateMonitor();
-        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, JabRefPreferences.getInstance());
+        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, fileUpdateMonitor, grobidService);
         grobidService = mock(GrobidService.class, Answers.RETURNS_DEEP_STUBS);
-        grobidCitationFetcher.setGrobidService(grobidService);
-        when(grobidService.processCitation(example1, 1)).thenReturn(example1AsBibtex);
-        when(grobidService.processCitation(example2, 1)).thenReturn(example2AsBibtex);
-        when(grobidService.processCitation(example3, 1)).thenReturn(example3AsBibtex);
-        when(grobidService.processCitation(example4, 1)).thenReturn(example4AsBibtex);
-        when(grobidService.processCitation(invalidInput1, 1)).thenReturn(defaultReturnValue);
-        when(grobidService.processCitation(invalidInput2, 1)).thenReturn(defaultReturnValue);
+        when(grobidService.processCitation(example1, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(example1AsBibtex);
+        when(grobidService.processCitation(example2, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(example2AsBibtex);
+        when(grobidService.processCitation(example3, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(example3AsBibtex);
+        when(grobidService.processCitation(example4, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(example4AsBibtex);
+        when(grobidService.processCitation(invalidInput1, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(defaultReturnValue);
+        when(grobidService.processCitation(invalidInput2, GrobidService.ConsolidateCitations.WITH_METADATA)).thenReturn(defaultReturnValue);
     }
 
     /**

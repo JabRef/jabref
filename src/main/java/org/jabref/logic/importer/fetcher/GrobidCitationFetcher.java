@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -27,6 +25,12 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private GrobidService grobidService;
     private List<String> failedEntries = new ArrayList<>();
 
+    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, GrobidService grobidService) {
+      this.importFormatPreferences = importFormatPreferences;
+      this.fileUpdateMonitor = fileUpdateMonitor;
+      this.grobidService = grobidService;
+    }
+
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -39,7 +43,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      */
     private String parseUsingGrobid(String plainText) throws FetcherException {
         try {
-            return grobidService.processCitation(plainText, 1);
+            return grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA);
         } catch (GrobidServiceException e) {
             throw new FetcherException("The Pipeline failed to get the results from the GROBID client", e);
         }
@@ -56,12 +60,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        TreeSet<String> plainReferences = new TreeSet<>();
-        String[] plainReferencesArray = query.split(";;");
-        for (int i = 0; i < plainReferencesArray.length; i++) {
-            plainReferences.add(plainReferencesArray[i].trim());
-        }
-        plainReferences.remove("");
+        TreeSet<String> plainReferences = Arrays.stream( query.split( "[\\r\\n]+" ) )
+              .map(String::trim)
+              .collect(Collectors.toCollection(TreeSet::new));
         if (plainReferences.size() == 0) {
             throw new FetcherException("Your entered references are empty.");
         } else {
@@ -76,13 +77,6 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public String getName() {
         return "GROBID";
-    }
-
-  /**
-   * This method is only used for testing purposes.
-   */
-  public void setGrobidService(GrobidService grobidService) {
-    this.grobidService = grobidService;
     }
 
     public List<String> getFailedEntries() {
