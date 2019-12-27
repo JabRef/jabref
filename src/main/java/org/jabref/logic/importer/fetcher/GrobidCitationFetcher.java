@@ -1,9 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -56,12 +54,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        TreeSet<String> plainReferences = new TreeSet<>();
-        String[] plainReferencesArray = query.split(";;");
-        for (int i = 0; i < plainReferencesArray.length; i++) {
-            plainReferences.add(plainReferencesArray[i].trim());
-        }
-        plainReferences.remove("");
+        TreeSet<String> plainReferences = Arrays.stream( query.split( "[\\r\\n]+" ) )
+              .map(String::trim)
+              .collect(Collectors.toCollection(TreeSet::new));
         if (plainReferences.size() == 0) {
             throw new FetcherException("Your entered References are empty.");
         } else {
