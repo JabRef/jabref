@@ -343,7 +343,7 @@ class FileUtilTest {
 
     @Test
     void validFilenameShouldBeMaximum255Chars() {
-        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(FileUtil.MAXIMUM_FILE_NAME_LENGTH).collect(Collectors.joining()) + ".pdf";
+        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(FileUtil.MAXIMUM_FILE_NAME_LENGTH - 4).collect(Collectors.joining()) + ".pdf";
         String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining()) + ".pdf";
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }

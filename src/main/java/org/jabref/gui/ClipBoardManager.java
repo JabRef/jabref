@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -57,20 +58,24 @@ public class ClipBoardManager {
     }
 
     /**
-     * Add X11 clipboard support to a text input control.
-     * It is necessary to call this method in every input where you want to use it:
-     * {@code ClipBoardManager.addX11Support(TextInputControl input);}.
+     * Add X11 clipboard support to a text input control. It is necessary to call this method in every input where you
+     * want to use it: {@code ClipBoardManager.addX11Support(TextInputControl input);}.
      *
      * @param input the TextInputControl (e.g., TextField, TextArea, and children) where adding this functionality.
-     * @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11 clipboards</a>
-     * @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer text over clipboards</a>
+     * @see <a href="https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html">Short summary for X11
+     * clipboards</a>
+     * @see <a href="https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193">Longer
+     * text over clipboards</a>
      */
     public static void addX11Support(TextInputControl input) {
-        input.selectedTextProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.isEmpty() && primary != null) {
-                primary.setContents(new StringSelection(newValue), null);
-            }
-        });
+        input.selectedTextProperty().addListener(
+                // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
+                observable -> Platform.runLater(() -> {
+                    String newValue = input.getSelectedText();
+                    if (!newValue.isEmpty() && primary != null) {
+                        primary.setContents(new StringSelection(newValue), null);
+                    }
+                }));
         input.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.MIDDLE) {
                 input.insertText(input.getCaretPosition(), getContentsPrimary());

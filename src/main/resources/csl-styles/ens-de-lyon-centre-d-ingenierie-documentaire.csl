@@ -18,7 +18,7 @@
     <category field="philosophy"/>
     <category field="humanities"/>
     <category field="political_science"/>
-    <updated>2018-05-22T00:59:23+00:00</updated>
+    <updated>2019-11-19T15:47:21+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -26,6 +26,7 @@
       <term name="cited">op.&#160;cit.</term>
       <term name="page" form="short">p.</term>
       <term name="editor" form="short">éd.</term>
+      <term name="editorial-director" form="short">dir.</term>
       <term name="translator" form="short">trad.</term>
       <term name="in">dans</term>
       <term name="et-al">et&#160;al.</term>
@@ -49,12 +50,17 @@
       </if>
       <else-if type="article-journal article-newspaper article-magazine bill chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
         <!-- pour éviter la répétition du champ editor qui sera déjà avant le container-->
-        <names variable="editor">
+        <names variable="editorial-director">
+          <!--la variable CSL "editorial-director" n'existe pas dans Zotero, mais elle peut ainsi se substituer à "editor" pour les ouvrages "dirigés par" un éditeur (cela lève l'ambiguité entre l'éditeur d'un manuscrit (éd.) et le directeur d'un ouvrage collectif (dir.) -->
           <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " initialize-with=". ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=".)"/>
+          <substitute>
+            <names variable="editor"/>
+          </substitute>
+          <!-- en utilisant la fonction "substitute", on présume que "editorial-director" et "editor" ne cohabitent jamais dans une référence - si c'était le cas, ça serait un doublon pour s'assurer que la référence reste correctement lisible par des styles ne prévoyant par le recours au seul "editorial-director"-->
         </names>
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia interview" match="none">
@@ -71,15 +77,19 @@
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <et-al font-style="italic"/>
+          <label form="short" prefix=" (" suffix=".)"/>
         </names>
       </if>
       <else-if type="article-journal article-newspaper article-magazine bill chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
-        <names variable="editor">
+        <names variable="editorial-director">
           <name form="long" and="text" delimiter-precedes-last="never" name-as-sort-order="first" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=".)"/>
+          <substitute>
+            <names variable="editor"/>
+          </substitute>
         </names>
       </else-if>
       <else-if type="entry-dictionary entry-encyclopedia interview" match="none">
@@ -97,10 +107,13 @@
         </names>
       </if>
       <else>
-        <names variable="editor">
-          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " initialize-with=". "/>
+        <names variable="editorial-director">
+          <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" "/>
           <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=".)"/>
+          <substitute>
+            <names variable="editor"/>
+          </substitute>
         </names>
       </else>
     </choose>
@@ -115,10 +128,13 @@
         </names>
       </if>
       <else>
-        <names variable="editor">
+        <names variable="editorial-director">
           <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" "/>
           <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=".)"/>
+          <substitute>
+            <names variable="editor"/>
+          </substitute>
         </names>
       </else>
     </choose>
@@ -155,10 +171,34 @@
   </macro>
   <!-- MACRO TITLE, PAR TYPE DE DOCUMENT (ndbp et biblio)-->
   <macro name="title">
+    <group delimiter=", ">
+      <choose>
+        <!-- Pour les book legal_case report song motion_picture graphic thesis -->
+        <if type="book legal_case report song motion_picture graphic thesis" match="any">
+          <text variable="title" text-case="capitalize-first" font-style="italic"/>
+        </if>
+        <!-- Pour les personal_communication (lettres) -->
+        <else-if type="personal_communication" match="any">
+          <group delimiter=", ">
+            <names variable="recipient" prefix="lettre à ">
+              <name form="long" and="text" sort-separator=" "/>
+            </names>
+            <!-- <text variable="title" text-case="capitalize-first" quotes="true"/> : le titre, peu utile pour une lettre, reste caché -->
+          </group>
+        </else-if>
+        <!-- Pour tous les autres cas -->
+        <else>
+          <text variable="title" text-case="capitalize-first" quotes="true"/>
+        </else>
+      </choose>
+      <text variable="scale" prefix="échelle "/>
+    </group>
+  </macro>
+  <!-- MACRO TITLE-SHORT-->
+  <macro name="title-short">
     <choose>
-      <!-- Pour les book legal_case report song motion_picture graphic thesis -->
-      <if type="book legal_case report song motion_picture graphic thesis" match="any">
-        <text variable="title" text-case="capitalize-first" font-style="italic"/>
+      <if type="bill book graphic legal_case motion_picture report song thesis" match="any">
+        <text variable="title" form="short" font-style="italic"/>
       </if>
       <!-- Pour les personal_communication (lettres) -->
       <else-if type="personal_communication" match="any">
@@ -169,9 +209,8 @@
           <!-- <text variable="title" text-case="capitalize-first" quotes="true"/> : le titre, peu utile pour une lettre, reste caché -->
         </group>
       </else-if>
-      <!-- Pour tous les autres cas -->
       <else>
-        <text variable="title" text-case="capitalize-first" quotes="true"/>
+        <text variable="title" form="short" text-case="capitalize-first" quotes="true"/>
       </else>
     </choose>
   </macro>
@@ -186,7 +225,7 @@
             <choose>
               <if variable="container-author" match="none">
                 <choose>
-                  <if variable="editor">
+                  <if variable="editor editorial-director" match="any">
                     <text macro="editor-ndbp"/>
                   </if>
                 </choose>
@@ -235,7 +274,7 @@
             <choose>
               <if variable="container-author" match="none">
                 <choose>
-                  <if variable="editor">
+                  <if variable="editor editorial-director" match="any">
                     <text macro="editor-bib"/>
                   </if>
                 </choose>
@@ -276,7 +315,7 @@
   <!-- MACRO PUB-PLACE (ndbp)-->
   <macro name="pub-place-ndbp">
     <choose>
-      <if type="book chapter legal_case manuscript paper-conference" match="any">
+      <if type="book chapter legal_case paper-conference" match="any">
         <choose>
           <if variable="publisher-place" match="any">
             <text variable="publisher-place"/>
@@ -286,7 +325,7 @@
           </else>
         </choose>
       </if>
-      <else-if type="thesis graphic motion_picture broadcast report song entry-dictionary entry-encyclopedia" match="any">
+      <else-if type="thesis graphic motion_picture broadcast report manuscript song entry-dictionary entry-encyclopedia" match="any">
         <text variable="publisher-place"/>
       </else-if>
       <else-if type="speech" match="any">
@@ -297,7 +336,7 @@
   <!-- MACRO PUB-PLACE (biblio)-->
   <macro name="pub-place-bib">
     <choose>
-      <if type="book chapter legal_case manuscript paper-conference" match="any">
+      <if type="book chapter legal_case paper-conference" match="any">
         <choose>
           <if variable="publisher-place" match="any">
             <text variable="publisher-place"/>
@@ -307,7 +346,7 @@
           </else>
         </choose>
       </if>
-      <else-if type="thesis graphic motion_picture broadcast report song entry-dictionary entry-encyclopedia" match="any">
+      <else-if type="thesis graphic motion_picture broadcast manuscript report song entry-dictionary entry-encyclopedia" match="any">
         <text variable="publisher-place"/>
       </else-if>
       <else-if type="speech" match="any">
@@ -329,8 +368,8 @@
   <!-- MACRO DATE PAR TYPE DE DOCUMENT (ndbp)-->
   <macro name="date-ndbp">
     <choose>
-      <!-- Pour les article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript -->
-      <if type="article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript" match="any">
+      <!-- Pour les webpage post de forum et post-weblog article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript -->
+      <if type="webpage post post-weblog motion_picture article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript" match="any">
         <choose>
           <if variable="issued" match="any">
             <date variable="issued" form="text">
@@ -344,24 +383,6 @@
           </else>
         </choose>
       </if>
-      <!-- Pour les webpage post de forum et post-weblog (comprend l'URL) -->
-      <else-if type="webpage post post-weblog" match="any">
-        <group delimiter=", ">
-          <text variable="URL"/>
-          <choose>
-            <if variable="issued" match="any">
-              <date variable="issued" form="text">
-                <date-part name="day" form="ordinal"/>
-                <date-part name="month"/>
-                <date-part name="year"/>
-              </date>
-            </if>
-            <else>
-              <text term="no date" form="short"/>
-            </else>
-          </choose>
-        </group>
-      </else-if>
       <!-- Pour le reste -->
       <else>
         <choose>
@@ -381,8 +402,8 @@
   <!-- MACRO DATE PAR TYPE DE DOCUMENT (biblio)-->
   <macro name="date-bib">
     <choose>
-      <!-- Pour les article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia -->
-      <if type="article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia" match="any">
+      <!-- Pour les webpage post de forum, enregistrement vidéo et post-weblog article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia -->
+      <if type="webpage post post-weblog motion_picture article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia" match="any">
         <group delimiter=" ">
           <choose>
             <if variable="issued" match="any">
@@ -398,32 +419,6 @@
           </choose>
         </group>
       </if>
-      <!-- Pour les webpage post de forum et post-weblog (comprend l'URL) -->
-      <else-if type="webpage post post-weblog" match="any">
-        <group delimiter=", ">
-          <text variable="URL"/>
-          <choose>
-            <if variable="issued" match="any">
-              <date variable="issued" form="text">
-                <date-part name="day" form="ordinal"/>
-                <date-part name="month"/>
-                <date-part name="year"/>
-              </date>
-            </if>
-            <else>
-              <text term="no date"/>
-            </else>
-          </choose>
-          <group delimiter=" ">
-            <text term="accessed"/>
-            <date variable="accessed" form="text">
-              <date-part name="day" form="ordinal"/>
-              <date-part name="month"/>
-              <date-part name="year"/>
-            </date>
-          </group>
-        </group>
-      </else-if>
       <!-- Pour le reste -->
       <else>
         <choose>
@@ -440,16 +435,15 @@
     </choose>
   </macro>
   <!-- MACRO URL/DOI (biblio seulement)-->
-  <!-- pour les webpage post et post-weblog, l'URL est dans la macro date -->
   <macro name="url_doi">
     <choose>
-      <if type="article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia paper-conference" match="any">
+      <if type="webpage post post-weblog motion_picture article-journal article-newspaper article-magazine bill broadcast speech personal_communication interview manuscript entry-dictionary entry-encyclopedia paper-conference" match="any">
         <!-- le "choose" qui suit permet d'éviter l'affichage du DOI pour les ressources imprimées (de même que l'interface de Zotero permet de choisir d'afficher ou non l'URL pour les articles qui contiennent une indication de pages). Pour toujours afficher le DOI quand il est disponible, supprimer <choose><if variable="page" match="none">, les balises fermantes correspondantes, ainsi que l'alternative -->
         <choose>
           <if variable="page" match="none">
             <choose>
               <if variable="DOI" match="any">
-                <group delimiter=", " prefix="(DOI&#160;: " suffix=")">
+                <group delimiter="&#160; " prefix="(DOI&#160;: " suffix=")">
                   <text variable="DOI"/>
                   <date variable="accessed" form="text" prefix="consulté le ">
                     <date-part name="day" form="ordinal"/>
@@ -459,7 +453,7 @@
                 </group>
               </if>
               <else-if variable="URL" match="any">
-                <group delimiter=", " prefix="(en ligne&#160;: " suffix=")">
+                <group delimiter="&#160;; " prefix="(en ligne&#160;: " suffix=")">
                   <text variable="URL"/>
                   <date variable="accessed" form="text" prefix="consulté le ">
                     <date-part name="day" form="ordinal"/>
@@ -474,7 +468,7 @@
             <choose>
               <!-- temporarily, we do not allow DOI to appear when there is a page indication, because it couldn't be chosen by the user in Zotero settings, whether or not to display the information (as is the case for URL and accessed variables) -->
               <if variable="URL" match="any">
-                <group delimiter=", " prefix="(en ligne&#160;: " suffix=")">
+                <group delimiter="&#160;; " prefix="(en ligne&#160;: " suffix=")">
                   <text variable="URL"/>
                   <date variable="accessed" form="text" prefix="consulté le ">
                     <date-part name="day" form="ordinal"/>
@@ -661,6 +655,21 @@
       <text variable="note" text-case="capitalize-first"/>
     </group>
   </macro>
+  <!-- MACRO DISAMBIGUATION -->
+  <macro name="disambiguation">
+    <choose>
+      <if type="book">
+        <choose>
+          <if variable="volume" match="any">
+            <text macro="volume_singlepublication"/>
+          </if>
+        </choose>
+      </if>
+      <else>
+        <text macro="date-ndbp"/>
+      </else>
+    </choose>
+  </macro>
   <!--_-_-_-_-_-SECTION DEFINITION DES NDBP (citation)-_-_-_-_-_-_-->
   <citation et-al-min="4" et-al-use-first="1">
     <layout delimiter="&#160;; ">
@@ -683,18 +692,11 @@
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="author-ndbp"/>
-            <choose>
-              <if type="bill book graphic legal_case motion_picture report song thesis" match="any">
-                <text variable="title" form="short" font-style="italic"/>
-              </if>
-              <else>
-                <text variable="title" form="short" text-case="capitalize-first" quotes="true"/>
-              </else>
-            </choose>
+            <text macro="title-short"/>
             <choose>
               <!-- Lorsque plusieurs références dans un même document ont le même auteur et le même titre, la date apparaît avant op. cit. -->
               <if disambiguate="true">
-                <text macro="date-ndbp"/>
+                <text macro="disambiguation"/>
               </if>
             </choose>
             <text term="cited" font-style="italic"/>
@@ -706,45 +708,48 @@
         </else-if>
         <!-- Pour les premières occurences d'une référence -->
         <else>
-          <group delimiter=", ">
-            <text macro="author-ndbp"/>
-            <group delimiter=" ">
-              <text macro="title"/>
-              <text macro="firstedition-ndbp"/>
+          <group delimiter=" ">
+            <group delimiter=", ">
+              <text macro="author-ndbp"/>
+              <group delimiter=" ">
+                <text macro="title"/>
+                <text macro="firstedition-ndbp"/>
+              </group>
+              <choose>
+                <if variable="container-title event" match="any">
+                  <text macro="translator-ndbp"/>
+                </if>
+              </choose>
+              <text macro="container-ndbp"/>
+              <choose>
+                <if variable="container-author" match="any">
+                  <choose>
+                    <if variable="author" match="any">
+                      <text macro="editor-ndbp"/>
+                    </if>
+                  </choose>
+                </if>
+              </choose>
+              <choose>
+                <if variable="container-title event" match="none">
+                  <choose>
+                    <if variable="author" match="any">
+                      <text macro="editor-ndbp"/>
+                    </if>
+                  </choose>
+                  <text macro="translator-ndbp"/>
+                </if>
+              </choose>
+              <text macro="edition"/>
+              <text macro="volume_periodical"/>
+              <text macro="issue_periodical"/>
+              <text macro="pub-place-ndbp"/>
+              <text macro="publisher"/>
+              <text macro="date-ndbp"/>
+              <text macro="volume_singlepublication"/>
+              <text macro="pages"/>
             </group>
-            <choose>
-              <if variable="container-title event" match="any">
-                <text macro="translator-ndbp"/>
-              </if>
-            </choose>
-            <text macro="container-ndbp"/>
-            <choose>
-              <if variable="container-author" match="any">
-                <choose>
-                  <if variable="author" match="any">
-                    <text macro="editor-ndbp"/>
-                  </if>
-                </choose>
-              </if>
-            </choose>
-            <choose>
-              <if variable="container-title event" match="none">
-                <choose>
-                  <if variable="author" match="any">
-                    <text macro="editor-ndbp"/>
-                  </if>
-                </choose>
-                <text macro="translator-ndbp"/>
-              </if>
-            </choose>
-            <text macro="edition"/>
-            <text macro="volume_periodical"/>
-            <text macro="issue_periodical"/>
-            <text macro="pub-place-ndbp"/>
-            <text macro="publisher"/>
-            <text macro="date-ndbp"/>
-            <text macro="volume_singlepublication"/>
-            <text macro="pages"/>
+            <text macro="url_doi"/>
           </group>
         </else>
       </choose>

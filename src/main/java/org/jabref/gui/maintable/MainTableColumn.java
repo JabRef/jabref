@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.util.BindingsHelper;
@@ -16,6 +17,12 @@ public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
                 model.widthProperty(),
                 value -> this.setPrefWidth(model.widthProperty().getValue()),
                 value -> model.widthProperty().setValue(this.getWidth()));
+
+        BindingsHelper.bindBidirectional(
+                this.sortTypeProperty(),
+                (ObservableValue<SortType>) model.sortTypeProperty(),
+                value -> this.setSortType(model.sortTypeProperty().getValue()),
+                value -> model.sortTypeProperty().setValue(this.getSortType()));
     }
 
     public MainTableColumnModel getModel() { return model; }

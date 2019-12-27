@@ -41,7 +41,7 @@
                     <Button maxWidth="Infinity" onAction="#resetPreferences" text="%Reset preferences"/>
                 </VBox>
             </VBox>
-            <ScrollPane fx:id="container" maxHeight="Infinity" maxWidth="Infinity"/>
+            <ScrollPane fx:id="preferencesContainer" maxHeight="Infinity" maxWidth="Infinity"/>
         </SplitPane>
     </content>
     <ButtonType fx:id="saveButton" text="%Save" buttonData="OK_DONE"/>

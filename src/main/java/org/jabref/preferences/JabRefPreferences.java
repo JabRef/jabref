@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -158,10 +157,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EXPORT_TERTIARY_SORT_FIELD = "exportTerSort";
     public static final String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
     public static final String NEWLINE = "newline";
-    public static final String COLUMN_WIDTHS = "columnWidths";
     public static final String COLUMN_NAMES = "columnNames";
-    public static final String COLUMN_IN_SORT_ORDER = "columnInSortOrder";
-    public static final String COlUMN_IN_SORT_ORDER_TYPE = "columnInSortOrderType";
+    public static final String COLUMN_WIDTHS = "columnWidths";
+    public static final String COLUMN_SORT_TYPES = "columnSortTypes";
+    public static final String COLUMN_SORT_ORDER = "columnSortOrder";
 
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
@@ -1748,12 +1747,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private SaveOrderConfig loadTableSaveOrder() {
         SaveOrderConfig config = new SaveOrderConfig();
-        List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
-        List<Boolean> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).map(type -> type == SortType.DESCENDING).collect(Collectors.toList());
+        List<MainTableColumnModel> sortOrder = createColumnSortOrder(createMainTableColumns());
 
-        for (int i = 0; i < columns.size(); i++) {
-            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(FieldFactory.parseField(columns.get(i)), sortTypes.get(i)));
-        }
+        sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                FieldFactory.parseField(column.getQualifier()),
+                column.getSortType().toString())));
 
         return config;
     }
@@ -1858,6 +1856,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private List<MainTableColumnModel> createMainTableColumns() {
         List<String> columnNames = getStringList(COLUMN_NAMES);
+
         List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
                 .stream()
                 .map(string -> {
@@ -1865,27 +1864,51 @@ public class JabRefPreferences implements PreferencesService {
                         return Double.parseDouble(string);
                     } catch (NumberFormatException e) {
                         LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return ColumnPreferences.DEFAULT_WIDTH;
+                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
                     }
                 })
                 .collect(Collectors.toList());
 
+        List<SortType> columnSortTypes = getStringList(COLUMN_SORT_TYPES)
+                .stream()
+                .map(SortType::valueOf)
+                .collect(Collectors.toList());
+
         List<MainTableColumnModel> columns = new ArrayList<>();
         for (int i = 0; i < columnNames.size(); i++) {
+            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
+
             if (i < columnWidths.size()) {
-                columns.add(MainTableColumnModel.parse(columnNames.get(i), columnWidths.get(i)));
-            } else {
-                columns.add(MainTableColumnModel.parse(columnNames.get(i)));
+                columnModel.widthProperty().setValue(columnWidths.get(i));
             }
+
+            if (i < columnSortTypes.size()) {
+                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
+            }
+
+            columns.add(columnModel);
         }
+
         return columns;
     }
 
+    private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
+        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
+        getStringList(COLUMN_SORT_ORDER).forEach(columnName -> columns.stream().filter(column ->
+                column.getName().equals(columnName))
+                .findFirst()
+                .ifPresent(columnsOrdered::add)
+        );
+        return columnsOrdered;
+    }
+
     public ColumnPreferences getColumnPreferences() {
+        List<MainTableColumnModel> mainTableColumns = createMainTableColumns();
+
         return new ColumnPreferences(
-                createMainTableColumns(),
-                getBoolean(EXTRA_FILE_COLUMNS),
-                getMainTableColumnSortTypes());
+                mainTableColumns,
+                createColumnSortOrder(mainTableColumns)
+        );
     }
 
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
@@ -1893,18 +1916,29 @@ public class JabRefPreferences implements PreferencesService {
                                                      .map(MainTableColumnModel::getName)
                                                      .collect(Collectors.toList()));
 
-        putBoolean(EXTRA_FILE_COLUMNS, columnPreferences.getExtraFileColumnsEnabled());
-
         List<String> columnWidthsInOrder = new ArrayList<>();
         columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
         putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
 
-        setMainTableColumnSortType(columnPreferences.getSortTypesForColumns());
+        List<String> columnSortTypesInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
+        putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
+
+        putStringList(COLUMN_SORT_ORDER, columnPreferences.getColumnSortOrder().stream()
+                .map(MainTableColumnModel::getName)
+                .collect(Collectors.toList()));
     }
 
     public MainTablePreferences getMainTablePreferences() {
         return new MainTablePreferences(getColumnPreferences(),
-                                        getBoolean(AUTO_RESIZE_MODE));
+                                        getBoolean(AUTO_RESIZE_MODE),
+                                        getBoolean(EXTRA_FILE_COLUMNS));
+    }
+
+    public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
+        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
+        putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
+        putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
 
     public SpecialFieldsPreferences getSpecialFieldsPreferences() {
@@ -1990,22 +2024,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public String getIdBasedFetcherForEntryGenerator() {
         return get(ID_ENTRY_GENERATOR);
-    }
-
-    public void setMainTableColumnSortType(Map<String, SortType> sortOrder) {
-        putStringList(COLUMN_IN_SORT_ORDER, new ArrayList<>(sortOrder.keySet()));
-        List<String> sortTypes = sortOrder.values().stream().map(SortType::name).collect(Collectors.toList());
-        putStringList(COlUMN_IN_SORT_ORDER_TYPE, sortTypes);
-    }
-
-    public Map<String, SortType> getMainTableColumnSortTypes() {
-        List<String> columns = getStringList(COLUMN_IN_SORT_ORDER);
-        List<SortType> sortTypes = getStringList(COlUMN_IN_SORT_ORDER_TYPE).stream().map(SortType::valueOf).collect(Collectors.toList());
-        Map<String, SortType> map = new LinkedHashMap<>();
-        for (int i = 0; i < columns.size(); i++) {
-            map.put(columns.get(i), sortTypes.get(i));
-        }
-        return map;
     }
 
     @Override

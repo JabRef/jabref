@@ -7,6 +7,12 @@ on:
       - 'src/test/java/org/jabref/logic/shared/**'
       - '.github/workflows/tests-oracle.yml'
       - 'build.gradle'
+  pull_request:
+    paths:
+      - 'src/test/java/org/jabref/model/database/**'
+      - 'src/test/java/org/jabref/logic/shared/**'
+      - '.github/workflows/tests-oracle.yml'
+      - 'build.gradle'
   schedule:
     # run on each Wednesday
     - cron: '2 3 * * 3'

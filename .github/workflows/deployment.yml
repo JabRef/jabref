@@ -3,124 +3,170 @@ name: Deployment
 on: [push]
 
 jobs:
-  deploy:
+  build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
          - os: ubuntu-latest
            displayName: linux
-           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-70_linux-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
-           archivePortable: tar -czf build/distribution/JabRef-portable_linux.tar.gz -C build/distribution JabRef && rm -R build/distribution/JabRef
+           archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
-           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-70_windows-x64_bin.zip
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_windows-x64_bin.zip
            jdk14Path: /jdk-14
            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
-           jpackageDownload: https://download.java.net/java/early_access/jpackage/1/openjdk-14-jpackage+1-70_osx-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
-           archivePortable: tar -czf build/distribution/JabRef-portable_macos.tar.gz -C build/distribution JabRef.app && rm -R build/distribution/JabRef.app
+           archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
-    name: Deploy on ${{ matrix.displayName }}
+    name: Create installer and portable version for ${{ matrix.displayName }}
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v2-beta
-      with:
-        fetch-depth: 0
-    - name: Fetch tags and master for GitVersion
-      run: |
-        git fetch --tags origin
-        git rev-parse --verify master
-        if (-not $?) {
-          git branch --force --create-reflog master origin/master
-        }
-      shell: pwsh
-    - name: Install GitVersion
-      uses: gittools/actions/setup-gitversion@v0.3
-      with:
-          versionSpec: '5.1.2'
-    - name: Run GitVersion
-      id: gitversion
-      uses: gittools/actions/execute-gitversion@v0.3
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 13
-    - uses: actions/cache@v1
-      with:
-        path: ~/.gradle/caches
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-        restore-keys: |
-          ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-          ${{ runner.OS }}-gradle-
-          ${{ runner.OS }}-
-    - uses: actions/cache@v1
-      name: Cache gradle wrapper
-      with:
-        path: ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-    - name: Download jpackage
-      # We need to download jpackage from https://jdk.java.net/jpackage/
-      run: |
-        import tarfile
-        import zipfile
-        import sys
-        if sys.version_info[0] >= 3:
-          from urllib.request import urlretrieve
-        else:
-          from urllib import urlretrieve
+      - name: Checkout source
+        uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+      - name: Fetch tags and master for GitVersion
+        run: |
+          git fetch --tags origin
+          git rev-parse --verify master
+          if (-not $?) {
+            git branch --force --create-reflog master origin/master
+          }
+        shell: pwsh
+      - name: Install GitVersion
+        uses: gittools/actions/setup-gitversion@v0.3
+        with:
+            versionSpec: '5.1.2'
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/execute-gitversion@v0.3
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
+      - uses: actions/cache@v1
+        name: Restore gradle cache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - uses: actions/cache@v1
+        name: Cache gradle wrapper
+        # cache at Mac OS X is 2 GB (too large)
+        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Download jpackage
+        # We need to download jpackage from https://jdk.java.net/jpackage/
+        run: |
+          import tarfile
+          import zipfile
+          import sys
+          if sys.version_info[0] >= 3:
+            from urllib.request import urlretrieve
+          else:
+            from urllib import urlretrieve
 
-        url = "${{ matrix.jpackageDownload }}"
-        tmpfile, headers = urlretrieve(url)
-        if (url.endswith("tar.gz")):
-          tar = tarfile.open(tmpfile)
-          tar.extractall()
-          tar.close()
-        elif (url.endswith("zip")):
-          zip = zipfile.ZipFile(tmpfile)
-          zip.extractall()
-          zip.close()
-      shell: python
-    - name: Build runtime image
-      run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
-    - name: Build installer
-      run: |
-        export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-        ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
-      shell: bash
-    - name: Add installer as artifact
-      uses: actions/upload-artifact@master
-      with:
-        name: JabRef-${{ matrix.displayName }}
-        path: build/distribution
-    - name: Package application image
-      run: ${{ matrix.archivePortable }}
-      shell: bash
-    - name: Build and publish snap
-      if: matrix.os == 'ubuntu-latest' && steps.gitversion.outputs.branchName == 'master'
-      env:
-        SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-      run: |
-          mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-          docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
-      shell: bash
-    - name: Rename files
-      run: |
-        get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
-        get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
-      shell: pwsh
-    - name: Upload to builds.jabref.org
-      uses: garygrossgarten/github-action-scp@release
-      with:
-        local: build/distribution
-        remote: www/${{ steps.gitversion.outputs.branchName }}
-        host: builds.jabref.org
-        username: builds_jabref_org
-        privateKey: ${{ secrets.buildJabRefPrivateKey }}
-        port: 9922
+          url = "${{ matrix.jpackageDownload }}"
+          tmpfile, headers = urlretrieve(url)
+          if (url.endswith("tar.gz")):
+            tar = tarfile.open(tmpfile)
+            tar.extractall()
+            tar.close()
+          elif (url.endswith("zip")):
+            zip = zipfile.ZipFile(tmpfile)
+            zip.extractall()
+            zip.close()
+        shell: python
+      - name: Build runtime image
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
+      - name: Build installer
+        run: |
+          export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
+          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        shell: bash
+      - name: Package application image
+        run: ${{ matrix.archivePortable }}
+        shell: bash
+      - name: Build and publish snap
+        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
+        env:
+          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
+        run: |
+            mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
+            docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
+        shell: bash
+      - name: Rename files
+        run: |
+          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
+          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
+        shell: pwsh
+      - name: Upload to GitHub workflow artifacts store
+        uses: actions/upload-artifact@master
+        with:
+          name: JabRef-${{ matrix.displayName }}
+          path: build/distribution
+  deploy:
+    name: Deploy binaries on builds.jabref.org
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+      - name: Fetch tags and master for GitVersion
+        run: |
+          git fetch --tags origin
+          git rev-parse --verify master
+          if (-not $?) {
+            git branch --force --create-reflog master origin/master
+          }
+        shell: pwsh
+      - name: Install GitVersion
+        uses: gittools/actions/setup-gitversion@v0.3
+        with:
+            versionSpec: '5.1.2'
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/execute-gitversion@v0.3
+      - name: Get linux binaries
+        uses: actions/download-artifact@master
+        with:
+          name: JabRef-linux
+          path: build/distribution
+      - name: Get windows binaries
+        uses: actions/download-artifact@master
+        with:
+          name: JabRef-windows
+          path: build/distribution
+      - name: Get macOS binaries
+        uses: actions/download-artifact@master
+        with:
+          name: JabRef-macOS
+          path: build/distribution/
+      - name: Deploy to builds.jabref.org
+        id: deploy
+        uses: Pendect/action-rsyncer@v1.1.0
+        env:
+          DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
+          BRANCH: ${{ steps.gitversion.outputs.branchName }}
+        with:
+          flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync"
+          options: ''
+          ssh_options: '-p 9922'
+          src: 'build/distribution/'
+          dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/

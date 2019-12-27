@@ -117,4 +117,17 @@ class CitationStyleGeneratorTest {
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
         assertEquals(expectedCitation, actualCitation);
     }
+
+    @Test
+    void testHandleDiacritics() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.AUTHOR, "L{\"a}st, First and Doe, Jane");
+        // if the default citation style changes this has to be modified.
+        // in this case ä was added to check if it is formatted appropriately
+        String expected = "  <div class=\"csl-entry\">\n" +
+                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">F. Läst and J. Doe, .</div>\n" +
+                "  </div>\n";
+        String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
+        assertEquals(expected, citation);
+    }
 }
