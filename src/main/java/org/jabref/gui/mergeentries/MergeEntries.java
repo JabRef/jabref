@@ -31,6 +31,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.l10n.Localization;
@@ -43,6 +44,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class MergeEntries extends BorderPane {
 
+    private static final int NUMBER_OF_COLUMNS = 6;
     private static final int LEFT_RADIOBUTTON_INDEX = 0;
     private static final int RIGHT_RADIOBUTTON_INDEX = 2;
     private final ComboBox<DiffMode> diffMode = new ComboBox<>();
@@ -50,9 +52,9 @@ public class MergeEntries extends BorderPane {
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
                                                               Localization.lang("Left entry"),
-                                                              "\uD83E\uDC44",
+                                                              "left icon",
                                                               Localization.lang("None"),
-                                                              "\uD83E\uDC46",
+                                                              "right icon",
                                                               Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
@@ -269,8 +271,15 @@ public class MergeEntries extends BorderPane {
 
     private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
-        for (int i = 0; i < 6; i++) {
-            Label colHeading = new Label(columnHeadings.get(i));
+        for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
+            Label colHeading = new Label();
+            if (i == 2) {
+                colHeading.setGraphic(JabRefIcons.LEFT.getGraphicNode());
+            } else if (i == 4) {
+                colHeading.setGraphic(JabRefIcons.RIGHT.getGraphicNode());
+            } else {
+                colHeading.setText(columnHeadings.get(i));
+            }
             colHeading.setMinWidth(USE_PREF_SIZE);
             mergePanel.add(colHeading, i, 0);
         }
@@ -385,6 +394,7 @@ public class MergeEntries extends BorderPane {
     }
 
     public enum DiffMode {
+
         PLAIN,
         WORD,
         CHARACTER,
