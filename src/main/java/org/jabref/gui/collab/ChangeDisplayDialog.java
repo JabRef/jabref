@@ -30,17 +30,23 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         this.getDialogPane().setPrefSize(800, 600);
 
         tree = new ListView<>(FXCollections.observableArrayList(changes));
-        tree.setPrefWidth(190);
+        tree.setPrefWidth(160);
         EasyBind.subscribe(tree.getSelectionModel().selectedItemProperty(), this::selectedChangeChanged);
 
         SplitPane pane = new SplitPane();
-        pane.setDividerPositions(0.25);
-        pane.getItems().addAll(new ScrollPane(tree), infoPanel);
+        pane.setDividerPositions(0.2);
+        ScrollPane scroll = new ScrollPane(tree);
+        scroll.setFitToHeight(true);
+        scroll.setFitToWidth(true);
+        pane.getItems().addAll(scroll, infoPanel);
+        pane.setResizableWithParent(scroll, false);
+
         getDialogPane().setContent(pane);
 
-        infoPanel.setBottom(cb);
+
         Label rootInfo = new Label(Localization.lang("Select the tree nodes to view and accept or reject changes") + '.');
         infoPanel.setCenter(rootInfo);
+        tree.getSelectionModel().select(0);
 
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss changes"), ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().setAll(
@@ -67,7 +73,7 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         });
 
         EasyBind.subscribe(cb.selectedProperty(), selected -> {
-            if (selected != null && tree.getSelectionModel().getSelectedItem() != null) {
+            if ((selected != null) && (tree.getSelectionModel().getSelectedItem() != null)) {
                 tree.getSelectionModel().getSelectedItem().setAccepted(selected);
             }
         });
@@ -76,7 +82,10 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
         if (currentChange != null) {
             infoPanel.setCenter(currentChange.description());
-            cb.setSelected(currentChange.isAccepted());
+            if (!(currentChange instanceof EntryChangeViewModel)) {
+                infoPanel.setBottom(cb);
+                cb.setSelected(currentChange.isAccepted());
+            }
         }
     }
 }
