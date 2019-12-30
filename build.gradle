@@ -149,7 +149,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    compile ('com.google.guava:guava:28.1-jre') {
+    compile ('com.google.guava:guava:28.2-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
