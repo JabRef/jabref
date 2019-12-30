@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -97,6 +98,7 @@ public class CSLAdapter {
             for (Field key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
+                        .map(LatexToUnicodeAdapter::format)
                         .map(latexToHtmlConverter::format)
                         .ifPresent(value -> {
                             if (StandardField.MONTH.equals(key)) {

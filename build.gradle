@@ -255,7 +255,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.0.26-9.1.2/) {
+            if (selection.candidate.version ==~ /2.0.26-9.1.1/ || selection.candidate.version ==~ /2.0.26-9.1.2/) {
                 selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
         }
@@ -265,12 +265,12 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }

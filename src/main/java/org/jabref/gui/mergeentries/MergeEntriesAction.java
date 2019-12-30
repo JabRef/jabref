@@ -49,7 +49,7 @@ public class MergeEntriesAction extends SimpleCommand {
         BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two, basePanel.getBibDatabaseContext().getMode());
+        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two);
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dlg.showAndWait();
         if (mergedEntry.isPresent()) {

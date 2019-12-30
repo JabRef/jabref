@@ -84,7 +84,7 @@ public class FetchAndMergeEntry {
     }
 
     private void showMergeDialog(BibEntry originalEntry, BibEntry fetchedEntry, WebFetcher fetcher) {
-        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry, panel.getBibDatabaseContext().getMode());
+        MergeEntriesDialog dialog = new MergeEntriesDialog(originalEntry, fetchedEntry);
         dialog.setTitle(Localization.lang("Merge entry with %0 information", fetcher.getName()));
         dialog.setLeftHeaderText(Localization.lang("Original entry"));
         dialog.setRightHeaderText(Localization.lang("Entry from %0", fetcher.getName()));
