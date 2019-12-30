@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<DialogPane prefHeight="436.0" prefWidth="472.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.customentrytypes.CustomizeEntryTypeDialogView">
+   <content>
+      <HBox minWidth="-Infinity" prefHeight="100.0" spacing="4.0">
+         <children>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Entry types" />
+                  <TableView fx:id="entryTypes" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="entryTypColumn" prefWidth="75.0" text="Entry Type" />
+                      <TableColumn fx:id="entryTypeActionsColumn" prefWidth="75.0" />
+                    </columns>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <ComboBox fx:id="addNewEntryType" editable="true" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#addEntryType" prefHeight="20.0" prefWidth="20.0" text="add" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Required fields" />
+                  <TableView fx:id="requiredFields" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="requiredFieldsNameColumn" prefWidth="75.0" text="Field" />
+                      <TableColumn fx:id="requiredFieldsActionColumn" prefWidth="75.0" />
+                    </columns>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <ComboBox fx:id="addNewRequiredField" editable="true" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#addRequiredFields" text="Button" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Optional fields" />
+                  <TableView fx:id="optionalFields" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="optionalFieldNameColumn" prefWidth="75.0" text="Field" />
+                      <TableColumn fx:id="optionalFieldActionColumn" prefWidth="75.0" />
+                    </columns>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <ComboBox fx:id="addOptionalField" editable="true" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#addOptionalField" text="add" />
+                     </children>
+                  </HBox>
+                  <Label text="Optional fields 2" />
+                  <TableView fx:id="optionalFields2" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="optionalFields2NameColumn" prefWidth="75.0" text="Field" />
+                      <TableColumn fx:id="optionalFields2ActionColumn" prefWidth="75.0" />
+                    </columns>
+                  </TableView>
+                  <HBox>
+                     <children>
+                        <ComboBox fx:id="addOptionalFields2" editable="true" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#addOptionalField2" text="Button" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </content>
+     <ButtonType fx:id="applyButton" buttonData="OK_DONE" text="%Apply" />
+    <ButtonType fx:constant="CANCEL" />
+</DialogPane>

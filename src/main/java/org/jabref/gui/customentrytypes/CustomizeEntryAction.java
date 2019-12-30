@@ -13,7 +13,7 @@ public class CustomizeEntryAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        EntryTypeCustomizationDialog dialog = new EntryTypeCustomizationDialog();
+        CustomizeEntryTypeDialogView dialog = new CustomizeEntryTypeDialogView(this.frame.getCurrentBasePanel().getBibDatabaseContext());
         dialog.showAndWait();
     }
 }
