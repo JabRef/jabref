@@ -123,7 +123,7 @@ public class DefaultAuxParser implements AuxParser {
     /**
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
      *
-     * @param AUX file
+     * @param result AUX file
      */
     private void resolveTags(AuxParserResult result) {
         List<BibEntry> entriesToInsert = new ArrayList<>();

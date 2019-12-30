@@ -1,7 +1,5 @@
 package org.jabref.model.database;
 
-import org.jabref.model.entry.BibEntry;
-
 public class KeyCollisionException extends RuntimeException {
 
     private String id;

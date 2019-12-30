@@ -1,7 +1,5 @@
 package org.jabref.gui.collab;
 
-import java.util.Collections;
-
 import javafx.scene.Node;
 
 import org.jabref.Globals;
