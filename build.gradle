@@ -110,9 +110,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'org.apache.pdfbox:pdfbox:2.0.17'
-    compile 'org.apache.pdfbox:fontbox:2.0.17'
-    compile 'org.apache.pdfbox:xmpbox:2.0.17'
+    compile 'org.apache.pdfbox:pdfbox:2.0.18'
+    compile 'org.apache.pdfbox:fontbox:2.0.18'
+    compile 'org.apache.pdfbox:xmpbox:2.0.18'
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 
@@ -149,7 +149,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    compile ('com.google.guava:guava:28.1-jre') {
+    compile ('com.google.guava:guava:28.2-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -225,7 +225,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testCompile "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.27'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.28'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
@@ -255,7 +255,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.0.26-9.1.2/) {
+            if (selection.candidate.version ==~ /2.0.26-9.1.1/ || selection.candidate.version ==~ /2.0.26-9.1.2/) {
                 selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
         }
@@ -265,12 +265,12 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }
