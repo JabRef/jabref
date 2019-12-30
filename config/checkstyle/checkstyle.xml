@@ -20,9 +20,7 @@
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
         <module name="InvalidJavadocPosition"/>
         <module name="JavadocMethod">
-            <property name="allowUndeclaredRTE" value="true"/>
             <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
             <property name="validateThrows" value="true"/>
         </module>
