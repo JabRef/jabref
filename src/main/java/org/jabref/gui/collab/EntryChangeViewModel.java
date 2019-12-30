@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.mergeentries.MergeEntries.DefaultRadioButtonSelectionMode;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,8 +43,8 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(oldEntry);
         database.getDatabase().insertEntry(mergePanel.getMergeEntry());
-        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), oldEntry));
-        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), mergePanel.getMergeEntry()));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), mergePanel.getMergeEntry()));
     }
 
     @Override

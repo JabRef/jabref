@@ -59,7 +59,7 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.worker.SendAsEMailAction;
@@ -80,8 +80,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -168,7 +168,7 @@ public class BasePanel extends StackPane {
         setupActions();
 
         this.getDatabase().registerListener(new SearchListener());
-        this.getDatabase().registerListener(new EntryRemovedListener());
+        this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -605,29 +605,39 @@ public class BasePanel extends StackPane {
         }
     }
 
-    /**
-     * This method is called from JabRefFrame when the user wants to create a new entry.
-     *
-     * @param bibEntry The new entry.
-     */
     public void insertEntry(final BibEntry bibEntry) {
         if (bibEntry != null) {
+            insertEntries(Collections.singletonList(bibEntry));
+        }
+    }
+
+    /**
+     * This method is called from JabRefFrame when the user wants to create a new entry or entries.
+     * It is necessary when the user would expect the added entry or one of the added entries
+     * to be selected in the entry editor
+     *
+     * @param entries The new entries.
+     */
+
+    public void insertEntries(final List<BibEntry> entries) {
+        if (!entries.isEmpty()) {
             try {
-                bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+                bibDatabaseContext.getDatabase().insertEntries(entries);
 
                 // Set owner and timestamp
-                UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
-
-                // Create an UndoableInsertEntry object.
-                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry));
+                for (BibEntry entry : entries) {
+                    UpdateField.setAutomaticFields(entry, true, true, Globals.prefs.getUpdateFieldPreferences());
+                }
+                // Create an UndoableInsertEntries object.
+                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
                 markBaseChanged(); // The database just changed.
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(bibEntry);
+                    showAndEdit(entries.get(0));
                 }
-                clearAndSelect(bibEntry);
+                clearAndSelect(entries.get(0));
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + bibEntry.getId(), ex);
+                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
             }
         }
     }
@@ -1111,22 +1121,21 @@ public class BasePanel extends StackPane {
     private class GroupTreeListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
+        public void listen(EntriesAddedEvent addedEntriesEvent) {
+            // if the event is an undo, don't add it to the current group
+            if (addedEntriesEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {
                 return;
             }
 
-            // Automatically add new entry to the selected group (or set of groups)
+            // Automatically add new entries to the selected group (or set of groups)
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
-                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
-                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
+                        selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
         }
     }
 
-    private class EntryRemovedListener {
+    private class EntriesRemovedListener {
 
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
@@ -1141,8 +1150,8 @@ public class BasePanel extends StackPane {
     private class SearchAutoCompleteListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry()));
+        public void listen(EntriesAddedEvent addedEntriesEvent) {
+            DefaultTaskExecutor.runInJavaFXThread(() -> addedEntriesEvent.getBibEntries().forEach(entry -> searchAutoCompleter.indexEntry(entry)));
         }
 
         @Subscribe
@@ -1158,7 +1167,7 @@ public class BasePanel extends StackPane {
     private class SearchListener {
 
         @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
+        public void listen(EntriesAddedEvent addedEntryEvent) {
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
         }
 
