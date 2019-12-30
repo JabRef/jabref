@@ -112,7 +112,7 @@ dependencies {
 
     compile 'org.apache.pdfbox:pdfbox:2.0.18'
     compile 'org.apache.pdfbox:fontbox:2.0.17'
-    compile 'org.apache.pdfbox:xmpbox:2.0.17'
+    compile 'org.apache.pdfbox:xmpbox:2.0.18'
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
 
