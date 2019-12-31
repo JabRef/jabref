@@ -5,15 +5,14 @@ on:
     types: [closed]
 
 jobs:
-  build:
-
+  cleanup:
     runs-on: ubuntu-latest
     
     steps:
     - name: Extract branch name
       id: extract_branch
       run: |
-        echo "##[set-output name=branch;]$(echo ${${{ github.event.pull_request.head.ref }}#refs/heads/})"
+        echo "##[set-output name=branch;]$(echo ${{ github.event.pull_request.head.ref }})"
     - name: Delete folder on builds.jabref.org
       uses: appleboy/ssh-action@v0.0.6
       with:
