@@ -31,49 +31,20 @@
                   </HBox>
                </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Required fields" />
+                  <Label text="Required and optional fields" />
                   <TableView fx:id="requiredFields" prefHeight="200.0" prefWidth="200.0">
                     <columns>
                       <TableColumn fx:id="requiredFieldsNameColumn" prefWidth="75.0" text="Field" />
-                      <TableColumn fx:id="requiredFieldsActionColumn" prefWidth="75.0" />
+                        <TableColumn fx:id="fieldTypeColumn" prefWidth="75.0" text="Field type" />
+                        <TableColumn fx:id="fieldTypeActionColumn" prefWidth="75.0" />
                     </columns>
                   </TableView>
                   <HBox>
                      <children>
-                        <ComboBox fx:id="addNewRequiredField" editable="true" prefWidth="150.0" />
-                        <Button mnemonicParsing="false" onAction="#addRequiredFields" text="Button" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <Label text="Optional fields" />
-                  <TableView fx:id="optionalFields" prefHeight="200.0" prefWidth="200.0">
-                    <columns>
-                      <TableColumn fx:id="optionalFieldNameColumn" prefWidth="75.0" text="Field" />
-                      <TableColumn fx:id="optionalFieldActionColumn" prefWidth="75.0" />
-                    </columns>
-                  </TableView>
-                  <HBox>
-                     <children>
-                        <ComboBox fx:id="addOptionalField" editable="true" prefWidth="150.0" />
-                        <Button mnemonicParsing="false" onAction="#addOptionalField" text="add" />
-                     </children>
-                  </HBox>
-                  <Label text="Optional fields 2" />
-                  <TableView fx:id="optionalFields2" prefHeight="200.0" prefWidth="200.0">
-                    <columns>
-                      <TableColumn fx:id="optionalFields2NameColumn" prefWidth="75.0" text="Field" />
-                      <TableColumn fx:id="optionalFields2ActionColumn" prefWidth="75.0" />
-                    </columns>
-                  </TableView>
-                  <HBox>
-                     <children>
-                        <ComboBox fx:id="addOptionalFields2" editable="true" prefWidth="150.0" />
-                        <Button mnemonicParsing="false" onAction="#addOptionalField2" text="Button" />
+                        <ComboBox fx:id="addNewField" editable="true" prefWidth="150.0" />
+                        <Button mnemonicParsing="false" onAction="#addNewField" text="Button" />
                      </children>
                   </HBox>
                </children>

@@ -39,7 +39,7 @@ public class CustomEntryTypeDialogViewModel {
         return null;
     }
 
-    public Object removeOptionalField(Field  focusedItem) {
+    public Object removeOptionalField(Field focusedItem) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -49,6 +49,9 @@ public class CustomEntryTypeDialogViewModel {
         return null;
     }
 
-
-
+    public enum FieldType {
+        REQUIRED,
+        PRIMARY_OPTIONAL,
+        SECONDARY_OPTIONAL
+    }
 }
