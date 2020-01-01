@@ -27,11 +27,11 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST = "UpdateTimestampListenerTest";
     private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
     private static final String CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST = "LinkedFileViewModelTest";
+    private static final String CLASS_ORG_JABREF_SOURCE_TAB_TEST = "SourceTabTest";
 
     private final List<String> exceptions;
 
     public TestArchitectureTests() {
-
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new ArrayList<>();
@@ -41,6 +41,7 @@ public class TestArchitectureTests {
         exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
         exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
         exceptions.add(CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST);
+        exceptions.add(CLASS_ORG_JABREF_SOURCE_TAB_TEST);
     }
 
     public static Stream<String[]> data() {
