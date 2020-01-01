@@ -68,6 +68,8 @@ public class MergeEntries extends BorderPane {
     private Boolean identicalTypes;
     private List<RadioButton> typeRadioButtons;
     private final DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode;
+    private final List<RadioButton> leftRadioButtons = new ArrayList<>();
+    private final List<RadioButton> rightRadioButtons = new ArrayList<>();
 
     /**
      * Constructor with optional column captions for the two entries
@@ -218,15 +220,20 @@ public class MergeEntries extends BorderPane {
                 }
                 radioButtons.put(field, list);
                 if (leftString.isPresent()) {
+                    leftRadioButtons.add(list.get(LEFT_RADIOBUTTON_INDEX));
                     list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
                     if (!rightString.isPresent()) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
                     } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                    } else {
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                     }
                 } else {
                     list.get(LEFT_RADIOBUTTON_INDEX).setDisable(true);
                     list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                    rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                 }
             }
 
@@ -263,8 +270,11 @@ public class MergeEntries extends BorderPane {
             }
             if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
                 typeRadioButtons.get(1).setSelected(true); //This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+                rightRadioButtons.add(typeRadioButtons.get(1));
             } else {
                 typeRadioButtons.get(0).setSelected(true);
+                leftRadioButtons.add(typeRadioButtons.get(0));
+
             }
         }
     }
@@ -346,6 +356,18 @@ public class MergeEntries extends BorderPane {
             if (!rightText.isEmpty() && rightTextPanes.containsKey(field)) {
                 rightTextPanes.get(field).getChildren().setAll(rightText);
             }
+        }
+    }
+
+    public void selectAllRightRadioButtons() {
+        for (RadioButton radioButton : rightRadioButtons) {
+            radioButton.setSelected(true);
+        }
+    }
+
+    public void selectAllLeftRadioButtons() {
+        for (RadioButton radioButton : leftRadioButtons) {
+            radioButton.setSelected(true);
         }
     }
 
