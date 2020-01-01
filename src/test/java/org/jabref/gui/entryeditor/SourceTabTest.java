@@ -1,20 +1,27 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.Collections;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
@@ -25,6 +32,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
@@ -40,7 +48,16 @@ public class SourceTabTest {
     public void onStart(Stage stage) {
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), mock(ImportFormatPreferences.class), new DummyFileUpdateMonitor(), mock(DialogService.class), mock(StateManager.class));
+        StateManager stateManager = mock(StateManager.class);
+        when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
+        Globals.prefs = mock(JabRefPreferences.class);
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
+        when(Globals.prefs.getKeyBindingRepository()).thenReturn(keyBindingRepository);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getFieldContentParserPreferences())
+                .thenReturn(mock(FieldContentParserPreferences.class));
+
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

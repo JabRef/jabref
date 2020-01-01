@@ -40,6 +40,9 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         }
 
         textList.add(getCaseSensitiveDescription());
+        textList.add(TooltipTextUtil.createText("\n\nHint: To search specific fields only, enter for example:\n"));
+        textList.add(TooltipTextUtil.createText("author=smith and title=electrical"));
+
         TextFlow searchDescription = new TextFlow();
         searchDescription.getChildren().setAll(textList);
         return searchDescription;
