@@ -32,18 +32,14 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -130,8 +126,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     @Subscribe
-    public void listen(AllInsertsFinishedEvent event) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getBibEntry()));
+    public void listen(EntriesAddedEvent event) {
+        DefaultTaskExecutor.runInJavaFXThread(() -> clearAndSelect(event.getFirstEntry()));
     }
 
     public void clearAndSelect(BibEntry bibEntry) {
@@ -215,28 +211,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void paste() {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
-
+        panel.insertEntries(entriesToAdd);
         if (!entriesToAdd.isEmpty()) {
-            // Add new entries
-            NamedCompound ce = new NamedCompound((entriesToAdd.size() > 1 ? Localization.lang("paste entries") : Localization.lang("paste entry")));
-            for (BibEntry entryToAdd : entriesToAdd) {
-                UpdateField.setAutomaticFields(entryToAdd, Globals.prefs.getUpdateFieldPreferences());
-
-                database.getDatabase().insertEntry(entryToAdd);
-
-                ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entryToAdd));
-            }
-            ce.end();
-            undoManager.addEdit(ce);
-
-            // Show editor if user want us to do this
-            BibEntry firstNewEntry = entriesToAdd.get(0);
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                panel.showAndEdit(firstNewEntry);
-            }
-
-            // Select and focus first new entry
-            clearAndSelect(firstNewEntry);
             this.requestFocus();
         }
     }

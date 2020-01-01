@@ -1,6 +1,11 @@
 name: Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    # always run on pull requests
 
 jobs:
   checkstyle:

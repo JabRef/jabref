@@ -12,7 +12,7 @@ import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -94,7 +94,7 @@ public class ImportHandler {
             }
 
             importEntries(entriesToAdd);
-            entriesToAdd.forEach(entry -> ce.addEdit(new UndoableInsertEntry(database.getDatabase(), entry)));
+            ce.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd));
         }
         ce.end();
         undoManager.addEdit(ce);
@@ -109,7 +109,7 @@ public class ImportHandler {
 
     public void importEntries(List<BibEntry> entries) {
         //TODO: Add undo/redo
-        //ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
+        //undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
 
         database.getDatabase().insertEntries(entries);
 

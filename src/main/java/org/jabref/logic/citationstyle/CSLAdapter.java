@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
-import org.jabref.logic.layout.format.HTMLChars;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.ItemDataProvider;
@@ -92,12 +92,11 @@ public class CSLAdapter {
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
-            HTMLChars latexToHtmlConverter = new HTMLChars();
             RemoveNewlinesFormatter removeNewlinesFormatter = new RemoveNewlinesFormatter();
             for (Field key : bibEntry.getFieldMap().keySet()) {
                 bibEntry.getField(key)
                         .map(removeNewlinesFormatter::format)
-                        .map(latexToHtmlConverter::format)
+                        .map(LatexToUnicodeAdapter::format)
                         .ifPresent(value -> {
                             if (StandardField.MONTH.equals(key)) {
                                 // Change month from #mon# to mon because CSL does not support the former format

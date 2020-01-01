@@ -1,6 +1,9 @@
 package org.jabref.gui.autocompleter;
 
-import org.jabref.model.database.event.EntryAddedEvent;
+import java.util.List;
+
+import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -17,8 +20,11 @@ public class AutoCompleteUpdater {
     }
 
     @Subscribe
-    public void listen(EntryAddedEvent addedEntryEvent) {
-        suggestionProviders.indexEntry(addedEntryEvent.getBibEntry());
+    public void listen(EntriesAddedEvent entryAddedEvent) {
+        List<BibEntry> entries = entryAddedEvent.getBibEntries();
+        for (BibEntry entry : entries) {
+            suggestionProviders.indexEntry(entry);
+        }
     }
 
     @Subscribe

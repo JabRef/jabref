@@ -20,6 +20,7 @@ class MetaDataChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
+
         /*
         // TODO: Show detailed description of the changes
         StringBuilder sb = new StringBuilder(

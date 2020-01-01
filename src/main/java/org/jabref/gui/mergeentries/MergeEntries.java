@@ -15,6 +15,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -30,10 +31,10 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
+import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -43,14 +44,17 @@ import org.fxmisc.easybind.EasyBind;
 
 public class MergeEntries extends BorderPane {
 
+    private static final int NUMBER_OF_COLUMNS = 6;
+    private static final int LEFT_RADIOBUTTON_INDEX = 0;
+    private static final int RIGHT_RADIOBUTTON_INDEX = 2;
     private final ComboBox<DiffMode> diffMode = new ComboBox<>();
 
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
                                                               Localization.lang("Left entry"),
-                                                              Localization.lang("Left"),
+                                                              "left icon",
                                                               Localization.lang("None"),
-                                                              Localization.lang("Right"),
+                                                              "right icon",
                                                               Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
@@ -63,6 +67,7 @@ public class MergeEntries extends BorderPane {
     private final Map<Field, List<RadioButton>> radioButtons = new HashMap<>();
     private Boolean identicalTypes;
     private List<RadioButton> typeRadioButtons;
+    private final DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode;
 
     /**
      * Constructor with optional column captions for the two entries
@@ -71,11 +76,12 @@ public class MergeEntries extends BorderPane {
      * @param entryRight   Right entry
      * @param headingLeft  Heading for left entry
      * @param headingRight Heading for right entry
-     * @param type         Bib database mode
+     * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
         this.leftEntry = entryLeft;
         this.rightEntry = entryRight;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
 
         initialize();
         setLeftHeaderText(headingLeft);
@@ -83,16 +89,40 @@ public class MergeEntries extends BorderPane {
     }
 
     /**
+     * Constructor with optional column captions for the two entries
+     *
+     * @param entryLeft    Left entry
+     * @param entryRight   Right entry
+     * @param headingLeft  Heading for left entry
+     * @param headingRight Heading for right entry
+     */
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight) {
+        this(entryLeft, entryRight, headingLeft, headingRight, DefaultRadioButtonSelectionMode.LEFT);
+    }
+
+    /**
      * Constructor taking two entries
      *
      * @param entryLeft Left entry
      * @param entryRight Right entry
-     * @param type Bib database mode
+     * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, BibDatabaseMode type) {
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
         leftEntry = entryLeft;
         rightEntry = entryRight;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
         initialize();
+    }
+
+    /**
+     * Constructor taking two entries
+     *
+     * @param entryLeft Left entry
+     * @param entryRight Right entry
+     */
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight) {
+        this(entryLeft, entryRight, DefaultRadioButtonSelectionMode.LEFT);
+
     }
 
     private static String getDisplayText(DiffMode mode) {
@@ -126,12 +156,14 @@ public class MergeEntries extends BorderPane {
         mergePanel.setVgap(10);
         mergePanel.setHgap(15);
         ColumnConstraints columnLabel = new ColumnConstraints();
-        columnLabel.setHgrow(Priority.NEVER);
+        columnLabel.setHgrow(Priority.ALWAYS);
         ColumnConstraints columnValues = new ColumnConstraints();
-        columnValues.setHgrow(Priority.ALWAYS);
+        columnValues.setHgrow(Priority.NEVER);
         columnValues.setPercentWidth(40);
         ColumnConstraints columnSelect = new ColumnConstraints();
         columnSelect.setHgrow(Priority.NEVER);
+        columnSelect.setHalignment(HPos.CENTER);
+        // See columnHeadings variable for the headings: 1) field, 2) left content, 3) left arrow, 4) "none", 5) right arrow, 6) right content
         mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
 
         setupHeadingRows(mergePanel);
@@ -154,6 +186,7 @@ public class MergeEntries extends BorderPane {
         int row = 2;
         for (Field field : allFields) {
             Label label = new Label(field.getDisplayName());
+            label.setMinWidth(USE_PREF_SIZE);
             mergePanel.add(label, 0, row);
             Optional<String> leftString = leftEntry.getField(field);
             Optional<String> rightString = rightEntry.getField(field);
@@ -185,13 +218,15 @@ public class MergeEntries extends BorderPane {
                 }
                 radioButtons.put(field, list);
                 if (leftString.isPresent()) {
-                    list.get(0).setSelected(true);
+                    list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
                     if (!rightString.isPresent()) {
-                        list.get(2).setDisable(true);
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
+                    } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
                     }
                 } else {
-                    list.get(0).setDisable(true);
-                    list.get(2).setSelected(true);
+                    list.get(LEFT_RADIOBUTTON_INDEX).setDisable(true);
+                    list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
                 }
             }
 
@@ -226,14 +261,27 @@ public class MergeEntries extends BorderPane {
                 group.getToggles().add(button);
                 mergePanel.add(button, 2 + k, 1);
             }
-            typeRadioButtons.get(0).setSelected(true);
+            if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
+                typeRadioButtons.get(1).setSelected(true); //This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+            } else {
+                typeRadioButtons.get(0).setSelected(true);
+            }
         }
     }
 
     private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
-        for (int i = 0; i < 6; i++) {
-            mergePanel.add(new Label(columnHeadings.get(i)), i, 0);
+        for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
+            Label colHeading = new Label();
+            if (i == 2) {
+                colHeading.setGraphic(JabRefIcons.LEFT.getGraphicNode());
+            } else if (i == 4) {
+                colHeading.setGraphic(JabRefIcons.RIGHT.getGraphicNode());
+            } else {
+                colHeading.setText(columnHeadings.get(i));
+            }
+            colHeading.setMinWidth(USE_PREF_SIZE);
+            mergePanel.add(colHeading, i, 0);
         }
     }
 
@@ -325,9 +373,9 @@ public class MergeEntries extends BorderPane {
                 // May happen during initialization -> just ignore
                 continue;
             }
-            if (radioButtons.get(field).get(0).isSelected()) {
+            if (radioButtons.get(field).get(LEFT_RADIOBUTTON_INDEX).isSelected()) {
                 mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
-            } else if (radioButtons.get(field).get(2).isSelected()) {
+            } else if (radioButtons.get(field).get(RIGHT_RADIOBUTTON_INDEX).isSelected()) {
                 mergedEntry.setField(field, rightEntry.getField(field).get()); // Will only happen if field exists
             } else {
                 mergedEntry.clearField(field);
@@ -346,6 +394,7 @@ public class MergeEntries extends BorderPane {
     }
 
     public enum DiffMode {
+
         PLAIN,
         WORD,
         CHARACTER,
@@ -359,5 +408,10 @@ public class MergeEntries extends BorderPane {
                 return Optional.empty();
             }
         }
+    }
+
+    public enum DefaultRadioButtonSelectionMode {
+        LEFT,
+        RIGHT
     }
 }
