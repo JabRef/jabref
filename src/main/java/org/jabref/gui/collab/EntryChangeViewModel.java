@@ -64,23 +64,13 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-
         mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), DefaultRadioButtonSelectionMode.LEFT);
-
-        ButtonBar options = new ButtonBar();
-        Button selectAllLeft = new Button(Localization.lang("Select all changes on the left"));
-        selectAllLeft.setOnAction(evt -> mergePanel.selectAllLeftRadioButtons());
-        Button selectAllRight = new Button(Localization.lang("Select all changes on the right"));
-        selectAllRight.setOnAction(evt -> mergePanel.selectAllRightRadioButtons());
-        options.getButtons().addAll(selectAllLeft, selectAllRight);
-
         VBox container = new VBox(10);
         Label header = new Label(name);
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
         container.getChildren().add(mergePanel);
         container.setMargin(mergePanel, new Insets(5, 5, 5, 5));
-        container.getChildren().add(options);
         return container;
     }
 }
