@@ -104,14 +104,17 @@ jobs:
       - name: Build snap
         uses: jhenstridge/snapcraft-build-action@v1
         id: snapcraft
-        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
+        if: matrix.displayName == 'linux'
+      - run: |
+          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
+        if: matrix.displayName == 'linux'
       - name: Upload snap
         if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
         run: |
             mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            mv ${{ steps.snapcraft.outputs.snap }} build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
+            snapcraft push build/distribution/jabref*.snap --release edge || true"
         shell: bash
       - name: Rename files
         run: |
