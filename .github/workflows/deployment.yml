@@ -1,6 +1,18 @@
-name: Deployment
+name: Create and deploy binaries on builds.jabref.org
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/deployment.yml'
+      - 'build.gradle'
+      - 'src/main/**'
+  pull_request:
+    paths:
+      - '.github/workflows/deployment.yml'
+      - 'build.gradle'
+      - 'src/main/**'
 
 jobs:
   build:
