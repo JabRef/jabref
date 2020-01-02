@@ -16,15 +16,18 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import org.slf4j.Logger;
@@ -131,79 +134,149 @@ public abstract class DBMSProcessor {
     abstract String escape(String expression);
 
     /**
-     * Inserts the given bibEntry into shared database.
+     * Inserts the List of BibEntry into the shared database.
      *
-     * @param bibEntry {@link BibEntry} to be inserted
+     * @param bibEntries List of {@link BibEntry} to be inserted
      */
-    public void insertEntry(BibEntry bibEntry) {
-        if (!checkForBibEntryExistence(bibEntry)) {
-            insertIntoEntryTable(bibEntry);
+    public void insertEntries(List<BibEntry> bibEntries) {
+        List<BibEntry> notYetExistingEntries = filterForBibEntryExistence(bibEntries);
+        insertIntoEntryTable(notYetExistingEntries);
+        // Temporary fix
+        for (BibEntry bibEntry : notYetExistingEntries) {
             insertIntoFieldTable(bibEntry);
         }
     }
 
     /**
-     * Inserts the given bibEntry into ENTRY table.
+     * Inserts the given List of BibEntry into the ENTRY table.
      *
-     * @param bibEntry {@link BibEntry} to be inserted
+     * @param bibEntries List of {@link BibEntry} to be inserted
      */
-    protected void insertIntoEntryTable(BibEntry bibEntry) {
+    protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
+
+        // Probably has to be split into smaller methods
+
+
         // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
-        String insertIntoEntryQuery =
-                "INSERT INTO " +
-                        escape("ENTRY") +
-                        "(" +
-                        escape("TYPE") +
-                        ") VALUES(?)";
+        StringBuilder insertIntoEntryQuery = new StringBuilder()
+                .append("INSERT INTO ")
+                .append(escape("ENTRY"))
+                .append("(")
+                .append(escape("TYPE"))
+                .append(") VALUES(?)");
+        // Number of commas is bibEntries.size() - 1
+        for (int i = 0; i < bibEntries.size() - 1; i++) {
+            insertIntoEntryQuery.append(", (?)");
+        }
 
-        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
+        // Check where VERSION belongs in method, if anywhere
+
+        Set<Integer> keys = new HashSet<>();
+        Map<EntryType, Set<Integer>> typeMap = new HashMap<>();
+        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
-
-            preparedEntryStatement.setString(1, bibEntry.getType().getName());
+            for (int i = 0; i < bibEntries.size(); i++) {
+                preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
+            }
             preparedEntryStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
+                    keys.add(generatedKeys.getInt(1));
                 }
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
+        }
+        StringBuilder getKeyTypeMapQuery = new StringBuilder();
+        getKeyTypeMapQuery.append("SELECT * FROM ")
+                          .append(escape("ENTRY"))
+                          .append(" WHERE ")
+                          .append(escape("SHARED_ID"))
+                          .append(" IN (?")
+                          .append(", ?".repeat(keys.size() - 1))
+                          .append(")");
+        try (PreparedStatement preparedIdStatement = connection.prepareStatement(getKeyTypeMapQuery.toString())) {
+            int index = 1;
+            for (int key : keys) {
+                preparedIdStatement.setInt(index, key);
+                index++;
+            }
+            ResultSet keyResult = preparedIdStatement.executeQuery();
+            while (keyResult.next()) {
+                EntryType type = EntryTypeFactory.parse(keyResult.getString("TYPE"));
+                if (!typeMap.entrySet().contains(type)) {
+                    typeMap.put(type, new HashSet<>());
+                }
+                typeMap.get(type).add(keyResult.getInt("SHARED_ID"));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+
+        for (BibEntry entry : bibEntries) {
+            EntryType type = entry.getType();
+            // Pick arbitrary element from set of shared ids associated with type
+            // This is okay because the DB rows representing rows with the same type
+            // should be identical except for shared id.
+            int sharedId = typeMap.get(type).iterator().next();
+            // Remove a key from typeMap set when associated with BibEntry
+            typeMap.get(type).remove(sharedId);
+            entry.getSharedBibEntryData().setSharedID(sharedId);
+        }
+        // Check to make sure all keys were assigned
+        for (Set set : typeMap.values()) {
+            if (!set.isEmpty()) {
+                // Maybe should raise exceptoin
+                LOGGER.error("Error: Some shared IDs left unassigned");
+            }
         }
     }
 
     /**
-     * Checks whether the given bibEntry already exists on shared database.
+     * Filters a list of BibEntry to and returns those which do not exist in the database
+     * Matches the shared ID
      *
-     * @param bibEntry {@link BibEntry} to be checked
+     * @param bibEntries {@link BibEntry} to be checked
      * @return <code>true</code> if existent, else <code>false</code>
      */
-    private boolean checkForBibEntryExistence(BibEntry bibEntry) {
+    private List<BibEntry> filterForBibEntryExistence(List<BibEntry> bibEntries) {
+        // IDs for entries that are in bibEntries and not on the remote database
+        List<Integer> notExistingIds = new ArrayList<>();
         try {
             // Check if already exists
-            int sharedID = bibEntry.getSharedBibEntryData().getSharedID();
-            if (sharedID != -1) {
-                String selectQuery =
-                        "SELECT * FROM " +
-                                escape("ENTRY") +
-                                " WHERE " +
-                                escape("SHARED_ID") +
-                                " = ?";
+            List<Integer> sharedIds = bibEntries.stream()
+                                              .map(BibEntry::getSharedBibEntryData)
+                                              .map(SharedBibEntryData::getSharedID)
+                                              .filter((id) -> id != -1)
+                                              .collect(Collectors.toList());
+            StringBuilder selectQuery = new StringBuilder()
+                    .append("SELECT * FROM ")
+                    .append(escape("ENTRY"))
+                    .append(" WHERE ")
+                    .append(escape("SHARED_ID"))
+                    .append(" IN (?")
+                    .append(", ?".repeat(sharedIds.size()))
+                    .append(")");
 
-                try (PreparedStatement preparedSelectStatement = connection.prepareStatement(selectQuery)) {
-                    preparedSelectStatement.setInt(1, sharedID);
-                    try (ResultSet resultSet = preparedSelectStatement.executeQuery()) {
-                        if (resultSet.next()) {
-                            return true;
+            try (PreparedStatement preparedSelectStatement = connection.prepareStatement(selectQuery.toString())) {
+                for (int i = 0; i < sharedIds.size(); i++) {
+                    preparedSelectStatement.setInt(i + 1, sharedIds.get(i));
+                }
+                try (ResultSet resultSet = preparedSelectStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int id = resultSet.getInt("SHARED_ID");
+                        notExistingIds.add(id);
                         }
                     }
                 }
+            } catch (SQLException e) {
+               LOGGER.error("SQL Error: ", e);
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            return bibEntries.stream().filter((entry) ->
+                notExistingIds.contains(entry.getSharedBibEntryData().getSharedID()))
+                .collect(Collectors.toList());
         }
-        return false;
-    }
 
     /**
      * Inserts the given bibEntry into FIELD table.

@@ -82,12 +82,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
-            List<BibEntry> entries = event.getBibEntries();
-            for (BibEntry entry : entries) {
-                dbmsProcessor.insertEntry(entry);
+            dbmsProcessor.insertEntries(event.getBibEntries());
             }
         }
-    }
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
