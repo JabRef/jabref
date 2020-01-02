@@ -126,11 +126,6 @@ class DBMSProcessorTest {
 
             try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
                 while (fieldResultSet.next()) {
-                    System.out.println(fieldResultSet.getString("ENTRY_SHARED_ID"));
-                    System.out.println(fieldResultSet.getString("NAME"));
-                    System.out.println(fieldResultSet.getString("VALUE"));
-                    System.out.println();
-
                     if (actualFieldMap.keySet().contains(fieldResultSet.getInt("ENTRY_SHARED_ID"))) {
                         actualFieldMap.get(fieldResultSet.getInt("ENTRY_SHARED_ID")).put(
                                 fieldResultSet.getString("NAME"), fieldResultSet.getString("VALUE"));
