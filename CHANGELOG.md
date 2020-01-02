@@ -18,6 +18,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the Medline fetcher was only working when JabRef was running from source [#5645](https://github.com/JabRef/jabref/issues/5645)
 - We fixed some visual issues in the dark theme [#5764](https://github.com/JabRef/jabref/pull/5764) [#5753](https://github.com/JabRef/jabref/issues/5753)
 - We fixed an issue where non-default previews didn't handle unicode characters. [#5779](https://github.com/JabRef/jabref/issues/5779)
+- We fixed an issue where the ampersand character wasn't rendering correctly on previews.[#3840](https://github.com/JabRef/jabref/issues/3840)
 
 
 ### Removed
@@ -40,6 +41,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We made the columns for groups, files and uri in the main table reorderable and merged the clickable icon columns for uri, url, doi and eprint. [#5544](https://github.com/JabRef/jabref/pull/5544)
 - We reduced the number of write actions performed when autosave is enabled [#5679](https://github.com/JabRef/jabref/issues/5679)
 - We made the column sort order in the main table persistent [#5730](https://github.com/JabRef/jabref/pull/5730)
+- When an entry is modified on disk, the change dialog now shows the merge dialog to highlight the changes [#5688](https://github.com/JabRef/jabref/pull/5688)
 
 ### Fixed
 

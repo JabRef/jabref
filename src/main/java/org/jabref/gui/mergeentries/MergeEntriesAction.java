@@ -10,7 +10,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +48,7 @@ public class MergeEntriesAction extends SimpleCommand {
         BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two, basePanel.getBibDatabaseContext().getMode());
+        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two);
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dlg.showAndWait();
         if (mergedEntry.isPresent()) {
@@ -57,7 +57,7 @@ public class MergeEntriesAction extends SimpleCommand {
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableInsertEntry(basePanel.getDatabase(), mergedEntry.get()));
+            ce.addEdit(new UndoableInsertEntries(basePanel.getDatabase(), mergedEntry.get()));
             List<BibEntry> entriesToRemove = Arrays.asList(one, two);
             ce.addEdit(new UndoableRemoveEntries(basePanel.getDatabase(), entriesToRemove));
             basePanel.getDatabase().removeEntries(entriesToRemove);

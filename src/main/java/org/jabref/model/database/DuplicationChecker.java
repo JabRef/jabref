@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
@@ -95,20 +95,13 @@ public class DuplicationChecker {
     @Subscribe
     public void listen(EntriesRemovedEvent entriesRemovedEvent) {
         List<BibEntry> entries = entriesRemovedEvent.getBibEntries();
-        for (BibEntry entry : entries) {
-            Optional<String> citeKey = entry.getCiteKeyOptional();
-            if (citeKey.isPresent()) {
-                removeKeyFromSet(citeKey.get());
-            }
-        }
+        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citeKey -> removeKeyFromSet(citeKey));
     }
 
     @Subscribe
-    public void listen(EntryAddedEvent entryAddedEvent) {
-        Optional<String> citekey = entryAddedEvent.getBibEntry().getCiteKeyOptional();
-        if (citekey.isPresent()) {
-            addKeyToSet(citekey.get());
-        }
+    public void listen(EntriesAddedEvent entriesAddedEvent) {
+        List<BibEntry> entries = entriesAddedEvent.getBibEntries();
+        entries.stream().map(BibEntry::getCiteKeyOptional).flatMap(Optional::stream).forEach(citeKey -> addKeyToSet(citeKey));
     }
 
 }

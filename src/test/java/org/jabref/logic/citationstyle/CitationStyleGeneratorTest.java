@@ -130,4 +130,16 @@ class CitationStyleGeneratorTest {
         String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
         assertEquals(expected, citation);
     }
+
+    @Test
+    void testHandleAmpersand() {
+        String expectedCitation = "[1]B. Smith, B. Jones, and J. Williams, “&TitleTest&” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016.\n";
+        BibEntry entry = TestEntry.getTestEntry();
+        entry.setField(StandardField.TITLE, "“&TitleTest&”");
+        String style = CitationStyle.getDefault().getSource();
+        CitationStyleOutputFormat format = CitationStyleOutputFormat.TEXT;
+
+        String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
+        assertEquals(expectedCitation, actualCitation);
+    }
 }

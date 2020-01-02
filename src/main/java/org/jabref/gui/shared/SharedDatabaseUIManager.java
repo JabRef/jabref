@@ -103,7 +103,7 @@ public class SharedDatabaseUIManager {
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
 
         if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, updateRefusedEvent.getBibDatabaseContext().getMode());
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
             Optional<BibEntry> mergedEntry = dialog.showAndWait();
 
             mergedEntry.ifPresent(mergedBibEntry -> {
