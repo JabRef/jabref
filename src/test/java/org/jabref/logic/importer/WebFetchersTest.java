@@ -74,6 +74,10 @@ class WebFetchersTest {
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
             expected.remove(SearchBasedParserFetcher.class);
+
+            // Remove ACM, because it doesn't work currently
+            expected.remove(ACMPortalFetcher.class);
+
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
     }
