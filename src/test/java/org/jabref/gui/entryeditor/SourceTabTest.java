@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
-public class SourceTabTest {
+class SourceTabTest {
 
     private Stage stage;
     private Scene scene;
