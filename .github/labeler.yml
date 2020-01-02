@@ -1,0 +1,3 @@
+fetcher:
+  - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+  - 'src/test/java/org/jabref/logic/importer/fetcher/**'
