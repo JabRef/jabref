@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" default-locale="en-US">
-  <!-- Generated with https://github.com/citation-style-language/utilities/tree/master/generate_dependent_styles/data/apa -->
+  <!-- American Psychological Association (APA), generated from "apa" metadata at https://github.com/citation-style-language/journals -->
   <info>
-    <title>Canadian Psychology</title>
+    <title>Canadian Psychology / Psychologie canadienne</title>
     <id>http://www.zotero.org/styles/canadian-psychology</id>
     <link href="http://www.zotero.org/styles/canadian-psychology" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="independent-parent"/>
