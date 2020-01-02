@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -135,9 +134,7 @@ public class ImportAction {
                     directParserResult = pr;
                 }
                 // Merge entries:
-                for (BibEntry entry : pr.getDatabase().getEntries()) {
-                    database.insertEntry(entry);
-                }
+                database.insertEntries(pr.getDatabase().getEntries());
 
                 // Merge strings:
                 for (BibtexString bs : pr.getDatabase().getStringValues()) {
@@ -151,16 +148,14 @@ public class ImportAction {
             } else {
 
                 ParserResult pr = importResult.parserResult;
-                Collection<BibEntry> entries = pr.getDatabase().getEntries();
+                List<BibEntry> entries = pr.getDatabase().getEntries();
 
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
                 UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
 
-                for (BibEntry entry : entries) {
-                    database.insertEntry(entry);
-                }
+                database.insertEntries(entries);
             }
         }
 

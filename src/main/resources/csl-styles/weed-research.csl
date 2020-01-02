@@ -42,7 +42,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="symbol" delimiter-precedes-last="never" delimiter-precedes-et-al="never"  initialize-with="" name-as-sort-order="all" sort-separator=" ">
+      <name and="symbol" delimiter-precedes-last="never" delimiter-precedes-et-al="never" initialize-with="" name-as-sort-order="all" sort-separator=" ">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>

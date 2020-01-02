@@ -18,7 +18,7 @@
     <issn>0007-1234</issn>
     <eissn>1469-2112</eissn>
     <summary>BJPS Style as updated per 6 March 2018 guidelines.</summary>
-    <updated>2018-09-13T13:59:45+00:00</updated>
+    <updated>2019-12-23T10:58:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -51,6 +51,9 @@
           <if type="report">
             <text variable="publisher"/>
           </if>
+          <else-if type="legal_case" match="any">
+            <text variable="title"/>
+          </else-if>
         </choose>
         <text macro="anon"/>
       </substitute>

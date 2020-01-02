@@ -2,6 +2,8 @@ name: Oracle Tests
 
 on:
   push:
+    branches:
+      - master
     paths:
       - 'src/test/java/org/jabref/model/database/**'
       - 'src/test/java/org/jabref/logic/shared/**'

@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The Harvard author-date style, 2nd edition, as outlined by the library of the University of Lincoln.</summary>
-    <updated>2019-03-26T13:11:32+00:00</updated>
+    <updated>2019-11-13T14:03:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -61,16 +61,18 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="webpage article-journal article-newspaper" match="any">
-        <text term="available at" text-case="capitalize-first" suffix=" "/>
-        <text variable="URL"/>
-        <group delimiter=" " prefix=" [" suffix="]">
-          <text term="accessed"/>
-          <date variable="accessed">
-            <date-part name="day" suffix=" "/>
-            <date-part name="month" suffix=" "/>
-            <date-part name="year"/>
-          </date>
+      <if type="bill webpage article-journal article-newspaper" match="any">
+        <group delimiter=" ">
+          <text term="available at" text-case="capitalize-first"/>
+          <text variable="URL"/>
+          <group delimiter=" " prefix="[" suffix="]">
+            <text term="accessed"/>
+            <date variable="accessed">
+              <date-part name="day" suffix=" "/>
+              <date-part name="month" suffix=" "/>
+              <date-part name="year"/>
+            </date>
+          </group>
         </group>
       </if>
     </choose>
@@ -166,8 +168,14 @@
       <key variable="title"/>
     </sort>
     <layout suffix=".">
-      <text macro="author"/>
-      <text macro="year-date" prefix=" (" suffix=")"/>
+      <choose>
+        <if type="bill" match="none">
+          <group delimiter=" ">
+            <text macro="author"/>
+            <text macro="year-date" prefix="(" suffix=")"/>
+          </group>
+        </if>
+      </choose>
       <choose>
         <if type="thesis">
           <group prefix=" " delimiter=". " suffix=".">
@@ -177,6 +185,12 @@
             <text macro="publisher"/>
           </group>
         </if>
+        <else-if type="bill">
+          <text variable="title" font-style="italic"/>
+          <text variable="authority" prefix=" [" suffix="]"/>
+          <text variable="number" prefix=" Bill " suffix=", "/>
+          <text variable="chapter-number" suffix=". "/>
+        </else-if>
         <else-if type="webpage">
           <group prefix=" " delimiter=". ">
             <text macro="title"/>
