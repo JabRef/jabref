@@ -41,6 +41,19 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     }
 
+    /**
+     *   We override this here to select the radio buttons accordingly
+     */
+    @Override
+    public void setAccepted(boolean accepted) {
+        super.setAccepted(accepted);
+        if (accepted) {
+            mergePanel.selectAllRightRadioButtons();
+        } else {
+            mergePanel.selectAllLeftRadioButtons();
+        }
+    }
+
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(oldEntry);
