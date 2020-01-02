@@ -12,6 +12,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled("ACM endpoint does not work, thus the fetcher does not work at all. See https://github.com/JabRef/jabref/issues/5804 for details.")
 class ACMPortalFetcherTest {
     ACMPortalFetcher fetcher;
 
