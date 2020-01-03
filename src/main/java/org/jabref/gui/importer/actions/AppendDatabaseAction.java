@@ -15,7 +15,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -59,8 +59,7 @@ public class AppendDatabaseAction implements BaseAction {
                                         boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
 
         BibDatabase fromDatabase = parserResult.getDatabase();
-        List<BibEntry> appendedEntries = new ArrayList<>();
-        List<BibEntry> originalEntries = new ArrayList<>();
+        List<BibEntry> entriesToAppend = new ArrayList<>();
         BibDatabase database = panel.getDatabase();
 
         NamedCompound ce = new NamedCompound(Localization.lang("Append library"));
@@ -74,11 +73,10 @@ public class AppendDatabaseAction implements BaseAction {
                 BibEntry entry = (BibEntry) originalEntry.clone();
                 UpdateField.setAutomaticFields(entry, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
-                database.insertEntry(entry);
-                appendedEntries.add(entry);
-                originalEntries.add(originalEntry);
-                ce.addEdit(new UndoableInsertEntry(database, entry));
+                entriesToAppend.add(entry);
             }
+            database.insertEntries(entriesToAppend);
+            ce.addEdit(new UndoableInsertEntries(database, entriesToAppend));
         }
 
         if (importStrings) {
@@ -99,7 +97,7 @@ public class AppendDatabaseAction implements BaseAction {
                         ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
                                 Globals.prefs.getKeywordDelimiter());
                         newGroups.setGroup(group);
-                        group.add(appendedEntries);
+                        group.add(entriesToAppend);
                     } catch (IllegalArgumentException e) {
                         LOGGER.error("Problem appending entries to group", e);
                     }

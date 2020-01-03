@@ -129,7 +129,7 @@
           <text macro="year-date"/>
         </group>
         <group>
-          <label plural="never" suffix=" " variable="locator" form="short"/>
+          <label plural="never" suffix="&#160;" variable="locator" form="short"/>
           <text variable="locator" form="short"/>
         </group>
       </group>

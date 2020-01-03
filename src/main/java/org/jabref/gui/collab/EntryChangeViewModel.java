@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.mergeentries.MergeEntries.DefaultRadioButtonSelectionMode;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -39,19 +39,30 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     }
 
+    /**
+     *   We override this here to select the radio buttons accordingly
+     */
+    @Override
+    public void setAccepted(boolean accepted) {
+        super.setAccepted(accepted);
+        if (accepted) {
+            mergePanel.selectAllRightRadioButtons();
+        } else {
+            mergePanel.selectAllLeftRadioButtons();
+        }
+    }
+
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(oldEntry);
         database.getDatabase().insertEntry(mergePanel.getMergeEntry());
-        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), oldEntry));
-        undoEdit.addEdit(new UndoableInsertEntry(database.getDatabase(), mergePanel.getMergeEntry()));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), mergePanel.getMergeEntry()));
     }
 
     @Override
     public Node description() {
-
         mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), DefaultRadioButtonSelectionMode.LEFT);
-
         VBox container = new VBox(10);
         Label header = new Label(name);
         header.getStyleClass().add("sectionHeader");
