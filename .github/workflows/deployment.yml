@@ -101,14 +101,15 @@ jobs:
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
-      - name: Build snap
+      - name: Build snap (1) Setup snapcraft
         uses: jhenstridge/snapcraft-build-action@v1
         id: snapcraft
         if: matrix.displayName == 'linux'
-      - run: |
+      - name: Build snap (2) Run build
+        run: |
           mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
         if: matrix.displayName == 'linux'
-      - name: Upload snap
+      - name: Build snap (3) Upload snap
         if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
