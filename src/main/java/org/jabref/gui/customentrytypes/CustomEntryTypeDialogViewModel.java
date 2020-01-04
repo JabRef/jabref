@@ -1,57 +1,56 @@
 package org.jabref.gui.customentrytypes;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 
 public class CustomEntryTypeDialogViewModel {
 
+    private ListProperty<BibEntryType> entryTypesProperty;
+    private ListProperty<Field> fieldsProperty;
+
     public CustomEntryTypeDialogViewModel() {
 
+        entryTypesProperty = new SimpleListProperty<BibEntryType>(FXCollections.observableArrayList(BiblatexEntryTypeDefinitions.ALL));
+        fieldsProperty = new SimpleListProperty<Field>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
     }
 
-    public void addNewOptionalField2() {
-        // TODO Auto-generated method stub
-
+    public ListProperty<BibEntryType> entryTypesProperty() {
+        return this.entryTypesProperty;
     }
 
-    public void addNewOptionalField() {
-        // TODO Auto-generated method stub
-
+    public ListProperty<Field> fieldsProperty() {
+        return this.fieldsProperty;
     }
 
-    public void addNewRequiredField() {
-        // TODO Auto-generated method stub
+    public enum FieldType {
+
+        REQUIRED("Required"),
+        OTPIONAL("Optional");
+
+        private String name;
+
+        FieldType(String name) {
+            this.name = name;
+        }
+
+        public String getDisplayName() {
+            return this.name;
+        }
+    }
+
+    public void addNewField() {
+        //We need to add a new unknown field
 
     }
 
     public void addNewCustomEntryType() {
         // TODO Auto-generated method stub
 
-    }
-
-    public Object removeEntryType(EntryType focusedItem) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object removeRequiredField(Field focusedItem) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object removeOptionalField(Field focusedItem) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object removeOptional2Field(Field focusedItem) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public enum FieldType {
-        REQUIRED,
-        PRIMARY_OPTIONAL,
-        SECONDARY_OPTIONAL
     }
 }
