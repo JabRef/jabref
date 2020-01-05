@@ -1,4 +1,4 @@
 site_name: JabRef Developer Documentation
 repo_url: https://github.com/jabref/jabref/
 theme:
-    name: 'material'
+    name: readthedocs
