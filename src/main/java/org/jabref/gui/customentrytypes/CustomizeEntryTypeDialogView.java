@@ -8,14 +8,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -24,9 +23,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableView<BibEntryType> entryTypes;
     @FXML private TableColumn<BibEntryType, String> entryTypColumn;
     @FXML private TableColumn<BibEntryType, String> entryTypeActionsColumn;
-    @FXML private ComboBox<BibEntryType> addNewEntryType;
+    @FXML private TextField addNewEntryType;
     @FXML private TableView<FieldViewModel> requiredFields;
-    @FXML private TableColumn<FieldViewModel, String> requiredFieldsNameColumn;
+    @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
     @FXML private TableColumn<FieldViewModel, FieldType> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private ComboBox<Field> addNewField;
@@ -57,11 +56,11 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldTypeProperty());
 
-        requiredFieldsNameColumn.setCellValueFactory(item -> item.getValue().fieldNameProperty());
+        fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldNameProperty());
 
         viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
-        addNewEntryType.setItems(viewModel.entryTypesProperty());
-        //TODO Change to the new viewmodel
+
+        viewModel.entryTypeToAddProperty().bind(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fieldsProperty());
         requiredFields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());

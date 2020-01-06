@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -26,7 +27,7 @@
                   </TableView>
                   <HBox spacing="10.0">
                      <children>
-                        <ComboBox fx:id="addNewEntryType" editable="true" prefWidth="150.0" />
+                        <TextField fx:id="addNewEntryType" />
                         <Button mnemonicParsing="false" onAction="#addEntryType" prefHeight="20.0" prefWidth="20.0" text="add" />
                      </children>
                      <VBox.margin>
@@ -40,7 +41,7 @@
                   <Label text="Required and optional fields" />
                   <TableView fx:id="requiredFields" minWidth="-Infinity" VBox.vgrow="ALWAYS">
                     <columns>
-                      <TableColumn fx:id="requiredFieldsNameColumn" minWidth="150.0" prefWidth="-1.0" text="Field" />
+                      <TableColumn fx:id="fieldNameColumn" minWidth="150.0" prefWidth="-1.0" text="Field" />
                         <TableColumn fx:id="fieldTypeColumn" minWidth="100.0" prefWidth="100.0" text="Field type" />
                         <TableColumn fx:id="fieldTypeActionColumn" prefWidth="20.0" />
                     </columns>

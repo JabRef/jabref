@@ -7,7 +7,10 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
@@ -22,10 +25,15 @@ public class CustomEntryTypeDialogViewModel {
     private ListProperty<Field> fieldsProperty;
     private ObjectProperty<BibEntryType> selectedEntryTypesProperty = new SimpleObjectProperty<>();
     private ListProperty<FieldViewModel> fieldsForTypeProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ObjectProperty<Field> selectedFieldToAddProperty = new SimpleObjectProperty<>();
+    private StringProperty entryTypeToAddProperty = new SimpleStringProperty("");
+    private ObservableList<BibEntryType> entryTypes;
 
     public CustomEntryTypeDialogViewModel() {
 
-        entryTypesProperty = new SimpleListProperty<BibEntryType>(FXCollections.observableArrayList(BiblatexEntryTypeDefinitions.ALL));
+        entryTypes = FXCollections.observableArrayList(BiblatexEntryTypeDefinitions.ALL);
+        entryTypesProperty = new SimpleListProperty<>(entryTypes);
+        
         fieldsProperty = new SimpleListProperty<Field>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
 
         EasyBind.subscribe(selectedEntryTypesProperty, type -> {
@@ -62,12 +70,15 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void addNewField() {
-        //We need to add a new unknown field
+
+        //Field fieldToAdd = new UnknownField(name)
 
     }
 
     public void addNewCustomEntryType() {
-        // TODO Auto-generated method stub
+
+        // BibEntryTypeBuilder
+        //new UnknownEntryType(null).
 
     }
 
@@ -79,4 +90,11 @@ public class CustomEntryTypeDialogViewModel {
         return this.fieldsForTypeProperty;
     }
 
+    public ObjectProperty<Field> selectedFieldToAddProperty() {
+        return this.selectedFieldToAddProperty;
+    }
+
+    public StringProperty entryTypeToAddProperty() {
+        return this.entryTypeToAddProperty;
+    }
 }
