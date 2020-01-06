@@ -25,11 +25,11 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<BibEntryType, String> entryTypColumn;
     @FXML private TableColumn<BibEntryType, String> entryTypeActionsColumn;
     @FXML private ComboBox<BibEntryType> addNewEntryType;
-    @FXML private TableView<Field> requiredFields;
-    @FXML private TableColumn<Field, String> requiredFieldsNameColumn;
-    @FXML private TableColumn<Field, FieldType> fieldTypeColumn;
-    @FXML private TableColumn<Field, String> fieldTypeActionColumn;
-    @FXML private ComboBox<?> addNewField;
+    @FXML private TableView<FieldViewModel> requiredFields;
+    @FXML private TableColumn<FieldViewModel, String> requiredFieldsNameColumn;
+    @FXML private TableColumn<FieldViewModel, FieldType> fieldTypeColumn;
+    @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
+    @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
 
     private final CustomEntryTypeDialogViewModel viewModel;
@@ -51,15 +51,21 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private void setupTable() {
 
         entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
+        entryTypes.setItems(viewModel.entryTypesProperty());
+        entryTypes.getSelectionModel().selectFirst();
+
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
-        new ValueTableCellFactory<Field, FieldType>().withText(FieldType::getDisplayName).install(fieldTypeColumn);
+        fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldTypeProperty());
 
-        requiredFieldsNameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getDisplayName()));
-        new ValueTableCellFactory<Field, FieldType>().withText(FieldType::getDisplayName).install(fieldTypeColumn);
+        requiredFieldsNameColumn.setCellValueFactory(item -> item.getValue().fieldNameProperty());
 
-        entryTypes.itemsProperty().bind(viewModel.entryTypesProperty());
+        viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
+        addNewEntryType.setItems(viewModel.entryTypesProperty());
         //TODO Change to the new viewmodel
-        requiredFields.itemsProperty().bind(viewModel.fieldsProperty());
+
+        addNewField.setItems(viewModel.fieldsProperty());
+        requiredFields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
+
     }
 
     @FXML
