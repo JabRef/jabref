@@ -84,12 +84,13 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ### Set-up Eclipse
 
-0. Install the [Eclipse Java 13 marketplace addon](https://marketplace.eclipse.org/content/java-13-support-eclipse-2019-09-413)
+
 1. Run `./gradlew run` to generate all resources and to check if jabref runs. (This step is only required once)
 2. Run `./gradlew eclipse` (This has to be always execute, when there are new upstream changes)
 7. Copy the file Log4jPlugins.java from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `org.jabref.gui.logging.plugins`
 8. Create a run/debug configuration for main class `org.jabref.JabRefLauncher` 
 9. In the arguments tab enter the same runtime arguments as above for intellij.
+10. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the eclipse marketplace
 
 ## Final comments
 
