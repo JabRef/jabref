@@ -9,7 +9,13 @@ To ensure high code-quality,
 - we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
 - we review each pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
-# How JabRef Aquires Contributors
+## Continuos integration
+
+Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries.
+The binaries are create using [gradle](https://gradle.org/) and are uploaded to to <https://builds.jabref.org>.
+These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: <https://github.com/JabRef/jabref/actions?workflow=Deployment>.
+
+## How JabRef aquires contributors
 
 * We participate in [Hacktoberfest](https://hacktoberfest.digitalocean.com/). See <https://www.jabref.org/hacktoberfest/> for details.
 * We participate in [Google Summer of Code](https://developers.google.com/open-source/gsoc/).
