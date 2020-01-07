@@ -15,6 +15,13 @@ Since end of 2019, we just use GitHub actions to execute our tests and to create
 The binaries are create using [gradle](https://gradle.org/) and are uploaded to to <https://builds.jabref.org>.
 These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: <https://github.com/JabRef/jabref/actions?workflow=Deployment>.
 
+## Branches
+
+The branch [master](https://builds.jabref.org/master/) is the main development line and is intended to incorporate fixes and improvements as soon as possible and to move JabRef forward to modern technologies such as the latest Java version.
+
+Other branches are used for discussing improvements with the help of [pull requests](https://github.com/JabRef/jabref/pulls).
+One can see the binaries of each branch at <https://builds.jabref.org/>.
+
 ## How JabRef aquires contributors
 
 * We participate in [Hacktoberfest](https://hacktoberfest.digitalocean.com/). See <https://www.jabref.org/hacktoberfest/> for details.
