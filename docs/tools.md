@@ -1,3 +1,5 @@
+# Useful development tooling
+
 This page lists some software we consider useful.
 
 ## Browser plugins
@@ -6,6 +8,7 @@ This page lists some software we consider useful.
 * [Sourcegraph Browser Extension](https://docs.sourcegraph.com/integration/browser_extension): Navigate through source on github
 
 ## git hints
+
 Here, we collect some helpful git hints
 
 * https://github.com/blog/2019-how-to-undo-almost-anything-with-git
@@ -39,9 +42,8 @@ Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 ### General git tooling on Windows
 
 * Use [git for windows](https://git-for-windows.github.io/), no additional git tooling required
-  * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation
+  * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation. Aim: Store password for GitHub permanently for https repository locations
 * [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
-*  - Aim: Store password for GitHub permanently for https repository locations
 
 ### Better console applications
 
