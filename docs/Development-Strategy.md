@@ -1,3 +1,22 @@
+# JabRef's development strategy
+
+We aim to keep up to high-quality code standards and use code quality tools wherever possible.
+
+To ensure high code-quality,
+
+- we follow the priniciples of [Java by Comparison](https://java.by-comparison.com/).
+- we use [Design Pattners](https://java-design-patterns.com/patterns/) wherever possible.
+- we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
+- we review each pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
+
+## Historical notes
+
+### JabRef 4.x
+
+The main roadmap for JabRef 4.x was to modernize the UI, make the installation easier and reduce the number of opened issues.
+
+### JabRef 3.x
+
 JabRef at the beginning of 2016 had a few issues:
 
 - Most of the code is untested, non-documented, and contains a lot of bugs and issues.
