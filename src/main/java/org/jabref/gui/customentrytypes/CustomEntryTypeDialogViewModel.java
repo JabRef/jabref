@@ -68,6 +68,11 @@ public class CustomEntryTypeDialogViewModel {
         public String getDisplayName() {
             return this.name;
         }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
     }
 
     public void addNewField() {
@@ -79,7 +84,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void addNewCustomEntryType() {
-
+        // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
         // BibEntryTypeBuilder
         //new UnknownEntryType(null).
 
