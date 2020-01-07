@@ -28,12 +28,13 @@ public class CustomEntryTypeDialogViewModel {
     private ObjectProperty<Field> selectedFieldToAddProperty = new SimpleObjectProperty<>();
     private StringProperty entryTypeToAddProperty = new SimpleStringProperty("");
     private ObservableList<BibEntryType> entryTypes;
+    private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
 
     public CustomEntryTypeDialogViewModel() {
 
         entryTypes = FXCollections.observableArrayList(BiblatexEntryTypeDefinitions.ALL);
         entryTypesProperty = new SimpleListProperty<>(entryTypes);
-        
+
         fieldsProperty = new SimpleListProperty<Field>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
 
         EasyBind.subscribe(selectedEntryTypesProperty, type -> {
@@ -70,6 +71,8 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void addNewField() {
+        // Field field = FieldFactory.parseField(newFieldToAddProperty.getValue());
+        //TODO: How should I add the field to the type?
 
         //Field fieldToAdd = new UnknownField(name)
 
@@ -96,5 +99,9 @@ public class CustomEntryTypeDialogViewModel {
 
     public StringProperty entryTypeToAddProperty() {
         return this.entryTypeToAddProperty;
+    }
+
+    public ObjectProperty<Field> newFieldToAddProperty() {
+        return this.newFieldToAddProperty;
     }
 }

@@ -9,12 +9,14 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.UnknownField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -63,6 +65,21 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         viewModel.entryTypeToAddProperty().bind(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fieldsProperty());
+
+        addNewField.setConverter(new StringConverter<Field>() {
+
+            @Override
+            public String toString(Field object) {
+
+                return object != null ? object.getDisplayName() : "";
+            }
+
+            @Override
+            public Field fromString(String string) {
+                return new UnknownField(string);
+            }
+        });
+        viewModel.newFieldToAddProperty().bind(addNewField.valueProperty());
         requiredFields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
 
     }
