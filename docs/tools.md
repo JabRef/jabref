@@ -56,7 +56,7 @@ Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
     * Upper right corner: "Settings..." (third entrry Eintrag)
     * Startup/Tasks: Choose task no. 7 ("Bash::Git bash"). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
     * `Save Settings`
-* [clink] - Aim: Unix keys (Alt+b, Ctrl+s, etc.) also available at the prompt of `cmd.exe`
+* [clink] - Aim: Unix keys (<kbd>Alt</kbd>+b, Ctrl+s, etc.) also available at the prompt of `cmd.exe`
 
 #### Other bundles
 
