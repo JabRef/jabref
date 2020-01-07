@@ -22,113 +22,113 @@ More details about the MVVM pattern can be found in [an article by Microsoft](ht
 
 - The ViewModel should derive from `AbstractViewModel`
 
-    ```java
-    public class MyDialogViewModel extends AbstractViewModel {
-    }
-    ```
+```java
+public class MyDialogViewModel extends AbstractViewModel {
+}
+```
 
 - Add a (readonly) property as a private field and generate the getters according to the [JavaFX bean conventions](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm):
 
-    ```java
-        private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
+```java
+private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
 
-        public ReadOnlyStringProperty headingProperty() {
-            return heading.getReadOnlyProperty();
-        }
+public ReadOnlyStringProperty headingProperty() {
+    return heading.getReadOnlyProperty();
+}
 
-        public String getHeading() {
-            return heading.get();
-        }
-    ```
+public String getHeading() {
+    return heading.get();
+}
+```
 
 - Create constructor which initializes the fields to their default values. Write tests to ensure that everything works as expected!
 
-    ```java
-    public MyDialogViewModel(Dependency dependency) {
-        this.dependency = Objects.requireNonNull(dependency);
-        heading.set("Hello " + dependency.getUserName());
-    }
-    ```
+```java
+public MyDialogViewModel(Dependency dependency) {
+    this.dependency = Objects.requireNonNull(dependency);
+    heading.set("Hello " + dependency.getUserName());
+}
+```
 
 - Add methods which allow interaction. Again, don't forget to write tests!
 
-    ```java
-    public void shutdown() {
-        heading.set("Goodbye!");
-    }
-    ```
+```java
+public void shutdown() {
+    heading.set("Goodbye!");
+}
+```
 
 ### View - Controller
 
 - The "code-behind" part of the view, which binds the `View` to the `ViewModel`.
 - The usual convention is that the controller ends on the suffix `*View`. Dialogs should derive from `BaseDialog`.
 
-    ```java
-    public class AboutDialogView extends BaseDialog<Void>
-    ```
+```java
+public class AboutDialogView extends BaseDialog<Void>
+```
 
 - You get access to nodes in the FXML file by declaring them with the `@FXML` annotation.
 
-    ```java
-    @FXML protected Button helloButton;
-    @FXML protected ImageView iconImage;
-    ```
+```java
+@FXML protected Button helloButton;
+@FXML protected ImageView iconImage;
+```
 
 - Dependencies can easily be injected into the controller using the `@Inject` annotation.
 
-    ```java
-    @Inject private DialogService dialogService;
-    ```
+```java
+@Inject private DialogService dialogService;
+```
 
 - It is convenient to load the FXML-view directly from the controller class.
   The FXML file is loaded using `ViewLoader` based on the name of the class passed to `view`. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
   Note that fields annotated with `@FXML` or `@Inject` only become accessible after `ViewLoader.load()` is called.
 a `View` class that loads the FXML file.
 
-    ```java
-    private Dependency dependency;
+```java
+private Dependency dependency;
 
-    public AboutDialogView(Dependency dependency) {
-            this.dependency = dependency;
+public AboutDialogView(Dependency dependency) {
+        this.dependency = dependency;
 
-            this.setTitle(Localization.lang("About JabRef"));
+        this.setTitle(Localization.lang("About JabRef"));
 
-            ViewLoader.view(this)
-                    .load()
-                    .setAsDialogPane(this);
-    }
-    ```
+        ViewLoader.view(this)
+                .load()
+                .setAsDialogPane(this);
+}
+```
 
 - Dialogs should use [setResultConverter](https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Dialog.html#setResultConverter-javafx.util.Callback-) to convert the data entered in the dialog to the desired result. This conversion should be done by the view model and not the controller.
 
-    ```java
-    setResultConverter(button -> {
-        if (button == ButtonType.OK) {
-            return viewModel.getData();
-        }
-        return null;
-    });
-    ```
+```java
+setResultConverter(button -> {
+    if (button == ButtonType.OK) {
+        return viewModel.getData();
+    }
+    return null;
+});
+```
 
 - The initialize method may use data-binding to connect the ui-controls and the `ViewModel`. However, it is recommended to do as much binding as possible directly in the FXML-file.
 
-    ```java
-    @FXML
-    private void initialize() {
-        viewModel = new AboutDialogViewModel(dialogService, dependency, ...);
+```java
+@FXML
+private void initialize() {
+    viewModel = new AboutDialogViewModel(dialogService, dependency, ...);
 
-        helloLabel.textProperty().bind(viewModel.helloMessageProperty());
-    }
-    ```
+    helloLabel.textProperty().bind(viewModel.helloMessageProperty());
+}
+```
 
 - calling the view model:
 
-    ```java
-    @FXML
-    private void openJabrefWebsite() {
-        viewModel.openJabrefWebsite();
-    }
-    ```
+```java
+@FXML
+private void openJabrefWebsite() {
+    viewModel.openJabrefWebsite();
+}
+```
 
 ### View - FXML
 
