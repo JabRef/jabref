@@ -9,6 +9,11 @@ To ensure high code-quality,
 - we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
 - we review each pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
+# How JabRef Aquires Contributors
+
+* We participate in [Hacktoberfest](https://hacktoberfest.digitalocean.com/). See <https://www.jabref.org/hacktoberfest/> for details.
+* We participate in [Google Summer of Code](https://developers.google.com/open-source/gsoc/).
+
 ## Historical notes
 
 ### JabRef 4.x
