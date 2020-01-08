@@ -101,13 +101,21 @@ jobs:
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
-      - name: Build and publish snap
+      - name: Build snap (1) Setup snapcraft
+        uses: jhenstridge/snapcraft-build-action@v1
+        id: snapcraft
+        if: matrix.displayName == 'linux'
+      - name: Build snap (2) Run build
+        run: |
+          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
+        if: matrix.displayName == 'linux'
+      - name: Build snap (3) Upload snap
         if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
         run: |
             mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
+            snapcraft push build/distribution/jabref*.snap --release edge || true"
         shell: bash
       - name: Rename files
         run: |
