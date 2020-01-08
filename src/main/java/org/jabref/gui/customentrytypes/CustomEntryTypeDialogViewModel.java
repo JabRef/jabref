@@ -1,5 +1,6 @@
 package org.jabref.gui.customentrytypes;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +13,14 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.UnknownEntryType;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -24,23 +29,33 @@ public class CustomEntryTypeDialogViewModel {
     private ListProperty<BibEntryType> entryTypesProperty;
     private ListProperty<Field> fieldsProperty;
     private ObjectProperty<BibEntryType> selectedEntryTypesProperty = new SimpleObjectProperty<>();
-    private ListProperty<FieldViewModel> fieldsForTypeProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ListProperty<FieldViewModel> fieldsForTypeProperty;
     private ObjectProperty<Field> selectedFieldToAddProperty = new SimpleObjectProperty<>();
     private StringProperty entryTypeToAddProperty = new SimpleStringProperty("");
     private ObservableList<BibEntryType> entryTypes;
+    private ObservableList<FieldViewModel> existingFieldsForType;
     private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
+    private BibDatabaseMode mode;
+    private ObservableList<FieldViewModel> allFieldsForType;
 
-    public CustomEntryTypeDialogViewModel() {
+    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode) {
+        this.mode = mode;
 
-        entryTypes = FXCollections.observableArrayList(BiblatexEntryTypeDefinitions.ALL);
+        List<BibEntryType> alllTypes = mode == mode.BIBLATEX ? BiblatexEntryTypeDefinitions.ALL : BibtexEntryTypeDefinitions.ALL;
+        entryTypes = FXCollections.observableArrayList(alllTypes);
         entryTypesProperty = new SimpleListProperty<>(entryTypes);
 
-        fieldsProperty = new SimpleListProperty<Field>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
+        fieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
+
+        existingFieldsForType = FXCollections.observableArrayList();
+        allFieldsForType = FXCollections.observableArrayList();
+
+        this.fieldsForTypeProperty = new SimpleListProperty<>(existingFieldsForType);
 
         EasyBind.subscribe(selectedEntryTypesProperty, type -> {
             if (type != null) {
-                List<FieldViewModel> fields = type.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), type.isRequired(bibField.getField()))).collect(Collectors.toList());
-                this.fieldsForTypeProperty.setValue(FXCollections.observableArrayList(fields));
+                List<FieldViewModel> fields = type.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), type.isRequired(bibField.getField()), type)).collect(Collectors.toList());
+                existingFieldsForType.setAll(fields);
             }
         });
 
@@ -76,14 +91,23 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void addNewField() {
-        // Field field = FieldFactory.parseField(newFieldToAddProperty.getValue());
+
+        Field field = newFieldToAddProperty.getValue();
+
+        FieldViewModel model = new FieldViewModel(field, true, selectedEntryTypesProperty.getValue());
+
         //TODO: How should I add the field to the type?
 
-        //Field fieldToAdd = new UnknownField(name)
+        //BibEntryType type = new BibEntryType(type, fields, requiredFields)
+        //   Globals.entryTypesManager.addCustomOrModifiedType(entryType, mode);
 
     }
 
     public void addNewCustomEntryType() {
+        EntryType newentryType = new UnknownEntryType(entryTypeToAddProperty.getValue());
+        BibEntryType type = new BibEntryType(newentryType, Collections.emptyList(), Collections.emptyList());
+        this.entryTypes.add(type);
+
         // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
         // BibEntryTypeBuilder
         //new UnknownEntryType(null).

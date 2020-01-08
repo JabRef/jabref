@@ -2,6 +2,8 @@ package org.jabref.gui.customentrytypes;
 
 import java.util.EnumSet;
 
+import javax.inject.Inject;
+
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -14,9 +16,11 @@ import javafx.util.StringConverter;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -33,11 +37,15 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
 
+    @Inject PreferencesService preferencesService;
+
     private final CustomEntryTypeDialogViewModel viewModel;
+    private BibDatabaseMode mode;
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext) {
 
-        viewModel = new CustomEntryTypeDialogViewModel();
+        viewModel = new CustomEntryTypeDialogViewModel(mode);
+        this.mode = bibDatabaseContext.getMode();
 
         ViewLoader.view(this)
                   .load()
