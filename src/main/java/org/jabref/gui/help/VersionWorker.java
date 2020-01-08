@@ -36,6 +36,7 @@ public class VersionWorker {
      * The version which was previously ignored by the user
      */
     private final Version toBeIgnored;
+
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 

@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.Globals;
@@ -31,7 +32,7 @@ public class PushToApplicationAction extends SimpleCommand {
     private PushToApplication application;
 
     public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.application = Globals.prefs.getActivePushToApplication(pushToApplicationsManager);
+        this.application = Objects.requireNonNull(Globals.prefs.getActivePushToApplication(pushToApplicationsManager));
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
@@ -40,7 +41,7 @@ public class PushToApplicationAction extends SimpleCommand {
     }
 
     public void updateApplication(PushToApplication application) {
-        this.application = application;
+        this.application = Objects.requireNonNull(application);
     }
 
     public Action getActionInformation() {
