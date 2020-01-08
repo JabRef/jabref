@@ -1,6 +1,9 @@
+# Guidelines to setup a local workspace
+
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
 For a complete step-by-step guide (using IntellJ as the IDE), have a look at the following video instructions:
+
 <p align="center">
   <a href="http://www.youtube.com/watch?v=FeQpygT0314"><img src="http://img.youtube.com/vi/FeQpygT0314/0.jpg" /></a>
 </p>
@@ -13,11 +16,11 @@ A working Java 13 installation is required. In the command line (terminal in Lin
 
 ### git
 
-It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git). 
-* In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
+It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/).
+* In Debian-based distros: `sudo apt-get install git`
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/). - See also our [tool recommendations](tools.md) for installation hints including [chocolatey](https://chocolatey.org/).
+
 If you do not yet have a GitHub account, please [create one](https://github.com/join).
 
 ### IDE
@@ -31,11 +34,11 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 ### Fork JabRef into your GitHub account
 
 1. Log into your GitHub account
-2. Go to https://github.com/JabRef/jabref 
+2. Go to <https://github.com/JabRef/jabref>
 3. Create a fork by clicking at fork button on the right top corner
 4. A fork repository will be created under your account (https://github.com/YOUR_USERNAME/jabref)
 
-### Clone your forked repository on your local machine.
+### Clone your forked repository on your local machine
 
 * In a command line, navigate to the folder where you want to place the source code (parent folder of `jabref/`). To prevent issues along the way, it is strongly recommend to choose a path that does not contain any special (non-ASCII or whitespace) characters.
 * Run `git clone --depth=10 https://github.com/YOUR_USERNAME/jabref.git`. The `--depth--10` is used to limit the download to ~20 MB instead of downloading the complete history (~800 MB). If you want to dig in our commit history, feel free to download everything.
@@ -54,7 +57,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    * Ensure that the projects SDK is Java 12: Project Settings -> Project -> Project SDK: Choose Java 12
    * Ensure that standard SDK is Java 12: Platform Settings -> SDK -> Choose Java 12
 4. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
-   ```batch
+   ```text
    --patch-module test=fastparse_2.12-1.0.0.jar
    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
    --patch-module test3=sourcecode_2.12-0.1.4.jar
@@ -83,7 +86,6 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 6. Use the provided run configuration: Run -> Run "JabRef Main"
 
 ### Set-up Eclipse
-
 
 1. Run `./gradlew run` to generate all resources and to check if jabref runs. (This step is only required once)
 2. Run `./gradlew eclipse` (This has to be always execute, when there are new upstream changes)
@@ -114,7 +116,9 @@ Execution failed for task ':compileJava'.
 
 Another indication is following output
 
-    java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+```text
+java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
+```
 
 ### Problems with generated source files
 
