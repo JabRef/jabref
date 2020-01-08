@@ -60,7 +60,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private void setupTable() {
 
         entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
-        entryTypes.setItems(viewModel.entryTypesProperty());
+        entryTypes.itemsProperty().bind(viewModel.entryTypesProperty());
         entryTypes.getSelectionModel().selectFirst();
 
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));

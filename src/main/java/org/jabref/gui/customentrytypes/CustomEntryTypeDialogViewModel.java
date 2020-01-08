@@ -1,7 +1,10 @@
 package org.jabref.gui.customentrytypes;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -37,6 +40,7 @@ public class CustomEntryTypeDialogViewModel {
     private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
     private BibDatabaseMode mode;
     private ObservableList<FieldViewModel> allFieldsForType;
+    private Map<BibEntryType, List<FieldViewModel>> typesWithField = new HashMap<>();
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode) {
         this.mode = mode;
@@ -48,14 +52,18 @@ public class CustomEntryTypeDialogViewModel {
         fieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
 
         existingFieldsForType = FXCollections.observableArrayList();
-        allFieldsForType = FXCollections.observableArrayList();
+
+        for (BibEntryType entryType : alllTypes) {
+            List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), entryType)).collect(Collectors.toList());
+            typesWithField.put(entryType, fields);
+        }
 
         this.fieldsForTypeProperty = new SimpleListProperty<>(existingFieldsForType);
 
         EasyBind.subscribe(selectedEntryTypesProperty, type -> {
             if (type != null) {
-                List<FieldViewModel> fields = type.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), type.isRequired(bibField.getField()), type)).collect(Collectors.toList());
-                existingFieldsForType.setAll(fields);
+                List<FieldViewModel> typesForField = typesWithField.get(type);
+                existingFieldsForType.setAll(typesForField);
             }
         });
 
@@ -93,9 +101,9 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField() {
 
         Field field = newFieldToAddProperty.getValue();
-
         FieldViewModel model = new FieldViewModel(field, true, selectedEntryTypesProperty.getValue());
-
+        typesWithField.computeIfAbsent(selectedEntryTypesProperty.getValue(), key -> new ArrayList<>()).add(model);
+        existingFieldsForType.add(model);
         //TODO: How should I add the field to the type?
 
         //BibEntryType type = new BibEntryType(type, fields, requiredFields)
@@ -105,8 +113,10 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAddProperty.getValue());
-        BibEntryType type = new BibEntryType(newentryType, Collections.emptyList(), Collections.emptyList());
+        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
         this.entryTypes.add(type);
+
+        this.typesWithField.put(type, new ArrayList<>());
 
         // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
         // BibEntryTypeBuilder
