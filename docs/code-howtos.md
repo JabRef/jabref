@@ -56,7 +56,7 @@ Please read https://github.com/cxxr/better-java
 
 ### Throwing and Catching Exceptions
 
-Principles: 
+Principles:
 
 - All Exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases (see details below!).
 - Catch and wrap all API exceptions (such as `IOExceptions`) and rethrow them
@@ -65,7 +65,7 @@ Principles:
     try {
         // ...
     } catch (IOException ioe) {
-        throw new JabRefException("Something went wrong...", 
+        throw new JabRefException("Something went wrong...",
             Localization.lang("Something went wrong...", ioe);
     }
     ```
@@ -115,9 +115,9 @@ Any listening method has to be annotated with `@Subscribe` keyword and must have
 import com.google.common.eventbus.Subscribe;
 
 public class Listener {
-   
+
    private int value = 0;
-   
+
    @Subscribe
    public void listen(int value) {
       this.value = value;
@@ -136,7 +136,7 @@ import com.google.common.eventbus.EventBus;
 
 public class Main {
    private static EventBus eventBus = new EventBus();
-   
+
    public static void main(String[] args) {
       Main main = new Main();
       Listener listener = new Listener();
@@ -160,14 +160,14 @@ If you want to catch the event you'll have to register your listener class with 
 ## Logging
 
 JabRef uses the logging facade [SLF4j](https://www.slf4j.org/).
-All log messages are passed internally to [log4j2](https://logging.apache.org/log4j/2.x/) which handles any filtering, formatting and writing of log messages. 
-- Obtaining a Logger for a Class: 
+All log messages are passed internally to [log4j2](https://logging.apache.org/log4j/2.x/) which handles any filtering, formatting and writing of log messages.
+- Obtaining a logger for a class:
 
   ```java
   private static final Log LOGGER = LogFactory.getLog(<ClassName>.class);
   ```
 
-- If the logging event is caused by an exception, please add the exception to the log message as: 
+- If the logging event is caused by an exception, please add the exception to the log message as:
 
   ```java
     catch (SomeException e) {
@@ -180,18 +180,18 @@ All log messages are passed internally to [log4j2](https://logging.apache.org/lo
 
 ## Using Localization correctly
 
-*(More information about this topic from the translator side is provided under this link: [Translating JabRef Interface](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
+*(More information about this topic from the translator side is provided under this link: [Translating JabRef Interface](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and
 [Translating JabRef Help](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) about the JabRef help files)*
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
-JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized. 
+JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized.
 
 To show an localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to obtain translated strings:
 
 ```java
     public static String lang(String key);
-    
+
     public static String lang(String key, String... params);
 
     public static String menuTitle(String key, String... params);
@@ -217,11 +217,11 @@ The tests check whether translation strings appear correctly in the resource bun
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. <s>With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well (you can use `gradlew localizationUpdateExtended` for extended output).</s> [Crowdin](http://translate.jabref.org) will add them as required.
-5. Tests are green again. 
+5. Tests are green again.
 
 ## Cleanup and Formatters
 
-We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test. 
+We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test.
 
 Example: [PageNumbersFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/net/sf/jabref/logic/formatter/bibtexfields/PageNumbersFormatter.java)
 
@@ -229,11 +229,11 @@ Example: [PageNumbersFormatter](https://github.com/JabRef/jabref/blob/master/src
 
 Drag and Drop makes usage of the Dragboard. For JavaFX the following [tutorial](https://docs.oracle.com/javafx/2/drag_drop/jfxpub-drag_drop.htm) is helpful. Note that the data has to be serializable which is put on the dragboard. For drag and drop of Bib-entries between the maintable and the groups panel, a custom Dragboard is used, `CustomLocalDragboard` which is a generic alternative to the system one.
 
-For accessing or putting data into the Clipboard use the `ClipboardManager`. 
+For accessing or putting data into the Clipboard use the `ClipboardManager`.
 
 ## Get the JabRef frame panel
 
-`JabRefFrame` and `BasePanel` are the two main classes. 
+`JabRefFrame` and `BasePanel` are the two main classes.
 You should never directly call them, instead pass them as parameters to the class.
 
 ## Get Absolute Filename or Path for file in File directory
@@ -248,42 +248,24 @@ The Preferences should only be directly accessed in the GUI. For the usage in lo
 ## Setting a Database Directory for a .bib File
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
-* “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory” 
-* There is also “fileDirectory-&lt;username&gt;”, which is determined by Globals.prefs.get(“userFileDirIndividual”) 
-* Used at DatabasePropertiesDialog 
+* “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”
+* There is also “fileDirectory-&lt;username&gt;”, which is determined by Globals.prefs.get(“userFileDirIndividual”)
+* Used at DatabasePropertiesDialog
 
 ## How to work with Preferences
 
-`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and https://github.com/JabRef/jabref/pull/658 for a detailed discussion.
+`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and <https://github.com/JabRef/jabref/pull/658> for a detailed discussion.
 
-`Globals.prefs` is a global variable storing a link to the preferences form. 
-
-`Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”.
-
-To store the configuration keys in constants, one has two options:
-
-* as constant in the own class 
-* as constant in `org.jabref.JaRefPreferences.java`
-
-There are JabRef classes existing, where the strings are hard-coded and where constants are not used. That way of configuration should be avoided. 
-
-When adding a new preference, following steps have to be taken:
-
-* add a constant for the configuration key
-* in org.jabref.JaRefPreferences.java put a “`defaults.put(<configuration key>, <value>)`” statement
-
-When accessing a preference value, the method `Globals.prefs.getTYPE(key)` has to be used.
+See <https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java> (via <https://github.com/JabRef/jabref/pull/3092>) for the current way how to deal with preferences.
 
 Defaults should go into the model package. See [Comments in this Commit](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484)
-
-See <https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java<> (via <https://github.com/JabRef/jabref/pull/3092>) for the current way how to deal with preferences.
 
 ## Test Cases
 
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
-- *Placing:* all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`. 
+- *Placing:* all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`.
 - *Naming:* the name should be descriptive enough to describe the whole test. Use the format `methodUnderTest_ expectedBehavior_context` (without the dashes). So for example `formatRemovesDoubleBracesAtBeginning`. Try to avoid naming the tests with a `test` prefix since this information is already contained in the class name. Moreover, starting the name with `test` leads often to inferior test names (see also the [Stackoverflow discussion about naming](http://stackoverflow.com/questions/155436/unit-test-naming-best-practices)).
-- *Test only one thing per test:* tests should be short and test only one small part of the method. So instead of 
+- *Test only one thing per test:* tests should be short and test only one small part of the method. So instead of
 ```java
 testFormat() {
    assertEqual("test", format("test"));
@@ -295,14 +277,14 @@ testFormat() {
 ```
 we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, `formatRemovesDoubleBracesAtBeginning`, etc.). See [JUnit AntiPattern](http://www.exubero.com/junit/antipatterns.html#Multiple_Assertions) for background.
 - Do *not just test happy paths*, but also wrong/weird input.
-- It is recommend to write tests *before* you actually implement the functionality (test driven development). 
+- It is recommend to write tests *before* you actually implement the functionality (test driven development).
 - *Bug fixing:* write a test case covering the bug and then fix it, leaving the test as a security that the bug will never reappear.
 - Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, ()->doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/)  to the test method.
 
 ### Lists in tests
 
 * Use `assertEquals(Collections.emptyList(), actualList);` instead of `assertEquals(0, actualList.size());` to test whether a list is empty.
-* Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
+* Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of
 ```java
          assertEquals(2, actualList.size());
          assertEquals("a", actualList.get(0));
@@ -329,7 +311,7 @@ to the test class. A temporary file is now created by `Files.createFile(path)`. 
 
 ### Loading Files from Resources
 
-Sometimes it is necessary to load a specific resource or to access the resource directory 
+Sometimes it is necessary to load a specific resource or to access the resource directory
 ```` java
 Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
 ````
@@ -409,12 +391,12 @@ The following expressions can be used in FXML attributes, according to the [offi
 
 Type | Expression | Value point to | Remark
 --- | --- | --- | ---
-Location | `@image.png` | path relative to the current FXML file | 
+Location | `@image.png` | path relative to the current FXML file |
 Resource | `%textToBeTranslated` | key in ResourceBundle |
 Attribute variable | `$idOfControl` or `$variable` | named control or variable in controller (may be path in the namespace) | resolved only once at load time
 Expression binding | `${expression}` | expression, for example `textField.text` | changes to source are propagated
 Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX, see [feature request](https://bugs.openjdk.java.net/browse/JDK-8090665))
-Event handler | `#nameOfEventHandler` | name of the event handler method in the controller | 
+Event handler | `#nameOfEventHandler` | name of the event handler method in the controller |
 Constant | `<text><Strings fx:constant="MYSTRING"/></text>` | constant (here `MYSTRING` in the `Strings` class) |
 
 ### JavaFX Radio Buttons example
