@@ -26,6 +26,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
@@ -70,6 +71,7 @@ public class SourceTab extends EntryEditorTab {
     private final StateManager stateManager;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
     private CodeArea codeArea;
+    private KeyBindingRepository keyBindingRepository;
 
     private class EditAction extends SimpleCommand {
 
@@ -99,7 +101,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -110,6 +112,7 @@ public class SourceTab extends EntryEditorTab {
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.keyBindingRepository = keyBindingRepository;
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
@@ -176,7 +179,7 @@ public class SourceTab extends EntryEditorTab {
         });
         codeArea.setId("bibtexSourceCodeArea");
 
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
