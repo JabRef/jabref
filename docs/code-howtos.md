@@ -1,37 +1,46 @@
-This page provides some development support in the form of howtos. See also [[High Level Documentation]].
+# Code Howtos
+
+This page provides some development support in the form of howtos. See also [High Level Documentation](high-level-documentation.md).
 
 ## Table of Contents
-  * [Generic code how tos](#generic-code-how-tos)
-  * [Error Handling in JabRef](#error-handling-in-jabref)
-    * [Throwing and Catching Exceptions](#throwing-and-catching-exceptions)
-    * [Outputting Errors in the UI](#outputting-errors-in-the-ui)
-  * [Using the EventSystem](#using-the-eventsystem)
-  * [Logging](#logging)
-  * [Using Localization correctly](#using-localization-correctly)
-  * [Cleanup and Formatters](#cleanup-and-formatters)
-  * [Drag and Drop](#drag-and-drop)
-  * [Get the JabRef frame panel](#get-the-jabref-frame-panel)
-  * [Get Absolute Filename or Path](#get-absolute-filename-or-path)
-  * [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-.bib-file)
-  * [How to work with Preferences](#how-to-work-with-preferences)
-  * [Test Cases](#test-cases)
-    * [Lists in tests](#lists-in-tests)
-    * [BibEntries in tests](#bibentries-in-tests)
-    * [Files and folders](#files-and-folders-in-tests)
-    * [Loading Files from Resources](#loading-files-from-resources)
-    * [Preferences in tests](#preferences-in-tests)
-  * [UI](#ui)
-  * [UI for Preferences](#ui-for-preferences)
-  * [Designing GUI Confirmation dialogs](#designing-gui-confirmation-dialogs)
-  * ["Special Fields"](#special-fields)
-    * [keywords sync](#keywords-sync)
-  * [Working with BibTeX data](#working-with-bibtex-data)
-    * [Working with authors](#working-with-authors)
-  * [Benchmarks](#benchmarks)
-  * [equals](#equals)
-  * [Files & Paths](#files-and-paths)
-  * [JavaFX](#javafx)
 
+- [Code Howtos](#code-howtos)
+  - [Table of Contents](#table-of-contents)
+  - [Generic code how tos](#generic-code-how-tos)
+  - [Error Handling in JabRef](#error-handling-in-jabref)
+    - [Throwing and Catching Exceptions](#throwing-and-catching-exceptions)
+    - [Outputting Errors in the UI](#outputting-errors-in-the-ui)
+  - [Using the EventSystem](#using-the-eventsystem)
+    - [What the EventSystem is used for?](#what-the-eventsystem-is-used-for)
+    - [Main principle](#main-principle)
+    - [Register to the EventBus](#register-to-the-eventbus)
+    - [Posting an object](#posting-an-object)
+    - [Short example](#short-example)
+    - [Event handling in JabRef](#event-handling-in-jabref)
+  - [Logging](#logging)
+  - [Using Localization correctly](#using-localization-correctly)
+  - [Cleanup and Formatters](#cleanup-and-formatters)
+  - [Drag and Drop](#drag-and-drop)
+  - [Get the JabRef frame panel](#get-the-jabref-frame-panel)
+  - [Get Absolute Filename or Path for file in File directory](#get-absolute-filename-or-path-for-file-in-file-directory)
+  - [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-bib-file)
+  - [How to work with Preferences](#how-to-work-with-preferences)
+  - [Test Cases](#test-cases)
+    - [Lists in tests](#lists-in-tests)
+    - [BibEntries in tests](#bibentries-in-tests)
+    - [Files and folders in tests](#files-and-folders-in-tests)
+    - [Loading Files from Resources](#loading-files-from-resources)
+    - [Preferences in tests](#preferences-in-tests)
+  - [UI](#ui)
+  - [&quot;Special Fields&quot;](#quotspecial-fieldsquot)
+    - [keywords sync](#keywords-sync)
+  - [Working with BibTeX data](#working-with-bibtex-data)
+    - [Working with authors](#working-with-authors)
+  - [Benchmarks](#benchmarks)
+  - [equals](#equals)
+  - [Files and Paths](#files-and-paths)
+  - [JavaFX](#javafx)
+    - [JavaFX Radio Buttons example](#javafx-radio-buttons-example)
 
 ## Generic code how tos
 
@@ -43,22 +52,23 @@ Please read https://github.com/cxxr/better-java
 - use lowerCamelCase instead of snake_case
 - name enums in singular, e.g. `Weekday` instead of `Weekdays` (except if they represent flags)
 
-
 ## Error Handling in JabRef
 
 ### Throwing and Catching Exceptions
+
 Principles: 
+
 - All Exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases (see details below!).
 - Catch and wrap all API exceptions (such as `IOExceptions`) and rethrow them
- - Example:
-  ```java
-  try {
-      // ...
-  } catch (IOException ioe) {
-      throw new JabRefException("Something went wrong...", 
-           Localization.lang("Something went wrong...", ioe);
-  }
-  ```
+  - Example:
+    ```java
+    try {
+        // ...
+    } catch (IOException ioe) {
+        throw new JabRefException("Something went wrong...", 
+            Localization.lang("Something went wrong...", ioe);
+    }
+    ```
 - Never, ever throw and catch `Exception` or `Throwable`
 - Errors should only be logged when they are finally caught (i.e., logged only once). See **Logging** for details.
 - If the Exception message is intended to be shown to the User in the UI (see below) provide also a localizedMessage (see `JabRefException`).
@@ -66,9 +76,11 @@ Principles:
 *(Rationale and further reading: https://www.baeldung.com/java-exceptions)*
 
 ### Outputting Errors in the UI
+
 Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized. The technical reasons (and stack traces) for a failure should only be logged.
 
 To show error message two different ways are usually used in JabRef:
+
 - showing an error dialog
 - updating the status bar at the bottom of the main window
 
@@ -77,23 +89,26 @@ To show error message two different ways are usually used in JabRef:
 ## Using the EventSystem
 
 ### What the EventSystem is used for?
+
 Many times there is a need to provide an object on many locations simultaneously.
 This design pattern is quite similar to Java's Observer, but it is much simplier and readable while having the same functional sense.
 
-
 ### Main principle
+
 `EventBus` represents a communication line between multiple components.
 Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance.
 Hence the passed object is available as a parameter in the listening method.
 
 ### Register to the `EventBus`
+
 Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method(s) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using differnt parameter types.
 
-
 ### Posting an object
+
 `post(object)` posts an object trough the `EventBus` which has been used to register the listening/subscribing methods.
 
 ### Short example
+
 ```java
 /* Listener.java */
 
@@ -142,7 +157,6 @@ For example: Every time an entry was added to the database a new `EntryAddedEven
 
 If you want to catch the event you'll have to register your listener class with the `registerListener(Object listener)` method in `BibDatabase`. `EntryAddedEvent` provides also methods to get the inserted `BibEntry`.
 
-
 ## Logging
 
 JabRef uses the logging facade [SLF4j](https://www.slf4j.org/).
@@ -161,10 +175,11 @@ All log messages are passed internally to [log4j2](https://logging.apache.org/lo
        ...
     }
   ```
+
 - SLF4J also support parameterized logging, e.g. if you want to print out multiple arguments in a log statement use a pair of curly braces. [Examples](https://www.slf4j.org/faq.html#logging_performance)
 
-
 ## Using Localization correctly
+
 *(More information about this topic from the translator side is provided under this link: [Translating JabRef Interface](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
 [Translating JabRef Help](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) about the JabRef help files)*
 
@@ -218,26 +233,24 @@ For accessing or putting data into the Clipboard use the `ClipboardManager`.
 
 ## Get the JabRef frame panel
 
-```java
 `JabRefFrame` and `BasePanel` are the two main classes. 
-You should never directly call them, instead pass them as parameters to the class. 
-```
+You should never directly call them, instead pass them as parameters to the class.
 
 ## Get Absolute Filename or Path for file in File directory
 
 ```java
  Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
 ```
+
 `String path` Can be the files name or a relative path to it.
 The Preferences should only be directly accessed in the GUI. For the usage in logic pass them as parameter
 
-
 ## Setting a Database Directory for a .bib File
 
-  * @comment{jabref-meta: fileDirectory:&lt;directory&gt;} 
-  * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory” 
-  * There is also “fileDirectory-&lt;username&gt;”, which is determined by Globals.prefs.get(“userFileDirIndividual”) 
-  * Used at DatabasePropertiesDialog 
+* `@comment{jabref-meta: fileDirectory:<directory>`
+* “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory” 
+* There is also “fileDirectory-&lt;username&gt;”, which is determined by Globals.prefs.get(“userFileDirIndividual”) 
+* Used at DatabasePropertiesDialog 
 
 ## How to work with Preferences
 
@@ -245,32 +258,33 @@ The Preferences should only be directly accessed in the GUI. For the usage in lo
 
 `Globals.prefs` is a global variable storing a link to the preferences form. 
 
-`Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”. 
+`Globals.prefs.getTYPE(key)` returns the value of the given configuration key. TYPE has to be replaced by Boolean, Double, Int, ByteArray. If a string is to be put, the method name is only “get”.
 
-To store the configuration keys in constants, one has two options 
+To store the configuration keys in constants, one has two options:
 
-  * as constant in the own class 
-  * as constant in `org.jabref.JaRefPreferences.java`
+* as constant in the own class 
+* as constant in `org.jabref.JaRefPreferences.java`
 
 There are JabRef classes existing, where the strings are hard-coded and where constants are not used. That way of configuration should be avoided. 
 
-When adding a new preference, following steps have to be taken: 
+When adding a new preference, following steps have to be taken:
 
-  * add a constant for the configuration key 
-  * in org.jabref.JaRefPreferences.java put a “defaults.put(&lt;configuration key&gt;, &lt;value&gt;)” statement 
+* add a constant for the configuration key
+* in org.jabref.JaRefPreferences.java put a “`defaults.put(<configuration key>, <value>)`” statement
 
-When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used.
+When accessing a preference value, the method `Globals.prefs.getTYPE(key)` has to be used.
 
 Defaults should go into the model package. See [Comments in this Commit](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484)
 
-See https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java (via https://github.com/JabRef/jabref/pull/3092) for the current way how to deal with preferences.
+See <https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java<> (via <https://github.com/JabRef/jabref/pull/3092>) for the current way how to deal with preferences.
 
 ## Test Cases
+
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
 - *Placing:* all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`. 
 - *Naming:* the name should be descriptive enough to describe the whole test. Use the format `methodUnderTest_ expectedBehavior_context` (without the dashes). So for example `formatRemovesDoubleBracesAtBeginning`. Try to avoid naming the tests with a `test` prefix since this information is already contained in the class name. Moreover, starting the name with `test` leads often to inferior test names (see also the [Stackoverflow discussion about naming](http://stackoverflow.com/questions/155436/unit-test-naming-best-practices)).
 - *Test only one thing per test:* tests should be short and test only one small part of the method. So instead of 
-````
+```java
 testFormat() {
    assertEqual("test", format("test"));
    assertEqual("{test", format("{test"));
@@ -278,7 +292,7 @@ testFormat() {
    assertEqual("test", format("test}}"));
    assertEqual("test", format("{{test}}"));
 }
-````
+```
 we would have five tests containing a single `assert` statement and named accordingly (`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, `formatRemovesDoubleBracesAtBeginning`, etc.). See [JUnit AntiPattern](http://www.exubero.com/junit/antipatterns.html#Multiple_Assertions) for background.
 - Do *not just test happy paths*, but also wrong/weird input.
 - It is recommend to write tests *before* you actually implement the functionality (test driven development). 
@@ -286,20 +300,23 @@ we would have five tests containing a single `assert` statement and named accord
 - Do not catch exceptions in tests, instead use the `assertThrows(Exception.class, ()->doSomethingThrowsEx())` feature of [junit-jupiter](https://junit.org/junit5/docs/current/user-guide/)  to the test method.
 
 ### Lists in tests
+
 * Use `assertEquals(Collections.emptyList(), actualList);` instead of `assertEquals(0, actualList.size());` to test whether a list is empty.
 * Similarly, use `assertEquals(Arrays.asList("a", "b"), actualList);` to compare lists instead of 
-```` java
+```java
          assertEquals(2, actualList.size());
          assertEquals("a", actualList.get(0));
          assertEquals("b", actualList.get(1));
-````
+```
 
 ### BibEntries in tests
+
 * Use the `assertEquals` methods in `BibtexEntryAssert` to check that the correct BibEntry is returned.
 
 ### Files and folders in tests
+
 * If you need a temporary file in tests, then add the following Annotation before the class:
-```` java
+``` java
 @ExtendWith(TempDirectory.class)
 class TestClass{
 
@@ -307,30 +324,28 @@ class TestClass{
     void setUp(@TempDirectory.TempDir Path temporaryFolder){
     }
 }
-````
+```
 to the test class. A temporary file is now created by `Files.createFile(path)`. Using this pattern automatically ensures that the test folder is deleted after the tests are run. See the [junit-pioneer doc](https://junit-pioneer.org/docs/temp-directory/) for more details.
 
-### Loading Files from Resources:
+### Loading Files from Resources
+
 Sometimes it is necessary to load a specific resource or to access the resource directory 
 ```` java
 Path resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
 ````
 When the directory is needed, it is important to first point to an actual existing file. Otherwise the wrong directory will be returned.
 
-
 ### Preferences in tests
-
 
 If you modify preference, use following pattern to ensure that the stored preferences of a developer are not affected:
 
-
-
 Or even better, try to mock the preferences and insert them via dependency injection.
-````java
+
+```java
 @Test
 public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      // Mock preferences
-     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);        
+     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);
      // Switch to BibLatex mode
      when(mockedPrefs.getBoolean("BiblatexMode")).thenReturn(true);
 
@@ -338,7 +353,8 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      EntryTypes biblatexentrytypes = new EntryTypes(mockedPrefs);
      assertEquals(BibLatexEntryTypes.ARTICLE, biblatexentrytypes.getType("article"));
 }
-````
+```
+
 To test that a preferences migration works succesfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
 
 ## UI
@@ -349,7 +365,7 @@ Global variables should be avoided. Try to pass them as dependency.
 
 ### keywords sync
 
-Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent does not provide the field information. Therefore, we have to use BibtexEntry.addPropertyChangeListener(VetoableChangeListener listener) 
+Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent does not provide the field information. Therefore, we have to use BibtexEntry.addPropertyChangeListener(VetoableChangeListener listener)
 
 ## Working with BibTeX data
 
@@ -358,6 +374,7 @@ Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent doe
 You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `org.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the von parts or the junior information).
 
 ## Benchmarks
+
 - Benchmarks can be executed by running the `jmh` gradle task (this functionality uses the [JMH Gradle plugin]( https://github.com/melix/jmh-gradle-plugin))
 - Best practices:
   - Read test input from `@State` objects
@@ -365,17 +382,20 @@ You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor
 - [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
 
 ## equals
-When creating an `equals`method follow:
- 1.   Use the `== `operator to check if the argument is a reference to this object. If so, return `true`.
- 2.   Use the `instanceof` operator to check if the argument has the correct type. If not, return `false`.
- 3.   Cast the argument to the correct type.
- 4.   For each “significant” field in the class, check if that field of the argument matches the corresponding field of this object. If all these tests succeed, return `true` otherwise, return `false`.
- 5.   When you are finished writing your equals method, ask yourself three questions: Is it symmetric? Is it transitive? Is it consistent?
+
+When creating an `equals` method follow:
+
+1. Use the `== ` operator to check if the argument is a reference to this object. If so, return `true`.
+2. Use the `instanceof` operator to check if the argument has the correct type. If not, return `false`.
+3. Cast the argument to the correct type.
+4. For each “significant” field in the class, check if that field of the argument matches the corresponding field of this object. If all these tests succeed, return `true` otherwise, return `false`.
+5. When you are finished writing your equals method, ask yourself three questions: Is it symmetric? Is it transitive? Is it consistent?
 
 Also, note:
- *   Always override `hashCode` when you override equals (`hashCode` also has very strict rules)
- *   Don’t try to be too clever
- *   Don’t substitute another type for `Object` in the equals declaration
+
+* Always override `hashCode` when you override equals (`hashCode` also has very strict rules) (Item 9 of[Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/))
+* Don’t try to be too clever
+* Don’t substitute another type for `Object` in the equals declaration
 
 ## Files and Paths
 Always try to use the methods from the nio-package. For interoperability, they provide methods to convert between file and path.
@@ -390,18 +410,19 @@ The following expressions can be used in FXML attributes, according to the [offi
 Type | Expression | Value point to | Remark
 --- | --- | --- | ---
 Location | `@image.png` | path relative to the current FXML file | 
-Resource | `%textToBeTranslated` | key in ResourceBundle | 
+Resource | `%textToBeTranslated` | key in ResourceBundle |
 Attribute variable | `$idOfControl` or `$variable` | named control or variable in controller (may be path in the namespace) | resolved only once at load time
 Expression binding | `${expression}` | expression, for example `textField.text` | changes to source are propagated
 Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX, see [feature request](https://bugs.openjdk.java.net/browse/JDK-8090665))
 Event handler | `#nameOfEventHandler` | name of the event handler method in the controller | 
 Constant | `<text><Strings fx:constant="MYSTRING"/></text>` | constant (here `MYSTRING` in the `Strings` class) |
 
-### JavaFX Radio Buttons example:
-All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code
-Example:    
+### JavaFX Radio Buttons example
 
-```
+All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code
+Example:
+
+```xml
 <VBox>
             <fx:define>
                 <ToggleGroup fx:id="citeToggleGroup"/>
