@@ -39,6 +39,19 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     }
 
+    /**
+     *   We override this here to select the radio buttons accordingly
+     */
+    @Override
+    public void setAccepted(boolean accepted) {
+        super.setAccepted(accepted);
+        if (accepted) {
+            mergePanel.selectAllRightRadioButtons();
+        } else {
+            mergePanel.selectAllLeftRadioButtons();
+        }
+    }
+
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         database.getDatabase().removeEntry(oldEntry);
@@ -49,9 +62,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public Node description() {
-
         mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), DefaultRadioButtonSelectionMode.LEFT);
-
         VBox container = new VBox(10);
         Label header = new Label(name);
         header.getStyleClass().add("sectionHeader");

@@ -169,4 +169,4 @@ jobs:
           options: ''
           ssh_options: '-p 9922'
           src: 'build/distribution/'
-          dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/

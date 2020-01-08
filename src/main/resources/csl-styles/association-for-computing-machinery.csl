@@ -13,7 +13,7 @@
     </author>
     <category citation-format="numeric"/>
     <category field="engineering"/>
-    <updated>2017-07-03T15:22:45+00:00</updated>
+    <updated>2019-12-18T11:27:24+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -125,7 +125,7 @@
       </group>
       <group suffix=".">
         <choose>
-          <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
+          <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
             <text macro="book-publisher" suffix="."/>
           </if>
           <else-if type="paper-conference">
@@ -137,6 +137,7 @@
                   <text variable="collection-title" prefix="(" suffix=")"/>
                 </group>
               </group>
+              <text macro="book-publisher"/>
               <text variable="page"/>
             </group>
           </else-if>
@@ -178,6 +179,12 @@
             <group delimiter=", " suffix=".">
               <text macro="journal"/>
               <text variable="page"/>
+            </group>
+          </else-if>
+          <else-if type="thesis" match="any">
+            <group delimiter=". ">
+              <text variable="genre"/>
+              <text macro="book-publisher"/>
             </group>
           </else-if>
           <else>

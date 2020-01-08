@@ -2,10 +2,10 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
   <info>
     <title>American Psychological Association 6th edition (no DOIs, no issue numbers)</title>
-    <title-short>APA</title-short>
+    <title-short>APA (6th ed., no DOI)</title-short>
     <id>http://www.zotero.org/styles/apa-no-doi-no-issue</id>
     <link href="http://www.zotero.org/styles/apa-no-doi-no-issue" rel="self"/>
-    <link href="http://www.zotero.org/styles/apa" rel="template"/>
+    <link href="http://www.zotero.org/styles/apa-6th-edition" rel="template"/>
     <link href="http://owl.english.purdue.edu/owl/resource/560/01/" rel="documentation"/>
     <author>
       <name>Simon Kornblith</name>
@@ -42,9 +42,17 @@
         <multiple>eds. &amp; trans.</multiple>
       </term>
       <term name="translator" form="short">trans.</term>
-      <term name="interviewer" form="short">interviewer</term>
+      <term name="interviewer" form="short">
+        <single>interviewer</single>
+        <multiple>interviewers</multiple>
+      </term>
+      <term name="collection-editor" form="short">
+        <single>series ed.</single>
+        <multiple>series eds.</multiple>
+      </term>
       <term name="circa" form="short">ca.</term>
-      <term name="collection-editor" form="short">series ed.</term>
+      <term name="bc"> B.C.E.</term>
+      <term name="ad"> C.E.</term>
     </terms>
   </locale>
   <locale xml:lang="es">
@@ -63,6 +71,11 @@
     </terms>
   </locale>
   <locale xml:lang="nn">
+    <terms>
+      <term name="et-al">et al.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="nl">
     <terms>
       <term name="et-al">et al.</term>
     </terms>
