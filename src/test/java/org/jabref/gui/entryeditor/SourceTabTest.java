@@ -52,12 +52,11 @@ class SourceTabTest {
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         Globals.prefs = mock(JabRefPreferences.class);
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
-        when(Globals.prefs.getKeyBindingRepository()).thenReturn(keyBindingRepository);
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences())
                 .thenReturn(mock(FieldContentParserPreferences.class));
 
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new LatexFieldFormatterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
