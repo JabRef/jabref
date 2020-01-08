@@ -239,7 +239,7 @@ You should never directly call them, instead pass them as parameters to the clas
 ## Get Absolute Filename or Path for file in File directory
 
 ```java
- Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
+Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
 ```
 
 `String path` Can be the files name or a relative path to it.
