@@ -11,18 +11,20 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
 
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.fxmisc.easybind.EasyBind;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -63,32 +65,42 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypes.itemsProperty().bind(viewModel.entryTypesProperty());
         entryTypes.getSelectionModel().selectFirst();
 
+        
+        entryTypeActionsColumn.setSortable(false);
+        entryTypeActionsColumn.setReorderable(false);
+        entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
+        new ValueTableCellFactory<BibEntryType, String>()
+             .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+             .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
+             .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getFocusModel().getFocusedItem()))
+             .install(entryTypeActionsColumn);
+
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldTypeProperty());
-
         fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldNameProperty());
 
         viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
-
         viewModel.entryTypeToAddProperty().bind(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fieldsProperty());
+        addNewField.setConverter(viewModel.fieldStringConverter);
 
-        addNewField.setConverter(new StringConverter<Field>() {
+        fieldTypeActionColumn.setSortable(false);
+        fieldTypeActionColumn.setReorderable(false);
+        fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldNameProperty());
 
-            @Override
-            public String toString(Field object) {
+        new ValueTableCellFactory<FieldViewModel, String>()
+           .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+           .withTooltip(name -> Localization.lang("Remove field from entry type") + " " + name)
+           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(requiredFields.getFocusModel().getFocusedItem()))
+           .install(fieldTypeActionColumn);
 
-                return object != null ? object.getDisplayName() : "";
-            }
-
-            @Override
-            public Field fromString(String string) {
-                return new UnknownField(string);
-            }
-        });
         viewModel.newFieldToAddProperty().bind(addNewField.valueProperty());
         requiredFields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
+
+        EasyBind.subscribe(requiredFields.getSelectionModel().selectedItemProperty(), field -> {
+            System.out.println("selected field " + field);
+        });
 
     }
 

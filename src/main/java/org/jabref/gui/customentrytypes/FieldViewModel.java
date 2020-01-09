@@ -21,6 +21,7 @@ public class FieldViewModel {
         this.entryType = entryType;
         this.fieldNameProperty.setValue(field.getDisplayName());
         this.fieldTypeProperty.setValue(fieldType);
+
     }
 
     public FieldViewModel(Field field, boolean required, BibEntryType entryType) {
@@ -42,5 +43,10 @@ public class FieldViewModel {
     public BibEntryType getEntryType() {
         return entryType;
 
+    }
+
+    @Override
+    public String toString() {
+        return this.field.getDisplayName();
     }
 }

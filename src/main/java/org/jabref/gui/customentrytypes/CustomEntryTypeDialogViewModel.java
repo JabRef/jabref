@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -15,11 +16,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.StringConverter;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -29,6 +32,19 @@ import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
+    public static final StringConverter<Field> fieldStringConverter = new StringConverter<Field>() {
+
+        @Override
+        public String toString(Field object) {
+            return object != null ? object.getDisplayName() : "";
+        }
+
+        @Override
+        public Field fromString(String string) {
+            return new UnknownField(string);
+        }
+    };
+
     private ListProperty<BibEntryType> entryTypesProperty;
     private ListProperty<Field> fieldsProperty;
     private ObjectProperty<BibEntryType> selectedEntryTypesProperty = new SimpleObjectProperty<>();
@@ -36,10 +52,9 @@ public class CustomEntryTypeDialogViewModel {
     private ObjectProperty<Field> selectedFieldToAddProperty = new SimpleObjectProperty<>();
     private StringProperty entryTypeToAddProperty = new SimpleStringProperty("");
     private ObservableList<BibEntryType> entryTypes;
-    private ObservableList<FieldViewModel> existingFieldsForType;
+    private ObservableList<FieldViewModel> existingFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldNameProperty(), extractor.fieldTypeProperty()});
     private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
     private BibDatabaseMode mode;
-    private ObservableList<FieldViewModel> allFieldsForType;
     private Map<BibEntryType, List<FieldViewModel>> typesWithField = new HashMap<>();
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode) {
@@ -50,8 +65,6 @@ public class CustomEntryTypeDialogViewModel {
         entryTypesProperty = new SimpleListProperty<>(entryTypes);
 
         fieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
-
-        existingFieldsForType = FXCollections.observableArrayList();
 
         for (BibEntryType entryType : alllTypes) {
             List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), entryType)).collect(Collectors.toList());
@@ -142,5 +155,12 @@ public class CustomEntryTypeDialogViewModel {
 
     public ObjectProperty<Field> newFieldToAddProperty() {
         return this.newFieldToAddProperty;
+    }
+
+    public void removeEntryType(BibEntryType focusedItem) {
+    }
+
+    public void removeField(FieldViewModel focusedItem) {
+        // TODO Auto-generated method stub
     }
 }

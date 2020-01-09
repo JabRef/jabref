@@ -32,8 +32,11 @@
 								<TableColumn fx:id="entryTypColumn" minWidth="100.0"
 									prefWidth="100.0" text="Entry Type" />
 								<TableColumn fx:id="entryTypeActionsColumn"
-									prefWidth="20.0" />
+									maxWidth="40.0" minWidth="40.0" resizable="false" />
 							</columns>
+							<columnResizePolicy>
+								<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+							</columnResizePolicy>
 						</TableView>
 						<HBox spacing="10.0">
 							<children>
@@ -66,8 +69,11 @@
 								<TableColumn fx:id="fieldTypeColumn"
 									minWidth="100.0" prefWidth="100.0" text="%Field type" />
 								<TableColumn fx:id="fieldTypeActionColumn"
-									prefWidth="20.0" />
+									maxWidth="40.0" minWidth="40.0" resizable="false" />
 							</columns>
+							<columnResizePolicy>
+								<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+							</columnResizePolicy>
 						</TableView>
 						<HBox spacing="10.0">
 							<children>
