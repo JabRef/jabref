@@ -72,7 +72,7 @@ public class SourceTab extends EntryEditorTab {
     private final CodeArea codeArea;
     private KeyBindingRepository keyBindingRepository;
 
-    private BibEntry boundEntry;
+    private BibEntry previousEntry;
 
     private class EditAction extends SimpleCommand {
 
@@ -205,8 +205,8 @@ public class SourceTab extends EntryEditorTab {
         });
 
         codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
-            if (!onFocus && boundEntry != null) {
-                storeSource(boundEntry, codeArea.textProperty().getValue());
+            if (!onFocus && currentEntry != null) {
+                storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
     }
@@ -216,28 +216,31 @@ public class SourceTab extends EntryEditorTab {
         return true;
     }
 
+    private void updateCodeArea() {
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+            codeArea.clear();
+            try {
+                codeArea.appendText(getSourceString(currentEntry, mode, fieldFormatterPreferences));
+                highlightSearchPattern();
+            } catch (IOException ex) {
+                codeArea.setEditable(false);
+                codeArea.appendText(ex.getMessage() + "\n\n" +
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                LOGGER.debug("Incorrect entry", ex);
+            }
+        });
+    }
+
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (boundEntry != null) {
-            storeSource(boundEntry, codeArea.textProperty().getValue());
+        if (previousEntry != null) {
+            storeSource(previousEntry, codeArea.textProperty().getValue());
         }
+        this.previousEntry = entry;
 
-        this.boundEntry = entry;
+        updateCodeArea();
 
-        if (entry != null) {
-            DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                codeArea.clear();
-                try {
-                    codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
-                    highlightSearchPattern();
-                } catch (IOException ex) {
-                    codeArea.setEditable(false);
-                    codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                    LOGGER.debug("Incorrect entry", ex);
-                }
-            });
-        }
+        entry.getFieldsObservable().addListener((InvalidationListener) listener -> updateCodeArea());
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
