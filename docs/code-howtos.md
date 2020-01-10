@@ -2,46 +2,6 @@
 
 This page provides some development support in the form of howtos. See also [High Level Documentation](high-level-documentation.md).
 
-## Table of Contents
-
-- [Code Howtos](#code-howtos)
-  - [Table of Contents](#table-of-contents)
-  - [Generic code how tos](#generic-code-how-tos)
-  - [Error Handling in JabRef](#error-handling-in-jabref)
-    - [Throwing and Catching Exceptions](#throwing-and-catching-exceptions)
-    - [Outputting Errors in the UI](#outputting-errors-in-the-ui)
-  - [Using the EventSystem](#using-the-eventsystem)
-    - [What the EventSystem is used for?](#what-the-eventsystem-is-used-for)
-    - [Main principle](#main-principle)
-    - [Register to the EventBus](#register-to-the-eventbus)
-    - [Posting an object](#posting-an-object)
-    - [Short example](#short-example)
-    - [Event handling in JabRef](#event-handling-in-jabref)
-  - [Logging](#logging)
-  - [Using Localization correctly](#using-localization-correctly)
-  - [Cleanup and Formatters](#cleanup-and-formatters)
-  - [Drag and Drop](#drag-and-drop)
-  - [Get the JabRef frame panel](#get-the-jabref-frame-panel)
-  - [Get Absolute Filename or Path for file in File directory](#get-absolute-filename-or-path-for-file-in-file-directory)
-  - [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-bib-file)
-  - [How to work with Preferences](#how-to-work-with-preferences)
-  - [Test Cases](#test-cases)
-    - [Lists in tests](#lists-in-tests)
-    - [BibEntries in tests](#bibentries-in-tests)
-    - [Files and folders in tests](#files-and-folders-in-tests)
-    - [Loading Files from Resources](#loading-files-from-resources)
-    - [Preferences in tests](#preferences-in-tests)
-  - [UI](#ui)
-  - [&quot;Special Fields&quot;](#quotspecial-fieldsquot)
-    - [keywords sync](#keywords-sync)
-  - [Working with BibTeX data](#working-with-bibtex-data)
-    - [Working with authors](#working-with-authors)
-  - [Benchmarks](#benchmarks)
-  - [equals](#equals)
-  - [Files and Paths](#files-and-paths)
-  - [JavaFX](#javafx)
-    - [JavaFX Radio Buttons example](#javafx-radio-buttons-example)
-
 ## Generic code how tos
 
 We really recommend reading the book [Java by Comparison](http://java.by-comparison.com/).

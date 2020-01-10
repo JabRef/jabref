@@ -60,7 +60,7 @@
 }
 
 .table-view .groupColumnBackground {
-    -fx-stroke: -jr-gray-4;
+    -fx-stroke: -jr-gray-3;
 }
 
 .code-area .lineno {
