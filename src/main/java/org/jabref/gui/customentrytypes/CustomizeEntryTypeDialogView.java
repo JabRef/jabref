@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,7 +33,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<BibEntryType, String> entryTypColumn;
     @FXML private TableColumn<BibEntryType, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
-    @FXML private TableView<FieldViewModel> requiredFields;
+    @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
     @FXML private TableColumn<FieldViewModel, FieldType> fieldTypeColumn;
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
@@ -52,6 +53,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+        
+        ControlHelper.setAction(applyButton, getDialogPane(), evt->viewModel.apply());
     }
 
     @FXML
@@ -92,13 +95,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         new ValueTableCellFactory<FieldViewModel, String>()
            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
            .withTooltip(name -> Localization.lang("Remove field from entry type") + " " + name)
-           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(requiredFields.getFocusModel().getFocusedItem()))
+           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getFocusModel().getFocusedItem()))
            .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bind(addNewField.valueProperty());
-        requiredFields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
+        fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
 
-        EasyBind.subscribe(requiredFields.getSelectionModel().selectedItemProperty(), field -> {
+        EasyBind.subscribe(fields.getSelectionModel().selectedItemProperty(), field -> {
             System.out.println("selected field " + field);
         });
 
@@ -112,7 +115,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML
     void addNewField() {
         viewModel.addNewField();
-
     }
 
 }

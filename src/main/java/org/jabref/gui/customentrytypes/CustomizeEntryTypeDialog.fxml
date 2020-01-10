@@ -61,7 +61,7 @@
 					HBox.hgrow="ALWAYS">
 					<children>
 						<Label text="%Required and optional fields" />
-						<TableView fx:id="requiredFields" minWidth="-Infinity"
+						<TableView fx:id="fields" minWidth="-Infinity"
 							VBox.vgrow="ALWAYS">
 							<columns>
 								<TableColumn fx:id="fieldNameColumn"

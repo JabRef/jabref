@@ -32,7 +32,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
-    public static final StringConverter<Field> fieldStringConverter = new StringConverter<Field>() {
+    public static final StringConverter<Field> fieldStringConverter = new StringConverter<>() {
 
         @Override
         public String toString(Field object) {
@@ -52,10 +52,10 @@ public class CustomEntryTypeDialogViewModel {
     private ObjectProperty<Field> selectedFieldToAddProperty = new SimpleObjectProperty<>();
     private StringProperty entryTypeToAddProperty = new SimpleStringProperty("");
     private ObservableList<BibEntryType> entryTypes;
-    private ObservableList<FieldViewModel> existingFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldNameProperty(), extractor.fieldTypeProperty()});
+    private ObservableList<FieldViewModel> fieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldNameProperty(), extractor.fieldTypeProperty()});
     private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
     private BibDatabaseMode mode;
-    private Map<BibEntryType, List<FieldViewModel>> typesWithField = new HashMap<>();
+    private Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode) {
         this.mode = mode;
@@ -68,15 +68,15 @@ public class CustomEntryTypeDialogViewModel {
 
         for (BibEntryType entryType : alllTypes) {
             List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), entryType)).collect(Collectors.toList());
-            typesWithField.put(entryType, fields);
+            typesWithFields.put(entryType, fields);
         }
 
-        this.fieldsForTypeProperty = new SimpleListProperty<>(existingFieldsForType);
+        this.fieldsForTypeProperty = new SimpleListProperty<>(fieldsForType);
 
         EasyBind.subscribe(selectedEntryTypesProperty, type -> {
             if (type != null) {
-                List<FieldViewModel> typesForField = typesWithField.get(type);
-                existingFieldsForType.setAll(typesForField);
+                List<FieldViewModel> typesForField = typesWithFields.get(type);
+                fieldsForType.setAll(typesForField);
             }
         });
 
@@ -115,13 +115,8 @@ public class CustomEntryTypeDialogViewModel {
 
         Field field = newFieldToAddProperty.getValue();
         FieldViewModel model = new FieldViewModel(field, true, selectedEntryTypesProperty.getValue());
-        typesWithField.computeIfAbsent(selectedEntryTypesProperty.getValue(), key -> new ArrayList<>()).add(model);
-        existingFieldsForType.add(model);
-        //TODO: How should I add the field to the type?
-
-        //BibEntryType type = new BibEntryType(type, fields, requiredFields)
-        //   Globals.entryTypesManager.addCustomOrModifiedType(entryType, mode);
-
+        typesWithFields.computeIfAbsent(selectedEntryTypesProperty.getValue(), key -> new ArrayList<>()).add(model);
+        fieldsForType.add(model);
     }
 
     public void addNewCustomEntryType() {
@@ -129,11 +124,7 @@ public class CustomEntryTypeDialogViewModel {
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
         this.entryTypes.add(type);
 
-        this.typesWithField.put(type, new ArrayList<>());
-
-        // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
-        // BibEntryTypeBuilder
-        //new UnknownEntryType(null).
+        this.typesWithFields.put(type, new ArrayList<>());
 
     }
 
@@ -158,9 +149,28 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeEntryType(BibEntryType focusedItem) {
+        typesWithFields.remove(focusedItem);
+        entryTypes.remove(focusedItem);
     }
 
     public void removeField(FieldViewModel focusedItem) {
-        // TODO Auto-generated method stub
+        typesWithFields.computeIfAbsent(selectedEntryTypesProperty.getValue(), key -> new ArrayList<>()).remove(focusedItem);
+        fieldsForType.remove(focusedItem);
+    }
+
+    public void apply() {
+
+        for (var entry : typesWithFields.entrySet()) {
+            entry.getKey();
+            //TODO: store them as BibEntry types again
+            //Find out if we simply can dump all the types with fields or do we need to check for custom ones before adding them?
+                
+            
+            // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
+            // BibEntryTypeBuilder
+            //new UnknownEntryType(null).
+            
+
+        }
     }
 }
