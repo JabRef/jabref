@@ -142,7 +142,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog(dialogService));
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(dialogService));
         newGroup.ifPresent(group -> {
             parent.addSubgroup(group);
 
@@ -167,7 +167,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
         Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(dialogService, oldGroup.getGroupNode().getGroup()));
+                .showCustomDialogAndWait(new GroupDialogView(dialogService, oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
             // TODO: Keep assignments
             boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(

@@ -480,7 +480,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         autoGroupKeywordsOption.setToggleGroup(tg);
         autoGroupPersonsOption.setToggleGroup(tg);
         VBox fieldToGroupByKeywords = new VBox(
-                new Label(Localization.lang("Field to group by") + ":"),
+                new Label(Localization.lang("Field to group by:")),
                 autoGroupKeywordsField
         );
         fieldToGroupByKeywords.setPadding(new Insets(0, 0, 0, 20));
@@ -493,7 +493,7 @@ class GroupDialog extends BaseDialog<AbstractGroup> {
         );
         delimiterCharacters.setPadding(new Insets(0, 0, 0, 20));
         VBox fieldToGroupByPersons = new VBox(
-                new Label(Localization.lang("Field to group by") + ":"),
+                new Label(Localization.lang("Field to group by:")),
                 autoGroupPersonsField
         );
         fieldToGroupByPersons.setPadding(new Insets(0, 0, 0, 20));
