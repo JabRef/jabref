@@ -27,6 +27,7 @@ import org.jabref.preferences.NewLineSeparator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
@@ -51,7 +52,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final FunctionBasedValidator mainFileDirValidator;
+    private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -136,9 +137,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus status = mainFileDirValidationStatus();
-        if (!status.isValid()) {
-            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = mainFileDirValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;

@@ -68,4 +68,5 @@ open module org.jabref {
     requires org.jsoup;
     requires commons.csv;
     requires io.github.javadiffutils;
+    requires flowless;
 }
