@@ -50,6 +50,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -196,10 +197,10 @@ public class SourceTab extends EntryEditorTab {
         sourceValidator.addRule(sourceIsValid);
 
         sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
-            if (!sourceValidator.getValidationStatus().isValid()) {
-                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> {
-                    dialogService.showErrorDialogAndWait(validationMessage.getMessage());
-                });
+            ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
+            if (!sourceValidationStatus.isValid()) {
+                sourceValidationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             }
         });
 
@@ -217,6 +218,10 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
+        if (boundEntry != null) {
+            storeSource(boundEntry, codeArea.textProperty().getValue());
+        }
+
         this.boundEntry = entry;
 
         if (entry != null) {
