@@ -22,7 +22,9 @@ class MetaDataChangeViewModel extends DatabaseChangeViewModel {
     public Node description() {
         VBox container = new VBox(15);
 
-        container.getChildren().add(new Label(Localization.lang("The following metadata changed:")));
+        Label header = new Label(Localization.lang("The following metadata changed:"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().add(header);
 
         for (String change : metaDataDiff.getDifferences()) {
             container.getChildren().add(new Label(change));

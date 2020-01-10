@@ -82,6 +82,6 @@ public class ChangeScanner {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry());
         }
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), database);
+        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry());
     }
 }
