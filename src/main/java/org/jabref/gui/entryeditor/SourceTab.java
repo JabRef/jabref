@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
@@ -31,7 +31,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
@@ -51,7 +50,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.controlsfx.control.NotificationPane;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -64,14 +62,16 @@ public class SourceTab extends EntryEditorTab {
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
-    @SuppressWarnings("unchecked") private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
     private final StateManager stateManager;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
-    private CodeArea codeArea;
+    private final CodeArea codeArea;
     private KeyBindingRepository keyBindingRepository;
+
+    private BibEntry boundEntry;
 
     private class EditAction extends SimpleCommand {
 
@@ -81,7 +81,6 @@ public class SourceTab extends EntryEditorTab {
 
         @Override
         public void execute() {
-            if (codeArea != null) {
                 switch (command) {
                     case COPY:
                         codeArea.copy();
@@ -97,7 +96,6 @@ public class SourceTab extends EntryEditorTab {
                         break;
                 }
                 codeArea.requestFocus();
-            }
         }
     }
 
@@ -113,6 +111,11 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.keyBindingRepository = keyBindingRepository;
+        this.codeArea = new CodeArea();
+
+        setupSourceEditor();
+        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
+        this.setContent(scrollableCodeArea);
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
@@ -144,7 +147,7 @@ public class SourceTab extends EntryEditorTab {
     /* Work around for different input methods.
      * https://github.com/FXMisc/RichTextFX/issues/146
      */
-    private class InputMethodRequestsObject implements InputMethodRequests {
+    private static class InputMethodRequestsObject implements InputMethodRequests {
 
         @Override
         public String getSelectedText() {
@@ -167,8 +170,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private CodeArea createSourceEditor() {
-        CodeArea codeArea = new CodeArea();
+    private void setupSourceEditor() {
         codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
@@ -191,7 +193,21 @@ public class SourceTab extends EntryEditorTab {
         contextMenu.getStyleClass().add("context-menu");
         codeArea.setContextMenu(contextMenu);
 
-        return codeArea;
+        sourceValidator.addRule(sourceIsValid);
+
+        sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
+            if (!sourceValidator.getValidationStatus().isValid()) {
+                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> {
+                    dialogService.showErrorDialogAndWait(validationMessage.getMessage());
+                });
+            }
+        });
+
+        codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
+            if (!onFocus && boundEntry != null) {
+                storeSource(boundEntry, codeArea.textProperty().getValue());
+            }
+        });
     }
 
     @Override
@@ -201,30 +217,9 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        CodeArea codeArea = createSourceEditor();
-        VirtualizedScrollPane<CodeArea> node = new VirtualizedScrollPane<>(codeArea);
-        NotificationPane notificationPane = new NotificationPane(node);
-        notificationPane.setShowFromTop(false);
-        sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
-            if (sourceValidator.getValidationStatus().isValid()) {
-                notificationPane.hide();
-            } else {
-                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> {
-                    notificationPane.show(validationMessage.getMessage());//this seems not working
-                    dialogService.showErrorDialogAndWait(validationMessage.getMessage());
-                });
-            }
-        });
-        this.setContent(codeArea);
-        this.codeArea = codeArea;
+        this.boundEntry = entry;
 
-        // Store source for on focus out event in the source code (within its text area)
-        // and update source code for every change of entry field values
-        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.focusedProperty(), onFocus -> {
-            if (!onFocus) {
-                storeSource(entry, codeArea.textProperty().getValue());
-            }
-        }, fields -> {
+        if (entry != null) {
             DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
                 codeArea.clear();
                 try {
@@ -233,12 +228,11 @@ public class SourceTab extends EntryEditorTab {
                 } catch (IOException ex) {
                     codeArea.setEditable(false);
                     codeArea.appendText(ex.getMessage() + "\n\n" +
-                                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                     LOGGER.debug("Incorrect entry", ex);
                 }
             });
-        });
-
+        }
     }
 
     private void storeSource(BibEntry outOfFocusEntry, String text) {
