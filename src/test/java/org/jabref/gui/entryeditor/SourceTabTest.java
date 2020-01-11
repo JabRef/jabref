@@ -78,7 +78,7 @@ class SourceTabTest {
 
         // Update source editor
         robot.interact(() -> pane.getSelectionModel().select(2));
-        robot.interact(() -> sourceTab.bindToEntry(entry));
+        robot.interact(() -> sourceTab.notifyAboutFocus(entry));
         robot.clickOn(1200, 500);
         robot.interrupt(100);
 

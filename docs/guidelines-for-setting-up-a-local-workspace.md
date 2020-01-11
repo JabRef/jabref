@@ -54,8 +54,8 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 2. Enable annotation processors:
    * File -> Settings -> Compiler -> Annotation processors -> Check "Enable annotation processing"
 3. Configure module settings: Right click on project -> Open Module Settings
-   * Ensure that the projects SDK is Java 12: Project Settings -> Project -> Project SDK: Choose Java 12
-   * Ensure that standard SDK is Java 12: Platform Settings -> SDK -> Choose Java 12
+   * Ensure that the projects SDK is Java 13: Project Settings -> Project -> Project SDK: Choose Java 13
+   * Ensure that standard SDK is Java 13: Platform Settings -> SDK -> Choose Java 13
 4. Specify additional compiler arguments: File -> Settings -> Build, Execution, Deployment -> Compiler -> Java Compiler -> Under "Override compiler parameters per-module" add the following compiler arguments for the `JabRef.main` module:
    ```text
    --patch-module test=fastparse_2.12-1.0.0.jar
@@ -102,7 +102,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 11 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 13 is installed is following error message:
 
 ```text
 compileJava FAILED

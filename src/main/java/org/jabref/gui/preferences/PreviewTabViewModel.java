@@ -43,6 +43,7 @@ import org.jabref.preferences.PreviewPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
-    private FunctionBasedValidator chosenListValidator;
+    private Validator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
 
     public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
