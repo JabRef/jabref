@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.JabRefPreferences;
 
 public class MetaDataDiff {
 
@@ -32,7 +32,7 @@ public class MetaDataDiff {
     /**
      * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
      */
-    public List<String> getDifferences() {
+    public List<String> getDifferences(JabRefPreferences preferences) {
         List<String> changes = new ArrayList<>();
 
         if (originalMetaData.isProtected() != newMetaData.isProtected()) {
@@ -47,7 +47,7 @@ public class MetaDataDiff {
         if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
             changes.add(Localization.lang("Save sort order"));
         }
-        if (!Objects.equals(originalMetaData.getCiteKeyPattern(Globals.prefs.getKeyPattern()), newMetaData.getCiteKeyPattern(Globals.prefs.getKeyPattern()))) {
+        if (!Objects.equals(originalMetaData.getCiteKeyPattern(preferences.getKeyPattern()), newMetaData.getCiteKeyPattern(preferences.getKeyPattern()))) {
             changes.add(Localization.lang("Key patterns"));
         }
         if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {

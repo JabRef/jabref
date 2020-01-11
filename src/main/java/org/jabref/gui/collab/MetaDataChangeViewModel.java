@@ -8,14 +8,17 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.JabRefPreferences;
 
 class MetaDataChangeViewModel extends DatabaseChangeViewModel {
 
     private final MetaDataDiff metaDataDiff;
+    private final JabRefPreferences preferences;
 
-    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff) {
+    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff, JabRefPreferences preferences) {
         super(Localization.lang("Metadata change"));
         this.metaDataDiff = metaDataDiff;
+        this.preferences = preferences;
     }
 
     @Override
@@ -26,7 +29,7 @@ class MetaDataChangeViewModel extends DatabaseChangeViewModel {
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
 
-        for (String change : metaDataDiff.getDifferences()) {
+        for (String change : metaDataDiff.getDifferences(preferences)) {
             container.getChildren().add(new Label(change));
         }
 
