@@ -10,11 +10,14 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
@@ -57,11 +60,8 @@ public class GroupDialogViewModel {
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
     private final StringProperty iconProperty = new SimpleStringProperty("");
     private final ObjectProperty<Color> colorProperty = new SimpleObjectProperty<>();
-
-    // Hierarchical Context
-    private final BooleanProperty hierarchyIndependentProperty = new SimpleBooleanProperty();
-    private final BooleanProperty hierarchyIntersectionProperty = new SimpleBooleanProperty();
-    private final BooleanProperty hierarchyUnionProperty = new SimpleBooleanProperty();
+    private final ListProperty<GroupHierarchyType> groupHierarchyListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty = new SimpleObjectProperty<>();
 
     // Type
     private final BooleanProperty typeExplicitProperty = new SimpleBooleanProperty();
@@ -74,11 +74,11 @@ public class GroupDialogViewModel {
     private final StringProperty keywordGroupSearchTermProperty = new SimpleStringProperty("");
     private final StringProperty keywordGroupSearchFieldProperty = new SimpleStringProperty("");
     private final BooleanProperty keywordGroupCaseSensitiveProperty = new SimpleBooleanProperty();
-    private final BooleanProperty keywordGroupRegExpProperty = new SimpleBooleanProperty();
+    private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
 
-    private final StringProperty searchGroupSearchExpressionProperty = new SimpleStringProperty("");
+    private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
     private final BooleanProperty searchGroupCaseSensitiveProperty = new SimpleBooleanProperty();
-    private final BooleanProperty searchGroupRegExpProperty = new SimpleBooleanProperty();
+    private final BooleanProperty searchGroupRegexProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty autoGroupKeywordsOptionProperty = new SimpleBooleanProperty();
     private final StringProperty autoGroupKeywordsFieldProperty = new SimpleStringProperty("");
@@ -92,15 +92,21 @@ public class GroupDialogViewModel {
     // Description text
     private final StringProperty hintTextProperty = new SimpleStringProperty("");
 
-    private final Validator nameValidator;
-    private final Validator sameNameValidator;
-    private final Validator keywordRegexValidator;
-    private final Validator searchRegexValidator;
+    private Validator nameValidator;
+    private Validator nameContainsDelimiterValidator;
+    private Validator sameNameValidator;
+    private Validator keywordRegexValidator;
+    private Validator keywordSearchTermEmptyValidator;
+    private Validator searchRegexValidator;
+    private Validator searchSearchTermEmptyValidator;
+    private CompositeValidator validator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final BasePanel basePanel;
     private final AbstractGroup editedGroup;
+
+    private final Character keywordDelimiter;
 
     public GroupDialogViewModel(DialogService dialogService, BasePanel basePanel, JabRefPreferences preferences, AbstractGroup editedGroup) {
         this.dialogService = dialogService;
@@ -108,10 +114,26 @@ public class GroupDialogViewModel {
         this.basePanel = basePanel;
         this.editedGroup = editedGroup;
 
+        this.keywordDelimiter = Globals.prefs.getKeywordDelimiter();
+
+        setupValidation();
+        setValues();
+    }
+
+    private void setupValidation() {
         nameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 StringUtil::isNotBlank,
                 ValidationMessage.error(Localization.lang("Please enter a name for the group.")));
+
+        nameContainsDelimiterValidator = new FunctionBasedValidator<>(
+                nameProperty,
+                name -> !name.contains(Character.toString(keywordDelimiter)),
+                ValidationMessage.warning(
+                        Localization.lang(
+                                "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
+                                Character.toString(keywordDelimiter)
+                        )));
 
         sameNameValidator = new FunctionBasedValidator<>(
                 nameProperty,
@@ -136,7 +158,7 @@ public class GroupDialogViewModel {
         keywordRegexValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
                 input -> {
-                    if (!keywordGroupRegExpProperty.getValue()) {
+                    if (!keywordGroupRegexProperty.getValue()) {
                         return true;
                     }
 
@@ -152,15 +174,24 @@ public class GroupDialogViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %n %s %n %n %s %n %s",
-                        Localization.lang("Dynamically group entries by searching a field for a keyword"),
+                        Localization.lang("Searching for keywords"),
                         Localization.lang("Keywords"),
                         Localization.lang("Invalid regular expression:"),
                         keywordGroupSearchTermProperty.getValue())));
 
+        keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
+                keywordGroupSearchTermProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %n %s %n %n %s",
+                        Localization.lang("Searching for keywords"),
+                        Localization.lang("Keywords"),
+                        Localization.lang("Search term is empty.")
+                )));
+
         searchRegexValidator = new FunctionBasedValidator<>(
-                searchGroupSearchExpressionProperty,
+                searchGroupSearchTermProperty,
                 input -> {
-                    if (!searchGroupRegExpProperty.getValue()) {
+                    if (!searchGroupRegexProperty.getValue()) {
                         return true;
                     }
 
@@ -175,90 +206,97 @@ public class GroupDialogViewModel {
                         return false;
                     }
                 },
-                ValidationMessage.error(String.format("%s > %n %s %n %n %s %n %s",
-                        Localization.lang("Dynamically group entries by a free-form search expression"),
-                        Localization.lang("Keywords"),
+                ValidationMessage.error(String.format("%s > %n %s %n %s",
+                        Localization.lang("Free search expression"),
                         Localization.lang("Invalid regular expression:"),
-                        searchGroupSearchExpressionProperty.getValue())));
+                        searchGroupSearchTermProperty.getValue())));
 
-        setValues();
+        searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
+                searchGroupSearchTermProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %n %s",
+                        Localization.lang("Free search expression"),
+                        Localization.lang("Search term is empty.")
+                )));
+
+        validator = new CompositeValidator(nameValidator,sameNameValidator);
+
+        typeSearchProperty.addListener((obs,oldVal,newVal) -> {
+            if (newVal) {
+                validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+            } else {
+                validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
+            }
+        });
+
+        typeKeywordsProperty.addListener((obs,oldVal,newVal) -> {
+            if (newVal) {
+                validator.addValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+            } else {
+                validator.removeValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+            }
+        });
     }
 
     public AbstractGroup resultConverter(ButtonType button) {
         if (button == ButtonType.OK) {
+            ValidationStatus validationStatus = validator.getValidationStatus();
+            if (validationStatus.getHighestMessage().isPresent()) {
+                dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
+                return null;
+            }
+
             AbstractGroup resultingGroup = null;
             try {
                 String groupName = nameProperty.getValue().trim();
                 if (typeExplicitProperty.getValue()) {
-                    Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
-                    if (groupName.contains(Character.toString(keywordDelimiter))) {
-                        dialogService.showWarningDialogAndWait(null, Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
-                    }
-
-                    Optional<GroupTreeNode> rootGroup = basePanel.getBibDatabaseContext().getMetaData().getGroups();
-                    if (rootGroup.isPresent()) {
-                        int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
-                        boolean warnAboutSameName = false;
-                        if ((editedGroup == null) && (groupsWithSameName > 0)) {
-                            // New group but there is already one group with the same name
-                            warnAboutSameName = true;
-                        }
-                        if ((editedGroup != null) && !editedGroup.getName().equals(groupName) && (groupsWithSameName > 0)) {
-                            // Edit group, changed name to something that is already present
-                            warnAboutSameName = true;
-                        }
-
-                        if (warnAboutSameName) {
-                            dialogService.showErrorDialogAndWait(Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
-                            return null;
-                        }
-                    }
-
-                    resultingGroup = new ExplicitGroup(groupName, getContext(),
+                    resultingGroup = new ExplicitGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
                             keywordDelimiter);
                 } else if (typeKeywordsProperty.getValue()) {
-                    if (keywordGroupRegExpProperty.getValue()) {
+                    if (keywordGroupRegexProperty.getValue()) {
                         resultingGroup = new RegexKeywordGroup(
                                 groupName,
-                                getContext(),
+                                groupHierarchySelectedProperty.getValue(),
                                 FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                                 keywordGroupSearchTermProperty.getValue().trim(),
                                 keywordGroupCaseSensitiveProperty.getValue());
                     } else {
                         resultingGroup = new WordKeywordGroup(
                                 groupName,
-                                getContext(),
+                                groupHierarchySelectedProperty.getValue(),
                                 FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                                 keywordGroupSearchTermProperty.getValue().trim(),
                                 keywordGroupCaseSensitiveProperty.getValue(),
-                                Globals.prefs.getKeywordDelimiter(),
+                                keywordDelimiter,
                                 false);
                     }
                 } else if (typeSearchProperty.getValue()) {
                     resultingGroup = new SearchGroup(
                             groupName,
-                            getContext(),
-                            searchGroupSearchExpressionProperty.getValue().trim(),
+                            groupHierarchySelectedProperty.getValue(),
+                            searchGroupSearchTermProperty.getValue().trim(),
                             searchGroupCaseSensitiveProperty.getValue(),
-                            searchGroupRegExpProperty.getValue());
+                            searchGroupRegexProperty.getValue());
                 } else if (typeAutoProperty.getValue()) {
                     if (autoGroupKeywordsOptionProperty.getValue()) {
                         resultingGroup = new AutomaticKeywordGroup(
                                 groupName,
-                                getContext(),
+                                groupHierarchySelectedProperty.getValue(),
                                 FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
                                 autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
                                 autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
                     } else {
                         resultingGroup = new AutomaticPersonsGroup(
                                 groupName,
-                                getContext(),
+                                groupHierarchySelectedProperty.getValue(),
                                 FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
                     }
                 } else if (typeTexProperty.getValue()) {
                     resultingGroup = TexGroup.create(
                             groupName,
-                            getContext(),
+                            groupHierarchySelectedProperty.getValue(),
                             Paths.get(texGroupFilePathProperty.getValue().trim()),
                             new DefaultAuxParser(new BibDatabase()),
                             Globals.getFileUpdateMonitor(),
@@ -283,24 +321,26 @@ public class GroupDialogViewModel {
     }
 
     public void setValues() {
+        groupHierarchyListProperty.setValue(FXCollections.observableArrayList(GroupHierarchyType.values()));
+
         if (editedGroup == null) {
             // creating new group -> defaults!
             colorProperty.setValue(IconTheme.getDefaultGroupColor());
             typeExplicitProperty.setValue(true);
-            setContext(GroupHierarchyType.INDEPENDENT);
+            groupHierarchySelectedProperty.setValue(GroupHierarchyType.INDEPENDENT);
         } else {
             nameProperty.setValue(editedGroup.getName());
             colorProperty.setValue(editedGroup.getColor().orElse(IconTheme.getDefaultGroupColor()));
             descriptionProperty.setValue(editedGroup.getDescription().orElse(""));
             iconProperty.setValue(editedGroup.getIconName().orElse(""));
-            setContext(editedGroup.getHierarchicalContext());
+            groupHierarchySelectedProperty.setValue(editedGroup.getHierarchicalContext());
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
                 keywordGroupSearchFieldProperty.setValue(group.getSearchField().getName());
                 keywordGroupSearchTermProperty.setValue(group.getSearchExpression());
                 keywordGroupCaseSensitiveProperty.setValue(group.isCaseSensitive());
-                keywordGroupRegExpProperty.setValue(false);
+                keywordGroupRegexProperty.setValue(false);
 
                 typeExplicitProperty.setValue(false);
                 typeKeywordsProperty.setValue(true);
@@ -312,7 +352,7 @@ public class GroupDialogViewModel {
                 keywordGroupSearchFieldProperty.setValue(group.getSearchField().getName());
                 keywordGroupSearchTermProperty.setValue(group.getSearchExpression());
                 keywordGroupCaseSensitiveProperty.setValue(group.isCaseSensitive());
-                keywordGroupRegExpProperty.setValue(true);
+                keywordGroupRegexProperty.setValue(true);
 
                 typeExplicitProperty.setValue(false);
                 typeKeywordsProperty.setValue(true);
@@ -321,9 +361,9 @@ public class GroupDialogViewModel {
                 typeTexProperty.setValue(false);
             } else if (editedGroup.getClass() == SearchGroup.class) {
                 SearchGroup group = (SearchGroup) editedGroup;
-                searchGroupSearchExpressionProperty.setValue(group.getSearchExpression());
+                searchGroupSearchTermProperty.setValue(group.getSearchExpression());
                 searchGroupCaseSensitiveProperty.setValue(group.isCaseSensitive());
-                searchGroupRegExpProperty.setValue(group.isRegularExpression());
+                searchGroupRegexProperty.setValue(group.isRegularExpression());
 
                 typeExplicitProperty.setValue(false);
                 typeKeywordsProperty.setValue(false);
@@ -369,12 +409,10 @@ public class GroupDialogViewModel {
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> texGroupFilePathProperty.setValue(relativise(file.toAbsolutePath()).toString()));
-    }
-
-    private Path relativise(Path path) {
-        List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileUtil.relativize(path, fileDirectories);
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                     .ifPresent(file -> texGroupFilePathProperty.setValue(
+                             FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
+                     ));
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
@@ -385,57 +423,21 @@ public class GroupDialogViewModel {
         return fileDirs;
     }
 
-    public ValidationStatus validationStatus() {
-        CompositeValidator validator = new CompositeValidator();
-
-        validator.addValidators(nameValidator);
-        validator.addValidators(sameNameValidator);
-
-        if (typeSearchProperty.getValue()) {
-            validator.addValidators(searchRegexValidator);
-        }
-
-        if (typeKeywordsProperty.getValue()) {
-            validator.addValidators(keywordRegexValidator);
-        }
-
-        return validator.getValidationStatus();
-    }
+    public ValidationStatus validationStatus() { return validator.getValidationStatus(); }
 
     public ValidationStatus nameValidationStatus() { return nameValidator.getValidationStatus(); }
+
+    public ValidationStatus nameContainsDelimiterValidationStatus() { return nameContainsDelimiterValidator.getValidationStatus(); }
 
     public ValidationStatus sameNameValidationStatus() { return sameNameValidator.getValidationStatus(); }
 
     public ValidationStatus searchRegexValidationStatus() { return searchRegexValidator.getValidationStatus(); }
 
+    public ValidationStatus searchSearchTermEmptyValidationStatus() { return searchSearchTermEmptyValidator.getValidationStatus(); }
+
     public ValidationStatus keywordRegexValidationStatus() { return keywordRegexValidator.getValidationStatus(); }
 
-    private GroupHierarchyType getContext() {
-        if (hierarchyIndependentProperty.getValue()) {
-            return GroupHierarchyType.INDEPENDENT;
-        }
-        if (hierarchyIntersectionProperty.getValue()) {
-            return GroupHierarchyType.REFINING;
-        }
-        if (hierarchyUnionProperty.getValue()) {
-            return GroupHierarchyType.INCLUDING;
-        }
-        return GroupHierarchyType.INDEPENDENT; // default
-    }
-
-    private void setContext(GroupHierarchyType context) {
-        switch (context) {
-            case INDEPENDENT:
-                hierarchyIndependentProperty.setValue(true);
-                break;
-            case REFINING:
-                hierarchyIntersectionProperty.setValue(true);
-                break;
-            case INCLUDING:
-                hierarchyUnionProperty.setValue(true);
-                break;
-        }
-    }
+    public ValidationStatus keywordSearchTermEmptyValidationStatus() { return keywordSearchTermEmptyValidator.getValidationStatus(); }
 
     public StringProperty nameProperty() { return nameProperty; }
 
@@ -445,11 +447,9 @@ public class GroupDialogViewModel {
 
     public ObjectProperty<Color> colorFieldProperty() { return colorProperty; }
 
-    public BooleanProperty hierarchyIndependentProperty() { return hierarchyIndependentProperty; }
+    public ListProperty<GroupHierarchyType> groupHierarchyListProperty() { return groupHierarchyListProperty; }
 
-    public BooleanProperty hierarchyIntersectionProperty() { return hierarchyIntersectionProperty; }
-
-    public BooleanProperty hierarchyUnionProperty() { return hierarchyUnionProperty; }
+    public ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty() { return groupHierarchySelectedProperty; }
 
     public BooleanProperty typeExplicitProperty() { return typeExplicitProperty; }
 
@@ -467,13 +467,13 @@ public class GroupDialogViewModel {
 
     public BooleanProperty keywordGroupCaseSensitiveProperty() { return keywordGroupCaseSensitiveProperty; }
 
-    public BooleanProperty keywordGroupRegExpProperty() { return keywordGroupRegExpProperty; }
+    public BooleanProperty keywordGroupRegexProperty() { return keywordGroupRegexProperty; }
 
-    public StringProperty searchGroupSearchExpressionProperty() { return searchGroupSearchExpressionProperty; }
+    public StringProperty searchGroupSearchTermProperty() { return searchGroupSearchTermProperty; }
 
     public BooleanProperty searchGroupCaseSensitiveProperty() { return searchGroupCaseSensitiveProperty; }
 
-    public BooleanProperty searchGroupRegExpProperty() { return searchGroupRegExpProperty; }
+    public BooleanProperty searchGroupRegexProperty() { return searchGroupRegexProperty; }
 
     public BooleanProperty autoGroupKeywordsOptionProperty() { return autoGroupKeywordsOptionProperty; }
 
