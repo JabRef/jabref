@@ -102,7 +102,7 @@ public class MetaDataParser {
                     break;
                 default:
                     // Keep meta data items that we do not know in the file
-                    metaData.putUnkownMetaDataItem(entry.getKey(), value);
+                    metaData.putUnknownMetaDataItem(entry.getKey(), value);
             }
         }
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
