@@ -1,13 +1,11 @@
 package org.jabref.gui.groups;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -15,7 +13,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
@@ -25,13 +22,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -233,7 +228,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                         setDescription(GroupDescriptions.getDescriptionForPreview(searchField, searchTerm, keywordGroupCaseSensitive.isSelected(),
                                 keywordGroupRegex.isSelected()));
                     } catch (PatternSyntaxException e) {
-                        setDescription(formatRegexException(searchTerm, e));
+                        setDescription(GroupDescriptions.formatRegexException(searchTerm, e));
                     }
                 } else {
                     setDescription(GroupDescriptions.getDescriptionForPreview(searchField, searchTerm, keywordGroupCaseSensitive.isSelected(),
@@ -246,7 +241,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         } else if (searchRadioButton.isSelected()) {
             searchTerm = searchGroupSearchTerm.getText().trim();
             if (!searchTerm.isEmpty()) {
-                setDescription(fromTextFlowToHTMLString(SearchDescribers
+                setDescription(GroupDescriptions.fromTextFlowToHTMLString(SearchDescribers
                         .getSearchDescriberFor(new SearchQuery(
                                 searchTerm,
                                 searchGroupCaseSensitive.isSelected(),
@@ -256,7 +251,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                     try {
                         Pattern.compile(searchTerm);
                     } catch (PatternSyntaxException e) {
-                        setDescription(formatRegexException(searchTerm, e));
+                        setDescription(GroupDescriptions.formatRegexException(searchTerm, e));
                     }
                 }
             } else {
@@ -272,77 +267,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     }
 
     private void setDescription(String description) {
-        hintTextFlow.getChildren().setAll(createFormattedDescription(description));
-    }
-
-    private ArrayList<Node> createFormattedDescription(String descriptionHTML) {
-        ArrayList<Node> nodes = new ArrayList<>();
-
-        descriptionHTML = descriptionHTML.replaceAll("<p>|<br>", "\n");
-
-        String[] boldSplit = descriptionHTML.split("(?=<b>)|(?<=</b>)|(?=<i>)|(?<=</i>)|(?=<tt>)|(?<=</tt>)|(?=<kbd>)|(?<=</kbd>)");
-
-        for (String bs : boldSplit) {
-
-            if (bs.matches("<b>[^<>]*</b>")) {
-
-                bs = bs.replaceAll("<b>|</b>", "");
-                Text textElement = new Text(bs);
-                textElement.setStyle("-fx-font-weight: bold");
-                nodes.add(textElement);
-            } else if (bs.matches("<i>[^<>]*</i>")) {
-
-                bs = bs.replaceAll("<i>|</i>", "");
-                Text textElement = new Text(bs);
-                textElement.setStyle("-fx-font-style: italic");
-                nodes.add(textElement);
-            } else if (bs.matches("<tt>[^<>]*</tt>|<kbd>[^<>]*</kbd>")) {
-
-                bs = bs.replaceAll("<tt>|</tt>|<kbd>|</kbd>", "");
-                Text textElement = new Text(bs);
-                textElement.setStyle("-fx-font-family: 'Courier New', Courier, monospace");
-                nodes.add(textElement);
-            } else {
-                nodes.add(new Text(bs));
-            }
-        }
-
-        return nodes;
-    }
-
-    private static String formatRegexException(String regExp, Exception e) {
-        String[] sa = e.getMessage().split("\\n");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < sa.length; ++i) {
-            if (i > 0) {
-                sb.append("<br>");
-            }
-            sb.append(StringUtil.quoteForHTML(sa[i]));
-        }
-        String s = Localization.lang(
-                "The regular expression <b>%0</b> is invalid:",
-                StringUtil.quoteForHTML(regExp))
-                + "<p><tt>"
-                + sb
-                + "</tt>";
-        if (!(e instanceof PatternSyntaxException)) {
-            return s;
-        }
-        int lastNewline = s.lastIndexOf("<br>");
-        int hat = s.lastIndexOf('^');
-        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
-        }
-        return s;
-    }
-
-    private String fromTextFlowToHTMLString(TextFlow textFlow) {
-        StringBuilder htmlStringBuilder = new StringBuilder();
-        for (Node node : textFlow.getChildren()) {
-            if (node instanceof Text) {
-                htmlStringBuilder.append(TooltipTextUtil.textToHTMLString((Text) node));
-            }
-        }
-        return htmlStringBuilder.toString();
+        hintTextFlow.getChildren().setAll(GroupDescriptions.createFormattedDescription(description));
     }
 }

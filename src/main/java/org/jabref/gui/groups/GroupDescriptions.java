@@ -1,5 +1,13 @@
 package org.jabref.gui.groups;
 
+import java.util.ArrayList;
+import java.util.regex.PatternSyntaxException;
+
+import javafx.scene.Node;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.KeywordGroup;
@@ -117,6 +125,77 @@ public class GroupDescriptions {
             break;
         }
         return sb.toString();
+    }
+
+    protected static String fromTextFlowToHTMLString(TextFlow textFlow) {
+        StringBuilder htmlStringBuilder = new StringBuilder();
+        for (Node node : textFlow.getChildren()) {
+            if (node instanceof Text) {
+                htmlStringBuilder.append(TooltipTextUtil.textToHTMLString((Text) node));
+            }
+        }
+        return htmlStringBuilder.toString();
+    }
+
+    protected static String formatRegexException(String regExp, Exception e) {
+        String[] sa = e.getMessage().split("\\n");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sa.length; ++i) {
+            if (i > 0) {
+                sb.append("<br>");
+            }
+            sb.append(StringUtil.quoteForHTML(sa[i]));
+        }
+        String s = Localization.lang(
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
+        if (!(e instanceof PatternSyntaxException)) {
+            return s;
+        }
+        int lastNewline = s.lastIndexOf("<br>");
+        int hat = s.lastIndexOf('^');
+        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
+        }
+        return s;
+    }
+
+    protected static ArrayList<Node> createFormattedDescription(String descriptionHTML) {
+        ArrayList<Node> nodes = new ArrayList<>();
+
+        descriptionHTML = descriptionHTML.replaceAll("<p>|<br>", "\n");
+
+        String[] boldSplit = descriptionHTML.split("(?=<b>)|(?<=</b>)|(?=<i>)|(?<=</i>)|(?=<tt>)|(?<=</tt>)|(?=<kbd>)|(?<=</kbd>)");
+
+        for (String bs : boldSplit) {
+
+            if (bs.matches("<b>[^<>]*</b>")) {
+
+                bs = bs.replaceAll("<b>|</b>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-weight: bold");
+                nodes.add(textElement);
+            } else if (bs.matches("<i>[^<>]*</i>")) {
+
+                bs = bs.replaceAll("<i>|</i>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-style: italic");
+                nodes.add(textElement);
+            } else if (bs.matches("<tt>[^<>]*</tt>|<kbd>[^<>]*</kbd>")) {
+
+                bs = bs.replaceAll("<tt>|</tt>|<kbd>|</kbd>", "");
+                Text textElement = new Text(bs);
+                textElement.setStyle("-fx-font-family: 'Courier New', Courier, monospace");
+                nodes.add(textElement);
+            } else {
+                nodes.add(new Text(bs));
+            }
+        }
+
+        return nodes;
     }
 
 }

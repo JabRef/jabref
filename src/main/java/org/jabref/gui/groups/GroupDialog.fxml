@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.text.TextFlow?>
+
 <DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
     <content>
@@ -39,9 +39,8 @@
                     <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
                 </VBox>
             </HBox>
-            <Separator/>
             <HBox spacing="4.0">
-                <VBox spacing="4.0">
+                <VBox spacing="10.0">
                     <Label text="%Collect by"/>
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
