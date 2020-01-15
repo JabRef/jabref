@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago">
   <info>
-    <title>Chicago Manual of Style 17th edition (note)</title>
-    <id>http://www.zotero.org/styles/chicago-note-bibliography</id>
-    <link href="http://www.zotero.org/styles/chicago-note-bibliography" rel="self"/>
+    <title>Chicago Manual of Style 17th edition (full note, short title subsequent)</title>
+    <id>http://www.zotero.org/styles/chicago-fullnote-bibliography-short-title-subsequent</id>
+    <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography-short-title-subsequent" rel="self"/>
+    <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
     <link href="http://www.chicagomanualofstyle.org/tools_citationguide.html" rel="documentation"/>
     <author>
       <name>Julian Onions</name>
@@ -30,8 +31,8 @@
     </contributor>
     <category citation-format="note"/>
     <category field="generic-base"/>
-    <summary>Chicago format with short notes and bibliography</summary>
-    <updated>2017-10-12T12:00:00+00:00</updated>
+    <summary>Chicago format with full notes and bibliography</summary>
+    <updated>2020-01-12T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -1312,28 +1313,7 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
     <layout suffix="." delimiter="; ">
       <choose>
-        <if position="ibid ibid-with-locator" match="any">
-          <group delimiter=", ">
-            <text macro="contributors-short"/>
-            <group delimiter=" ">
-              <group delimiter=", ">
-                <choose>
-                  <if variable="author editor translator" match="none">
-                    <text macro="title-short"/>
-                  </if>
-                </choose>
-                <text macro="case-locator-subsequent"/>
-              </group>
-              <text macro="case-pinpoint-subsequent"/>
-            </group>
-            <choose>
-              <if match="none" type="legal_case">
-                <text macro="point-locators-subsequent"/>
-              </if>
-            </choose>
-          </group>
-        </if>
-        <else>
+        <if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
             <group delimiter=" ">
@@ -1350,6 +1330,40 @@
                 <text macro="point-locators-subsequent"/>
               </if>
             </choose>
+          </group>
+        </if>
+        <else>
+          <group delimiter=", ">
+            <group delimiter=": ">
+              <group delimiter=", ">
+                <group delimiter=" ">
+                  <group delimiter=", ">
+                    <group delimiter=" ">
+                      <group delimiter=", ">
+                        <group delimiter=", ">
+                          <text macro="contributors-note"/>
+                          <text macro="title-note"/>
+                          <text macro="issue-map-graphic"/>
+                        </group>
+                        <text macro="description-note"/>
+                        <text macro="secondary-contributors-note"/>
+                        <text macro="container-title-note"/>
+                        <text macro="container-contributors-note"/>
+                      </group>
+                      <text macro="locators-note-join-with-space"/>
+                    </group>
+                    <text macro="locators-note-join-with-comma"/>
+                    <text macro="collection-title"/>
+                    <text macro="issue-note-join-with-comma"/>
+                  </group>
+                  <text macro="issue-note-join-with-space"/>
+                </group>
+                <text macro="locators-newspaper"/>
+                <text macro="point-locators-join-with-comma"/>
+              </group>
+              <text macro="point-locators-join-with-colon"/>
+            </group>
+            <text macro="access-note"/>
           </group>
         </else>
       </choose>
