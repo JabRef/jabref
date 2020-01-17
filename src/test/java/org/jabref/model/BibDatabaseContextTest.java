@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnDefaultBibtex() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
 
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
@@ -23,7 +23,7 @@ public class BibDatabaseContextTest {
 
     @Test
     public void testTypeBasedOnDefaultBiblatex() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), new Defaults(BibDatabaseMode.BIBLATEX));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
         bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);

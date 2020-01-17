@@ -19,7 +19,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
-import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -81,7 +80,7 @@ class BibtexDatabaseWriterTest {
 
         database = new BibDatabase();
         metaData = new MetaData();
-        bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
+        bibtexContext = new BibDatabaseContext(database, metaData);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
@@ -288,7 +287,7 @@ class BibtexDatabaseWriterTest {
                         + "@Comment{jabref-entrytype: customizedtype: req[author;date;title] opt[month;publisher;year]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
-    
+
     @Test
     void writeCustomizedTypesInAlphabeticalOrder() throws Exception {
         EntryType customizedType = new UnknownEntryType("customizedType");
@@ -329,8 +328,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -344,8 +342,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -359,8 +356,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -377,8 +373,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(Paths.get("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
@@ -397,8 +392,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
 
@@ -413,8 +407,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
         assertEquals(Files.readString(testBibtexFile, encoding), stringWriter.toString());
@@ -664,8 +657,7 @@ class BibtexDatabaseWriterTest {
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.isSaveInOriginalOrder()).thenReturn(true);
-        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
@@ -692,8 +684,7 @@ class BibtexDatabaseWriterTest {
         // modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
-        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
@@ -742,8 +733,7 @@ class BibtexDatabaseWriterTest {
         // write entry
         stringWriter = new StringWriter();
         databaseWriter = new BibtexDatabaseWriter(stringWriter, preferences, entryTypesManager);
-        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
         assertEquals(bibtexEntry + OS.NEWLINE +
@@ -770,8 +760,7 @@ class BibtexDatabaseWriterTest {
         // modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
-        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
-                new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries());
 
