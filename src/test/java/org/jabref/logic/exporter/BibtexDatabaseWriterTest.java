@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -277,7 +278,7 @@ class BibtexDatabaseWriterTest {
         BibEntry entry = new BibEntry(customizedType);
         database.insertEntry(entry);
 
-        databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry));
+        databaseWriter.saveDatabase(bibtexContext);
 
         assertEquals(
                 OS.NEWLINE +
@@ -646,6 +647,22 @@ class BibtexDatabaseWriterTest {
                         "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE
                 , stringWriter.toString());
+    }
+
+    @Test
+    void trimFieldContents() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry(StandardEntryType.Article);
+        entry.setField(StandardField.NOTE, "        some note    \t");
+        database.insertEntry(entry);
+
+        databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries());
+
+        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  note = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        assertEquals(expected, stringWriter.toString());
     }
 
     @Test
