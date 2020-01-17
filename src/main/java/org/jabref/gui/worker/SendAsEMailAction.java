@@ -15,7 +15,7 @@ import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
@@ -72,8 +72,7 @@ public class SendAsEMailAction implements BaseAction {
         List<BibEntry> bes = panel.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), Globals.entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(Globals.prefs.getFieldWriterPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : bes) {
             try {

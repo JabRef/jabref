@@ -20,7 +20,6 @@ import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
-import org.jabref.model.Defaults;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -59,7 +58,7 @@ class CleanupWorkerTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
         context.setDatabaseFile(bibFolder.resolve("test.bib").toFile());
 

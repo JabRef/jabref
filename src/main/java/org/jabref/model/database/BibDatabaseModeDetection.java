@@ -17,8 +17,7 @@ public class BibDatabaseModeDetection {
      * Only standard BibTex and Biblatex entry types are considered in the decision process.
      *
      * 1. Check if any of the entries is a type exclusive to Biblatex
-     * 2. Check if any exclusive Biblatex fields are present
-     * 3. Otherwise return BibTex
+     * 2. Otherwise return BibTex
      *
      * @param database a BibDatabase database
      * @return the inferred database type
@@ -26,11 +25,9 @@ public class BibDatabaseModeDetection {
     public static BibDatabaseMode inferMode(BibDatabase database) {
         final Stream<EntryType> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 
-        // type-based check
         if (entryTypes.anyMatch(EntryTypeFactory::isExclusiveBiblatex)) {
             return BibDatabaseMode.BIBLATEX;
         } else {
-            // field-based check
             return BibDatabaseMode.BIBTEX;
         }
     }
