@@ -41,9 +41,17 @@
         <multiple>eds. &amp; trans.</multiple>
       </term>
       <term name="translator" form="short">trans.</term>
-      <term name="interviewer" form="short">interviewer</term>
+      <term name="interviewer" form="short">
+        <single>interviewer</single>
+        <multiple>interviewers</multiple>
+      </term>
+      <term name="collection-editor" form="short">
+        <single>series ed.</single>
+        <multiple>series eds.</multiple>
+      </term>
       <term name="circa" form="short">ca.</term>
-      <term name="collection-editor" form="short">series ed.</term>
+      <term name="bc"> B.C.E.</term>
+      <term name="ad"> C.E.</term>
     </terms>
   </locale>
   <locale xml:lang="es">
@@ -62,6 +70,11 @@
     </terms>
   </locale>
   <locale xml:lang="nn">
+    <terms>
+      <term name="et-al">et al.</term>
+    </terms>
+  </locale>
+  <locale xml:lang="nl">
     <terms>
       <term name="et-al">et al.</term>
     </terms>
