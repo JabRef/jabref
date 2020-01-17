@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-GB">
   <info>
     <title>British Journal of Political Science</title>
     <title-short>BJPS</title-short>
@@ -18,7 +18,7 @@
     <issn>0007-1234</issn>
     <eissn>1469-2112</eissn>
     <summary>BJPS Style as updated per 6 March 2018 guidelines.</summary>
-    <updated>2018-09-13T13:59:45+00:00</updated>
+    <updated>2020-01-10T14:40:07+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -36,9 +36,6 @@
       <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
-  <macro name="anon">
-    <text term="anonymous" form="short" text-case="capitalize-first" strip-periods="true"/>
-  </macro>
   <macro name="author">
     <names variable="author" font-weight="bold">
       <name and="text" initialize-with="" name-as-sort-order="all" sort-separator=" " delimiter-precedes-last="never"/>
@@ -51,8 +48,10 @@
           <if type="report">
             <text variable="publisher"/>
           </if>
+          <else>
+            <text variable="title" font-weight="bold"/>
+          </else>
         </choose>
-        <text macro="anon"/>
       </substitute>
     </names>
   </macro>
@@ -66,15 +65,27 @@
           <if type="report">
             <text variable="publisher"/>
           </if>
+          <else-if type="legal_case legislation" match="any">
+            <group delimiter=", ">
+              <text variable="title"/>
+              <group delimiter=" ">
+                <text variable="volume"/>
+                <text variable="container-title"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </else-if>
+          <else>
+            <text variable="title"/>
+          </else>
         </choose>
-        <text macro="anon"/>
       </substitute>
     </names>
   </macro>
   <macro name="access">
     <group>
       <choose>
-        <if match="any" type="webpage post-weblog">
+        <if match="any" type="webpage post-weblog post legislation">
           <group prefix=" " delimiter=" ">
             <text term="available at" text-case="capitalize-first"/>
             <text variable="URL"/>
@@ -193,7 +204,7 @@
             <text macro="publisher"/>
           </group>
         </else-if>
-        <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <else-if type="bill book graphic motion_picture report song" match="any">
           <group delimiter=", " prefix=" " suffix=". ">
             <text macro="title"/>
             <text macro="edition"/>
@@ -235,6 +246,16 @@
               <date-part name="month"/>
             </date>
           </group>
+        </else-if>
+        <else-if type="legal_case" match="any">
+          <group delimiter=" " prefix=", ">
+            <text variable="volume"/>
+            <text variable="container-title"/>
+            <text variable="page"/>
+          </group>
+        </else-if>
+        <else-if type="legislation" match="any">
+          <text variable="chapter-number" prefix=" c. "/>
         </else-if>
         <else>
           <group suffix=".">

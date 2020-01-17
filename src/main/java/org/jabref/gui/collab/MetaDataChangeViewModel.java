@@ -2,38 +2,42 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.JabRefPreferences;
 
 class MetaDataChangeViewModel extends DatabaseChangeViewModel {
 
-    private final MetaData newMetaData;
+    private final MetaDataDiff metaDataDiff;
+    private final JabRefPreferences preferences;
 
-    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff) {
+    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff, JabRefPreferences preferences) {
         super(Localization.lang("Metadata change"));
-        this.newMetaData = metaDataDiff.getNewMetaData();
+        this.metaDataDiff = metaDataDiff;
+        this.preferences = preferences;
     }
 
     @Override
     public Node description() {
-        /*
-        // TODO: Show detailed description of the changes
-        StringBuilder sb = new StringBuilder(
-                "<html>" + Localization.lang("Changes have been made to the following metadata elements")
-                        + ":<p><br>&nbsp;&nbsp;");
-        sb.append(changes.stream().map(unit -> unit.key).collect(Collectors.joining("<br>&nbsp;&nbsp;")));
-        sb.append("</html>");
-        infoPane.setText(sb.toString());
-        */
-        return new Label(Localization.lang("Metadata change"));
+        VBox container = new VBox(15);
+
+        Label header = new Label(Localization.lang("The following metadata changed:"));
+        header.getStyleClass().add("sectionHeader");
+        container.getChildren().add(header);
+
+        for (String change : metaDataDiff.getDifferences(preferences)) {
+            container.getChildren().add(new Label(change));
+        }
+
+        return container;
     }
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        database.setMetaData(newMetaData);
+        database.setMetaData(metaDataDiff.getNewMetaData());
     }
 }

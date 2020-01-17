@@ -173,7 +173,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
-        if (!entry.isPresent() || layout == null) {
+        if (entry.isEmpty() || layout == null) {
             // Nothing to do
             return;
         }

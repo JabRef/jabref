@@ -24,7 +24,10 @@ public class MedlineFetcherTest {
     private BibEntry entryWijedasa, entryEndharti, bibEntryIchikawa, bibEntrySari;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        // pause between runs to avoid 403 and 429 at Medline
+        Thread.sleep(1000);
+
         fetcher = new MedlineFetcher();
 
         entryWijedasa = new BibEntry();
@@ -167,7 +170,6 @@ public class MedlineFetcherTest {
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright);
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
-        assertTrue(entryList.contains(bibEntrySari));
     }
 
     @Test

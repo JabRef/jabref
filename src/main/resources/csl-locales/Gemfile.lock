@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/citation-style-language/Sheldon.git
-  revision: 09d0daebe0b6c76ccf9963f86e2e966b28a3ef46
+  revision: c2cc508c57157ee7d00948e24c46e10e3f319d57
   specs:
     sheldon (1.0.2)
       citeproc-ruby
@@ -26,30 +26,30 @@ GEM
     diff-lcs (1.3)
     diffy (3.3.0)
     dotenv (2.7.5)
-    fuubar (2.4.1)
+    fuubar (2.5.0)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
     mini_portile2 (2.4.0)
     namae (1.0.1)
-    nokogiri (1.10.4)
+    nokogiri (1.10.7)
       mini_portile2 (~> 2.4.0)
     ostruct (0.1.0)
-    rake (13.0.0)
+    rake (13.0.1)
     reverse_markdown (1.3.0)
       nokogiri
-    rspec (3.8.0)
-      rspec-core (~> 3.8.0)
-      rspec-expectations (~> 3.8.0)
-      rspec-mocks (~> 3.8.0)
-    rspec-core (3.8.2)
-      rspec-support (~> 3.8.0)
-    rspec-expectations (3.8.4)
+    rspec (3.9.0)
+      rspec-core (~> 3.9.0)
+      rspec-expectations (~> 3.9.0)
+      rspec-mocks (~> 3.9.0)
+    rspec-core (3.9.0)
+      rspec-support (~> 3.9.0)
+    rspec-expectations (3.9.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.8.0)
-    rspec-mocks (3.8.1)
+      rspec-support (~> 3.9.0)
+    rspec-mocks (3.9.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.8.0)
-    rspec-support (3.8.2)
+      rspec-support (~> 3.9.0)
+    rspec-support (3.9.0)
     ruby-progressbar (1.10.1)
 
 PLATFORMS

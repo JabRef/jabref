@@ -15,7 +15,7 @@
     <issn>0033-6807</issn>
     <eissn>1467-9310</eissn>
     <summary>Style for the R &amp; D Management Journal.</summary>
-    <updated>2019-06-25T14:36:25+00:00</updated>
+    <updated>2019-12-03T13:29:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="title">
@@ -209,7 +209,7 @@
       <name form="short" and="text" delimiter=", " delimiter-precedes-last="never" initialize-with=". "/>
     </names>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" collapse="year">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
       <key variable="issued" sort="ascending"/>
     </sort>

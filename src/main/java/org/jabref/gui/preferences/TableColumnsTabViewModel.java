@@ -19,6 +19,7 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
@@ -31,6 +32,7 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
@@ -59,19 +61,21 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
-    private FunctionBasedValidator columnsNotEmptyValidator;
+    private Validator columnsNotEmptyValidator;
 
     private List<String> restartWarnings = new ArrayList<>();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
+    private final MainTablePreferences mainTablePreferences;
     private final ColumnPreferences columnPreferences;
     private final SpecialFieldsPreferences specialFieldsPreferences;
 
     public TableColumnsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.columnPreferences = preferences.getColumnPreferences();
+        this.mainTablePreferences = preferences.getMainTablePreferences();
+        this.columnPreferences = mainTablePreferences.getColumnPreferences();
         this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
@@ -101,27 +105,25 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        ColumnPreferences columnPreferences = preferences.getColumnPreferences();
-        SpecialFieldsPreferences specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
-
         specialFieldsEnabledProperty.setValue(specialFieldsPreferences.getSpecialFieldsEnabled());
         specialFieldsSyncKeywordsProperty.setValue(specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
         specialFieldsSerializeProperty.setValue(specialFieldsPreferences.getSerializeSpecialFields());
-        extraFileColumnsEnabledProperty.setValue(columnPreferences.getExtraFileColumnsEnabled());
+        extraFileColumnsEnabledProperty.setValue(mainTablePreferences.getExtraFileColumnsEnabled());
 
         fillColumnList();
 
         availableColumnsProperty.clear();
 
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName()));
-        availableColumnsProperty.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
+        availableColumnsProperty.addAll(
+                new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
+                new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
+                new MainTableColumnModel(MainTableColumnModel.Type.FILES),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName())
+        );
 
         EnumSet.allOf(StandardField.class).stream()
                .map(Field::getName)
@@ -207,10 +209,13 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.storeColumnPreferences(new ColumnPreferences(
-                columnsListProperty.getValue(),
-                extraFileColumnsEnabledProperty.getValue(),
-                columnPreferences.getSortTypesForColumns()
+        MainTablePreferences newMainTablePreferences = preferences.getMainTablePreferences();
+        preferences.storeMainTablePreferences(new MainTablePreferences(
+                new ColumnPreferences(
+                        columnsListProperty.getValue(),
+                        newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
+                newMainTablePreferences.getResizeColumnsToFit(),
+                extraFileColumnsEnabledProperty.getValue()
         ));
 
         SpecialFieldsPreferences newSpecialFieldsPreferences = new SpecialFieldsPreferences(
@@ -235,9 +240,10 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus status = columnsListValidationStatus();
-        if (!status.isValid() && status.getHighestMessage().isPresent()) {
-            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = columnsListValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;

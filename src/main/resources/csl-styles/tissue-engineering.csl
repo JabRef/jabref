@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/tissue-engineering</id>
     <link href="http://www.zotero.org/styles/tissue-engineering" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://www.liebertpub.com/manuscript/tissue-engineering-parts-a-b-and-c/595/" rel="documentation"/>
+    <link href="https://home.liebertpub.com/publications/tissue-engineering-parts-a-b-and-c/595/for-authors" rel="documentation"/>
     <author>
       <name>Charles Parnot</name>
       <email>charles.parnot@gmail.com</email>
@@ -15,7 +15,7 @@
     <issn>2152-4947</issn>
     <eissn>2152-4955</eissn>
     <summary>A style for the journal Tissue Engineering, Parts A, B &amp; C, published by Mary Ann Liebert, Inc.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2019-12-04T12:33:25+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -26,8 +26,8 @@
   </locale>
   <macro name="author">
     <names variable="author">
-      <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-      <label form="long" prefix=", "/>
+      <name delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+      <label form="short" prefix=", "/>
       <substitute>
         <names variable="editor"/>
       </substitute>
@@ -41,13 +41,13 @@
         </if>
       </choose>
       <names variable="editor" suffix=".">
-        <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-        <label form="long" prefix=", "/>
+        <name delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all"/>
+        <label form="short" prefix=", "/>
       </names>
     </group>
   </macro>
   <macro name="publisher">
-    <group delimiter=": " suffix=";">
+    <group delimiter=": " suffix=",">
       <choose>
         <if type="thesis">
           <text variable="publisher-place" prefix="[" suffix="]"/>
@@ -90,7 +90,7 @@
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
         <group suffix="." delimiter=" ">
-          <text variable="container-title" form="short"/>
+          <text variable="container-title" form="short" strip-periods="true"/>
           <choose>
             <if variable="URL">
               <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
@@ -99,7 +99,6 @@
         </group>
         <text macro="edition" prefix=" "/>
       </if>
-      <!--add event-name and event-place once they become available-->
       <else-if type="bill legislation" match="any">
         <group delimiter=", ">
           <group delimiter=". ">
@@ -151,7 +150,7 @@
   <macro name="date">
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
-        <group suffix=";" delimiter=" ">
+        <group delimiter=" ">
           <date variable="issued" delimiter=" ">
             <date-part name="year"/>
           </date>
@@ -191,7 +190,10 @@
         <text variable="page-first"/>
       </if>
       <else>
-        <text variable="page" prefix=" p. "/>
+        <group delimiter=" ">
+          <label variable="page" form="short"/>
+          <text variable="page"/>
+        </group>
       </else>
     </choose>
   </macro>
@@ -199,7 +201,6 @@
     <choose>
       <if type="article-journal article-magazine" match="any">
         <text variable="volume" font-weight="bold"/>
-        <text variable="issue" prefix="(" suffix=")"/>
       </if>
     </choose>
   </macro>
@@ -214,11 +215,11 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=",">
+    <layout vertical-align="sup" delimiter=",">
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
+  <bibliography and="text" et-al-min="7" et-al-use-first="6" second-field-align="flush" line-spacing="2">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=". ">

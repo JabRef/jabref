@@ -41,10 +41,6 @@
     -fx-font-weight: normal;
 }
 
-.code-area .context-menu {
-    -fx-font-family: sans-serif;
-}
-
 .icon-button.narrow {
     -fx-padding: 0.1em;
 }
@@ -90,35 +86,59 @@
     -fx-background-color: -jr-error;
 }
 
-.code-area .text {
+.code-area .context-menu {
+    -fx-font-family: sans-serif;
+}
+
+#related-articles-tab {
+    -fx-padding: 20 20 20 20;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#related-articles-tab * {
     -fx-fill: -fx-text-background-color;
 }
 
-.gdpr-dialog {
-    -fx-font-size: 14pt;
+#gdpr-dialog {
+    -fx-border-color: -jr-warn;
+    -fx-border-insets: 5;
+    -fx-border-style: dashed;
+    -fx-border-width: 2;
+    -fx-padding: 12;
+    -fx-font-size: 1.3em;
 }
 
-.related-articles-tab {
-    -fx-padding: 20 20 20 20;
-}
-
-.recommendation-heading {
-    -fx-font-size: 14pt;
-    -fx-font-weight: bold;
-}
-
-.recommendation-description {
-    -fx-font-style: italic;
+#gdpr-dialog * {
+    -fx-fill: -fx-text-background-color;
 }
 
 .recommendation-item {
     -fx-padding: 0 0 0 20;
 }
 
+#bibtexSourceCodeArea {
+    -fx-padding: 4 4 4 4;
+    -fx-background-color: -fx-control-inner-background;
+}
+
 #bibtexSourceCodeArea .search {
     -fx-fill: red;
 }
 
-.bibtexSourceCodeArea .text {
+#citationsPane {
+    -fx-padding: 0;
+    -fx-background-color: -fx-control-inner-background;
+}
+
+#citationsPane * {
     -fx-fill: -fx-text-background-color;
+}
+
+.heading {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.description {
+    -fx-font-style: italic;
 }

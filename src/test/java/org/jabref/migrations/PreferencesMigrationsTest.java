@@ -138,6 +138,7 @@ class PreferencesMigrationsTest {
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
         List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
         List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
+        List<String> newSortTypes = Arrays.asList("ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING","ASCENDING");
 
         when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
         when(prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
@@ -146,5 +147,6 @@ class PreferencesMigrationsTest {
 
         verify(prefs).putStringList(JabRefPreferences.COLUMN_NAMES, updatedNames);
         verify(prefs).putStringList(JabRefPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_SORT_TYPES, newSortTypes);
     }
 }

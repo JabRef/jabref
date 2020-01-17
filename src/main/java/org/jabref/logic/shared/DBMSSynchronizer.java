@@ -21,8 +21,8 @@ import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
@@ -76,13 +76,16 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * @param event {@link EntryAddedEvent} object
      */
     @Subscribe
-    public void listen(EntryAddedEvent event) {
+    public void listen(EntriesAddedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
-            dbmsProcessor.insertEntry(event.getBibEntry());
+            List<BibEntry> entries = event.getBibEntries();
+            for (BibEntry entry : entries) {
+                dbmsProcessor.insertEntry(entry);
+            }
         }
     }
 
@@ -106,10 +109,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
      *
-     * @param event {@link EntryRemovedEvent} object
+     * @param event {@link EntriesRemovedEvent} object
      */
 
-    // This has not been made parallel yet - hence the for loop - that will take more effort
     @Subscribe
     public void listen(EntriesRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.

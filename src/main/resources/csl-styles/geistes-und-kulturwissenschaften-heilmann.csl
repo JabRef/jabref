@@ -13,7 +13,7 @@
     <category citation-format="note"/>
     <category field="humanities"/>
     <summary>German style for humanities. Citations in notes; full bibliography.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2019-11-25T19:48:35+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -50,7 +50,7 @@
           <if type="book">
             <names variable="editor">
               <name name-as-sort-order="first" and="text" sort-separator=", " delimiter=", " delimiter-precedes-last="never"/>
-              <label prefix=" (" form="short" suffix=".)"/>
+              <label form="short" prefix=" (" suffix=")"/>
             </names>
           </if>
         </choose>
@@ -293,10 +293,12 @@
         </group>
       </else-if>
       <else>
-        <text prefix=", " variable="genre"/>
-        <group delimiter=": ">
-          <text variable="publisher-place"/>
-          <text variable="publisher"/>
+        <group delimiter=", " prefix=", ">
+          <text variable="genre"/>
+          <group delimiter=": ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
         </group>
         <choose>
           <if variable="issued">

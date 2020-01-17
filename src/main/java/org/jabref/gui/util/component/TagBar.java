@@ -1,6 +1,7 @@
 package org.jabref.gui.util.component;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -27,9 +29,12 @@ public class TagBar<T> extends HBox {
 
     private final ListProperty<T> tags;
     private StringConverter<T> stringConverter;
-    @FXML private TextField inputTextField;
-    @FXML private HBox tagList;
+    @FXML
+    private TextField inputTextField;
+    @FXML
+    private HBox tagList;
     private BiConsumer<T, MouseEvent> onTagClicked;
+    private java.util.Set<FieldProperty> properties;
 
     public TagBar() {
         tags = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -37,8 +42,8 @@ public class TagBar<T> extends HBox {
 
         // Load FXML
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
         getStylesheets().add(0, TagBar.class.getResource("TagBar.css").toExternalForm());
     }
 
@@ -66,6 +71,9 @@ public class TagBar<T> extends HBox {
                 tagList.getChildren().addAll(change.getFrom(), change.getAddedSubList().stream().map(this::createTag).collect(Collectors.toList()));
             }
         }
+        if (this.properties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            inputTextField.setDisable(!tags.isEmpty());
+        }
     }
 
     private Tag<T> createTag(T item) {
@@ -83,7 +91,7 @@ public class TagBar<T> extends HBox {
         String inputText = inputTextField.getText();
         if (StringUtil.isNotBlank(inputText)) {
             T newTag = stringConverter.fromString(inputText);
-            if ((newTag != null) && !tags.contains(newTag)) {
+            if ((newTag != null) && !tags.contains(newTag) && (tags.isEmpty() || this.properties.contains(FieldProperty.MULTIPLE_ENTRY_LINK))) {
                 tags.add(newTag);
                 inputTextField.clear();
             }
@@ -96,5 +104,9 @@ public class TagBar<T> extends HBox {
 
     public void setOnTagClicked(BiConsumer<T, MouseEvent> onTagClicked) {
         this.onTagClicked = onTagClicked;
+    }
+
+    public void setFieldProperties(Set<FieldProperty> properties) {
+        this.properties = properties;
     }
 }
