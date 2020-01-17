@@ -7,7 +7,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.Formatter;
 
 /**
- * Trim all whitespace characters(defined in java) in the string.
+ * Trim all whitespace characters (defined in java) in the string.
  */
 public class NormalizeNewlinesFormatter extends Formatter {
 
