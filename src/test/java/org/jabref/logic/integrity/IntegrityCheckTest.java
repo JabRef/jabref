@@ -378,7 +378,9 @@ class IntegrityCheckTest {
     }
 
     private BibDatabaseContext createContext(Field field, String value) {
-        return createContext(field, value, new MetaData());
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        return createContext(field, value, metaData);
     }
 
     private void assertWrong(BibDatabaseContext context) {
