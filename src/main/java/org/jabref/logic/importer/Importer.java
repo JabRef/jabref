@@ -104,8 +104,7 @@ public abstract class Importer implements Comparable<Importer> {
      */
     public ParserResult importDatabase(String data) throws IOException {
         try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
-            ParserResult parserResult = importDatabase(bufferedReader);
-            return parserResult;
+            return importDatabase(bufferedReader);
         }
     }
 

@@ -89,10 +89,10 @@ public class BibDatabaseContext {
     public BibDatabaseMode getMode() {
         Optional<BibDatabaseMode> mode = metaData.getMode();
 
-        if (!mode.isPresent()) {
-            BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
+        if (mode.isEmpty()) {
             BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
-            if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
+            if ((defaults.mode == BibDatabaseMode.BIBLATEX)
+                    || (BibDatabaseModeDetection.inferMode(database) == BibDatabaseMode.BIBLATEX)) {
                 newMode = BibDatabaseMode.BIBLATEX;
             }
             this.setMode(newMode);
