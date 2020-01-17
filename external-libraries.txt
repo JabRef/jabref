@@ -13,6 +13,12 @@ In case you add a library, please use these identifiers.
 For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
 Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
 
+# bst files
+
+Project: IEEEtran
+Path:    src/main/resources/bst/IEEEtran.bst
+URL:     https://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/bibtex
+License: LPPL-1.3
 
 # Fonts and Icons
 
