@@ -38,16 +38,6 @@ class FieldWriterTests {
     }
 
     @Test
-    void newlineAtEndOfAbstractFieldIsDeleted() throws Exception {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
-
-        String result = writer.write(StandardField.ABSTRACT, text + OS.NEWLINE);
-        String expected = "{" + text + "}";
-
-        assertEquals(expected, result);
-    }
-
-    @Test
     void preserveNewlineInAbstractField() throws Exception {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
