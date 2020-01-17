@@ -2,16 +2,13 @@ package org.jabref.gui.importer.actions;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -32,7 +29,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -77,17 +73,13 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        List<Path> filesToOpen = new ArrayList<>();
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                                                                                               .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                                                                                               .withInitialDirectory(getInitialDirectory())
-                                                                                               .build();
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                .withInitialDirectory(getInitialDirectory())
+                .build();
 
-        List<Path> chosenFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
-        filesToOpen.addAll(chosenFiles);
-
+        List<Path> filesToOpen = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
         openFiles(filesToOpen, true);
     }
 
@@ -97,15 +89,11 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private Path getInitialDirectory() {
         if (frame.getBasePanelCount() == 0) {
-            return getWorkingDirectoryPath();
+            return Globals.prefs.getWorkingDir();
         } else {
             Optional<Path> databasePath = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(p -> p.getParent()).orElse(getWorkingDirectoryPath());
+            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
         }
-    }
-
-    private Path getWorkingDirectoryPath() {
-        return Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY));
     }
 
     /**
@@ -114,15 +102,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param file the file, may be null or not existing
      */
     public void openFile(Path file, boolean raisePanel) {
-        List<Path> filesToOpen = new ArrayList<>();
-        filesToOpen.add(file);
-        openFiles(filesToOpen, raisePanel);
-    }
-
-    public void openFilesAsStringList(List<String> fileNamesToOpen, boolean raisePanel) {
-        List<Path> filesToOpen = fileNamesToOpen.stream().map(Paths::get).collect(Collectors.toList());
-
-        openFiles(filesToOpen, raisePanel);
+        openFiles(Collections.singletonList(file), raisePanel);
     }
 
     /**
@@ -178,7 +158,6 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /**
      * @param file the file, may be null or not existing
-     * @return
      */
     private void openTheFile(Path file, boolean raisePanel) {
         Objects.requireNonNull(file);
@@ -228,9 +207,6 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     private BasePanel addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
-
-        BibDatabase database = result.getDatabase();
-
         if (result.hasWarnings()) {
             ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
         }

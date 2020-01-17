@@ -1,0 +1,6 @@
+site_name: JabRef Developer Documentation
+repo_url: https://github.com/jabref/jabref/
+theme:
+    name: readthedocs
+extra_css:
+    - mkdocs-custom.css

@@ -1078,7 +1078,7 @@ public class JabRefPreferences implements PreferencesService {
     public List<String> getStringList(String key) {
         String names = get(key);
         if (names == null) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         StringReader rd = new StringReader(names);
