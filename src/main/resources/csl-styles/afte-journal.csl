@@ -11,7 +11,7 @@
     </author>
     <category citation-format="numeric"/>
     <issn>1048-9959</issn>
-    <updated>2019-12-21T16:56:50+00:00</updated>
+    <updated>2020-01-07T19:11:47+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -88,7 +88,7 @@
       <key variable="citation-number"/>
     </sort>
     <layout suffix=".">
-      <text variable="citation-number" suffix=". "/>
+      <text variable="citation-number" prefix="[" suffix="]"/>
       <choose>
         <if type="article-journal article article-magazine article-newspaper">
           <text macro="authors" suffix=", "/>
@@ -130,7 +130,7 @@
           <text macro="authors" suffix=", "/>
           <!-- <text macro="author-first" suffix=" "/> -->
           <group suffix=", ">
-            <text variable="title" text-case="title" quotes="true" suffix=", "/>
+            <text variable="title" text-case="title" quotes="true"/>
           </group>
           <text variable="container-title" prefix="Presented at " suffix=", "/>
           <!-- Proc Title -->
@@ -154,7 +154,7 @@
         <else-if type="webpage">
           <text macro="authors" suffix=". "/>
           <text variable="title" quotes="true" suffix=". "/>
-          <text variable="URL" prefix=" &lt;URL: " suffix="&gt;. "/>
+          <text variable="URL" prefix="&lt;URL: " suffix="&gt;. "/>
           <group delimiter=", ">
             <date variable="accessed" prefix="Accessed: " suffix=".">
               <date-part name="year" suffix=" "/>
@@ -164,11 +164,12 @@
           </group>
         </else-if>
         <else-if type="personal_communication" match="any">
-          <text macro="authors" suffix=". Personal communication."/>
-          <date variable="accessed" suffix=".">
-            <date-part name="year" suffix=" "/>
-            <date-part name="month" form="short" suffix=" "/>
-            <date-part name="day" form="numeric-leading-zeros" suffix=""/>
+          <text macro="authors" suffix=". "/>
+          <text value="Personal communication" suffix=". "/>
+          <date variable="issued" suffix=".">
+            <date-part name="month" suffix=" "/>
+            <date-part name="day" form="numeric-leading-zeros" suffix=", "/>
+            <date-part name="year" suffix="."/>
           </date>
         </else-if>
         <else-if type="report">
@@ -196,27 +197,31 @@
             <text macro="year"/>
           </group>
         </else-if>
-        <else>
+        <else-if type="patent" match="any">
           <text macro="authors" suffix=", "/>
-          <!-- <text macro="author-first" suffix=" "/> -->
-          <group suffix=", ">
-            <text variable="title" text-case="title" quotes="true" suffix=", "/>
-          </group>
-          <text variable="container-title" prefix="Presented at " suffix=", "/>
-          <!-- Proc Title -->
-          <group delimiter=". ">
+          <text variable="title" text-case="title" quotes="true" suffix=", "/>
+          <text variable="number" prefix="Patent " suffix=", "/>
+          <group delimiter=".">
             <group delimiter=", ">
-              <text variable="publisher-place"/>
+              <text variable="publisher"/>
               <group delimiter=", ">
-                <text variable="publisher"/>
-                <date variable="issued">
-                  <date-part name="day" form="numeric-leading-zeros" suffix=" "/>
-                  <date-part name="month" suffix=" "/>
-                  <date-part name="year" form="long"/>
-                </date>
+                <text variable="publisher-place"/>
+                <text macro="year"/>
               </group>
             </group>
-            <text variable="page" prefix="pp. "/>
+          </group>
+        </else-if>
+        <else>
+          <text macro="authors" suffix=", "/>
+          <text variable="title" text-case="title" quotes="true" suffix=", "/>
+          <group delimiter=".">
+            <group delimiter=", ">
+              <text variable="publisher"/>
+              <group delimiter=", ">
+                <text variable="publisher-place"/>
+                <text macro="year"/>
+              </group>
+            </group>
             <!--&#160; - Uppercase -->
             <text macro="URLandDOI"/>
           </group>

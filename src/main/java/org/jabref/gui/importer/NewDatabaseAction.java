@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -21,7 +20,7 @@ public class NewDatabaseAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(mode);
         jabRefFrame.addTab(bibDatabaseContext, true);
     }

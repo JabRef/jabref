@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import org.jabref.logic.util.FileType;
+import org.jabref.model.database.BibDatabaseModeDetection;
 
 /**
  * Role of an importer for JabRef.
@@ -88,6 +89,11 @@ public abstract class Importer implements Comparable<Importer> {
             ParserResult parserResult = importDatabase(bufferedReader);
             parserResult.getMetaData().setEncoding(encoding);
             parserResult.setFile(filePath.toFile());
+
+            // Make sure the mode is always set
+            if (parserResult.getMetaData().getMode().isEmpty()) {
+                parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
+            }
             return parserResult;
         }
     }
@@ -104,8 +110,7 @@ public abstract class Importer implements Comparable<Importer> {
      */
     public ParserResult importDatabase(String data) throws IOException {
         try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
-            ParserResult parserResult = importDatabase(bufferedReader);
-            return parserResult;
+            return importDatabase(bufferedReader);
         }
     }
 

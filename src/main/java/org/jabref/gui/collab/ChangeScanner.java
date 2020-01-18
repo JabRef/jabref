@@ -44,7 +44,7 @@ public class ChangeScanner {
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
-                changes.add(new MetaDataChangeViewModel(diff));
+                changes.add(new MetaDataChangeViewModel(diff, Globals.prefs));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
             });
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));
@@ -82,6 +82,6 @@ public class ChangeScanner {
             return new EntryDeleteChangeViewModel(diff.getOriginalEntry());
         }
 
-        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry(), database);
+        return new EntryChangeViewModel(diff.getOriginalEntry(), diff.getNewEntry());
     }
 }

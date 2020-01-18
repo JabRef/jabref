@@ -3,10 +3,8 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -49,12 +47,12 @@ public class SynchronizationTestSimulator {
         DBMSConnection dbmsConnection = TestConnector.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
         TestManager.clearTables(dbmsConnection);
 
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
+        clientContextA = new BibDatabaseContext();
         DBMSSynchronizer synchronizerA = new DBMSSynchronizer(clientContextA, ',', pattern, new DummyFileUpdateMonitor());
         clientContextA.convertToSharedDatabase(synchronizerA);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
+        clientContextB = new BibDatabaseContext();
         DBMSSynchronizer synchronizerB = new DBMSSynchronizer(clientContextB, ',', pattern, new DummyFileUpdateMonitor());
         clientContextB.convertToSharedDatabase(synchronizerB);
         // use a second connection, because this is another client (typically on another machine)

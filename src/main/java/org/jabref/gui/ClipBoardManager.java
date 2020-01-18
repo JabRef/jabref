@@ -21,7 +21,7 @@ import javafx.scene.input.MouseButton;
 
 import org.jabref.Globals;
 import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -152,7 +152,7 @@ public class ClipBoardManager {
 
     public void setContent(List<BibEntry> entries) throws IOException {
         final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), Globals.entryTypesManager);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(Globals.prefs.getFieldWriterPreferences()), Globals.entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
         content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
         content.putString(serializedEntries);
