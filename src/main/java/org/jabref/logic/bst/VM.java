@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,15 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * A Bibtex Virtual machine that can execute .bst files.
- *
+ * A BibTeX Virtual machine that can execute .bst files.
+ * <p>
  * Documentation can be found in the original bibtex distribution:
- *
+ * <p>
  * https://www.ctan.org/pkg/bibtex
- *
  */
-
 public class VM implements Warn {
 
     public static final Integer FALSE = 0;
@@ -74,7 +72,6 @@ public class VM implements Warn {
 
         public final String name;
 
-
         public Identifier(String name) {
             this.name = name;
         }
@@ -87,7 +84,6 @@ public class VM implements Warn {
     public static class Variable {
 
         public final String name;
-
 
         public Variable(String name) {
             this.name = name;
@@ -102,7 +98,6 @@ public class VM implements Warn {
     public interface BstFunction {
         void execute(BstEntry context);
     }
-
 
     public VM(File f) throws RecognitionException, IOException {
         this(new ANTLRFileStream(f.getPath()));
@@ -225,7 +220,16 @@ public class VM implements Warn {
             Object o2 = stack.pop();
             Object o1 = stack.pop();
 
+            if (o1 == null) {
+                o1 = "";
+            }
+            if (o2 == null) {
+                o2 = "";
+            }
+
             if (!((o1 instanceof String) && (o2 instanceof String))) {
+                LOGGER.error("o1: {} ({})", o1, o1.getClass());
+                LOGGER.error("o2: {} ({})", o2, o2.getClass());
                 throw new VMException("Can only concatenate two String with *");
             }
 
@@ -493,7 +497,7 @@ public class VM implements Warn {
          * Is a no-op.
          */
         buildInFunctions.put("skip$", context -> {
-                // Nothing to do! Yeah!
+            // Nothing to do! Yeah!
         });
 
         /*
@@ -613,7 +617,6 @@ public class VM implements Warn {
             String s = (String) stack.pop();
             VM.this.bbl.append(s);
         });
-
     }
 
     private void textLengthFunction() {
@@ -816,7 +819,6 @@ public class VM implements Warn {
                 return true;
             }
             return false;
-
         }
 
         if ((context != null) && context.localIntegers.containsKey(name)) {
@@ -837,6 +839,15 @@ public class VM implements Warn {
     }
 
     public String run(Collection<BibEntry> bibtex) {
+        return this.run(bibtex, null);
+    }
+
+    /**
+     * @param bibtex      list of entries to convert
+     * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+     */
+    public String run(Collection<BibEntry> bibtex, BibDatabase bibDatabase) {
+        Objects.requireNonNull(bibtex);
 
         // Reset
         bbl = new StringBuilder();
@@ -862,39 +873,39 @@ public class VM implements Warn {
         for (int i = 0; i < tree.getChildCount(); i++) {
             Tree child = tree.getChild(i);
             switch (child.getType()) {
-            case BstParser.STRINGS:
-                strings(child);
-                break;
-            case BstParser.INTEGERS:
-                integers(child);
-                break;
-            case BstParser.FUNCTION:
-                function(child);
-                break;
-            case BstParser.EXECUTE:
-                execute(child);
-                break;
-            case BstParser.SORT:
-                sort();
-                break;
-            case BstParser.ITERATE:
-                iterate(child);
-                break;
-            case BstParser.REVERSE:
-                reverse(child);
-                break;
-            case BstParser.ENTRY:
-                entry(child);
-                break;
-            case BstParser.READ:
-                read();
-                break;
-            case BstParser.MACRO:
-                macro(child);
-                break;
-            default:
-                LOGGER.info("Unknown type: " + child.getType());
-                break;
+                case BstParser.STRINGS:
+                    strings(child);
+                    break;
+                case BstParser.INTEGERS:
+                    integers(child);
+                    break;
+                case BstParser.FUNCTION:
+                    function(child);
+                    break;
+                case BstParser.EXECUTE:
+                    execute(child);
+                    break;
+                case BstParser.SORT:
+                    sort();
+                    break;
+                case BstParser.ITERATE:
+                    iterate(child);
+                    break;
+                case BstParser.REVERSE:
+                    reverse(child);
+                    break;
+                case BstParser.ENTRY:
+                    entry(child);
+                    break;
+                case BstParser.READ:
+                    read(bibDatabase);
+                    break;
+                case BstParser.MACRO:
+                    macro(child);
+                    break;
+                default:
+                    LOGGER.info("Unknown type: {}", child.getType());
+                    break;
             }
         }
 
@@ -902,19 +913,18 @@ public class VM implements Warn {
     }
 
     /**
-     * Dredges up from the database file the field values for each entry in the
-     * list. It has no arguments. If a database entry doesn't have a value for a
-     * field (and probably no database entry will have a value for every field),
-     * that field variable is marked as missing for the entry.
-     *
+     * Dredges up from the database file the field values for each entry in the list. It has no arguments. If a database
+     * entry doesn't have a value for a field (and probably no database entry will have a value for every field), that
+     * field variable is marked as missing for the entry.
+     * <p>
      * We use null for the missing entry designator.
+     * @param bibDatabase
      */
-    private void read() {
+    private void read(BibDatabase bibDatabase) {
         for (BstEntry e : entries) {
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
-                String fieldValue = e.getBibtexEntry().getField(field).orElse(null);
-
+                String fieldValue = e.getBibtexEntry().getResolvedFieldOrAlias(field, bibDatabase).orElse(null);
                 mEntry.setValue(fieldValue);
             }
         }
@@ -927,14 +937,11 @@ public class VM implements Warn {
     }
 
     /**
-     * Defines a string macro. It has two arguments; the first is the macro's
-     * name, which is treated like any other variable or function name, and the
-     * second is its definition, which must be double-quote-delimited. You must
-     * have one for each three-letter month abbreviation; in addition, you
-     * should have one for common journal names. The user's database may
-     * override any definition you define using this command. If you want to
-     * define a string the user can't touch, use the FUNCTION command, which has
-     * a compatible syntax.
+     * Defines a string macro. It has two arguments; the first is the macro's name, which is treated like any other
+     * variable or function name, and the second is its definition, which must be double-quote-delimited. You must have
+     * one for each three-letter month abbreviation; in addition, you should have one for common journal names. The
+     * user's database may override any definition you define using this command. If you want to define a string the
+     * user can't touch, use the FUNCTION command, which has a compatible syntax.
      */
     private void macro(Tree child) {
         String name = child.getChild(0).getText();
@@ -945,7 +952,6 @@ public class VM implements Warn {
     public class MacroFunction implements BstFunction {
 
         private final String replacement;
-
 
         public MacroFunction(String replacement) {
             this.replacement = replacement;
@@ -958,13 +964,11 @@ public class VM implements Warn {
     }
 
     /**
-     * Declares the fields and entry variables. It has three arguments, each a
-     * (possibly empty) list of variable names. The three lists are of: fields,
-     * integer entry variables, and string entry variables. There is an
-     * additional field that BibTEX automatically declares, crossref, used for
-     * cross referencing. And there is an additional string entry variable
-     * automatically declared, sort.key$, used by the SORT command. Each of
-     * these variables has a value for each entry on the list.
+     * Declares the fields and entry variables. It has three arguments, each a (possibly empty) list of variable names.
+     * The three lists are of: fields, integer entry variables, and string entry variables. There is an additional field
+     * that BibTEX automatically declares, crossref, used for cross referencing. And there is an additional string entry
+     * variable automatically declared, sort.key$, used by the SORT command. Each of these variables has a value for
+     * each entry on the list.
      */
     private void entry(Tree child) {
         // Fields first
@@ -1044,7 +1048,6 @@ public class VM implements Warn {
 
         private final Tree localTree;
 
-
         public StackFunction(Tree stack) {
             localTree = stack;
         }
@@ -1062,22 +1065,22 @@ public class VM implements Warn {
                 try {
 
                     switch (c.getType()) {
-                    case BstParser.STRING:
-                        String s = c.getText();
-                        push(s.substring(1, s.length() - 1));
-                        break;
-                    case BstParser.INTEGER:
-                        push(Integer.parseInt(c.getText().substring(1)));
-                        break;
-                    case BstParser.QUOTED:
-                        push(new Identifier(c.getText().substring(1)));
-                        break;
-                    case BstParser.STACK:
-                        push(c);
-                        break;
-                    default:
-                        VM.this.execute(c.getText(), context);
-                        break;
+                        case BstParser.STRING:
+                            String s = c.getText();
+                            push(s.substring(1, s.length() - 1));
+                            break;
+                        case BstParser.INTEGER:
+                            push(Integer.parseInt(c.getText().substring(1)));
+                            break;
+                        case BstParser.QUOTED:
+                            push(new Identifier(c.getText().substring(1)));
+                            break;
+                        case BstParser.STACK:
+                            push(c);
+                            break;
+                        default:
+                            VM.this.execute(c.getText(), context);
+                            break;
                     }
                 } catch (VMException e) {
                     if (file == null) {
@@ -1089,7 +1092,6 @@ public class VM implements Warn {
                     throw e;
                 }
             }
-
         }
     }
 
@@ -1136,16 +1138,12 @@ public class VM implements Warn {
         String name = child.getChild(0).getText();
         Tree localStack = child.getChild(1);
         functions.put(name, new StackFunction(localStack));
-
     }
 
     /**
-     * Declares global integer variables. It has one argument, a list of
-     * variable names. There are two such automatically-declared variables,
-     * entry.max$ and global.max$, used for limiting the lengths of string vari-
-     * ables. You may have any number of these commands, but a variable's
-     * declaration must precede its use.
-     *
+     * Declares global integer variables. It has one argument, a list of variable names. There are two such
+     * automatically-declared variables, entry.max$ and global.max$, used for limiting the lengths of string vari-
+     * ables. You may have any number of these commands, but a variable's declaration must precede its use.
      */
     private void integers(Tree child) {
         Tree t = child.getChild(0);
@@ -1157,9 +1155,8 @@ public class VM implements Warn {
     }
 
     /**
-     * Declares global string variables. It has one argument, a list of variable
-     * names. You may have any number of these commands, but a variable's
-     * declaration must precede its use.
+     * Declares global string variables. It has one argument, a list of variable names. You may have any number of these
+     * commands, but a variable's declaration must precede its use.
      *
      * @param child
      */
@@ -1181,7 +1178,6 @@ public class VM implements Warn {
         private final Map<String, String> fields = new HashMap<>();
 
         private final Map<String, Integer> localIntegers = new HashMap<>();
-
 
         public BstEntry(BibEntry e) {
             this.entry = e;
@@ -1232,5 +1228,4 @@ public class VM implements Warn {
     public void warn(String string) {
         LOGGER.warn(string);
     }
-
 }
