@@ -89,7 +89,7 @@
                             <CheckBox fx:id="keywordGroupRegex" text="Regular expression"/>
                         </HBox>
                     </VBox>
-                    <VBox visible="${searchRadioButton.selected}" spacing="4.0">
+                    <VBox visible="${searchRadioButton.selected}" spacing="10.0">
                         <VBox>
                             <Label text="%Search expression"/>
                             <TextField fx:id="searchGroupSearchTerm"/>
@@ -99,26 +99,34 @@
                             <CheckBox fx:id="searchGroupRegex" text="Regular expression"/>
                         </HBox>
                     </VBox>
-                    <VBox visible="${autoRadioButton.selected}" spacing="4.0">
+                    <VBox visible="${autoRadioButton.selected}" spacing="10.0">
                         <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
                                      text="Generate groups from keywords in a BibTeX field"/>
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets left="20.0"/>
                             </padding>
-                            <HBox spacing="4.0">
+                            <HBox spacing="10.0">
                                 <VBox HBox.hgrow="ALWAYS">
-                                    <Label text="%Field to group by:"/>
+                                    <Label text="%Field to group by"/>
                                     <TextField fx:id="autoGroupKeywordsField"
                                                disable="${!autoGroupKeywordsOption.selected}"/>
                                 </VBox>
                                 <VBox>
                                     <Label text="%Delimiter(s)"/>
                                     <HBox spacing="10.0">
-                                        <TextField fx:id="autoGroupKeywordsDeliminator" prefWidth="25.0"
-                                                   disable="${!autoGroupKeywordsOption.selected}"/>
-                                        <TextField fx:id="autoGroupKeywordsHierarchicalDeliminator" prefWidth="25.0"
-                                                   disable="${!autoGroupKeywordsOption.selected}"/>
+                                        <TextField fx:id="autoGroupKeywordsDeliminator" prefWidth="30.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}">
+                                            <tooltip>
+                                                <Tooltip text="%Keyword delimiter"/>
+                                            </tooltip>
+                                        </TextField>
+                                        <TextField fx:id="autoGroupKeywordsHierarchicalDeliminator" prefWidth="30.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}">
+                                            <tooltip>
+                                                <Tooltip text="%Hierarchical keyword delimiter"/>
+                                            </tooltip>
+                                        </TextField>
                                     </HBox>
                                 </VBox>
                             </HBox>
@@ -129,7 +137,7 @@
                             <padding>
                                 <Insets left="20.0"/>
                             </padding>
-                            <Label text="%Field to group by:"/>
+                            <Label text="%Field to group by"/>
                             <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
                         </VBox>
                     </VBox>
