@@ -7,7 +7,6 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 
@@ -28,10 +27,6 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                     </columnResizePolicy>
                 </TableView>
-                <HBox spacing="4.0">
-                    <TextField fx:id="addStringLabel" promptText="%Label" HBox.hgrow="ALWAYS"/>
-                    <TextField fx:id="addStringContent" promptText="%Content" HBox.hgrow="ALWAYS"/>
-                </HBox>
             </VBox>
             <VBox>
                 <Button styleClass="icon-button,narrow" onAction="#openHelp">

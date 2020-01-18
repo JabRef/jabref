@@ -3,15 +3,13 @@ package org.jabref.gui.metadata;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.DialogService;
@@ -32,8 +30,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<BibtexStringEditorItemModel, String> labelColumn;
     @FXML private TableColumn<BibtexStringEditorItemModel, String> contentColumn;
     @FXML private TableColumn<BibtexStringEditorItemModel, String> actionsColumn;
-    @FXML private TextField addStringLabel;
-    @FXML private TextField addStringContent;
     @FXML private Button addStringButton;
     @FXML private ButtonType saveButton;
 
@@ -104,7 +100,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
                         viewModel.removeString(stringsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
-        addStringLabel.textProperty().bindBidirectional(viewModel.addLabelProperty());
+/*        addStringLabel.textProperty().bindBidirectional(viewModel.addLabelProperty());
         addStringLabel.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 addStringContent.requestFocus();
@@ -120,7 +116,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
                 addStringLabel.requestFocus();
                 event.consume();
             }
-        });
+        }); */
 
         stringsList.itemsProperty().bindBidirectional(viewModel.stringsListProperty());
         stringsList.setEditable(true);
@@ -128,7 +124,14 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
     @FXML
     private void addString() {
-        viewModel.addNewString();
+        BibtexStringEditorItemModel newString = new BibtexStringEditorItemModel("New String","");
+        viewModel.addNewString(newString);
+        stringsList.edit(stringsList.getItems().size() - 1, labelColumn);
+
+        // NPE - textfield does not yet exist.
+        Node textfield = stringsList.lookup(".text-field");
+        textfield.requestFocus();
+
     }
 
     @FXML
