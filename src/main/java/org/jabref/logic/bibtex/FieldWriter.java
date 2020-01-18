@@ -7,35 +7,33 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Currently the only implementation of org.jabref.exporter.FieldFormatter
- * <p>
  * Obeys following settings:
  * * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
  * * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
  * * JabRefPreferences.WRITEFIELD_WRAPFIELD
  */
-public class LatexFieldFormatter {
+public class FieldWriter {
 
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
     private final boolean neverFailOnHashes;
-    private final LatexFieldFormatterPreferences prefs;
+    private final FieldWriterPreferences prefs;
     private final FieldContentParser parser;
     private StringBuilder stringBuilder;
 
-    public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
+    public FieldWriter(FieldWriterPreferences prefs) {
         this(true, prefs);
     }
 
-    private LatexFieldFormatter(boolean neverFailOnHashes, LatexFieldFormatterPreferences prefs) {
+    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences prefs) {
         this.neverFailOnHashes = neverFailOnHashes;
         this.prefs = prefs;
 
         parser = new FieldContentParser(prefs.getFieldContentParserPreferences());
     }
 
-    public static LatexFieldFormatter buildIgnoreHashes(LatexFieldFormatterPreferences prefs) {
-        return new LatexFieldFormatter(true, prefs);
+    public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
+        return new FieldWriter(true, prefs);
     }
 
     private static void checkBraces(String text) throws InvalidFieldValueException {
@@ -73,34 +71,22 @@ public class LatexFieldFormatter {
     /**
      * Formats the content of a field.
      *
-     * @param content   the content of the field
-     * @param field the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+     * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
+     * @param content the content of the field
      * @return a formatted string suitable for output
      * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String format(String content, Field field) throws InvalidFieldValueException {
+    public String write(Field field, String content) throws InvalidFieldValueException {
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
         }
 
-        String result = content;
-
-        // normalize newlines
-        boolean shouldNormalizeNewlines = !result.contains(OS.NEWLINE) && result.contains("\n");
-        if (shouldNormalizeNewlines) {
-            // if we don't have real new lines, but pseudo newlines, we replace them
-            // On Win 8.1, this is always true for multiline fields
-            result = result.replace("\n", OS.NEWLINE);
-        }
-
         // If the field is non-standard, we will just append braces, wrap and write.
         if (!shouldResolveStrings(field)) {
-            return formatWithoutResolvingStrings(result, field);
+            return formatWithoutResolvingStrings(content, field);
         }
 
-        // Trim whitespace
-        result = result.trim();
-        return formatAndResolveStrings(result, field);
+        return formatAndResolveStrings(content, field);
     }
 
     /**
