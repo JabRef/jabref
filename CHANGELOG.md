@@ -13,6 +13,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+- We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
+
 ### Fixed
 
 - We fixed an issue where the Medline fetcher was only working when JabRef was running from source. [#5645](https://github.com/JabRef/jabref/issues/5645)
