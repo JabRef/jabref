@@ -5,21 +5,21 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 
-public class LatexFieldFormatterPreferences {
+public class FieldWriterPreferences {
 
     private final boolean resolveStringsAllFields;
     private final List<Field> doNotResolveStringsFor;
     private final int lineLength = 65; // Constant
     private final FieldContentParserPreferences fieldContentParserPreferences;
 
-    public LatexFieldFormatterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
-                                          FieldContentParserPreferences fieldContentParserPreferences) {
+    public FieldWriterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
+                                  FieldContentParserPreferences fieldContentParserPreferences) {
         this.resolveStringsAllFields = resolveStringsAllFields;
         this.doNotResolveStringsFor = doNotResolveStringsFor;
         this.fieldContentParserPreferences = fieldContentParserPreferences;
     }
 
-    public LatexFieldFormatterPreferences() {
+    public FieldWriterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
         this(true, Collections.emptyList(), new FieldContentParserPreferences());
     }

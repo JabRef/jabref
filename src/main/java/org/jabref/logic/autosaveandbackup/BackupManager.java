@@ -8,17 +8,14 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -46,8 +43,7 @@ public class BackupManager {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
-    private final ExecutorService executor;
-    private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
+    private final DelayTaskThrottler throttler;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -55,8 +51,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
-        this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
+        this.throttler = new DelayTaskThrottler(15000);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -71,8 +66,6 @@ public class BackupManager {
      * As long as no database file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
-     * @param entryTypesManager
-     * @param preferences
      */
     public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
         BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
@@ -151,11 +144,7 @@ public class BackupManager {
     }
 
     private void startBackupTask() {
-        try {
-            executor.submit(backupTask);
-        } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting while another backup process is already running.");
-        }
+        throttler.schedule(() -> determineBackupPath().ifPresent(this::performBackup));
     }
 
     /**
@@ -165,7 +154,7 @@ public class BackupManager {
     private void shutdown() {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
-        executor.shutdown();
+        throttler.shutdown();
         determineBackupPath().ifPresent(this::deleteBackupFile);
     }
 

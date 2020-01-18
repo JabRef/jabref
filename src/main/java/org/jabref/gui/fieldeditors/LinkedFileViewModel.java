@@ -29,6 +29,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -85,7 +86,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
         this.xmpPreferences = xmpPreferences;
-        
+
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
@@ -397,7 +398,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
         try {
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
-            if (!targetDirectory.isPresent()) {
+            if (targetDirectory.isEmpty()) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
                 return;
             }
@@ -420,7 +421,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                    String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                    String suggestedTypeName = suggestedType.orElse(StandardExternalFileType.PDF).getName();
                     linkedFile.setFileType(suggestedTypeName);
 
                     String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
@@ -435,7 +436,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Optional<ExternalFileType> suggestedType = inferFileTypeFromMimeType(urlDownload);
 
         // If we did not find a file type from the MIME type, try based on extension:
-        if (!suggestedType.isPresent()) {
+        if (suggestedType.isEmpty()) {
             suggestedType = inferFileTypeFromURL(urlDownload.getSource().toExternalForm());
         }
         return suggestedType;
@@ -454,7 +455,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
         return URLUtil.getSuffix(url)
-                      .flatMap(extension -> externalFileTypes.getExternalFileTypeByExt(extension));
+                      .flatMap(externalFileTypes::getExternalFileTypeByExt);
     }
 
     public LinkedFile getFile() {

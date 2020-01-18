@@ -51,7 +51,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void noLinkFound() throws IOException, FetcherException {
-        entry.setField(StandardField.TITLE, "Pro WF: Windows Workflow in NET 3.5");
+        entry.setField(StandardField.TITLE, "Curriculum programme of career-oriented java specialty guided by principles of software engineering");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }

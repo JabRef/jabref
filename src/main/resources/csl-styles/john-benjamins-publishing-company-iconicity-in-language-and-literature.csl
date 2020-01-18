@@ -2,11 +2,12 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="chicago" default-locale="en-US">
   <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>John Benjamins Publishing Company - collective volumes</title>
-    <id>http://www.zotero.org/styles/john-benjamins-publishing-company-collective-volumes</id>
-    <link href="http://www.zotero.org/styles/john-benjamins-publishing-company-collective-volumes" rel="self"/>
+    <title>John Benjamins Publishing Company - Iconicity in Language and Literature</title>
+    <id>http://www.zotero.org/styles/john-benjamins-publishing-company-iconicity-in-language-and-literature</id>
+    <link href="http://www.zotero.org/styles/john-benjamins-publishing-company-iconicity-in-language-and-literature" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-author-date" rel="template"/>
     <link href="https://github.com/citation-style-language/styles/files/2571238/BenjaminsStylesheet.pdf" rel="documentation"/>
+    <link href="https://benjamins.com/catalog/ill" rel="documentation"/>
     <author>
       <name>Mark Dingemanse</name>
       <email>markdingemanse@gmail.com</email>
@@ -14,6 +15,7 @@
     </author>
     <category citation-format="author-date"/>
     <category field="linguistics"/>
+    <issn>1873-5037</issn>
     <summary>Stylesheet based on the "Submission guidelines for contributors to collective volumes published by John Benjamins", basically a modified version of the author-date variant of the Chicago style.</summary>
     <updated>2018-11-02T22:57:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>

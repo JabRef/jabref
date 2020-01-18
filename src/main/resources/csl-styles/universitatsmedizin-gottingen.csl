@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="de-DE" version="1.0" demote-non-dropping-particle="never">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="de-DE">
   <info>
     <title>Universitätsmedizin Göttingen (German)</title>
     <title-short>UMG</title-short>
     <id>http://www.zotero.org/styles/universitatsmedizin-gottingen</id>
     <link href="http://www.zotero.org/styles/universitatsmedizin-gottingen" rel="self"/>
     <link href="http://www.zotero.org/styles/plant-physiology" rel="template"/>
-    <link href="http://www.med.uni-goettingen.de/de/media/G1-2_lehre_promotion/richtlinen_dissertation.pdf" rel="documentation"/>
+    <link href="https://www.umg.eu/studium-lehre/promotion/downloads-promotion/" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -25,7 +25,7 @@
   </locale>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text"/>
+      <name form="short" and="text" sort-separator=" " initialize-with="" name-as-sort-order="all"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -61,8 +61,8 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <label form="verb-short" suffix=" "/>
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+      <label form="short" text-case="capitalize-first" suffix=")" prefix=" ("/>
     </names>
   </macro>
   <macro name="edition">
@@ -115,7 +115,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-givenname="true">
     <sort>
       <key macro="year" sort="ascending"/>
       <key macro="author"/>
@@ -145,24 +145,30 @@
       <text macro="author"/>
       <choose>
         <if type="chapter paper-conference" match="any">
-          <group prefix=": " delimiter="; ">
+          <group prefix=": " delimiter=". ">
             <text variable="title"/>
-            <group delimiter=", ">
-              <group delimiter=" ">
-                <text term="in" suffix=":"/>
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first" suffix=":"/>
+                <text macro="editor"/>
+                <group delimiter=" ">
                 <text variable="container-title"/>
+                <group prefix="(" suffix=")" delimiter=" ">
+                  <text variable="collection-title"/>
+                  <text variable="collection-number"/>
+                </group>
               </group>
+              </group>
+              <group delimiter="; ">
               <group delimiter=" ">
                 <label variable="volume"/>
                 <text variable="volume"/>
               </group>
               <text macro="edition"/>
-            </group>
-            <text macro="editor"/>
             <group delimiter=", ">
               <text macro="publisher"/>
               <text variable="page"/>
             </group>
+          </group>
           </group>
         </if>
         <else-if type="report">
@@ -173,20 +179,20 @@
         </else-if>
         <else-if type="bill book graphic legal_case legislation motion_picture song" match="any">
           <group prefix=": " delimiter=". ">
-            <text variable="title"/>
-            <group delimiter="; ">
-              <group delimiter=", ">
-                <group prefix="(" suffix=")" delimiter=" ">
-                  <text variable="collection-title"/>
-                  <text variable="collection-number"/>
-                </group>
-                <group delimiter=" ">
-                  <label variable="volume"/>
-                  <text variable="volume"/>
-                </group>
-                <text macro="edition"/>
+            <group delimiter=" ">
+              <text variable="title"/>
+              <group prefix="(" suffix=")" delimiter=" ">
+                <text variable="collection-title"/>
+                <text variable="collection-number"/>
               </group>
-              <text macro="publisher"/>
+            </group>
+            <group delimiter="; ">
+              <group delimiter=" ">
+                <label variable="volume"/>
+                <text variable="volume"/>
+              </group>
+              <text macro="edition"/>
+            <text macro="publisher"/>
             </group>
           </group>
         </else-if>

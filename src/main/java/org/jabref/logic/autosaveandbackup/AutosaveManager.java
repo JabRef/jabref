@@ -2,11 +2,9 @@ package org.jabref.logic.autosaveandbackup;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -25,21 +23,18 @@ import org.slf4j.LoggerFactory;
 public class AutosaveManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
-    private static final int AUTO_SAVE_DELAY = 200;
 
     private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final ScheduledExecutorService executor;
+
     private final EventBus eventBus;
     private final CoarseChangeFilter changeFilter;
-    private Future<?> scheduledSaveAction;
+    private final DelayTaskThrottler throttler;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-        executor.setRemoveOnCancelPolicy(true); // This prevents memory leaks
-        this.executor = executor;
+        this.throttler = new DelayTaskThrottler(2000);
         this.eventBus = new EventBus();
         this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -47,18 +42,15 @@ public class AutosaveManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (scheduledSaveAction != null) {
-            scheduledSaveAction.cancel(false);
-        }
-        scheduledSaveAction = executor.schedule(() -> {
+        throttler.schedule(() -> {
             eventBus.post(new AutosaveEvent());
-        }, AUTO_SAVE_DELAY, TimeUnit.MILLISECONDS);
+        });
     }
 
     private void shutdown() {
         changeFilter.unregisterListener(this);
         changeFilter.shutdown();
-        executor.shutdown();
+        throttler.shutdown();
     }
 
     /**
