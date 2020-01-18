@@ -1,10 +1,6 @@
 package org.jabref.gui.groups;
 
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -12,19 +8,15 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.text.TextFlow;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.preferences.JabRefPreferences;
@@ -67,17 +59,11 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
-    // Description text
-    @FXML private TextFlow hintTextFlow;
-
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     private final GroupDialogViewModel viewModel;
 
-    private final boolean showHints;
-
     public GroupDialogView(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
         viewModel = new GroupDialogViewModel(dialogService, basePanel, prefs, editedGroup);
-        this.showHints = prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS);
 
         ViewLoader.view(this)
                   .load()
@@ -86,13 +72,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         if (editedGroup == null) {
             this.setTitle(Localization.lang("Add subgroup"));
         } else {
-            this.setTitle(Localization.lang("Edit group"));
+            this.setTitle(Localization.lang("Edit group") + " " + editedGroup.getName());
         }
-
-        if (showHints) {
-            hintTextFlow.setPrefHeight(0d);
-        }
-        hintTextFlow.setVisible(showHints);
 
         setResultConverter(viewModel::resultConverter);
 
@@ -170,8 +151,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
 
-        hintTextFlow.accessibleTextProperty().bindBidirectional(viewModel.hintTextProperty());
-
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
@@ -183,25 +162,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
         });
 
-        // ToDo: This comes straight from hell
-
-        nameField.textProperty().addListener((obs, oldval, newval) -> updateComponents());
-        keywordGroupSearchTerm.textProperty().addListener((obs, oldval, newval) -> updateComponents());
-        searchGroupSearchTerm.textProperty().addListener((obs, oldval, newval) -> updateComponents());
-
-        nameField.addEventHandler(KeyEvent.KEY_RELEASED, e -> updateComponents());
-        descriptionField.addEventHandler(KeyEvent.KEY_RELEASED, e -> updateComponents());
-        iconField.addEventHandler(KeyEvent.KEY_RELEASED, e -> updateComponents());
-        keywordGroupSearchField.addEventHandler(KeyEvent.KEY_RELEASED, e -> updateComponents());
-        keywordGroupSearchTerm.addEventHandler(KeyEvent.KEY_RELEASED, e -> updateComponents());
-        keywordGroupCaseSensitive.addEventHandler(ActionEvent.ANY, e -> updateComponents());
-        keywordGroupRegex.addEventHandler(ActionEvent.ANY, e -> updateComponents());
-        searchGroupSearchTerm.addEventHandler(ActionEvent.ANY, e -> updateComponents());
-        searchGroupCaseSensitive.addEventHandler(ActionEvent.ANY, e -> updateComponents());
-        searchGroupRegex.addEventHandler(ActionEvent.ANY, e -> updateComponents());
-
-        // NPE
-        // getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(viewModel.validationStatus().validProperty().not());
+        // Binding to the validProperty throws an NPE, so we have to work around this issue
+        viewModel.validationStatus().validProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue) {
+                getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
+            } else {
+                getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+            }
+        });
     }
 
     @FXML
@@ -209,64 +177,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         viewModel.texGroupBrowse();
     }
 
-    // ToDo: The following lines NEED to be changed!
-
-    private void updateComponents() {
-        if (!showHints) {
-            return;
-        }
-
-        String searchField;
-        String searchTerm;
-        if (keywordsRadioButton.isSelected()) {
-            searchField = keywordGroupSearchField.getText().trim();
-            searchTerm = keywordGroupSearchTerm.getText().trim();
-            if (searchField.matches("\\w+") && !searchTerm.isEmpty()) {
-                if (keywordGroupRegex.isSelected()) {
-                    try {
-                        Pattern.compile(searchTerm);
-                        setDescription(GroupDescriptions.getDescriptionForPreview(searchField, searchTerm, keywordGroupCaseSensitive.isSelected(),
-                                keywordGroupRegex.isSelected()));
-                    } catch (PatternSyntaxException e) {
-                        setDescription(GroupDescriptions.formatRegexException(searchTerm, e));
-                    }
-                } else {
-                    setDescription(GroupDescriptions.getDescriptionForPreview(searchField, searchTerm, keywordGroupCaseSensitive.isSelected(),
-                            keywordGroupRegex.isSelected()));
-                }
-            } else {
-                setDescription(Localization.lang(
-                        "Please enter the field to search (e.g. <b>keywords</b>) and the keyword to search it for (e.g. <b>electrical</b>)."));
-            }
-        } else if (searchRadioButton.isSelected()) {
-            searchTerm = searchGroupSearchTerm.getText().trim();
-            if (!searchTerm.isEmpty()) {
-                setDescription(GroupDescriptions.fromTextFlowToHTMLString(SearchDescribers
-                        .getSearchDescriberFor(new SearchQuery(
-                                searchTerm,
-                                searchGroupCaseSensitive.isSelected(),
-                                searchGroupRegex.isSelected()))
-                        .getDescription()));
-                if (searchGroupRegex.isSelected()) {
-                    try {
-                        Pattern.compile(searchTerm);
-                    } catch (PatternSyntaxException e) {
-                        setDescription(GroupDescriptions.formatRegexException(searchTerm, e));
-                    }
-                }
-            } else {
-                setDescription(Localization
-                        .lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p>"
-                                + "<tt>smith</tt><p>"
-                                + "To search the field <b>Author</b> for <b>Smith</b> and the field <b>Title</b> for <b>electrical</b>, enter:<p>"
-                                + "<tt>author=smith and title=electrical</tt>"));
-            }
-        } else if (explicitRadioButton.isSelected()) {
-            setDescription(GroupDescriptions.getDescriptionForPreview());
-        }
-    }
-
-    private void setDescription(String description) {
-        hintTextFlow.getChildren().setAll(GroupDescriptions.createFormattedDescription(description));
+    @FXML
+    private void openHelp() {
+        viewModel.openHelpPage();
     }
 }

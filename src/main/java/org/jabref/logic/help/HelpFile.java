@@ -10,6 +10,7 @@ public enum HelpFile {
     CONTENTS(""), // this is always the index
     ENTRY_EDITOR("general/entryeditor"),
     STRING_EDITOR("setup/stringeditor"),
+    GROUPS("finding-sorting-and-cleaning-entries/groups#groups-structure-creating-and-removing-groups"),
     SPECIAL_FIELDS("fields/specialfields"),
     BIBTEX_KEY_PATTERN("setup/bibtexkeypatterns"),
     OWNER("fields/owner"),

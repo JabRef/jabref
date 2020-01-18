@@ -13,6 +13,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+- We cleaned up the group add/edit dialog. [#5826](https://github.com/JabRef/jabref/pull/5826)
+
 ### Fixed
 
 - We fixed an issue where the Medline fetcher was only working when JabRef was running from source [#5645](https://github.com/JabRef/jabref/issues/5645)

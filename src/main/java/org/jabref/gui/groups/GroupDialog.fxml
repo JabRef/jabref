@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.TextFlow?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 
 <DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
@@ -39,7 +39,7 @@
                     <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
                 </VBox>
             </HBox>
-            <HBox spacing="4.0">
+            <HBox>
                 <VBox spacing="10.0">
                     <Label text="%Collect by"/>
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
@@ -74,76 +74,82 @@
                     </RadioButton>
                 </VBox>
                 <Separator orientation="VERTICAL"/>
-                <VBox HBox.hgrow="ALWAYS">
-                    <StackPane>
-                        <VBox visible="${keywordsRadioButton.selected}" spacing="10.0">
+                <StackPane HBox.hgrow="ALWAYS">
+                    <VBox visible="${keywordsRadioButton.selected}" spacing="10.0">
+                        <VBox>
                             <Label text="%Field"/>
                             <TextField fx:id="keywordGroupSearchField"/>
+                        </VBox>
+                        <VBox>
                             <Label text="%Keyword"/>
                             <TextField fx:id="keywordGroupSearchTerm"/>
-                            <HBox alignment="CENTER" spacing="10.0">
-                                <CheckBox fx:id="keywordGroupCaseSensitive" text="Case sensitive"/>
-                                <CheckBox fx:id="keywordGroupRegex" text="Regular expression"/>
-                            </HBox>
                         </VBox>
-                        <VBox visible="${searchRadioButton.selected}" spacing="10.0">
+                        <HBox spacing="10.0">
+                            <CheckBox fx:id="keywordGroupCaseSensitive" text="Case sensitive"/>
+                            <CheckBox fx:id="keywordGroupRegex" text="Regular expression"/>
+                        </HBox>
+                    </VBox>
+                    <VBox visible="${searchRadioButton.selected}" spacing="4.0">
+                        <VBox>
                             <Label text="%Search expression"/>
                             <TextField fx:id="searchGroupSearchTerm"/>
-                            <HBox alignment="CENTER" spacing="10.0">
-                                <CheckBox fx:id="searchGroupCaseSensitive" text="Case sensitive"/>
-                                <CheckBox fx:id="searchGroupRegex" text="Regular expression"/>
+                        </VBox>
+                        <HBox spacing="10.0">
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="Case sensitive"/>
+                            <CheckBox fx:id="searchGroupRegex" text="Regular expression"/>
+                        </HBox>
+                    </VBox>
+                    <VBox visible="${autoRadioButton.selected}" spacing="4.0">
+                        <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
+                                     text="Generate groups from keywords in a BibTeX field"/>
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets left="20.0"/>
+                            </padding>
+                            <HBox spacing="4.0">
+                                <VBox HBox.hgrow="ALWAYS">
+                                    <Label text="%Field to group by:"/>
+                                    <TextField fx:id="autoGroupKeywordsField"
+                                               disable="${!autoGroupKeywordsOption.selected}"/>
+                                </VBox>
+                                <VBox>
+                                    <Label text="%Delimiter(s)"/>
+                                    <HBox spacing="10.0">
+                                        <TextField fx:id="autoGroupKeywordsDeliminator" prefWidth="25.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}"/>
+                                        <TextField fx:id="autoGroupKeywordsHierarchicalDeliminator" prefWidth="25.0"
+                                                   disable="${!autoGroupKeywordsOption.selected}"/>
+                                    </HBox>
+                                </VBox>
                             </HBox>
                         </VBox>
-                        <VBox visible="${autoRadioButton.selected}" spacing="10.0">
-                            <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
-                                         text="Generate groups from keywords in a BibTeX field"/>
-                            <VBox spacing="10.0">
-                                <padding>
-                                    <Insets left="20.0"/>
-                                </padding>
-                                <HBox spacing="10.0">
-                                    <VBox HBox.hgrow="ALWAYS">
-                                        <Label text="%Field to group by:"/>
-                                        <TextField fx:id="autoGroupKeywordsField"
-                                                   disable="${!autoGroupKeywordsOption.selected}"/>
-                                    </VBox>
-                                    <VBox>
-                                        <Label text="%Delimiter character(s):"/>
-                                        <HBox spacing="10.0">
-                                            <TextField fx:id="autoGroupKeywordsDeliminator" prefWidth="50.0"
-                                                       disable="${!autoGroupKeywordsOption.selected}"/>
-                                            <TextField fx:id="autoGroupKeywordsHierarchicalDeliminator" prefWidth="50.0"
-                                                       disable="${!autoGroupKeywordsOption.selected}"/>
-                                        </HBox>
-                                    </VBox>
-                                </HBox>
-                            </VBox>
-                            <RadioButton fx:id="autoGroupPersonsOption" toggleGroup="$autoGroupOptions"
-                                         text="Generate groups for author last names"/>
-                            <VBox>
-                                <padding>
-                                    <Insets left="20.0"/>
-                                </padding>
-                                <Label text="%Field to group by:"/>
-                                <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
-                            </VBox>
+                        <RadioButton fx:id="autoGroupPersonsOption" toggleGroup="$autoGroupOptions"
+                                     text="Generate groups for author last names"/>
+                        <VBox>
+                            <padding>
+                                <Insets left="20.0"/>
+                            </padding>
+                            <Label text="%Field to group by:"/>
+                            <TextField fx:id="autoGroupPersonsField" disable="${!autoGroupPersonsOption.selected}"/>
                         </VBox>
-                        <VBox visible="${texRadioButton.selected}" spacing="10.0">
-                            <Label text="%Aux file"/>
-                            <VBox>
-                                <padding>
-                                    <Insets left="20.0"/>
-                                </padding>
-                                <HBox spacing="10.0">
-                                    <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS"/>
-                                    <Button onAction="#texGroupBrowse" text="%Browse"/>
-                                </HBox>
-                            </VBox>
-                        </VBox>
-                    </StackPane>
-                </VBox>
+                    </VBox>
+                    <VBox visible="${texRadioButton.selected}">
+                        <Label text="%Aux file"/>
+                        <HBox spacing="10.0">
+                            <TextField fx:id="texGroupFilePath" HBox.hgrow="ALWAYS" prefHeight="30.0"/>
+                            <Button onAction="#texGroupBrowse" text="%Browse" prefHeight="30.0"/>
+                        </HBox>
+                    </VBox>
+                </StackPane>
+                <Button styleClass="icon-button,narrow" onAction="#openHelp">
+                    <graphic>
+                        <JabRefIconView glyph="HELP"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%Open Help page"/>
+                    </tooltip>
+                </Button>
             </HBox>
-            <TextFlow fx:id="hintTextFlow" VBox.vgrow="ALWAYS" minHeight="100.0" maxHeight="100.0" prefHeight="100.0"/>
         </VBox>
     </content>
 </DialogPane>
