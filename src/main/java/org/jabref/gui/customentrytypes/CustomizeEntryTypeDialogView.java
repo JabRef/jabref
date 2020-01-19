@@ -25,7 +25,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -68,7 +67,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypes.itemsProperty().bind(viewModel.entryTypesProperty());
         entryTypes.getSelectionModel().selectFirst();
 
-        
         entryTypeActionsColumn.setSortable(false);
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
@@ -100,11 +98,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         viewModel.newFieldToAddProperty().bind(addNewField.valueProperty());
         fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
-
-        EasyBind.subscribe(fields.getSelectionModel().selectedItemProperty(), field -> {
-            System.out.println("selected field " + field);
-        });
-
     }
 
     @FXML
