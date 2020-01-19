@@ -18,21 +18,26 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 
+import org.jabref.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
-    public static final StringConverter<Field> fieldStringConverter = new StringConverter<>() {
+    public static final StringConverter<Field> FIELD_STRING_CONVERTER = new StringConverter<>() {
 
         @Override
         public String toString(Field object) {
@@ -57,8 +62,11 @@ public class CustomEntryTypeDialogViewModel {
     private BibDatabaseMode mode;
     private Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
 
-    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode) {
+    private PreferencesService preferencesService;
+
+    public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService) {
         this.mode = mode;
+        this.preferencesService = preferencesService;
 
         List<BibEntryType> alllTypes = mode == mode.BIBLATEX ? BiblatexEntryTypeDefinitions.ALL : BibtexEntryTypeDefinitions.ALL;
         entryTypes = FXCollections.observableArrayList(alllTypes);
@@ -67,7 +75,7 @@ public class CustomEntryTypeDialogViewModel {
         fieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
 
         for (BibEntryType entryType : alllTypes) {
-            List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), entryType)).collect(Collectors.toList());
+            List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList());
             typesWithFields.put(entryType, fields);
         }
 
@@ -93,7 +101,7 @@ public class CustomEntryTypeDialogViewModel {
     public enum FieldType {
 
         REQUIRED("Required"),
-        OTPIONAL("Optional");
+        OPTIONAL("Optional");
 
         private String name;
 
@@ -112,9 +120,8 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void addNewField() {
-
         Field field = newFieldToAddProperty.getValue();
-        FieldViewModel model = new FieldViewModel(field, true, selectedEntryTypesProperty.getValue());
+        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, selectedEntryTypesProperty.getValue());
         typesWithFields.computeIfAbsent(selectedEntryTypesProperty.getValue(), key -> new ArrayList<>()).add(model);
         fieldsForType.add(model);
     }
@@ -125,7 +132,6 @@ public class CustomEntryTypeDialogViewModel {
         this.entryTypes.add(type);
 
         this.typesWithFields.put(type, new ArrayList<>());
-
     }
 
     public ObjectProperty<BibEntryType> selectedEntryTypeProperty() {
@@ -161,16 +167,26 @@ public class CustomEntryTypeDialogViewModel {
     public void apply() {
 
         for (var entry : typesWithFields.entrySet()) {
-            entry.getKey();
+            BibEntryType type = entry.getKey();
+            List<FieldViewModel> allFields = entry.getValue();
+
+            List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
+            List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
+
+            BibEntryType newType = new BibEntryType(type.getType(), otherFields, requiredFields);
+
+            Globals.entryTypesManager.addCustomOrModifiedType(newType, mode);
+
             //TODO: store them as BibEntry types again
             //Find out if we simply can dump all the types with fields or do we need to check for custom ones before adding them?
-                
-            
-            // entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
+
+            //  Globals.entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
             // BibEntryTypeBuilder
             //new UnknownEntryType(null).
-            
 
         }
+        preferencesService.saveCustomEntryTypes();
+
     }
+
 }

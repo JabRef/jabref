@@ -8,24 +8,26 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldPriority;
 
 public class FieldViewModel {
 
     private final ObjectProperty<FieldType> fieldTypeProperty = new SimpleObjectProperty<>();
     private final StringProperty fieldNameProperty = new SimpleStringProperty("");
     private final Field field;
+    private final FieldPriority fieldPriority;
     private BibEntryType entryType;
 
-    public FieldViewModel(Field field, FieldType fieldType, BibEntryType entryType) {
+    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority, BibEntryType entryType) {
         this.field = field;
         this.entryType = entryType;
         this.fieldNameProperty.setValue(field.getDisplayName());
         this.fieldTypeProperty.setValue(fieldType);
-
+        this.fieldPriority = fieldPriority;
     }
 
-    public FieldViewModel(Field field, boolean required, BibEntryType entryType) {
-        this(field, required ? FieldType.REQUIRED : FieldType.OTPIONAL, entryType);
+    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, BibEntryType entryType) {
+        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority, entryType);
     }
 
     public ObjectProperty<FieldType> fieldTypeProperty() {
@@ -41,8 +43,15 @@ public class FieldViewModel {
     }
 
     public BibEntryType getEntryType() {
-        return entryType;
+        return this.entryType;
+    }
 
+    public FieldPriority getFieldPriority() {
+        return this.fieldPriority;
+    }
+
+    public FieldType getFieldType() {
+        return this.fieldTypeProperty.getValue();
     }
 
     @Override

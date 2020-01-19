@@ -41,12 +41,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     @Inject PreferencesService preferencesService;
 
-    private final CustomEntryTypeDialogViewModel viewModel;
+    private CustomEntryTypeDialogViewModel viewModel;
     private BibDatabaseMode mode;
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext) {
-
-        viewModel = new CustomEntryTypeDialogViewModel(mode);
         this.mode = bibDatabaseContext.getMode();
 
         ViewLoader.view(this)
@@ -54,10 +52,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
         
         ControlHelper.setAction(applyButton, getDialogPane(), evt->viewModel.apply());
+
     }
 
     @FXML
     private void initialize() {
+        viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService);
+
         setupTable();
     }
 
@@ -84,7 +85,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         viewModel.entryTypeToAddProperty().bind(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fieldsProperty());
-        addNewField.setConverter(viewModel.fieldStringConverter);
+        addNewField.setConverter(viewModel.FIELD_STRING_CONVERTER);
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
