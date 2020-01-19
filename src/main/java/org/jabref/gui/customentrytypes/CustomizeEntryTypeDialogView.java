@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
