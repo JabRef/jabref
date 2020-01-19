@@ -39,7 +39,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
 
-    @Inject PreferencesService preferencesService;
+    @Inject private PreferencesService preferencesService;
 
     private CustomEntryTypeDialogViewModel viewModel;
     private BibDatabaseMode mode;
@@ -51,8 +51,12 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
         
-        ControlHelper.setAction(applyButton, getDialogPane(), evt->viewModel.apply());
-
+        setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                viewModel.apply();
+            }
+            return null;
+        });
     }
 
     @FXML
