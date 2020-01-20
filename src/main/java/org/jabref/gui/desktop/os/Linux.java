@@ -30,7 +30,11 @@ public class Linux implements NativeDesktop {
             viewer = "xdg-open";
         }
         String[] cmdArray = { viewer, filePath };
-        Runtime.getRuntime().exec(cmdArray);
+        Process p;
+        p = Runtime.getRuntime().exec(cmdArray);
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        String line;
+        line = in.readLine();
     }
 
     @Override
@@ -46,7 +50,11 @@ public class Linux implements NativeDesktop {
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
-        Runtime.getRuntime().exec(cmdArray);
+        Process p;
+        p = Runtime.getRuntime().exec(cmdArray);
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        String line;
+        line = in.readLine();
     }
 
     @Override
