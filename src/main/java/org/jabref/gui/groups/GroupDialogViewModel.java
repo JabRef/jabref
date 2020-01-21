@@ -113,7 +113,7 @@ public class GroupDialogViewModel {
         this.basePanel = basePanel;
         this.editedGroup = editedGroup;
 
-        this.keywordDelimiter = Globals.prefs.getKeywordDelimiter();
+        this.keywordDelimiter = preferences.getKeywordDelimiter();
 
         setupValidation();
         setValues();

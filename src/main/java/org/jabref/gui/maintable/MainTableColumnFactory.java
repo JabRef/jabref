@@ -131,7 +131,7 @@ class MainTableColumnFactory {
     }
 
     /**
-     * Creates a text column to display any standard field.
+     * Creates a column with a continous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
