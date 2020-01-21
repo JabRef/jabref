@@ -30,6 +30,7 @@ public class MainTableColumnModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
 
     public enum Type {
+        INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
         FILES("files", Localization.lang("Linked files")),
         GROUPS("groups", Localization.lang("Groups")),
@@ -132,7 +133,8 @@ public class MainTableColumnModel {
     }
 
     public String getDisplayName() {
-        if (Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank()) {
+        if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
+                || typeProperty.getValue() == Type.INDEX) {
             return typeProperty.getValue().getDisplayName();
         } else {
             return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
