@@ -154,7 +154,7 @@ public abstract class DBMSProcessor {
      */
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
 
-        // Probably has to be split into smaller methods
+        // Probably has to be split into smaller methods - also must be changed for Oracle INSERT ALL syntax
 
 
         // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
