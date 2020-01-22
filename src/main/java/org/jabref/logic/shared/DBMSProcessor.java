@@ -171,7 +171,7 @@ public abstract class DBMSProcessor {
 
         // Check where VERSION belongs in method, if anywhere
 
-        Set<Integer> keys = new HashSet<>();
+        List<Integer> keys = new ArrayList<>();
         Map<EntryType, Set<Integer>> typeMap = new HashMap<>();
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
@@ -181,55 +181,18 @@ public abstract class DBMSProcessor {
             preparedEntryStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
+                // The following assumes that we get the generated keys in the order the entries were inserted
+                // This should be the case
+                for (BibEntry bibEntry : bibEntries) {
+                    generatedKeys.next();
+                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
+                }
                 if (generatedKeys.next()) {
-                    keys.add(generatedKeys.getInt(1));
+                    LOGGER.error("Error: Some shared IDs left unassigned");
                 }
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
-        }
-        StringBuilder getKeyTypeMapQuery = new StringBuilder();
-        getKeyTypeMapQuery.append("SELECT * FROM ")
-                          .append(escape("ENTRY"))
-                          .append(" WHERE ")
-                          .append(escape("SHARED_ID"))
-                          .append(" IN (?")
-                          .append(", ?".repeat(keys.size() - 1))
-                          .append(")");
-        try (PreparedStatement preparedIdStatement = connection.prepareStatement(getKeyTypeMapQuery.toString())) {
-            int index = 1;
-            for (int key : keys) {
-                preparedIdStatement.setInt(index, key);
-                index++;
-            }
-            ResultSet keyResult = preparedIdStatement.executeQuery();
-            while (keyResult.next()) {
-                EntryType type = EntryTypeFactory.parse(keyResult.getString("TYPE"));
-                if (!typeMap.entrySet().contains(type)) {
-                    typeMap.put(type, new HashSet<>());
-                }
-                typeMap.get(type).add(keyResult.getInt("SHARED_ID"));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
-        }
-
-        for (BibEntry entry : bibEntries) {
-            EntryType type = entry.getType();
-            // Pick arbitrary element from set of shared ids associated with type
-            // This is okay because the DB rows representing rows with the same type
-            // should be identical except for shared id.
-            int sharedId = typeMap.get(type).iterator().next();
-            // Remove a key from typeMap set when associated with BibEntry
-            typeMap.get(type).remove(sharedId);
-            entry.getSharedBibEntryData().setSharedID(sharedId);
-        }
-        // Check to make sure all keys were assigned
-        for (Set set : typeMap.values()) {
-            if (!set.isEmpty()) {
-                // Maybe should raise exceptoin
-                LOGGER.error("Error: Some shared IDs left unassigned");
-            }
         }
     }
 
