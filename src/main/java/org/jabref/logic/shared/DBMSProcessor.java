@@ -134,6 +134,15 @@ public abstract class DBMSProcessor {
     abstract String escape(String expression);
 
     /**
+     * For use in test only. Inserts the BibEntry into the shared database.
+     *
+     * @param bibEntry {@link BibEntry} to be inserted.
+     * */
+     public void insertEntry(BibEntry bibEntry) {
+         insertEntries(Collections.singletonList(bibEntry));
+     }
+
+    /**
      * Inserts the List of BibEntry into the shared database.
      *
      * @param bibEntries List of {@link BibEntry} to be inserted
