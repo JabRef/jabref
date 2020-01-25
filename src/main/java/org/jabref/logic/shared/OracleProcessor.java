@@ -111,7 +111,7 @@ public class OracleProcessor extends DBMSProcessor {
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT ALL");
             for (Field field : fields) {
-                insertFieldQuery.append(" INTO")
+                insertFieldQuery.append(" INTO ")
                                 .append(escape("FIELD"))
                                 .append(" (")
                                 .append(escape("ENTRY_SHARED_ID"))
@@ -121,7 +121,7 @@ public class OracleProcessor extends DBMSProcessor {
                                 .append(escape("VALUE"))
                                 .append(") VALUES (?, ?, ?)");
             }
-            insertFieldQuery.append("SELECT * FROM DUAL");
+            insertFieldQuery.append(" SELECT * FROM DUAL");
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                 for (int i = 0; i < fields.size(); i++) {
                     // columnIndex starts with 1
