@@ -137,8 +137,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.7.2'
-    compile 'org.antlr:antlr4-runtime:4.7.2'
+    antlr4 'org.antlr:antlr4:4.8-1'
+    compile 'org.antlr:antlr4-runtime:4.8-1'
 
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.3'
 
