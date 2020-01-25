@@ -1,5 +1,7 @@
 package org.jabref.gui.groups;
 
+import java.util.EnumMap;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -9,17 +11,15 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -59,11 +59,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
+    private final EnumMap<GroupHierarchyType,String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
+    private final EnumMap<GroupHierarchyType,String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
+
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     private final GroupDialogViewModel viewModel;
 
-    public GroupDialogView(DialogService dialogService, BasePanel basePanel, JabRefPreferences prefs, AbstractGroup editedGroup) {
-        viewModel = new GroupDialogViewModel(dialogService, basePanel, prefs, editedGroup);
+    public GroupDialogView(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup) {
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup);
 
         ViewLoader.view(this)
                   .load()
@@ -76,54 +79,26 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         }
 
         setResultConverter(viewModel::resultConverter);
-
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
-
-        getDialogPane().getScene().getWindow().sizeToScene();
-    }
-
-    public GroupDialogView(DialogService dialogService, AbstractGroup editedGroup) {
-        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, editedGroup);
-    }
-
-    public GroupDialogView(DialogService dialogService) {
-        this(dialogService, JabRefGUI.getMainFrame().getCurrentBasePanel(), Globals.prefs, null);
-    }
-
-    private String getHierarchyDisplayText(GroupHierarchyType type) {
-        switch (type) {
-            case INCLUDING:
-                return Localization.lang("Union");
-            case REFINING:
-                return Localization.lang("Intersection");
-            default:
-            case INDEPENDENT:
-                return Localization.lang("Independent");
-        }
-    }
-
-    private String getHierarchyToolTip(GroupHierarchyType type) {
-        switch (type) {
-            case INCLUDING:
-                return Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups");
-            case REFINING:
-                return Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup");
-            default:
-            case INDEPENDENT:
-                return Localization.lang("Independent group: When selected, view only this group's entries");
-        }
     }
 
     @FXML
     public void initialize() {
+        hierarchyText.put(GroupHierarchyType.INCLUDING, Localization.lang("Union"));
+        hierarchyToolTip.put(GroupHierarchyType.INCLUDING, Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
+        hierarchyText.put(GroupHierarchyType.REFINING, Localization.lang("Intersection"));
+        hierarchyToolTip.put(GroupHierarchyType.REFINING, Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
+        hierarchyText.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent"));
+        hierarchyToolTip.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent group: When selected, view only this group's entries"));
+
         nameField.textProperty().bindBidirectional(viewModel.nameProperty());
         descriptionField.textProperty().bindBidirectional(viewModel.descriptionProperty());
         iconField.textProperty().bindBidirectional(viewModel.iconProperty());
         colorField.valueProperty().bindBidirectional(viewModel.colorFieldProperty());
         hierarchicalContextCombo.itemsProperty().bind(viewModel.groupHierarchyListProperty());
         new ViewModelListCellFactory<GroupHierarchyType>()
-                .withText(this::getHierarchyDisplayText)
-                .withStringTooltip(this::getHierarchyToolTip)
+                .withText(hierarchyText::get)
+                .withStringTooltip(hierarchyToolTip::get)
                 .install(hierarchicalContextCombo);
         hierarchicalContextCombo.valueProperty().bindBidirectional(viewModel.groupHierarchySelectedProperty());
 
@@ -162,7 +137,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
         });
 
-        // Binding to the validProperty throws an NPE, so we have to work around this issue
+        // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
         viewModel.validationStatus().validProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue) {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(false);

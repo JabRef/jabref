@@ -39,9 +39,20 @@
                     <ComboBox fx:id="hierarchicalContextCombo" minWidth="130.0" maxWidth="130.0" prefWidth="130.0"/>
                 </VBox>
             </HBox>
+            <HBox alignment="BOTTOM_LEFT">
+                <Label text="%Collect by" styleClass="sectionHeader"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button styleClass="icon-button,narrow" onAction="#openHelp">
+                    <graphic>
+                        <JabRefIconView glyph="HELP"/>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="%Open Help page"/>
+                    </tooltip>
+                </Button>
+            </HBox>
             <HBox>
                 <VBox spacing="10.0">
-                    <Label text="%Collect by"/>
                     <RadioButton fx:id="explicitRadioButton" toggleGroup="$type" wrapText="true"
                                  text="%Explicit selection">
                         <tooltip>
@@ -149,14 +160,6 @@
                         </HBox>
                     </VBox>
                 </StackPane>
-                <Button styleClass="icon-button,narrow" onAction="#openHelp">
-                    <graphic>
-                        <JabRefIconView glyph="HELP"/>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="%Open Help page"/>
-                    </tooltip>
-                </Button>
             </HBox>
         </VBox>
     </content>

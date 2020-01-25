@@ -22,7 +22,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
@@ -33,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -47,7 +47,7 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -101,19 +101,15 @@ public class GroupDialogViewModel {
     private CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
-    private final BasePanel basePanel;
+    private final PreferencesService preferencesService;
+    private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
 
-    private final Character keywordDelimiter;
-
-    public GroupDialogViewModel(DialogService dialogService, BasePanel basePanel, JabRefPreferences preferences, AbstractGroup editedGroup) {
+    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.basePanel = basePanel;
+        this.preferencesService = preferencesService;
+        this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
-
-        this.keywordDelimiter = preferences.getKeywordDelimiter();
 
         setupValidation();
         setValues();
@@ -127,17 +123,17 @@ public class GroupDialogViewModel {
 
         nameContainsDelimiterValidator = new FunctionBasedValidator<>(
                 nameProperty,
-                name -> !name.contains(Character.toString(keywordDelimiter)),
+                name -> !name.contains(Character.toString(preferencesService.getKeywordDelimiter())),
                 ValidationMessage.warning(
                         Localization.lang(
                                 "The group name contains the keyword separator \"%0\" and thus probably does not work as expected.",
-                                Character.toString(keywordDelimiter)
+                                Character.toString(preferencesService.getKeywordDelimiter())
                         )));
 
         sameNameValidator = new FunctionBasedValidator<>(
                 nameProperty,
                 name -> {
-                    Optional<GroupTreeNode> rootGroup = basePanel.getBibDatabaseContext().getMetaData().getGroups();
+                    Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
                     if (rootGroup.isPresent()) {
                         int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).size();
                         if ((editedGroup == null) && (groupsWithSameName > 0)) {
@@ -250,7 +246,7 @@ public class GroupDialogViewModel {
                     resultingGroup = new ExplicitGroup(
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
-                            keywordDelimiter);
+                            preferencesService.getKeywordDelimiter());
                 } else if (typeKeywordsProperty.getValue()) {
                     if (keywordGroupRegexProperty.getValue()) {
                         resultingGroup = new RegexKeywordGroup(
@@ -266,7 +262,7 @@ public class GroupDialogViewModel {
                                 FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                                 keywordGroupSearchTermProperty.getValue().trim(),
                                 keywordGroupCaseSensitiveProperty.getValue(),
-                                keywordDelimiter,
+                                preferencesService.getKeywordDelimiter(),
                                 false);
                     }
                 } else if (typeSearchProperty.getValue()) {
@@ -297,7 +293,7 @@ public class GroupDialogViewModel {
                             Paths.get(texGroupFilePathProperty.getValue().trim()),
                             new DefaultAuxParser(new BibDatabase()),
                             Globals.getFileUpdateMonitor(),
-                            basePanel.getBibDatabaseContext().getMetaData());
+                            currentDatabase.getMetaData());
                 }
 
                 if (resultingGroup != null) {
@@ -382,7 +378,7 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(preferencesService.getWorkingDir()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()
@@ -395,8 +391,8 @@ public class GroupDialogViewModel {
 
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
-        MetaData metaData = basePanel.getBibDatabaseContext().getMetaData();
-        metaData.getLaTexFileDirectory(preferences.getFilePreferences().getUser()).ifPresent(fileDirs::add);
+        MetaData metaData = currentDatabase.getMetaData();
+        metaData.getLaTexFileDirectory(preferencesService.getFilePreferences().getUser()).ifPresent(fileDirs::add);
 
         return fileDirs;
     }
