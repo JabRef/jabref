@@ -90,7 +90,7 @@ public class GroupNodeViewModel {
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
-        throttler = new DelayTaskThrottler(1000);
+        throttler = taskExecutor.createThrottler(1000);
 
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);

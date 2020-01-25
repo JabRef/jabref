@@ -5,16 +5,16 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 
-public class FieldContentParserPreferences {
+public class FieldContentFormatterPreferences {
 
     private final List<Field> nonWrappableFields;
 
-    public FieldContentParserPreferences() {
+    public FieldContentFormatterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
         this.nonWrappableFields = Collections.emptyList();
     }
 
-    public FieldContentParserPreferences(List<Field> nonWrappableFields) {
+    public FieldContentFormatterPreferences(List<Field> nonWrappableFields) {
         this.nonWrappableFields = nonWrappableFields;
     }
 

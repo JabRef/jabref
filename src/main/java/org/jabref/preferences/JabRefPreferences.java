@@ -54,7 +54,7 @@ import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -1440,14 +1440,14 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
-    public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
+    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
+        return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
 
     @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
     @Override

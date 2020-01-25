@@ -37,7 +37,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
-    private static final String API_URL = "http://api.springernature.com/meta/v1/json?q=";
+    private static final String API_URL = "http://api.springernature.com/meta/v1/json";
     private static final String API_KEY = "a98b4a55181ffcd27259bea45edad12e";
 
     /**
