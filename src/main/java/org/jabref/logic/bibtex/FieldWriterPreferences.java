@@ -10,18 +10,18 @@ public class FieldWriterPreferences {
     private final boolean resolveStringsAllFields;
     private final List<Field> doNotResolveStringsFor;
     private final int lineLength = 65; // Constant
-    private final FieldContentParserPreferences fieldContentParserPreferences;
+    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
     public FieldWriterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
-                                  FieldContentParserPreferences fieldContentParserPreferences) {
+                                  FieldContentFormatterPreferences fieldContentFormatterPreferences) {
         this.resolveStringsAllFields = resolveStringsAllFields;
         this.doNotResolveStringsFor = doNotResolveStringsFor;
-        this.fieldContentParserPreferences = fieldContentParserPreferences;
+        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
 
     public FieldWriterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
-        this(true, Collections.emptyList(), new FieldContentParserPreferences());
+        this(true, Collections.emptyList(), new FieldContentFormatterPreferences());
     }
 
     public boolean isResolveStringsAllFields() {
@@ -36,7 +36,7 @@ public class FieldWriterPreferences {
         return lineLength;
     }
 
-    public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return fieldContentParserPreferences;
+    public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
+        return fieldContentFormatterPreferences;
     }
 }

@@ -17,19 +17,19 @@ public class FieldWriter {
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
     private final boolean neverFailOnHashes;
-    private final FieldWriterPreferences prefs;
-    private final FieldContentParser parser;
+    private final FieldWriterPreferences preferences;
+    private final FieldContentFormatter formatter;
     private StringBuilder stringBuilder;
 
-    public FieldWriter(FieldWriterPreferences prefs) {
-        this(true, prefs);
+    public FieldWriter(FieldWriterPreferences preferences) {
+        this(true, preferences);
     }
 
-    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences prefs) {
+    private FieldWriter(boolean neverFailOnHashes, FieldWriterPreferences preferences) {
         this.neverFailOnHashes = neverFailOnHashes;
-        this.prefs = prefs;
+        this.preferences = preferences;
 
-        parser = new FieldContentParser(prefs.getFieldContentParserPreferences());
+        formatter = new FieldContentFormatter(preferences.getFieldContentFormatterPreferences());
     }
 
     public static FieldWriter buildIgnoreHashes(FieldWriterPreferences prefs) {
@@ -152,13 +152,13 @@ public class FieldWriter {
             }
         }
 
-        return parser.format(stringBuilder, field);
+        return formatter.format(stringBuilder, field);
     }
 
     private boolean shouldResolveStrings(Field field) {
-        if (prefs.isResolveStringsAllFields()) {
+        if (preferences.isResolveStringsAllFields()) {
             // Resolve strings for all fields except some:
-            return !prefs.getDoNotResolveStringsFor().contains(field);
+            return !preferences.getDoNotResolveStringsFor().contains(field);
         } else {
             // Default operation - we only resolve strings for standard fields:
             return field instanceof StandardField || InternalField.BIBTEX_STRING.equals(field);
@@ -170,7 +170,7 @@ public class FieldWriter {
 
         stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
 
-        stringBuilder.append(parser.format(content, field));
+        stringBuilder.append(formatter.format(content, field));
 
         stringBuilder.append(FIELD_END);
 
@@ -179,63 +179,7 @@ public class FieldWriter {
 
     private void writeText(String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);
-        boolean escape = false;
-        boolean inCommandName = false;
-        boolean inCommand = false;
-        boolean inCommandOption = false;
-        int nestedEnvironments = 0;
-        StringBuilder commandName = new StringBuilder();
-        for (int i = startPos; i < endPos; i++) {
-            char c = text.charAt(i);
-
-            // Track whether we are in a LaTeX command of some sort.
-            if (Character.isLetter(c) && (escape || inCommandName)) {
-                inCommandName = true;
-                if (!inCommandOption) {
-                    commandName.append(c);
-                }
-            } else if (Character.isWhitespace(c) && (inCommand || inCommandOption)) {
-                // Whitespace
-            } else if (inCommandName) {
-                // This means the command name is ended.
-                // Perhaps the beginning of an argument:
-                if (c == '[') {
-                    inCommandOption = true;
-                } else if (inCommandOption && (c == ']')) {
-                    // Or the end of an argument:
-                    inCommandOption = false;
-                } else if (!inCommandOption && (c == '{')) {
-                    inCommandName = false;
-                    inCommand = true;
-                } else {
-                    // Or simply the end of this command alltogether:
-                    commandName.delete(0, commandName.length());
-                    inCommandName = false;
-                }
-            }
-            // If we are in a command body, see if it has ended:
-            if (inCommand && (c == '}')) {
-                if ("begin".equals(commandName.toString())) {
-                    nestedEnvironments++;
-                }
-                if ((nestedEnvironments > 0) && "end".equals(commandName.toString())) {
-                    nestedEnvironments--;
-                }
-
-                commandName.delete(0, commandName.length());
-                inCommand = false;
-            }
-
-            // We add a backslash before any ampersand characters, with one exception: if
-            // we are inside an \\url{...} command, we should write it as it is. Maybe.
-            if ((c == '&') && !escape && !(inCommand && "url".equals(commandName.toString()))
-                && (nestedEnvironments == 0)) {
-                stringBuilder.append("\\&");
-            } else {
-                stringBuilder.append(c);
-            }
-            escape = c == '\\';
-        }
+        stringBuilder.append(text, startPos, endPos);
         stringBuilder.append(FIELD_END);
     }
 
@@ -245,7 +189,7 @@ public class FieldWriter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
+        stringBuilder.append(StringUtil.wrap(s, preferences.getLineLength(), OS.NEWLINE));
     }
 
 }

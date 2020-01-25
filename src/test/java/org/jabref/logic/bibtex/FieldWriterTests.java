@@ -116,7 +116,7 @@ class FieldWriterTests {
     @Test
     void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
         FieldWriterPreferences fieldWriterPreferences = new FieldWriterPreferences(
-                false, Collections.emptyList(), new FieldContentParserPreferences());
+                false, Collections.emptyList(), new FieldContentFormatterPreferences());
         FieldWriter formatter = new FieldWriter(fieldWriterPreferences);
         String text = "#jan# - #feb#";
         assertEquals("jan #{ - } # feb", formatter.write(StandardField.MONTH, text));
