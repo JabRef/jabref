@@ -15,11 +15,11 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.preferences.JabRefPreferences;
 
-import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
