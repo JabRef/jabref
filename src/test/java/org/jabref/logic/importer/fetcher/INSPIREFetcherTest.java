@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -26,7 +26,7 @@ class INSPIREFetcherTest {
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         fetcher = new INSPIREFetcher(importFormatPreferences);
     }
 

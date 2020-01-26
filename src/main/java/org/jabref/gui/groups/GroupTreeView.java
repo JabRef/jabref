@@ -45,6 +45,7 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -67,6 +68,8 @@ public class GroupTreeView {
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private PreferencesService preferencesService;
+
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
 
@@ -75,7 +78,7 @@ public class GroupTreeView {
     @FXML
     public void initialize() {
         this.localDragboard = GUIGlobals.localDragboard;
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

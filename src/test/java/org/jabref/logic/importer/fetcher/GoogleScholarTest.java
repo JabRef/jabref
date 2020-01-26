@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -31,8 +31,8 @@ class GoogleScholarTest {
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                mock(FieldContentFormatterPreferences.class));
         finder = new GoogleScholar(importFormatPreferences);
         entry = new BibEntry();
     }

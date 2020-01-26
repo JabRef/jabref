@@ -13,7 +13,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -50,8 +50,8 @@ class SourceTabTest {
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences())
-                .thenReturn(mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences())
+                .thenReturn(mock(FieldContentFormatterPreferences.class));
 
         sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new FieldWriterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
         pane = new TabPane(

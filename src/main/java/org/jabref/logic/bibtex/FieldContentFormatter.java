@@ -15,16 +15,15 @@ import org.jabref.model.strings.StringUtil;
  * in JabRef style. The reformatting must undo all formatting done by JabRef when
  * writing the same fields.
  */
-public class FieldContentParser {
+public class FieldContentFormatter {
 
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     private final Set<Field> multiLineFields;
 
-
-    public FieldContentParser(FieldContentParserPreferences prefs) {
-        Objects.requireNonNull(prefs);
+    public FieldContentFormatter(FieldContentFormatterPreferences preferences) {
+        Objects.requireNonNull(preferences);
 
         multiLineFields = new HashSet<>();
         // the following two are also coded in org.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
@@ -32,7 +31,7 @@ public class FieldContentParser {
         multiLineFields.add(StandardField.COMMENT);
         multiLineFields.add(StandardField.REVIEW);
         // the file field should not be formatted, therefore we treat it as a multi line field
-        multiLineFields.addAll(prefs.getNonWrappableFields());
+        multiLineFields.addAll(preferences.getNonWrappableFields());
     }
 
     /**
