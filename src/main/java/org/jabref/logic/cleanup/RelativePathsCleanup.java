@@ -33,10 +33,17 @@ public class RelativePathsCleanup implements CleanupJob {
 
         for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
-            String newFileName = FileUtil
-                    .relativize(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
-                    .toString();
-
+            String newFileName = null;
+            if (isWebUrl(oldFileName)) {
+                // let web url untouched
+                newFileName = oldFileName;
+            }
+            else {
+                // only try to transform local file path to relative one
+                newFileName = FileUtil
+                        .relativize(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
+                        .toString();
+            }
             LinkedFile newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {
                 newFileEntry = new LinkedFile(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
@@ -57,4 +64,21 @@ public class RelativePathsCleanup implements CleanupJob {
         return Collections.emptyList();
     }
 
+    /**
+     * Checks, if the given file path is a well-formed web url
+     *
+     * @param filePath file path to check
+     * @return <code>true</code>, if the given file path is a web url, <code>false</code> otherwise
+     */
+    private static boolean isWebUrl(String filePath)
+    {
+        if (filePath == null) {
+            return false;
+        }
+        String normalizedFilePath = filePath.trim().toLowerCase();
+        if (normalizedFilePath.startsWith("http://") || normalizedFilePath.startsWith("https://")) { // INFO: can be extended, if needed
+            return true;
+        }
+        return false;
+    }
 }
