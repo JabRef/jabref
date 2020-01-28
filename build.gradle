@@ -169,7 +169,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.1'
 
     compile 'org.jsoup:jsoup:1.12.1'
-    compile 'com.konghq:unirest-java:3.4.00'
+    compile 'com.konghq:unirest-java:3.4.01'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -207,11 +207,11 @@ dependencies {
 
 
     testCompile 'io.github.classgraph:classgraph:4.8.60'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.5.2'
-    testCompile 'org.junit.platform:junit-platform-launcher:1.5.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
+    testCompile 'org.junit.platform:junit-platform-launcher:1.6.0'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.6'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.7'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.2.4'
@@ -224,7 +224,7 @@ dependencies {
     testCompile "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testCompile "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.28'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.29'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
