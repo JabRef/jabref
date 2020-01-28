@@ -120,7 +120,6 @@ public class BibEntryTypesManager {
         }
     }
 
-    
     public Collection<BibEntryType> getAllTypes(BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
     }
