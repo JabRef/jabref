@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -34,7 +33,6 @@ public class GrobidService {
     }
 
     private static JabRefPreferences jabRefPreferences;
-    private static ProxyPreferences preferences;
 
     public GrobidService(JabRefPreferences jabRefPreferences) {
         GrobidService.jabRefPreferences = jabRefPreferences;
