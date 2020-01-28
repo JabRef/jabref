@@ -95,14 +95,47 @@ public class GrobidCitationFetcherTest {
      * not null.
      */
     @Test
-    public void passGrobidRequestTest() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void passGrobidRequestTestOne() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
       Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
       parseUsingGrobid.setAccessible(true);
       assertEquals(example1AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example1));
-      assertEquals(example2AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example2));
-      assertEquals(example3AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example3));
-      assertEquals(example4AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example4));
     }
+
+  /**
+   * Checks if the Grobid parser returns a String if the input is a text reference
+   * which should be able to be parsed. The result should either be empty or not empty but
+   * not null.
+   */
+  @Test
+  public void passGrobidRequestTestTwo() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
+    parseUsingGrobid.setAccessible(true);
+    assertEquals(example2AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example2));
+  }
+
+  /**
+   * Checks if the Grobid parser returns a String if the input is a text reference
+   * which should be able to be parsed. The result should either be empty or not empty but
+   * not null.
+   */
+  @Test
+  public void passGrobidRequestTestThree() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
+    parseUsingGrobid.setAccessible(true);
+    assertEquals(example3AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example3));
+  }
+
+  /**
+   * Checks if the Grobid parser returns a String if the input is a text reference
+   * which should be able to be parsed. The result should either be empty or not empty but
+   * not null.
+   */
+  @Test
+  public void passGrobidRequestTestFour() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    Method parseUsingGrobid = GrobidCitationFetcher.class.getDeclaredMethod("parseUsingGrobid", String.class);
+    parseUsingGrobid.setAccessible(true);
+    assertEquals(example4AsBibtex, parseUsingGrobid.invoke(grobidCitationFetcher, example4));
+  }
 
     /**
      * Giving an invalid string as a request to the grobid parser, should fail and return an

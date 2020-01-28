@@ -1,6 +1,7 @@
 package org.jabref.gui.bibtexextractor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class BibtexExtractorViewModel {
                     );
                     extractedEntries = currentCitationfetcher.performSearch(inputTextProperty.getValue());
                 } catch (FetcherException e) {
-                    extractedEntries = new ArrayList<>();
+                    extractedEntries = Collections.emptyList();
                 }
                 Platform.runLater(() -> executeParse());
                 return null;
@@ -70,7 +71,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void executeParse() {
-        if (extractedEntries.size() > 0) {
+        if (!extractedEntries.isEmpty()) {
             if (directAdd) {
                 BibtexKeyGenerator bibtexKeyGenerator = new BibtexKeyGenerator(newDatabaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
                 for (BibEntry bibEntries: extractedEntries) {
