@@ -6,6 +6,7 @@ import javax.inject.Inject;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -51,7 +52,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
         
         setResultConverter(button -> {
-            if (button == ButtonType.OK) {
+            if (button.getButtonData() == ButtonData.OK_DONE) {
                 viewModel.apply();
             }
             return null;

@@ -1,6 +1,7 @@
 package org.jabref.gui.customentrytypes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +28,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
@@ -61,6 +60,7 @@ public class CustomEntryTypeDialogViewModel {
     private ObjectProperty<Field> newFieldToAddProperty = new SimpleObjectProperty<>();
     private BibDatabaseMode mode;
     private Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
+    private List<BibEntryType> typesToRemove = new ArrayList<>();
 
     private PreferencesService preferencesService;
 
@@ -68,13 +68,15 @@ public class CustomEntryTypeDialogViewModel {
         this.mode = mode;
         this.preferencesService = preferencesService;
 
-        List<BibEntryType> alllTypes = mode == mode.BIBLATEX ? BiblatexEntryTypeDefinitions.ALL : BibtexEntryTypeDefinitions.ALL;
-        entryTypes = FXCollections.observableArrayList(alllTypes);
+        Collection<BibEntryType> allTypes = Globals.entryTypesManager.getAllTypes(mode);
+        allTypes.addAll(Globals.entryTypesManager.getAllCustomTypes(mode));
+
+        entryTypes = FXCollections.observableArrayList(allTypes);
         entryTypesProperty = new SimpleListProperty<>(entryTypes);
 
         fieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getAllFields()));
 
-        for (BibEntryType entryType : alllTypes) {
+        for (BibEntryType entryType : allTypes) {
             List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList());
             typesWithFields.put(entryType, fields);
         }
@@ -155,6 +157,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeEntryType(BibEntryType focusedItem) {
+        typesToRemove.add(focusedItem);
         typesWithFields.remove(focusedItem);
         entryTypes.remove(focusedItem);
     }
@@ -174,19 +177,13 @@ public class CustomEntryTypeDialogViewModel {
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
 
             BibEntryType newType = new BibEntryType(type.getType(), otherFields, requiredFields);
-
             Globals.entryTypesManager.addCustomOrModifiedType(newType, mode);
+        }
 
-            //TODO: store them as BibEntry types again
-            //Find out if we simply can dump all the types with fields or do we need to check for custom ones before adding them?
-
-            //  Globals.entryTypesManager.addCustomOrModifiedType(overwrittenStandardType ?
-            // BibEntryTypeBuilder
-            //new UnknownEntryType(null).
-
+        for (var type : typesToRemove) {
+            Globals.entryTypesManager.removeCustomEntryType(type, mode);
         }
         preferencesService.saveCustomEntryTypes();
-
     }
 
 }
