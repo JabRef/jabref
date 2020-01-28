@@ -64,9 +64,8 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
               .map(String::trim)
               .collect(Collectors.toCollection(TreeSet::new));
         if (plainReferences.size() == 0) {
-            throw new FetcherException("Your entered references are empty.");
+            return List.of();
         } else {
-            //ArrayList<BibEntry> resultsList = new ArrayList<>();
           List<BibEntry> resultsList = new ArrayList<>();
             for (String reference: plainReferences) {
                 parseBibToBibEntry(parseUsingGrobid(reference)).ifPresentOrElse(resultsList::add, () -> failedEntries.add(reference));
