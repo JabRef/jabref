@@ -79,11 +79,11 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    ```
 4. Use IntellJ to build and run (instead of gradle): File -> Settings -> Build, Execution, Deployment ->  Build Tools -> Gradle -> At "Build and run using" and "Run tests using" choose "Intellj IDEA"
 4. Ensure that JDK13 is enabled for Gradle: Use IntellJ to build and run (instead of gradle): File -> Settings -> Build, Execution, Deployment ->  Build Tools -> Gradle -> Gradle -> Gradle JVM
-5. Use the provided code style: 
-   1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Marketplace -> Search for "CHeckstyle" and choose "CheckSTyle-IDEA).
+5. Use the provided code style:
+   1. Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via plug-in repository (File > Settings > Plugins > Marketplace -> Search for "Checkstyle" and choose "CheckStyle-IDEA). Close the settings afterwards and restart IntelliJ.
    2. Go to File > Settings > Editor > Code Style, choose a code style (or create a new one) 
    3. Click on the settings wheel (next to the scheme chooser), then click "Import Scheme" and choose "IntelliJ Code Style xml". Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`. Click OK.
-   4. Go to File -> Settings -> Checkstyle and import the above CheckStyle configuration file. Activate it.
+   4. Go to File -> Settings -> Checkstyle and import the CheckStyle configuration file. Activate it.
 6. Use the provided run configuration: Run -> Run "JabRef Main"
 
 ### Set-up Eclipse
