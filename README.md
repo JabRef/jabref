@@ -87,7 +87,7 @@ We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
 We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
 
-If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
+If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/guidelines-for-setting-up-a-local-workspace/).
 
 To compile JabRef from source, you need a Java Development Kit 13 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
