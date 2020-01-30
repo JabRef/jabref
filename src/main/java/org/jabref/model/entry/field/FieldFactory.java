@@ -118,7 +118,7 @@ public class FieldFactory {
                              .collect(Collectors.toSet());
     }
 
-    private static Set<Field> getAllFields() {
+    public static Set<Field> getAllFields() {
         Set<Field> fields = new HashSet<>();
         fields.addAll(EnumSet.allOf(IEEEField.class));
         fields.addAll(EnumSet.allOf(InternalField.class));

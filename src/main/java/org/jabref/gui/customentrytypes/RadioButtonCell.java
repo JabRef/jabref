@@ -10,6 +10,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
 
@@ -22,7 +23,9 @@ public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
     @Override
     protected void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);
-        if (!empty) {
+        if (empty || (item == null)) {
+            setGraphic(null);
+        } else {
             // gui setup
             HBox hb = new HBox(7);
             hb.setAlignment(Pos.CENTER);
@@ -37,6 +40,7 @@ public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
                 if (enumElement.equals(item)) {
                     radioButton.setSelected(true);
                 }
+                hb.setHgrow(radioButton, Priority.ALWAYS);
             }
 
             // issue events on change of the selected radio button
