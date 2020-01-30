@@ -15,19 +15,25 @@ public class EditExternalFileTypeViewModel {
     private final StringProperty mimeTypeProperty = new SimpleStringProperty("");
     private final StringProperty selectedApplicationProperty = new SimpleStringProperty("");
     private final BooleanProperty defaultApplicationSelectedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty customApplicationSelectedProperty = new SimpleBooleanProperty(false);
     private final Node icon;
     private final CustomExternalFileType fileType;
 
     public EditExternalFileTypeViewModel(CustomExternalFileType fileType) {
         this.fileType = fileType;
         extensionProperty.setValue(fileType.getExtension());
-        nameProperty.setValue(fileType.getField().getDisplayName());
+        nameProperty.setValue(fileType.getName());
         mimeTypeProperty.setValue(fileType.getMimeType());
         selectedApplicationProperty.setValue(fileType.getOpenWithApplication());
         icon = fileType.getIcon().getGraphicNode();
 
         if (fileType.getOpenWithApplication().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
+            customApplicationSelectedProperty.setValue(false);
+        }
+        else {
+            defaultApplicationSelectedProperty.setValue(false);
+            customApplicationSelectedProperty.setValue(true);
         }
 
     }
@@ -52,6 +58,10 @@ public class EditExternalFileTypeViewModel {
         return defaultApplicationSelectedProperty;
     }
 
+    public BooleanProperty customApplicationSelectedProperty() {
+        return customApplicationSelectedProperty;
+    }
+
     public Node getIcon() {
         return icon;
     }
@@ -69,20 +79,14 @@ public class EditExternalFileTypeViewModel {
         }
 
         String application = selectedApplicationProperty.getValue().trim();
-        if (OS.WINDOWS) {
-            // On Windows, store application as empty if the "Default" option is selected,
-            // or if the application name is empty:
-            if (defaultApplicationSelectedProperty.getValue() || application.isEmpty()) {
-                fileType.setOpenWith("");
-                selectedApplicationProperty.setValue("");
 
-            } else {
-                fileType.setOpenWith(application);
-            }
+        // store application as empty if the "Default" option is selected, or if the application name is empty:
+        if (defaultApplicationSelectedProperty.getValue() || application.isEmpty()) {
+            fileType.setOpenWith("");
+            selectedApplicationProperty.setValue("");
         } else {
             fileType.setOpenWith(application);
         }
-
     }
 
 }
