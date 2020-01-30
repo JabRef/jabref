@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-
 public class ClearFormatterTest {
 
     private ClearFormatter formatter;

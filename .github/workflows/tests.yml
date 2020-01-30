@@ -1,6 +1,11 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    # always run on pull requests
 
 jobs:
   checkstyle:
@@ -128,37 +133,6 @@ jobs:
         env:
           CI: "true"
           DBMS: "mysql"
-  fetchertests:
-    name: Fetcher tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run fetcher tests
-        run: ./gradlew fetcherTest
-        env:
-          CI: "true"
   guitests:
     name: GUI tests
     runs-on: ubuntu-latest

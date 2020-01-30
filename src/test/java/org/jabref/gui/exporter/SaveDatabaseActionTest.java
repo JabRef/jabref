@@ -2,6 +2,7 @@ package org.jabref.gui.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -14,8 +15,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
@@ -110,8 +111,8 @@ class SaveDatabaseActionTest {
         file = Files.createTempFile("JabRef", ".bib");
         file.toFile().deleteOnExit();
 
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class);
-        when(latexFieldFormatterPreferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentParserPreferences.class));
+        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class);
+        when(fieldWriterPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         SavePreferences savePreferences = mock(SavePreferences.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
@@ -119,8 +120,8 @@ class SaveDatabaseActionTest {
         MetaData metaData = mock(MetaData.class);
         when(savePreferences.withEncoding(any(Charset.class))).thenReturn(savePreferences);
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
-        when(savePreferences.getEncoding()).thenReturn(Charset.forName("UTF-8"));
-        when(savePreferences.getLatexFieldFormatterPreferences()).thenReturn(latexFieldFormatterPreferences);
+        when(savePreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
         GlobalBibtexKeyPattern emptyGlobalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern("");
         when(savePreferences.getGlobalCiteKeyPattern()).thenReturn(emptyGlobalBibtexKeyPattern);
         when(metaData.getCiteKeyPattern(any(GlobalBibtexKeyPattern.class))).thenReturn(emptyGlobalBibtexKeyPattern);
@@ -130,8 +131,8 @@ class SaveDatabaseActionTest {
         when(dbContext.getMetaData()).thenReturn(metaData);
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-        when(preferences.getDefaultEncoding()).thenReturn(Charset.forName("UTF-8"));
-        when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentParserPreferences.class));
+        when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         when(preferences.loadForSaveFromPreferences()).thenReturn(savePreferences);
         when(basePanel.frame()).thenReturn(jabRefFrame);
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);

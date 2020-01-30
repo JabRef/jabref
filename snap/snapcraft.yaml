@@ -31,13 +31,19 @@ plugs:
   opengl:
   network-bind:
   removable-media:
-  browser-extension:
-    interface: system-files
-    read:
-      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts
-    write:
+  plugs:
+    hostfs-mozilla-native-messaging-jabref:
+      interface: system-files
+      write:
       - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
-
+    hostfs-chrome-native-messaging-jabref:
+      interface: system-files
+      write:
+      - /var/lib/snapd/hostfs/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+    hostfs-chromium-native-messaging-jabref:
+      interface: system-files
+      write:
+      - /var/lib/snapd/hostfs/etc/chromium/native-messaging-hosts/org.jabref.jabref.json
 parts:
   jabref:
     plugin: dump
@@ -49,4 +55,4 @@ parts:
     override-build: |
       snapcraftctl build
       snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
-      sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/org.jabref.jabref.json
+      sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json

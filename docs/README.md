@@ -2,6 +2,10 @@
 
 This page presents all development informatation around JabRef. For users documentation see <https://docs.jabref.org>.
 
+## How tos
+
+- [Sync your fork with the JabRef repository](https://help.github.com/articles/syncing-a-fork/)
+
 ## Command Line
 
 The package `org.jabref.cli` is responsible for handling the command line options.

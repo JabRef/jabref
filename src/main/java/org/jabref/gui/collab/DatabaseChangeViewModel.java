@@ -1,5 +1,7 @@
 package org.jabref.gui.collab;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 
 import org.jabref.gui.undo.NamedCompound;
@@ -8,7 +10,7 @@ import org.jabref.model.database.BibDatabaseContext;
 abstract class DatabaseChangeViewModel {
 
     protected String name;
-    private boolean accepted = true;
+    private BooleanProperty acceptedProperty = new SimpleBooleanProperty(true);
 
     DatabaseChangeViewModel() {
         name = "";
@@ -24,11 +26,15 @@ abstract class DatabaseChangeViewModel {
     }
 
     public boolean isAccepted() {
-        return accepted;
+        return acceptedProperty.getValue();
     }
 
-    public void setAccepted(boolean a) {
-        accepted = a;
+    public BooleanProperty acceptedProperty() {
+        return this.acceptedProperty;
+    }
+
+    public void setAccepted(boolean accepted) {
+        this.acceptedProperty.setValue(accepted);
     }
 
     /**

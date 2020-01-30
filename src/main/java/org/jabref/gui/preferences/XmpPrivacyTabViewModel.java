@@ -21,6 +21,7 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
@@ -32,7 +33,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    private FunctionBasedValidator xmpFilterListValidator;
+    private Validator xmpFilterListValidator;
 
     XmpPrivacyTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;

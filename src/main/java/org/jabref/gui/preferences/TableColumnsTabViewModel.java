@@ -32,6 +32,7 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
@@ -60,7 +61,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
-    private FunctionBasedValidator<?> columnsNotEmptyValidator;
+    private Validator columnsNotEmptyValidator;
 
     private List<String> restartWarnings = new ArrayList<>();
 
@@ -114,6 +115,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         availableColumnsProperty.clear();
 
         availableColumnsProperty.addAll(
+                new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
                 new MainTableColumnModel(MainTableColumnModel.Type.FILES),
@@ -239,9 +241,10 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus status = columnsListValidationStatus();
-        if (!status.isValid() && status.getHighestMessage().isPresent()) {
-            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = columnsListValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;

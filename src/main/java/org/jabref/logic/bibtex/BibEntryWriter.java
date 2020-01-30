@@ -26,11 +26,11 @@ import org.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
 
-    private final LatexFieldFormatter fieldFormatter;
     private final BibEntryTypesManager entryTypesManager;
+    private final FieldWriter fieldWriter;
 
-    public BibEntryWriter(LatexFieldFormatter fieldFormatter, BibEntryTypesManager entryTypesManager) {
-        this.fieldFormatter = fieldFormatter;
+    public BibEntryWriter(FieldWriter fieldWriter, BibEntryTypesManager entryTypesManager) {
+        this.fieldWriter = fieldWriter;
         this.entryTypesManager = entryTypesManager;
     }
 
@@ -144,22 +144,21 @@ public class BibEntryWriter {
      *
      * @param entry the entry to write
      * @param out   the target of the write
-     * @param name  The field name
+     * @param field the field
      * @throws IOException In case of an IO error
      */
-    private void writeField(BibEntry entry, Writer out, Field name, int indentation) throws IOException {
-        Optional<String> field = entry.getField(name);
+    private void writeField(BibEntry entry, Writer out, Field field, int indentation) throws IOException {
+        Optional<String> value = entry.getField(field);
         // only write field if is is not empty
         // field.ifPresent does not work as an IOException may be thrown
-        if (field.isPresent() && !field.get().trim().isEmpty()) {
-            out.write("  " + getFormattedFieldName(name, indentation));
-
+        if (value.isPresent() && !value.get().trim().isEmpty()) {
+            out.write("  " + getFormattedFieldName(field, indentation));
             try {
-                out.write(fieldFormatter.format(field.get(), name));
-                out.write(',' + OS.NEWLINE);
+                out.write(fieldWriter.write(field, value.get()));
             } catch (InvalidFieldValueException ex) {
-                throw new IOException("Error in field '" + name + "': " + ex.getMessage(), ex);
+                throw new IOException("Error in field '" + field + " of entry " + entry.getCiteKeyOptional().orElse("") + "': " + ex.getMessage(), ex);
             }
+            out.write(',' + OS.NEWLINE);
         }
     }
 

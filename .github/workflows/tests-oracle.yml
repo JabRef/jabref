@@ -2,6 +2,7 @@ name: Oracle Tests
 
 on:
   push:
+    # we need to trigger on all branches, because sometimes need copy of branches, because secrets are only available on "internal" pull requests
     paths:
       - 'src/test/java/org/jabref/model/database/**'
       - 'src/test/java/org/jabref/logic/shared/**'

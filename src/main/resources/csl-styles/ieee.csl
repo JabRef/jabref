@@ -4,7 +4,8 @@
     <title>IEEE</title>
     <id>http://www.zotero.org/styles/ieee</id>
     <link href="http://www.zotero.org/styles/ieee" rel="self"/>
-    <link href="https://www.ieee.org/content/dam/ieee-org/ieee/web/org/conferences/style_references_manual.pdf" rel="documentation"/>
+    <link href="https://ieeeauthorcenter.ieee.org/wp-content/uploads/IEEE-Reference-Guide.pdf" rel="documentation"/>
+    <link href="https://journals.ieeeauthorcenter.ieee.org/your-role-in-article-production/ieee-editorial-style-manual/" rel="documentation"/>
     <author>
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
@@ -32,7 +33,8 @@
     <category citation-format="numeric"/>
     <category field="engineering"/>
     <category field="generic-base"/>
-    <updated>2019-01-02T15:01:14+00:00</updated>
+    <summary>IEEE style as per the 2018 guidelines, V 11.12.2018.</summary>
+    <updated>2019-12-20T09:14:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -179,7 +181,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="webpage">
+      <if type="webpage post post-weblog" match="any">
         <choose>
           <if variable="URL">
             <group delimiter=". ">
@@ -200,6 +202,9 @@
           </if>
         </choose>
       </if>
+      <else-if match="any" variable="DOI">
+        <text variable="DOI" prefix="doi: "/>
+      </else-if>
     </choose>
   </macro>
   <macro name="page">
@@ -251,6 +256,7 @@
             <text macro="page"/>
             <text macro="issued"/>
             <text macro="status"/>
+            <text macro="access"/>
           </group>
         </if>
         <else-if type="paper-conference speech" match="any">
@@ -261,6 +267,7 @@
             <text macro="locators"/>
             <text macro="page"/>
             <text macro="status"/>
+            <text macro="access"/>
           </group>
         </else-if>
         <else-if type="report">
@@ -282,7 +289,7 @@
             <text macro="issued"/>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="webpage post-weblog post" match="any">
           <group delimiter=", " suffix=". ">
             <text macro="title"/>
             <text variable="container-title" font-style="italic"/>
@@ -345,6 +352,7 @@
             <text macro="publisher"/>
             <text macro="page"/>
             <text macro="issued"/>
+            <text macro="access"/>
           </group>
         </else>
       </choose>

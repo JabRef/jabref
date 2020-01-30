@@ -1,6 +1,18 @@
 name: Deployment
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+      - 'src/test/**'
+      - 'README.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'src/test/**'
+      - 'README.md'
 
 jobs:
   build:
@@ -11,17 +23,17 @@ jobs:
         include:
          - os: ubuntu-latest
            displayName: linux
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_linux-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_windows-x64_bin.zip
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_windows-x64_bin.zip
            jdk14Path: /jdk-14
            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/27/GPL/openjdk-14-ea+27_osx-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
@@ -101,13 +113,21 @@ jobs:
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
-      - name: Build and publish snap
+      - name: Build snap (1) Setup snapcraft
+        uses: jhenstridge/snapcraft-build-action@v1
+        id: snapcraft
+        if: matrix.displayName == 'linux'
+      - name: Build snap (2) Run build
+        run: |
+          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
+        if: matrix.displayName == 'linux'
+      - name: Build snap (3) Upload snap
         if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
         run: |
             mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            docker run -v $(pwd):$(pwd) -t lyzardking/snapcraft-bionic sh -c "apt update -qq && cd $(pwd) && snapcraft && mv jabref*.snap build/distribution/ && snapcraft push build/distribution/jabref*.snap --release edge || true"
+            snapcraft push build/distribution/jabref*.snap --release edge || true
         shell: bash
       - name: Rename files
         run: |
@@ -169,4 +189,4 @@ jobs:
           options: ''
           ssh_options: '-p 9922'
           src: 'build/distribution/'
-          dest: jrrsync@builds.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+          dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/

@@ -516,10 +516,10 @@
       <if type="article-journal">
         <group delimiter=", ">
           <text macro="collection-title-journal"/>
-          <number variable="volume"/>
+          <text variable="volume"/>
           <group delimiter=" ">
             <text term="issue" form="short"/>
-            <number variable="issue"/>
+            <text variable="issue"/>
           </group>
         </group>
       </if>
@@ -637,10 +637,10 @@
       <if type="article-journal">
         <group delimiter=", ">
           <text macro="collection-title-journal"/>
-          <number variable="volume"/>
+          <text variable="volume"/>
           <group delimiter=" ">
             <text term="issue" form="short"/>
-            <number variable="issue"/>
+            <text variable="issue"/>
           </group>
         </group>
       </if>
@@ -837,7 +837,7 @@
         <choose>
           <if locator="page">
             <group delimiter=":">
-              <number variable="volume"/>
+              <text variable="volume"/>
               <text variable="locator"/>
             </group>
           </if>
@@ -955,7 +955,7 @@
           <else>
             <choose>
               <if variable="page">
-                <number variable="volume" suffix=":"/>
+                <text variable="volume" suffix=":"/>
                 <text variable="page"/>
               </if>
             </choose>
@@ -1041,10 +1041,9 @@
   </macro>
   <macro name="issue-note-join-with-comma">
     <choose>
-      <if type="graphic map" match="any"/>
-      <else-if type="article-journal bill legislation legal_case manuscript thesis" variable="event-place publisher-place publisher" match="none">
+      <if type="article-journal bill legislation legal_case manuscript speech thesis" variable="publisher-place publisher" match="none">
         <text macro="issue-note"/>
-      </else-if>
+      </if>
       <else-if type="article-newspaper">
         <text macro="issue-note"/>
       </else-if>
@@ -1094,6 +1093,8 @@
               <text variable="genre"/>
             </if>
           </choose>
+          <text variable="event"/>
+          <text variable="event-place"/>
           <text variable="publisher"/>
           <text macro="issued"/>
         </group>

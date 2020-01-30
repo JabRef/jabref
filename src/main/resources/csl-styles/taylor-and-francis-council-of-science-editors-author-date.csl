@@ -12,8 +12,8 @@
     </author>
     <category citation-format="author-date"/>
     <category field="science"/>
-    <summary>The Council of Science Editors style.</summary>
-    <updated>2012-09-09T21:58:08+00:00</updated>
+    <summary>The Council of Science Editors style for T&amp;F journals as per guidelines (version 2.0, 18 Jan 2018).</summary>
+    <updated>2019-10-30T11:30:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
@@ -46,10 +46,7 @@
     </names>
   </macro>
   <macro name="access">
-    <group>
-      <text value="Available from:" suffix=" "/>
-      <text variable="URL"/>
-    </group>
+    <text variable="URL"/>
   </macro>
   <macro name="title">
     <group delimiter=" ">
@@ -92,11 +89,11 @@
   <macro name="cited">
     <choose>
       <if variable="URL">
-        <group prefix=" [" suffix="]" delimiter=" ">
-          <text term="cited"/>
+        <group delimiter=" " prefix=" [" suffix="]">
+          <text term="accessed"/>
           <date variable="accessed">
             <date-part name="year"/>
-            <date-part name="month" prefix=" " form="short" strip-periods="true"/>
+            <date-part name="month" form="short" strip-periods="true" prefix=" "/>
             <date-part name="day" prefix=" "/>
           </date>
         </group>
@@ -188,9 +185,12 @@
             <text macro="editor-translator" suffix="."/>
             <group prefix=" " suffix=".">
               <text macro="container" suffix="."/>
-              <group delimiter=";">
+              <group delimiter=" ">
                 <text macro="cited"/>
-                <text variable="volume" prefix=" "/>
+                <group>
+                  <text variable="volume" prefix=" "/>
+                  <text variable="issue" prefix="(" suffix=")"/>
+                </group>
               </group>
               <text variable="page" prefix=":"/>
             </group>

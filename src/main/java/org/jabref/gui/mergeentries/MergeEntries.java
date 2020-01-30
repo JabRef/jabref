@@ -17,11 +17,13 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -68,6 +70,8 @@ public class MergeEntries extends BorderPane {
     private Boolean identicalTypes;
     private List<RadioButton> typeRadioButtons;
     private final DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode;
+    private final List<RadioButton> leftRadioButtons = new ArrayList<>();
+    private final List<RadioButton> rightRadioButtons = new ArrayList<>();
 
     /**
      * Constructor with optional column captions for the two entries
@@ -218,15 +222,20 @@ public class MergeEntries extends BorderPane {
                 }
                 radioButtons.put(field, list);
                 if (leftString.isPresent()) {
+                    leftRadioButtons.add(list.get(LEFT_RADIOBUTTON_INDEX));
                     list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
                     if (!rightString.isPresent()) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
                     } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
                         list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                    } else {
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                     }
                 } else {
                     list.get(LEFT_RADIOBUTTON_INDEX).setDisable(true);
                     list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                    rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                 }
             }
 
@@ -242,29 +251,32 @@ public class MergeEntries extends BorderPane {
 
     private void setupEntryTypeRow(GridPane mergePanel) {
         // Start with entry type
-        mergePanel.add(new Label(Localization.lang("Entry type")), 0, 1);
-
+        int rowIndex = 1;
+        mergePanel.add(new Label(Localization.lang("Entry type")), 0, rowIndex);
         if (leftEntry.getType().equals(rightEntry.getType())) {
-            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, 1);
-            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, 1);
+            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
             identicalTypes = true;
         } else {
-            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, 1);
-            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, 1);
+            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
             identicalTypes = false;
             ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);
+
             for (int k = 0; k < 3; k += 2) {
                 RadioButton button = new RadioButton();
                 EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
                 typeRadioButtons.add(button);
                 group.getToggles().add(button);
-                mergePanel.add(button, 2 + k, 1);
+                mergePanel.add(button, 2 + k, rowIndex);
             }
             if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
                 typeRadioButtons.get(1).setSelected(true); //This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+                rightRadioButtons.add(typeRadioButtons.get(1));
             } else {
                 typeRadioButtons.get(0).setSelected(true);
+                leftRadioButtons.add(typeRadioButtons.get(0));
             }
         }
     }
@@ -272,16 +284,24 @@ public class MergeEntries extends BorderPane {
     private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
         for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
-            Label colHeading = new Label();
             if (i == 2) {
-                colHeading.setGraphic(JabRefIcons.LEFT.getGraphicNode());
+                Button selectAllLeft = new Button();
+                selectAllLeft.setGraphic(JabRefIcons.LEFT.getGraphicNode());
+                selectAllLeft.setOnAction(evt -> this.selectAllLeftRadioButtons());
+                selectAllLeft.setTooltip(new Tooltip(Localization.lang("Select all changes on the left")));
+                mergePanel.add(selectAllLeft, i, 0);
             } else if (i == 4) {
-                colHeading.setGraphic(JabRefIcons.RIGHT.getGraphicNode());
+                Button selectAllRight = new Button();
+                selectAllRight.setOnAction(evt -> this.selectAllRightRadioButtons());
+                selectAllRight.setGraphic(JabRefIcons.RIGHT.getGraphicNode());
+                selectAllRight.setTooltip(new Tooltip(Localization.lang("Select all changes on the right")));
+                mergePanel.add(selectAllRight, i, 0);
             } else {
-                colHeading.setText(columnHeadings.get(i));
+                Label colHeading = new Label(columnHeadings.get(i));
+                colHeading.setMinWidth(USE_PREF_SIZE);
+                mergePanel.add(colHeading, i, 0);
             }
-            colHeading.setMinWidth(USE_PREF_SIZE);
-            mergePanel.add(colHeading, i, 0);
+
         }
     }
 
@@ -346,6 +366,18 @@ public class MergeEntries extends BorderPane {
             if (!rightText.isEmpty() && rightTextPanes.containsKey(field)) {
                 rightTextPanes.get(field).getChildren().setAll(rightText);
             }
+        }
+    }
+
+    public void selectAllRightRadioButtons() {
+        for (RadioButton radioButton : rightRadioButtons) {
+            radioButton.setSelected(true);
+        }
+    }
+
+    public void selectAllLeftRadioButtons() {
+        for (RadioButton radioButton : leftRadioButtons) {
+            radioButton.setSelected(true);
         }
     }
 

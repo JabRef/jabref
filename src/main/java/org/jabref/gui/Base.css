@@ -311,7 +311,7 @@
 
 .button {
     -fx-background-color: transparent;
-    -fx-border-color: rgba(0, 0, 0, 0.23);
+    -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
     -fx-border-width: 1px;
     -fx-border-radius: 4px;
     -fx-padding: 0.5em 1em 0.5em 1em;
@@ -1120,4 +1120,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: monospace;
     -fx-font-weight: bold;
     -fx-label-padding: 5 0 10 10;
+}
+
+TextFlow * {
+    -fx-fill: -fx-text-background-color;
 }

@@ -227,7 +227,7 @@ class OOBibBase {
             if (document != null) {
                 result.add(document);
             }
-        }   
+        }
         return result;
     }
 
@@ -1273,6 +1273,7 @@ class OOBibBase {
         throws NoSuchElementException, WrappedTargetException {
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys();
+        List<BibEntry> entriesToInsert = new ArrayList<BibEntry>();
 
         // For each cited key
         for (String key : cited) {
@@ -1283,13 +1284,13 @@ class OOBibBase {
                 if (entry.isPresent()) {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     // Insert a copy of the entry
-                    resultDatabase.insertEntry(clonedEntry);
+                    entriesToInsert.add(clonedEntry);
                     // Check if the cloned entry has a crossref field
                     clonedEntry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current library
-                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
+                            loopDatabase.getEntryByKey(crossref).ifPresent(entriesToInsert::add);
                         }
                     });
 
@@ -1298,7 +1299,7 @@ class OOBibBase {
                 }
             }
         }
-
+        resultDatabase.insertEntries(entriesToInsert);
         return resultDatabase;
     }
 

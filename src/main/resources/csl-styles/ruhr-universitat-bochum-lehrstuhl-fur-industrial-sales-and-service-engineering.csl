@@ -12,19 +12,19 @@
       <email>sebastian.knop@rub.de</email>
     </author>
     <category citation-format="author-date"/>
-    <updated>2019-05-20T11:40:20+01:00</updated>
+    <updated>2019-12-18T15:42:00+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
     <terms>
-      <term name="et-al">et&amp;#160;al.</term>
+      <term name="et-al">et&#160;al.</term>
       <term name="retrieved">abgerufen am</term>
       <term name="and"> und </term>
     </terms>
   </locale>
   <locale xml:lang="en">
     <terms>
-      <term name="et-al">et&amp;#160;al.</term>
+      <term name="et-al">et&#160;al.</term>
       <term name="ordinal">ᵗʰ</term>
       <term name="ordinal-01">ˢᵗ</term>
       <term name="ordinal-02">ⁿᵈ</term>
@@ -37,6 +37,7 @@
     </terms>
   </locale>
   <locale xml:lang="en-US">
+  <style-options punctuation-in-quote="false"/>
     <date form="text">
       <date-part name="month" suffix=" "/>
       <date-part name="day" form="numeric" suffix=", "/>
@@ -102,10 +103,7 @@
     <choose>
       <if type="article-magazine article-newspaper article-journal bill book broadcast chapter entry-dictionary figure graphic interview legislation legal_case map motion_picture musical_score pamphlet paper-conference patent personal_communication report review review-book song speech thesis treaty dataset" match="any"/>
       <else>
-        <date variable="issued">
-          <date-part name="month" form="long" prefix=", "/>
-          <date-part name="day" form="ordinal" prefix=" "/>
-        </date>
+        <date variable="issued" form="text" prefix=" " />
         <group prefix=", URL: ">
           <text variable="URL"/>
           <choose>
@@ -138,7 +136,7 @@
           <text variable="number" prefix=" No. "/>
         </group>
       </if>
-      <else-if type="bill book graphic legal_case legislation manuscript motion_picture report song speech" match="any">
+      <else-if type="bill book graphic legal_case legislation manuscript motion_picture report song" match="any">
         <text variable="title" font-style="italic"/>
       </else-if>
       <else>
@@ -246,13 +244,13 @@
   <macro name="citation-locator">
     <group>
       <label variable="locator" form="short"/>
-      <text variable="locator" prefix="&amp;#160;"/>
+      <text variable="locator" prefix="&#160;"/>
     </group>
   </macro>
   <macro name="container-phrase">
     <group>
       <choose>
-        <if type="chapter paper-conference" match="any">
+        <if type="chapter paper-conference speech" match="any">
           <choose>
             <if variable="container-title" match="none">
               <text variable="event" font-style="italic"/>
@@ -307,7 +305,7 @@
           <text macro="event"/>
           <text macro="publisher"/>
         </group>
-        <group delimiter="&amp;#160;" prefix=", ">
+        <group delimiter="&#160;" prefix=", ">
           <label variable="page" form="short"/>
           <text variable="page"/>
         </group>

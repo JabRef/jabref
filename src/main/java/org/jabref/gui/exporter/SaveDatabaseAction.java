@@ -114,10 +114,10 @@ public class SaveDatabaseAction {
         if (saveWithDifferentEncoding) {
             Optional<Charset> newEncoding = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
-                saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
-
                 // Make sure to remember which encoding we used.
                 panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
+
+                saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }
         }
     }
@@ -126,13 +126,15 @@ public class SaveDatabaseAction {
         panel.setSaving(true);
         Path targetPath = panel.getBibDatabaseContext().getDatabasePath().get();
         try {
+            Charset encoding = panel.getBibDatabaseContext()
+                                    .getMetaData()
+                                    .getEncoding()
+                                    .orElse(prefs.getDefaultEncoding());
+            // Make sure to remember which encoding we used.
+            panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
+
             // Save the database
-            boolean success = saveDatabase(targetPath, false,
-                    panel.getBibDatabaseContext()
-                         .getMetaData()
-                         .getEncoding()
-                         .orElse(prefs.getDefaultEncoding()),
-                    SavePreferences.DatabaseSaveType.ALL);
+            boolean success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
 
             if (success) {
                 panel.getUndoManager().markUnchanged();

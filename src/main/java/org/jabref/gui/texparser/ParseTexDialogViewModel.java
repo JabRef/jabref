@@ -37,6 +37,7 @@ import org.jabref.preferences.PreferencesService;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileMonitor;
     private final StringProperty texDirectory;
-    private final FunctionBasedValidator<String> texDirectoryValidator;
+    private final Validator texDirectoryValidator;
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final BooleanProperty noFilesFound;

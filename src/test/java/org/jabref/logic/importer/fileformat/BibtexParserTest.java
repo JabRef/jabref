@@ -1105,7 +1105,7 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentParserPreferences().getNonWrappableFields())
+        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
                 .thenReturn(Collections.singletonList(StandardField.FILE));
         BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
         ParserResult result = parser
@@ -1140,7 +1140,7 @@ class BibtexParserTest {
     @Test
     void parseHandlesAccentsCorrectly() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("@article{test,author = {H\'{e}lne Fiaux}}"));
+                .parse(new StringReader("@article{test,author = {H'{e}lne Fiaux}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1149,7 +1149,7 @@ class BibtexParserTest {
         assertEquals(1, parsedEntries.size());
         assertEquals(StandardEntryType.Article, parsedEntry.getType());
         assertEquals(Optional.of("test"), parsedEntry.getCiteKeyOptional());
-        assertEquals(Optional.of("H\'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("H'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
     }
 
     /**
@@ -1158,7 +1158,7 @@ class BibtexParserTest {
     @Test
     void parsePreambleAndEntryWithoutNewLine() throws IOException {
         ParserResult result = parser
-                .parse(new StringReader("@preamble{some text and \\latex}@article{test,author = {H\'{e}lne Fiaux}}"));
+                .parse(new StringReader("@preamble{some text and \\latex}@article{test,author = {H'{e}lne Fiaux}}"));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1168,7 +1168,7 @@ class BibtexParserTest {
         assertEquals(1, parsedEntries.size());
         assertEquals(StandardEntryType.Article, parsedEntry.getType());
         assertEquals(Optional.of("test"), parsedEntry.getCiteKeyOptional());
-        assertEquals(Optional.of("H\'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("H'{e}lne Fiaux"), parsedEntry.getField(StandardField.AUTHOR));
     }
 
     @Test
