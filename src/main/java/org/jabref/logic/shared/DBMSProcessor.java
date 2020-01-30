@@ -180,8 +180,6 @@ public abstract class DBMSProcessor {
 
         // Check where VERSION belongs in method, if anywhere
 
-        List<Integer> keys = new ArrayList<>();
-        Map<EntryType, Set<Integer>> typeMap = new HashMap<>();
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
