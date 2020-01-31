@@ -50,5 +50,4 @@ public class TestManager {
                                   + "IF SQLCODE != -2289 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
         }
     }
-
 }
