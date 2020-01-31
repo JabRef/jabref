@@ -40,7 +40,6 @@ public class CustomizeExternalFileTypesDialog extends BaseDialog<Void> {
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {
                 viewModel.storeSettings();
-                fileTypesTable.refresh();
             }
             return null;
         });

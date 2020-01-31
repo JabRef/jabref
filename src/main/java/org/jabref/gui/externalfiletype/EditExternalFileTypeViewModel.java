@@ -6,8 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 
-import org.jabref.logic.util.OS;
-
 public class EditExternalFileTypeViewModel {
 
     private final StringProperty extensionProperty = new SimpleStringProperty("");
@@ -29,10 +27,8 @@ public class EditExternalFileTypeViewModel {
 
         if (fileType.getOpenWithApplication().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
-            customApplicationSelectedProperty.setValue(false);
         }
         else {
-            defaultApplicationSelectedProperty.setValue(false);
             customApplicationSelectedProperty.setValue(true);
         }
 
