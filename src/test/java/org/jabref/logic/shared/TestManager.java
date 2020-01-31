@@ -32,7 +32,6 @@ public class TestManager {
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"METADATA\"");
         } else if (dbmsType == DBMSType.ORACLE) {
             dbmsConnection.getConnection().createStatement()
-            dbmsConnection.getConnection().createStatement()
                           .executeUpdate("BEGIN\n"
                                   + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
                                   + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
