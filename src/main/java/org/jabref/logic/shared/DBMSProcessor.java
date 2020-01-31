@@ -211,40 +211,32 @@ public abstract class DBMSProcessor {
      * @return <code>true</code> if existent, else <code>false</code>
      */
     private List<BibEntry> filterForBibEntryExistence(List<BibEntry> bibEntries) {
-        // IDs for entries that are in bibEntries and not on the remote database
-        List<Integer> notExistingIds = new ArrayList<>();
+
+        List<Integer> remoteIds = new ArrayList<>();
+        List<Integer> localIds = bibEntries.stream()
+                                           .map(BibEntry::getSharedBibEntryData)
+                                           .map(SharedBibEntryData::getSharedID)
+                                           .filter((id) -> id != -1)
+                                           .collect(Collectors.toList());
+        if (localIds.isEmpty()) {
+            return bibEntries;
+        }
         try {
-            // Check if already exists
-            List<Integer> sharedIds = bibEntries.stream()
-                                              .map(BibEntry::getSharedBibEntryData)
-                                              .map(SharedBibEntryData::getSharedID)
-                                              .filter((id) -> id != -1)
-                                              .collect(Collectors.toList());
             StringBuilder selectQuery = new StringBuilder()
                     .append("SELECT * FROM ")
-                    .append(escape("ENTRY"))
-                    .append(" WHERE ")
-                    .append(escape("SHARED_ID"))
-                    .append(" IN (?")
-                    .append(", ?".repeat(sharedIds.size()))
-                    .append(")");
+                    .append(escape("ENTRY"));
 
-            try (PreparedStatement preparedSelectStatement = connection.prepareStatement(selectQuery.toString())) {
-                for (int i = 0; i < sharedIds.size(); i++) {
-                    preparedSelectStatement.setInt(i + 1, sharedIds.get(i));
+            try (ResultSet resultSet = connection.createStatement().executeQuery(selectQuery.toString())) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("SHARED_ID");
+                    remoteIds.add(id);
                 }
-                try (ResultSet resultSet = preparedSelectStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int id = resultSet.getInt("SHARED_ID");
-                        notExistingIds.add(id);
-                        }
-                    }
-                }
-            } catch (SQLException e) {
-               LOGGER.error("SQL Error: ", e);
             }
-            return bibEntries.stream().filter((entry) ->
-                notExistingIds.contains(entry.getSharedBibEntryData().getSharedID()))
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+        return bibEntries.stream().filter((entry) ->
+                !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                 .collect(Collectors.toList());
         }
 

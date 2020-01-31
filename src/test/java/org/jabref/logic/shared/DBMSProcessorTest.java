@@ -102,8 +102,8 @@ class DBMSProcessorTest {
         for (int i = 0; i < 5; i++) {
             entries.add(new BibEntry(StandardEntryType.Article).withField(StandardField.JOURNAL, "journal " + i)
             .withField(StandardField.ISSUE, Integer.toString(i)));
-            entries.get(3).setType(StandardEntryType.Thesis);
         }
+        entries.get(3).setType(StandardEntryType.Thesis);
         dbmsProcessor.insertEntries(entries);
         //BibEntry firstEntry = getBibEntryExample();
         //String firstId = firstEntry.getId();
@@ -130,7 +130,7 @@ class DBMSProcessorTest {
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(3, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getInt("TYPE"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(4, entryResultSet.getInt("SHARED_ID"));
@@ -138,7 +138,7 @@ class DBMSProcessorTest {
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(5, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("article", entryResultSet.getShort("TYPE"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
