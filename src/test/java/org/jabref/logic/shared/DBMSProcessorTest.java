@@ -284,8 +284,6 @@ class DBMSProcessorTest {
         assertEquals(List.of(bibEntry), actualEntries);
     }
 
-    // You may need a test to make sure that the entries come back in the same order when there is more than one
-
     @Test
     void testGetSharedEntry() {
         BibEntry expectedBibEntry = getBibEntryExampleWithEmptyFields();
