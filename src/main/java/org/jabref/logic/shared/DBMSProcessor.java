@@ -150,7 +150,7 @@ public abstract class DBMSProcessor {
     public void insertEntries(List<BibEntry> bibEntries) {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
         insertIntoEntryTable(notYetExistingEntries);
-        // Temporary fix
+        // Temporary fix - THIS MUST BE CHANGED BEFORE MERGING TO MASTER
         for (BibEntry bibEntry : notYetExistingEntries) {
             insertIntoFieldTable(bibEntry);
         }
