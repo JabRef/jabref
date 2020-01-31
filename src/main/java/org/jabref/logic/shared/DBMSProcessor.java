@@ -148,7 +148,7 @@ public abstract class DBMSProcessor {
      * @param bibEntries List of {@link BibEntry} to be inserted
      */
     public void insertEntries(List<BibEntry> bibEntries) {
-        List<BibEntry> notYetExistingEntries = filterForBibEntryExistence(bibEntries);
+        List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
         insertIntoEntryTable(notYetExistingEntries);
         // Temporary fix
         for (BibEntry bibEntry : notYetExistingEntries) {
@@ -162,11 +162,6 @@ public abstract class DBMSProcessor {
      * @param bibEntries List of {@link BibEntry} to be inserted
      */
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
-
-        // Probably has to be split into smaller methods - also must be changed for Oracle INSERT ALL syntax
-
-
-        // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
                 .append(escape("ENTRY"))
@@ -177,8 +172,6 @@ public abstract class DBMSProcessor {
         for (int i = 0; i < bibEntries.size() - 1; i++) {
             insertIntoEntryQuery.append(", (?)");
         }
-
-        // Check where VERSION belongs in method, if anywhere
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
@@ -205,12 +198,11 @@ public abstract class DBMSProcessor {
 
     /**
      * Filters a list of BibEntry to and returns those which do not exist in the database
-     * Matches the shared ID
      *
      * @param bibEntries {@link BibEntry} to be checked
      * @return <code>true</code> if existent, else <code>false</code>
      */
-    private List<BibEntry> filterForBibEntryExistence(List<BibEntry> bibEntries) {
+    private List<BibEntry> getNotYetExistingEntries(List<BibEntry> bibEntries) {
 
         List<Integer> remoteIds = new ArrayList<>();
         List<Integer> localIds = bibEntries.stream()
