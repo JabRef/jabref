@@ -105,17 +105,6 @@ class DBMSProcessorTest {
         }
         entries.get(3).setType(StandardEntryType.Thesis);
         dbmsProcessor.insertEntries(entries);
-        //BibEntry firstEntry = getBibEntryExample();
-        //String firstId = firstEntry.getId();
-        //BibEntry secondEntry = getBibEntryExample2();
-        //String secondId = secondEntry.getId();
-        //BibEntry thirdEntry = getBibEntryExample3();
-        //String thirdId = thirdEntry.getId();
-
-        //// This must eventually be changed to insertEntries() once that method is implemented
-        //dbmsProcessor.insertEntry(firstEntry);
-        //dbmsProcessor.insertEntry(secondEntry);
-        //dbmsProcessor.insertEntry(thirdEntry);
 
         Map<Integer, Map<String, String>> actualFieldMap = new HashMap<>();
 
@@ -158,7 +147,6 @@ class DBMSProcessorTest {
                 }
             }
         }
-        //List<BibEntry> entries = Arrays.asList(firstEntry, secondEntry, thirdEntry);
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
                                                                            (bibEntry) -> bibEntry.getFieldMap().entrySet().stream()
