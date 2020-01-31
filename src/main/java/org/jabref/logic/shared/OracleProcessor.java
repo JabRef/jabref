@@ -1,11 +1,14 @@
 package org.jabref.logic.shared;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.database.shared.DatabaseConnection;
+import org.jabref.model.entry.BibEntry;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;
@@ -95,6 +98,33 @@ public class OracleProcessor extends DBMSProcessor {
             LOGGER.error("SQL Error: ", e);
         }
 
+    }
+
+    @Override
+    protected void insertIntoEntryTable(List<BibEntry> entries) {
+        try {
+            // Inserting into ENTRY table
+            StringBuilder insertEntryQuery = new StringBuilder()
+                    .append("INSERT ALL");
+            for (BibEntry entry : entries) {
+                insertEntryQuery.append(" INTO ")
+                                .append(escape("ENTRY"))
+                                .append(" (")
+                                .append(escape("TYPE"))
+                                .append(") VALUES (?)");
+            }
+            insertEntryQuery.append(" SELECT * FROM DUAL");
+            LOGGER.info(insertEntryQuery.toString());
+            try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertEntryQuery.toString())) {
+                for (int i = 0; i < entries.size(); i++) {
+                    // columnIndex starts with 1
+                    preparedFieldStatement.setString(i + 1, entries.get(i).getType().toString());
+                }
+                preparedFieldStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
     }
 
     @Override
