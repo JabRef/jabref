@@ -10,9 +10,11 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 
+import org.fxmisc.easybind.EasyBind;
+
 public class FieldViewModel {
 
-    private final ObjectProperty<FieldType> fieldTypeProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<FieldType> fieldTypeProperty;
     private final StringProperty fieldNameProperty = new SimpleStringProperty("");
     private final Field field;
     private final FieldPriority fieldPriority;
@@ -22,8 +24,13 @@ public class FieldViewModel {
         this.field = field;
         this.entryType = entryType;
         this.fieldNameProperty.setValue(field.getDisplayName());
-        this.fieldTypeProperty.setValue(fieldType);
+        this.fieldTypeProperty = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
+        
+        EasyBind.subscribe(this.fieldTypeProperty, changed->{
+            
+            System.out.println("Radio button change? ");
+        });
     }
 
     public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, BibEntryType entryType) {
@@ -52,6 +59,10 @@ public class FieldViewModel {
 
     public FieldType getFieldType() {
         return this.fieldTypeProperty.getValue();
+    }
+    
+    public void setFieldType(FieldType type) {
+        this.fieldTypeProperty.setValue(type);
     }
 
     @Override
