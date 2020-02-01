@@ -206,7 +206,7 @@
     </choose>
   </macro>
   <!--Layout der In-Line-Zitation -->
-  <citation disambiguate-add-year-suffix="true">
+  <citation disambiguate-add-year-suffix="true" disambiguate-add-names="true">
     <layout prefix="(" suffix=")" delimiter=", ">
       <choose>
         <if position="ibid-with-locator">
