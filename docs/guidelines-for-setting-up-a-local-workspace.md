@@ -91,10 +91,9 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
       4. Click "Next" and "Finish"
       5. Activate the CheckStyle configuration file by ticking it in the list
       6. Save settings by clicking "OK"
-8. Open Run -> Edit Configurations...:
-   1. Select Application -> JabRef Main
-   2. Verify, that "JRE" is set to "Default (JDK 13)" or to JDK 13
-   3. Set "VM Options" to the following:
+8. Open Run -> Edit Configurations... -> Select Application -> JabRef Main
+   * Verify, that "JRE" is set to "Default (JDK 13)" or to JDK 13
+   * Set "VM Options" to the following:
 
     ```
     --patch-module org.jabref=build/resources/main
