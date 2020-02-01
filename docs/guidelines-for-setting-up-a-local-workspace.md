@@ -157,7 +157,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
-4. Open the existing project in Eclipse
+4. Open or import the existing project in Eclipse as Java project. Import as gradle project will not work correctly.
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` (both can be used equivalently)
    * In the tab "Arguments" of the run/debug configuration, enter the same runtime VM arguments as above for intelliJ:
      * Set "VM Arguments" to:
