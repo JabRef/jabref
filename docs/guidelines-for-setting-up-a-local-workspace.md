@@ -53,7 +53,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 1. Open `jabref/build.gradle` as a project
 2. Enable annotation processors:
-   * File -> Settings -> Compiler -> Annotation processors:
+   * File -> Settings -> Build, Execution, Deployment -> Compiler -> Annotation processors:
      * Check "Enable annotation processing"
 3. Configure module settings: Right click on project -> Open Module Settings:
    * Ensure that the projects' SDK is Java 13:
@@ -84,7 +84,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
       1. Click on the settings wheel (next to the scheme chooser), then click "Import Scheme" and choose "IntelliJ Code Style.xml".
       2. Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
       3. Click "OK".
-   4. Go to File -> Settings -> Checkstyle -> Configuration File:
+   4. Go to File -> Settings -> Other Settings -> Checkstyle -> Configuration File:
       1. Import the CheckStyle configuration file by clicking the [+] button
       2. For the description provide e.g. "CheckStyle"
       3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
