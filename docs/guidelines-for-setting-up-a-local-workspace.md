@@ -142,8 +142,8 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
     2. Navigate to the following entry in the gradle tool window:
        * JabRef -> Tasks -> application -> run
     3. Double click "run" to build and run the application
-    4. After that a new entry called "jabref [run]" will appear in the run configurations
-    5. Now you can also select "jabref [run]" and either run or debug the application from within IntelliJ
+    4. After that a new entry called "jabref [run]" will appear in the run configurations.
+    5. Now you can also select "jabref [run]" and either run or debug the application from within IntelliJ.
        * Equivalently, this can also be executed from the terminal by running `./gradlew run`.
 
 
