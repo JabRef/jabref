@@ -10,8 +10,6 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 
-import org.fxmisc.easybind.EasyBind;
-
 public class FieldViewModel {
 
     private final ObjectProperty<FieldType> fieldTypeProperty;
@@ -26,11 +24,6 @@ public class FieldViewModel {
         this.fieldNameProperty.setValue(field.getDisplayName());
         this.fieldTypeProperty = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
-        
-        EasyBind.subscribe(this.fieldTypeProperty, changed->{
-            
-            System.out.println("Radio button change? ");
-        });
     }
 
     public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, BibEntryType entryType) {

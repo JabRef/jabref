@@ -2,12 +2,9 @@ package org.jabref.gui.customentrytypes;
 
 import java.util.EnumSet;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -20,6 +17,7 @@ public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
         this.enumeration = enumeration;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void updateItem(T item, boolean empty) {
         super.updateItem(item, empty);
@@ -44,16 +42,11 @@ public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
             }
 
             // issue events on change of the selected radio button
-            group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public void changed(ObservableValue<? extends Toggle> observable,
-                                    Toggle oldValue, Toggle newValue) {
-                    getTableView().edit(getIndex(), getTableColumn());
-                    RadioButtonCell.this.commitEdit((T) newValue.getUserData());
-                }
+            group.selectedToggleProperty().addListener((oservable, oldValue, newValue) -> {
+                getTableView().edit(getIndex(), getTableColumn());
+                RadioButtonCell.this.commitEdit((T) newValue.getUserData());
             });
+
             setGraphic(hb);
         }
     }

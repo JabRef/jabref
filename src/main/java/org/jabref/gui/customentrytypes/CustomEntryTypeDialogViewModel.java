@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.util.StringConverter;
 
@@ -69,6 +68,9 @@ public class CustomEntryTypeDialogViewModel {
         this.mode = mode;
         this.preferencesService = preferencesService;
 
+        Globals.entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                                                           preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+
         Collection<BibEntryType> allTypes = Globals.entryTypesManager.getAllTypes(mode);
         allTypes.addAll(Globals.entryTypesManager.getAllCustomTypes(mode));
 
@@ -90,16 +92,6 @@ public class CustomEntryTypeDialogViewModel {
                 fieldsForType.setAll(typesForField);
             }
         });
-
-        //TODO: ONLY for testing
-        this.fieldsForType.addListener(new ListChangeListener<>() {
-
-            @Override
-            public void onChanged(Change<? extends FieldViewModel> c) {
-                System.out.println(c);               
-            }
-        });
- 
     }
 
     public ListProperty<BibEntryType> entryTypesProperty() {
@@ -182,13 +174,6 @@ public class CustomEntryTypeDialogViewModel {
         for (var entry : typesWithFields.entrySet()) {
             BibEntryType type = entry.getKey();
             List<FieldViewModel> allFields = entry.getValue();
-
-            if (type.getType().getDisplayName().equalsIgnoreCase("article")) {
-                for (var field : allFields) {
-
-                    System.out.println(field.toString() + " " + field.getFieldType());
-                }
-            }
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
