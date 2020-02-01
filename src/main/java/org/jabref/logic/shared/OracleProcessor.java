@@ -1,6 +1,7 @@
 package org.jabref.logic.shared;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -117,12 +118,23 @@ public class OracleProcessor extends DBMSProcessor {
             }
             insertEntryQuery.append(" SELECT * FROM DUAL");
             LOGGER.info(insertEntryQuery.toString());
-            try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertEntryQuery.toString())) {
+            try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertEntryQuery.toString())) {
                 for (int i = 0; i < entries.size(); i++) {
                     // columnIndex starts with 1
-                    preparedFieldStatement.setString(i + 1, entries.get(i).getType().toString());
+                    preparedEntryStatement.setString(i + 1, entries.get(i).getType().getName());
                 }
-                preparedFieldStatement.executeUpdate();
+                preparedEntryStatement.executeUpdate();
+                try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
+                    // The following assumes that we get the generated keys in the order the entries were inserted
+                    // This should be the case
+                    for (BibEntry entry : entries) {
+                        generatedKeys.next();
+                        entry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
+                    }
+                    if (generatedKeys.next()) {
+                        LOGGER.error("Error: Some shared IDs left unassigned");
+                    }
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
