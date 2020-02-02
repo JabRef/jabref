@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
