@@ -34,10 +34,12 @@ public class RadioButtonCell<S, T extends Enum<T>> extends TableCell<S, T> {
                 RadioButton radioButton = new RadioButton(enumElement.toString());
                 radioButton.setUserData(enumElement);
                 radioButton.setToggleGroup(group);
+                radioButton.setMinWidth(USE_PREF_SIZE);
                 hb.getChildren().add(radioButton);
                 if (enumElement.equals(item)) {
                     radioButton.setSelected(true);
                 }
+                hb.setMinWidth(USE_PREF_SIZE);
                 hb.setHgrow(radioButton, Priority.ALWAYS);
             }
 

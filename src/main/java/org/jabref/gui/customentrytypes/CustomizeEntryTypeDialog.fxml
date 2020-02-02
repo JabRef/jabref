@@ -15,7 +15,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import javafx.scene.control.Tooltip?>
 
-<DialogPane prefHeight="596.0" prefWidth="600.0"
+<DialogPane prefHeight="596.0" prefWidth="680"
 	xmlns="http://javafx.com/javafx/8.0.171"
 	xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="org.jabref.gui.customentrytypes.CustomizeEntryTypeDialogView">
