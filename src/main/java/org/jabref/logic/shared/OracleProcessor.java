@@ -118,7 +118,8 @@ public class OracleProcessor extends DBMSProcessor {
             }
             insertEntryQuery.append(" SELECT * FROM DUAL");
             LOGGER.info(insertEntryQuery.toString());
-            try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertEntryQuery.toString())) {
+            try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertEntryQuery.toString(),
+                    new String[]{"SHARED_ID"})) {
                 for (int i = 0; i < entries.size(); i++) {
                     // columnIndex starts with 1
                     preparedEntryStatement.setString(i + 1, entries.get(i).getType().getName());
