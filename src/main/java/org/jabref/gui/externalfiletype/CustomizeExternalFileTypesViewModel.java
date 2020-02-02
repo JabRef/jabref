@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +18,8 @@ public class CustomizeExternalFileTypesViewModel {
 
     public CustomizeExternalFileTypesViewModel() {
         Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-        fileTypes = FXCollections.observableArrayList(types);
+        fileTypes = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.getName(), extractor.getExtension(), extractor.getMimeType(), extractor.getOpenWithApplication()});
+        fileTypes.addAll(types);
         fileTypes.sort(Comparator.comparing(ExternalFileType::getNameAsString));
     }
 
