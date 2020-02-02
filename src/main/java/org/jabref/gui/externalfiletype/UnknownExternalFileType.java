@@ -1,5 +1,8 @@
 package org.jabref.gui.externalfiletype;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
@@ -11,36 +14,46 @@ import org.jabref.gui.icon.JabRefIcon;
  */
 public class UnknownExternalFileType implements ExternalFileType {
 
-    private final String name;
-    private final String extension;
+    private final StringProperty name;
+    private final StringProperty extension;
 
     public UnknownExternalFileType(String name) {
         this(name, "");
     }
 
     public UnknownExternalFileType(String name, String extension) {
-        this.name = name;
-        this.extension = extension;
+        this.name = new SimpleStringProperty(name);
+        this.extension = new SimpleStringProperty(extension);
     }
 
     @Override
-    public String getName() {
+    public StringProperty getName() {
         return name;
     }
 
     @Override
-    public String getExtension() {
+    public String getNameAsString() {
+        return name.getValue();
+    }
+
+    @Override
+    public StringProperty getExtension() {
         return extension;
     }
 
     @Override
-    public String getMimeType() {
-        return "";
+    public String getExtensionAsString() {
+        return extension.getValue();
     }
 
     @Override
-    public String getOpenWithApplication() {
-        return "";
+    public StringProperty getMimeType() {
+        return new SimpleStringProperty("");
+    }
+
+    @Override
+    public StringProperty getOpenWithApplication() {
+        return new SimpleStringProperty("");
     }
 
     @Override

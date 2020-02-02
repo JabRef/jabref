@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -17,7 +18,7 @@ public class CustomizeExternalFileTypesViewModel {
     public CustomizeExternalFileTypesViewModel() {
         Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         fileTypes = FXCollections.observableArrayList(types);
-        fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
+        fileTypes.sort(Comparator.comparing(ExternalFileType::getNameAsString));
     }
 
     /**
@@ -30,11 +31,11 @@ public class CustomizeExternalFileTypesViewModel {
     public void resetToDefaults() {
         List<ExternalFileType> list = ExternalFileTypes.getDefaultExternalFileTypes();
         fileTypes.setAll(list);
-        fileTypes.sort(Comparator.comparing(ExternalFileType::getName));
+        fileTypes.sort(Comparator.comparing(ExternalFileType::getNameAsString));
     }
 
     public void addNewType() {
-        CustomExternalFileType type = new CustomExternalFileType("", "", "", "", "new", IconTheme.JabRefIcons.FILE);
+        CustomExternalFileType type = new CustomExternalFileType(new SimpleStringProperty(""), new SimpleStringProperty(""), new SimpleStringProperty(""), new SimpleStringProperty(""), new SimpleStringProperty("new"), IconTheme.JabRefIcons.FILE);
         fileTypes.add(type);
         showEditDialog(type, Localization.lang("Add new file type"));
     }

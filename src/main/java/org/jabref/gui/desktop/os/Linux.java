@@ -29,8 +29,8 @@ public class Linux implements NativeDesktop {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
         String viewer;
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            viewer = type.get().getOpenWithApplication();
+        if (type.isPresent() && !type.get().getOpenWithApplication().getValue().isEmpty()) {
+            viewer = type.get().getOpenWithApplication().getValue();
         } else {
             viewer = "xdg-open";
         }

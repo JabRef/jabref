@@ -1097,7 +1097,7 @@ public class BasePanel extends StackPane {
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
-            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+            final List<String> extensions = types.stream().map(ExternalFileType::getExtensionAsString).collect(Collectors.toList());
 
             // Run the search operation:
             FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());

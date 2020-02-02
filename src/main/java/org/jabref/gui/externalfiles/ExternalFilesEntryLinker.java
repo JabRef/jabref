@@ -57,7 +57,7 @@ public class ExternalFilesEntryLinker {
                 ExternalFileType type = externalFileTypes.getExternalFileTypeByExt(ext)
                                                          .orElse(new UnknownExternalFileType(ext));
                 Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectoriesAsPaths(filePreferences));
-                LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName());
+                LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName().getValue());
                 entry.addFile(linkedfile);
             });
         }

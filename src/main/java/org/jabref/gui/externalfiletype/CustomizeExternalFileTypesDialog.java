@@ -52,10 +52,10 @@ public class CustomizeExternalFileTypesDialog extends BaseDialog<Void> {
         fileTypesTable.setItems(viewModel.getFileTypes());
 
         fileTypesTableIconColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getIcon()));
-        fileTypesTableNameColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getName()));
-        fileTypesTableExtensionColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getExtension()));
-        fileTypesTableTypeColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getMimeType()));
-        fileTypesTableApplicationColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getOpenWithApplication()));
+        fileTypesTableNameColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getName().getValue()));
+        fileTypesTableExtensionColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getExtension().getValue()));
+        fileTypesTableTypeColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getMimeType().getValue()));
+        fileTypesTableApplicationColumn.setCellValueFactory(data -> BindingsHelper.constantOf(data.getValue().getOpenWithApplication().getValue()));
         fileTypesTableEditColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
         fileTypesTableDeleteColumn.setCellValueFactory(data -> BindingsHelper.constantOf(true));
 

@@ -2,6 +2,9 @@ package org.jabref.gui.externalfiletype;
 
 import java.util.Objects;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 
@@ -12,26 +15,26 @@ import org.jabref.gui.icon.JabRefIcon;
  */
 public class CustomExternalFileType implements ExternalFileType {
 
-    private String name;
-    private String extension;
-    private String openWith;
-    private String iconName;
-    private String mimeType;
+    private StringProperty name;
+    private StringProperty extension;
+    private StringProperty openWith;
+    private StringProperty iconName;
+    private StringProperty mimeType;
     private JabRefIcon icon;
 
-    public CustomExternalFileType(String name, String extension, String mimeType,
-                                  String openWith, String iconName, JabRefIcon icon) {
+    public CustomExternalFileType(StringProperty name, StringProperty extension, StringProperty mimeType,
+                                  StringProperty openWith, StringProperty iconName, JabRefIcon icon) {
         this.name = name;
         this.extension = extension;
         this.mimeType = mimeType;
         this.openWith = openWith;
 
-        setIconName(iconName);
+        setIconName(iconName.getValue());
         setIcon(icon);
     }
 
     public CustomExternalFileType(ExternalFileType type) {
-        this(type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), "", type.getIcon());
+        this(type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), new SimpleStringProperty(""), type.getIcon());
     }
 
     /**
@@ -75,52 +78,62 @@ public class CustomExternalFileType implements ExternalFileType {
             }
         }
 
-        return new CustomExternalFileType(name, extension, mimeType, openWith, iconName, icon);
+        return new CustomExternalFileType(new SimpleStringProperty(name), new SimpleStringProperty(extension), new SimpleStringProperty(mimeType), new SimpleStringProperty(openWith), new SimpleStringProperty(iconName), icon);
     }
 
     @Override
-    public String getName() {
+    public StringProperty getName() {
         return name;
     }
 
+    @Override
+    public String getNameAsString() {
+        return name.getValue();
+    }
+
     public void setName(String name) {
-        this.name = name;
+        this.name = new SimpleStringProperty(name);
     }
 
     @Override
-    public String getExtension() {
+    public StringProperty getExtension() {
         if (extension == null) {
-            return "";
+            return new SimpleStringProperty("");
         }
         return extension;
     }
 
+    @Override
+    public String getExtensionAsString() {
+        return extension.getValue();
+    }
+
     public void setExtension(String extension) {
-        this.extension = extension;
+        this.extension = new SimpleStringProperty(extension);
     }
 
     @Override
-    public String getMimeType() {
+    public StringProperty getMimeType() {
         if (mimeType == null) {
-            return "";
+            return new SimpleStringProperty("");
         }
         return mimeType;
     }
 
     public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+        this.mimeType = new SimpleStringProperty(mimeType);
     }
 
     @Override
-    public String getOpenWithApplication() {
+    public StringProperty getOpenWithApplication() {
         if (openWith == null) {
-            return "";
+            return new SimpleStringProperty("");
         }
         return openWith;
     }
 
     public void setOpenWith(String openWith) {
-        this.openWith = openWith;
+        this.openWith = new SimpleStringProperty(openWith);
     }
 
     /**
@@ -129,7 +142,7 @@ public class CustomExternalFileType implements ExternalFileType {
      * @return The icon name.
      */
     public String getIconName() {
-        return iconName;
+        return iconName.getValue();
     }
 
     /**
@@ -138,7 +151,7 @@ public class CustomExternalFileType implements ExternalFileType {
      * @param name The icon name to use.
      */
     public void setIconName(String name) {
-        this.iconName = name;
+        this.iconName = new SimpleStringProperty(name);
     }
 
     @Override
@@ -153,7 +166,7 @@ public class CustomExternalFileType implements ExternalFileType {
 
     @Override
     public String toString() {
-        return getName();
+        return getName().toString();
     }
 
     public ExternalFileType copy() {

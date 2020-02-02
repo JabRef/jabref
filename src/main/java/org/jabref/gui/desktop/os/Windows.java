@@ -22,8 +22,8 @@ public class Windows implements NativeDesktop {
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
 
-        if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
-            openFileWithApplication(filePath, type.get().getOpenWithApplication());
+        if (type.isPresent() && !type.get().getOpenWithApplication().getValue().isEmpty()) {
+            openFileWithApplication(filePath, type.get().getOpenWithApplication().getValue());
         } else {
             // quote String so explorer handles URL query strings correctly
             String quotePath = "\"" + filePath + "\"";

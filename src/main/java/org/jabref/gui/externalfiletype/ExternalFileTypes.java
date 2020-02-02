@@ -26,7 +26,7 @@ public class ExternalFileTypes {
     // The only instance of this class:
     private static ExternalFileTypes singleton;
     // Map containing all registered external file types:
-    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getName));
+    private final Set<ExternalFileType> externalFileTypes = new TreeSet<>(Comparator.comparing(ExternalFileType::getNameAsString));
 
     private final ExternalFileType HTML_FALLBACK_TYPE = StandardExternalFileType.URL;
 
@@ -72,7 +72,7 @@ public class ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByExt(String extension) {
         String extensionCleaned = extension.replace(".", "").replace("*", "");
-        return externalFileTypes.stream().filter(type -> type.getExtension().equalsIgnoreCase(extensionCleaned)).findFirst();
+        return externalFileTypes.stream().filter(type -> type.getExtension().getValue().equalsIgnoreCase(extensionCleaned)).findFirst();
     }
 
     /**
@@ -82,7 +82,7 @@ public class ExternalFileTypes {
      * @return true if an ExternalFileType with the extension exists, false otherwise
      */
     public boolean isExternalFileTypeByExt(String extension) {
-        return externalFileTypes.stream().anyMatch(type -> type.getExtension().equalsIgnoreCase(extension));
+        return externalFileTypes.stream().anyMatch(type -> type.getExtension().getValue().equalsIgnoreCase(extension));
     }
 
     /**
@@ -95,9 +95,9 @@ public class ExternalFileTypes {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if (!type.getExtension().isEmpty() && filename.toLowerCase(Locale.ROOT).endsWith(type.getExtension().toLowerCase(Locale.ROOT))
-                    && (type.getExtension().length() > longestFound)) {
-                longestFound = type.getExtension().length();
+            if (!type.getExtension().getValue().isEmpty() && filename.toLowerCase(Locale.ROOT).endsWith(type.getExtension().getValue().toLowerCase(Locale.ROOT))
+                    && (type.getExtension().getValue().length() > longestFound)) {
+                longestFound = type.getExtension().getValue().length();
                 foundType = type;
             }
         }
@@ -113,7 +113,7 @@ public class ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
         for (ExternalFileType type : externalFileTypes) {
-            if (type.getMimeType().equalsIgnoreCase(mimeType)) {
+            if (type.getMimeType().getValue().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
             }
         }
@@ -176,7 +176,7 @@ public class ExternalFileTypes {
             i++;
         }
         for (ExternalFileType type : defTypes) {
-            array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
+            array[i] = new String[] {type.getName().getValue(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
         Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileFieldWriter.encodeStringArray(array));
@@ -190,7 +190,7 @@ public class ExternalFileTypes {
      * @return A String[] containing all information about this file type.
      */
     private String[] getStringArrayRepresentation(ExternalFileType type) {
-        return new String[]{type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
+        return new String[]{type.getName().getValue(), type.getExtension().getValue(), type.getMimeType().getValue(), type.getOpenWithApplication().getValue(), type.getIcon().name()};
     }
 
     /**

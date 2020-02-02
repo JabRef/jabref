@@ -81,7 +81,7 @@ public class AutoSetFileLinksUtil {
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
         List<LinkedFile> linkedFiles = new ArrayList<>();
 
-        List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+        List<String> extensions = externalFileTypes.getExternalFileTypeSelection().stream().map(ExternalFileType::getExtensionAsString).collect(Collectors.toList());
 
         // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
@@ -105,7 +105,7 @@ public class AutoSetFileLinksUtil {
                                                             .map(externalFileTypes::getExternalFileTypeByExt)
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
-                String strType = type.isPresent() ? type.get().getName() : "";
+                String strType = type.isPresent() ? type.get().getName().getValue() : "";
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
                 LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);

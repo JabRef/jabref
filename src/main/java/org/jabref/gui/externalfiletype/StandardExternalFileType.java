@@ -1,5 +1,8 @@
 package org.jabref.gui.externalfiletype;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -30,42 +33,52 @@ public enum StandardExternalFileType implements ExternalFileType {
     MHT("MHT", "mht", "multipart/related", "firefox", "www", IconTheme.JabRefIcons.WWW),
     ePUB("ePUB", "epub", "application/epub+zip", "firefox", "www", IconTheme.JabRefIcons.WWW);
 
-    private final String name;
-    private final String extension;
-    private final String mimeType;
-    private final String openWith;
-    private final String iconName;
+    private final StringProperty name;
+    private final StringProperty extension;
+    private final StringProperty mimeType;
+    private final StringProperty openWith;
+    private final StringProperty iconName;
     private final JabRefIcon icon;
 
     StandardExternalFileType(String name, String extension, String mimeType,
                              String openWith, String iconName, JabRefIcon icon) {
-        this.name = name;
-        this.extension = extension;
-        this.mimeType = mimeType;
-        this.openWith = openWith;
-        this.iconName = iconName;
+        this.name = new SimpleStringProperty(name);
+        this.extension = new SimpleStringProperty(extension);
+        this.mimeType = new SimpleStringProperty(mimeType);
+        this.openWith = new SimpleStringProperty(openWith);
+        this.iconName = new SimpleStringProperty(iconName);
         this.icon = icon;
     }
 
     @Override
-    public String getName() {
+    public StringProperty getName() {
         return name;
     }
 
     @Override
-    public String getExtension() {
+    public String getNameAsString() {
+        return name.getValue();
+    }
+
+    @Override
+    public StringProperty getExtension() {
         return extension;
     }
 
     @Override
-    public String getMimeType() {
+    public String getExtensionAsString() {
+        return extension.getValue();
+    }
+
+    @Override
+    public StringProperty getMimeType() {
         return mimeType;
     }
 
     @Override
-    public String getOpenWithApplication() {
+    public StringProperty getOpenWithApplication() {
         // On all OSes there is a generic application available to handle file opening, so use this one
-        return "";
+        return new SimpleStringProperty("");
     }
 
     @Override

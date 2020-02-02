@@ -19,13 +19,13 @@ public class EditExternalFileTypeViewModel {
 
     public EditExternalFileTypeViewModel(CustomExternalFileType fileType) {
         this.fileType = fileType;
-        extensionProperty.setValue(fileType.getExtension());
-        nameProperty.setValue(fileType.getName());
-        mimeTypeProperty.setValue(fileType.getMimeType());
-        selectedApplicationProperty.setValue(fileType.getOpenWithApplication());
+        extensionProperty.setValue(fileType.getExtension().getValue());
+        nameProperty.setValue(fileType.getName().getValue());
+        mimeTypeProperty.setValue(fileType.getMimeType().getValue());
+        selectedApplicationProperty.setValue(fileType.getOpenWithApplication().getValue());
         icon = fileType.getIcon().getGraphicNode();
 
-        if (fileType.getOpenWithApplication().isEmpty()) {
+        if (fileType.getOpenWithApplication().getValue().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
         }
         else {

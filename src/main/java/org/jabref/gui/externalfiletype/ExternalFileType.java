@@ -1,15 +1,21 @@
 package org.jabref.gui.externalfiletype;
 
+import javafx.beans.property.StringProperty;
+
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public interface ExternalFileType {
-    String getName();
+    StringProperty getName();
 
-    String getExtension();
+    String getNameAsString();
 
-    String getMimeType();
+    StringProperty getExtension();
+
+    String getExtensionAsString();
+
+    StringProperty getMimeType();
 
     /**
      * Get the bibtex field name used for this file type.
@@ -18,10 +24,12 @@ public interface ExternalFileType {
      * @return The field name.
      */
     default Field getField() {
-        return FieldFactory.parseField(getExtension());
+        return FieldFactory.parseField(getExtension().getValue());
     }
 
-    String getOpenWithApplication();
+    StringProperty getOpenWithApplication();
 
     JabRefIcon getIcon();
+
+    String toString();
 }

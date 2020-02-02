@@ -38,7 +38,7 @@ public class FileListEntry {
     }
 
     private String getTypeName() {
-        return this.getType().isPresent() ? this.getType().get().getName() : "";
+        return this.getType().isPresent() ? this.getType().get().getName().getValue() : "";
     }
 
     @Override
@@ -47,7 +47,7 @@ public class FileListEntry {
     }
 
     public LinkedFile toParsedFileField() {
-        return new LinkedFile(getDescription(), getLink(), getType().isPresent() ? getType().get().getName() : "");
+        return new LinkedFile(getDescription(), getLink(), getType().isPresent() ? getType().get().getName().getValue() : "");
     }
 
     public String getDescription() {
