@@ -72,7 +72,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     private void setupTable() {
 
-        fields.setEditable(true); //Table View must be editable, otherwise the change of the Radiobuttons does not propgage the commit event
+        fields.setEditable(true); //Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
         entryTypes.itemsProperty().bind(viewModel.entryTypes());
         entryTypes.getSelectionModel().selectFirst();
