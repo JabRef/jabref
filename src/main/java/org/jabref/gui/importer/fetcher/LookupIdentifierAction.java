@@ -76,7 +76,7 @@ public class LookupIdentifierAction<T extends Identifier> extends SimpleCommand 
 
             @Override
             public String getText() {
-                return fetcher.getIdentifierName();
+                return Localization.lang("Look up document identifier %0 online", fetcher.getIdentifierName());
             }
 
             @Override
