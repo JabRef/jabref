@@ -50,7 +50,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        
+
         setResultConverter(button -> {
             if (button.getButtonData() == ButtonData.OK_DONE) {
                 viewModel.apply();
@@ -101,7 +101,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
            .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getFocusModel().getFocusedItem()))
            .install(fieldTypeActionColumn);
 
-        viewModel.newFieldToAddProperty().bind(addNewField.valueProperty());
+        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
     }
 
