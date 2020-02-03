@@ -65,6 +65,7 @@
         <single>org</single>
         <multiple>org</multiple>
       </term>
+      <!--usando editor de coleção para quando for editor do livro-->
       <term name="collection-editor" form="short">
         <single>ed</single>
         <multiple>ed</multiple>
@@ -207,14 +208,17 @@
   <macro name="container-title">
     <choose>
       <if type="paper-conference" match="any">
-        <text variable="container-title" text-case="uppercase"/>
+        <text variable="event" text-case="uppercase"/>
         <text variable="number" prefix=", " suffix=". , "/>
         <text macro="issued-year" prefix=" " suffix=", "/>
         <text variable="publisher-place" suffix=". "/>
         <choose>
-          <if match="any" variable="title-short">
-            <text variable="title-short" font-weight="bold" suffix=". "/>
+          <if match="any" variable="container-title">
+            <text variable="container-title" font-weight="bold" suffix=". "/>
           </if>
+          <else-if match="any" variable="title-short">
+            <text variable="title-short" font-weight="bold" suffix=". "/>
+          </else-if>
           <else>
             <text value="Anais [...]" font-weight="bold" suffix=". "/>
           </else>
@@ -486,12 +490,13 @@
             <text macro="author" suffix=". "/>
             <text macro="title" suffix=". "/>
             <text macro="translator" suffix=". "/>
+            <text variable="genre" suffix=". "/>
             <text macro="edition" suffix=". "/>
             <text variable="version" prefix="Versão " suffix=". "/>
             <text macro="publisher" suffix=". "/>
             <text macro="collection-title" prefix="(" suffix=")."/>
             <text macro="locators"/>
-            <text variable="genre" suffix="."/>
+            <text variable="medium" suffix="."/>
             <text macro="access"/>
           </group>
         </else-if>
@@ -514,6 +519,7 @@
           <group>
             <text macro="author" suffix=". "/>
             <text macro="title" suffix=". "/>
+            <text variable="genre" suffix=". "/>
             <text macro="container-title" suffix=", "/>
             <choose>
               <if match="any" variable="publisher-place">
@@ -663,8 +669,8 @@
             <text macro="author" suffix=". "/>
             <text macro="composer" suffix=". "/>
             <text macro="publisher"/>
-            <text variable="medium" prefix=" " suffix=". "/>
-            <text variable="genre" prefix=" " suffix="."/>
+            <text variable="medium" prefix=" "/>
+            <text variable="dimensions" prefix=" (" suffix=")."/>
             <text macro="access"/>
           </group>
         </else-if>
@@ -672,6 +678,7 @@
           <group>
             <text macro="author" suffix=". "/>
             <text macro="title" text-case="capitalize-first" suffix=" "/>
+            <text variable="medium" suffix=". "/>
             <text macro="publisher" suffix="  "/>
             <text variable="genre" suffix="."/>
             <text variable="scale" suffix=". "/>
@@ -701,7 +708,8 @@
             <text macro="author" suffix=". "/>
             <text macro="title"/>
             <text macro="issued-year" suffix=". "/>
-            <text variable="medium" suffix="."/>
+            <text variable="medium" suffix=", "/>
+            <text variable="dimensions" suffix="."/>
             <text variable="genre" suffix="."/>
             <text macro="access"/>
           </group>
