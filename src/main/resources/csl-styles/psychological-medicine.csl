@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="en-GB" version="1.0" demote-non-dropping-particle="sort-only">
-  <!-- Psychological Medicine 2013 (Harvard-based author-date system)
-       NOTES
-- This style is based on the May 2011 version of the style guide.
-- This style has been tested with Zotero 2.1.7
-- Resource type is assumed to be electronic if both URL and Accessed date are filled out. Moreover, for journal articles there is an inbuilt override checkbox on 'Styles' tab in Preferences that only exports URL and accessed date if no page number. See http://forums.zotero.org/discussion/6268/electronic-journal-articles-and-item-type/
-KNOWN CHALLENGES
-- This file specifically has been formatted for journal articles and books - may not be accurate for other types of citations
-  -->
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
     <title>Psychological Medicine</title>
     <title-short>PSM</title-short>
@@ -23,12 +15,15 @@ KNOWN CHALLENGES
       <name>Drew Schiller</name>
       <email>drew@drewschiller.com</email>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <issn>0033-2917</issn>
     <eissn>1469-8978</eissn>
     <summary>Psychological Medicine - based on the May 2011 version of the style guide titled The Harvard Author&#8211;Date Referencing System</summary>
-    <updated>2019-08-09T16:12:21+00:00</updated>
+    <updated>2020-01-29T11:15:51+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -60,7 +55,6 @@ KNOWN CHALLENGES
     </names>
   </macro>
   <macro name="noauthor_title">
-    <!-- This macro is only called when author is empty and the trick with substitute automatically suppresses repeating elements -->
     <choose>
       <if type="article-newspaper">
         <names variable="author">
@@ -93,7 +87,7 @@ KNOWN CHALLENGES
   <macro name="author-short">
     <names variable="author">
       <label form="short" suffix=" "/>
-      <name form="short" name-as-sort-order="all" and="symbol" sort-separator=", " delimiter=", " delimiter-precedes-last="never" initialize-with=""/>
+      <name form="short" name-as-sort-order="all" and="text" sort-separator=", " delimiter=", " delimiter-precedes-last="never" initialize-with=""/>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
@@ -102,9 +96,8 @@ KNOWN CHALLENGES
     </names>
   </macro>
   <macro name="title">
-    <!-- book, webpage, document -->
     <choose>
-      <if type="chapter paper-conference article-journal article-magazine article-newspaper broadcast interview manuscript map personal_communication speech thesis map song" match="none">
+      <if type="book report" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else>
@@ -113,9 +106,7 @@ KNOWN CHALLENGES
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=": " prefix=". ">
-      <text variable="publisher"/>
-      <!-- The special treatment of event is due to the "place" field being shared (e.g. in a "conference paper") for both "event-place" and "publisher-place" in Zotero -->
+    <group delimiter=": ">
       <choose>
         <if variable="container-title">
           <text variable="publisher-place"/>
@@ -124,6 +115,7 @@ KNOWN CHALLENGES
           <text variable="publisher-place"/>
         </else-if>
       </choose>
+      <text variable="publisher"/>
     </group>
   </macro>
   <macro name="year-date">
@@ -140,7 +132,6 @@ KNOWN CHALLENGES
   </macro>
   <macro name="day-month-date">
     <choose>
-      <!-- "post" and "post-weblog" are currently not mapped by Zotero 2.1, "podcast" could be worked around as a report -->
       <if type="article-newspaper report post post-weblog" match="any">
         <date variable="issued">
           <date-part name="day" form="numeric" suffix=" "/>
@@ -178,14 +169,7 @@ KNOWN CHALLENGES
     </group>
   </macro>
   <macro name="genre">
-    <choose>
-      <if type="thesis">
-        <text variable="genre" text-case="capitalize-first" suffix=" thesis"/>
-      </if>
-      <else>
-        <text variable="genre"/>
-      </else>
-    </choose>
+    <text variable="genre"/>
   </macro>
   <macro name="container">
     <choose>
@@ -202,13 +186,19 @@ KNOWN CHALLENGES
           </else-if>
         </choose>
       </if>
-      <else-if type="webpage">
+      <else-if type="webpage post post-weblog" match="any">
         <text variable="container-title"/>
       </else-if>
       <else>
         <text variable="container-title" font-style="italic"/>
       </else>
     </choose>
+  </macro>
+  <macro name="access">
+    <group delimiter=": ">
+      <text term="available at" text-case="capitalize-first"/>
+      <text variable="URL"/>
+    </group>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
@@ -217,10 +207,8 @@ KNOWN CHALLENGES
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
-        <group delimiter=" ">
-          <text macro="author-short"/>
-          <text macro="year-date"/>
-        </group>
+        <text macro="author-short"/>
+        <text macro="year-date"/>
         <group>
           <label variable="locator" suffix=" " form="short"/>
           <text variable="locator"/>
@@ -234,15 +222,15 @@ KNOWN CHALLENGES
       <key macro="year-date" sort="ascending"/>
       <key macro="title"/>
     </sort>
-    <layout>
+    <layout suffix=".">
       <choose>
         <if type="personal_communication" match="none">
           <text macro="author" font-weight="bold"/>
-          <text macro="year-date" prefix=" (" suffix=")."/>
+          <text macro="year-date" prefix=" (" suffix=")"/>
           <group delimiter=". " prefix=" ">
             <text macro="title"/>
             <choose>
-              <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
+              <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference song" match="any">
                 <group delimiter=" ">
                   <text macro="container"/>
                   <text macro="edition"/>
@@ -253,30 +241,37 @@ KNOWN CHALLENGES
                   <text macro="volume"/>
                   <text variable="number" prefix="no. "/>
                   <text variable="collection-title"/>
+                  <choose>
+                    <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference song" match="any">
+                      <text macro="pages"/>
+                      <text macro="publisher"/>
+                    </if>
+                  </choose>
                 </group>
               </if>
+              <else-if type="webpage post post-weblog" match="any">
+                <group delimiter=". ">
+                  <text macro="container"/>
+                  <text macro="access"/>
+                </group>
+              </else-if>
+              <else-if type="report" match="any">
+                <text macro="access"/>
+              </else-if>
               <else>
                 <group delimiter=" ">
                   <text macro="editor"/>
                   <text macro="translator"/>
-                  <text macro="genre"/>
+                  <text macro="genre" suffix="."/>
                   <text macro="publisher"/>
                   <text macro="container"/>
                   <text macro="day-month-date"/>
                   <text variable="number"/>
-                  <text variable="volume" font-weight="bold"/>
+                  <group delimiter=", ">
+                    <text variable="volume" font-weight="bold"/>
+                    <text macro="journal-pages"/>
+                  </group>
                 </group>
-              </else>
-            </choose>
-          </group>
-          <group suffix=".">
-            <choose>
-              <if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
-                <text macro="pages"/>
-                <text macro="publisher"/>
-              </if>
-              <else>
-                <text macro="journal-pages" prefix=", "/>
               </else>
             </choose>
           </group>

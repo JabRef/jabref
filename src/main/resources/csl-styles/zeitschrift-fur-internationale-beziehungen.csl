@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="de-DE" demote-non-dropping-particle="never">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="de-DE">
   <info>
     <title>Zeitschrift für Internationale Beziehungen (German)</title>
     <title-short>ZIB</title-short>
@@ -14,7 +14,7 @@
     <category field="social_science"/>
     <issn>0946-7165</issn>
     <summary>Stil für ZIB herausgegeben vom Nomos Verlag. Stil erstellt mit freundlicher Unterstützung durch die ZIB Redaktion</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-01-24T09:07:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -112,7 +112,6 @@
         </else-if>
         <else-if type="report">
           <choose>
-            <!--be flexible about data entry as type or as series for reports-->
             <if variable="genre">
               <group delimiter=" ">
                 <text variable="genre"/>
@@ -199,7 +198,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" givenname-disambiguation-rule="by-cite" disambiguate-add-givenname="true" collapse="year" after-collapse-delimiter=";">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" givenname-disambiguation-rule="by-cite" disambiguate-add-givenname="true" collapse="year" cite-group-delimiter="; ">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=": ">
         <group delimiter=" ">
@@ -212,7 +211,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="99" et-al-use-first="98" entry-spacing="1" line-spacing="1">
+  <bibliography hanging-indent="true" entry-spacing="1" line-spacing="1">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>
