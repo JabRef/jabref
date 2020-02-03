@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 - We cleaned up the group add/edit dialog. [#5826](https://github.com/JabRef/jabref/pull/5826)
 - We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
+- We reimplemented and improved the dialog "Customize entry types" [#4719](https://github.com/JabRef/jabref/issues/4719)
 
 ### Fixed
 

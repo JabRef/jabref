@@ -12,8 +12,8 @@ import org.jabref.model.entry.field.FieldPriority;
 
 public class FieldViewModel {
 
-    private final ObjectProperty<FieldType> fieldTypeProperty = new SimpleObjectProperty<>();
-    private final StringProperty fieldNameProperty = new SimpleStringProperty("");
+    private final ObjectProperty<FieldType> fieldType;
+    private final StringProperty fieldName = new SimpleStringProperty("");
     private final Field field;
     private final FieldPriority fieldPriority;
     private BibEntryType entryType;
@@ -21,8 +21,8 @@ public class FieldViewModel {
     public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority, BibEntryType entryType) {
         this.field = field;
         this.entryType = entryType;
-        this.fieldNameProperty.setValue(field.getDisplayName());
-        this.fieldTypeProperty.setValue(fieldType);
+        this.fieldName.setValue(field.getDisplayName());
+        this.fieldType = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
     }
 
@@ -30,12 +30,12 @@ public class FieldViewModel {
         this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority, entryType);
     }
 
-    public ObjectProperty<FieldType> fieldTypeProperty() {
-        return this.fieldTypeProperty;
+    public ObjectProperty<FieldType> fieldType() {
+        return this.fieldType;
     }
 
-    public StringProperty fieldNameProperty() {
-        return this.fieldNameProperty;
+    public StringProperty fieldName() {
+        return this.fieldName;
     }
 
     public Field getField() {
@@ -51,7 +51,11 @@ public class FieldViewModel {
     }
 
     public FieldType getFieldType() {
-        return this.fieldTypeProperty.getValue();
+        return this.fieldType.getValue();
+    }
+    
+    public void setFieldType(FieldType type) {
+        this.fieldType.setValue(type);
     }
 
     @Override
