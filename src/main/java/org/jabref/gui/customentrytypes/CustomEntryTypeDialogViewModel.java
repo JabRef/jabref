@@ -50,21 +50,21 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private ListProperty<BibEntryType> entryTypes;
-    private ListProperty<Field> fields;
-    private ObjectProperty<BibEntryType> selectedEntryTypes = new SimpleObjectProperty<>();
-    private ListProperty<FieldViewModel> fieldsForType;
-    private ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
-    private StringProperty entryTypeToAdd = new SimpleStringProperty("");
-    private ObservableList<BibEntryType> allEntryTypes;
-    private ObservableList<FieldViewModel> allFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldName(), extractor.fieldType()});
-    private ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
-    private BibDatabaseMode mode;
-    private Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
-    private List<BibEntryType> typesToRemove = new ArrayList<>();
+    private final ListProperty<BibEntryType> entryTypes;
+    private final ListProperty<Field> fields;
+    private final ObjectProperty<BibEntryType> selectedEntryTypes = new SimpleObjectProperty<>();
+    private final ListProperty<FieldViewModel> fieldsForType;
+    private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
+    private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
+    private final ObservableList<BibEntryType> allEntryTypes;
+    private final ObservableList<FieldViewModel> allFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldName(), extractor.fieldType()});
+    private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
+    private final BibDatabaseMode mode;
+    private final Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
+    private final List<BibEntryType> typesToRemove = new ArrayList<>();
 
-    private PreferencesService preferencesService;
-    private BibEntryTypesManager entryTypesManager;
+    private final PreferencesService preferencesService;
+    private final BibEntryTypesManager entryTypesManager;
 
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
         this.mode = mode;
