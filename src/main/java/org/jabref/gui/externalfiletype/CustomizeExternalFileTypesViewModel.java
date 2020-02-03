@@ -49,6 +49,8 @@ public class CustomizeExternalFileTypesViewModel {
             typeForEdit = (CustomExternalFileType) type;
         } else {
             typeForEdit = new CustomExternalFileType(type);
+            fileTypes.add(fileTypes.indexOf(type), typeForEdit);
+            fileTypes.remove(type);
         }
 
         EditExternalFileTypeEntryDialog dlg = new EditExternalFileTypeEntryDialog(typeForEdit, dialogTitle);

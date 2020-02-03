@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -43,7 +42,9 @@ public class RequiredFieldsTab extends FieldsEditorTab {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         if (entryType.isPresent()) {
-            fields.addAll(entryType.get().getRequiredFields().stream().map(OrFields::getPrimary).collect(Collectors.toSet()));
+            for (OrFields orFields : entryType.get().getRequiredFields()) {
+                fields.addAll(orFields);
+            }
             // Add the edit field for Bibtex-key.
             fields.add(InternalField.KEY_FIELD);
         } else {

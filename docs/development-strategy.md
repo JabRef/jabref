@@ -6,9 +6,9 @@ To ensure high code-quality,
 
 - we follow the priniciples of [Java by Comparison](https://java.by-comparison.com/).
 - we follow the principles of [Effetcive Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
-- we use [Design Pattners](https://java-design-patterns.com/patterns/) wherever possible.
+- we use [Design Pattners](https://java-design-patterns.com/patterns/) when applicable.
 - we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
-- we review each pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
+- we review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
 ## Continuos integration
 
@@ -22,6 +22,7 @@ The branch [master](https://builds.jabref.org/master/) is the main development l
 
 Other branches are used for discussing improvements with the help of [pull requests](https://github.com/JabRef/jabref/pulls).
 One can see the binaries of each branch at <https://builds.jabref.org/>.
+Releases mark milestones and are based on the master at a point in time.
 
 ## How JabRef aquires contributors
 
