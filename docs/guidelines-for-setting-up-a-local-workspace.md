@@ -69,10 +69,10 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
    ```
 
-5. Use IntellJ to build and run (instead of gradle):
+5. Use IntelliJ to build and run (instead of gradle):
    * File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle:
      * Set "Build and run using" and "Run tests using" both to "IntelliJ IDEA"
-6. Ensure that the JDK13 is enabled for Gradle: Use IntellJ to build and run (instead of gradle):
+6. Ensure that the JDK13 is enabled for Gradle: Use IntelliJ to build and run (instead of gradle):
    * File -> Settings -> Build, Execution, Deployment -> Build Tools -> Gradle -> Gradle:
      * Set "Gradle JVM" to "JDK13"
 7. Use the provided code style:
@@ -146,17 +146,17 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
     5. Now you can also select "jabref [run]" and either run or debug the application from within IntelliJ.
        * Equivalently, this can also be executed from the terminal by running `./gradlew run`.
 
-
 ### Setup for Eclipse
 
-1. Run `./gradlew run` to generate all resources and to check if jabref runs.
+1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
 2. Run `./gradlew eclipse`
    * **This must always be executed, when there are new upstream changes.**
-3. Copy the file `Log4jPlugins.java` from `build\generated\sources\annotationProcessor\java\main\org\jabref\gui\logging\plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
+3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
-4. Open or import the existing project in Eclipse as Java project. Import as gradle project will not work correctly.
+4. Open or import the existing project in Eclipse as Java project.
+   * Remark: Importing it as gradle project will not work correctly.
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` (both can be used equivalently)
    * In the tab "Arguments" of the run/debug configuration, enter the same runtime VM arguments as above for intelliJ:
      * Set "VM Arguments" to:
@@ -189,7 +189,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
     --add-opens javafx.base/com.sun.javafx.event=com.jfoenix
     ```
 
-6. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the eclipse marketplace:
+6. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace:
    1. Help -> Eclipse Marketplace... -> Search tab
    2. Enter "e(fx)clipse" in the search dialogue
    3. Click "Go"

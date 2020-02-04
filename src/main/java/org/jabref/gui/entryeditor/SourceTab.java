@@ -240,6 +240,7 @@ public class SourceTab extends EntryEditorTab {
 
         updateCodeArea();
 
+        entry.typeProperty().addListener(listener -> updateCodeArea());
         entry.getFieldsObservable().addListener((InvalidationListener) listener -> updateCodeArea());
     }
 
