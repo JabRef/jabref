@@ -97,7 +97,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldNameColumn.setCellValueFactory(item -> item.getValue().fieldName());
 
         viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
-        viewModel.entryTypeToAddProperty().bind(addNewEntryType.textProperty());
+        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
 
         addNewField.setItems(viewModel.fields());
         addNewField.setConverter(viewModel.FIELD_STRING_CONVERTER);
