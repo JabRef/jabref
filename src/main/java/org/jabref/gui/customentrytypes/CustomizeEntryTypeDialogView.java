@@ -108,7 +108,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         new ValueTableCellFactory<FieldViewModel, String>()
            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-           .withTooltip(name -> Localization.lang("Remove field from entry type") + " " + name)
+           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type",name))
            .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
            .install(fieldTypeActionColumn);
 
