@@ -54,8 +54,8 @@ import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -868,16 +868,16 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
         return new EntryEditorPreferences(getEntryEditorTabList(),
-                                          getLatexFieldFormatterPreferences(),
-                                          getImportFormatPreferences(),
-                                          getCustomTabFieldNames(),
-                                          getBoolean(SHOW_RECOMMENDATIONS),
-                                          getBoolean(ACCEPT_RECOMMENDATIONS),
-                                          getBoolean(SHOW_LATEX_CITATIONS),
-                                          getBoolean(DEFAULT_SHOW_SOURCE),
-                                          getBibtexKeyPatternPreferences(),
-                                          Globals.getKeyPrefs(),
-                                          getBoolean(AVOID_OVERWRITING_KEY));
+                getFieldWriterPreferences(),
+                getImportFormatPreferences(),
+                getCustomTabFieldNames(),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(ACCEPT_RECOMMENDATIONS),
+                getBoolean(SHOW_LATEX_CITATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBibtexKeyPatternPreferences(),
+                Globals.getKeyPrefs(),
+                getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
@@ -1078,7 +1078,7 @@ public class JabRefPreferences implements PreferencesService {
     public List<String> getStringList(String key) {
         String names = get(key);
         if (names == null) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         StringReader rd = new StringReader(names);
@@ -1423,31 +1423,31 @@ public class JabRefPreferences implements PreferencesService {
                                    fieldDirectories,
                                    getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
                                    get(IMPORT_FILENAMEPATTERN),
-                                   get(IMPORT_FILEDIRPATTERN));
+                get(IMPORT_FILEDIRPATTERN));
     }
 
     @Override
     public UpdateFieldPreferences getUpdateFieldPreferences() {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
                 getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                                          get(TIME_STAMP_FORMAT));
+                get(TIME_STAMP_FORMAT));
     }
 
-    public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
-        return new LatexFieldFormatterPreferences(
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return new FieldWriterPreferences(
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
                 getFieldContentParserPreferences());
     }
 
-    public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
+    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
+        return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
 
     @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-               && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
     @Override
@@ -1469,32 +1469,32 @@ public class JabRefPreferences implements PreferencesService {
             }
         }
         return new SavePreferences(
-                                   saveInOriginalOrder,
-                                   saveOrder,
-                                   this.getDefaultEncoding(),
-                                   this.getBoolean(JabRefPreferences.BACKUP),
-                                   SavePreferences.DatabaseSaveType.ALL,
-                                   false,
-                                   this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                                   this.getLatexFieldFormatterPreferences(),
-                                   this.getKeyPattern(),
-                                   getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
-                                   getBibtexKeyPatternPreferences());
+                saveInOriginalOrder,
+                saveOrder,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                false,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getFieldWriterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public SavePreferences loadForSaveFromPreferences() {
         return new SavePreferences(
-                                   false,
-                                   null,
-                                   this.getDefaultEncoding(),
-                                   this.getBoolean(JabRefPreferences.BACKUP),
-                                   SavePreferences.DatabaseSaveType.ALL,
-                                   true,
-                                   this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                                   this.getLatexFieldFormatterPreferences(),
-                                   this.getKeyPattern(),
-                                   getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
-                                   getBibtexKeyPatternPreferences());
+                false,
+                null,
+                this.getDefaultEncoding(),
+                this.getBoolean(JabRefPreferences.BACKUP),
+                SavePreferences.DatabaseSaveType.ALL,
+                true,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getFieldWriterPreferences(),
+                this.getKeyPattern(),
+                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                getBibtexKeyPatternPreferences());
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {

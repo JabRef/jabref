@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseChangeMonitor implements FileUpdateListener {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseChangeMonitor.class);
 
     private final BibDatabaseContext database;
@@ -46,6 +47,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                               listeners.forEach(listener -> listener.databaseChanged(changes));
                           }
                       })
+                      .onFailure(e -> LOGGER.error("Error while watching for changes", e))
                       .executeWith(taskExecutor);
     }
 

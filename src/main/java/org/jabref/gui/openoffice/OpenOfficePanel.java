@@ -48,7 +48,6 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -305,8 +304,7 @@ public class OpenOfficePanel {
 
             }
 
-            Defaults defaults = new Defaults(jabRefPreferences.getDefaultBibDatabaseMode());
-            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
+            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
             this.frame.addTab(databaseContext, true);
 
         } catch (BibEntryNotFoundException ex) {
@@ -445,7 +443,6 @@ public class OpenOfficePanel {
             jarURLs.add((jarPath.get().toUri().toURL()));
         }
         return jarURLs;
-
     }
 
     private OOBibBase createBibBase(List<URL> jarUrls) throws IOException, InvocationTargetException, IllegalAccessException,

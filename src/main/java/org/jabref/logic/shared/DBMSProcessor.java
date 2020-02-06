@@ -213,25 +213,30 @@ public abstract class DBMSProcessor {
     private void insertIntoFieldTable(BibEntry bibEntry) {
         try {
             // Inserting into FIELD table
-            for (Field field : bibEntry.getFields()) {
-                StringBuilder insertFieldQuery = new StringBuilder()
-                        .append("INSERT INTO ")
-                        .append(escape("FIELD"))
-                        .append("(")
-                        .append(escape("ENTRY_SHARED_ID"))
-                        .append(", ")
-                        .append(escape("NAME"))
-                        .append(", ")
-                        .append(escape("VALUE"))
-                        .append(") VALUES(?, ?, ?)");
-
-                try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
+            // Coerce to ArrayList in order to use List.get()
+            List<Field> fields = new ArrayList<>(bibEntry.getFields());
+            StringBuilder insertFieldQuery = new StringBuilder()
+                    .append("INSERT INTO ")
+                    .append(escape("FIELD"))
+                    .append("(")
+                    .append(escape("ENTRY_SHARED_ID"))
+                    .append(", ")
+                    .append(escape("NAME"))
+                    .append(", ")
+                    .append(escape("VALUE"))
+                    .append(") VALUES(?, ?, ?)");
+            // Number of commas is fields.size() - 1
+            for (int i = 0; i < fields.size() - 1; i++) {
+                insertFieldQuery.append(", (?, ?, ?)");
+            }
+            try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
+                for (int i = 0; i < fields.size(); i++) {
                     // columnIndex starts with 1
-                    preparedFieldStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
-                    preparedFieldStatement.setString(2, field.getName());
-                    preparedFieldStatement.setString(3, bibEntry.getField(field).get());
-                    preparedFieldStatement.executeUpdate();
+                    preparedFieldStatement.setInt((3 * i) + 1, bibEntry.getSharedBibEntryData().getSharedID());
+                    preparedFieldStatement.setString((3 * i) + 2, fields.get(i).getName());
+                    preparedFieldStatement.setString((3 * i) + 3, bibEntry.getField(fields.get(i)).get());
                 }
+                preparedFieldStatement.executeUpdate();
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);

@@ -21,6 +21,10 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
 
     public EntryDeleteChangeViewModel(BibEntry entry) {
         super(Localization.lang("Deleted entry"));
+
+        this.name = entry.getCiteKeyOptional()
+            .map(key -> Localization.lang("Deleted entry") + ": '" + key + '\'')
+            .orElse(Localization.lang("Deleted entry"));
         this.entry = entry;
     }
 

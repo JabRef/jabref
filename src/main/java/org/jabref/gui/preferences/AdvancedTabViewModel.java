@@ -25,6 +25,7 @@ import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
@@ -39,11 +40,11 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
 
-    private FunctionBasedValidator remotePortValidator;
-    private FunctionBasedValidator proxyHostnameValidator;
-    private FunctionBasedValidator proxyPortValidator;
-    private FunctionBasedValidator proxyUsernameValidator;
-    private FunctionBasedValidator proxyPasswordValidator;
+    private Validator remotePortValidator;
+    private Validator proxyHostnameValidator;
+    private Validator proxyPortValidator;
+    private Validator proxyUsernameValidator;
+    private Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;

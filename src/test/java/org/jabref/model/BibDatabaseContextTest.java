@@ -11,19 +11,19 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibDatabaseContextTest {
+class BibDatabaseContextTest {
     @Test
-    public void testTypeBasedOnDefaultBibtex() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), new Defaults(BibDatabaseMode.BIBTEX));
-        assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
+    void testTypeBasedOnDefaultBiblatex() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
         bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
     }
 
     @Test
-    public void testTypeBasedOnDefaultBiblatex() {
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData(), new Defaults(BibDatabaseMode.BIBLATEX));
+    void testTypeBasedOnDefaultBibtex() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 
         bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
@@ -31,17 +31,7 @@ public class BibDatabaseContextTest {
     }
 
     @Test
-    public void testTypeBasedOnInferredModeBibTeX() {
-        BibDatabase db = new BibDatabase();
-        BibEntry e1 = new BibEntry();
-        db.insertEntry(e1);
-
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
-        assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
-    }
-
-    @Test
-    public void testTypeBasedOnInferredModeBiblatex() {
+    void testTypeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
         db.insertEntry(e1);

@@ -1,0 +1,55 @@
+name: Fetcher Tests
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - '.github/workflows/tests-fetchers.yml'
+      - 'build.gradle'
+  pull_request:
+    paths:
+      - 'src/main/java/org/jabref/logic/**'
+      - 'src/test/java/org/jabref/logic/**'
+      - 'src/main/java/org/jabref/model/**'
+      - 'src/test/java/org/jabref/model/**'
+      - '.github/workflows/tests-fetchers.yml'
+      - 'build.gradle'
+  schedule:
+    # run on each Wednesday
+    - cron: '2 3 * * 3'
+
+jobs:
+  fetchertests:
+    name: Fetcher tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+        with:
+          depth: 1
+          submodules: false
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+      - uses: actions/cache@v1
+        name: Restore gradle chache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - uses: actions/cache@v1
+        name: Restore gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Run fetcher tests
+        run: ./gradlew fetcherTest
+        env:
+          CI: "true"

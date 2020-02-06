@@ -25,4 +25,8 @@ public class EntryChangedEvent extends EntriesEvent {
         super(Collections.singletonList(bibEntry), location);
     }
 
+    public BibEntry getBibEntry() {
+        // An entryChangedEvent should only have one BibEntry, but its parent class stores a List<BibEntry>
+        return getBibEntries().get(0);
+    }
 }

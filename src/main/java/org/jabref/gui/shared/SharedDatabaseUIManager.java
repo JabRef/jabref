@@ -28,9 +28,7 @@ import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -103,7 +101,7 @@ public class SharedDatabaseUIManager {
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
 
         if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, updateRefusedEvent.getBibDatabaseContext().getMode());
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
             Optional<BibEntry> mergedEntry = dialog.showAndWait();
 
             mergedEntry.ifPresent(mergedBibEntry -> {
@@ -144,8 +142,8 @@ public class SharedDatabaseUIManager {
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
         throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
-        BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
@@ -169,8 +167,8 @@ public class SharedDatabaseUIManager {
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
-        BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 

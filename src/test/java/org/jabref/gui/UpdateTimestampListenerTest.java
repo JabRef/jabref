@@ -30,7 +30,7 @@ class UpdateTimestampListenerTest {
         database = new BibDatabase();
         bibEntry = new BibEntry();
 
-        database.insertEntries(bibEntry);
+        database.insertEntry(bibEntry);
 
         preferencesMock = mock(JabRefPreferences.class);
         timestampPreferencesMock = mock(TimestampPreferences.class);
