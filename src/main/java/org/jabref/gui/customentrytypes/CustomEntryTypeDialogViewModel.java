@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
@@ -33,6 +34,10 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
@@ -66,6 +71,9 @@ public class CustomEntryTypeDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
 
+    private final Validator entryTypeValidator;
+    private final Validator fieldValidator;
+
     public CustomEntryTypeDialogViewModel(BibDatabaseMode mode, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
         this.mode = mode;
         this.preferencesService = preferencesService;
@@ -91,6 +99,13 @@ public class CustomEntryTypeDialogViewModel {
                 allFieldsForType.setAll(typesWithFields.get(type));
             }
         });
+
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name")));
+        fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
+                                                      input -> input != null && !input.getDisplayName().isEmpty(),
+                                                      ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name")));
+
     }
 
     public ListProperty<BibEntryType> entryTypes() {
@@ -156,6 +171,14 @@ public class CustomEntryTypeDialogViewModel {
 
     public ObjectProperty<Field> newFieldToAddProperty() {
         return this.newFieldToAdd;
+    }
+
+    public ValidationStatus entryTypeValidationStatus() {
+        return entryTypeValidator.getValidationStatus();
+    }
+
+    public ValidationStatus fieldValidationStatus() {
+        return fieldValidator.getValidationStatus();
     }
 
     public void removeEntryType(BibEntryType focusedItem) {

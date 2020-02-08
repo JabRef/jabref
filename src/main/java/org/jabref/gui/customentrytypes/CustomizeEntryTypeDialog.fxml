@@ -41,7 +41,7 @@
 						<HBox spacing="10.0">
 							<children>
 								<TextField fx:id="addNewEntryType" />
-								<Button prefHeight="20.0" prefWidth="20.0"
+								<Button fx:id="addNewEntryTypeButton" prefHeight="20.0" prefWidth="20.0"
 									styleClass="icon-button,narrow" onAction="#addEntryType">
 									<graphic>
 										<JabRefIconView glyph="ADD_NOBOX" />
@@ -79,7 +79,7 @@
 							<children>
 								<ComboBox fx:id="addNewField" editable="true"
 									prefWidth="150.0" />
-								<Button prefHeight="20.0" prefWidth="20.0"
+								<Button fx:id="addNewFieldButton" prefHeight="20.0" prefWidth="20.0"
 									styleClass="icon-button,narrow" onAction="#addNewField">
 									<graphic>
 										<JabRefIconView glyph="ADD_NOBOX" />

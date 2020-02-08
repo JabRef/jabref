@@ -4,8 +4,10 @@ import java.util.EnumSet;
 
 import javax.inject.Inject;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -27,6 +29,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
@@ -43,10 +46,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
+    @FXML private Button addNewEntryTypeButton;
+    @FXML private Button addNewFieldButton;
 
     @Inject private PreferencesService preferencesService;
 
     private CustomEntryTypeDialogViewModel viewModel;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         this.mode = bibDatabaseContext.getMode();
@@ -68,6 +74,14 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
         setupTable();
+
+        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());
+        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
+
+        Platform.runLater(() -> {
+            visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);
+            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);
+        });
     }
 
     private void setupTable() {
@@ -108,7 +122,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         new ValueTableCellFactory<FieldViewModel, String>()
            .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type",name))
+           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
            .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
            .install(fieldTypeActionColumn);
 
