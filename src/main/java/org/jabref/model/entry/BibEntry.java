@@ -914,7 +914,6 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-
     public ObjectBinding<String> getFieldBinding(Field field) {
         if (field == InternalField.TYPE_HEADER || field == InternalField.OBSOLETE_TYPE_HEADER) {
             return Bindings.createObjectBinding(() -> {
