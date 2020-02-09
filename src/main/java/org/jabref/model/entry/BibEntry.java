@@ -914,8 +914,13 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
+
     public ObjectBinding<String> getFieldBinding(Field field) {
-        //noinspection unchecked
+        if (field == InternalField.TYPE_HEADER || field == InternalField.OBSOLETE_TYPE_HEADER) {
+            return Bindings.createObjectBinding(() -> {
+                return type.getValue().getDisplayName();
+            }, type);
+        }
         return Bindings.valueAt(fields, field);
     }
 
@@ -937,7 +942,7 @@ public class BibEntry implements Cloneable {
      * Returns a list of observables that represent the data of the entry.
      */
     public Observable[] getObservables() {
-        return new Observable[] {fields};
+        return new Observable[] {fields, type};
     }
 
     private interface GetFieldInterface {
