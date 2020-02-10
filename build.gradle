@@ -114,7 +114,7 @@ dependencies {
     compile 'org.apache.pdfbox:fontbox:2.0.18'
     compile 'org.apache.pdfbox:xmpbox:2.0.18'
 
-    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.7'
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
 
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.23'
 
