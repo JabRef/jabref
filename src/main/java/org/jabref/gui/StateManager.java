@@ -9,6 +9,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -53,7 +54,7 @@ public class StateManager {
     }
 
     public IntegerProperty getSearchResultSize() {
-        return searchResultMap.get(activeDatabase.getValue().orElse(new BibDatabaseContext()));
+        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
