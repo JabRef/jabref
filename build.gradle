@@ -565,7 +565,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    options = ['--compress', '2', '--no-man-pages']
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'JabRef'
     }
