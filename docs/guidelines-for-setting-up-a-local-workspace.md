@@ -25,7 +25,7 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 ### IDE
 
-We suggest [IntelliJ](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) (`2019-06` or newer).
+We suggest [IntelliJ](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) (`2019-12` or newer).
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
@@ -148,6 +148,8 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ### Setup for Eclipse
 
+Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is required.
+
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
@@ -157,12 +159,15 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    * Usually, the folder `plugins` must be created for that.
 4. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
+   * Refresh the project in Eclipse
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` (both can be used equivalently)
-   * In the tab "Arguments" of the run/debug configuration, enter the same runtime VM arguments as above for intelliJ:
+   * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
      * Set "VM Arguments" to:
-
+     
     ```
-    --patch-module org.jabref=build/resources/main
+    --patch-module test=fastparse_2.12-1.0.0.jar
+    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
+    --patch-module test3=sourcecode_2.12-0.1.4.jar
     --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
     --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
     --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
@@ -178,15 +183,7 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
     --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-    --add-opens javafx.controls/javafx.scene.control=org.jabref
-    --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
-    --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls
-    --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-    --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-opens javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.binding=com.jfoenix
-    --add-opens javafx.graphics/com.sun.javafx.stage=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.event=com.jfoenix
+    --patch-module org.jabref=build\resources\main
     ```
 
 6. Optional: Install the [e(fx)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace:
@@ -196,7 +193,6 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
    4. Click "Install" button next to the plugin
    5. Click "Finish"
 7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
-   * Alternatively, it is still possible to start the application from the terminal by executing `./gradlew run`, but the application will start significantly slower.
 
 ## Final comments
 
