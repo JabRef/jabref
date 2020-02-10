@@ -40,6 +40,7 @@ import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class BibEntry implements Cloneable {
     /**
      * Cache that stores the field as keyword lists (format <Field, Separator, Keyword list>)
      */
-    private MultiKeyMap<Field, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>();
+    private final MultiKeyMap<Field, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>();
 
     private final EventBus eventBus = new EventBus();
     private String id;
@@ -148,27 +149,27 @@ public class BibEntry implements Cloneable {
         }
 
         //// 2. Handle special field mappings
-        if ((sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.InBook) ||
-            (sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.BookInBook) ||
-            (sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.SuppBook) ||
-            (sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.InBook) ||
-            (sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.BookInBook) ||
-            (sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.SuppBook)) {
+        if (((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.InBook)) ||
+            ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.BookInBook)) ||
+            ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.SuppBook)) ||
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook))) {
             if (targetField == StandardField.AUTHOR) { return Optional.of(StandardField.AUTHOR); }
             if (targetField == StandardField.BOOKAUTHOR) { return Optional.of(StandardField.AUTHOR); }
         }
 
-        if ((sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.Book) ||
-            (sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.InBook) ||
-            (sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.BookInBook) ||
-            (sourceEntry == StandardEntryType.MvBook && targetEntry == StandardEntryType.SuppBook) ||
-            (sourceEntry == StandardEntryType.MvCollection && targetEntry == StandardEntryType.Collection) ||
-            (sourceEntry == StandardEntryType.MvCollection && targetEntry == StandardEntryType.InCollection) ||
-            (sourceEntry == StandardEntryType.MvCollection && targetEntry == StandardEntryType.SuppCollection) ||
-            (sourceEntry == StandardEntryType.MvProceedings && targetEntry == StandardEntryType.Proceedings) ||
-            (sourceEntry == StandardEntryType.MvProceedings && targetEntry == StandardEntryType.InProceedings) ||
-            (sourceEntry == StandardEntryType.MvReference && targetEntry == StandardEntryType.Reference) ||
-            (sourceEntry == StandardEntryType.MvReference && targetEntry == StandardEntryType.InReference)) {
+        if (((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.Book)) ||
+            ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.InBook)) ||
+            ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.BookInBook)) ||
+            ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.SuppBook)) ||
+            ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.Collection)) ||
+            ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.InCollection)) ||
+            ((sourceEntry == StandardEntryType.MvCollection) && (targetEntry == StandardEntryType.SuppCollection)) ||
+            ((sourceEntry == StandardEntryType.MvProceedings) && (targetEntry == StandardEntryType.Proceedings)) ||
+            ((sourceEntry == StandardEntryType.MvProceedings) && (targetEntry == StandardEntryType.InProceedings)) ||
+            ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.Reference)) ||
+            ((sourceEntry == StandardEntryType.MvReference) && (targetEntry == StandardEntryType.InReference))) {
             if (targetField == StandardField.MAINTITLE) { return Optional.of(StandardField.TITLE); }
             if (targetField == StandardField.MAINSUBTITLE) { return Optional.of(StandardField.SUBTITLE); }
             if (targetField == StandardField.MAINTITLEADDON) { return Optional.of(StandardField.TITLEADDON); }
@@ -186,13 +187,13 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        if ((sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.InBook) ||
-            (sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.BookInBook) ||
-            (sourceEntry == StandardEntryType.Book && targetEntry == StandardEntryType.SuppBook) ||
-            (sourceEntry == StandardEntryType.Collection && targetEntry == StandardEntryType.InCollection) ||
-            (sourceEntry == StandardEntryType.Collection && targetEntry == StandardEntryType.SuppCollection) ||
-            (sourceEntry == StandardEntryType.Reference && targetEntry == StandardEntryType.InReference) ||
-            (sourceEntry == StandardEntryType.Proceedings && targetEntry == StandardEntryType.InProceedings)) {
+        if (((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.InBook)) ||
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.BookInBook)) ||
+            ((sourceEntry == StandardEntryType.Book) && (targetEntry == StandardEntryType.SuppBook)) ||
+            ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.InCollection)) ||
+            ((sourceEntry == StandardEntryType.Collection) && (targetEntry == StandardEntryType.SuppCollection)) ||
+            ((sourceEntry == StandardEntryType.Reference) && (targetEntry == StandardEntryType.InReference)) ||
+            ((sourceEntry == StandardEntryType.Proceedings) && (targetEntry == StandardEntryType.InProceedings))) {
             if (targetField == StandardField.BOOKTITLE) { return Optional.of(StandardField.TITLE); }
             if (targetField == StandardField.BOOKSUBTITLE) { return Optional.of(StandardField.SUBTITLE); }
             if (targetField == StandardField.BOOKTITLEADDON) { return Optional.of(StandardField.TITLEADDON); }
@@ -210,8 +211,8 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        if ((sourceEntry == IEEETranEntryType.Periodical && targetEntry == StandardEntryType.Article) ||
-            (sourceEntry == IEEETranEntryType.Periodical && targetEntry == StandardEntryType.SuppPeriodical)) {
+        if (((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.Article)) ||
+            ((sourceEntry == IEEETranEntryType.Periodical) && (targetEntry == StandardEntryType.SuppPeriodical))) {
             if (targetField == StandardField.JOURNALTITLE) { return Optional.of(StandardField.TITLE); }
             if (targetField == StandardField.JOURNALSUBTITLE) { return Optional.of(StandardField.SUBTITLE); }
 
@@ -915,8 +916,10 @@ public class BibEntry implements Cloneable {
     }
 
     public ObjectBinding<String> getFieldBinding(Field field) {
-        //noinspection unchecked
-        return Bindings.valueAt(fields, field);
+        if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
+            return (ObjectBinding<String>) EasyBind.map(type, EntryType::getDisplayName);
+      }
+       return Bindings.valueAt(fields, field);
     }
 
     public ObjectBinding<String> getCiteKeyBinding() {
@@ -937,7 +940,7 @@ public class BibEntry implements Cloneable {
      * Returns a list of observables that represent the data of the entry.
      */
     public Observable[] getObservables() {
-        return new Observable[] {fields};
+        return new Observable[] {fields, type};
     }
 
     private interface GetFieldInterface {
