@@ -63,6 +63,7 @@ open module org.jabref {
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires richtextfx;
+    require com.google.gson;
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
     requires org.jsoup;
