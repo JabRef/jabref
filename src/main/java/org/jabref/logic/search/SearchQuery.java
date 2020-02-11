@@ -18,6 +18,9 @@ import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
 
+    // regexp pattern for escaping special characters in javascript regex
+    public static final String JAVASCRIPT_ESCAPED_CHARS_PATTERN = "[\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\/]";
+
     private final String query;
     private final boolean caseSensitive;
     private final boolean regularExpression;
@@ -124,6 +127,18 @@ public class SearchQuery implements SearchMatcher {
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
     public Optional<Pattern> getPatternForWords() {
+        return joinWordsToPattern(false);
+    }
+
+    // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped for javascript if no regular expression search is enabled
+    public Optional<Pattern> getJsPatternForWords() {
+        return joinWordsToPattern(true);
+    }
+
+    /* Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+     * @param escapeSpecialCharsForJS whether to escape characters in wi for javascript regexp (escaping all special characters) or for java (using \Q and \E)
+     */
+    private Optional<Pattern> joinWordsToPattern(boolean escapeSpecialCharsForJS) {
         List<String> words = getSearchWords();
 
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
@@ -133,7 +148,7 @@ public class SearchQuery implements SearchMatcher {
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
         StringJoiner joiner = new StringJoiner(")|(", "(", ")");
         for (String word : words) {
-            joiner.add(regularExpression ? word : Pattern.quote(word));
+            joiner.add(regularExpression ? word : (escapeSpecialCharsForJS ? word.replaceAll(JAVASCRIPT_ESCAPED_CHARS_PATTERN, "\\\\$0") : Pattern.quote(word)));
         }
         String searchPattern = joiner.toString();
 
