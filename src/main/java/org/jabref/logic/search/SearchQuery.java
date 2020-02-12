@@ -24,7 +24,7 @@ public class SearchQuery implements SearchMatcher {
     public static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\/]");
 
     /**
-     * Metod for escaping special characters in regular expressions
+     * The mode of escaping special characters in regular expressions
      */
     private enum EscapeMode {
         /**
@@ -147,12 +147,12 @@ public class SearchQuery implements SearchMatcher {
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped for javascript if no regular expression search is enabled
-    public Optional<Pattern> getJsPatternForWords() {
+    public Optional<Pattern> getJavaScriptPatternForWords() {
         return joinWordsToPattern(EscapeMode.JAVASCRIPT);
     }
 
     /** Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-     * @param escapeMode method for escaping special characters in wi
+     * @param escapeMode the mode of escaping special characters in wi
      */
     private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
         List<String> words = getSearchWords();
@@ -166,8 +166,7 @@ public class SearchQuery implements SearchMatcher {
         for (String word : words) {
             if (regularExpression) {
                 joiner.add(word);
-            }
-            else {
+            } else {
                 switch (escapeMode) {
                     case JAVA:
                         joiner.add(Pattern.quote(word));
@@ -176,7 +175,7 @@ public class SearchQuery implements SearchMatcher {
                         joiner.add(JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(word).replaceAll("\\\\$0"));
                         break;
                     default:
-                        throw new IllegalArgumentException("Unknown special characters escape method: " + escapeMode);
+                        throw new IllegalArgumentException("Unknown special characters escape mode: " + escapeMode);
                 }
             }
         }
