@@ -9,6 +9,9 @@ import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 
+import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.File;
 /**
  * Versatile author name formatter that takes arguments to control the formatting style.
  */
@@ -77,6 +80,7 @@ public class Authors extends AbstractParamLayoutFormatter {
     private static final String SEMICOLON = "; ";
     private static final String AND = " and ";
     private static final String OXFORD = ", and ";
+    private static boolean[] visited = new boolean[38];
 
     private int flMode;
 
@@ -116,42 +120,59 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     private void handleArgument(String key, String value) {
         if (Authors.AUTHOR_ORDER.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[0] = true;
             if (comp(key, "FirstFirst")) {
+                visited[1] = true;
                 flMode = Authors.FIRST_FIRST;
             } else if (comp(key, "LastFirst")) {
+                visited[2] = true;
                 flMode = Authors.LAST_FIRST;
             } else if (comp(key, "LastFirstFirstFirst")) {
+                visited[3] = true;
                 flMode = Authors.LF_FF;
             }
         } else if (Authors.AUTHOR_ABRV.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[4] = true;
             if (comp(key, "FullName")) {
+                visited[5] = true;
                 abbreviate = false;
             } else if (comp(key, "Initials")) {
+                visited[6] = true;
                 abbreviate = true;
                 firstInitialOnly = false;
             } else if (comp(key, "FirstInitial")) {
+                visited[7] = true;
                 abbreviate = true;
                 firstInitialOnly = true;
             } else if (comp(key, "MiddleInitial")) {
+                visited[8] = true;
                 abbreviate = true;
                 middleInitial = true;
             } else if (comp(key, "LastName")) {
+                visited[9] = true;
                 lastNameOnly = true;
             } else if (comp(key, "InitialsNoSpace")) {
+                visited[10] = true;
                 abbreviate = true;
                 abbrSpaces = false;
             }
+            visited[11] = true;
         } else if (Authors.AUTHOR_PUNC.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[12] = true;
             if (comp(key, "FullPunc")) {
+                visited[13] = true;
                 abbrDots = true;
                 lastFirstSeparator = ", ";
             } else if (comp(key, "NoPunc")) {
+                visited[14] = true;
                 abbrDots = false;
                 lastFirstSeparator = " ";
             } else if (comp(key, "NoComma")) {
+                visited[15] = true;
                 abbrDots = true;
                 lastFirstSeparator = " ";
             } else if (comp(key, "NoPeriod")) {
+                visited[16] = true;
                 abbrDots = false;
                 lastFirstSeparator = ", ";
             }
@@ -160,56 +181,95 @@ public class Authors extends AbstractParamLayoutFormatter {
         // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
         // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
         else if (Authors.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[17] = true;
             if (comp(key, "Comma")) {
+                visited[18] = true;
                 if (setSep) {
+                    visited[19] = true;
                     lastSeparator = Authors.COMMA;
                 } else {
+                    visited[20] = true;
                     separator = Authors.COMMA;
                     setSep = true;
                 }
             } else if (comp(key, "And")) {
+                visited[21] = true;
                 if (setSep) {
+                    visited[22] = true;
                     lastSeparator = Authors.AND;
                 } else {
+                    visited[23] = true;
                     separator = Authors.AND;
                     setSep = true;
                 }
             } else if (comp(key, "Colon")) {
+                visited[24] = true;
                 if (setSep) {
+                    visited[25] = true;
                     lastSeparator = Authors.COLON;
                 } else {
+                    visited[26] = true;
                     separator = Authors.COLON;
                     setSep = true;
                 }
             } else if (comp(key, "Semicolon")) {
+                visited[27] = true;
                 if (setSep) {
+                    visited[28] = true;
                     lastSeparator = Authors.SEMICOLON;
                 } else {
+                    visited[29] = true;
                     separator = Authors.SEMICOLON;
                     setSep = true;
                 }
             } else if (comp(key, "Oxford")) {
+                visited[30] = true;
                 lastSeparator = Authors.OXFORD;
             } else if (comp(key, "Amp")) {
+                visited[31] = true;
                 lastSeparator = Authors.AMP;
             } else if (comp(key, "Sep") && !value.isEmpty()) {
+                visited[32] = true;
                 separator = value;
                 setSep = true;
             } else if (comp(key, "LastSep") && !value.isEmpty()) {
+                visited[33] = true;
                 lastSeparator = value;
             }
         } else if ("etal".equalsIgnoreCase(key.trim())) {
+            visited[34] = true;
             etAlString = value;
         } else if (Authors.NUMBER_PATTERN.matcher(key.trim()).matches()) {
+            visited[35] = true;
             // Just a number:
             int num = Integer.parseInt(key.trim());
             if (setMaxAuthors) {
+                visited[36] = true;
                 authorNumberEtAl = num;
             } else {
+                visited[37] = true;
                 maxAuthors = num;
                 setMaxAuthors = true;
             }
         }
+
+        try {
+            File f = new File("/tmp/handleArgument.txt");
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            double frac = 0;
+            for(int i = 0; i < visited.length; ++i) {
+                frac += (visited[i] ? 1 : 0);
+                bw.write("branch " + i + " was " + (visited[i] ? " visited." : " not visited.") + "\n");
+            }
+
+            bw.write("" + frac/visited.length);
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("ye");
+        }
+
+        // SHOULD BE: 58%
     }
 
     /**

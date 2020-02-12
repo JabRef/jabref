@@ -56,6 +56,7 @@ public class Author {
     }
 
     public static String addDotIfAbbreviation(String name) {
+        //static boolean[] branches = new boolean[15];
         if ((name == null) || name.isEmpty()) {
             return name;
         }
