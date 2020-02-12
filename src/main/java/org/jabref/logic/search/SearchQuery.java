@@ -18,8 +18,24 @@ import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
 
-    // regexp pattern for escaping special characters in javascript regex
-    public static final String JAVASCRIPT_ESCAPED_CHARS_PATTERN = "[\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\/]";
+    /**
+     * Regex pattern for escaping special characters in javascript regular expressions
+     */
+    public static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\/]");
+
+    /**
+     * Metod for escaping special characters in regular expressions
+     */
+    private enum EscapeMode {
+        /**
+         * using \Q and \E marks
+         */
+        JAVA,
+        /**
+         * escaping all javascript regex special characters separately
+         */
+        JAVASCRIPT
+    }
 
     private final String query;
     private final boolean caseSensitive;
@@ -127,18 +143,18 @@ public class SearchQuery implements SearchMatcher {
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
     public Optional<Pattern> getPatternForWords() {
-        return joinWordsToPattern(false);
+        return joinWordsToPattern(EscapeMode.JAVA);
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped for javascript if no regular expression search is enabled
     public Optional<Pattern> getJsPatternForWords() {
-        return joinWordsToPattern(true);
+        return joinWordsToPattern(EscapeMode.JAVASCRIPT);
     }
 
-    /* Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
-     * @param escapeSpecialCharsForJS whether to escape characters in wi for javascript regexp (escaping all special characters) or for java (using \Q and \E)
+    /** Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+     * @param escapeMode method for escaping special characters in wi
      */
-    private Optional<Pattern> joinWordsToPattern(boolean escapeSpecialCharsForJS) {
+    private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
         List<String> words = getSearchWords();
 
         if ((words == null) || words.isEmpty() || words.get(0).isEmpty()) {
@@ -148,7 +164,19 @@ public class SearchQuery implements SearchMatcher {
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
         StringJoiner joiner = new StringJoiner(")|(", "(", ")");
         for (String word : words) {
-            joiner.add(regularExpression ? word : (escapeSpecialCharsForJS ? word.replaceAll(JAVASCRIPT_ESCAPED_CHARS_PATTERN, "\\\\$0") : Pattern.quote(word)));
+            if (regularExpression)
+                joiner.add(word);
+            else
+                switch (escapeMode) {
+                    case JAVA:
+                        joiner.add(Pattern.quote(word));
+                        break;
+                    case JAVASCRIPT:
+                        joiner.add(JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(word).replaceAll("\\\\$0"));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown special characters escape method: " + escapeMode);
+                }
         }
         String searchPattern = joiner.toString();
 
