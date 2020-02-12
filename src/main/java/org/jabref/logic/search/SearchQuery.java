@@ -164,9 +164,10 @@ public class SearchQuery implements SearchMatcher {
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
         StringJoiner joiner = new StringJoiner(")|(", "(", ")");
         for (String word : words) {
-            if (regularExpression)
+            if (regularExpression) {
                 joiner.add(word);
-            else
+            }
+            else {
                 switch (escapeMode) {
                     case JAVA:
                         joiner.add(Pattern.quote(word));
@@ -177,6 +178,7 @@ public class SearchQuery implements SearchMatcher {
                     default:
                         throw new IllegalArgumentException("Unknown special characters escape method: " + escapeMode);
                 }
+            }
         }
         String searchPattern = joiner.toString();
 
