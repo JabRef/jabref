@@ -44,7 +44,9 @@ public enum SpecialField implements Field {
 
     RELEVANCE("relevance",
         SpecialFieldValue.RELEVANT
-    );
+    ),
+
+    CITATION_COUNT("citationcount");
 
     private List<SpecialFieldValue> values;
     private KeywordList keywords;
