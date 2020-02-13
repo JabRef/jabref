@@ -22,6 +22,7 @@ import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
     @Override
@@ -34,7 +35,7 @@ public class Linux implements NativeDesktop {
         } else {
             viewer = "xdg-open";
         }
-        String[] cmdArray = { viewer, filePath };
+        String[] cmdArray = {viewer, filePath};
         Process p = Runtime.getRuntime().exec(cmdArray);
         // When the stream is full at some point, then blocks the execution of the program
         // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
@@ -57,13 +58,21 @@ public class Linux implements NativeDesktop {
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
-        Process p = Runtime.getRuntime().exec(cmdArray);
+        Process process = Runtime.getRuntime().exec(cmdArray);
         // When the stream is full at some point, then blocks the execution of the program
         // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
         String line;
-        line = in.readLine();
-        LOGGER.debug("Received output: " + line);
+        while ((line = in.readLine()) != null) {
+            LOGGER.debug("Received output from error stream: " + line);
+        }
+
+        BufferedReader standardIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String outputLine;
+        while ((outputLine = standardIn.readLine()) != null) {
+            LOGGER.debug("Received output: " + outputLine);
+        }
+
     }
 
     @Override
@@ -118,7 +127,7 @@ public class Linux implements NativeDesktop {
 
             openFileWithApplication(filePath, sj.toString());
         } else {
-            openFile( filePath, "PDF");
+            openFile(filePath, "PDF");
         }
     }
 
