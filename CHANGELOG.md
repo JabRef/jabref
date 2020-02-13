@@ -12,12 +12,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- we changed the open office panel to show buttons in rows of three instead of going straight down to save space as the button expanded out to take up unnecessary horizontal space [#5479] (https://github.com/JabRef/jabref/issues/5479)
+
+- We changed the open office panel to show buttons in rows of three instead of going straight down to save space as the button expanded out to take up unnecessary horizontal space [#5479](https://github.com/JabRef/jabref/issues/5479)
 
 - We cleaned up the group add/edit dialog. [#5826](https://github.com/JabRef/jabref/pull/5826)
 - We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
 - Filenames of external files can no longer contain curly braces
-
+- We reintroduced the possibility to extract references from plain text (using GROBID) [#5614](https://github.com/JabRef/jabref/pull/5614) 
 
 ### Fixed
 
