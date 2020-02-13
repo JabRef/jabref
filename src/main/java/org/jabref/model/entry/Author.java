@@ -1,5 +1,8 @@
 package org.jabref.model.entry;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -15,6 +18,7 @@ import org.jabref.model.strings.StringUtil;
  * all other methods are provided for completeness.
  */
 public class Author {
+    static boolean[] visited = new boolean[30];
 
     private final String firstPart;
 
@@ -55,59 +59,92 @@ public class Author {
         jrPart = removeStartAndEndBraces(jr);
     }
 
+    @SuppressWarnings("checkstyle:WhitespaceAround")
     public static String addDotIfAbbreviation(String name) {
         if ((name == null) || name.isEmpty()) {
+            visited[0] = true;
             return name;
+        } else {
+            visited[1] = true;
         }
         // If only one character (uppercase letter), add a dot and return immediately:
         if ((name.length() == 1) && Character.isLetter(name.charAt(0)) &&
                 Character.isUpperCase(name.charAt(0))) {
+            visited[2] = true;
             return name + ".";
+        } else {
+            visited[3] = true;
         }
 
         StringBuilder sb = new StringBuilder();
         char lastChar = name.charAt(0);
         for (int i = 0; i < name.length(); i++) {
+            visited[4] = true;
             if (i > 0) {
+                visited[5] = true;
                 lastChar = name.charAt(i - 1);
+            } else {
+                visited[6] = true;
             }
             char currentChar = name.charAt(i);
             sb.append(currentChar);
 
             if (currentChar == '.') {
+                visited[7] = true;
                 // A.A. -> A. A.
                 if (((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
+                    visited[8] = true;
                     sb.append(' ');
                 }
+                else {
+                    visited[9] = true;
+                }
+            } else {
+                visited[10] = true;
             }
 
             boolean currentIsUppercaseLetter = Character.isLetter(currentChar) && Character.isUpperCase(currentChar);
             if (!currentIsUppercaseLetter) {
+                visited[11] = true;
                 // No uppercase letter, hence nothing to do
                 continue;
+            } else {
+                visited[12] = true;
             }
 
             boolean lastIsLowercaseLetter = Character.isLetter(lastChar) && Character.isLowerCase(lastChar);
             if (lastIsLowercaseLetter) {
+                visited[13] = true;
                 // previous character was lowercase (probably an acronym like JabRef) -> don't change anything
                 continue;
+            } else {
+                visited[14] = true;
             }
 
             if ((i + 1) >= name.length()) {
+                visited[15] = true;
                 // Current character is last character in input, so append dot
                 sb.append('.');
                 continue;
+            } else {
+                visited[16] = true;
             }
 
             char nextChar = name.charAt(i + 1);
             if ('-' == nextChar) {
+                visited[17] = true;
                 // A-A -> A.-A.
                 sb.append(".");
                 continue;
+            } else {
+                visited[18] = true;
             }
             if ('.' == nextChar) {
+                visited[19] = true;
                 // Dot already there, so nothing to do
                 continue;
+            } else {
+                visited[20] = true;
             }
 
             // AA -> A. A.
@@ -115,27 +152,52 @@ public class Author {
             boolean nextWordIsUppercase = true;
             char furtherChar = Character.MIN_VALUE;
             for (int j = i + 1; j < name.length(); j++) {
+                visited[21] = true;
                 furtherChar = name.charAt(j);
                 if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
+                    visited[22] = true;
                     // end of word
                     break;
+                } else {
+                    visited[23] = true;
                 }
 
                 boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
                 if (!furtherIsUppercaseLetter) {
+                    visited[24] = true;
                     nextWordIsUppercase = false;
                     break;
+                } else {
+                    visited[25] = true;
                 }
+
             }
             if (nextWordIsUppercase) {
+                visited[26] = true;
                 if (Character.isWhitespace(furtherChar)) {
+                    visited[27] = true;
                     sb.append(".");
                 } else {
+                    visited[28] = true;
                     sb.append(". ");
                 }
+            } else {
+                visited[29] = true;
             }
         }
-
+        try {
+            File f = new File("/Temp/addDotIfAbbreviation.txt");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            double frac = 0;
+            for (int i = 0; i < visited.length; ++i) {
+                frac += (visited[i] ? 1 : 0);
+                bw.write("branch " + i + " was " + (visited[i] ? " visited." : " not visited.") + "\n");
+            }
+            bw.write("" + frac / visited.length);
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("ye");
+        }
         return sb.toString().trim();
     }
 
