@@ -102,7 +102,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param file the file, may be null or not existing
      */
     public void openFile(Path file, boolean raisePanel) {
-        openFiles(Collections.singletonList(file), raisePanel);
+        openFiles(Arrays.asList(file), raisePanel);
     }
 
     /**
