@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
@@ -54,7 +55,7 @@ public class FetchCitationCounts extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        List<BibEntry> entries = stateManager.getSelectedEntries();
+        ObservableList<BibEntry> entries = stateManager.getSelectedEntries();
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Fetch citation counts"));
 
@@ -74,11 +75,20 @@ public class FetchCitationCounts extends SimpleCommand {
                     String creatorsType = "";
 
                     creatorsString = entry.getField(StandardField.AUTHOR).orElse("").trim();
-                    creatorsType = "author";
 
-                    if (creatorsString.length() == 0) {
+                    if (creatorsString.length() != 0) {
+                        creatorsType = "author";
+                    }
+                    else {
                         creatorsString = entry.getField(StandardField.EDITOR).orElse("").trim();
-                        creatorsType = "editor";
+
+                        if (creatorsString.length() != 0) {
+                            creatorsType = "editor";
+                        }
+                        else
+                        {
+                            creatorsType = "";
+                        }
                     }
 
                     AuthorList authorList = AuthorList.parse(creatorsString);

@@ -132,7 +132,7 @@ public enum StandardActions implements Action {
     FIND_UNLINKED_FILES(Localization.lang("Search for unlinked local files"), IconTheme.JabRefIcons.SEARCH, KeyBinding.FIND_UNLINKED_FILES),
     AUTO_LINK_FILES(Localization.lang("Automatically set file links"), IconTheme.JabRefIcons.AUTO_FILE_LINK, KeyBinding.AUTOMATICALLY_LINK_FILES),
     LOOKUP_DOC_IDENTIFIER(Localization.lang("Search document identifier online")),
-    FETCH_CITATION_COUNTS(Localization.lang("Fetch citation counts online")),
+    FETCH_CITATION_COUNTS(Localization.lang("Fetch citation counts online"), IconTheme.JabRefIcons.DOWNLOAD, KeyBinding.COPY_BIBTEX_KEY.FETCH_CITATION_COUNTS),
     LOOKUP_FULLTEXT(Localization.lang("Search full text documents online"), IconTheme.JabRefIcons.FILE_SEARCH, KeyBinding.DOWNLOAD_FULL_TEXT),
     GENERATE_CITE_KEY(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),
     GENERATE_CITE_KEYS(Localization.lang("Generate BibTeX keys"), IconTheme.JabRefIcons.MAKE_KEY, KeyBinding.AUTOGENERATE_BIBTEX_KEYS),

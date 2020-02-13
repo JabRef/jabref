@@ -27,6 +27,7 @@ public enum KeyBinding {
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),
     DOWNLOAD_FULL_TEXT("Download full text documents", Localization.lang("Download full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
+    FETCH_CITATION_COUNTS("Fetch citation counts online", Localization.lang("Fetch citation counts online"), "ctrl+alt+C", KeyBindingCategory.TOOLS),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
     EXPORT("Export", Localization.lang("Export"), "ctrl+alt+e", KeyBindingCategory.FILE),
     EXPORT_SELECTED("Export Selected", Localization.lang("Export selected entries"), "ctrl+shift+e", KeyBindingCategory.FILE),
