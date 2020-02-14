@@ -11,8 +11,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.util.StreamGobbler;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -54,25 +56,18 @@ public class Linux implements NativeDesktop {
         } else {
             openWith = new String[] {"xdg-open"};
         }
-
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
+
         Process process = Runtime.getRuntime().exec(cmdArray);
         // When the stream is full at some point, then blocks the execution of the program
         // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
-        BufferedReader in = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-        String line;
-        while ((line = in.readLine()) != null) {
-            LOGGER.debug("Received output from error stream: " + line);
-        }
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
 
-        BufferedReader standardIn = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String outputLine;
-        while ((outputLine = standardIn.readLine()) != null) {
-            LOGGER.debug("Received output: " + outputLine);
-        }
-
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
