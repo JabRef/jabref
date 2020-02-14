@@ -38,13 +38,14 @@ public class Linux implements NativeDesktop {
             viewer = "xdg-open";
         }
         String[] cmdArray = {viewer, filePath};
-        Process p = Runtime.getRuntime().exec(cmdArray);
+        Process process = Runtime.getRuntime().exec(cmdArray);
         // When the stream is full at some point, then blocks the execution of the program
         // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        String line;
-        line = in.readLine();
-        LOGGER.debug("Received output: " + line);
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
