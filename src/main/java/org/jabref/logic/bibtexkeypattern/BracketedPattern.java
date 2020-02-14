@@ -1,5 +1,8 @@
 package org.jabref.logic.bibtexkeypattern;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +45,7 @@ public class BracketedPattern {
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
+    private static boolean[] visited = new boolean[65];
 
     private final String pattern;
 
@@ -160,114 +164,152 @@ public class BracketedPattern {
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
     public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database, boolean isEnforceLegalKey) {
-
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
+                visited[0] = true;
                 // result the author
                 String authString;
                 if (database != null) {
+                    visited[1] = true;
                     authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
                                       .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 } else {
+                    visited[2] = true;
                     authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
                 }
 
                 if (val.startsWith("pure")) {
+                    visited[3] = true;
                     // "pure" is used in the context of authors to resolve to authors only and not fallback to editors
                     // The other functionality of the pattern "ForeIni", ... is the same
                     // Thus, remove the "pure" prefix so the remaining code in this section functions correctly
                     //
                     val = val.substring(4);
                 } else {
+                    visited[4] = true;
                     // special feature: A pattern starting with "auth" falls back to the editor
                     if (authString.isEmpty()) {
+                        visited[5] = true;
                         if (database != null) {
+                            visited[6] = true;
                             authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database)
                                               .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                         } else {
+                            visited[7] = true;
                             authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                         }
+                    } else {
+                        visited[8] = true;
                     }
                 }
 
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 if ("auth".equals(val)) {
+                    visited[9] = true;
                     return firstAuthor(authString);
                 } else if ("authForeIni".equals(val)) {
+                    visited[10] = true;
                     return firstAuthorForenameInitials(authString);
                 } else if ("authFirstFull".equals(val)) {
+                    visited[11] = true;
                     return firstAuthorVonAndLast(authString);
                 } else if ("authors".equals(val)) {
+                    visited[12] = true;
                     return allAuthors(authString);
                 } else if ("authorsAlpha".equals(val)) {
+                    visited[13] = true;
                     return authorsAlpha(authString);
                 }
                 // Last author's last name
                 else if ("authorLast".equals(val)) {
+                    visited[14] = true;
                     return lastAuthor(authString);
                 } else if ("authorLastForeIni".equals(val)) {
+                    visited[15] = true;
                     return lastAuthorForenameInitials(authString);
                 } else if ("authorIni".equals(val)) {
+                    visited[16] = true;
                     return oneAuthorPlusIni(authString);
                 } else if (val.matches("authIni[\\d]+")) {
+                    visited[17] = true;
                     int num = Integer.parseInt(val.substring(7));
                     return authIniN(authString, num);
                 } else if ("auth.auth.ea".equals(val)) {
+                    visited[18] = true;
                     return authAuthEa(authString);
                 } else if ("auth.etal".equals(val)) {
+                    visited[19] = true;
                     return authEtal(authString, ".", ".etal");
                 } else if ("authEtAl".equals(val)) {
+                    visited[20] = true;
                     return authEtal(authString, "", "EtAl");
                 } else if ("authshort".equals(val)) {
+                    visited[21] = true;
                     return authshort(authString);
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
+                    visited[22] = true;
                     String[] nums = val.substring(4).split("_");
                     return authNofMth(authString, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
                 } else if (val.matches("auth\\d+")) {
+                    visited[23] = true;
                     int num = Integer.parseInt(val.substring(4));
                     return authN(authString, num, isEnforceLegalKey);
                 } else if (val.matches("authors\\d+")) {
+                    visited[24] = true;
                     return nAuthors(authString, Integer.parseInt(val.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
+                    visited[25] = true;
                     return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if (val.startsWith("ed")) {
+                visited[26] = true;
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
+                    visited[27] = true;
                     return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
+                    visited[28] = true;
                     return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editors".equals(val)) {
+                    visited[29] = true;
                     return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
+                    visited[30] = true;
                     return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
+                    visited[31] = true;
                     return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("editorIni".equals(val)) {
+                    visited[32] = true;
                     return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
+                    visited[33] = true;
                     int num = Integer.parseInt(val.substring(7));
                     return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
+                    visited[34] = true;
                     String[] nums = val.substring(4).split("_");
                     return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                 } else if ("edtr.edtr.ea".equals(val)) {
+                    visited[35] = true;
                     return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrshort".equals(val)) {
+                    visited[36] = true;
                     return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
+                    visited[37] = true;
                     String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
@@ -275,86 +317,132 @@ public class BracketedPattern {
                     }
                     return fa.substring(0, num);
                 } else {
+                    visited[38] = true;
                     // This "ed" business was a dead end, so just
                     // use it literally:
                     return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
+                visited[39] = true;
                 return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("pageprefix".equals(val)) {
+                visited[40] = true;
                 return pagePrefix(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("lastpage".equals(val)) {
+                visited[41] = true;
                 return lastPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
             } else if ("title".equals(val)) {
+                visited[42] = true;
                 return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("fulltitle".equals(val)) {
+                visited[43] = true;
                 return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("");
             } else if ("shorttitle".equals(val)) {
+                visited[44] = true;
                 return getTitleWords(3,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("shorttitleINI".equals(val)) {
+                visited[45] = true;
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
+                visited[46] = true;
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
             } else if ("camel".equals(val)) {
+                visited[47] = true;
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
             } else if ("shortyear".equals(val)) {
+                visited[48] = true;
                 String yearString = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).orElse("");
                 if (yearString.isEmpty()) {
+                    visited[49] = true;
                     return yearString;
                     // In press/in preparation/submitted
                 } else if (yearString.startsWith("in") || yearString.startsWith("sub")) {
+                    visited[50] = true;
                     return "IP";
                 } else if (yearString.length() > 2) {
+                    visited[51] = true;
                     return yearString.substring(yearString.length() - 2);
                 } else {
+                    visited[52] = true;
                     return yearString;
                 }
             } else if ("entrytype".equals(val)) {
+                visited[53] = true;
                 return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse("");
             } else if (val.matches("keyword\\d+")) {
+                visited[54] = true;
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
                 KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
                 if (separatedKeywords.size() < num) {
+                    visited[55] = true;
                     // not enough keywords
                     return "";
                 } else {
+                    visited[56] = true;
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
                     return separatedKeywords.get(num - 1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
+                visited[57] = true;
                 // return all keywords, not separated
                 int num;
                 if (val.length() > 8) {
+                    visited[58] = true;
                     num = Integer.parseInt(val.substring(8));
                 } else {
+                    visited[59] = true;
                     num = Integer.MAX_VALUE;
                 }
                 KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
                 for (Keyword keyword : separatedKeywords) {
+                    visited[60] = true;
                     // remove all spaces
                     sb.append(keyword.toString().replaceAll("\\s+", ""));
 
                     i++;
                     if (i >= num) {
+                        visited[61] = true;
                         break;
+                    } else {
+                        visited[62] = true;
                     }
                 }
                 return sb.toString();
             } else {
+                visited[63] = true;
                 // we haven't seen any special demands
+                getBranchCoverage(visited);
                 return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
             }
         }
         catch (NullPointerException ex) {
+            visited[64] = true;
+            getBranchCoverage(visited);
             LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
+        }
+    }
+
+    private static void getBranchCoverage(boolean[] visited) {
+        try {
+            File f = new File("/Temp/getFieldValue.txt");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            double frac = 0;
+            for (int i = 0; i < visited.length; ++i) {
+                frac += (visited[i] ? 1 : 0);
+                bw.write("branch " + i + " was" + (visited[i] ? " visited." : " not visited.") + "\n");
+            }
+            bw.write("" + frac / visited.length);
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("ye");
         }
     }
 
