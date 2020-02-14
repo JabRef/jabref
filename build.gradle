@@ -590,6 +590,7 @@ jlink {
         requires 'java.rmi'
         requires 'java.xml'
         requires 'com.sun.xml.txw2'
+        requires 'com.google.gson';
         requires 'java.desktop'
         requires 'java.security.jgss'
         requires 'jdk.jsobject'
