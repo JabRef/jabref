@@ -432,7 +432,11 @@ public class BracketedPattern {
 
     private static void getBranchCoverage(boolean[] visited) {
         try {
-            File f = new File("/Temp/getFieldValue.txt");
+            File directory = new File("/Temp");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            File f = new File(directory + "/getFieldValue.txt");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             double frac = 0;
             for (int i = 0; i < visited.length; ++i) {

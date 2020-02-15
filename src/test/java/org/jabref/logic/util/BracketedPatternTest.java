@@ -241,4 +241,54 @@ class BracketedPatternTest {
         assertEquals("2003-JabRef Science",
                 BracketedPattern.expandBrackets("[year]-[journal:regex(\"Organization\",\"JabRef\")]", ';', dbentry, database));
     }
+
+    /**
+     * This function tests that the expandBrackets() method returns the expected value if the database entered is equal to null.
+     * The function will call the getFieldValue() method and thus improve its branch coverage since it will visit a new branch.
+     */
+    @Test
+    void testIfDatabaseNull() {
+        BibEntry child = new BibEntry();
+        assertEquals("", BracketedPattern.expandBrackets("[author]", ';', child, null));
+    }
+
+    /**
+     * This function tests that the expandBrackets() method returns the expected value if the pattern entered is equal to [authForeIni].
+     * The method should return the initial of the authors first name.
+     * The function will call the getFieldValue() method and thus improve its branch coverage since it will visit a new branch.
+     */
+    @Test
+    void testAuthForeIniPattern() {
+        BibDatabase db = new BibDatabase();
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Rosquist, Christine");
+        assertEquals("C", BracketedPattern.expandBrackets("[authForeIni]", ';', bibEntry, db));
+    }
+
+    /**
+     * This function tests that the expandBrackets() method returns the expected value if the pattern entered is equal to [authFirstFull].
+     * The method should return the von part and the last name of the first author.
+     * The function will call the getFieldValue() method and thus improve its branch coverage since it will visit a new branch.
+     */
+    @Test
+    void testAuthFirstFullPattern() {
+        BibDatabase db = new BibDatabase();
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Von Rosquist, Christine");
+        assertEquals("Von Rosquist", BracketedPattern.expandBrackets("[authFirstFull]", ';', bibEntry, db));
+    }
+
+    /**
+     * This function tests that the expandBrackets() method returns the expected value if the pattern entered is equal to [authors].
+     * The method should return the last name of the author/authors.
+     * The function will call the getFieldValue() method and thus improve its branch coverage since it will visit a new branch.
+     */
+    @Test
+    void testAuthorsPattern() {
+        BibDatabase db = new BibDatabase();
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Anka, Kalle");
+        assertEquals("Anka", BracketedPattern.expandBrackets("[authors]", ';', bibEntry, db));
+    }
+
 }
