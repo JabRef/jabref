@@ -1,4 +1,4 @@
-package org.jabref.gui.citationcounts;
+package org.jabref.gui.citationmetadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +31,9 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
- * This action triggers fetching the current citation counts from Google Scholar for the currently selected entries in a library.
+ * This action triggers fetching current citation metadata (e.g. citation counts) from the web for the currently selected entries in a library.
  */
-public class FetchCitationCounts extends SimpleCommand {
+public class FetchCitationMetadata extends SimpleCommand {
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -41,7 +41,7 @@ public class FetchCitationCounts extends SimpleCommand {
     private UndoManager undoManager;
     private TaskExecutor taskExecutor;
 
-    public FetchCitationCounts(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public FetchCitationMetadata(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -59,7 +59,7 @@ public class FetchCitationCounts extends SimpleCommand {
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Fetch citation counts"));
 
-        Task<List<BibEntry>> fetchCitationCountsTask = new Task<List<BibEntry>>() {
+        Task<List<BibEntry>> fetchCitationMetadataTask = new Task<List<BibEntry>>() {
 
             @Override
             protected List<BibEntry> call() {
@@ -106,6 +106,7 @@ public class FetchCitationCounts extends SimpleCommand {
                     entryObject.addProperty("title", entry.getTitle().orElse("").trim());
                     entryObject.addProperty("year", entry.getField(StandardField.YEAR).orElse("").trim());
                     entryObject.addProperty("date", entry.getField(StandardField.DATE).orElse("").trim());
+                    entryObject.addProperty("dio", entry.getField(StandardField.DOI).orElse("").trim());
                     entryObject.add("creators", creatorsArray);
 
                     entriesArray.add(entryObject);
@@ -151,7 +152,7 @@ public class FetchCitationCounts extends SimpleCommand {
         dialogService.showProgressDialogAndWait(
                 Localization.lang("Fetching citation counts online"),
                 Localization.lang("Querying citations counts..."),
-                fetchCitationCountsTask);
-        taskExecutor.execute(fetchCitationCountsTask);
+                fetchCitationMetadataTask);
+        taskExecutor.execute(fetchCitationMetadataTask);
     }
 }

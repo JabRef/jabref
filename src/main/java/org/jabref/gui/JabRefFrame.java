@@ -53,7 +53,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
-import org.jabref.gui.citationcounts.FetchCitationCounts;
+import org.jabref.gui.citationmetadata.FetchCitationMetadata;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
@@ -775,7 +775,7 @@ public class JabRefFrame extends BorderPane {
                 lookupIdentifiers,
                 factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, stateManager)),
 
-                factory.createMenuItem(StandardActions.FETCH_CITATION_COUNTS, new FetchCitationCounts(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
+                factory.createMenuItem(StandardActions.FETCH_CITATION_METADATA, new FetchCitationMetadata(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
 
                 new SeparatorMenuItem(),
 
