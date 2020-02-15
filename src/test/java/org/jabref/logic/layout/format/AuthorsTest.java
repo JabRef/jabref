@@ -61,6 +61,50 @@ public class AuthorsTest {
                 a.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper and Chuck Chuckles"));
     }
 
+    /**
+     * Test the FirstFirst method in authors order.
+     * setArgument() will pass the String into handleArgument() to set flMode.
+     * Increase branch coverage from 58% to 61%.
+     */
+    @Test
+    public void testStandardUsageFirstFirst() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("FirstFirst, Comma, Comma");
+        assertEquals("B. C. Bruce, C. Manson, J. Jumper",
+                a.format("Bob Croydon Bruce and Charles Manson and Jolly Jumper"));
+    }
+
+    /**
+     * Test the And method in separators of authors.
+     * setArgument() will pass the String into handleArgument() to set separator and lastSeparator.
+     * Increase branch coverage from 58% to 66%.
+     */
+    @Test
+    public void testStandardUsageAnd() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("fullname, LastFirst, Comma, And");
+        assertEquals("Bruce, Bob Croydon, Jumper, Jolly and Manson, Charles", 
+                a.format("Bob Croydon Bruce and Jolly Jumper and Charles Manson"));
+        
+        a = new Authors();
+        a.setArgument("fullname, LastFirst, Add, And");
+        assertEquals("Bruce, Bob Croydon and Jumper, Jolly and Manson, Charles", 
+                a.format("Bob Croydon Bruce and Jolly Jumper and Charles Manson"));
+    }
+
+    /**
+     * Test the Colon method in separators of authors.
+     * setArgument() will pass the String into handleArgument() to set separator and lastSeparator.
+     * Increase branch coverage from 58% to 66%
+     */
+    @Test
+    public void testStandardUsageColon() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("fullname, LastFirst, Colon, Colon");
+        assertEquals("Bruce, Bob Croydon: Jumper, Jolly: Manson, Charles", 
+                a.format("Bob Croydon Bruce and Jolly Jumper and Charles Manson"));
+    }
+
     @Test
     public void testSpecialEtAl() {
         ParamLayoutFormatter a = new Authors();
@@ -120,6 +164,19 @@ public class AuthorsTest {
         ParamLayoutFormatter a = new Authors();
         a.setArgument("MiddleInitial");
         assertEquals("Bob C. Bruce, Charles K. von Manson and Jolly Jumper",
+                a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
+    }
+
+    /**
+     * Test the FirstInitial method in abbreviation of authors.
+     * setArgument() will pass the String into handleArgument() to set abbreviate.
+     * Increase branch coverage from 58% to 61%.
+     */
+    @Test
+    public void testFirstInitial() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("FirstInitial");
+        assertEquals("B. Bruce, C. von Manson and J. Jumper",
                 a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
     }
 
