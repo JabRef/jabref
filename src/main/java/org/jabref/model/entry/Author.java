@@ -186,7 +186,11 @@ public class Author {
             }
         }
         try {
-            File f = new File("/Temp/addDotIfAbbreviation.txt");
+            File directory = new File("/Temp");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            File f = new File(directory + "/addDotIfAbbreviation.txt");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             double frac = 0;
             for (int i = 0; i < visited.length; ++i) {
