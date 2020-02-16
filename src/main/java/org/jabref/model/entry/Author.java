@@ -18,7 +18,7 @@ import org.jabref.model.strings.StringUtil;
  * all other methods are provided for completeness.
  */
 public class Author {
-    static boolean[] visited = new boolean[30];
+    static boolean[] visited = new boolean[32];
 
     private final String firstPart;
 
@@ -63,6 +63,7 @@ public class Author {
     public static String addDotIfAbbreviation(String name) {
         if ((name == null) || name.isEmpty()) {
             visited[0] = true;
+            getBranchCoverage(visited);
             return name;
         } else {
             visited[1] = true;
@@ -71,6 +72,7 @@ public class Author {
         if ((name.length() == 1) && Character.isLetter(name.charAt(0)) &&
                 Character.isUpperCase(name.charAt(0))) {
             visited[2] = true;
+            getBranchCoverage(visited);
             return name + ".";
         } else {
             visited[3] = true;
@@ -172,6 +174,11 @@ public class Author {
                 }
 
             }
+            if (!(name.length() > i + 1)) {
+                visited[31] = true;
+            } else {
+                visited[30] = true;
+            }
             if (nextWordIsUppercase) {
                 visited[26] = true;
                 if (Character.isWhitespace(furtherChar)) {
@@ -185,6 +192,11 @@ public class Author {
                 visited[29] = true;
             }
         }
+        getBranchCoverage(visited);
+        return sb.toString().trim();
+    }
+
+    private static void getBranchCoverage(boolean[] visited) {
         try {
             File directory = new File("/Temp");
             if (!directory.exists()) {
@@ -195,14 +207,13 @@ public class Author {
             double frac = 0;
             for (int i = 0; i < visited.length; ++i) {
                 frac += (visited[i] ? 1 : 0);
-                bw.write("branch " + i + " was " + (visited[i] ? " visited." : " not visited.") + "\n");
+                bw.write("branch " + i + " was" + (visited[i] ? " visited." : " not visited.") + "\n");
             }
             bw.write("" + frac / visited.length);
             bw.close();
         } catch (Exception e) {
             System.err.println("ye");
         }
-        return sb.toString().trim();
     }
 
     @Override
