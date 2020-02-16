@@ -1,4 +1,4 @@
-package org.jabref.gui.citationmetadata;
+package org.jabref.gui.referencemetadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 /**
  * This action triggers fetching current citation metadata (e.g. citation counts) from the web for the currently selected entries in a library.
  */
-public class FetchCitationMetadata extends SimpleCommand {
+public class FetchReferenceMetadata extends SimpleCommand {
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -41,7 +41,7 @@ public class FetchCitationMetadata extends SimpleCommand {
     private UndoManager undoManager;
     private TaskExecutor taskExecutor;
 
-    public FetchCitationMetadata(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public FetchReferenceMetadata(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;
@@ -59,7 +59,7 @@ public class FetchCitationMetadata extends SimpleCommand {
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Fetch citation counts"));
 
-        Task<List<BibEntry>> fetchCitationMetadataTask = new Task<List<BibEntry>>() {
+        Task<List<BibEntry>> fetchReferenceMetadataTask = new Task<List<BibEntry>>() {
 
             @Override
             protected List<BibEntry> call() {
@@ -152,7 +152,7 @@ public class FetchCitationMetadata extends SimpleCommand {
         dialogService.showProgressDialogAndWait(
                 Localization.lang("Fetching citation counts online"),
                 Localization.lang("Querying citations counts..."),
-                fetchCitationMetadataTask);
-        taskExecutor.execute(fetchCitationMetadataTask);
+                fetchReferenceMetadataTask);
+        taskExecutor.execute(fetchReferenceMetadataTask);
     }
 }
