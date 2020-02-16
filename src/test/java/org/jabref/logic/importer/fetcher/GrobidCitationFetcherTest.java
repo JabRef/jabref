@@ -4,14 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -21,61 +18,40 @@ import static org.mockito.Mockito.mock;
 @FetcherTest
 public class GrobidCitationFetcherTest {
 
-    static ImportFormatPreferences importFormatPreferences;
-    static FileUpdateMonitor fileUpdateMonitor;
-    static GrobidCitationFetcher grobidCitationFetcher;
+    static ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences);
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
-    static String example1AsBibtex = "@article{-1,\n" +
-            "author\t=\t\"T Derwing and M Rossiter and M Munro\",\n" +
-            "title\t=\t\"Teaching native speakers to listen to foreign-accented speech\",\n" +
-            "journal\t=\t\"Journal of Multilingual and Multicultural Development\",\n" +
-            "year\t=\t\"2002\",\n" +
-            "pages\t=\t\"245--259\",\n" +
-            "volume\t=\t\"23\",\n" +
-            "number\t=\t\"4\"\n" +
-            "}";
+    static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCiteKey("-1")
+                .withField(StandardField.AUTHOR, "T Derwing and M Rossiter and M Munro")
+                .withField(StandardField.TITLE, "Teaching native speakers to listen to foreign-accented speech")
+                .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
+                .withField(StandardField.YEAR, "2002")
+                .withField(StandardField.PAGES, "245--259")
+                .withField(StandardField.VOLUME, "23")
+                .withField(StandardField.NUMBER, "4");
     static String example2 = "Thomas, H. K. (2004). Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation). University of Colorado, Boulder.";
-    static String example2AsBibtex = "@misc{-1,\n" +
-            "author\t=\t\"H Thomas\",\n" +
-            "title\t=\t\"Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)\",\n"
-            +
-            "year\t=\t\"2004\",\n" +
-            "address\t=\t\"Boulder\"\n" +
-            "}";
+    static BibEntry example2AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
+            .withField(StandardField.AUTHOR, "H Thomas")
+            .withField(StandardField.TITLE, "Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)")
+            .withField(StandardField.YEAR, "2004")
+            .withField(StandardField.ADDRESS, "Boulder");
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
-    static String example3AsBibtex = "@misc{-1,\n" +
-            "author\t=\t\"J Turk and P Graham and F Verhulst\",\n" +
-            "title\t=\t\"Child and adolescent psychiatry : A developmental approach\",\n" +
-            "publisher\t=\t\"Oxford University Press\",\n" +
-            "year\t=\t\"2007\",\n" +
-            "address\t=\t\"Oxford, England\"\n" +
-            "}";
+    static BibEntry example3AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
+            .withField(StandardField.AUTHOR, "J Turk and P Graham and F Verhulst")
+            .withField(StandardField.TITLE, "Child and adolescent psychiatry : A developmental approach")
+            .withField(StandardField.PUBLISHER, "Oxford University Press")
+            .withField(StandardField.YEAR, "2007")
+            .withField(StandardField.ADDRESS, "Oxford, England");
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
-    static String example4AsBibtex = "@article{-1,\n" +
-            "author\t=\t\"I Carr and R Kidner\",\n" +
-            "booktitle\t=\t\"Statutes and conventions on international trade law\",\n" +
-            "publisher\t=\t\"Cavendish\",\n" +
-            "year\t=\t\"2003\",\n" +
-            "address\t=\t\"London, England\"\n" +
-            "}";
+    static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.Article).withCiteKey("-1")
+            .withField(StandardField.AUTHOR, "I Carr and R Kidner")
+            .withField(StandardField.BOOKTITLE, "Statutes and conventions on international trade law")
+            .withField(StandardField.PUBLISHER, "Cavendish")
+            .withField(StandardField.YEAR, "2003")
+            .withField(StandardField.ADDRESS, "London, England");
     static String invalidInput1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________";
     static String invalidInput2 = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
-    static BibEntry example1AsBibEntry;
-    static BibEntry example2AsBibEntry;
-    static BibEntry example3AsBibEntry;
-    static BibEntry example4AsBibEntry;
-
-    @BeforeAll
-    public static void setup() throws ParseException {
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        fileUpdateMonitor = new DummyFileUpdateMonitor();
-        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences);
-        example1AsBibEntry = BibtexParser.singleFromString(example1AsBibtex, importFormatPreferences, fileUpdateMonitor).get();
-        example2AsBibEntry = BibtexParser.singleFromString(example2AsBibtex, importFormatPreferences, fileUpdateMonitor).get();
-        example3AsBibEntry = BibtexParser.singleFromString(example3AsBibtex, importFormatPreferences, fileUpdateMonitor).get();
-        example4AsBibEntry = BibtexParser.singleFromString(example4AsBibtex, importFormatPreferences, fileUpdateMonitor).get();
-    }
 
     @Test
     public void grobidPerformSearchCorrectResultTest() {
