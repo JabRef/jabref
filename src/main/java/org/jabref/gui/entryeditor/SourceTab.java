@@ -33,9 +33,9 @@ import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
-    private final LatexFieldFormatterPreferences fieldFormatterPreferences;
+    private final FieldWriterPreferences fieldWriterPreferences;
     private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
@@ -100,13 +100,13 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
-        this.fieldFormatterPreferences = fieldFormatterPreferences;
+        this.fieldWriterPreferences = fieldWriterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
@@ -137,10 +137,10 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
+    private static String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
-        new BibEntryWriter(formatter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
+        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
@@ -220,7 +220,7 @@ public class SourceTab extends EntryEditorTab {
         DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
             codeArea.clear();
             try {
-                codeArea.appendText(getSourceString(currentEntry, mode, fieldFormatterPreferences));
+                codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
                 highlightSearchPattern();
             } catch (IOException ex) {
                 codeArea.setEditable(false);
@@ -240,6 +240,7 @@ public class SourceTab extends EntryEditorTab {
 
         updateCodeArea();
 
+        entry.typeProperty().addListener(listener -> updateCodeArea());
         entry.getFieldsObservable().addListener((InvalidationListener) listener -> updateCodeArea());
     }
 
@@ -300,7 +301,7 @@ public class SourceTab extends EntryEditorTab {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(fieldFormatterPreferences).format(newValue, fieldName);
+                    new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
 
                     compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
                     outOfFocusEntry.setField(fieldName, newValue);

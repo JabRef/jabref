@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" default-locale="en-US">
   <info>
-    <title>Canadian Guide to Uniform Legal Citation 7th edition (McGill Guide)</title>
+    <title>Canadian Guide to Uniform Legal Citation 9th edition (McGill Guide)</title>
     <id>http://www.zotero.org/styles/mcgill-en</id>
     <link href="http://www.zotero.org/styles/mcgill-en" rel="self"/>
-    <link href="http://www.lawjournal.mcgill.ca/en/text/22" rel="documentation"/>
+    <link href="https://lawjournal.mcgill.ca/cite-guide" rel="documentation"/>
     <author>
       <name>Liam McHugh-Russell</name>
       <email>liam.mchugh.russell@gmail.com</email>
@@ -17,9 +17,14 @@
       <email>f.martin-bariteau@umontreal.ca</email>
       <uri>http://f-mb.github.io/cslegal/</uri>
     </contributor>
+    <contributor>
+      <name>Gareth Spanglett</name>
+      <email>gspanglett@gmail.com</email>
+      <uri>https://gspanglett.github.io</uri>
+    </contributor>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2014-06-28T19:23:00+00:00</updated>
+    <updated>2020-01-06T22:32:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -34,22 +39,19 @@
       <term name="ordinal-12">th</term>
       <term name="ordinal-13">th</term>
       <term name="paragraph" form="short">
-        <single>para</single>
-        <multiple>paras</multiple>
+        <single>at para</single>
+        <multiple>at paras</multiple>
       </term>
-      <!-- the usual workaround for inserting "Art" or "Arts" (article) pinpointers is to type the term directly into the pinpoint box, and to use sub verbo for a blank pinpointer. However, for clarity and compliance, this functionality needs to be activated by the user by taking the element below out of documentation
-      <term name="sub verbo" form="short">
-        <single/>
-        <multiple/>
-      </term>
+      <!-- the usual workaround for inserting "Art" or "Arts" (article) pinpointers is to type the term directly into the pinpoint box and to use sub verbo for a blank pinpointer. However for clarity and compliance this functionality needs to be activated by the user by taking the element below out of documentation
+      <term name="sub verbo" form="short"><single/><multiple/></term>
       -->
       <term name="section" form="short">
         <single>s</single>
         <multiple>ss</multiple>
       </term>
       <term name="chapter" form="short">
-        <single>ch</single>
-        <multiple>chs</multiple>
+        <single>c</single>
+        <multiple>cs</multiple>
       </term>
     </terms>
   </locale>
@@ -106,12 +108,16 @@
       <date-part name="year" form="long"/>
     </date>
   </macro>
+  <macro name="submitted-long">
+    <date variable="submitted" delimiter=" ">
+      <date-part name="day"/>
+      <date-part name="month" form="long"/>
+      <date-part name="year" form="long"/>
+    </date>
+  </macro>
   <macro name="edition">
     <number variable="edition" form="ordinal" text-case="lowercase" suffix=" "/>
     <text term="edition" form="short" strip-periods="true"/>
-  </macro>
-  <macro name="references">
-    <text variable="references"/>
   </macro>
   <macro name="series-info">
     <group delimiter=" ">
@@ -139,7 +145,7 @@
     </choose>
   </macro>
   <!-- the 'rendering' macros mostly check if called from w/i bibliography so that author gets printed
-    right. Only actually need to check for 'first' because w/i cite,
+    right. Only actually need to check for 'first' because w/i cite
 all the other tests should have been done... -->
   <macro name="render-chapter">
     <group delimiter=" ">
@@ -148,7 +154,7 @@ all the other tests should have been done... -->
       <text macro="editor" strip-periods="true" suffix=","/>
       <text macro="container-title" font-style="italic"/>
     </group>
-    <text macro="series-info" prefix=", "/>
+    <text macro="series-info" prefix=" "/>
     <text macro="edition" prefix=", "/>
     <text macro="publisher-place-year"/>
     <text variable="page-first" prefix=" "/>
@@ -162,7 +168,8 @@ all the other tests should have been done... -->
         <text variable="issue"/>
       </group>
       <text macro="container-title"/>
-      <text variable="page-first"/>
+      <text variable="collection-title" prefix="(" suffix=") "/>
+      <text variable="page"/>
     </group>
     <text macro="internet-location"/>
   </macro>
@@ -178,7 +185,13 @@ all the other tests should have been done... -->
   </macro>
   <macro name="render-report">
     <group delimiter=", ">
+      <text variable="archive_location"/>
+      <text variable="archive"/>
       <text variable="title" font-style="italic"/>
+      <text variable="genre"/>
+      <text macro="author-note" strip-periods="true" prefix="by "/>
+      <text variable="source"/>
+      <text variable="call-number"/>
       <group delimiter=" ">
         <text variable="collection-title" strip-periods="true"/>
         <text macro="genre"/>
@@ -206,7 +219,7 @@ all the other tests should have been done... -->
   </macro>
   <macro name="render-article-magazine">
     <group delimiter=" ">
-      <text variable="title" quotes="true" suffix=","/>
+      <text variable="title" quotes="true" suffix=""/>
       <text macro="container-title" font-style="italic"/>
       <text macro="issued-long" prefix="(" suffix=")"/>
       <text variable="page-first"/>
@@ -226,15 +239,68 @@ all the other tests should have been done... -->
   </macro>
   <!-- cases and bill legislations render the same for biblio and (first) cite -->
   <macro name="render-bill">
+    <group delimiter=", ">
+      <choose>
+        <if variable="container-title" match="none">
+          <!-- if no volume, assume bill -->
+          <text variable="publisher-place"/>
+          <text variable="authority"/>
+          <text variable="section"/>
+          <text variable="chapter-number"/>
+          <group delimiter=" ">
+            <text variable="title" font-style="italic"/>
+            <text variable="references" prefix="(" suffix=")"/>
+          </group>
+          <text variable="number-of-volumes"/>
+          <text variable="number"/>
+          <group delimiter=" ">
+            <text variable="number"/>
+            <text macro="issued-long" prefix="(" suffix=")"/>
+          </group>
+        </if>
+        <else>
+          <text variable="number" prefix="Bill "/>
+          <group delimiter=" ">
+            <text variable="title" font-style="italic"/>
+            <text variable="references" prefix="(" suffix=")"/>
+          </group>
+          <text variable="chapter-number"/>
+          <text variable="authority"/>
+          <group delimiter=" ">
+            <date form="text" variable="issued" date-parts="year"/>
+          </group>
+          <text variable="section"/>
+        </else>
+      </choose>
+    </group>
+  </macro>
+  <macro name="render-patent">
     <group delimiter=" ">
-      <group delimiter=", ">
-        <text variable="title" font-style="italic"/>
-        <text macro="author-note" strip-periods="true"/>
-        <text macro="issued-long"/>
-        <text macro="container-title"/>
-      </group>
-      <text macro="references" prefix="(" suffix=")"/>
-      <text variable="title" prefix="[" suffix="]" font-style="italic" form="short"/>
+      <text variable="title" quotes="true" suffix=","/>
+      <text variable="publisher-place"/>
+      <text variable="number" prefix="Patent No "/>
+      <text variable="references" prefix=", PCT Patent No "/>
+      <text macro="submitted-long" prefix="(" suffix=")"/>
+    </group>
+  </macro>
+  <macro name="render-song">
+    <group delimiter=" ">
+      <text variable="title" quotes="true"/>
+      <text variable="medium" prefix="(" suffix=")"/>
+      <text macro="author-note" strip-periods="true" suffix=","/>
+      <text variable="publisher-place"/>
+      <text variable="call-number"/>
+      <text macro="issued-long" prefix="(" suffix=")"/>
+    </group>
+  </macro>
+  <macro name="render-manuscript">
+    <group delimiter=" ">
+      <text variable="title" quotes="true"/>
+      <text variable="medium" prefix="(" suffix=")"/>
+      <text macro="author-note" strip-periods="true" suffix=","/>
+      <text variable="publisher-place"/>
+      <text variable="call-number"/>
+      <text macro="issued-long" prefix="(" suffix=")"/>
     </group>
   </macro>
   <macro name="render-case">
@@ -251,7 +317,6 @@ all the other tests should have been done... -->
           <text variable="container-title" strip-periods="true" font-style="italic"/>
           <text variable="volume"/>
           <text variable="page"/>
-          <text variable="note"/>
         </group>
       </if>
       <else-if variable="title" match="none">
@@ -266,7 +331,6 @@ all the other tests should have been done... -->
           <text variable="container-title" strip-periods="true" font-style="italic"/>
           <text variable="volume"/>
           <text variable="page"/>
-          <text variable="note"/>
         </group>
       </else-if>
       <else>
@@ -284,14 +348,13 @@ all the other tests should have been done... -->
             <text variable="volume" suffix=" "/>
             <text variable="container-title" suffix=" " strip-periods="true"/>
             <text variable="page"/>
-            <text variable="authority" prefix=" (" suffix=")" strip-periods="true"/>
+            <!-- COMMENTED OUT FOR 9TH ED  <text variable="authority" prefix=" (" suffix=")" strip-periods="true"/> -->
           </else>
         </choose>
-        <text variable="note" prefix=", "/>
-        <text variable="references" prefix=" (" suffix=")"/>
+        <!-- <text variable="references" prefix=", "/> -->
       </else>
     </choose>
-    <text variable="URL" prefix=" (available on " suffix=")"/>
+    <!-- COMMENTED OUT FOR 9TH ED  <text variable="URL" prefix=" (available on " suffix=")"/> -->
   </macro>
   <macro name="pinpoint">
     <group delimiter=" ">
@@ -304,7 +367,7 @@ all the other tests should have been done... -->
           </choose>
         </if>
         <else>
-          <label variable="locator" plural="contextual" form="short" strip-periods="true" prefix=", "/>
+          <label variable="locator" plural="contextual" form="short" strip-periods="true" prefix=" "/>
         </else>
       </choose>
       <text variable="locator"/>
@@ -312,7 +375,7 @@ all the other tests should have been done... -->
   </macro>
   <macro name="short-form">
     <!-- Hump to overcome: cannot check against existence of short title.
-Not implemented: "cited to" for cases, construct short casenames, adding ref to article -->
+Not implemented: "cited to" for cases construct short casenames adding ref to article -->
     <choose>
       <if type="bill legal_case legislation" match="none">
         <names variable="author">
@@ -330,11 +393,11 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
             <choose>
               <if variable="author">
                 <text variable="authority" suffix=", "/>
-                <date form="numeric" variable="issued" suffix=", "/>
+                <date form="numeric" variable="issued" suffix=" "/>
               </if>
               <else-if variable="title" match="none">
                 <text variable="authority" suffix=", "/>
-                <date form="numeric" variable="issued" suffix=", "/>
+                <date form="numeric" variable="issued" suffix=" "/>
               </else-if>
             </choose>
           </if>
@@ -353,7 +416,7 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
     </group>
   </macro>
   <citation et-al-min="4" et-al-use-first="1">
-    <!-- translator needs to be added for chapter, book, film etc. chapter? -->
+    <!-- translator needs to be added for chapter book film etc. chapter? -->
     <layout delimiter="; " suffix=".">
       <choose>
         <!-- Not implemented: ibid only needs capitalize-first if it's the first word in a footnote -->
@@ -385,8 +448,20 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
                 <if type="bill legislation" match="any">
                   <text macro="render-bill"/>
                 </if>
+                <else-if type="song" match="any">
+                  <text macro="render-song"/>
+                </else-if>
+                <else-if type="patent" match="any">
+                  <text macro="render-patent"/>
+                </else-if>
+                <else-if type="manuscript" match="any">
+                  <text macro="render-manuscript"/>
+                </else-if>
                 <else-if type="legal_case">
                   <text macro="render-case"/>
+                </else-if>
+                <else-if type="report">
+                  <text macro="render-report"/>
                 </else-if>
                 <else>
                   <text macro="author-note" strip-periods="true"/>
@@ -412,9 +487,7 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
                     <else-if type="book">
                       <text macro="render-book"/>
                     </else-if>
-                    <else-if type="report">
-                      <text macro="render-report"/>
-                    </else-if>
+                    <!--                    <else-if type="song" match="any"><text macro="render-song"/></else-if><else-if type="patent" match="any"><text macro="render-patent"/></else-if><else-if type="manuscript" match="any"><text macro="render-manuscript"/></else-if> -->
                     <else>
                       <group delimiter=" ">
                         <group delimiter=", ">
@@ -430,6 +503,13 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
               </choose>
             </group>
             <text macro="pinpoint"/>
+            <text variable="note" prefix=", "/>
+            <choose>
+              <if type="legal_case" match="any">
+                <text variable="references" prefix=", "/>
+              </if>
+            </choose>
+            <text variable="title-short" prefix=" [" suffix="]" font-style="italic"/>
           </group>
         </else>
       </choose>
@@ -439,6 +519,7 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
     <sort>
       <key macro="sort-by-type"/>
       <key macro="author-bib"/>
+      <key variable="title"/>
       <key variable="issued"/>
     </sort>
     <layout suffix=".">
@@ -480,6 +561,15 @@ Not implemented: "cited to" for cases, construct short casenames, adding ref to 
               </else-if>
               <else-if type="report">
                 <text macro="render-report"/>
+              </else-if>
+              <else-if type="patent">
+                <text macro="render-patent"/>
+              </else-if>
+              <else-if type="song">
+                <text macro="render-song"/>
+              </else-if>
+              <else-if type="manuscript">
+                <text macro="render-manuscript"/>
               </else-if>
               <else>
                 <group>

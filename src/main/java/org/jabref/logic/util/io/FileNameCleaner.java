@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * This class is based on http://stackoverflow.com/a/5626340/873282
- *
+ * extended with LEFT CURLY BRACE and RIGHT CURLY BRACE
  * Replaces illegal characters in given file paths.
  */
 public class FileNameCleaner {
@@ -21,7 +21,7 @@ public class FileNameCleaner {
             42,
             58,
             60, 62, 63,
-            124
+            123, 124, 125
     };
     // @formatter:on
 

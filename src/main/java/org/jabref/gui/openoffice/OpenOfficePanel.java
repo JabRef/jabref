@@ -48,7 +48,6 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -270,8 +269,18 @@ public class OpenOfficePanel {
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
         hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
 
+        VBox row1 = new VBox();
+        VBox row2 = new VBox();
+        VBox row3 = new VBox();
+        row1.getChildren().addAll(setStyleFile,pushEntries, pushEntriesInt);
+        row2.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
+        row3.getChildren().addAll(manageCitations, exportCitations, settingsB);
+        HBox hbox1 =  new HBox();
+        hbox1.getChildren().addAll(row1,row2,row3);
+        hbox1.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
+
         vbox.setFillWidth(true);
-        vbox.getChildren().addAll(hbox, setStyleFile, pushEntries, pushEntriesInt, pushEntriesAdvanced, pushEntriesEmpty, merge, manageCitations, exportCitations, settingsB);
+        vbox.getChildren().addAll(hbox, hbox1);
     }
 
     private void exportEntries() {
@@ -295,8 +304,7 @@ public class OpenOfficePanel {
 
             }
 
-            Defaults defaults = new Defaults(jabRefPreferences.getDefaultBibDatabaseMode());
-            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
+            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
             this.frame.addTab(databaseContext, true);
 
         } catch (BibEntryNotFoundException ex) {
@@ -435,7 +443,6 @@ public class OpenOfficePanel {
             jarURLs.add((jarPath.get().toUri().toURL()));
         }
         return jarURLs;
-      
     }
 
     private OOBibBase createBibBase(List<URL> jarUrls) throws IOException, InvocationTargetException, IllegalAccessException,

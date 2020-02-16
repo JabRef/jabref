@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.field.Field;
@@ -13,7 +13,7 @@ import org.jabref.model.entry.field.Field;
 public class EntryEditorPreferences {
 
     private final Map<String, Set<Field>> entryEditorTabList;
-    private final LatexFieldFormatterPreferences latexFieldFormatterPreferences;
+    private final FieldWriterPreferences fieldWriterPreferences;
     private final ImportFormatPreferences importFormatPreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final List<Field> customTabFieldNames;
@@ -24,9 +24,9 @@ public class EntryEditorPreferences {
     private boolean avoidOverwritingCiteKey;
     private final boolean shouldShowLatexCitationsTab;
 
-    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, LatexFieldFormatterPreferences latexFieldFormatterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
-        this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
+        this.fieldWriterPreferences = fieldWriterPreferences;
         this.importFormatPreferences = importFormatPreferences;
         this.customTabFieldNames = customTabFieldNames;
         this.shouldShowRecommendationsTab = shouldShowRecommendationsTab;
@@ -42,8 +42,8 @@ public class EntryEditorPreferences {
         return entryEditorTabList;
     }
 
-    public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
-        return latexFieldFormatterPreferences;
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return fieldWriterPreferences;
     }
 
     public ImportFormatPreferences getImportFormatPreferences() {

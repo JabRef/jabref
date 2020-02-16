@@ -5,23 +5,23 @@ import java.util.List;
 
 import org.jabref.model.entry.field.Field;
 
-public class LatexFieldFormatterPreferences {
+public class FieldWriterPreferences {
 
     private final boolean resolveStringsAllFields;
     private final List<Field> doNotResolveStringsFor;
     private final int lineLength = 65; // Constant
-    private final FieldContentParserPreferences fieldContentParserPreferences;
+    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
 
-    public LatexFieldFormatterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
-                                          FieldContentParserPreferences fieldContentParserPreferences) {
+    public FieldWriterPreferences(boolean resolveStringsAllFields, List<Field> doNotResolveStringsFor,
+                                  FieldContentFormatterPreferences fieldContentFormatterPreferences) {
         this.resolveStringsAllFields = resolveStringsAllFields;
         this.doNotResolveStringsFor = doNotResolveStringsFor;
-        this.fieldContentParserPreferences = fieldContentParserPreferences;
+        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
 
-    public LatexFieldFormatterPreferences() {
+    public FieldWriterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
-        this(true, Collections.emptyList(), new FieldContentParserPreferences());
+        this(true, Collections.emptyList(), new FieldContentFormatterPreferences());
     }
 
     public boolean isResolveStringsAllFields() {
@@ -36,7 +36,7 @@ public class LatexFieldFormatterPreferences {
         return lineLength;
     }
 
-    public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return fieldContentParserPreferences;
+    public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
+        return fieldContentFormatterPreferences;
     }
 }

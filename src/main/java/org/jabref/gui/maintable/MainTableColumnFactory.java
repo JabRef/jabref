@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -22,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -82,6 +84,9 @@ class MainTableColumnFactory {
         preferences.getColumns().forEach(column -> {
 
             switch (column.getType()) {
+                case INDEX:
+                    columns.add(createIndexColumn(column));
+                    break;
                 case GROUPS:
                     columns.add(createGroupColumn(column));
                     break;
@@ -123,6 +128,24 @@ class MainTableColumnFactory {
         column.setMinWidth(width);
         column.setPrefWidth(width);
         column.setMaxWidth(width);
+    }
+
+    /**
+     * Creates a column with a continous number
+     */
+    private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
+        TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
+        Node header = new Text("#");
+        Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
+        column.setGraphic(header);
+        column.setStyle("-fx-alignment: CENTER-RIGHT;");
+        column.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(
+                String.valueOf(cellData.getTableView().getItems().indexOf(cellData.getValue()) + 1)));
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                .withText(text -> text)
+                .install(column);
+        column.setSortable(false);
+        return column;
     }
 
     /**

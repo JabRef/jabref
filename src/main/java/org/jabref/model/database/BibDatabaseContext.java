@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.model.Defaults;
 import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
@@ -27,7 +26,6 @@ import org.jabref.model.metadata.MetaData;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private final Defaults defaults;
     private MetaData metaData;
 
     /**
@@ -40,36 +38,26 @@ public class BibDatabaseContext {
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
-        this(new Defaults());
-    }
-
-    public BibDatabaseContext(Defaults defaults) {
-        this(new BibDatabase(), defaults);
+        this(new BibDatabase());
     }
 
     public BibDatabaseContext(BibDatabase database) {
-        this(database, new Defaults());
+        this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, Defaults defaults) {
-        this(database, new MetaData(), defaults);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
-        this.defaults = Objects.requireNonNull(defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
         this.file = Optional.empty();
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this(database, metaData, new Defaults());
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
+        this(database, metaData, file, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults,
-                              DatabaseLocation location) {
-        this(database, metaData, defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, DatabaseLocation location) {
+        this(database, metaData);
         Objects.requireNonNull(location);
         this.file = Optional.ofNullable(file);
 
@@ -78,27 +66,8 @@ public class BibDatabaseContext {
         }
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults) {
-        this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
-        this(database, metaData, file, new Defaults());
-    }
-
     public BibDatabaseMode getMode() {
-        Optional<BibDatabaseMode> mode = metaData.getMode();
-
-        if (!mode.isPresent()) {
-            BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
-            BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
-            if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                newMode = BibDatabaseMode.BIBLATEX;
-            }
-            this.setMode(newMode);
-            return newMode;
-        }
-        return mode.get();
+        return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {

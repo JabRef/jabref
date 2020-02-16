@@ -65,26 +65,17 @@
   </macro>
   <macro name="journal-title">
     <choose>
-      <if type="article-journal article-magazine" match="any">
-        <text variable="container-title" suffix=" "/>
+      <if type="article-journal" match="any">
+        <text variable="container-title" suffix=" " form="short" strip-periods="true"/>
       </if>
       <else>
-        <text variable="container-title" suffix=". " form="short"/>
+        <text variable="container-title" suffix=". "/>
       </else>
     </choose>
   </macro>
   <macro name="title">
     <group delimiter=" ">
       <text variable="title"/>
-      <choose>
-        <if type="article-journal article-magazine" match="none">
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
-        </if>
-      </choose>
       <choose>
         <if type="thesis">
           <text variable="genre" prefix="[" suffix="]"/>

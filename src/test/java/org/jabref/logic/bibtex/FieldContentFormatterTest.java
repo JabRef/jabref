@@ -11,18 +11,18 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FieldContentParserTest {
+class FieldContentFormatterTest {
 
-    private FieldContentParser parser;
+    private FieldContentFormatter parser;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        FieldContentParserPreferences prefs = new FieldContentParserPreferences(Collections.emptyList());
-        parser = new FieldContentParser(prefs);
+    void setUp() throws Exception {
+        FieldContentFormatterPreferences preferences = new FieldContentFormatterPreferences(Collections.emptyList());
+        parser = new FieldContentFormatter(preferences);
     }
 
     @Test
-    public void unifiesLineBreaks() {
+    void unifiesLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
         String expected = "I\nunify\nline\nbreaks.".replace("\n", OS.NEWLINE);
         String processed = parser.format(new StringBuilder(original), StandardField.ABSTRACT);
@@ -31,7 +31,7 @@ public class FieldContentParserTest {
     }
 
     @Test
-    public void retainsWhitespaceForMultiLineFields() {
+    void retainsWhitespaceForMultiLineFields() {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
         String formatted = original.replace("\n", OS.NEWLINE);
 
@@ -43,7 +43,7 @@ public class FieldContentParserTest {
     }
 
     @Test
-    public void removeWhitespaceFromNonMultiLineFields() {
+    void removeWhitespaceFromNonMultiLineFields() {
         String original = "I\nshould\nnot\ninclude\nadditional\nwhitespaces  \nor\n\ttabs.";
         String expected = "I should not include additional whitespaces or tabs.";
 

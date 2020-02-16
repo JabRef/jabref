@@ -15,10 +15,15 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
+
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
@@ -30,7 +35,13 @@ public class Linux implements NativeDesktop {
             viewer = "xdg-open";
         }
         String[] cmdArray = { viewer, filePath };
-        Runtime.getRuntime().exec(cmdArray);
+        Process p = Runtime.getRuntime().exec(cmdArray);
+        // When the stream is full at some point, then blocks the execution of the program
+        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        String line;
+        line = in.readLine();
+        LOGGER.debug("Received output: " + line);
     }
 
     @Override
@@ -46,7 +57,13 @@ public class Linux implements NativeDesktop {
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
-        Runtime.getRuntime().exec(cmdArray);
+        Process p = Runtime.getRuntime().exec(cmdArray);
+        // When the stream is full at some point, then blocks the execution of the program
+        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
+        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+        String line;
+        line = in.readLine();
+        LOGGER.debug("Received output: " + line);
     }
 
     @Override

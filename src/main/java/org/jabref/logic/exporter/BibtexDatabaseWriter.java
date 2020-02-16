@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -85,9 +85,9 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
             writer.write("{}");
         } else {
             try {
-                String formatted = new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
-                        .format(bibtexString.getContent(),
-                                InternalField.BIBTEX_STRING);
+                String formatted = new FieldWriter(preferences.getFieldWriterPreferences())
+                        .write(InternalField.BIBTEX_STRING, bibtexString.getContent()
+                        );
                 writer.write(formatted);
             } catch (InvalidFieldValueException ex) {
                 throw new IOException(ex);
@@ -129,8 +129,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()), entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldWriterPreferences()), entryTypesManager);
         bibtexEntryWriter.write(entry, writer, mode, preferences.isReformatFile());
     }
 }
