@@ -306,21 +306,6 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
-        actions.put(Actions.OPEN_EXTERNAL_FILE, this::openExternalFile);
-
-        actions.put(Actions.OPEN_FOLDER, () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
-            for (final Path f : files) {
-                try {
-                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
-                } catch (IOException e) {
-                    LOGGER.info("Could not open folder", e);
-                }
-            }
-        }));
-
-        actions.put(Actions.OPEN_CONSOLE, () -> JabRefDesktop.openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
-
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
@@ -540,37 +525,6 @@ public class BasePanel extends StackPane {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
             }
         }
-    }
-
-    private void openExternalFile() {
-        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-        if (selectedEntries.size() != 1) {
-            output(Localization.lang("This operation requires exactly one item to be selected."));
-            return;
-        }
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            final BibEntry entry = selectedEntries.get(0);
-            if (!entry.hasField(StandardField.FILE)) {
-                // no bibtex field
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-
-            List<LinkedFile> files = new ArrayList<>();
-            entry.getField(StandardField.FILE).map(FileFieldParser::parse).ifPresent(files::addAll);
-
-            if (files.isEmpty()) {
-                // content in BibTeX field is not readable
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-            LinkedFile flEntry = files.get(0);
-            try {
-                JabRefDesktop.openExternalFileAnyFormat(this.getBibDatabaseContext(), flEntry.getLink(), ExternalFileTypes.getInstance().fromLinkedFile(flEntry, true));
-            } catch (IOException ex) {
-                dialogService.showErrorDialogAndWait(ex);
-            }
-        });
     }
 
     /**
@@ -1074,47 +1028,6 @@ public class BasePanel extends StackPane {
 
     public void cut() {
         mainTable.cut();
-    }
-
-    private static class SearchAndOpenFile {
-
-        private final BibEntry entry;
-        private final BasePanel basePanel;
-
-        public SearchAndOpenFile(final BibEntry entry, final BasePanel basePanel) {
-            this.entry = entry;
-            this.basePanel = basePanel;
-        }
-
-        public void searchAndOpen() {
-            if (!Globals.prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH)) {
-                /*  The search can lead to an unexpected 100% CPU usage which is perceived
-                    as a bug, if the search incidentally starts at a directory with lots
-                    of stuff below. It is now disabled by default. */
-                return;
-            }
-
-            final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
-            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
-
-            // Run the search operation:
-            FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
-            try {
-                List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
-                if (!files.isEmpty()) {
-                    Path file = files.get(0);
-                    Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(file, basePanel.getBibDatabaseContext(), type);
-                        basePanel.output(Localization.lang("External viewer called") + '.');
-                    }
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Problems with finding/or opening files ", ex);
-                basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
-            }
-        }
     }
 
     private class GroupTreeListener {

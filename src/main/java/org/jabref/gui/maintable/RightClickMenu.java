@@ -10,6 +10,9 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.OpenExternalFileAction;
+import org.jabref.gui.OpenFolderAction;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
@@ -27,11 +30,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
 
 public class RightClickMenu {
 
-    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, DialogService dialogService) {
+    public static ContextMenu create(BibEntryTableViewModel entry, KeyBindingRepository keyBindingRepository, BasePanel panel, DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
@@ -58,8 +62,8 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_FOLDER, getOpenFolderCommand(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, getOpenExternalFileCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferencesService)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferencesService)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_URL, getOpenUrlCommand(panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
@@ -87,18 +91,6 @@ public class RightClickMenu {
     private static OldCommandWrapper getOpenUrlCommand(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_URL, panel);
         command.setExecutable(isFieldSetForSelectedEntry(StandardField.URL, panel) || isFieldSetForSelectedEntry(StandardField.DOI, panel));
-        return command;
-    }
-
-    private static OldCommandWrapper getOpenExternalFileCommand(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_EXTERNAL_FILE, panel);
-        command.setExecutable(isFieldSetForSelectedEntry(StandardField.FILE, panel));
-        return command;
-    }
-
-    private static OldCommandWrapper getOpenFolderCommand(BasePanel panel) {
-        OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_FOLDER, panel);
-        command.setExecutable(isFieldSetForSelectedEntry(StandardField.FILE, panel));
         return command;
     }
 
