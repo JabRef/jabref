@@ -17,7 +17,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v1
       with:
-        java-version: 13
+        java-version: 13.0.2
     - name: Look for outdated dependencies
       run: ./gradlew -q checkOutdatedDependencies
     - name: Report issues

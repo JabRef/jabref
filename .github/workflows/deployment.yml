@@ -23,17 +23,17 @@ jobs:
         include:
          - os: ubuntu-latest
            displayName: linux
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_linux-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_windows-x64_bin.zip
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_windows-x64_bin.zip
            jdk14Path: /jdk-14
            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_osx-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
@@ -63,7 +63,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 13.0.2
       # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         name: Restore gradle cache
