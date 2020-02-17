@@ -11,6 +11,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.websocket.handlers.HandlerCmdRegister;
+import org.jabref.websocket.handlers.HandlerInfoGoogleScholarCitationCounts;
+import org.jabref.websocket.handlers.HandlerInfoGoogleScholarSolvingCaptchaNeeded;
+import org.jabref.websocket.handlers.HandlerInfoMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
@@ -89,11 +94,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Subscribes a new <code>WsClient</code>, if no <code>WsClient</code> has already subscribed with the given <code>websocket</code> object.
+     * Registers a new <code>WsClient</code>, if no <code>WsClient</code> has already registered with the given <code>websocket</code> object.
      *
-     * @return <code>true</code>, if the subscription was successful, <code>false</code> otherwise
+     * @return <code>true</code>, if the registration was successful, <code>false</code> otherwise
      */
-    private boolean subscribeWsClient(WsClientType wsClientType, WebSocket websocket) {
+    public boolean registerWsClient(WsClientType wsClientType, WebSocket websocket) {
         if (websocket == null) {
             return false;
         }
@@ -110,12 +115,12 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Unsubscribes an existing <code>WsClient</code>, which has the associated <code>websocket</code> object, if a subscription exists.
+     * Deregisters an existing <code>WsClient</code>, which has the associated <code>websocket</code> object, if a registration exists.
      *
      * @param websocket
-     * @return <code>true</code>, if a <code>WsClient</code> could be unsubscribed, <code>false</code> otherwise
+     * @return <code>true</code>, if a <code>WsClient</code> could be registered, <code>false</code> otherwise
      */
-    private boolean unsubscribeWsClient(WebSocket websocket) {
+    private boolean deregisterWsClient(WebSocket websocket) {
         if (websocket == null) {
             return false;
         }
@@ -204,7 +209,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
     public void onClose(WebSocket websocket, int code, String reason, boolean remote) {
         synchronized (SYNC_OBJECT) {
             System.out.println("[ws] @onClose: " + websocket + " has disconnected.");
-            unsubscribeWsClient(websocket);
+            deregisterWsClient(websocket);
         }
     }
 
@@ -294,7 +299,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             JsonObject jsonMessage = new Gson().fromJson(message, JsonObject.class);
 
             String action = jsonMessage.get("action").getAsString();
-            JsonObject payload = jsonMessage.getAsJsonObject("payload");
+            JsonObject messagePayload = jsonMessage.getAsJsonObject("payload");
 
             if (!WsAction.isValidWsAction(action)) {
                 System.out.println("[ws] unknown WsAction received: " + action);
@@ -302,17 +307,20 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 return;
             }
 
-            if (WsAction.CMD_SUBSCRIBE.equals(action)) {
+            if (WsAction.CMD_REGISTER.equals(action)) {
+                HandlerCmdRegister.handler(websocket, messagePayload, this);
 
+                return;
+            }
+
+            if (WsAction.INFO_MESSAGE.equals(action)) {
+                HandlerInfoMessage.handler(websocket, messagePayload);
             }
             else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(action)) {
-
+                HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
             }
-            else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTACHA_NEEDED.equals(action)) {
-
-            }
-            else if (WsAction.INFO_MESSAGE.equals(action)) {
-
+            else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED.equals(action)) {
+                HandlerInfoGoogleScholarSolvingCaptchaNeeded.handler(websocket, messagePayload);
             }
             else {
                 System.out.println("[ws] unimplemented WsAction received: " + action);

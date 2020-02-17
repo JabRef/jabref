@@ -6,9 +6,9 @@ public enum WsAction {
     CMD_GET_GOOGLE_SCHOLAR_CITATION_COUNTS("cmd.getGoogleScholarCitationCounts"),
 
     // receive only
-    CMD_SUBSCRIBE("cmd.subscribe"),
+    CMD_REGISTER("cmd.register"),
     INFO_GOOGLE_SCHOLAR_CITATION_COUNTS("info.googleScholarCitationCounts"),
-    INFO_GOOGLE_SCHOLAR_SOLVING_CAPTACHA_NEEDED("info.googleScholarSolvingCaptchaNeeded"),
+    INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED("info.googleScholarSolvingCaptchaNeeded"),
 
     // send and receive
     INFO_MESSAGE("info.message");
@@ -27,6 +27,16 @@ public enum WsAction {
         }
 
         return false;
+    }
+
+    public static WsAction getWsActionFromString(String wsAction) {
+        for (WsAction lWsAction : WsAction.values()) {
+            if (lWsAction.toString().equals(wsAction)) {
+                return lWsAction;
+            }
+        }
+
+        return null;
     }
 
     @Override

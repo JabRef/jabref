@@ -10,13 +10,23 @@ public enum WsClientType {
     }
 
     public static boolean isValidWsClientType(String wsClientType) {
-        for (WsAction lWsClientType : WsAction.values()) {
+        for (WsClientType lWsClientType : WsClientType.values()) {
             if (lWsClientType.toString().equals(wsClientType)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    public static WsClientType getClientTypeFromString(String wsClientType) {
+        for (WsClientType lWsClientType : WsClientType.values()) {
+            if (lWsClientType.toString().equals(wsClientType)) {
+                return lWsClientType;
+            }
+        }
+
+        return null;
     }
 
     @Override
