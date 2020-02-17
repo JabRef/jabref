@@ -23,6 +23,8 @@ import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.websocket.JabRefWebsocketServer;
+import org.jabref.websocket.JabRefWebsocketServerInstance;
 
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
@@ -99,6 +101,8 @@ public class Globals {
         if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
         }
+
+        JabRefWebsocketServerInstance.getInstance().startServer();
     }
 
     private static void stopTelemetryClient() {
@@ -139,6 +143,7 @@ public class Globals {
     public static void stopBackgroundTasks() {
         stopTelemetryClient();
         Unirest.shutDown();
+        JabRefWebsocketServerInstance.getInstance().stopServer();
     }
 
     public static Optional<TelemetryClient> getTelemetryClient() {
