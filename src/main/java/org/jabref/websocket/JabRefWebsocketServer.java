@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +29,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefWebsocketServer.class);
 
-    final Runnable heartbeatRunnable = () -> {
+    private final Runnable heartbeatRunnable = () -> {
         System.out.println("[ws] heartbeat thread is active ...");
 
         JsonObject messagePayload = new JsonObject();
@@ -40,8 +38,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
     };
 
     private final Object SYNC_OBJECT = new Object();
-
-    private final List<WsClient> wsClients = new CopyOnWriteArrayList<>();
 
     private int heartbeatInterval = 5;
     private TimeUnit timeUnitHeartbeatInterval = TimeUnit.SECONDS;
@@ -76,15 +72,16 @@ public class JabRefWebsocketServer extends WebSocketServer {
         JabRefWebsocketServer jabRefWebsocketServer = new JabRefWebsocketServer(port);
         jabRefWebsocketServer.startServer();
 
-        BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
-            String input = sysin.readLine();
+            String input = systemIn.readLine();
 
             JsonObject messagePayload = new JsonObject();
+            messagePayload.addProperty("messageType", "info");
             messagePayload.addProperty("message", input);
 
-            if (input.equals("exit")) {
+            if (input.equals("quit")) {
                 jabRefWebsocketServer.stopServer();
                 break;
             }
@@ -94,102 +91,75 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Registers a new <code>WsClient</code>, if no <code>WsClient</code> has already registered with the given <code>websocket</code> object.
-     *
-     * @return <code>true</code>, if the registration was successful, <code>false</code> otherwise
-     */
-    public boolean registerWsClient(WsClientType wsClientType, WebSocket websocket) {
-        if (websocket == null) {
-            return false;
-        }
-
-        for (WsClient wsClient : wsClients) {
-            if (wsClient.getWebsocket().equals(websocket)) {
-                return false;
-            }
-        }
-
-        wsClients.add(new WsClient(wsClientType, websocket));
-
-        return true;
-    }
-
-    /**
-     * Deregisters an existing <code>WsClient</code>, which has the associated <code>websocket</code> object, if a registration exists.
-     *
-     * @param websocket
-     * @return <code>true</code>, if a <code>WsClient</code> could be registered, <code>false</code> otherwise
-     */
-    private boolean deregisterWsClient(WebSocket websocket) {
-        if (websocket == null) {
-            return false;
-        }
-
-        for (WsClient wsClient : wsClients) {
-            if (wsClient.getWebsocket().equals(websocket)) {
-                wsClients.remove(wsClient);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Get the first <code>WsClient</code> which matches the given <code>wsClientType</code>, prioritizing open connections.
+     * Gets the first websocket client, which matches the given <code>WsClientType</code>.
      *
      * @param wsClientType
-     * @return the matching WsClient, or <code>null</code> otherwise
+     * @return the matching websocket client, or <code>null</code> otherwise
      */
-    private WsClient getFirstWsClient(WsClientType wsClientType) {
-        WsClient wsClientCandiate = null;
-
-        for (WsClient wsClient : wsClients) {
-            if (wsClient.getWsClientType().equals(wsClientType)) {
-                wsClientCandiate = wsClient;
-
-                if (wsClientCandiate.getWebsocket().isOpen()) {
-                    return wsClientCandiate; // immediately return wsClientCandidate, if the connection is open
-                }
+    private WebSocket getFirstWsClientByWsClientType(WsClientType wsClientType) {
+        for (WebSocket websocket : getConnections()) {
+            WsClientData wsClientData = websocket.getAttachment();
+            if (wsClientData != null && wsClientData.getWsClientType().equals(wsClientType)) {
+                return websocket;
             }
         }
 
-        return wsClientCandiate;
+        return null;
     }
 
-    private boolean sendJsonString(WebSocket recipient, String jsonString) {
-        if (recipient == null) {
+    /**
+     * Gets the websocket client, which matches the given websocket's <code>uid</code>.
+     *
+     * @param wsUid
+     * @return the matching websocket client, or <code>null</code> otherwise
+     */
+    private WebSocket getWsClientByWsUid(String wsUid) {
+        for (WebSocket websocket : getConnections()) {
+            WsClientData wsClientData = websocket.getAttachment();
+            if (wsClientData != null && wsClientData.getWsUID().equals(wsUid)) {
+                return websocket;
+            }
+        }
+
+        return null;
+    }
+
+    private boolean sendJsonString(WebSocket websocketOfRecipient, String jsonString) {
+        if (websocketOfRecipient == null || jsonString == null) {
             return false;
         }
 
-        if (recipient.isOpen()) {
-            recipient.send(jsonString);
+        if (websocketOfRecipient.isOpen()) {
+            websocketOfRecipient.send(jsonString);
             return true;
         } else {
             return false;
         }
     }
 
-    public boolean sendMessage(WebSocket recipient, JsonObject messageContainer) {
-        return sendJsonString(recipient, new Gson().toJson(messageContainer));
+    public boolean sendMessage(WebSocket websocketOfRecipient, JsonObject messageContainer) {
+        return sendJsonString(websocketOfRecipient, new Gson().toJson(messageContainer));
     }
 
-    public boolean sendMessage(WsClient recipient, JsonObject messageContainer) {
-        String jsonString = new Gson().toJson(messageContainer);
-        return sendJsonString(recipient.getWebsocket(), jsonString);
+    public boolean sendMessage(WsClientType wsClientTypeOfRecipient, JsonObject messageContainer) {
+        WebSocket websocket = getFirstWsClientByWsClientType(wsClientTypeOfRecipient);
+        if (websocket != null) {
+            return sendMessage(websocket, messageContainer);
+        }
+        return false;
     }
 
-    public boolean sendMessage(WsClientType recipient, JsonObject messageContainer) {
-        WsClient wsClient = getFirstWsClient(recipient);
-        if (wsClient != null) {
-            return sendMessage(wsClient, messageContainer);
+    public boolean sendMessage(String wsUIDofRecipient, JsonObject messageContainer) {
+        WebSocket websocket = getWsClientByWsUid(wsUIDofRecipient);
+        if (websocket != null) {
+            return sendMessage(websocket, messageContainer);
         }
         return false;
     }
 
     public void broadcastMessage(JsonObject messageContainer) {
-        for (WsClient wsClient : wsClients) {
-            sendMessage(wsClient, messageContainer);
+        for (WebSocket websocket : getConnections()) {
+            sendMessage(websocket, messageContainer);
         }
     }
 
@@ -198,8 +168,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
         synchronized (SYNC_OBJECT) {
             System.out.println("[ws] @onOpen: " + websocket.getRemoteSocketAddress().getAddress().getHostAddress() + " connected.");
 
+            websocket.setAttachment(new WsClientData(WsClientType.UNKNOWN));
+
             JsonObject messagePayload = new JsonObject();
-            messagePayload.addProperty("message", "Welcome!");
+            messagePayload.addProperty("messageType", "info");
+            messagePayload.addProperty("message", "welcome!");
 
             sendMessage(websocket, WsServerUtils.createMessageContainer(WsAction.INFO_MESSAGE, messagePayload));
         }
@@ -209,7 +182,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
     public void onClose(WebSocket websocket, int code, String reason, boolean remote) {
         synchronized (SYNC_OBJECT) {
             System.out.println("[ws] @onClose: " + websocket + " has disconnected.");
-            deregisterWsClient(websocket);
         }
     }
 
@@ -226,9 +198,9 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-        System.out.println("[ws] JabRefWebsocketServer started on port " + getPort() + ".");
-
         serverStarted = true;
+
+        System.out.println("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
 
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(connectionLostTimeout);
@@ -246,11 +218,12 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     public boolean startServer() {
         if (serverStarted) {
-            System.out.println("[ws] server has already been started");
+            System.out.println("[ws] JabRefWebsocketServer has already been started");
 
             return false;
         } else {
             System.out.println("[ws] JabRefWebsocketServer is starting up...");
+
             serverStarted = true;
             start();
 
@@ -259,12 +232,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     public void stopServer() {
-        if (heartbeatExecutor != null) {
-            heartbeatExecutor.shutdown();
-
-            this.heartbeatExecutor = null;
-        }
-
         if (serverStarted) {
             System.out.println("[ws] stopping JabRefWebsocketServer...");
 
@@ -274,9 +241,14 @@ public class JabRefWebsocketServer extends WebSocketServer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             System.out.println("[ws] JabRefWebsocketServer is not started");
+        }
+
+        if (heartbeatExecutor != null) {
+            heartbeatExecutor.shutdown();
+
+            this.heartbeatExecutor = null;
         }
     }
 
@@ -296,33 +268,25 @@ public class JabRefWebsocketServer extends WebSocketServer {
         synchronized (SYNC_OBJECT) {
             System.out.println("[ws] @onMessage: " + websocket + ": " + message);
 
-            JsonObject jsonMessage = new Gson().fromJson(message, JsonObject.class);
+            JsonObject messageContainer = new Gson().fromJson(message, JsonObject.class);
 
-            String action = jsonMessage.get("action").getAsString();
-            JsonObject messagePayload = jsonMessage.getAsJsonObject("payload");
+            String action = messageContainer.get("action").getAsString();
+            JsonObject messagePayload = messageContainer.getAsJsonObject("payload");
 
             if (!WsAction.isValidWsAction(action)) {
                 System.out.println("[ws] unknown WsAction received: " + action);
-
                 return;
             }
 
             if (WsAction.CMD_REGISTER.equals(action)) {
-                HandlerCmdRegister.handler(websocket, messagePayload, this);
-
-                return;
-            }
-
-            if (WsAction.INFO_MESSAGE.equals(action)) {
+                HandlerCmdRegister.handler(websocket, messagePayload);
+            } else if (WsAction.INFO_MESSAGE.equals(action)) {
                 HandlerInfoMessage.handler(websocket, messagePayload);
-            }
-            else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(action)) {
+            } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(action)) {
                 HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
-            }
-            else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED.equals(action)) {
+            } else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED.equals(action)) {
                 HandlerInfoGoogleScholarSolvingCaptchaNeeded.handler(websocket, messagePayload);
-            }
-            else {
+            } else {
                 System.out.println("[ws] unimplemented WsAction received: " + action);
             }
         }

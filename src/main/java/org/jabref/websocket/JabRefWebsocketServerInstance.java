@@ -18,17 +18,13 @@ public class JabRefWebsocketServerInstance {
         return jabRefWebsocketServer;
     }
 
-    private static void addShutdownHook()
-    {
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
+    private static void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             /**
              * run() is invoked, when JabRef gets terminated.
              */
-            public void run()
-            {
-                if (jabRefWebsocketServer != null)
-                {
+            public void run() {
+                if (jabRefWebsocketServer != null) {
                     jabRefWebsocketServer.stopServer();
                 }
             }

@@ -1,21 +1,29 @@
 package org.jabref.websocket.handlers;
 
-import org.jabref.websocket.JabRefWebsocketServer;
+import org.jabref.websocket.JabRefWebsocketServerInstance;
+import org.jabref.websocket.WsAction;
+import org.jabref.websocket.WsClientData;
 import org.jabref.websocket.WsClientType;
+import org.jabref.websocket.WsServerUtils;
 
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
 
 public class HandlerCmdRegister {
-    public static void handler(WebSocket websocket, JsonObject messagePayload, JabRefWebsocketServer jabRefWebsocketServer) {
+    public static void handler(WebSocket websocket, JsonObject messagePayload) {
         String wsClientTypeString = messagePayload.get("wsClientType").getAsString();
 
-        WsClientType wsClientType = WsClientType.getClientTypeFromString(wsClientTypeString);
-
-        if (wsClientType == null) {
+        if (WsClientType.isValidWsClientType(wsClientTypeString)) {
+            WsClientType wsClientType = WsClientType.getClientTypeFromString(wsClientTypeString);
+            websocket.<WsClientData>getAttachment().setWsClientType(wsClientType);
+        } else {
             System.out.println("[ws] invalid WsClientType: " + wsClientTypeString);
-        }
 
-        jabRefWebsocketServer.registerWsClient(wsClientType, websocket);
+            JsonObject messagePayloadForClient = new JsonObject();
+            messagePayloadForClient.addProperty("messageType", "warning");
+            messagePayloadForClient.addProperty("message", "invalid WsClientType: " + wsClientTypeString);
+
+            JabRefWebsocketServerInstance.getInstance().sendMessage(websocket, WsServerUtils.createMessageContainer(WsAction.INFO_MESSAGE, messagePayloadForClient));
+        }
     }
 }

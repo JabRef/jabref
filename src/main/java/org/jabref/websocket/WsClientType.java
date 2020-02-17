@@ -1,6 +1,7 @@
 package org.jabref.websocket;
 
 public enum WsClientType {
+    UNKNOWN("unknown"),
     JABREF_BROWSER_EXTENSION("JabRefBrowserExtension");
 
     private String wsClientType;
