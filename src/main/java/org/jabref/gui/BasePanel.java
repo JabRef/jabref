@@ -40,7 +40,6 @@ import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -355,16 +354,16 @@ public class BasePanel extends StackPane {
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
 
-        actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
+        /* actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
             entryEditor.nextPreviewStyle();
         });
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
             entryEditor.previousPreviewStyle();
-        });
+        }); */
 
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
-        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
+        // actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
         actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
