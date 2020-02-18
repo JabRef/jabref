@@ -3,16 +3,18 @@ package org.jabref.gui.preview;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -32,33 +34,35 @@ import org.slf4j.LoggerFactory;
  * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard.
  * This worker cannot be reused.
  */
-public class CitationStyleToClipboardWorker {
+public class CopyCitationAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleToClipboardWorker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);
 
-    private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
+    private StateManager stateManager;
     private final PreviewLayout style;
     private final String previewStyle;
     private final CitationStyleOutputFormat outputFormat;
     private final DialogService dialogService;
     private final ClipBoardManager clipBoardManager;
 
-    public CitationStyleToClipboardWorker(BasePanel basePanel, CitationStyleOutputFormat outputFormat, DialogService dialogService, ClipBoardManager clipBoardManager, PreviewPreferences previewPreferences) {
-        this.basePanel = basePanel;
-        this.selectedEntries = basePanel.getSelectedEntries();
+    public CopyCitationAction(CitationStyleOutputFormat outputFormat, DialogService dialogService, StateManager stateManager, ClipBoardManager clipBoardManager, PreviewPreferences previewPreferences) {
+        this.selectedEntries = stateManager.getSelectedEntries();
         this.style = previewPreferences.getCurrentPreviewStyle();
         this.previewStyle = previewPreferences.getPreviewStyle();
         this.outputFormat = outputFormat;
         this.clipBoardManager = clipBoardManager;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
-    public void copyCitationStyleToClipboard(TaskExecutor taskExecutor) {
+    public void execute() {
         BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
                       .onSuccess(this::setClipBoardContent)
-                      .executeWith(taskExecutor);
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private List<String> generateCitations() throws IOException {
@@ -71,13 +75,17 @@ public class CitationStyleToClipboardWorker {
         if (styleSource != null) {
             return CitationStyleGenerator.generateCitations(selectedEntries, styleSource, outputFormat);
         } else {
+            if (stateManager.getActiveDatabase().isEmpty()) {
+                return Collections.emptyList();
+            }
+
             StringReader sr = new StringReader(previewStyle.replace("__NEWLINE__", "\n"));
             LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             Layout layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
 
             List<String> citations = new ArrayList<>(selectedEntries.size());
             for (BibEntry entry : selectedEntries) {
-                citations.add(layout.doLayout(entry, basePanel.getDatabase()));
+                citations.add(layout.doLayout(entry, stateManager.getActiveDatabase().get().getDatabase()));
             }
             return citations;
         }

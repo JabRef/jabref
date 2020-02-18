@@ -46,7 +46,6 @@ import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.preview.CitationStyleToClipboardWorker;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
@@ -57,7 +56,6 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
-import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
@@ -283,11 +281,13 @@ public class BasePanel extends StackPane {
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
 
+        /*
         actions.put(Actions.COPY_CITATION_ASCII_DOC, () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
         actions.put(Actions.COPY_CITATION_XSLFO, () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
         actions.put(Actions.COPY_CITATION_HTML, () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
         actions.put(Actions.COPY_CITATION_RTF, () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
         actions.put(Actions.COPY_CITATION_TEXT, () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
+        */
 
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
         actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
@@ -344,16 +344,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
-    }
-
-    /**
-     * Generates and copies citations based on the selected entries to the clipboard
-     *
-     * @param outputFormat the desired {@link CitationStyleOutputFormat}
-     */
-    private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        CitationStyleToClipboardWorker worker = new CitationStyleToClipboardWorker(this, outputFormat, dialogService, Globals.clipboardManager, Globals.prefs.getPreviewPreferences());
-        worker.copyCitationStyleToClipboard(Globals.TASK_EXECUTOR);
     }
 
     /**
