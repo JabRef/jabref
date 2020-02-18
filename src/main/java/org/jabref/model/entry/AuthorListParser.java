@@ -8,7 +8,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+
 public class AuthorListParser {
+
+    private static boolean[] visited = new boolean[36];
 
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
@@ -333,26 +339,47 @@ public class AuthorListParser {
      * <CODE>token_case</CODE>.
      */
     private int getToken() {
+        visited[0] = true;
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {
+            visited[1] = true;
             char c = original.charAt(tokenStart);
             if (!((c == '~') || (c == '-') || Character.isWhitespace(c))) {
+                visited[2] = true;
                 break;
+            }
+            else {
+                visited[3] = true;
             }
             tokenStart++;
         }
         tokenEnd = tokenStart;
         if (tokenStart >= original.length()) {
+            visited[4] = true;
+            branchCoverage();
             return TOKEN_EOF;
         }
+        else {
+            visited[5] = true;
+        }
         if (original.charAt(tokenStart) == ',') {
+            visited[6] = true;
             tokenEnd++;
+            branchCoverage();
             return TOKEN_COMMA;
+        }
+        else {
+            visited[7] = true;
         }
         // Semicolon is considered to separate names like "and"
         if (original.charAt(tokenStart) == ';') {
+            visited[8] = true;
             tokenEnd++;
+            branchCoverage();
             return TOKEN_AND;
+        }
+        else {
+            visited[9] = true;
         }
         tokenAbbrEnd = -1;
         tokenTerm = ' ';
@@ -361,21 +388,36 @@ public class AuthorListParser {
         int currentBackslash = -1;
         boolean firstLetterIsFound = false;
         while (tokenEnd < original.length()) {
+            visited[10] = true;
             char c = original.charAt(tokenEnd);
             if (c == '{') {
+                visited[11] = true;
                 bracesLevel++;
             }
-
+            else {
+                visited[12] = true;
+            }
             if (firstLetterIsFound && (tokenAbbrEnd < 0) && ((bracesLevel == 0) || (c == '{'))) {
+                visited[13] = true;
                 tokenAbbrEnd = tokenEnd;
             }
+            else {
+                visited[14] = true;
+            }
             if ((c == '}') && (bracesLevel > 0)) {
+                visited[15] = true;
                 bracesLevel--;
             }
+            else {
+                visited[16] = true;
+            }
             if (!firstLetterIsFound && (currentBackslash < 0) && Character.isLetter(c)) {
+                visited[17] = true;
                 if (bracesLevel == 0) {
+                    visited[18] = true;
                     tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);
                 } else {
+                    visited[19] = true;
                     // If this is a particle in braces, always treat it as if it starts with
                     // an upper case letter. Otherwise a name such as "{van den Bergen}, Hans"
                     // will not yield a proper last name:
@@ -383,35 +425,87 @@ public class AuthorListParser {
                 }
                 firstLetterIsFound = true;
             }
+            else {
+                visited[20] = true;
+            }
             if ((currentBackslash >= 0) && !Character.isLetter(c)) {
+                visited[21] = true;
                 if (!firstLetterIsFound) {
+                    visited[22] = true;
                     String texCmdName = original.substring(currentBackslash + 1, tokenEnd);
                     if (TEX_NAMES.contains(texCmdName)) {
+                        visited[23] = true;
                         tokenCase = Character.isUpperCase(texCmdName.charAt(0));
                         firstLetterIsFound = true;
                     }
+                    else {
+                        visited[24] = true;
+                    }
+                }
+                else {
+                    visited[25] = true;
                 }
                 currentBackslash = -1;
             }
             if (c == '\\') {
+                visited[26] = true;
                 currentBackslash = tokenEnd;
             }
+            else {
+                visited[27] = true;
+            }
             if ((bracesLevel == 0) && ((",;~-".indexOf(c) != -1) || Character.isWhitespace(c))) {
+                visited[28] = true;
                 break;
+            }
+            else {
+                visited[29] = true;
             }
             tokenEnd++;
         }
         if (tokenAbbrEnd < 0) {
+            visited[30] = true;
             tokenAbbrEnd = tokenEnd;
         }
+        else {
+            visited[31] = true;
+        }
         if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
+            visited[32] = true;
             tokenTerm = '-';
         }
+        else {
+            visited[33] = true;
+        }
         if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {
+            visited[34] = true;
+            branchCoverage();
             return TOKEN_AND;
         } else {
+            visited[35] = true;
+            branchCoverage();
             return TOKEN_WORD;
         }
+    }
+
+    private static void branchCoverage() {
+        try {
+            File directory = new File("/Temp");
+            if (!directory.exists()){
+                directory.mkdir();
+            }
+            File f = new File(directory + "/getToken.txt");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            double frac = 0;
+            for (int j = 0; j < visited.length; ++j) {
+                frac += (visited[j] ? 1 : 0);
+                bw.write("branch " + j + " was" + (visited[j] ? " visited. " : " not visited. ") + "\n");
+            }
+            bw.write("" + frac / visited.length);
+            bw.close();
+        } catch (Exception e) {
+            System.err.println("Did not find the path");
+        }        
     }
 
 }
