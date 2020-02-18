@@ -19,6 +19,7 @@ import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.model.entry.field.SpecialField;
@@ -40,7 +41,7 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldCommandWrapper(Actions.SEND_AS_EMAIL, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 

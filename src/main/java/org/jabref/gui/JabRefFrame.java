@@ -104,6 +104,7 @@ import org.jabref.gui.texparser.ParseTexAction;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.IdFetcher;
@@ -780,7 +781,7 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)),
                 pushToApplicationMenuItem,
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,

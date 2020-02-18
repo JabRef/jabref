@@ -56,7 +56,6 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.l10n.Localization;
@@ -335,7 +334,7 @@ public class BasePanel extends StackPane {
             entryEditor.previousPreviewStyle();
         }); */
 
-        actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
+        // actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
         // actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
