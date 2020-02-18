@@ -1,16 +1,12 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -34,7 +30,6 @@ import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
-import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -57,8 +52,6 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.UpdateField;
@@ -270,16 +263,16 @@ public class BasePanel extends StackPane {
         // actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
 
         // The action for copying the selected entry's key.
-        actions.put(Actions.COPY_KEY, this::copyKey);
+        // actions.put(Actions.COPY_KEY, this::copyKey);
 
         // The action for copying the selected entry's title.
-        actions.put(Actions.COPY_TITLE, this::copyTitle);
+        // actions.put(Actions.COPY_TITLE, this::copyTitle);
 
         // The action for copying a cite for the selected entry.
-        actions.put(Actions.COPY_CITE_KEY, this::copyCiteKey);
+        // actions.put(Actions.COPY_CITE_KEY, this::copyCiteKey);
 
         // The action for copying the BibTeX key and the title for the first selected entry
-        actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
+        // actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
 
         /*
         actions.put(Actions.COPY_CITATION_ASCII_DOC, () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
@@ -290,7 +283,7 @@ public class BasePanel extends StackPane {
         */
 
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
+        // actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
@@ -383,126 +376,6 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    private void copyTitle() {
-        List<BibEntry> selectedBibEntries = mainTable.getSelectedEntries();
-        if (!selectedBibEntries.isEmpty()) {
-            // Collect all non-null titles.
-            List<String> titles = selectedBibEntries.stream()
-                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                    .map(bibEntry -> bibEntry.getTitle().get())
-                                                    .collect(Collectors.toList());
-
-            if (titles.isEmpty()) {
-                output(Localization.lang("None of the selected entries have titles."));
-                return;
-            }
-            final String copiedTitles = String.join("\n", titles);
-            Globals.clipboardManager.setContent(copiedTitles);
-
-            if (titles.size() == selectedBibEntries.size()) {
-                // All entries had titles.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedTitles) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined title.", Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
-            }
-        }
-    }
-
-    private void copyCiteKey() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            List<String> keys = new ArrayList<>(bes.size());
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                be.getCiteKeyOptional().ifPresent(keys::add);
-            }
-            if (keys.isEmpty()) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                                         .filter(cite -> cite.contains("\\")) // must contain \
-                                         .orElse("\\cite");
-            final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
-            Globals.clipboardManager.setContent(copiedCiteCommand);
-
-            if (keys.size() == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedCiteCommand) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void copyKey() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            List<String> keys = new ArrayList<>(bes.size());
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                be.getCiteKeyOptional().ifPresent(keys::add);
-            }
-            if (keys.isEmpty()) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            final String copiedKeys = String.join(",", keys);
-            Globals.clipboardManager.setContent(copiedKeys);
-
-            if (keys.size() == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeys) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void copyKeyAndTitle() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            // OK: in a future version, this string should be configurable to allow arbitrary exports
-            StringReader sr = new StringReader("\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
-            Layout layout;
-            try {
-                layout = new LayoutHelper(sr, Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                        .getLayoutFromText();
-            } catch (IOException e) {
-                LOGGER.info("Could not get layout", e);
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            int copied = 0;
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                if (be.hasCiteKey()) {
-                    copied++;
-                    sb.append(layout.doLayout(be, bibDatabaseContext.getDatabase()));
-                }
-            }
-
-            if (copied == 0) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            final String copiedKeysAndTitles = sb.toString();
-            Globals.clipboardManager.setContent(copiedKeysAndTitles);
-
-            if (copied == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeysAndTitles) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
-            }
-        }
     }
 
     /**

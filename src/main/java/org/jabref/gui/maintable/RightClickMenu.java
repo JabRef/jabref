@@ -13,6 +13,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -36,7 +37,7 @@ public class RightClickMenu {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new OldCommandWrapper(Actions.COPY, panel)));
-        contextMenu.getItems().add(createCopySubMenu(panel, factory, dialogService, stateManager));
+        contextMenu.getItems().add(createCopySubMenu(panel, factory, dialogService, stateManager, preferencesService));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new OldCommandWrapper(Actions.CUT, panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
@@ -72,13 +73,13 @@ public class RightClickMenu {
         return contextMenu;
     }
 
-    private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory, DialogService dialogService, StateManager stateManager) {
+    private static Menu createCopySubMenu(BasePanel panel, ActionFactory factory, DialogService dialogService, StateManager stateManager, PreferencesService preferencesService) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_TITLE, new OldCommandWrapper(Actions.COPY_TITLE, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY, new OldCommandWrapper(Actions.COPY_KEY, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITE_KEY, new OldCommandWrapper(Actions.COPY_CITE_KEY, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new OldCommandWrapper(Actions.COPY_KEY_AND_TITLE, panel)));
-        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new OldCommandWrapper(Actions.COPY_KEY_AND_LINK, panel)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.clipboardManager, preferencesService)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.clipboardManager, preferencesService)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.clipboardManager, preferencesService)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.clipboardManager, preferencesService)));
+        copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.clipboardManager, preferencesService)));
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
