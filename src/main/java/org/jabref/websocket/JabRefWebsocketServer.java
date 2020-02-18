@@ -34,25 +34,24 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
         JsonObject messagePayload = new JsonObject();
 
-        broadcastMessage(WsServerUtils.createMessageContainer(WsAction.HEARTBEAT, messagePayload));
+        broadcastMessage(WsAction.HEARTBEAT, messagePayload);
     };
 
     private final Object SYNC_OBJECT = new Object();
 
+    private boolean serverStarting = false;
+    private boolean serverStarted = false;
+
+    // configuration
+    private boolean enableHeartbeat = true;
     private int heartbeatInterval = 5;
     private TimeUnit timeUnitHeartbeatInterval = TimeUnit.SECONDS;
-    private boolean enableHeartbeat = true;
     private volatile ScheduledExecutorService heartbeatExecutor = null;
 
     /**
      * [s] 0 ... disabled
      */
     private int connectionLostTimeout = 5;
-
-    /**
-     * is <code>true</code>, if the the server is about to start or has started, <code>false</code> otherwise
-     */
-    private boolean serverStarted = false;
 
     public JabRefWebsocketServer(int port) {
         super(new InetSocketAddress(port));
@@ -86,14 +85,14 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 break;
             }
 
-            jabRefWebsocketServer.broadcastMessage(WsServerUtils.createMessageContainer(WsAction.INFO_MESSAGE, messagePayload));
+            jabRefWebsocketServer.broadcastMessage(WsAction.INFO_MESSAGE, messagePayload);
         }
     }
 
     /**
      * Gets the first websocket client, which matches the given <code>WsClientType</code>.
      *
-     * @param wsClientType
+     * @param wsClientType wsClientType of the requested websocket client
      * @return the matching websocket client, or <code>null</code> otherwise
      */
     private WebSocket getFirstWsClientByWsClientType(WsClientType wsClientType) {
@@ -110,7 +109,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
     /**
      * Gets the websocket client, which matches the given websocket's <code>uid</code>.
      *
-     * @param wsUid
+     * @param wsUid wsUid of the requested websocket client
      * @return the matching websocket client, or <code>null</code> otherwise
      */
     private WebSocket getWsClientByWsUid(String wsUid) {
@@ -137,29 +136,30 @@ public class JabRefWebsocketServer extends WebSocketServer {
         }
     }
 
-    public boolean sendMessage(WebSocket websocketOfRecipient, JsonObject messageContainer) {
+    public boolean sendMessage(WebSocket websocketOfRecipient, WsAction wsAction, JsonObject messagePayload) {
+        JsonObject messageContainer = WsServerUtils.createMessageContainer(wsAction, messagePayload);
         return sendJsonString(websocketOfRecipient, new Gson().toJson(messageContainer));
     }
 
-    public boolean sendMessage(WsClientType wsClientTypeOfRecipient, JsonObject messageContainer) {
+    public boolean sendMessage(WsClientType wsClientTypeOfRecipient, WsAction wsAction, JsonObject messagePayload) {
         WebSocket websocket = getFirstWsClientByWsClientType(wsClientTypeOfRecipient);
         if (websocket != null) {
-            return sendMessage(websocket, messageContainer);
+            return sendMessage(websocket, wsAction, messagePayload);
         }
         return false;
     }
 
-    public boolean sendMessage(String wsUIDofRecipient, JsonObject messageContainer) {
+    public boolean sendMessage(String wsUIDofRecipient, WsAction wsAction, JsonObject messagePayload) {
         WebSocket websocket = getWsClientByWsUid(wsUIDofRecipient);
         if (websocket != null) {
-            return sendMessage(websocket, messageContainer);
+            return sendMessage(websocket, wsAction, messagePayload);
         }
         return false;
     }
 
-    public void broadcastMessage(JsonObject messageContainer) {
+    public void broadcastMessage(WsAction wsAction, JsonObject messagePayload) {
         for (WebSocket websocket : getConnections()) {
-            sendMessage(websocket, messageContainer);
+            sendMessage(websocket, wsAction, messagePayload);
         }
     }
 
@@ -174,7 +174,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             messagePayload.addProperty("messageType", "info");
             messagePayload.addProperty("message", "welcome!");
 
-            sendMessage(websocket, WsServerUtils.createMessageContainer(WsAction.INFO_MESSAGE, messagePayload));
+            sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayload);
         }
     }
 
@@ -199,6 +199,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
     @Override
     public void onStart() {
         serverStarted = true;
+        serverStarting = false;
 
         System.out.println("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
 
@@ -217,6 +218,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     public boolean startServer() {
+        if (serverStarting) {
+            System.out.println("[ws] JabRefWebsocketServer is already starting");
+
+            return false;
+        }
         if (serverStarted) {
             System.out.println("[ws] JabRefWebsocketServer has already been started");
 
@@ -224,15 +230,21 @@ public class JabRefWebsocketServer extends WebSocketServer {
         } else {
             System.out.println("[ws] JabRefWebsocketServer is starting up...");
 
-            serverStarted = true;
+            serverStarting = true;
             start();
 
             return true;
         }
     }
 
-    public void stopServer() {
-        if (serverStarted) {
+    public boolean stopServer() {
+        if (heartbeatExecutor != null) {
+            heartbeatExecutor.shutdown();
+
+            this.heartbeatExecutor = null;
+        }
+
+        if (serverStarting || serverStarted) {
             System.out.println("[ws] stopping JabRefWebsocketServer...");
 
             serverStarted = false;
@@ -241,15 +253,17 @@ public class JabRefWebsocketServer extends WebSocketServer {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            return true;
         } else {
             System.out.println("[ws] JabRefWebsocketServer is not started");
-        }
 
-        if (heartbeatExecutor != null) {
-            heartbeatExecutor.shutdown();
-
-            this.heartbeatExecutor = null;
+            return false;
         }
+    }
+
+    public boolean isServerStarting() {
+        return serverStarting;
     }
 
     public boolean isServerStarted() {
@@ -278,13 +292,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 return;
             }
 
-            if (WsAction.CMD_REGISTER.equals(action)) {
+            WsAction wsAction = WsAction.getWsActionFromString(action);
+
+            if (WsAction.CMD_REGISTER.equals(wsAction)) {
                 HandlerCmdRegister.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_MESSAGE.equals(action)) {
+            } else if (WsAction.INFO_MESSAGE.equals(wsAction)) {
                 HandlerInfoMessage.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(action)) {
+            } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(wsAction)) {
                 HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED.equals(action)) {
+            } else if (WsAction.INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED.equals(wsAction)) {
                 HandlerInfoGoogleScholarSolvingCaptchaNeeded.handler(websocket, messagePayload);
             } else {
                 System.out.println("[ws] unimplemented WsAction received: " + action);

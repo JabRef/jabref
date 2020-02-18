@@ -11,6 +11,6 @@ public class HandlerInfoMessage {
         String messageType = messagePayload.get("messageType").getAsString();
         String message = messagePayload.get("message").getAsString();
 
-        System.out.println(messageType + ": " + message);
+        System.out.println("[ws] " + messageType + ": " + message);
     }
 }

@@ -4,7 +4,6 @@ import org.jabref.websocket.JabRefWebsocketServerInstance;
 import org.jabref.websocket.WsAction;
 import org.jabref.websocket.WsClientData;
 import org.jabref.websocket.WsClientType;
-import org.jabref.websocket.WsServerUtils;
 
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
@@ -23,7 +22,7 @@ public class HandlerCmdRegister {
             messagePayloadForClient.addProperty("messageType", "warning");
             messagePayloadForClient.addProperty("message", "invalid WsClientType: " + wsClientTypeString);
 
-            JabRefWebsocketServerInstance.getInstance().sendMessage(websocket, WsServerUtils.createMessageContainer(WsAction.INFO_MESSAGE, messagePayloadForClient));
+            JabRefWebsocketServerInstance.getInstance().sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayloadForClient);
         }
     }
 }

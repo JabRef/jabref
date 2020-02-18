@@ -5,6 +5,6 @@ import org.java_websocket.WebSocket;
 
 public class HandlerInfoGoogleScholarSolvingCaptchaNeeded {
     public static void handler(WebSocket websocket, JsonObject messagePayload) {
-
+        System.out.println("[ws] Google Scholar Captcha needs to be solved.");
     }
 }
