@@ -206,7 +206,7 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.62'
+    testCompile 'io.github.classgraph:classgraph:4.8.64'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.6.0'
@@ -590,6 +590,7 @@ jlink {
         requires 'java.rmi'
         requires 'java.xml'
         requires 'com.sun.xml.txw2'
+        requires 'com.google.gson';
         requires 'java.desktop'
         requires 'java.security.jgss'
         requires 'jdk.jsobject'
