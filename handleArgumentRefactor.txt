@@ -1,0 +1,9 @@
+branch 0 was  visited.
+branch 1 was  visited.
+branch 2 was  visited.
+branch 3 was  visited.
+branch 4 was  visited.
+branch 5 was  visited.
+branch 6 was  visited.
+branch 7 was  not visited.
+0.875

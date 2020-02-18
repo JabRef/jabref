@@ -15,7 +15,9 @@ import java.io.File;
 /**
  * Versatile author name formatter that takes arguments to control the formatting style.
  */
-public class Authors extends AbstractParamLayoutFormatter {
+public class AuthorsRefactor extends AbstractParamLayoutFormatter {
+
+    private static boolean[] visited = new boolean[8];
 
     /*
     AuthorSort = [FirstFirst | LastFirst | LastFirstFirstFirst]
@@ -37,34 +39,34 @@ public class Authors extends AbstractParamLayoutFormatter {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[0-9]+");
 
     static {
-        Authors.AUTHOR_ORDER.add("firstfirst");
-        Authors.AUTHOR_ORDER.add("lastfirst");
-        Authors.AUTHOR_ORDER.add("lastfirstfirstfirst");
+        AuthorsRefactor.AUTHOR_ORDER.add("firstfirst");
+        AuthorsRefactor.AUTHOR_ORDER.add("lastfirst");
+        AuthorsRefactor.AUTHOR_ORDER.add("lastfirstfirstfirst");
 
-        Authors.AUTHOR_ABRV.add("fullname");
-        Authors.AUTHOR_ABRV.add("initials");
-        Authors.AUTHOR_ABRV.add("firstinitial");
-        Authors.AUTHOR_ABRV.add("middleinitial");
-        Authors.AUTHOR_ABRV.add("lastname");
-        Authors.AUTHOR_ABRV.add("initialsnospace");
+        AuthorsRefactor.AUTHOR_ABRV.add("fullname");
+        AuthorsRefactor.AUTHOR_ABRV.add("initials");
+        AuthorsRefactor.AUTHOR_ABRV.add("firstinitial");
+        AuthorsRefactor.AUTHOR_ABRV.add("middleinitial");
+        AuthorsRefactor.AUTHOR_ABRV.add("lastname");
+        AuthorsRefactor.AUTHOR_ABRV.add("initialsnospace");
 
-        Authors.AUTHOR_PUNC.add("fullpunc");
-        Authors.AUTHOR_PUNC.add("nopunc");
-        Authors.AUTHOR_PUNC.add("nocomma");
-        Authors.AUTHOR_PUNC.add("noperiod");
+        AuthorsRefactor.AUTHOR_PUNC.add("fullpunc");
+        AuthorsRefactor.AUTHOR_PUNC.add("nopunc");
+        AuthorsRefactor.AUTHOR_PUNC.add("nocomma");
+        AuthorsRefactor.AUTHOR_PUNC.add("noperiod");
 
-        Authors.SEPARATORS.add("comma");
-        Authors.SEPARATORS.add("and");
-        Authors.SEPARATORS.add("colon");
-        Authors.SEPARATORS.add("semicolon");
-        Authors.SEPARATORS.add("sep");
+        AuthorsRefactor.SEPARATORS.add("comma");
+        AuthorsRefactor.SEPARATORS.add("and");
+        AuthorsRefactor.SEPARATORS.add("colon");
+        AuthorsRefactor.SEPARATORS.add("semicolon");
+        AuthorsRefactor.SEPARATORS.add("sep");
 
-        Authors.LAST_SEPARATORS.add("and");
-        Authors.LAST_SEPARATORS.add("colon");
-        Authors.LAST_SEPARATORS.add("semicolon");
-        Authors.LAST_SEPARATORS.add("amp");
-        Authors.LAST_SEPARATORS.add("oxford");
-        Authors.LAST_SEPARATORS.add("lastsep");
+        AuthorsRefactor.LAST_SEPARATORS.add("and");
+        AuthorsRefactor.LAST_SEPARATORS.add("colon");
+        AuthorsRefactor.LAST_SEPARATORS.add("semicolon");
+        AuthorsRefactor.LAST_SEPARATORS.add("amp");
+        AuthorsRefactor.LAST_SEPARATORS.add("oxford");
+        AuthorsRefactor.LAST_SEPARATORS.add("lastsep");
 
     }
 
@@ -80,7 +82,6 @@ public class Authors extends AbstractParamLayoutFormatter {
     private static final String SEMICOLON = "; ";
     private static final String AND = " and ";
     private static final String OXFORD = ", and ";
-    private static boolean[] visited = new boolean[42];
 
     private int flMode;
 
@@ -98,8 +99,8 @@ public class Authors extends AbstractParamLayoutFormatter {
     private int authorNumberEtAl = 1;
 
     private String lastFirstSeparator = ", ";
-    private String separator = Authors.COMMA;
-    private String lastSeparator = Authors.AND;
+    private String separator = AuthorsRefactor.COMMA;
+    private String lastSeparator = AuthorsRefactor.AND;
     private String etAlString = " et al.";
 
     @Override
@@ -118,148 +119,127 @@ public class Authors extends AbstractParamLayoutFormatter {
         }
     }
 
-    private void handleArgument(String key, String value) {
-        if (Authors.AUTHOR_ORDER.contains(key.trim().toLowerCase(Locale.ROOT))) {
-            visited[0] = true;
-            if (comp(key, "FirstFirst")) {
-                visited[1] = true;
-                flMode = Authors.FIRST_FIRST;
-            } else if (comp(key, "LastFirst")) {
-                visited[2] = true;
-                flMode = Authors.LAST_FIRST;
-            } else if (comp(key, "LastFirstFirstFirst")) {
-                visited[3] = true;
-                flMode = Authors.LF_FF;
-            } else {
-                visited[4] = true;
-            }
-        } else if (Authors.AUTHOR_ABRV.contains(key.trim().toLowerCase(Locale.ROOT))) {
-            visited[5] = true;
-            if (comp(key, "FullName")) {
-                visited[6] = true;
-                abbreviate = false;
-            } else if (comp(key, "Initials")) {
-                visited[7] = true;
-                abbreviate = true;
-                firstInitialOnly = false;
-            } else if (comp(key, "FirstInitial")) {
-                visited[8] = true;
-                abbreviate = true;
-                firstInitialOnly = true;
-            } else if (comp(key, "MiddleInitial")) {
-                visited[9] = true;
-                abbreviate = true;
-                middleInitial = true;
-            } else if (comp(key, "LastName")) {
-                visited[10] = true;
-                lastNameOnly = true;
-            } else if (comp(key, "InitialsNoSpace")) {
-                visited[11] = true;
-                abbreviate = true;
-                abbrSpaces = false;
-            } else {
-                visited[12] = true;
-            }
-        } else if (Authors.AUTHOR_PUNC.contains(key.trim().toLowerCase(Locale.ROOT))) {
-            visited[13] = true;
-            if (comp(key, "FullPunc")) {
-                visited[14] = true;
-                abbrDots = true;
-                lastFirstSeparator = ", ";
-            } else if (comp(key, "NoPunc")) {
-                visited[15] = true;
-                abbrDots = false;
-                lastFirstSeparator = " ";
-            } else if (comp(key, "NoComma")) {
-                visited[16] = true;
-                abbrDots = true;
-                lastFirstSeparator = " ";
-            } else if (comp(key, "NoPeriod")) {
-                visited[17] = true;
-                abbrDots = false;
-                lastFirstSeparator = ", ";
-            } else {
-                visited[18] = true;
-            }
-        }
+    private void handleOrder(String key) {
+        if (comp(key, "FirstFirst")) {
+            flMode = AuthorsRefactor.FIRST_FIRST;
+        } else if (comp(key, "LastFirst")) {
+            flMode = AuthorsRefactor.LAST_FIRST;
+        } else if (comp(key, "LastFirstFirstFirst")) {
+            flMode = AuthorsRefactor.LF_FF;
+        }        
+    }
 
-        // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
-        // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
-        else if (Authors.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
-            visited[19] = true;
-            if (comp(key, "Comma")) {
-                visited[20] = true;
-                if (setSep) {
-                    visited[21] = true;
-                    lastSeparator = Authors.COMMA;
-                } else {
-                    visited[22] = true;
-                    separator = Authors.COMMA;
-                    setSep = true;
-                }
-            } else if (comp(key, "And")) {
-                visited[23] = true;
-                if (setSep) {
-                    visited[24] = true;
-                    lastSeparator = Authors.AND;
-                } else {
-                    visited[25] = true;
-                    separator = Authors.AND;
-                    setSep = true;
-                }
-            } else if (comp(key, "Colon")) {
-                visited[26] = true;
-                if (setSep) {
-                    visited[27] = true;
-                    lastSeparator = Authors.COLON;
-                } else {
-                    visited[28] = true;
-                    separator = Authors.COLON;
-                    setSep = true;
-                }
-            } else if (comp(key, "Semicolon")) {
-                visited[29] = true;
-                if (setSep) {
-                    visited[30] = true;
-                    lastSeparator = Authors.SEMICOLON;
-                } else {
-                    visited[31] = true;
-                    separator = Authors.SEMICOLON;
-                    setSep = true;
-                }
-            } else if (comp(key, "Oxford")) {
-                visited[32] = true;
-                lastSeparator = Authors.OXFORD;
-            } else if (comp(key, "Amp")) {
-                visited[33] = true;
-                lastSeparator = Authors.AMP;
-            } else if (comp(key, "Sep") && !value.isEmpty()) {
-                visited[34] = true;
-                separator = value;
+    private void handleAbrv(String key) {
+        if (comp(key, "FullName")) {
+            abbreviate = false;
+        } else if (comp(key, "Initials")) {
+            abbreviate = true;
+            firstInitialOnly = false;
+        } else if (comp(key, "FirstInitial")) {
+            abbreviate = true;
+            firstInitialOnly = true;
+        } else if (comp(key, "MiddleInitial")) {
+            abbreviate = true;
+            middleInitial = true;
+        } else if (comp(key, "LastName")) {
+            lastNameOnly = true;
+        } else if (comp(key, "InitialsNoSpace")) {
+            abbreviate = true;
+            abbrSpaces = false;
+        }        
+    }
+
+    private void handlePunc(String key) {
+        if (comp(key, "FullPunc")) {
+            abbrDots = true;
+            lastFirstSeparator = ", ";
+        } else if (comp(key, "NoPunc")) {
+            abbrDots = false;
+            lastFirstSeparator = " ";
+        } else if (comp(key, "NoComma")) {
+            abbrDots = true;
+            lastFirstSeparator = " ";
+        } else if (comp(key, "NoPeriod")) {
+            abbrDots = false;
+            lastFirstSeparator = ", ";
+        }
+    }
+
+    private void handleSeparater(String key, String value) {
+        if (comp(key, "Comma")) {
+            if (setSep) {
+                lastSeparator = AuthorsRefactor.COMMA;
+            } else {
+                separator = AuthorsRefactor.COMMA;
                 setSep = true;
-            } else if (comp(key, "LastSep") && !value.isEmpty()) {
-                visited[35] = true;
-                lastSeparator = value;
-            } else {
-                visited[36] = true;
             }
-        } else if ("etal".equalsIgnoreCase(key.trim())) {
-            visited[37] = true;
-            etAlString = value;
-        } else if (Authors.NUMBER_PATTERN.matcher(key.trim()).matches()) {
-            visited[38] = true;
-            // Just a number:
-            int num = Integer.parseInt(key.trim());
-            if (setMaxAuthors) {
-                visited[39] = true;
-                authorNumberEtAl = num;
+        } else if (comp(key, "And")) {
+            if (setSep) {
+                lastSeparator = AuthorsRefactor.AND;
             } else {
-                visited[40] = true;
-                maxAuthors = num;
-                setMaxAuthors = true;
+                separator = AuthorsRefactor.AND;
+                setSep = true;
             }
+        } else if (comp(key, "Colon")) {
+            if (setSep) {
+                lastSeparator = AuthorsRefactor.COLON;
+            } else {
+                separator = AuthorsRefactor.COLON;
+                setSep = true;
+            }
+        } else if (comp(key, "Semicolon")) {
+            if (setSep) {
+                lastSeparator = AuthorsRefactor.SEMICOLON;
+            } else {
+                separator = AuthorsRefactor.SEMICOLON;
+                setSep = true;
+            }
+        } else if (comp(key, "Oxford")) {
+            lastSeparator = AuthorsRefactor.OXFORD;
+        } else if (comp(key, "Amp")) {
+            lastSeparator = AuthorsRefactor.AMP;
+        } else if (comp(key, "Sep") && !value.isEmpty()) {
+            separator = value;
+            setSep = true;
+        } else if (comp(key, "LastSep") && !value.isEmpty()) {
+            lastSeparator = value;
+        }
+    }
+
+    private void handleNumberPattern(String key) {
+        // Just a number:
+        int num = Integer.parseInt(key.trim());
+        if (setMaxAuthors) {
+            authorNumberEtAl = num;
         } else {
-            visited[41] = true;
+            maxAuthors = num;
+            setMaxAuthors = true;
+        }
+    }
+
+    private void handleArgument(String key, String value) {
+        visited[0] = true;
+        if (AuthorsRefactor.AUTHOR_ORDER.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[1] = true;
+            handleOrder(key);
+        } else if (AuthorsRefactor.AUTHOR_ABRV.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[2] = true;
+            handleAbrv(key);
+        } else if (AuthorsRefactor.AUTHOR_PUNC.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[3] = true;
+            handlePunc(key);
+        } else if (AuthorsRefactor.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || AuthorsRefactor.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            visited[4] = true;
+            handleSeparater(key, value);
+        } else if ("etal".equalsIgnoreCase(key.trim())) {
+            visited[5] = true;
+            etAlString = value;
+        } else if (AuthorsRefactor.NUMBER_PATTERN.matcher(key.trim()).matches()) {
+            visited[6] = true;
+            handleNumberPattern(key);
+        }
+        else {
+            visited[7] = true;
         }
 
         try {
@@ -267,7 +247,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             if (!directory.exists()){
                 directory.mkdir();
             }
-            File f = new File(directory + "/handleArgument.txt");
+            File f = new File(directory + "/handleArgumentRefactor.txt");
 
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             double frac = 0;
@@ -281,8 +261,6 @@ public class Authors extends AbstractParamLayoutFormatter {
         } catch (Exception e) {
             System.err.println("Did not find the path");
         }
-
-        // SHOULD BE: 58%
     }
 
     /**
@@ -309,7 +287,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             for (int i = 0; i < al.getNumberOfAuthors(); i++) {
                 Author a = al.getAuthor(i);
 
-                addSingleName(sb, a, (flMode == Authors.FIRST_FIRST) || ((flMode == Authors.LF_FF) && (i > 0)));
+                addSingleName(sb, a, (flMode == AuthorsRefactor.FIRST_FIRST) || ((flMode == AuthorsRefactor.LF_FF) && (i > 0)));
 
                 if (i < (al.getNumberOfAuthors() - 2)) {
                     sb.append(separator);
@@ -322,7 +300,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 if (i > 0) {
                     sb.append(separator);
                 }
-                addSingleName(sb, al.getAuthor(i), flMode == Authors.FIRST_FIRST);
+                addSingleName(sb, al.getAuthor(i), flMode == AuthorsRefactor.FIRST_FIRST);
             }
             sb.append(etAlString);
         }
