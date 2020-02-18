@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -15,23 +15,20 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
-
 public class MergeEntriesAction extends SimpleCommand {
 
-    private final JabRefFrame jabRefFrame;
+    private final BasePanel basePanel;
     private final DialogService dialogService;
 
-    public MergeEntriesAction(JabRefFrame jabRefFrame, StateManager stateManager) {
-        this.jabRefFrame = jabRefFrame;
-        this.dialogService = jabRefFrame.getDialogService();
+    public MergeEntriesAction(BasePanel panel, DialogService dialogService, StateManager stateManager) {
+        this.basePanel = panel;
+        this.dialogService = dialogService;
 
-        this.executable.bind(needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsEntriesSelected(2, stateManager));
     }
 
     @Override
     public void execute() {
-        BasePanel basePanel = jabRefFrame.getCurrentBasePanel();
 
         // Check if there are two entries selected
         List<BibEntry> selectedEntries = basePanel.getSelectedEntries();

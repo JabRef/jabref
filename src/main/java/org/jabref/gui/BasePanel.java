@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.CannotRedoException;
@@ -35,13 +34,11 @@ import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -49,8 +46,6 @@ import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preview.CitationStyleToClipboardWorker;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -70,9 +65,6 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.UpdateField;
-import org.jabref.logic.util.io.FileFinder;
-import org.jabref.logic.util.io.FileFinders;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -84,15 +76,12 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -281,7 +270,7 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
+        // actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, this::copyKey);
@@ -311,9 +300,9 @@ public class BasePanel extends StackPane {
             dbmsSynchronizer.pullChanges();
         });
 
-        actions.put(Actions.OPEN_URL, new OpenURLAction());
+        // actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
+        // actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
         actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
 
@@ -1109,60 +1098,6 @@ public class BasePanel extends StackPane {
             }
 
             markChangedOrUnChanged();
-        }
-    }
-
-    private class OpenURLAction implements BaseAction {
-
-        @Override
-        public void action() {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() == 1) {
-                Field field = StandardField.DOI;
-                Optional<String> link = bes.get(0).getField(StandardField.DOI);
-                if (bes.get(0).hasField(StandardField.URL)) {
-                    link = bes.get(0).getField(StandardField.URL);
-                    field = StandardField.URL;
-                }
-                if (link.isPresent()) {
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                    }
-                } else {
-                    // No URL or DOI found in the "url" and "doi" fields.
-                    // Look for web links in the "file" field as a fallback:
-
-                    List<LinkedFile> files = bes.get(0).getFiles();
-
-                    Optional<LinkedFile> linkedFile = files.stream()
-                                                           .filter(file -> (StandardField.URL.getName().equalsIgnoreCase(file.getFileType())
-                                                                   || StandardField.PS.getName().equalsIgnoreCase(file.getFileType())
-                                                                   || StandardField.PDF.getName().equalsIgnoreCase(file.getFileType())))
-                                                           .findFirst();
-
-                    if (linkedFile.isPresent()) {
-
-                        try {
-
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext,
-                                    linkedFile.get().getLink(),
-                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
-
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException e) {
-                            output(Localization.lang("Could not open link"));
-                            LOGGER.info("Could not open link", e);
-                        }
-                    } else {
-                        output(Localization.lang("No URL defined") + '.');
-                    }
-                }
-            } else {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-            }
         }
     }
 

@@ -2,14 +2,14 @@ package org.jabref.gui;
 
 import java.io.IOException;
 
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class OpenConsoleAction extends SimpleCommand {
 
@@ -19,7 +19,7 @@ public class OpenConsoleAction extends SimpleCommand {
     public OpenConsoleAction(StateManager stateManager) {
         this.stateManager = stateManager;
 
-        this.executable.bind(needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.isFieldSetForSelectedEntry(StandardField.FILE, stateManager));
     }
 
     @Override

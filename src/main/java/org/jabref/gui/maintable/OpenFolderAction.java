@@ -1,19 +1,17 @@
-package org.jabref.gui;
+package org.jabref.gui.maintable;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class OpenFolderAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OpenFolderAction.class);
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
@@ -23,7 +21,7 @@ public class OpenFolderAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.isFieldSetForSelectedEntry(StandardField.FILE, stateManager));
     }
 
     @Override
