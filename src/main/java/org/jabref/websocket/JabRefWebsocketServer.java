@@ -27,6 +27,9 @@ import org.slf4j.LoggerFactory;
  */
 public class JabRefWebsocketServer extends WebSocketServer {
 
+    private static JabRefWebsocketServer jabRefWebsocketServerSingleton = null;
+
+    private static final int DEFAULT_PORT = 8855;
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefWebsocketServer.class);
 
     private final Runnable heartbeatRunnable = () -> {
@@ -53,40 +56,83 @@ public class JabRefWebsocketServer extends WebSocketServer {
      */
     private int connectionLostTimeout = 5;
 
-    public JabRefWebsocketServer(int port) {
+    private JabRefWebsocketServer(int port) {
         super(new InetSocketAddress(port));
     }
 
-    public JabRefWebsocketServer(InetSocketAddress address) {
+    private JabRefWebsocketServer(InetSocketAddress address) {
         super(address);
     }
 
+    private static void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            /**
+             * run() is invoked, when JabRef gets terminated.
+             */
+            public void run() {
+                if (jabRefWebsocketServerSingleton != null) {
+                    if (jabRefWebsocketServerSingleton.isServerStarted()) {
+                        jabRefWebsocketServerSingleton.stopServer();
+                    }
+                }
+            }
+        });
+    }
+
+    public static synchronized JabRefWebsocketServer getInstance() {
+        if (jabRefWebsocketServerSingleton == null) {
+            jabRefWebsocketServerSingleton = new JabRefWebsocketServer(DEFAULT_PORT);
+        }
+        return jabRefWebsocketServerSingleton;
+    }
+
+    public static synchronized JabRefWebsocketServer getInstance(int port) {
+        if (jabRefWebsocketServerSingleton == null) {
+            jabRefWebsocketServerSingleton = new JabRefWebsocketServer(port);
+        }
+        return jabRefWebsocketServerSingleton;
+    }
+
+    public static boolean isJabRefWebsocketServerInstantiated() {
+        return jabRefWebsocketServerSingleton != null;
+    }
+
     public static void main(String[] args) throws IOException {
-        int port = 8855;
-        try {
-            port = Integer.parseInt(args[0]);
-        } catch (Exception ignored) {
+        JabRefWebsocketServer jabRefWebsocketServer;
+
+        if (JabRefWebsocketServer.isJabRefWebsocketServerInstantiated()) {
+            jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
+        } else {
+            int port = DEFAULT_PORT;
+            try {
+                port = Integer.parseInt(args[0]);
+            } catch (Exception ignored) {
+            }
+
+            jabRefWebsocketServer = JabRefWebsocketServer.getInstance(port);
         }
 
-        JabRefWebsocketServer jabRefWebsocketServer = new JabRefWebsocketServer(port);
-        jabRefWebsocketServer.startServer();
+        if (!jabRefWebsocketServer.isServerStarting() && !jabRefWebsocketServer.isServerStarted()) {
+            jabRefWebsocketServer.startServer();
+        }
 
         BufferedReader systemIn = new BufferedReader(new InputStreamReader(System.in));
 
         while (true) {
             String input = systemIn.readLine();
 
+            if (input.equals("quit")) {
+                break;
+            }
+
             JsonObject messagePayload = new JsonObject();
             messagePayload.addProperty("messageType", "info");
             messagePayload.addProperty("message", input);
 
-            if (input.equals("quit")) {
-                jabRefWebsocketServer.stopServer();
-                break;
-            }
-
             jabRefWebsocketServer.broadcastMessage(WsAction.INFO_MESSAGE, messagePayload);
         }
+
+        jabRefWebsocketServer.stopServer();
     }
 
     /**
@@ -102,7 +148,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 return websocket;
             }
         }
-
         return null;
     }
 
@@ -119,11 +164,14 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 return websocket;
             }
         }
-
         return null;
     }
 
     private boolean sendJsonString(WebSocket websocketOfRecipient, String jsonString) {
+        if (!serverStarted) {
+            return false;
+        }
+
         if (websocketOfRecipient == null || jsonString == null) {
             return false;
         }
@@ -161,6 +209,61 @@ public class JabRefWebsocketServer extends WebSocketServer {
         for (WebSocket websocket : getConnections()) {
             sendMessage(websocket, wsAction, messagePayload);
         }
+    }
+
+    public boolean startServer() {
+        if (serverStarting) {
+            System.out.println("[ws] JabRefWebsocketServer is already starting");
+            return false;
+        }
+        if (serverStarted) {
+            System.out.println("[ws] JabRefWebsocketServer has already been started");
+            return false;
+        } else {
+            System.out.println("[ws] JabRefWebsocketServer is starting up...");
+
+            serverStarting = true;
+
+            addShutdownHook();
+            start();
+
+            return true;
+        }
+    }
+
+    public boolean stopServer() {
+        if (serverStarting) {
+            System.out.println("[ws] JabRefWebsocketServer is currently starting up and cannot be stopped during this process");
+            return false;
+        } else if (serverStarted) {
+            System.out.println("[ws] stopping JabRefWebsocketServer...");
+
+            if (heartbeatExecutor != null) {
+                heartbeatExecutor.shutdown();
+                this.heartbeatExecutor = null;
+            }
+
+            try {
+                stop(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            serverStarted = false;
+
+            return true;
+        } else {
+            System.out.println("[ws] JabRefWebsocketServer is not started");
+            return false;
+        }
+    }
+
+    public boolean isServerStarting() {
+        return serverStarting;
+    }
+
+    public boolean isServerStarted() {
+        return serverStarted;
     }
 
     @Override
@@ -203,7 +306,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
         System.out.println("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
 
-        setConnectionLostTimeout(0);
         setConnectionLostTimeout(connectionLostTimeout);
 
         if (enableHeartbeat) {
@@ -215,59 +317,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
         } else {
             System.out.println("[ws] heartbeat thread is disabled...");
         }
-    }
-
-    public boolean startServer() {
-        if (serverStarting) {
-            System.out.println("[ws] JabRefWebsocketServer is already starting");
-
-            return false;
-        }
-        if (serverStarted) {
-            System.out.println("[ws] JabRefWebsocketServer has already been started");
-
-            return false;
-        } else {
-            System.out.println("[ws] JabRefWebsocketServer is starting up...");
-
-            serverStarting = true;
-            start();
-
-            return true;
-        }
-    }
-
-    public boolean stopServer() {
-        if (heartbeatExecutor != null) {
-            heartbeatExecutor.shutdown();
-
-            this.heartbeatExecutor = null;
-        }
-
-        if (serverStarting || serverStarted) {
-            System.out.println("[ws] stopping JabRefWebsocketServer...");
-
-            serverStarted = false;
-            try {
-                stop(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return true;
-        } else {
-            System.out.println("[ws] JabRefWebsocketServer is not started");
-
-            return false;
-        }
-    }
-
-    public boolean isServerStarting() {
-        return serverStarting;
-    }
-
-    public boolean isServerStarted() {
-        return serverStarted;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.jabref.websocket.handlers;
 
-import org.jabref.websocket.JabRefWebsocketServerInstance;
+import org.jabref.websocket.JabRefWebsocketServer;
 import org.jabref.websocket.WsAction;
 import org.jabref.websocket.WsClientData;
 import org.jabref.websocket.WsClientType;
@@ -22,7 +22,7 @@ public class HandlerCmdRegister {
             messagePayloadForClient.addProperty("messageType", "warning");
             messagePayloadForClient.addProperty("message", "invalid WsClientType: " + wsClientTypeString);
 
-            JabRefWebsocketServerInstance.getInstance().sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayloadForClient);
+            JabRefWebsocketServer.getInstance().sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayloadForClient);
         }
     }
 }
