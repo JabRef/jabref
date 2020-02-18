@@ -45,6 +45,68 @@ public class GvkParserTest {
     }
 
     @Test
+    /**
+     * Checks that the tag 037C works correctly.
+     * 
+     * Specifically, checks that the PICA+ (PICA 3.0)
+     * specification is correctly followed for the tag
+     * 037C (i.e academic records), by checking that 
+     * dissertation information and address can be 
+     * correctly extracted from the academic record.
+     */
+    public void test037C() throws Exception {
+        doTest("gvk_037C_diss.xml", 1, Collections.singletonList("gvk_037C_diss.bib"));
+        doTest("gvk_037C_book.xml", 1, Collections.singletonList("gvk_037C_book.bib"));
+    }
+
+    @Test
+    /**
+     * Checks that the tag 030F works correctly.
+     * 
+     * Specifically, checks that the PICA+ (PICA 3.0)
+     * specification is correctly followed for the tag
+     * 030F (i.e conference information), by checking that 
+     * conference information is correctly extracted and 
+     * put into the Bib entry.
+     * 
+     * This is done by sending conference information such 
+     * as a subtitle and conference address.
+     */
+    public void test030F() throws Exception {
+        doTest("gvk_030F.xml", 1, Collections.singletonList("gvk_030F.bib"));
+    }
+
+    @Test
+    /**
+     * Checks that the tag 031A works correctly.
+     * 
+     * Specifically, checks that the PICA+ (PICA 3.0)
+     * specification is correctly followed for the tag
+     * 031A (i.e differentiating information), by checking 
+     * that the year is properly overwritten with the new
+     * year (2020).
+     */
+    public void test031A() throws Exception {
+        doTest("gvk_031A.xml", 1, Collections.singletonList("gvk_031A.bib"));
+    }
+
+    @Test
+    /**
+     * Checks that the tag 002@ works correctly.
+     * 
+     * Specifically, checks that the PICA+ (PICA 3.0)
+     * specification is correctly followed for the tag
+     * 002@ (i.e document type/status/information), by 
+     * checking that the document type is correctly 
+     * extracted.
+     * 
+     * This test checks the type "Asy".
+     */
+    public void test002AT() throws Exception {
+        doTest("gvk_002@.xml", 1, Collections.singletonList("gvk_002@.bib"));
+    }
+
+    @Test
     public void testGMP() throws Exception {
         doTest("gvk_gmp.xml", 2, Arrays.asList("gvk_gmp.1.bib", "gvk_gmp.2.bib"));
     }

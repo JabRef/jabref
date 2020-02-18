@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+<zs:version>1.1</zs:version>
+<zs:numberOfRecords>1</zs:numberOfRecords>
+<zs:records>
+<zs:record>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordData>
+<record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="011@">
+    <subfield code="a">1999</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Aau</subfield>
+  </datafield>
+  <datafield tag="031A">
+    <subfield code="j">2020</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">On the Simplicity-Efficiency Trade-off in Learning</subfield>
+    <subfield code="d">As Applied to the "Hello World" Example</subfield>
+  </datafield>
+  <datafield tag="028A">
+    <subfield code="d">Anne</subfield>
+    <subfield code="a">Doe</subfield>
+  </datafield>
+  <datafield tag="028A">
+    <subfield code="d">John</subfield>
+    <subfield code="a">Doe</subfield>
+  </datafield>
+  <datafield tag="037C">
+    <subfield code="b">Stockholm</subfield>
+    <subfield code="a">KTH Royal Institute of Technology, Diss., 2020</subfield>
+  </datafield>
+</record>
+</zs:recordData>
+<zs:recordPosition>1</zs:recordPosition>
+</zs:record>
+</zs:records>
+<zs:echoedSearchRetrieveRequest>
+<zs:version>1.1</zs:version>
+<zs:query>pica.all=Stockholm</zs:query>
+<zs:maximumRecords>50</zs:maximumRecords>
+<zs:recordPacking>xml</zs:recordPacking>
+<zs:recordSchema>picaxml</zs:recordSchema>
+<zs:sortKeys>Year,,1</zs:sortKeys>
+</zs:echoedSearchRetrieveRequest>
+</zs:searchRetrieveResponse>
