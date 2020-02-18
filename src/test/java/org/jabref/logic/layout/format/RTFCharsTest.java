@@ -184,5 +184,42 @@ class RTFCharsTest {
         assertEquals("\\'cf", formatter.format("\\\"I"));
         assertEquals("\\'d6", formatter.format("\\\"O"));
         assertEquals("\\'dc", formatter.format("\\\"U"));
+    }    
+
+    /**
+     * First test to check whether a complicated sentence gets translated correctly
+     */
+    @Test
+    void testComplicated7() {
+        assertEquals("This \\u204Is a \\u223ssample t\\u200Est \\u354That \\u199Co\\u209Ntains \\u372Weird c\\u292Ha\\u340Racter\\u346S\\u161!"
+                , formatter.format("This Ìs a ßample tÈst Ţhat ÇoÑtains Ŵeird cĤaŔacterŚ¡"));
     }
+
+    /**
+     * Second test to check whether a complicated sentence gets translated correctly
+     */
+    @Test
+    void testComplicated8() {
+        assertEquals("We \\u198AEre missing \\u355tests for ce\\u341rtain \\u313Letters"
+                , formatter.format("We Ære missing ţests for ceŕtain Ĺetters"));
+    }
+
+    /**
+     * Third test to check whether a complicated sentence gets translated correctly
+     */
+    @Test
+    void testComplicated9() {
+        assertEquals("\\u374Yo\\u217U have to see these lette\\u222THs, they are \\u310Kinda am\\u338OEzin\\u284G."
+                , formatter.format("ŶoÙ have to see these letteÞs, they are Ķinda amŒzinĜ."));
+    }
+
+    /**
+     * Test if certain complicated symbols gets translated correctly
+     */
+    @Test
+    void testMoreSpecialCharacters() {        
+        assertEquals("\\u373w", formatter.format("\\^{w}")); // ŵ            
+        assertEquals("\\u209N", formatter.format("\\~N")); // Ñ    
+        assertEquals("\\u377Z", formatter.format("\\'{Z}")); // Ź
+    }       
 }
