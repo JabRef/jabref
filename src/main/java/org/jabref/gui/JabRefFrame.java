@@ -62,7 +62,7 @@ import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
-import org.jabref.gui.entryeditor.EntryEditorPreviewChangeAction;
+import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
@@ -807,8 +807,8 @@ public class JabRefFrame extends BorderPane {
 
                     new SeparatorMenuItem(),
 
-                    factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new EntryEditorPreviewChangeAction(EntryEditorPreviewChangeAction.Direction.NEXT, this, stateManager)),
-                    factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new EntryEditorPreviewChangeAction(EntryEditorPreviewChangeAction.Direction.PREVIOUS, this, stateManager)),
+                    factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, this, stateManager)),
+                    factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, this, stateManager)),
 
                     new SeparatorMenuItem(),
 

@@ -6,14 +6,14 @@ import org.jabref.gui.actions.SimpleCommand;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-public class EntryEditorPreviewChangeAction extends SimpleCommand {
+public class PreviewSwitchAction extends SimpleCommand {
 
     public enum Direction { PREVIOUS, NEXT }
 
     private final JabRefFrame frame;
     private final Direction direction;
 
-    public EntryEditorPreviewChangeAction(Direction direction, JabRefFrame frame, StateManager stateManager) {
+    public PreviewSwitchAction(Direction direction, JabRefFrame frame, StateManager stateManager) {
         this.frame = frame;
         this.direction = direction;
 
