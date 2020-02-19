@@ -32,12 +32,22 @@ public class TestManager {
             dbmsConnection.getConnection().createStatement().executeUpdate("DROP TABLE IF EXISTS \"METADATA\"");
         } else if (dbmsType == DBMSType.ORACLE) {
             dbmsConnection.getConnection().createStatement()
-                          .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n"
-                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n"
-                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n"
+                          .executeUpdate("BEGIN\n"
+                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"FIELD\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
+                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
+            dbmsConnection.getConnection().createStatement()
+                          .executeUpdate("BEGIN\n"
+                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"ENTRY\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
+                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
+            dbmsConnection.getConnection().createStatement()
+                          .executeUpdate("BEGIN\n"
+                                  + "EXECUTE IMMEDIATE 'DROP TABLE \"METADATA\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
+                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
+            dbmsConnection.getConnection().createStatement()
+                          // Sequence does not exist has a different error code than table does not exist
+                          .executeUpdate("BEGIN\n"
                                   + "EXECUTE IMMEDIATE 'DROP SEQUENCE \"ENTRY_SEQ\"';\n" + "EXCEPTION\n" + "WHEN OTHERS THEN\n"
-                                  + "IF SQLCODE != -942 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;");
+                                  + "IF SQLCODE != -2289 THEN\n" + "RAISE;\n" + "END IF;\n" + "END;\n");
         }
     }
-
 }
