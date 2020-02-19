@@ -112,6 +112,14 @@ public class BibEntryTypesManager {
         }
     }
 
+    public void removeCustomOrModifiedEntryType(BibEntryType entryType, BibDatabaseMode mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
+            BIBLATEX.removeCustomOrModifiedEntryType(entryType);
+        } else if (BibDatabaseMode.BIBTEX == mode) {
+            BIBTEX.removeCustomOrModifiedEntryType(entryType);
+        }
+    }
+
     public Collection<BibEntryType> getAllTypes(BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllTypes() : BIBTEX.getAllTypes();
     }
@@ -169,6 +177,10 @@ public class BibEntryTypesManager {
         private void addCustomOrModifiedType(BibEntryType type) {
             customOrModifiedType.remove(type);
             customOrModifiedType.add(type);
+        }
+        
+        private void removeCustomOrModifiedEntryType(BibEntryType type) {
+            customOrModifiedType.remove(type);
         }
 
         public SortedSet<BibEntryType> getAllTypes() {
