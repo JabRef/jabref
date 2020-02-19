@@ -72,6 +72,8 @@ import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 public class GlobalSearchBar extends HBox {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
@@ -99,6 +101,8 @@ public class GlobalSearchBar extends HBox {
 
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchDisplayMode = searchPreferences.getSearchMode();
+        
+        this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);

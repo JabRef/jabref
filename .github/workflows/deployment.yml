@@ -63,7 +63,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 13.0.2
       # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         name: Restore gradle cache
