@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
-    private static final String GROBID_URL = "http://grobid.cm.in.tum.de:8070";
+    private static final String GROBID_URL = "http://grobid.jabref.org:8070";
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
@@ -34,12 +34,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     /**
      * Passes request to grobid server, using consolidateCitations option to improve result.
      * Takes a while, since the server has to look up the entry.
+     * Returns a BibTeX string if it can extract it from the argument and an empty string otherwise.
      */
     private String parseUsingGrobid(String plainText) {
         try {
             return grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA);
         } catch (IOException e) {
-            LOGGER.atDebug().setCause(e).log(e.getMessage());
+            LOGGER.debug("Could not process citation", e);
             return "";
         }
     }
@@ -59,13 +60,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
               .map(String::trim)
               .filter(str -> !str.isBlank())
               .collect(Collectors.toCollection(ArrayList::new));
-        if (plainReferences.size() == 0) {
+        if (plainReferences.isEmpty()) {
             return Collections.emptyList();
         } else {
           List<BibEntry> resultsList = new ArrayList<>();
-            for (String reference: plainReferences) {
-                parseBibToBibEntry(parseUsingGrobid(reference)).ifPresent(resultsList::add);
-            }
+          for (String reference: plainReferences) {
+            parseBibToBibEntry(parseUsingGrobid(reference)).ifPresent(resultsList::add);
+          }
             return resultsList;
         }
     }

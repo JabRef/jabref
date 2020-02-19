@@ -30,13 +30,13 @@ public class GrobidServiceTest {
         String[] responseRows = response.split("\n");
         assertNotNull(response);
         assertEquals('@', response.charAt(0));
-        assertTrue(responseRows[1].contains("author") && responseRows[1].contains( "Derwing and M Rossiter"));
-        assertTrue(responseRows[2].contains("title") && responseRows[2].contains( "Teaching native speakers"));
-        assertTrue(responseRows[3].contains("journal") && responseRows[3].contains( "Journal of Multilingual and Multicultural"));
-        assertTrue(responseRows[4].contains("year") && responseRows[4].contains( "2002"));
-        assertTrue(responseRows[5].contains("pages") && responseRows[5].contains( "245--259"));
-        assertTrue(responseRows[6].contains("volume") && responseRows[6].contains( "23"));
-        assertTrue(responseRows[7].contains("number") && responseRows[7].contains( "4"));
+        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing and M Rossiter"));
+        assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching native speakers"));
+        assertTrue(responseRows[3].contains("journal") && responseRows[3].contains("Journal of Multilingual and Multicultural"));
+        assertTrue(responseRows[4].contains("year") && responseRows[4].contains("2002"));
+        assertTrue(responseRows[5].contains("pages") && responseRows[5].contains("245--259"));
+        assertTrue(responseRows[6].contains("volume") && responseRows[6].contains("23"));
+        assertTrue(responseRows[7].contains("number") && responseRows[7].contains("4"));
     }
 
     @Test
