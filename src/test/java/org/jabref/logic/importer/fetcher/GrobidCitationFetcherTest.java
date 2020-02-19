@@ -67,7 +67,7 @@ public class GrobidCitationFetcherTest {
 
     @Test
     public void grobidPerformSearchCorrectlySplitsStringTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n" + example2 + "\r\n" + example3 + "\r" + example4);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
         assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
     }
 
