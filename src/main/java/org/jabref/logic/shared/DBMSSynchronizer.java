@@ -73,7 +73,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
      *
-     * @param event {@link EntryAddedEvent} object
+     * @param event {@link EntriesAddedEvent} object
      */
     @Subscribe
     public void listen(EntriesAddedEvent event) {
@@ -296,15 +296,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
-            // synchronize only if changes were present
-            if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData).isEmpty()) {
-                try {
+            try {
+                // synchronize only if changes were present
+                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData).isEmpty()) {
                     dbmsProcessor.updateEntry(bibEntry);
-                } catch (OfflineLockException exception) {
-                    eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-                } catch (SQLException e) {
-                    LOGGER.error("SQL Error: ", e);
                 }
+            } catch (OfflineLockException exception) {
+                eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            } catch (SQLException e) {
+                LOGGER.error("SQL Error: ", e);
             }
         }
     }

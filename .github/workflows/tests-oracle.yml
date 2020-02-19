@@ -2,8 +2,7 @@ name: Oracle Tests
 
 on:
   push:
-    branches:
-      - master
+    # we need to trigger on all branches, because sometimes need copy of branches, because secrets are only available on "internal" pull requests
     paths:
       - 'src/test/java/org/jabref/model/database/**'
       - 'src/test/java/org/jabref/logic/shared/**'
@@ -32,7 +31,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 13.0.2
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:

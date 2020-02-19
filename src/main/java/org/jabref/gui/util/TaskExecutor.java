@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.concurrent.Task;
 
+import org.jabref.logic.util.DelayTaskThrottler;
+
 /**
  * An object that executes submitted {@link Task}s. This
  * interface provides a way of decoupling task submission from the
@@ -46,4 +48,9 @@ public interface TaskExecutor {
      * Shutdown the task executor.
      */
     void shutdown();
+
+    /**
+     * Creates a new task throttler, and registers it so that it gets properly shutdown.
+     */
+    DelayTaskThrottler createThrottler(int delay);
 }

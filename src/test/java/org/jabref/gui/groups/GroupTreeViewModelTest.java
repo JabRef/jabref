@@ -15,6 +15,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ public class GroupTreeViewModelTest {
         stateManager = new StateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
-        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), taskExecutor, new CustomLocalDragboard());
+        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class), mock(PreferencesService.class), taskExecutor, new CustomLocalDragboard());
     }
 
     @Test
