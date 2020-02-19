@@ -106,34 +106,24 @@ public class OracleProcessor extends DBMSProcessor {
     @Override
     protected void insertIntoEntryTable(List<BibEntry> entries) {
         try {
-            // Inserting into ENTRY table
-            StringBuilder insertEntryQuery = new StringBuilder()
-                    .append("INSERT ALL");
             for (BibEntry entry : entries) {
-                insertEntryQuery.append(" INTO ")
-                                .append(escape("ENTRY"))
-                                .append(" (")
-                                .append(escape("TYPE"))
-                                .append(") VALUES (?)");
-            }
-            insertEntryQuery.append(" SELECT * FROM DUAL");
-            LOGGER.info(insertEntryQuery.toString());
-            try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertEntryQuery.toString(),
-                    new String[]{"SHARED_ID"})) {
-                for (int i = 0; i < entries.size(); i++) {
-                    // columnIndex starts with 1
-                    preparedEntryStatement.setString(i + 1, entries.get(i).getType().getName());
-                }
-                preparedEntryStatement.executeUpdate();
-                try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
-                    // The following assumes that we get the generated keys in the order the entries were inserted
-                    // This should be the case
-                    for (BibEntry entry : entries) {
-                        generatedKeys.next();
-                        entry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
-                    }
-                    if (generatedKeys.next()) {
-                        LOGGER.error("Error: Some shared IDs left unassigned");
+                String insertIntoEntryQuery =
+                        "INSERT INTO " +
+                                escape("ENTRY") +
+                                "(" +
+                                escape("TYPE") +
+                                ") VALUES(?)";
+
+                try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
+                        new String[]{"SHARED_ID"})) {
+
+                    preparedEntryStatement.setString(1, entry.getType().getName());
+                    preparedEntryStatement.executeUpdate();
+
+                    try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            entry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
+                        }
                     }
                 }
             }
