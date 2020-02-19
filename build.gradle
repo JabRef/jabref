@@ -211,7 +211,7 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.6.0'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.7'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.8'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.2.4'
