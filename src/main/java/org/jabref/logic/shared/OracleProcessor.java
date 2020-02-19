@@ -1,11 +1,16 @@
 package org.jabref.logic.shared;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.database.shared.DatabaseConnection;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;
@@ -95,6 +100,40 @@ public class OracleProcessor extends DBMSProcessor {
             LOGGER.error("SQL Error: ", e);
         }
 
+    }
+
+    @Override
+    protected void insertIntoFieldTable(BibEntry bibEntry) {
+        try {
+            // Inserting into FIELD table
+            // Coerce to ArrayList in order to use List.get()
+            List<Field> fields = new ArrayList<>(bibEntry.getFields());
+            StringBuilder insertFieldQuery = new StringBuilder()
+                    .append("INSERT ALL");
+            for (Field field : fields) {
+                insertFieldQuery.append(" INTO ")
+                                .append(escape("FIELD"))
+                                .append(" (")
+                                .append(escape("ENTRY_SHARED_ID"))
+                                .append(", ")
+                                .append(escape("NAME"))
+                                .append(", ")
+                                .append(escape("VALUE"))
+                                .append(") VALUES (?, ?, ?)");
+            }
+            insertFieldQuery.append(" SELECT * FROM DUAL");
+            try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
+                for (int i = 0; i < fields.size(); i++) {
+                    // columnIndex starts with 1
+                    preparedFieldStatement.setInt((3 * i) + 1, bibEntry.getSharedBibEntryData().getSharedID());
+                    preparedFieldStatement.setString((3 * i) + 2, fields.get(i).getName());
+                    preparedFieldStatement.setString((3 * i) + 3, bibEntry.getField(fields.get(i)).get());
+                }
+                preparedFieldStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
     }
 
     @Override

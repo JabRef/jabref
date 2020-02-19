@@ -210,7 +210,7 @@ public abstract class DBMSProcessor {
      *
      * @param bibEntry {@link BibEntry} to be inserted
      */
-    private void insertIntoFieldTable(BibEntry bibEntry) {
+    protected void insertIntoFieldTable(BibEntry bibEntry) {
         try {
             // Inserting into FIELD table
             // Coerce to ArrayList in order to use List.get()

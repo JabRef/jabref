@@ -118,6 +118,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                 .setUser(user.getValue())
                 .setPassword(password.getValue())
                 .setUseSSL(useSSL.getValue())
+                // Authorize client to retrieve RSA server public key when serverRsaPublicKeyFile is not set (for sha256_password and caching_sha2_password authentication password)
+                .setAllowPublicKeyRetrieval(true)
                 .setKeyStore(keystore.getValue())
                 .setServerTimezone(serverTimezone.getValue())
                 .createDBMSConnectionProperties();
