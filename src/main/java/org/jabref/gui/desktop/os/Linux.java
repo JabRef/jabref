@@ -37,10 +37,8 @@ public class Linux implements NativeDesktop {
         } else {
             viewer = "xdg-open";
         }
-        String[] cmdArray = {viewer, filePath};
-        Process process = Runtime.getRuntime().exec(cmdArray);
-        // When the stream is full at some point, then blocks the execution of the program
-        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
+        ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
+        Process process = processBuilder.start();
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
         StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
 
@@ -61,9 +59,9 @@ public class Linux implements NativeDesktop {
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
 
-        Process process = Runtime.getRuntime().exec(cmdArray);
-        // When the stream is full at some point, then blocks the execution of the program
-        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
+        Process process = processBuilder.start();
+
         StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
         StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
 
