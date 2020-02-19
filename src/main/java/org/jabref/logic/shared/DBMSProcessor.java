@@ -27,7 +27,6 @@ import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import org.slf4j.Logger;
@@ -233,9 +232,9 @@ public abstract class DBMSProcessor {
         }
 
     /**
-     * Inserts the given bibEntry into FIELD table.
+     * Inserts the given list of BibEntry into FIELD table.
      *
-     * @param bibEntry {@link BibEntry} to be inserted
+     * @param bibEntries {@link BibEntry} to be inserted
      */
     protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         try {

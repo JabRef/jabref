@@ -131,7 +131,6 @@ class DBMSProcessorTest {
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
-
             try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
                 while (fieldResultSet.next()) {
                     if (actualFieldMap.keySet().contains(fieldResultSet.getInt("ENTRY_SHARED_ID"))) {
