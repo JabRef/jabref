@@ -71,7 +71,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        BibEntry emptyEntry = new BibEntry();
+        BibEntry emptyEntry = getBibEntryExample();
         emptyEntry.getSharedBibEntryData().setSharedID(1);
         dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
 

@@ -51,7 +51,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
     @Override
     protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
-        // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
         StringBuilder insertIntoEntryQuery = new StringBuilder()
                 .append("INSERT INTO ")
                 .append(escape("ENTRY"))

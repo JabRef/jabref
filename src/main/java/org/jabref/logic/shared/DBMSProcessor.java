@@ -149,11 +149,11 @@ public abstract class DBMSProcessor {
      */
     public void insertEntries(List<BibEntry> bibEntries) {
         List<BibEntry> notYetExistingEntries = getNotYetExistingEntries(bibEntries);
-        insertIntoEntryTable(notYetExistingEntries);
-        // Temporary fix - THIS MUST BE CHANGED BEFORE MERGING TO MASTER
-        for (BibEntry bibEntry : notYetExistingEntries) {
-            insertIntoFieldTable(bibEntry);
+        if (notYetExistingEntries.isEmpty()) {
+            return;
         }
+        insertIntoEntryTable(notYetExistingEntries);
+        insertIntoFieldTable(notYetExistingEntries);
     }
 
     /**
@@ -237,11 +237,12 @@ public abstract class DBMSProcessor {
      *
      * @param bibEntry {@link BibEntry} to be inserted
      */
-    protected void insertIntoFieldTable(BibEntry bibEntry) {
+    protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         try {
             // Inserting into FIELD table
             // Coerce to ArrayList in order to use List.get()
-            List<Field> fields = new ArrayList<>(bibEntry.getFields());
+            List<List<Field>> fields = bibEntries.stream().map(bibEntry -> new ArrayList<>(bibEntry.getFields()))
+                                                 .collect(Collectors.toList());
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
                     .append(escape("FIELD"))
@@ -252,16 +253,24 @@ public abstract class DBMSProcessor {
                     .append(", ")
                     .append(escape("VALUE"))
                     .append(") VALUES(?, ?, ?)");
+            int numFields = 0;
+            for (List<Field> entryFields : fields) {
+                numFields += entryFields.size();
+            }
             // Number of commas is fields.size() - 1
-            for (int i = 0; i < fields.size() - 1; i++) {
+            for (int i = 0; i < numFields - 1; i++) {
                 insertFieldQuery.append(", (?, ?, ?)");
             }
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
-                for (int i = 0; i < fields.size(); i++) {
-                    // columnIndex starts with 1
-                    preparedFieldStatement.setInt((3 * i) + 1, bibEntry.getSharedBibEntryData().getSharedID());
-                    preparedFieldStatement.setString((3 * i) + 2, fields.get(i).getName());
-                    preparedFieldStatement.setString((3 * i) + 3, bibEntry.getField(fields.get(i)).get());
+                int fieldsCompleted = 0;
+                for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
+                    for (int entryFieldsIndex = 0; entryFieldsIndex < fields.get(entryIndex).size(); entryFieldsIndex++) {
+                        // columnIndex starts with 1
+                        preparedFieldStatement.setInt((3 * fieldsCompleted) + 1, bibEntries.get(entryIndex).getSharedBibEntryData().getSharedID());
+                        preparedFieldStatement.setString((3 * fieldsCompleted) + 2, fields.get(entryIndex).get(entryFieldsIndex).getName());
+                        preparedFieldStatement.setString((3 * fieldsCompleted) + 3, bibEntries.get(entryIndex).getField(fields.get(entryIndex).get(entryFieldsIndex)).get());
+                        fieldsCompleted += 1;
+                    }
                 }
                 preparedFieldStatement.executeUpdate();
             }

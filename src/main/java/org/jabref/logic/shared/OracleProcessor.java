@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
 import org.jabref.model.database.shared.DatabaseConnection;
@@ -133,14 +134,19 @@ public class OracleProcessor extends DBMSProcessor {
     }
 
     @Override
-    protected void insertIntoFieldTable(BibEntry bibEntry) {
+    protected void insertIntoFieldTable(List<BibEntry> bibEntries) {
         try {
             // Inserting into FIELD table
             // Coerce to ArrayList in order to use List.get()
-            List<Field> fields = new ArrayList<>(bibEntry.getFields());
+            List<List<Field>> fields = bibEntries.stream().map(entry -> new ArrayList<>(entry.getFields()))
+                    .collect(Collectors.toList());
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT ALL");
-            for (Field field : fields) {
+            int numFields = 0;
+            for (List<Field> entryFields : fields) {
+                numFields += entryFields.size();
+            }
+            for (int i = 0; i < numFields; i++) {
                 insertFieldQuery.append(" INTO ")
                                 .append(escape("FIELD"))
                                 .append(" (")
@@ -153,14 +159,17 @@ public class OracleProcessor extends DBMSProcessor {
             }
             insertFieldQuery.append(" SELECT * FROM DUAL");
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
-                for (int i = 0; i < fields.size(); i++) {
-                    // columnIndex starts with 1
-                    preparedFieldStatement.setInt((3 * i) + 1, bibEntry.getSharedBibEntryData().getSharedID());
-                    preparedFieldStatement.setString((3 * i) + 2, fields.get(i).getName());
-                    preparedFieldStatement.setString((3 * i) + 3, bibEntry.getField(fields.get(i)).get());
+                int fieldsCompleted = 0;
+                for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {
+                    for (int entryFieldsIndex = 0; entryFieldsIndex < fields.get(entryIndex).size(); entryFieldsIndex++) {
+                        // columnIndex starts with 1
+                        preparedFieldStatement.setInt((3 * fieldsCompleted) + 1, bibEntries.get(entryIndex).getSharedBibEntryData().getSharedID());
+                        preparedFieldStatement.setString((3 * fieldsCompleted) + 2, fields.get(entryIndex).get(entryFieldsIndex).getName());
+                        preparedFieldStatement.setString((3 * fieldsCompleted) + 3, bibEntries.get(entryIndex).getField(fields.get(entryIndex).get(entryFieldsIndex)).get());
+                        fieldsCompleted += 1;
+                    }
                 }
-                preparedFieldStatement.executeUpdate();
-            }
+                preparedFieldStatement.executeUpdate();            }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
