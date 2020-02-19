@@ -40,7 +40,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
         this.setTitle(Localization.lang("Plain References Parser"));
-        input.setPromptText(Localization.lang("Please enter the plain references to extract from."));
+        input.setPromptText(Localization.lang("Please enter the plain references to extract from separated by double empty lines."));
         input.selectAll();
 
         buttonParse = (Button) getDialogPane().lookupButton(parseButtonType);
