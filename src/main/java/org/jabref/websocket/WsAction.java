@@ -3,12 +3,14 @@ package org.jabref.websocket;
 public enum WsAction {
     // send only
     HEARTBEAT("heartbeat"),
-    CMD_GET_GOOGLE_SCHOLAR_CITATION_COUNTS("cmd.getGoogleScholarCitationCounts"),
+    INFO_CONFIGURATION("info.configuration"),
+    CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS("cmd.fetchGoogleScholarCitationCounts"),
+    CMD_CONTINUE_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS("cmd.continueFetchGoogleScholarCitationCounts"),
 
     // receive only
     CMD_REGISTER("cmd.register"),
     INFO_GOOGLE_SCHOLAR_CITATION_COUNTS("info.googleScholarCitationCounts"),
-    INFO_GOOGLE_SCHOLAR_SOLVING_CAPTCHA_NEEDED("info.googleScholarSolvingCaptchaNeeded"),
+    INFO_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS_INTERRUPTED("info.fetchGoogleScholarCitationCountsInterrupted"),
 
     // send and receive
     INFO_MESSAGE("info.message");
