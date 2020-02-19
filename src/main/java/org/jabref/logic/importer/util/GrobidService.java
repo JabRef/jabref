@@ -37,10 +37,14 @@ public class GrobidService {
         this.grobidServerURL = grobidServerURL;
     }
 
+    /**
+     * @return A BibTeX-String if extraction is successful and an IOException otherwise.
+     */
     public String processCitation(String rawCitation, ConsolidateCitations consolidateCitations) throws IOException {
         rawCitation = URLEncoder.encode(rawCitation, StandardCharsets.UTF_8);
         URLDownload urlDownload = new URLDownload(grobidServerURL
                 + "/api/processCitation");
+        //urlDownload.addHeader("Accept", "application/x-bibtex"); //TODO: Uncomment as soon as the default GROBID server is used.
         urlDownload.setPostData("citations=" + rawCitation + "&consolidateCitations=" + consolidateCitations);
         String httpResponse = urlDownload.asString();
 
