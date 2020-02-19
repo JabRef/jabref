@@ -151,16 +151,9 @@
   <macro name="contributors-short-biblio">
     <choose>
       <if variable="author">
-        <choose>
-          <if match="any" variable="title-short">
-            <text variable="title-short"/>
-          </if>
-          <else>
-            <names variable="author">
-              <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
-            </names>
-          </else>
-        </choose>
+        <names variable="author">
+          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
+        </names>
       </if>
       <else-if variable="editor">
         <names variable="editor">
