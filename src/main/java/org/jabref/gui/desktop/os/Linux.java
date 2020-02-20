@@ -11,8 +11,10 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.util.StreamGobbler;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
     @Override
@@ -34,14 +37,13 @@ public class Linux implements NativeDesktop {
         } else {
             viewer = "xdg-open";
         }
-        String[] cmdArray = { viewer, filePath };
-        Process p = Runtime.getRuntime().exec(cmdArray);
-        // When the stream is full at some point, then blocks the execution of the program
-        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        String line;
-        line = in.readLine();
-        LOGGER.debug("Received output: " + line);
+        ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
+        Process process = processBuilder.start();
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
@@ -53,17 +55,18 @@ public class Linux implements NativeDesktop {
         } else {
             openWith = new String[] {"xdg-open"};
         }
-
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
-        Process p = Runtime.getRuntime().exec(cmdArray);
-        // When the stream is full at some point, then blocks the execution of the program
-        // See https://stackoverflow.com/questions/10981969/why-is-going-through-geterrorstream-necessary-to-run-a-process.
-        BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        String line;
-        line = in.readLine();
-        LOGGER.debug("Received output: " + line);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
+        Process process = processBuilder.start();
+
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
@@ -118,7 +121,7 @@ public class Linux implements NativeDesktop {
 
             openFileWithApplication(filePath, sj.toString());
         } else {
-            openFile( filePath, "PDF");
+            openFile(filePath, "PDF");
         }
     }
 
