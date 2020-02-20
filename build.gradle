@@ -23,7 +23,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.1'
+    id 'org.beryx.jlink' version '2.17.2'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -169,7 +169,7 @@ dependencies {
     compile 'org.controlsfx:controlsfx:11.0.1'
 
     compile 'org.jsoup:jsoup:1.12.2'
-    compile 'com.konghq:unirest-java:3.4.03'
+    compile 'com.konghq:unirest-java:3.5.00'
 
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -206,12 +206,12 @@ dependencies {
     }
 
 
-    testCompile 'io.github.classgraph:classgraph:4.8.62'
+    testCompile 'io.github.classgraph:classgraph:4.8.64'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
     testCompile 'org.junit.platform:junit-platform-launcher:1.6.0'
 
-    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.7'
+    testCompile 'net.bytebuddy:byte-buddy-parent:1.10.8'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testCompile 'org.mockito:mockito-core:3.2.4'
@@ -255,7 +255,7 @@ dependencyUpdates.resolutionStrategy = {
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.0.26-9.1.2/
-                || selection.candidate.version ==~ /2.0.26-9.1.1/ 
+                || selection.candidate.version ==~ /2.0.26-9.1.1/
                 || selection.candidate.version ==~ /2.0.26-9.1.0/) {
                 selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
@@ -590,7 +590,7 @@ jlink {
         requires 'java.rmi'
         requires 'java.xml'
         requires 'com.sun.xml.txw2'
-        requires 'com.google.gson';
+        requires 'com.google.gson'
         requires 'java.desktop'
         requires 'java.security.jgss'
         requires 'jdk.jsobject'
@@ -628,7 +628,6 @@ jlink {
             // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
             installerType = "msi"
             imageOptions = [
-                    '--win-console',
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
             ]
             installerOptions = [
