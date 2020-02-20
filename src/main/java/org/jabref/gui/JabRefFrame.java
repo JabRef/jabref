@@ -409,7 +409,7 @@ public class JabRefFrame extends BorderPane {
 
         setId("frame");
 
-        VBox head = new VBox(createMenu(),createToolbar());
+        VBox head = new VBox(createMenu(), createToolbar());
         head.setSpacing(0d);
         setTop(head);
 
@@ -681,8 +681,12 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true, Globals.prefs)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, stateManager))),
 
-                factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
-                factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, stateManager)),
+                new SeparatorMenuItem(),
+
+                factory.createSubMenu(StandardActions.REMOTE_DB,
+                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
+                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, stateManager))
+                ),
 
                 new SeparatorMenuItem(),
 

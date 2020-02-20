@@ -299,7 +299,8 @@ public class IconTheme {
         REMOVE_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_REMOVE),
         ADD_ABBREVIATION(MaterialDesignIcon.PLAYLIST_PLUS),
         REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS),
-        NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignIcon.PLUS_BOX);
+        NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignIcon.PLUS_BOX),
+        REMOTE_DATABASE(MaterialDesignIcon.DATABASE);
 
         private final JabRefIcon icon;
 
