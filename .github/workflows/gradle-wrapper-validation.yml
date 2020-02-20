@@ -1,0 +1,14 @@
+# This is https://github.com/marketplace/actions/gradle-wrapper-validation
+# It ensures that the jar file is from gradle and not by a strange third party.
+
+name: "Validate Gradle Wrapper"
+on: [push, pull_request]
+
+jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+

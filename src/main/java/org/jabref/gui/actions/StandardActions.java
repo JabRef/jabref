@@ -120,7 +120,7 @@ public enum StandardActions implements Action {
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
     NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),
-    NEW_ENTRY_FROM_PLAINTEX(Localization.lang("New entry from plain text"), KeyBinding.NEW_FROM_PLAIN_TEXT),
+    NEW_ENTRY_FROM_PLAIN_TEXT(Localization.lang("New entry from plain text"), IconTheme.JabRefIcons.NEW_ENTRY_FROM_PLAIN_TEXT, KeyBinding.NEW_ENTRY_FROM_PLAIN_TEXT),
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     EDIT_PREAMBLE(Localization.lang("Edit preamble")),
     EDIT_STRINGS(Localization.lang("Edit string constants"), IconTheme.JabRefIcons.EDIT_STRINGS, KeyBinding.EDIT_STRINGS),
@@ -138,7 +138,6 @@ public enum StandardActions implements Action {
     DOWNLOAD_FULL_TEXT(Localization.lang("Search full text documents online"), IconTheme.JabRefIcons.FILE_SEARCH, KeyBinding.DOWNLOAD_FULL_TEXT),
     CLEANUP_ENTRIES(Localization.lang("Cleanup entries"), IconTheme.JabRefIcons.CLEANUP_ENTRIES, KeyBinding.CLEANUP),
     SET_FILE_LINKS(Localization.lang("Automatically set file links"), KeyBinding.AUTOMATICALLY_LINK_FILES),
-    EXTRACT_BIBTEX(Localization.lang("Extract BibTeX from plain text")),
 
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
     HELP_KEY_PATTERNS(Localization.lang("Help on key patterns"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),

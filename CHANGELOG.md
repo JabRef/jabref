@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
+- We reintroduced the possibility to extract references from plain text (using GROBID) [#5614](https://github.com/JabRef/jabref/pull/5614) 
 - We changed the open office panel to show buttons in rows of three instead of going straight down to save space as the button expanded out to take up unnecessary horizontal space. [#5479](https://github.com/JabRef/jabref/issues/5479)
 - We cleaned up the group add/edit dialog. [#5826](https://github.com/JabRef/jabref/pull/5826)
 - We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
@@ -22,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 
+- We fixed an issue where the command line console was always opened in the background. [#5474](https://github.com/JabRef/jabref/issues/5474)
 - We fixed and issue where pdf files will not open under some KDE linux distributions when using okular. [#5253](https://github.com/JabRef/jabref/issues/5253)
 - We fixed an issue where the Medline fetcher was only working when JabRef was running from source. [#5645](https://github.com/JabRef/jabref/issues/5645)
 - We fixed some visual issues in the dark theme. [#5764](https://github.com/JabRef/jabref/pull/5764) [#5753](https://github.com/JabRef/jabref/issues/5753)

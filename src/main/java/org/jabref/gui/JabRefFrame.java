@@ -486,6 +486,7 @@ public class JabRefFrame extends BorderPane {
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
+                factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
@@ -734,6 +735,7 @@ public class JabRefFrame extends BorderPane {
         //@formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -773,7 +775,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
-                factory.createMenuItem(StandardActions.EXTRACT_BIBTEX, new ExtractBibtexAction(stateManager)),
 
                 new SeparatorMenuItem(),
 
