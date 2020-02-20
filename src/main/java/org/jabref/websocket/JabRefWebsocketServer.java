@@ -24,9 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple websocket server implementation for JabRef for bidirectional communication.
+ * A simple, robust websocket server implementation for JabRef for bidirectional communication with arbitrarily many websocket clients
  */
 public class JabRefWebsocketServer extends WebSocketServer {
+    // internals
     private static final int MAX_ONMESSAGE_CALLS_IN_PARALLEL = 500; // default: 500; 1: enables sequential processing
     private static final int DEFAULT_PORT = 8855;
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefWebsocketServer.class);
@@ -36,7 +37,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
     private final Semaphore semaphoreWsOnMessage = new Semaphore(MAX_ONMESSAGE_CALLS_IN_PARALLEL, true);
 
     private final Runnable heartbeatRunnable = () -> {
-        System.out.println("[ws] heartbeat thread is active ...");
+        System.out.println("[ws] heartbeat thread is active...");
 
         JsonObject messagePayload = new JsonObject();
 

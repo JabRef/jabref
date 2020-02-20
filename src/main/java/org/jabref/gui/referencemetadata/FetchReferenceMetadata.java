@@ -23,6 +23,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.websocket.JabRefWebsocketServer;
+import org.jabref.websocket.WsAction;
+import org.jabref.websocket.WsClientType;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -49,7 +52,7 @@ public class FetchReferenceMetadata extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
-        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, Localization.lang("This operation fetches the citation counts for the currently selected entries online."), Localization.lang("This operation requires one or more entries to be selected.")));
+        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, Localization.lang("This operation fetches reference metadata for the currently selected entries online."), Localization.lang("This operation requires one or more entries to be selected.")));
     }
 
     @Override
@@ -118,6 +121,9 @@ public class FetchReferenceMetadata extends SimpleCommand {
                 requestObject.add("entries", entriesArray);
 
                 // submit requestObject
+
+                JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
+                jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION, WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
 
                 // receive and process results (updating or adding citation counts)
 
