@@ -298,7 +298,8 @@ public class IconTheme {
         OPEN_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_OUTLINE),
         REMOVE_ABBREVIATION_LIST(MaterialDesignIcon.FOLDER_REMOVE),
         ADD_ABBREVIATION(MaterialDesignIcon.PLAYLIST_PLUS),
-        REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS);
+        REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS),
+        NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignIcon.PLUS_BOX);
 
         private final JabRefIcon icon;
 
