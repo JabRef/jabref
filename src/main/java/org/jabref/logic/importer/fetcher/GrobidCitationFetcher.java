@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
-    private static final String GROBID_URL = "http://grobid.cm.in.tum.de:8070";
+    private static final String GROBID_URL = "http://grobid.jabref.org:8070";
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
