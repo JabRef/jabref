@@ -2,6 +2,7 @@ package org.jabref.logic.shared;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +71,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        BibEntry emptyEntry = new BibEntry();
+        BibEntry emptyEntry = getBibEntryExample();
         emptyEntry.getSharedBibEntryData().setSharedID(1);
         dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
 
@@ -97,31 +98,37 @@ class DBMSProcessorTest {
 
     @Test
     void testInsertMultipleEntries() throws SQLException {
-        BibEntry firstEntry = getBibEntryExample();
-        String firstId = firstEntry.getId();
-        BibEntry secondEntry = getBibEntryExample2();
-        String secondId = secondEntry.getId();
-        BibEntry thirdEntry = getBibEntryExample3();
-        String thirdId = thirdEntry.getId();
-
-        // This must eventually be changed to insertEntries() once that method is implemented
-        dbmsProcessor.insertEntry(firstEntry);
-        dbmsProcessor.insertEntry(secondEntry);
-        dbmsProcessor.insertEntry(thirdEntry);
+        List<BibEntry> entries = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            entries.add(new BibEntry(StandardEntryType.Article).withField(StandardField.JOURNAL, "journal " + i)
+            .withField(StandardField.ISSUE, Integer.toString(i)));
+        }
+        entries.get(3).setType(StandardEntryType.Thesis);
+        dbmsProcessor.insertEntries(entries);
 
         Map<Integer, Map<String, String>> actualFieldMap = new HashMap<>();
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("inproceedings", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(2, entryResultSet.getInt("SHARED_ID"));
-            assertEquals("inproceedings", entryResultSet.getString("TYPE"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertTrue(entryResultSet.next());
             assertEquals(3, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
+            assertTrue(entryResultSet.next());
+            assertEquals(4, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("thesis", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
+            assertTrue(entryResultSet.next());
+            assertEquals(5, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
             try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
@@ -139,7 +146,6 @@ class DBMSProcessorTest {
                 }
             }
         }
-        List<BibEntry> entries = Arrays.asList(firstEntry, secondEntry, thirdEntry);
         Map<Integer, Map<String, String>> expectedFieldMap = entries.stream()
                                                                    .collect(Collectors.toMap(bibEntry -> bibEntry.getSharedBibEntryData().getSharedID(),
                                                                            (bibEntry) -> bibEntry.getFieldMap().entrySet().stream()

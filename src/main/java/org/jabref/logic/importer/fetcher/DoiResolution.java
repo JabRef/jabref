@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  */
 public class DoiResolution implements FulltextFetcher {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
 
     @Override
@@ -63,7 +64,11 @@ public class DoiResolution implements FulltextFetcher {
                         // Only check if pdf is included in the link or inside the text
                         // ACM uses tokens without PDF inside the link
                         // See https://github.com/lehner/LocalCopy for more scrape ideas
-                        if ((href.contains("pdf") || hrefText.contains("pdf")) && new URLDownload(href).isPdf()) {
+                        if (element.attr("title").toLowerCase(Locale.ENGLISH).contains("pdf") && new URLDownload(href).isPdf()) {
+                            return Optional.of(new URL(href));
+                        }
+
+                        if (href.contains("pdf") || hrefText.contains("pdf") && new URLDownload(href).isPdf()) {
                             links.add(Optional.of(new URL(href)));
                         }
                     }
