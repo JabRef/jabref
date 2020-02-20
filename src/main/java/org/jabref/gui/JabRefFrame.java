@@ -851,10 +851,10 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction("https://blog.jabref.org/")),
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
                         factory.createMenuItem(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                        factory.createMenuItem(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
 
                         new SeparatorMenuItem(),
 
-                        factory.createMenuItem(StandardActions.FORK_ME, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
 
