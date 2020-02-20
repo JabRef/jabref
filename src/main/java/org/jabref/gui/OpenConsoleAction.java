@@ -6,7 +6,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ public class OpenConsoleAction extends SimpleCommand {
     public OpenConsoleAction(StateManager stateManager) {
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.isFieldSetForSelectedEntry(StandardField.FILE, stateManager));
+        this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
     @Override

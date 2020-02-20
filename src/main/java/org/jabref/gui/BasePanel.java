@@ -260,41 +260,12 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        // actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
-
-        // The action for copying the selected entry's key.
-        // actions.put(Actions.COPY_KEY, this::copyKey);
-
-        // The action for copying the selected entry's title.
-        // actions.put(Actions.COPY_TITLE, this::copyTitle);
-
-        // The action for copying a cite for the selected entry.
-        // actions.put(Actions.COPY_CITE_KEY, this::copyCiteKey);
-
-        // The action for copying the BibTeX key and the title for the first selected entry
-        // actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
-
-        /*
-        actions.put(Actions.COPY_CITATION_ASCII_DOC, () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
-        actions.put(Actions.COPY_CITATION_XSLFO, () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
-        actions.put(Actions.COPY_CITATION_HTML, () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
-        actions.put(Actions.COPY_CITATION_RTF, () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
-        actions.put(Actions.COPY_CITATION_TEXT, () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
-        */
-
-        // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        // actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
-
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
-
-        // actions.put(Actions.OPEN_URL, new OpenURLAction());
-
-        // actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
         actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
 
@@ -319,17 +290,6 @@ public class BasePanel extends StackPane {
             actions.put(new SpecialFieldValueViewModel(status).getCommand(),
                     new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
         }
-
-        /* actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
-            entryEditor.nextPreviewStyle();
-        });
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
-            entryEditor.previousPreviewStyle();
-        }); */
-
-        // actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
-
-        // actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
         actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));

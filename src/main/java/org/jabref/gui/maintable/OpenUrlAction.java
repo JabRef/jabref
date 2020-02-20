@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.BooleanExpression;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -25,10 +25,9 @@ public class OpenUrlAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
-        BooleanBinding fieldIsSet = ActionHelper.isFieldSetForSelectedEntry(StandardField.URL, stateManager)
-                                                .or(ActionHelper.isFieldSetForSelectedEntry(StandardField.DOI, stateManager)
-                                                                .or(ActionHelper.isFieldSetForSelectedEntry(StandardField.URI, stateManager)
-                                                                                .or(ActionHelper.isFieldSetForSelectedEntry(StandardField.EPRINT, stateManager))));
+        BooleanExpression fieldIsSet = ActionHelper.isAnyFieldSetForSelectedEntry(
+                List.of(StandardField.URL, StandardField.DOI, StandardField.URI, StandardField.EPRINT),
+                stateManager);
         this.executable.bind(ActionHelper.needsEntriesSelected(1, stateManager).and(fieldIsSet));
     }
 

@@ -68,7 +68,7 @@ public class RightClickMenu {
         contextMenu.getItems().add(new ChangeEntryTypeMenu().getChangeEntryTypeMenu(entry.getEntry(), panel.getBibDatabaseContext(), panel.getUndoManager()));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(panel, dialogService, stateManager)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(panel, dialogService, stateManager, preferencesService)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(panel, dialogService, stateManager)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager)));
 
         return contextMenu;
     }

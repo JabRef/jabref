@@ -29,11 +29,11 @@ import org.slf4j.LoggerFactory;
 public class CopyMoreAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);
-    private StandardActions action;
-    private DialogService dialogService;
-    private StateManager stateManager;
+    private final StandardActions action;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
     private final ClipBoardManager clipBoardManager;
-    private PreferencesService preferencesService;
+    private final PreferencesService preferencesService;
 
     public CopyMoreAction(StandardActions action, DialogService dialogService, StateManager stateManager, ClipBoardManager clipBoardManager, PreferencesService preferencesService) {
         this.action = action;

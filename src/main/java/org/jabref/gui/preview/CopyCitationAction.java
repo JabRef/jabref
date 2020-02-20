@@ -39,7 +39,7 @@ public class CopyCitationAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyCitationAction.class);
 
     private final List<BibEntry> selectedEntries;
-    private StateManager stateManager;
+    private final StateManager stateManager;
     private final PreviewLayout style;
     private final String previewStyle;
     private final CitationStyleOutputFormat outputFormat;

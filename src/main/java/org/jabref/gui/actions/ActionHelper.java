@@ -32,7 +32,7 @@ public class ActionHelper {
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
         BibEntry entry = stateManager.getSelectedEntries().get(0);
         return Bindings.createBooleanBinding(
-                () -> !Collections.disjoint(fields, entry.getFields()),
+                () -> entry.getFields().stream().anyMatch(fields::contains),
                 entry.getFieldsObservable(),
                 stateManager.getSelectedEntries());
     }
