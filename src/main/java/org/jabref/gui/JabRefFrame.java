@@ -845,6 +845,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
+                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org")),
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(Globals.BUILD_INFO, prefs.getVersionPreferences(), dialogService, Globals.TASK_EXECUTOR)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction("https://jabref.org/")),
@@ -856,12 +857,7 @@ public class JabRefFrame extends BorderPane {
                         new SeparatorMenuItem(),
 
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
-                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md")),
-
-                        new SeparatorMenuItem(),
-
-                        factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction("https://donations.jabref.org"))
-
+                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md"))
                 ),
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
