@@ -23,7 +23,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.1'
+    id 'org.beryx.jlink' version '2.17.2'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -255,7 +255,7 @@ dependencyUpdates.resolutionStrategy = {
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /2.0.26-9.1.2/
-                || selection.candidate.version ==~ /2.0.26-9.1.1/ 
+                || selection.candidate.version ==~ /2.0.26-9.1.1/
                 || selection.candidate.version ==~ /2.0.26-9.1.0/) {
                 selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
@@ -590,7 +590,7 @@ jlink {
         requires 'java.rmi'
         requires 'java.xml'
         requires 'com.sun.xml.txw2'
-        requires 'com.google.gson';
+        requires 'com.google.gson'
         requires 'java.desktop'
         requires 'java.security.jgss'
         requires 'jdk.jsobject'
@@ -628,7 +628,6 @@ jlink {
             // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
             installerType = "msi"
             imageOptions = [
-                    '--win-console',
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.ico",
             ]
             installerOptions = [
