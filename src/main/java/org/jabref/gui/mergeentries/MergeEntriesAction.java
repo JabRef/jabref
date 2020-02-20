@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -18,10 +19,12 @@ import org.jabref.model.entry.BibEntry;
 
 public class MergeEntriesAction extends SimpleCommand {
 
+    private final JabRefFrame frame;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public MergeEntriesAction(DialogService dialogService, StateManager stateManager) {
+    public MergeEntriesAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+        this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
@@ -53,9 +56,10 @@ public class MergeEntriesAction extends SimpleCommand {
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dlg.showAndWait();
         if (mergedEntry.isPresent()) {
-            // FixMe: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
-            //  entries with a timestamp, only BasePanel::insertEntry does.
-            databaseContext.getDatabase().insertEntry(mergedEntry.get());
+            // ToDo: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
+            //  entries with a timestamp, only BasePanel::insertEntry does. Workaround for the moment is to get the
+            //  BasePanel from the constructor injected JabRefFrame. Should be refactored and extracted!
+            frame.getCurrentBasePanel().insertEntry(mergedEntry.get());
 
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
