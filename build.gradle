@@ -219,11 +219,9 @@ dependencies {
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.2.4'
-    //testImplementation 'com.github.tomakehurst:wiremock:2.24.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.6.3'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.13.1'
-    //testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.13.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
