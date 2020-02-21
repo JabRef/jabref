@@ -43,7 +43,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
                 xmpFilterListProperty,
                 input -> input.size() > 0,
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("XMP-metadata"),
+                        Localization.lang("XMP metadata"),
                         Localization.lang("Filter List"),
                         Localization.lang("List must not be empty."))));
     }
