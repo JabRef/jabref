@@ -299,7 +299,6 @@ processResources {
     }
 }
 
-
 task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateSearchGrammarSource",
                                 "generateMedlineSource",
@@ -368,7 +367,6 @@ task generateModsSource(type: XjcTask) {
 }
 
 tasks.withType(JavaCompile) {
-    // use UTF-8
     options.encoding = 'UTF-8'
 }
 
@@ -539,12 +537,6 @@ jacocoTestReport {
 checkstyle {
     // will only run when called explicitly from the command line
     sourceSets = []
-}
-
-modernizer {
-    // We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
-    // See https://github.com/andrewgaul/modernizer-maven-plugin for more information on modernizer
-    failOnViolations = false
 }
 
 // Release tasks

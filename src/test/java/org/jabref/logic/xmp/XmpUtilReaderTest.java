@@ -91,7 +91,7 @@ class XmpUtilReaderTest {
     @Test
     void testReadEmtpyMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
-        assertEquals(Collections.EMPTY_LIST, entries);
+        assertEquals(Collections.emptyList(), entries);
     }
 
     /**
