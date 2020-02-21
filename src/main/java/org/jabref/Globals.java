@@ -105,9 +105,6 @@ public class Globals {
         getTelemetryClient().ifPresent(client -> {
             client.trackSessionState(SessionState.End);
             client.flush();
-
-            //FIXME: Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
-            SDKShutdownActivity.INSTANCE.stopAll();
         });
     }
 
