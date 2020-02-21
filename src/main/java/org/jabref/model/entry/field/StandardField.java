@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Standard BibTeX and BibLaTex fields
+ * Standard BibTeX and BibLaTeX fields
  */
 public enum StandardField implements Field {
 
