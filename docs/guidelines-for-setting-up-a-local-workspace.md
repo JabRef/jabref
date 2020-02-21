@@ -2,13 +2,11 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
-For a complete step-by-step guide (using IntellJ as the IDE), have a look at the following video instructions:
+For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
-<div style="text-align: center">
 <a href="https://youtu.be/JkFVJ6p0urw">
 <img src="https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg" alt="JabRef development video tutorial"/>
 </a>
-</div>
 
 ## Prerequisites
 
