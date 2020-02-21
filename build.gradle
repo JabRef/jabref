@@ -47,8 +47,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = 13
-    targetCompatibility = 13
+    sourceCompatibility = JavaVersion.VERSION_13
+    targetCompatibility = JavaVersion.VERSION_13
 }
 
 application {
