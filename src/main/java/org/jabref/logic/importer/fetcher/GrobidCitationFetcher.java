@@ -32,16 +32,17 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     /**
-     * Passes request to grobid server, using consolidateCitations option to improve result.
-     * Takes a while, since the server has to look up the entry.
-     * @return A BibTeX-String if extraction is successful and an empty String otherwise.
+     * Passes request to grobid server, using consolidateCitations option to improve result. Takes a while, since the
+     * server has to look up the entry.
+     *
+     * @return A BibTeX string if extraction is successful
      */
-    private String parseUsingGrobid(String plainText) {
+    private Optional<String> parseUsingGrobid(String plainText) {
         try {
-            return grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA);
+            return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
         } catch (IOException e) {
             LOGGER.debug("Could not process citation", e);
-            return "";
+            return Optional.empty();
         }
     }
 
@@ -56,17 +57,21 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) {
-        List<String> plainReferences = Arrays.stream( query.split( "\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+" ) )
-              .map(String::trim)
-              .filter(str -> !str.isBlank())
-              .collect(Collectors.toCollection(ArrayList::new));
+        List<String> plainReferences = Arrays
+                .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                .map(String::trim)
+                .filter(str -> !str.isBlank())
+                .collect(Collectors.toCollection(ArrayList::new));
         if (plainReferences.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return plainReferences.stream()
-                  .map(reference -> parseBibToBibEntry(parseUsingGrobid(reference)))
-                  .flatMap(Optional::stream)
-                  .collect(Collectors.toList());
+            return plainReferences
+                    .stream()
+                    .map(reference -> parseUsingGrobid(reference))
+                    .flatMap(Optional::stream)
+                    .map(reference -> parseBibToBibEntry(reference))
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toList());
         }
     }
 
