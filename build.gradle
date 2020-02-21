@@ -667,6 +667,7 @@ jlink {
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
+                    '--resource-dir', "${projectDir}/buildres/mac",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
             ]
         }
