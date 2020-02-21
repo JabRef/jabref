@@ -409,7 +409,7 @@ public class JabRefFrame extends BorderPane {
 
         setId("frame");
 
-        VBox head = new VBox(createMenu(),createToolbar());
+        VBox head = new VBox(createMenu(), createToolbar());
         head.setSpacing(0d);
         setTop(head);
 
@@ -756,7 +756,16 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR))
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
+
+                new SeparatorMenuItem(),
+
+                factory.createSubMenu(StandardActions.ABBREVIATE,
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_DEFAULT, this, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_SHORTEST_UNIQUE, this, stateManager))),
+
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, stateManager))
         );
 
         // PushToApplication
@@ -781,14 +790,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
-                pushToApplicationMenuItem,
-
-                factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_DEFAULT, this, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_SHORTEST_UNIQUE, this, stateManager))),
-
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, stateManager))
+                pushToApplicationMenuItem
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
