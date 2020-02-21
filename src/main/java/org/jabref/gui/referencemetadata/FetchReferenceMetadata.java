@@ -110,6 +110,7 @@ public class FetchReferenceMetadata extends SimpleCommand {
                     entryObject.addProperty("year", entry.getField(StandardField.YEAR).orElse("").trim());
                     entryObject.addProperty("date", entry.getField(StandardField.DATE).orElse("").trim());
                     entryObject.addProperty("dio", entry.getField(StandardField.DOI).orElse("").trim());
+                    entryObject.addProperty("extra", entry.getField(StandardField.NOTE).orElse("").trim()); // send note field as extra field
                     entryObject.add("creators", creatorsArray);
 
                     entriesArray.add(entryObject);
@@ -133,6 +134,8 @@ public class FetchReferenceMetadata extends SimpleCommand {
 
                     // set new or updated citation count (for testing purposes)
                     entry.setField(SpecialField.CITATION_COUNT, "0004321");
+
+                    // set received "extra" field as "note" field
 
                     // fetch updated citation count (for testing purposes)
                     String updatedCitationCount = entry.getField(SpecialField.CITATION_COUNT).orElse("").trim();
