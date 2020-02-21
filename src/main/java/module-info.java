@@ -77,4 +77,5 @@ open module org.jabref {
     requires flowless;
     requires org.apache.tika.core;
     requires Java.WebSocket;
+    requires javafx.base;
 }

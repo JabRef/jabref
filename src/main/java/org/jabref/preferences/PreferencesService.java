@@ -19,6 +19,8 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -104,4 +106,6 @@ public interface PreferencesService {
     boolean getAllowIntegerEdition();
 
     EntryEditorPreferences getEntryEditorPreferences();
+
+    List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 }

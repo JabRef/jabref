@@ -37,7 +37,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     @FXML private RadioButton specialFieldsSerialize;
     @FXML private CheckBox extraFileColumnsEnable;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private final JabRefPreferences preferences;
 

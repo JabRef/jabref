@@ -369,7 +369,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void writeXMPMetadata() {
-        // Localization.lang("Writing XMP-metadata...")
+        // Localization.lang("Writing XMP metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (!file.isPresent()) {
@@ -386,7 +386,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return null;
         });
 
-        // Localization.lang("Finished writing XMP-metadata.")
+        // Localization.lang("Finished writing XMP metadata.")
 
         // TODO: Show progress
         taskExecutor.execute(writeTask);
