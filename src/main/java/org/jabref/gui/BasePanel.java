@@ -42,8 +42,6 @@ import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -70,8 +68,6 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -268,28 +264,6 @@ public class BasePanel extends StackPane {
         });
 
         actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
-
-        for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
-        }
-        for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
-        }
-        for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(status).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
-        }
 
         actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
