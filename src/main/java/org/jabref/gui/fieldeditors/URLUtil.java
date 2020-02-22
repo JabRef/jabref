@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
