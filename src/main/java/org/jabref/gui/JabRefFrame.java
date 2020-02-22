@@ -728,12 +728,14 @@ public class JabRefFrame extends BorderPane {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             edit.getItems().addAll(
                     new SeparatorMenuItem(),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, getCurrentBasePanel(), dialogService, stateManager),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, getCurrentBasePanel(), dialogService, stateManager),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, getCurrentBasePanel(), dialogService, stateManager),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, getCurrentBasePanel(), dialogService, stateManager),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, getCurrentBasePanel(), dialogService, stateManager),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, getCurrentBasePanel(), dialogService, stateManager)
+                    // ToDo: SpecialField needs the active BasePanel to mark it as changed.
+                    //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, this, dialogService, stateManager)
             );
         }
 

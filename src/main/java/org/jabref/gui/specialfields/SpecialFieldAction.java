@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class SpecialFieldAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
-    private final BasePanel panel;
+    private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
@@ -35,14 +35,14 @@ public class SpecialFieldAction extends SimpleCommand {
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
      */
     public SpecialFieldAction(
-            BasePanel panel,
+            JabRefFrame frame,
             SpecialField specialField,
             String value,
             boolean nullFieldIfValueIsTheSame,
             String undoText,
             DialogService dialogService,
             StateManager stateManager) {
-        this.panel = panel;
+        this.frame = frame;
         this.specialField = specialField;
         this.value = value;
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
@@ -70,9 +70,9 @@ public class SpecialFieldAction extends SimpleCommand {
             }
             ce.end();
             if (ce.hasEdits()) {
-                panel.getUndoManager().addEdit(ce);
-                panel.markBaseChanged();
-                panel.updateEntryEditorIfShowing();
+                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
+                frame.getCurrentBasePanel().markBaseChanged();
+                frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));
@@ -92,7 +92,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private String getTextDone(SpecialField field, String... params) {
         Objects.requireNonNull(params);
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, panel.getUndoManager());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getUndoManager());
 
         if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only
