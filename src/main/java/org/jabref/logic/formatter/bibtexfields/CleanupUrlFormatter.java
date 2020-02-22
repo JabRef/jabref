@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
