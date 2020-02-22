@@ -25,6 +25,9 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.17.2'
 
+    // required for SonarCube usage
+    id "org.sonarqube" version "2.8"
+
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
 }
