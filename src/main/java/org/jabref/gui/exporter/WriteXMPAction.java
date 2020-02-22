@@ -77,15 +77,15 @@ public class WriteXMPAction extends SimpleCommand {
 
             if (entries.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
+                        Localization.lang("Write XMP metadata"),
                         Localization.lang("This operation requires one or more entries to be selected."));
                 shouldContinue = false;
                 return;
 
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
-                        Localization.lang("Write XMP-metadata for all PDFs in current library?"));
+                        Localization.lang("Write XMP metadata"),
+                        Localization.lang("Write XMP metadata for all PDFs in current library?"));
                 if (confirm) {
                     shouldContinue = false;
                     return;
@@ -100,7 +100,7 @@ public class WriteXMPAction extends SimpleCommand {
         }
         optionsDialog.open();
 
-        dialogService.notify(Localization.lang("Writing XMP-metadata..."));
+        dialogService.notify(Localization.lang("Writing XMP metadata..."));
     }
 
     private void writeXMP() {
@@ -183,7 +183,7 @@ public class WriteXMPAction extends SimpleCommand {
         private final TextArea progressArea;
 
         public OptionsDialog() {
-            super(AlertType.NONE, Localization.lang("Writing XMP-metadata for selected entries..."), false);
+            super(AlertType.NONE, Localization.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setDisable(true);
             okButton.setOnAction(e -> dispose());
             okButton.setPrefSize(100, 30);
