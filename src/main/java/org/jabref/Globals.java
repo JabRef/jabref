@@ -27,7 +27,6 @@ import org.jabref.preferences.JabRefPreferences;
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
-import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 import kong.unirest.Unirest;
 
