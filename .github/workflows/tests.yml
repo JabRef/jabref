@@ -208,3 +208,16 @@ jobs:
           CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
+  sonarCloudTrigger:
+    name: SonarCloud Trigger
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          depth: 1
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
