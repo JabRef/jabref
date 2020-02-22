@@ -25,7 +25,7 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.0.8'
     id 'org.beryx.jlink' version '2.17.2'
 
-    // required for SonarCube usage
+    // required for SonarQube usage
     id "org.sonarqube" version "2.8"
 
     // nicer test outputs during running and completion
@@ -709,6 +709,13 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+}
+
+// Source: https://sonarcloud.io/documentation/analysis/scan/sonarscanner-for-gradle/
+sonarqube {
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+    }
 }
 
 // Source: https://stackoverflow.com/a/44168582/873282
