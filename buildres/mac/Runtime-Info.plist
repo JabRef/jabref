@@ -41,7 +41,7 @@
         <key>CFBundleVersion</key>
 
         <string>CF_BUNDLE_VERSION</string>
-        
+
         <key>NSSupportsAutomaticGraphicsSwitching</key>
         <true/>
 
