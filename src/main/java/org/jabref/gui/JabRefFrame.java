@@ -30,7 +30,6 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
@@ -487,13 +486,13 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
-                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
                 factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
-                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, stateManager)),
-                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, stateManager)),
+                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
+                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
@@ -577,6 +576,9 @@ public class JabRefFrame extends BorderPane {
                     }
                 });
 
+        // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
+        Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
+                EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
@@ -701,9 +703,9 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
 
-                factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
                         factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.clipboardManager, prefs)),
                         factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.clipboardManager, prefs)),
@@ -713,7 +715,7 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.clipboardManager, prefs.getPreviewPreferences())),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(this, dialogService))),
 
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(Actions.PASTE)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -743,7 +745,7 @@ public class JabRefFrame extends BorderPane {
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1241,63 +1243,6 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             quit();
-        }
-    }
-
-    /**
-     * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
-     * Globals.focusListener, and we call the action stored under the relevant name in its action map.
-     */
-    private class EditAction extends SimpleCommand {
-
-        private final Actions command;
-
-        public EditAction(Actions command) {
-            this.command = command;
-        }
-
-        @Override
-        public String toString() {
-            return this.command.toString();
-        }
-
-        @Override
-        public void execute() {
-            Node focusOwner = mainStage.getScene().getFocusOwner();
-            if (focusOwner != null) {
-                if (focusOwner instanceof TextInputControl) {
-                    // Focus is on text field -> copy/paste/cut selected text
-                    TextInputControl textInput = (TextInputControl) focusOwner;
-                    switch (command) {
-                        case COPY:
-                            textInput.copy();
-                            break;
-                        case CUT:
-                            textInput.cut();
-                            break;
-                        case PASTE:
-                            // handled by FX in TextInputControl#paste
-                            break;
-                        default:
-                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
-                    }
-                } else {
-                    // Not sure what is selected -> copy/paste/cut selected entries
-                    switch (command) {
-                        case COPY:
-                            getCurrentBasePanel().copy();
-                            break;
-                        case CUT:
-                            getCurrentBasePanel().cut();
-                            break;
-                        case PASTE:
-                            // handled by FX in TextInputControl#paste
-                            break;
-                        default:
-                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
-                    }
-                }
-            }
         }
     }
 

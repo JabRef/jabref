@@ -233,21 +233,6 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
 
-        // The action for copying selected entries.
-        actions.put(Actions.COPY, this::copy);
-
-        actions.put(Actions.CUT, this::cut);
-
-        actions.put(Actions.DELETE, () -> delete(false));
-
-        // The action for pasting entries or cell contents.
-        //  - more robust detection of available content flavors (doesn't only look at first one offered)
-        //  - support for parsing string-flavor clipboard contents which are bibtex entries.
-        //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
-        //                       (b) copy and paste entries between multiple instances of JabRef (since
-        //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, this::paste);
-
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
         // The action for auto-generating keys.

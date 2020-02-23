@@ -7,11 +7,10 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.EditAction;
 import org.jabref.gui.SendAsEMailAction;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.OldCommandWrapper;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.exporter.ExportToClipboardAction;
@@ -36,11 +35,11 @@ public class RightClickMenu {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new OldCommandWrapper(Actions.COPY, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, panel.frame(), stateManager)));
         contextMenu.getItems().add(createCopySubMenu(panel, factory, dialogService, stateManager, preferencesService));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new OldCommandWrapper(Actions.PASTE, panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new OldCommandWrapper(Actions.CUT, panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE, new OldCommandWrapper(Actions.DELETE, panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, panel.frame(), stateManager)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, panel.frame(), stateManager)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, panel.frame(), stateManager)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
