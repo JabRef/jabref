@@ -38,7 +38,7 @@ public class AttachFileAction extends SimpleCommand {
     @Override
     public void execute() {
         if (stateManager.getActiveDatabase().isEmpty()) {
-            dialogService.notify(Localization.lang("This operation requires exactly an open library."));
+            dialogService.notify(Localization.lang("This operation requires an open library."));
             return;
         }
 
