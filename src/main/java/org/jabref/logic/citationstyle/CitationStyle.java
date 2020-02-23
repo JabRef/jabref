@@ -144,7 +144,7 @@ public class CitationStyle {
         }
         try {
             URI uri = url.toURI();
-            if ("jar".equals(uri.getScheme())) {
+            LOGGER.debug("Uri " +uri);
                 try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
                     Path path = fs.getPath(STYLES_ROOT);
                     STYLES.addAll(discoverCitationStylesInPath(path));
