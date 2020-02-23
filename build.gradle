@@ -621,7 +621,6 @@ jlink {
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
         uses 'com.oracle.truffle.js.runtime.Evaluator'
-        uses 'com.sun.webkit.plugin.PluginHandler'
         uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup'
@@ -635,7 +634,6 @@ jlink {
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.oracle.truffle.js.runtime.Evaluator' with 'com.oracle.truffle.js.parser.GraalJSEvaluator'
-        provides 'javax.xml.bind.JAXBContext' with 'com.sun.xml.bind.v2.ContextFactory'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
                 'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
