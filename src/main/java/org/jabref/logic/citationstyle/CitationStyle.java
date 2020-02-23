@@ -139,7 +139,8 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT);
+        URL url = CitationStyle.class.getResource("/modules/org.jabref/csl-styles");
+        Objects.requireNonNull(url)
         if (url == null) {
             return Collections.emptyList();
         }
