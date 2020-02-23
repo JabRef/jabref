@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -144,19 +145,19 @@ public class CitationStyle {
         }
         try {
             URI uri = url.toURI();
-            LOGGER.debug("Uri " +uri);
-                try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+            LOGGER.debug("Uri " + uri);
+            try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+                Path path = fs.getPath(STYLES_ROOT);
+                STYLES.addAll(discoverCitationStylesInPath(path));
+            } catch (FileSystemAlreadyExistsException e) {
+                try (FileSystem fs = FileSystems.getFileSystem(uri)) {
                     Path path = fs.getPath(STYLES_ROOT);
                     STYLES.addAll(discoverCitationStylesInPath(path));
-                } catch (FileSystemAlreadyExistsException e) {
-                    try (FileSystem fs = FileSystems.getFileSystem(uri)) {
-                        Path path = fs.getPath(STYLES_ROOT);
-                        STYLES.addAll(discoverCitationStylesInPath(path));
-                    }
+                } catch (FileSystemException ex) {
+                    LOGGER.error("Failed to discover csl styles ", ex);
                 }
-            } else {
-                STYLES.addAll(discoverCitationStylesInPath(Paths.get(uri)));
             }
+
             return STYLES;
         } catch (URISyntaxException | IOException e) {
             LOGGER.error("something went wrong while searching available CitationStyles. Are you running directly from source code?", e);
