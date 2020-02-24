@@ -64,7 +64,6 @@ open module org.jabref {
     requires org.graalvm.truffle;
     requires org.graalvm.sdk;
     requires transitive org.graalvm.js;
-    requires transitive org.graalvm.js.scriptengine;
     requires java.scripting;
     requires jdk.internal.vm.compiler;
     requires org.apache.xmpbox;
