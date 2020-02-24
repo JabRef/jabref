@@ -201,6 +201,10 @@ public class GroupTreeView {
                     }
                 }
 
+                if (groupsToMove.size() > 0) {
+                    localDragboard.clearAll();
+                }
+
                 // Put the group nodes as content
                 Dragboard dragboard = treeTable.startDragAndDrop(TransferMode.MOVE);
                 // Display the group when dragging
