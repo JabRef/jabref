@@ -18,6 +18,7 @@ open module org.jabref {
     requires de.jensd.fx.fontawesomefx.commons;
     requires de.jensd.fx.fontawesomefx.materialdesignicons;
     requires org.controlsfx.controls;
+    requires org.fxmisc.richtext;
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
@@ -63,7 +64,6 @@ open module org.jabref {
     requires org.graalvm.js;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
-    requires richtextfx;
     requires com.google.gson;
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
