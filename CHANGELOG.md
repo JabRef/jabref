@@ -45,6 +45,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the most bottom group in the list got lost, if it was dragged on itself. [#5983](https://github.com/JabRef/jabref/issues/5983)
 - We fixed an issue where changing entry type doesn't always work when biblatex source is shown. [#5905](https://github.com/JabRef/jabref/issues/5905)
 - We fixed an issue where the group and the link column were not updated after changing the entry in the main table. [#5985](https://github.com/JabRef/jabref/issues/5985)
+- We fixed an issue where reordering the groups was not possible after inserting an article. [#6008](https://github.com/JabRef/jabref/issues/6008)
 
 ### Removed
 
