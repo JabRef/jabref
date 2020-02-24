@@ -24,10 +24,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 public class ReferenceMetadataFetcherGoogleScholar {
 
-    private static int DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ... disabled) can be used to prevent chaptchas (robot detection) or the response "too many requests"
-    private static boolean ENABLE_RANDOM_DWELL_TIME = true; // can be used to prevent chaptchas (robot detection) or the response "too many requests"
-    private static int UPPER_BOUND_RANDOM_DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ...disabled) can be used to prevent chaptchas (robot detection) or the response "too many requests"
-    private static int NUM_ENTRIES_PER_REQUEST = 1; // tuning factor; default: 1 (recommended)
+    private static int STATIC_DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ... disabled) can be used to prevent captchas (robot detection) or the response "too many requests"
+    private static boolean ENABLE_RANDOM_DWELL_TIME = true; // can be used to prevent captchas (robot detection) or the response "too many requests"
+    private static int UPPER_BOUND_RANDOM_DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ...disabled) can be used to prevent captchas (robot detection) or the response "too many requests"
+    private static int NUM_ENTRIES_PER_REQUEST = 1; // tuning factor; default: 1 (recommended, which allows fine grained dwell times between every requested entry)
 
     private static boolean UPDATE_NOTE_FIELD_WITH_CITATION_COUNT = true; // optional; default: false (since a dedicated field for the citation count exists)
 
@@ -203,9 +203,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 }
             }
 
-            if (DWELL_TIME_AFTER_REQUEST > 0) {
+            if (STATIC_DWELL_TIME_AFTER_REQUEST > 0) {
                 try {
-                    Thread.sleep(DWELL_TIME_AFTER_REQUEST);
+                    Thread.sleep(STATIC_DWELL_TIME_AFTER_REQUEST);
                 } catch (InterruptedException e) {
                 }
             }
