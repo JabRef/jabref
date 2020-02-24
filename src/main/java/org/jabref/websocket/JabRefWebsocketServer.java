@@ -180,6 +180,23 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
+     * Checks if at least one websocket client is registered, which matches the given <code>WsClientType</code>.
+     *
+     * @param wsClientType wsClientType of the websocket clients to search for
+     * @return <code>true</code>, if at least one websocket client with the given type is registered, or <code>false</code> otherwise
+     */
+    public boolean isWsClientWithGivenWsClientTypeRegistered(WsClientType wsClientType) {
+        for (WebSocket websocket : getConnections()) {
+            WsClientData wsClientData = websocket.getAttachment();
+            if (wsClientData != null && wsClientData.getWsClientType().equals(wsClientType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Gets the first websocket client, which matches the given <code>WsClientType</code>.
      *
      * @param wsClientType wsClientType of the requested websocket client
@@ -194,6 +211,23 @@ public class JabRefWebsocketServer extends WebSocketServer {
         }
 
         return null;
+    }
+
+    /**
+     * Checks if a websocket client is registered, which matches the given websocket's <code>uid</code>.
+     *
+     * @param wsUid wsUid of the websocket client to search for
+     * @return <code>true</code>, if a websocket client with the given uid is registered, or <code>false</code> otherwise
+     */
+    public boolean isWsClientWithGivenWsUidRegistered(String wsUid) {
+        for (WebSocket websocket : getConnections()) {
+            WsClientData wsClientData = websocket.getAttachment();
+            if (wsClientData != null && wsClientData.getWsUID().equals(wsUid)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
