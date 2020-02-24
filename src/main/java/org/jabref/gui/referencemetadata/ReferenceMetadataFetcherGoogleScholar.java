@@ -1,6 +1,7 @@
 package org.jabref.gui.referencemetadata;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -35,14 +36,25 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
 
-        dialogService.showInformationDialogAndWait(Localization.lang("Test"),Localization.lang("Test")); // TODO: test
+        AtomicInteger atomicInteger = new AtomicInteger();
+
+        synchronized (atomicInteger) {
+            Platform.runLater(() -> showDialog(dialogService, atomicInteger));
+            try {
+                atomicInteger.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("later on... value = " + atomicInteger.get());
 
         if (!jabRefWebsocketServer.isWsClientWithGivenWsClientTypeRegistered(WsClientType.JABREF_BROWSER_EXTENSION)) {
-            Platform.runLater(() -> {
-                dialogService.showInformationDialogAndWait(Localization.lang("JabRef-Browser-Extension Required"),Localization.lang("JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed."));
-            });
+            System.out.println("JabRef cannot connect to the JabRef-Browser-Extension");
 
-            System.out.println("JabRef-Browser-Extension Required: JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed.");
+            Platform.runLater(() -> {
+                dialogService.showInformationDialogAndWait(Localization.lang("JabRef-Browser-Extension Required"),Localization.lang("JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed. Furthermore, a functional Internet connection is required as well in order to fetch metadata online."));
+            });
             //dialogService.showConfirmationDialogAndWait("JabRef-Browser-Extension Required","JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed.");
             //dialogService.showConfirmationDialogWithOptOutAndWait("title", "content", "optout", null);
             //dialogService.showConfirmationDialogWithOptOutAndWait("title", "content", "ok-label", "cancel-label", "opt-out-message", null);
@@ -116,23 +128,27 @@ public class ReferenceMetadataFetcherGoogleScholar {
             requestObject.addProperty("databasePath", databasePath);
             requestObject.add("entries", entriesArray);
 
-            // submit request object
-            jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION, WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
-
-            // wait for response object
-            try {
-                HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT.wait();
-            } catch (InterruptedException e) {
-            }
-
-            // process response object
             synchronized (HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT) {
+                // submit request object
+                jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION, WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
+
+                // wait for response object
+                try {
+                    HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT.wait();
+                } catch (InterruptedException e) {
+                }
+
+                // process response object
                 JsonObject rxMessagePayload = HandlerInfoGoogleScholarCitationCounts.getCurrentMessagePayload();
 
                 String rxDatabasePath = rxMessagePayload.get("databasePath").getAsString();
 
                 if (!databasePath.equals(rxDatabasePath)) {
                     System.out.println("databasePath of response does not match currently open database");
+                    // info: Technically, the corresponding database could be searched as well, but since the progress
+                    // dialog is open, no other action can be performed and thus no other database can be opened and
+                    // and one cannot switch to a different database during this process. So this case should not happen
+                    // anyway and everything is fine.
 
                     startIndexIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
                     continue;
@@ -140,7 +156,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                 JsonArray rxEntriesArray = rxMessagePayload.getAsJsonArray("entries");
 
-                // process all entries
+                // process all entries of response object
                 for (int rxEntryIndex = 0; rxEntryIndex < rxEntriesArray.size(); rxEntryIndex++) {
                     JsonObject rxEntryObject = rxEntriesArray.get(rxEntryIndex).getAsJsonObject();
 
@@ -186,7 +202,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     entry.setField(SpecialField.CITATION_COUNT, citationCount);
 
                     if (UPDATE_NOTE_FIELD_WITH_CITATION_COUNT) {
-                        entry.setField(StandardField.NOTE, citationCount);
+                        entry.setField(StandardField.NOTE, note);
                     }
                 }
             }
@@ -224,5 +240,14 @@ public class ReferenceMetadataFetcherGoogleScholar {
         }
 
         return null;
+    }
+
+    private void showDialog(DialogService dialogService, AtomicInteger result) {
+        dialogService.showInformationDialogAndWait(Localization.lang("Test2"),Localization.lang("Test2")); // TODO: test
+
+        synchronized (result) {
+            result.set(4);
+            result.notify();
+        }
     }
 }
