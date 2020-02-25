@@ -11,11 +11,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
-import kong.unirest.HttpResponse;
-import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import kong.unirest.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
@@ -23,6 +22,9 @@ import kong.unirest.json.JSONObject;
  * @implSpec API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);
+
     private static String API_URL = "https://api.oadoi.org/v2/";
 
     @Override
@@ -47,17 +49,24 @@ public class OpenAccessDoi implements FulltextFetcher {
         return TrustLevel.META_SEARCH;
     }
 
-    public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {
-        HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
-                                                     .header("accept", "application/json")
-                                                     .asJson();
-        JSONObject root = jsonResponse.getBody().getObject();
-        Optional<String> url = Optional.ofNullable(root.optJSONObject("best_oa_location"))
-                .map(location -> location.optString("url"));
-        if (url.isPresent()) {
-            return Optional.of(new URL(url.get()));
-        } else {
-            return Optional.empty();
-        }
+    public Optional<URL> findFullText(DOI doi) throws UnirestException {
+        return Optional.of(Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
+                                  .header("accept", "application/json")
+                                  .asJson())
+                       .map(response -> response.getBody())
+                       .filter(body -> body != null)
+                       .map(body -> body.getObject())
+                       .filter(root -> root != null)
+                       .map(root -> root.optJSONObject("best_oa_location"))
+                       .filter(object -> object != null)
+                       .map(location -> location.optString("url"))
+                       .flatMap(url -> {
+                           try {
+                               return Optional.of(new URL(url));
+                           } catch (MalformedURLException e) {
+                               LOGGER.debug("Could not determine URL to fetch full text from", e);
+                               return Optional.empty();
+                           }
+                       });
     }
 }
