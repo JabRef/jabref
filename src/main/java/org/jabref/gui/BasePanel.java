@@ -2,9 +2,7 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,6 +98,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.apache.http.client.utils.URIBuilder;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 import org.slf4j.Logger;
@@ -1206,6 +1205,7 @@ public class BasePanel extends StackPane {
     }
 
     private class OpenShortScienceAction implements BaseAction {
+        private static final String BASIC_SEARCH_URL = "https://www.shortscience.org/internalsearch";
 
         @Override
         public void action() {
@@ -1213,22 +1213,21 @@ public class BasePanel extends StackPane {
             if (bes.size() == 1) {
                 Optional<String> title = bes.get(0).getField(StandardField.TITLE);
                 if (title.isPresent()) {
-                    String link;
+                    URIBuilder uriBuilder;
                     try {
-                        link = String.format("https://www.shortscience.org/internalsearch?q=%s", URLEncoder.encode(title.get(), StandardCharsets.UTF_8.name()));
-                    } catch (UnsupportedEncodingException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                        return;
+                        uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
+                    } catch (URISyntaxException e) {
+                        // This should never be able to happen as it would require the field to be misconfigured.
+                        throw new AssertionError("ShortScience URL is invalid.");
                     }
+                    // Direct the user to the search results for the title.
+                    uriBuilder.addParameter("q", title.get());
                     try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link, StandardField.URL);
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext, uriBuilder.toString(), StandardField.URL);
                         output(Localization.lang("External viewer called") + '.');
                     } catch (IOException ex) {
                         output(Localization.lang("Error") + ": " + ex.getMessage());
                     }
-                } else {
-                    //No title entered, we shouldn't be able to get here
-                    throw new AssertionError("OpenShortScienceAction called without title.");
                 }
             } else {
                 output(Localization.lang("This operation requires exactly one item to be selected."));
