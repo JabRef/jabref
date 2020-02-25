@@ -3,7 +3,7 @@
 We monitor the general source code quality at three places:
 
 * [Teamscale](https://www.cqse.eu/de/produkte/teamscale/landing/) is a popular German product analyzing code quality. The analysis results are available at <https://demo.teamscale.com/dashboard.html#show//?id=kinnen%2FJabref%20Overview>.
-* [codacy](https://www.codacy.com/) is a hosted service to monitor code quality. The code quality analysis for JabRef is available at <https://www.codacy.com/app/simonharrer/jabref/dashboard>.
+* [codacy](https://www.codacy.com/) is a hosted service to monitor code quality. The code quality analysis for JabRef is available at <https://app.codacy.com/gh/JabRef/jabref/dashboard>.
 * [codecov](https://codecov.io/) is a solution to check code coverage of test cases. The code coverage metrics for JabRef are available at <https://codecov.io/github/JabRef/jabref>.
 
 We strongly recommend to read following two books on code quality:
