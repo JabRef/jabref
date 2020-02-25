@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.jabref.websocket.handlers.HandlerCmdRegister;
 import org.jabref.websocket.handlers.HandlerInfoGoogleScholarCitationCounts;
-import org.jabref.websocket.handlers.HandlerInfoGoogleScholarCitationCountsInterrupted;
 import org.jabref.websocket.handlers.HandlerInfoMessage;
 
 import com.google.gson.Gson;
@@ -451,8 +450,6 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 HandlerInfoMessage.handler(websocket, messagePayload);
             } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(wsAction)) {
                 HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS_INTERRUPTED.equals(wsAction)) {
-                HandlerInfoGoogleScholarCitationCountsInterrupted.handler(websocket, messagePayload);
             } else {
                 System.out.println("[ws] unimplemented WsAction received: " + action);
             }
