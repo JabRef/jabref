@@ -139,7 +139,7 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource("/modules/org.jabref/csl-styles");
+        URL url = CitationStyle.class.getResource("academy-of-management-review.csl");
         Objects.requireNonNull(url);
         if (url == null) {
             return Collections.emptyList();
