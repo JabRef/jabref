@@ -9,6 +9,7 @@ import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.logic.importer.fetcher.WorldcatFetcher;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -61,7 +62,9 @@ class WebFetchersTest {
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
             expected.remove(EntryBasedParserFetcher.class);
-            expected.remove(MrDLibFetcher.class);
+			expected.remove(MrDLibFetcher.class);
+			expected.remove(WorldcatFetcher.class);
+
             assertEquals(expected, getClasses(idFetchers));
         }
     }
