@@ -11,8 +11,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.texparser.TexBibEntriesResolverResult;
-import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.texparser.LatexBibEntriesResolverResult;
+import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TexParserTest {
+public class LatexParserTest {
     private final static String DARWIN = "Darwin1888";
     private final static String EINSTEIN = "Einstein1920";
     private final static String NEWTON = "Newton1999";
@@ -91,10 +91,10 @@ public class TexParserTest {
 
     @Test
     public void testSameFileDifferentDatabases() throws URISyntaxException {
-        Path texFile = Paths.get(TexParserTest.class.getResource("paper.tex").toURI());
+        Path texFile = Paths.get(LatexParserTest.class.getResource("paper.tex").toURI());
 
-        TexParserResult parserResult = new DefaultTexParser().parse(texFile);
-        TexParserResult expectedParserResult = new TexParserResult();
+        LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
+        LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().add(texFile);
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
@@ -103,13 +103,13 @@ public class TexParserTest {
         expectedParserResult.addKey(EINSTEIN, texFile, 6, 14, 33, "Einstein said \\cite{Einstein1920} that lorem impsum, consectetur adipiscing elit.");
         expectedParserResult.addKey(DARWIN, texFile, 7, 67, 84, "Nunc ultricies leo nec libero rhoncus, eu vehicula enim efficitur. \\cite{Darwin1888}");
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
-        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(expectedParserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        TexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResult);
-        TexBibEntriesResolverResult expectedCrossingResult2 = new TexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResult);
 
         expectedCrossingResult2.addEntry(database.getEntryByKey(EINSTEIN).get());
         expectedCrossingResult2.addEntry(database.getEntryByKey(DARWIN).get());
@@ -119,11 +119,11 @@ public class TexParserTest {
 
     @Test
     public void testTwoFilesDifferentDatabases() throws URISyntaxException {
-        Path texFile = Paths.get(TexParserTest.class.getResource("paper.tex").toURI());
-        Path texFile2 = Paths.get(TexParserTest.class.getResource("paper2.tex").toURI());
+        Path texFile = Paths.get(LatexParserTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Paths.get(LatexParserTest.class.getResource("paper2.tex").toURI());
 
-        TexParserResult parserResult = new DefaultTexParser().parse(Arrays.asList(texFile, texFile2));
-        TexParserResult expectedParserResult = new TexParserResult();
+        LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
+        LatexParserResult expectedParserResult = new LatexParserResult();
 
         expectedParserResult.getFileList().addAll(Arrays.asList(texFile, texFile2));
         expectedParserResult.addBibFile(texFile, texFile.getParent().resolve("origin.bib"));
@@ -136,13 +136,13 @@ public class TexParserTest {
         expectedParserResult.addKey(EINSTEIN, texFile2, 5, 48, 67, "This is some content trying to cite a bib file: \\cite{Einstein1920}");
         expectedParserResult.addKey(NEWTON, texFile2, 6, 48, 65, "This is some content trying to cite a bib file: \\cite{Newton1999}");
 
-        TexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
-        TexBibEntriesResolverResult expectedCrossingResult = new TexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(expectedParserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
 
-        TexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResult);
-        TexBibEntriesResolverResult expectedCrossingResult2 = new TexBibEntriesResolverResult(expectedParserResult);
+        LatexBibEntriesResolverResult crossingResult2 = new TexBibEntriesResolver(database2, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult expectedCrossingResult2 = new LatexBibEntriesResolverResult(expectedParserResult);
 
         expectedCrossingResult2.addEntry(database.getEntryByKey(EINSTEIN).get());
         expectedCrossingResult2.addEntry(database.getEntryByKey(DARWIN).get());

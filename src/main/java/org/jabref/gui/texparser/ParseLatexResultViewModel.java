@@ -18,17 +18,17 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.texparser.Citation;
-import org.jabref.model.texparser.TexBibEntriesResolverResult;
+import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 
-public class ParseTexResultViewModel extends AbstractViewModel {
+public class ParseLatexResultViewModel extends AbstractViewModel {
 
-    private final TexBibEntriesResolverResult resolverResult;
+    private final LatexBibEntriesResolverResult resolverResult;
     private final BibDatabaseContext databaseContext;
     private final ObservableList<ReferenceViewModel> referenceList;
     private final ObservableList<Citation> citationList;
     private final BooleanProperty importButtonDisabled;
 
-    public ParseTexResultViewModel(TexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext) {
+    public ParseLatexResultViewModel(LatexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext) {
         this.resolverResult = resolverResult;
         this.databaseContext = databaseContext;
         this.referenceList = FXCollections.observableArrayList();

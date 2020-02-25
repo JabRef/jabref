@@ -13,22 +13,22 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.texparser.TexBibEntriesResolverResult;
+import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.fxmisc.easybind.EasyBind;
 
-public class ParseTexResultView extends BaseDialog<Void> {
+public class ParseLatexResultView extends BaseDialog<Void> {
 
-    private final TexBibEntriesResolverResult resolverResult;
+    private final LatexBibEntriesResolverResult resolverResult;
     private final BibDatabaseContext databaseContext;
     private final Path basePath;
     @FXML private ListView<ReferenceViewModel> referenceListView;
     @FXML private CitationsDisplay citationsDisplay;
     @FXML private ButtonType importButtonType;
-    private ParseTexResultViewModel viewModel;
+    private ParseLatexResultViewModel viewModel;
 
-    public ParseTexResultView(TexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext, Path basePath) {
+    public ParseLatexResultView(LatexBibEntriesResolverResult resolverResult, BibDatabaseContext databaseContext, Path basePath) {
         this.resolverResult = resolverResult;
         this.databaseContext = databaseContext;
         this.basePath = basePath;
@@ -47,7 +47,7 @@ public class ParseTexResultView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseTexResultViewModel(resolverResult, databaseContext);
+        viewModel = new ParseLatexResultViewModel(resolverResult, databaseContext);
 
         referenceListView.setItems(viewModel.getReferenceList());
         referenceListView.getSelectionModel().selectFirst();
