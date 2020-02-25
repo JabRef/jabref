@@ -216,16 +216,16 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<Path> getLaTexFileDirectory(String user) {
+    public Optional<Path> getLatexFileDirectory(String user) {
         return Optional.ofNullable(laTexFileDirectory.get(user));
     }
 
-    public void setLaTexFileDirectory(String user, Path path) {
+    public void setLatexFileDirectory(String user, Path path) {
         laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
         postChange();
     }
 
-    public void clearLaTexFileDirectory(String user) {
+    public void clearLatexFileDirectory(String user) {
         laTexFileDirectory.remove(user);
         postChange();
     }
@@ -306,7 +306,7 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, Path> getLaTexFileDirectories() {
+    public Map<String, Path> getLatexFileDirectories() {
         return Collections.unmodifiableMap(laTexFileDirectory);
     }
 

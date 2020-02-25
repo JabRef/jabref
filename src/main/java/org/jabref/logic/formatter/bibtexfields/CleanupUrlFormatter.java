@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
@@ -40,13 +39,7 @@ public class CleanupUrlFormatter extends Formatter {
         if (matcher.find()) {
             toDecode = matcher.group(1);
         }
-        try {
-            decodedLink = URLDecoder.decode(toDecode, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Used unsupported character encoding", e);
-        }
-
-        return decodedLink;
+        return URLDecoder.decode(toDecode, StandardCharsets.UTF_8);
     }
 
     @Override
