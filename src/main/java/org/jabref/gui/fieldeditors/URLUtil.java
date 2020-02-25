@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -53,7 +52,7 @@ public class URLUtil {
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf('=') + 1);
 
-                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8);
                     // url?
                     if (decode.matches(URL_EXP)) {
                         return decode;
@@ -61,7 +60,7 @@ public class URLUtil {
                 }
             }
             return url;
-        } catch (UnsupportedEncodingException | MalformedURLException e) {
+        } catch (MalformedURLException e) {
             return url;
         }
     }
