@@ -1,10 +1,14 @@
 package org.jabref.gui.referencemetadata;
 
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
@@ -12,6 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.websocket.JabRefWebsocketServer;
@@ -32,34 +37,29 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
     private static boolean UPDATE_NOTE_FIELD_WITH_CITATION_COUNT = true; // optional; default: false (since a dedicated field for the citation count exists)
 
+    private static final AtomicInteger ATOMIC_INTEGER_DIALOG_RESULT = new AtomicInteger(); // result: 0 ... cancel, 1 ... retry
+
     public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
 
-        AtomicInteger atomicInteger = new AtomicInteger();
-
-        synchronized (atomicInteger) {
-            Platform.runLater(() -> showDialog(dialogService, atomicInteger));
-            try {
-                atomicInteger.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        while (true) {
+            if (jabRefWebsocketServer.isWsClientWithGivenWsClientTypeRegistered(WsClientType.JABREF_BROWSER_EXTENSION)) {
+                break;
             }
-        }
+            else {
+                System.out.println("JabRef cannot connect to the JabRef-Browser-Extension");
 
-        System.out.println("later on... value = " + atomicInteger.get());
+                int result = showCustomDialogAndWait(dialogService, Alert.AlertType.ERROR,
+                        "JabRef-Browser-Extension Required",
+                        "JabRef cannot connect to the JabRef-Browser-Extension.\n\nIn order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed. Furthermore, a Internet connection is required in order to fetch metadata online.",
+                        "Retry",
+                        "Cancel");
 
-        if (!jabRefWebsocketServer.isWsClientWithGivenWsClientTypeRegistered(WsClientType.JABREF_BROWSER_EXTENSION)) {
-            System.out.println("JabRef cannot connect to the JabRef-Browser-Extension");
-
-            Platform.runLater(() -> {
-                dialogService.showInformationDialogAndWait(Localization.lang("JabRef-Browser-Extension Required"),Localization.lang("JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed. Furthermore, a functional Internet connection is required as well in order to fetch metadata online."));
-            });
-            //dialogService.showConfirmationDialogAndWait("JabRef-Browser-Extension Required","JabRef cannot connect to the JabRef-Browser-Extension. In order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed.");
-            //dialogService.showConfirmationDialogWithOptOutAndWait("title", "content", "optout", null);
-            //dialogService.showConfirmationDialogWithOptOutAndWait("title", "content", "ok-label", "cancel-label", "opt-out-message", null);
-
-            return false;
+                if (result != 1) {
+                    return false;
+                }
+            }
         }
 
         String databasePath = "";
@@ -70,13 +70,13 @@ public class ReferenceMetadataFetcherGoogleScholar {
             databasePath = "none_" + RandomStringUtils.random(20, true, true);
         }
 
-        int startIndexIndexEntriesBlock = 0;
+        int startIndexEntriesBlock = 0;
 
-        while (startIndexIndexEntriesBlock < entries.size()) {
+        while (startIndexEntriesBlock < entries.size()) {
             // prepare request object
             JsonArray entriesArray = new JsonArray();
 
-            for (int entryIndex = startIndexIndexEntriesBlock; entryIndex - startIndexIndexEntriesBlock < NUM_ENTRIES_PER_REQUEST && entryIndex < entries.size(); entryIndex++) {
+            for (int entryIndex = startIndexEntriesBlock; entryIndex - startIndexEntriesBlock < NUM_ENTRIES_PER_REQUEST && entryIndex < entries.size(); entryIndex++) {
                 BibEntry entry = entries.get(entryIndex);
 
                 String creatorsString = "";
@@ -113,7 +113,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 entryObject.addProperty("_entryId", entry.getId());
                 entryObject.addProperty("_lastEntry", entryIndex == entries.size() - 1);
                 // entry data
-                entryObject.addProperty("title", entry.getTitle().orElse("").trim());
+                entryObject.addProperty("key", entry.getField(InternalField.KEY_FIELD).orElse("").trim());
+                entryObject.addProperty("title", entry.getField(StandardField.TITLE).orElse("").trim());
                 entryObject.addProperty("year", entry.getField(StandardField.YEAR).orElse("").trim());
                 entryObject.addProperty("date", entry.getField(StandardField.DATE).orElse("").trim());
                 entryObject.addProperty("DOI", entry.getField(StandardField.DOI).orElse("").trim());
@@ -127,6 +128,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
             requestObject.addProperty("databasePath", databasePath);
             requestObject.add("entries", entriesArray);
+
+            boolean retryFetchingMetadata = false;
 
             synchronized (HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT) {
                 // submit request object
@@ -150,7 +153,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     // and one cannot switch to a different database during this process. So this case should not happen
                     // anyway and everything is fine.
 
-                    startIndexIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
+                    startIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
                     continue;
                 }
 
@@ -172,22 +175,68 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     boolean _status_solvingCaptchaNeeded = _status.get("solvingCaptchaNeeded").getAsBoolean();
                     boolean _status_tooManyRequests = _status.get("tooManyRequests").getAsBoolean();
 
+                    // - entry data
+                    String key = rxEntryObject.get("key").getAsString();
+                    String title = rxEntryObject.get("title").getAsString();
+                    String creators = rxEntryObject.get("creators").getAsJsonArray().toString();
+                    String note = rxEntryObject.get("extra").getAsString();
+                    String citationCount = rxEntryObject.get("citationCount").getAsString();
+
                     System.out.println("success: " + _status_success);
                     System.out.println("itemComplete: " + _status_itemComplete);
                     System.out.println("solvingCaptchaNeeded: " + _status_solvingCaptchaNeeded);
                     System.out.println("tooManyRequests: " + _status_tooManyRequests);
 
-                    if (_status_solvingCaptchaNeeded) {
-                        System.out.println("Captcha: The citation count could not be determined. Please show Google Scholar, that you are not a robot, by opening this <a id=\"googleScholarCaptchaLink\" href=\"https://scholar.google.com/scholar?q=google\" target=\"_blank\">Google Scholar link</a> and solving the shown captcha.</li>");
-                    }
+                    if (!_status_itemComplete) {
+                        System.out.println("Item incomplete: The citation count could not be determined, since the item data is incomplete.");
 
-                    if (_status_tooManyRequests) {
+                        int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
+                                "Item Incomplete",
+                                "The reference metadata could not be determined for the following item, since its data is incomplete (title or authors are missing).\n\nItem Key: " + key + "\nItem Title: \"" + title + "\"\nItem Authors: \"" + creators + "\"",
+                                "Skip and continue",
+                                "Cancel");
+
+                        if (result == 1) {
+                            // skip and continue process
+                        }
+                        else {
+                            return false; // cancel fetching metadata
+                        }
+                    }
+                    else if (_status_solvingCaptchaNeeded) {
+                        System.out.println("Captcha: The reference metadata could not be fetched. Please show Google Scholar, that you are not a robot, by opening this <a id=\"googleScholarCaptchaLink\" href=\"https://scholar.google.com/scholar?q=google\" target=\"_blank\">Google Scholar link</a> and solving the shown captcha.</li>");
+
+                        int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
+                                "Solving Capcha Needed",
+                                "Please show Google Scholar, that you are not a robot, by opening this <a id=\"googleScholarCaptchaLink\" href=\"https://scholar.google.com/scholar?q=google\" target=\"_blank\">Google Scholar link</a> and solving the shown captcha, otherwise the reference metadata cannot be fetched.</li>",
+                                "Continue",
+                                "Cancel");
+
+                        if (result == 1) {
+                            retryFetchingMetadata = true; // retry fetching metadata
+                            break;
+                        }
+                        else {
+                            return false; // cancel fetching metadata
+                        }
+                    }
+                    else if (_status_tooManyRequests) {
                         System.out.println("Too many requests: Google Scholar asks you to wait some time before sending further requests.");
-                    }
 
-                    // - entry data
-                    String note = rxEntryObject.get("extra").getAsString();
-                    String citationCount = rxEntryObject.get("citationCount").getAsString();
+                        int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
+                                "Too Many Requests",
+                                "Google Scholar asks you to wait some time before sending further requests.",
+                                "Continue",
+                                "Cancel");
+
+                        if (result == 1) {
+                            retryFetchingMetadata = true; // retry fetching metadata
+                            break;
+                        }
+                        else {
+                            return false; // cancel fetching metadata
+                        }
+                    }
 
                     // find entry to update
                     BibEntry entry = getBibEntryWithGivenEntryId(database, _entryId);
@@ -226,7 +275,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 }
             }
 
-            startIndexIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
+            if (!retryFetchingMetadata) {
+                startIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
+            }
         }
 
         return true;
@@ -242,12 +293,39 @@ public class ReferenceMetadataFetcherGoogleScholar {
         return null;
     }
 
-    private void showDialog(DialogService dialogService, AtomicInteger result) {
-        dialogService.showInformationDialogAndWait(Localization.lang("Test2"),Localization.lang("Test2")); // TODO: test
+    private int showCustomDialogAndWait(DialogService dialogService, Alert.AlertType alertType, String title, String content, String buttonNameYes, String ButtonNameCancelClose) {
+        synchronized (ATOMIC_INTEGER_DIALOG_RESULT) {
+            Platform.runLater(() -> {
+                ButtonType buttonYes = new ButtonType(Localization.lang(buttonNameYes), ButtonBar.ButtonData.YES);
+                ButtonType buttonCancelClose = new ButtonType(Localization.lang(ButtonNameCancelClose), ButtonBar.ButtonData.CANCEL_CLOSE);
 
-        synchronized (result) {
-            result.set(4);
-            result.notify();
+                Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(alertType,
+                        Localization.lang(title),
+                        Localization.lang(content),
+                        buttonYes,
+                        buttonCancelClose);
+
+                synchronized (ATOMIC_INTEGER_DIALOG_RESULT) {
+                    if (answer.isPresent()) {
+                        if (answer.get().equals(buttonYes)) {
+                            ATOMIC_INTEGER_DIALOG_RESULT.set(1);
+                        } else {
+                            ATOMIC_INTEGER_DIALOG_RESULT.set(0);
+                        }
+                    } else {
+                        ATOMIC_INTEGER_DIALOG_RESULT.set(0);
+                    }
+
+                    ATOMIC_INTEGER_DIALOG_RESULT.notify();
+                }
+            });
+
+            try {
+                ATOMIC_INTEGER_DIALOG_RESULT.wait();
+            } catch (InterruptedException e) {
+            }
+
+            return ATOMIC_INTEGER_DIALOG_RESULT.get();
         }
     }
 }
