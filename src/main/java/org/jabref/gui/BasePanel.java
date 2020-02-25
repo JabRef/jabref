@@ -2,6 +2,9 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -328,6 +331,8 @@ public class BasePanel extends StackPane {
         });
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
+
+        actions.put(Actions.OPEN_SHORTSCIENCE, new OpenShortScienceAction());
 
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
 
@@ -1197,6 +1202,37 @@ public class BasePanel extends StackPane {
             }
 
             markChangedOrUnChanged();
+        }
+    }
+
+    private class OpenShortScienceAction implements BaseAction {
+
+        @Override
+        public void action() {
+            final List<BibEntry> bes = mainTable.getSelectedEntries();
+            if (bes.size() == 1) {
+                Optional<String> title = bes.get(0).getField(StandardField.TITLE);
+                if (title.isPresent()) {
+                    String link;
+                    try {
+                        link = String.format("https://www.shortscience.org/internalsearch?q=%s", URLEncoder.encode(title.get(), StandardCharsets.UTF_8.name()));
+                    } catch (UnsupportedEncodingException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                        return;
+                    }
+                    try {
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link, StandardField.URL);
+                        output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                    }
+                } else {
+                    //No title entered, we shouldn't be able to get here
+                    throw new AssertionError("OpenShortScienceAction called without title.");
+                }
+            } else {
+                output(Localization.lang("This operation requires exactly one item to be selected."));
+            }
         }
     }
 

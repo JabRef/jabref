@@ -61,6 +61,7 @@ public class RightClickMenu {
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_FOLDER, getOpenFolderCommand(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, getOpenExternalFileCommand(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_URL, getOpenUrlCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_SHORTSCIENCE, getOpenShortScienceCommand(panel)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
@@ -87,6 +88,12 @@ public class RightClickMenu {
     private static OldCommandWrapper getOpenUrlCommand(BasePanel panel) {
         OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_URL, panel);
         command.setExecutable(isFieldSetForSelectedEntry(StandardField.URL, panel) || isFieldSetForSelectedEntry(StandardField.DOI, panel));
+        return command;
+    }
+
+    private static OldCommandWrapper getOpenShortScienceCommand(BasePanel panel) {
+        OldCommandWrapper command = new OldCommandWrapper(Actions.OPEN_SHORTSCIENCE, panel);
+        command.setExecutable(isFieldSetForSelectedEntry(StandardField.TITLE, panel));
         return command;
     }
 
