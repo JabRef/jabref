@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javafx.beans.binding.BooleanExpression;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -16,14 +15,15 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-
 public class OpenShortScienceAction extends SimpleCommand {
+    private static final String BASIC_SEARCH_URL = "https://www.shortscience.org/internalsearch";
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private static final String BASIC_SEARCH_URL = "https://www.shortscience.org/internalsearch";
 
     public OpenShortScienceAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
