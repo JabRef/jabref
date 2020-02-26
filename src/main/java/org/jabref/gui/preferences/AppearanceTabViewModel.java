@@ -24,6 +24,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
+    private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -60,11 +61,17 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             case ThemeLoader.DARK_CSS:
                 themeLightProperty.setValue(false);
                 themeDarkProperty.setValue(true);
+                themeCustomProperty.setValue(false);
                 break;
             case ThemeLoader.MAIN_CSS:
-            default:
                 themeLightProperty.setValue(true);
                 themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(false);
+                break;
+            default:
+                themeLightProperty.setValue(false);
+                themeDarkProperty.setValue(false);
+                themeCustomProperty.setValue(true);
         }
     }
 
@@ -87,6 +94,9 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
+        } else if (themeCustomProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.CUSTOM_THEME)) {
+            restartWarnings.add(Localization.lang("Theme change to a custom theme."));
+            preferences.put(JabRefPreferences.FX_THEME, preferences.getPathToCustomTheme());
         }
     }
 
@@ -113,4 +123,5 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty themeDarkProperty() { return themeDarkProperty; }
 
+    public BooleanProperty customThemeProperty() { return themeCustomProperty; }
 }
