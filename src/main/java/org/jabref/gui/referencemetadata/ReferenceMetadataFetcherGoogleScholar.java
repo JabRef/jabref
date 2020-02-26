@@ -57,7 +57,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
      * @param database database from which the given <code>entries</code> come from
      * @param entries entries for which some reference metadata should be fetched
      * @param dialogService dialog service which can be used for showing dialogs
-     * @return <code>true</code>if the the process has been completed successfully, <code>false</code> otherwise
+     * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
     public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
 
@@ -81,7 +81,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                 if (result != 1) {
                     entriesWithIncompleteMetadata.addAll(entries);
-                    return false; // cancel fetching metadata
+                    return true; // cancel fetching metadata
                 }
             }
         }
@@ -237,7 +237,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 // skip and continue process
                             } else {
                                 entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
-                                return false; // cancel fetching metadata
+                                return true; // cancel fetching metadata
                             }
                         }
                     }
@@ -259,7 +259,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         }
                         else {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
-                            return false; // cancel fetching metadata
+                            return true; // cancel fetching metadata
                         }
                     }
                     else if (_status_tooManyRequests) {
@@ -278,7 +278,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         }
                         else {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
-                            return false; // cancel fetching metadata
+                            return true; // cancel fetching metadata
                         }
                     }
 
@@ -356,7 +356,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
             }
         }
 
-        return true;
+        return false;
     }
 
     private static BibEntry getBibEntryWithGivenEntryId(BibDatabaseContext database, String entryId) {

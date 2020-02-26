@@ -68,34 +68,34 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
             @Override
             protected List<BibEntry> call() {
 
-                boolean processFinished = true;
+                boolean processCancelled = false;
 
                 ObservableList<BibEntry> entriesWithIncompleteMetadata = entries;
 
                 // run prioritized metadata fetcher pipeline
 
-                if (processFinished && USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
+                if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherGoogleScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
-                    processFinished = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherGoogleScholar.getEntriesWithIncompleteMetadata();
                 }
 
-                if (processFinished && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
+                if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherSemanticScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherSemanticScholar referenceMetadataFetcherSemanticScholar = new ReferenceMetadataFetcherSemanticScholar();
-                    processFinished = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherSemanticScholar.getEntriesWithIncompleteMetadata();
                 }
 
-                if (processFinished && USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS && entriesWithIncompleteMetadata.size() > 0) {
+                if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherOpenCitations.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherOpenCitations referenceMetadataFetcherOpenCitations = new ReferenceMetadataFetcherOpenCitations();
-                    processFinished = referenceMetadataFetcherOpenCitations.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherOpenCitations.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherOpenCitations.getEntriesWithIncompleteMetadata();
                 }
 
-                if (processFinished) {
+                if (!processCancelled) {
                     return entries;
                 }
                 else {
