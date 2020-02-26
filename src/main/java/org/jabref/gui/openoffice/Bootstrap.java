@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -360,7 +361,7 @@ public class Bootstrap {
             @Override
             public void run() {
                 try {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                    BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
                     for (;;) {
                         String s = r.readLine();

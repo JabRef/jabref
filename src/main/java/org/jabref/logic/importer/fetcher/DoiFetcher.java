@@ -15,6 +15,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
@@ -52,7 +53,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
                 // BibTeX data
                 URLDownload download = new URLDownload(doiURL);
-                download.addHeader("Accept", "application/x-bibtex");
+                download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
                 String bibtexString = download.asString();
 
                 // BibTeX entry
