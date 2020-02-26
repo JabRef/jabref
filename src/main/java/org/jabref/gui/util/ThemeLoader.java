@@ -50,7 +50,7 @@ public class ThemeLoader {
         String cssPreferences = jabRefPreferences.get(JabRefPreferences.FX_THEME);
         if (StringUtil.isNotBlank(cssVmArgument)) {
             // First priority: VM argument
-            LOGGER.info("Using css from VM option: " + cssVmArgument);
+            LOGGER.info("Using css from VM option: {}", cssVmArgument);
             URL cssVmUrl = null;
             try {
                 cssVmUrl = Paths.get(cssVmArgument).toUri().toURL();
@@ -62,11 +62,11 @@ public class ThemeLoader {
             // Otherwise load css from preference
             URL cssResource = JabRefFrame.class.getResource(cssPreferences);
             if (cssResource != null) {
-                LOGGER.debug("Using css " + cssResource);
+                LOGGER.debug("Using css {}", cssResource);
                 additionalCssToLoad = Optional.of(cssResource);
             } else {
                 additionalCssToLoad = Optional.empty();
-                LOGGER.warn("Cannot load css " + cssPreferences);
+                LOGGER.warn("Cannot load css {}", cssPreferences);
             }
         } else {
             additionalCssToLoad = Optional.empty();
