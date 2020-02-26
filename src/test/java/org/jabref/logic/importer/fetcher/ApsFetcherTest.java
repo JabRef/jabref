@@ -39,6 +39,17 @@ class ApsFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
+    void caseInsensitive() throws IOException {
+        entry.setField(StandardField.DOI, "10.1103/physrevlett.124.029002");
+
+        assertEquals(
+                Optional.of(new URL("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.124.029002")),
+                finder.findFullText(entry)
+        );
+    }
+
+    @Test
+    @DisabledOnCIServer("CI server is blocked")
     void notAuthorized() throws IOException {
         entry.setField(StandardField.DOI, "10.1103/PhysRevLett.89.127401");
 
