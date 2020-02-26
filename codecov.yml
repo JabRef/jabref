@@ -3,4 +3,7 @@ coverage:
   - src/gen/.*
   status:
     patch: false
+  project:
+    default:
+      threshold: 1%
 comment: off
