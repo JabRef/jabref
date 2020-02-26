@@ -1,5 +1,6 @@
 package org.jabref.gui.referencemetadata;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.undo.UndoManager;
@@ -60,21 +61,29 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
             @Override
             protected List<BibEntry> call() {
 
+                boolean success = false;
+
                 if (USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR) {
                     ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
-                    referenceMetadataFetcherGoogleScholar.fetchFor(database, entries, dialogService);
+                    success = referenceMetadataFetcherGoogleScholar.fetchFor(database, entries, dialogService);
                 }
 
-                return entries;
+                if (success) {
+                    return entries;
+                }
+                else {
+                    return new LinkedList<BibEntry>();
+                }
             }
 
             @Override
             protected void succeeded() {
                 if (!getValue().isEmpty()) {
-                    if (nc.hasEdits()) {
-                        nc.end();
-                        undoManager.addEdit(nc);
-                    }
+                    // reserved for future use
+                    //if (nc.hasEdits()) {
+                    //    nc.end();
+                    //    undoManager.addEdit(nc);
+                    //}
                     dialogService.notify(Localization.lang("Finished fetching reference metadata."));
                 } else {
                     dialogService.notify(Localization.lang("Cancelled fetching reference metadata."));

@@ -353,12 +353,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
     }
 
     /**
-     * @param dialogService
-     * @param alertType
-     * @param title
-     * @param content
-     * @param buttonNameYes
-     * @param ButtonNameCancelClose
+     * @param dialogService existing dialog service
+     * @param alertType type of alert
+     * @param title title
+     * @param content description
+     * @param buttonNameYes button for confirmation/continuation
+     * @param ButtonNameCancelClose button for cancelling/skipping
      *
      * @return returns <code>0</code> for "cancel" and  <code>1</code> for "retry/continue"
      */

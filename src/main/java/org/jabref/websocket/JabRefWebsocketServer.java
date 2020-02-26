@@ -420,7 +420,9 @@ public class JabRefWebsocketServer extends WebSocketServer {
         try {
             semaphoreWsOnMessage.acquire();
 
-            LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
+            if (SHOW_VERBOSE_DEBUG_OUTPUT) {
+                LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -433,7 +435,9 @@ public class JabRefWebsocketServer extends WebSocketServer {
         try {
             semaphoreWsOnMessage.acquire();
 
-            LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
+            if (SHOW_VERBOSE_DEBUG_OUTPUT) {
+                LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
+            }
 
             JsonObject messageContainer = new Gson().fromJson(message, JsonObject.class);
 
