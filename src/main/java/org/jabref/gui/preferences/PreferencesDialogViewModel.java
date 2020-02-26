@@ -203,19 +203,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-            try {
-                preferences.importPreferences(file);
-                updateAfterPreferenceChanges();
 
-                dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
-                        Localization.lang("You must restart JabRef for this to come into effect."));
-            } catch (JabRefException ex) {
-                LOGGER.error("Error while importing preferences", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Import CSS"), ex);
-            }
+            preferences.setPathToCustomTheme(file.toAbsolutePath().toString());
+
+            dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
+                    Localization.lang("You must restart JabRef for this to come into effect."));
         });
-    }
-
-    public void updateCSS() {
     }
 }
