@@ -1,20 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded" default-locale="en-US">
   <info>
-    <title>American Psychological Association 7th edition</title>
-    <title-short>APA</title-short>
-    <id>http://www.zotero.org/styles/apa</id>
-    <link href="http://www.zotero.org/styles/apa" rel="self"/>
-    <link href="http://www.zotero.org/styles/apa-6th-edition" rel="template"/>
-    <link href="https://apastyle.apa.org/style-grammar-guidelines/references/examples" rel="documentation"/>
-    <author>
-      <name>Brenton M. Wiernik</name>
-      <email>zotero@wiernik.org</email>
-    </author>
+    <title>Begell House - APA</title>
+    <id>http://www.zotero.org/styles/begell-house-apa</id>
+    <link href="http://www.zotero.org/styles/begell-house-apa" rel="self"/>
+    <link href="http://www.zotero.org/styles/apa" rel="template"/>
+    <link href="http://dl.begellhouse.com/forauthors/journals/00551c876cc2f027.html" rel="documentation"/>
     <category citation-format="author-date"/>
-    <category field="psychology"/>
     <category field="generic-base"/>
-    <updated>2019-12-04T13:09:49+00:00</updated>
+    <summary>The author-date variant of the Begell House American Psychological Association style</summary>
+    <updated>2020-02-20T16:31:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -41,78 +36,6 @@
         <single>issue</single>
         <multiple>issues</multiple>
       </term>
-    </terms>
-  </locale>
-  <locale xml:lang="af">
-    <terms>
-      <term name="letter">persoonlike kommunikasie</term>
-      <term name="letter" form="short">brief</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ar">
-    <terms>
-      <term name="letter">اتصال شخصي</term>
-      <term name="letter" form="short">خطاب</term>
-    </terms>
-  </locale>
-  <locale xml:lang="da">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikation</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="de">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">persönliche Kommunikation</term>
-      <term name="letter" form="short">Brief</term>
-    </terms>
-  </locale>
-  <locale xml:lang="es">
-    <terms>
-      <term name="from">de</term>
-      <term name="letter">comunicación personal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fr">
-    <terms>
-      <term name="letter">communication personnelle</term>
-      <term name="letter" form="short">lettre</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nb">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nl">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">persoonlijke communicatie</term>
-      <term name="letter" form="short">brief</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nn">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ru">
-    <terms>
-      <term name="letter">личная переписка</term>
-      <term name="letter" form="short">письмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="tr">
-    <terms>
-      <term name="letter">kişisel iletişim</term>
-      <term name="letter" form="short">mektup</term>
     </terms>
   </locale>
   <!-- General categories of item types:
@@ -506,27 +429,7 @@
     <!-- (Secondary contributors; Database location; Genre no. 123; Report Series 123, Version, Edition, Volume, Page) -->
     <group prefix="(" suffix=")">
       <choose>
-        <if type="patent">
-          <!-- authority: U.S. ; genre: patent ; number: 123,445 -->
-          <group delimiter=" ">
-            <text variable="authority" form="short"/>
-            <choose>
-              <if variable="genre">
-                <text variable="genre" text-case="capitalize-first"/>
-              </if>
-              <else>
-                <!-- This should be localized -->
-                <text value="patent" text-case="capitalize-first"/>
-              </else>
-            </choose>
-            <group delimiter=" ">
-              <!-- Replace with label variable="number" if that becomes available -->
-              <text term="issue" form="short" text-case="capitalize-first"/>
-              <text variable="number"/>
-            </group>
-          </group>
-        </if>
-        <else-if type="post webpage">
+        <if type="post webpage">
           <!-- For post webpage, container-title is treated as publisher -->
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -534,7 +437,7 @@
             <text macro="number"/>
             <text macro="locators-booklike"/>
           </group>
-        </else-if>
+        </if>
         <else-if variable="container-title">
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -1265,7 +1168,11 @@
     <choose>
       <if variable="container-title" match="any">
         <group delimiter=" ">
-          <text term="in" text-case="capitalize-first"/>
+          <choose>
+            <if type="paper-conference" match="none">
+              <text term="in" text-case="capitalize-first"/>
+            </if>
+          </choose>
           <group delimiter=", ">
             <names variable="editor translator" delimiter=", &amp; ">
               <!-- Change to editortranslator and move editor to substitute as that becomes available -->
@@ -1277,14 +1184,21 @@
                 <names variable="container-author"/>
               </substitute>
             </names>
-            <group delimiter=": " font-style="italic">
+            <group delimiter=": ">
               <text variable="container-title"/>
               <!-- Replace with volume-title as that becomes available -->
               <choose>
                 <if is-numeric="volume" match="none">
                   <group delimiter=" ">
-                    <label variable="volume" form="short" text-case="capitalize-first"/>
-                    <text variable="volume"/>
+                    <choose>
+                      <if type="paper-conference">
+                        <text variable="volume" font-style="italic"/>
+                      </if>
+                      <else>
+                        <label variable="volume" form="short" text-case="capitalize-first"/>
+                        <text variable="volume"/>
+                      </else>
+                    </choose>
                   </group>
                 </if>
               </choose>
@@ -1317,12 +1231,23 @@
           <!-- For paper-conference, don't print publisher if in a journal-like proceedings -->
           <choose>
             <if variable="collection-editor editor editorial-director" match="any">
-              <text variable="publisher"/>
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher"/>
+              </group>
             </if>
           </choose>
         </else-if>
         <else-if type="article-journal article-magazine article-newspaper post-weblog" match="none">
-          <text variable="publisher"/>
+          <group delimiter=": ">
+            <text variable="publisher-place"/>
+            <choose>
+              <if type="patent">
+                <text variable="authority"/>
+              </if>
+            </choose>
+            <text variable="publisher"/>
+          </group>
         </else-if>
       </choose>
       <group delimiter=", ">
@@ -1347,15 +1272,14 @@
   <macro name="access">
     <choose>
       <if variable="DOI" match="any">
-        <text variable="DOI" prefix="https://doi.org/"/>
+        <text variable="DOI" prefix="doi: "/>
       </if>
       <else-if variable="URL">
         <group delimiter=" ">
           <choose>
-            <if variable="issued status" match="none">
+            <if variable="status" match="none">
               <group delimiter=" ">
                 <text term="retrieved" text-case="capitalize-first"/>
-                <date variable="accessed" form="text" suffix=","/>
                 <text term="from"/>
               </group>
             </if>
@@ -1658,7 +1582,7 @@
       <text variable="locator"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation et-al-min="2" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
     <sort>
       <key macro="author-bib" names-min="3" names-use-first="1"/>
       <key macro="date-sort-group"/>

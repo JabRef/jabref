@@ -234,7 +234,7 @@
       <else-if variable="reviewed-author">
         <text variable="title" font-style="italic" prefix="review of "/>
       </else-if>
-      <else-if type="entry-dictionary"></else-if>
+      <else-if type="entry-dictionary"/>
       <else>
         <text variable="title" text-case="title" quotes="true"/>
       </else>
@@ -268,7 +268,7 @@
       <else-if type="bill legislation legal_case interview patent" match="any">
         <text variable="title"/>
       </else-if>
-      <else-if type="entry-dictionary"></else-if>
+      <else-if type="entry-dictionary"/>
       <else>
         <text variable="title" text-case="title" quotes="true"/>
       </else>
