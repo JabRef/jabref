@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
@@ -48,6 +49,16 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
     private static final AtomicInteger ATOMIC_INTEGER_DIALOG_RESULT = new AtomicInteger();
 
+    private final ObservableList<BibEntry> entriesWithIncompleteMetadata = FXCollections.observableArrayList(); // this list contains all entries with still incomplete metadata
+
+    /**
+     * fetches reference metadata for the given entries
+     *
+     * @param database database from which the given <code>entries</code> come from
+     * @param entries entries for which some reference metadata should be fetched
+     * @param dialogService dialog service which can be used for showing dialogs
+     * @return <code>true</code>if the the process has been completed successfully, <code>false</code> otherwise
+     */
     public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
@@ -69,7 +80,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         "Cancel");
 
                 if (result != 1) {
-                    return false;
+                    entriesWithIncompleteMetadata.addAll(entries);
+                    return false; // cancel fetching metadata
                 }
             }
         }
@@ -82,7 +94,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
             databasePath = "none_" + RandomStringUtils.random(20, true, true);
         }
 
-        Set<IncompleteItem> incompleteItems = new HashSet<IncompleteItem>();
+        Set<IncompleteItem> potentiallyIncompleteItems = new HashSet<IncompleteItem>();
 
         int startIndexEntriesBlock = 0;
 
@@ -206,7 +218,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         LOGGER.info("item incomplete: the citation count could not be determined, since the " +
                                 "item data is potentially incomplete");
 
-                        incompleteItems.add(new IncompleteItem(key, title, creators));
+                        potentiallyIncompleteItems.add(new IncompleteItem(key, title, creators));
+
+                        entriesWithIncompleteMetadata.add(entries.get(startIndexEntriesBlock + rxEntryIndex));
 
                         if (SHOW_EVERY_POTENTIALLY_INCOMPLETE_ENTRY_INTERACTIVELY) {
                             int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
@@ -222,6 +236,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                             if (result == 1) {
                                 // skip and continue process
                             } else {
+                                entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                                 return false; // cancel fetching metadata
                             }
                         }
@@ -243,6 +258,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                             break;
                         }
                         else {
+                            entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return false; // cancel fetching metadata
                         }
                     }
@@ -261,6 +277,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                             break;
                         }
                         else {
+                            entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return false; // cancel fetching metadata
                         }
                     }
@@ -309,12 +326,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
         }
 
         if (SHOW_POTENTIALLY_INCOMPLETE_ENTRIES_AS_SUMMARY) {
-            int numIncompleteItems = incompleteItems.size();
+            int numIncompleteItems = potentiallyIncompleteItems.size();
 
             if (numIncompleteItems > 0) {
                 StringBuilder keysString = new StringBuilder();
 
-                for (IncompleteItem incompleteItem : incompleteItems) {
+                for (IncompleteItem incompleteItem : potentiallyIncompleteItems) {
                     if (keysString.length() != 0) {
                         keysString.append(", ");
                     }
@@ -405,5 +422,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
         else {
             return plural;
         }
+    }
+
+    public ObservableList<BibEntry> getEntriesWithIncompleteMetadata() {
+        return entriesWithIncompleteMetadata;
     }
 }

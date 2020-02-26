@@ -2,6 +2,7 @@ package org.jabref.gui.referencemetadata;
 
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
@@ -28,12 +29,21 @@ public class ReferenceMetadataFetcherSemanticScholar {
     // API format: https://api.semanticscholar.org/v1/paper/[Paper Identifier or URL]
     private static final String API_URL = "https://api.semanticscholar.org/v1/paper/";
 
-    private static final int CITATION_COUNT_STRING_STRING_LENGTH = 7;
+    private static final int CITATION_COUNT_STRING_LENGTH = 7;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcherSemanticScholar.class);
 
-    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
+    private final ObservableList<BibEntry> entriesWithIncompleteMetadata = FXCollections.observableArrayList(); // this list contains all entries with still incomplete metadata
 
+    /**
+     * fetches reference metadata for the given entries
+     *
+     * @param database database from which the given <code>entries</code> come from
+     * @param entries entries for which some reference metadata should be fetched
+     * @param dialogService dialog service which can be used for showing dialogs
+     * @return <code>true</code>if the the process has been completed successfully, <code>false</code> otherwise
+     */
+    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
         for (int entryIndex = 0; entryIndex < entries.size(); entryIndex++) {
             BibEntry entry = entries.get(entryIndex);
 
@@ -49,6 +59,7 @@ public class ReferenceMetadataFetcherSemanticScholar {
                                                              .asJson();
 
                 if (!jsonResponse.isSuccess()) {
+                    entriesWithIncompleteMetadata.add(entry);
                     LOGGER.info("fetching metadata for reference with citation key \"" + citationKey + "\" was not successful");
                     continue;
                 }
@@ -58,22 +69,26 @@ public class ReferenceMetadataFetcherSemanticScholar {
                 if (jsonData != null && jsonData.has("influentialCitationCount")) {
                     int citationCountNumber = jsonData.getInt("influentialCitationCount");
 
-                    String citationCount = String.format("%0" + CITATION_COUNT_STRING_STRING_LENGTH + "d", citationCountNumber);
+                    String citationCount = String.format("%0" + CITATION_COUNT_STRING_LENGTH + "d", citationCountNumber);
 
                     // set (updated) entry data (citation count)
                     entry.setField(SpecialField.CITATION_COUNT, citationCount);
                 }
                 else {
+                    entriesWithIncompleteMetadata.add(entry);
                     LOGGER.info("reference with citation key \"" + citationKey + "\" does not have the required metadata");
                 }
             }
             else {
+                entriesWithIncompleteMetadata.add(entry);
                 LOGGER.info("skipping reference with citation key \"" + citationKey + "\", since it does not have a DOI");
-
-                entry.setField(SpecialField.CITATION_COUNT, ""); // set empty field
             }
         }
 
         return true;
+    }
+
+    public ObservableList<BibEntry> getEntriesWithIncompleteMetadata() {
+        return entriesWithIncompleteMetadata;
     }
 }
