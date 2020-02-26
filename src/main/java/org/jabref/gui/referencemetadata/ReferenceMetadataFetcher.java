@@ -28,7 +28,8 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
  */
 public class ReferenceMetadataFetcher extends SimpleCommand {
 
-    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = true;
+    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = false;
+    private static boolean USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR = true;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -66,6 +67,11 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
                 if (USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR) {
                     ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
                     success = referenceMetadataFetcherGoogleScholar.fetchFor(database, entries, dialogService);
+                }
+
+                if (!success && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR) {
+                    ReferenceMetadataFetcherSemanticScholar referenceMetadataFetcherSemanticScholar = new ReferenceMetadataFetcherSemanticScholar();
+                    success = referenceMetadataFetcherSemanticScholar.fetchFor(database, entries, dialogService);
                 }
 
                 if (success) {
