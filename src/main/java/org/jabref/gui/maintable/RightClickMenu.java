@@ -61,7 +61,7 @@ public class RightClickMenu {
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_FOLDER, getOpenFolderCommand(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, getOpenExternalFileCommand(panel)));
         contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_URL, getOpenUrlCommand(panel)));
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_SHORTSCIENCE, getOpenShortScienceCommand(panel)));
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.OPEN_SHORTSCIENCE, new OpenShortScienceAction(dialogService, stateManager)));
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 

@@ -1204,37 +1204,6 @@ public class BasePanel extends StackPane {
         }
     }
 
-    private class OpenShortScienceAction implements BaseAction {
-        private static final String BASIC_SEARCH_URL = "https://www.shortscience.org/internalsearch";
-
-        @Override
-        public void action() {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() == 1) {
-                Optional<String> title = bes.get(0).getField(StandardField.TITLE);
-                if (title.isPresent()) {
-                    URIBuilder uriBuilder;
-                    try {
-                        uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-                    } catch (URISyntaxException e) {
-                        // This should never be able to happen as it would require the field to be misconfigured.
-                        throw new AssertionError("ShortScience URL is invalid.");
-                    }
-                    // Direct the user to the search results for the title.
-                    uriBuilder.addParameter("q", title.get());
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, uriBuilder.toString(), StandardField.URL);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                    }
-                }
-            } else {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-            }
-        }
-    }
-
     private class OpenURLAction implements BaseAction {
 
         @Override
