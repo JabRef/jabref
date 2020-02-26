@@ -1,7 +1,9 @@
 package org.jabref.gui.referencemetadata;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
@@ -27,17 +29,24 @@ import org.jabref.websocket.handlers.HandlerInfoGoogleScholarCitationCounts;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReferenceMetadataFetcherGoogleScholar {
 
     private static int STATIC_DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ... disabled) can be used to prevent captchas (robot detection) or the response "too many requests"
     private static boolean ENABLE_RANDOM_DWELL_TIME = true; // can be used to prevent captchas (robot detection) or the response "too many requests"
     private static int UPPER_BOUND_RANDOM_DWELL_TIME_AFTER_REQUEST = 0; // [ms] (0 ...disabled) can be used to prevent captchas (robot detection) or the response "too many requests"
+
     private static int NUM_ENTRIES_PER_REQUEST = 1; // tuning factor; default: 1 (recommended, which allows fine grained dwell times between every requested entry)
 
-    private static boolean UPDATE_NOTE_FIELD_WITH_CITATION_COUNT = true; // optional; default: false (since a dedicated field for the citation count exists)
+    private static boolean UPDATE_NOTE_FIELD_WITH_CITATION_COUNT = false; // optional; default: false (since a dedicated field for the citation count exists)
+    private static boolean SHOW_EVERY_POTENTIALLY_INCOMPLETE_ENTRY_INTERACTIVELY = false; // default: false; note: not every incomplete item is actually really incomplete
+    private static boolean SHOW_POTENTIALLY_INCOMPLETE_ENTRIES_AS_SUMMARY = true; // default: true; remark: not every incomplete item is actually really incomplete
 
-    private static final AtomicInteger ATOMIC_INTEGER_DIALOG_RESULT = new AtomicInteger(); // result: 0 ... cancel, 1 ... retry
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcherGoogleScholar.class);
+
+    private static final AtomicInteger ATOMIC_INTEGER_DIALOG_RESULT = new AtomicInteger();
 
     public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
 
@@ -48,11 +57,14 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 break;
             }
             else {
-                System.out.println("JabRef cannot connect to the JabRef-Browser-Extension");
+                LOGGER.warn("JabRef cannot connect to the JabRef-Browser-Extension");
 
                 int result = showCustomDialogAndWait(dialogService, Alert.AlertType.ERROR,
                         "JabRef-Browser-Extension Required",
-                        "JabRef cannot connect to the JabRef-Browser-Extension.\n\nIn order to use this functionality, please make sure that a web browser is running, where the JabRef-Browser-Extension is installed. Furthermore, a Internet connection is required in order to fetch metadata online.",
+                        "JabRef cannot connect to the JabRef-Browser-Extension.\n\nIn order to use this " +
+                                "functionality, please make sure that a web browser is running, where the " +
+                                "JabRef-Browser-Extension is installed. Furthermore, a Internet connection is " +
+                                "required in order to fetch metadata online.",
                         "Retry",
                         "Cancel");
 
@@ -69,6 +81,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
         } else {
             databasePath = "none_" + RandomStringUtils.random(20, true, true);
         }
+
+        Set<IncompleteItem> incompleteItems = new HashSet<IncompleteItem>();
 
         int startIndexEntriesBlock = 0;
 
@@ -133,7 +147,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
             synchronized (HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT) {
                 // submit request object
-                jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION, WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
+                jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION,
+                        WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
 
                 // wait for response object
                 try {
@@ -147,7 +162,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 String rxDatabasePath = rxMessagePayload.get("databasePath").getAsString();
 
                 if (!databasePath.equals(rxDatabasePath)) {
-                    System.out.println("databasePath of response does not match currently open database");
+                    LOGGER.warn("databasePath of response does not match currently open database");
                     // info: Technically, the corresponding database could be searched as well, but since the progress
                     // dialog is open, no other action can be performed and thus no other database can be opened and
                     // and one cannot switch to a different database during this process. So this case should not happen
@@ -178,37 +193,48 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     // - entry data
                     String key = rxEntryObject.get("key").getAsString();
                     String title = rxEntryObject.get("title").getAsString();
-                    String creators = rxEntryObject.get("creators").getAsJsonArray().toString();
+                    JsonArray creators = rxEntryObject.get("creators").getAsJsonArray();
                     String note = rxEntryObject.get("extra").getAsString();
                     String citationCount = rxEntryObject.get("citationCount").getAsString();
 
-                    System.out.println("success: " + _status_success);
-                    System.out.println("itemComplete: " + _status_itemComplete);
-                    System.out.println("solvingCaptchaNeeded: " + _status_solvingCaptchaNeeded);
-                    System.out.println("tooManyRequests: " + _status_tooManyRequests);
+                    LOGGER.debug("success: " + _status_success);
+                    LOGGER.debug("itemComplete: " + _status_itemComplete);
+                    LOGGER.debug("solvingCaptchaNeeded: " + _status_solvingCaptchaNeeded);
+                    LOGGER.debug("tooManyRequests: " + _status_tooManyRequests);
 
                     if (!_status_itemComplete) {
-                        System.out.println("Item incomplete: The citation count could not be determined, since the item data is incomplete.");
+                        LOGGER.info("item incomplete: the citation count could not be determined, since the " +
+                                "item data is potentially incomplete");
 
-                        int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
-                                "Item Incomplete",
-                                "The reference metadata could not be determined for the following item, since its data is incomplete (title or authors are missing).\n\nItem Key: " + key + "\nItem Title: \"" + title + "\"\nItem Authors: \"" + creators + "\"",
-                                "Skip and continue",
-                                "Cancel");
+                        incompleteItems.add(new IncompleteItem(key, title, creators));
 
-                        if (result == 1) {
-                            // skip and continue process
-                        }
-                        else {
-                            return false; // cancel fetching metadata
+                        if (SHOW_EVERY_POTENTIALLY_INCOMPLETE_ENTRY_INTERACTIVELY) {
+                            int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
+                                    "Potentially Incomplete Item Found",
+                                    "No metadata could be fetched for the following reference, since it " +
+                                            "doesn't have sufficient information for reliably fetching it (DOI or " +
+                                            "title and author(s) are needed).\n\nCitation Key: \"" + key +
+                                            "\"\nItem Title: \"" + title + "\"\n\nIn some cases, like references of " +
+                                            "web pages, this is usually fine.",
+                                    "Skip and continue",
+                                    "Cancel");
+
+                            if (result == 1) {
+                                // skip and continue process
+                            } else {
+                                return false; // cancel fetching metadata
+                            }
                         }
                     }
                     else if (_status_solvingCaptchaNeeded) {
-                        System.out.println("Captcha: The reference metadata could not be fetched. Please show Google Scholar, that you are not a robot, by opening this <a id=\"googleScholarCaptchaLink\" href=\"https://scholar.google.com/scholar?q=google\" target=\"_blank\">Google Scholar link</a> and solving the shown captcha.</li>");
+                        LOGGER.info("solving captcha needed: reference metadata could not be fetched, since " +
+                                "solving the captcha is needed");
 
                         int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
                                 "Solving Capcha Needed",
-                                "Please show Google Scholar, that you are not a robot, by opening this <a id=\"googleScholarCaptchaLink\" href=\"https://scholar.google.com/scholar?q=google\" target=\"_blank\">Google Scholar link</a> and solving the shown captcha, otherwise the reference metadata cannot be fetched.</li>",
+                                "Please show Google Scholar, that you are not a robot, by opening the link " +
+                                        "https://scholar.google.com/scholar?q=google and solving the shown captcha, " +
+                                        "otherwise the reference metadata cannot be fetched.",
                                 "Continue",
                                 "Cancel");
 
@@ -221,7 +247,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         }
                     }
                     else if (_status_tooManyRequests) {
-                        System.out.println("Too many requests: Google Scholar asks you to wait some time before sending further requests.");
+                        LOGGER.info("too many requests: Google Scholar asks you to wait some time before " +
+                                "sending further requests");
 
                         int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
                                 "Too Many Requests",
@@ -242,7 +269,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     BibEntry entry = getBibEntryWithGivenEntryId(database, _entryId);
 
                     if (entry == null) {
-                        System.out.println("skipping bibEntry, since entry with entryId=" + _entryId + " could not be found");
+                        LOGGER.info("skipping bibEntry, since entry with entryId=" + _entryId + " could not " +
+                                "be found");
 
                         continue;
                     }
@@ -280,6 +308,37 @@ public class ReferenceMetadataFetcherGoogleScholar {
             }
         }
 
+        if (SHOW_POTENTIALLY_INCOMPLETE_ENTRIES_AS_SUMMARY) {
+            int numIncompleteItems = incompleteItems.size();
+
+            if (numIncompleteItems > 0) {
+                StringBuilder keysString = new StringBuilder();
+
+                for (IncompleteItem incompleteItem : incompleteItems) {
+                    if (keysString.length() != 0) {
+                        keysString.append(", ");
+                    }
+
+                    keysString.append("\"" + incompleteItem.getKey() + "\"");
+                }
+
+                String content = "For " + numIncompleteItems + " " +
+                        singularPluralChooser(numIncompleteItems, "reference", "references") +
+                        " no metadata could be fetched, since " +
+                        singularPluralChooser(numIncompleteItems, "it doesn't", "they don't") +
+                        " have sufficient information for reliably fetching it (DOI or title and author(s) are needed).\n" +
+                        "The citation " + singularPluralChooser(numIncompleteItems, "key", "keys") + " of the affected " +
+                        singularPluralChooser(numIncompleteItems, "reference is", "references are") + ":\n\n" +
+                        keysString.toString() + "\n\n" + "In some cases, like references of web pages, this is usually fine.\n";
+
+                Platform.runLater(() -> {
+                    dialogService.showInformationDialogAndWait(Localization.lang("Potentially Incomplete " +
+                            singularPluralChooser(numIncompleteItems, "Item", "Items") + " Found"),
+                            Localization.lang(content));
+                });
+            }
+        }
+
         return true;
     }
 
@@ -293,6 +352,16 @@ public class ReferenceMetadataFetcherGoogleScholar {
         return null;
     }
 
+    /**
+     * @param dialogService
+     * @param alertType
+     * @param title
+     * @param content
+     * @param buttonNameYes
+     * @param ButtonNameCancelClose
+     *
+     * @return returns <code>0</code> for "cancel" and  <code>1</code> for "retry/continue"
+     */
     private int showCustomDialogAndWait(DialogService dialogService, Alert.AlertType alertType, String title, String content, String buttonNameYes, String ButtonNameCancelClose) {
         synchronized (ATOMIC_INTEGER_DIALOG_RESULT) {
             Platform.runLater(() -> {
@@ -326,6 +395,15 @@ public class ReferenceMetadataFetcherGoogleScholar {
             }
 
             return ATOMIC_INTEGER_DIALOG_RESULT.get();
+        }
+    }
+
+    public static String singularPluralChooser(int number, String singular, String plural) {
+        if (number == 1) {
+            return singular;
+        }
+        else {
+            return plural;
         }
     }
 }

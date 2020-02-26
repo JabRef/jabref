@@ -30,13 +30,16 @@ public class JabRefWebsocketServer extends WebSocketServer {
     private static final int MAX_ONMESSAGE_CALLS_IN_PARALLEL = 500; // default: 500; 1: enables sequential processing
     private static final int DEFAULT_PORT = 8855;
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefWebsocketServer.class);
+    private static final boolean SHOW_VERBOSE_DEBUG_OUTPUT = false;
 
     private static JabRefWebsocketServer jabRefWebsocketServerSingleton = null;
 
     private final Semaphore semaphoreWsOnMessage = new Semaphore(MAX_ONMESSAGE_CALLS_IN_PARALLEL, true);
 
     private final Runnable heartbeatRunnable = () -> {
-        System.out.println("[ws] heartbeat thread is active...");
+        if (SHOW_VERBOSE_DEBUG_OUTPUT) {
+            LOGGER.debug("[ws] heartbeat thread is active...");
+        }
 
         JsonObject messagePayload = new JsonObject();
 
@@ -298,16 +301,16 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     public boolean startServer() {
         if (serverStarting) {
-            System.out.println("[ws] JabRefWebsocketServer is already starting");
+            LOGGER.info("[ws] JabRefWebsocketServer is already starting");
 
             return false;
         }
         else if (serverStarted) {
-            System.out.println("[ws] JabRefWebsocketServer has already been started");
+            LOGGER.info("[ws] JabRefWebsocketServer has already been started");
 
             return false;
         } else {
-            System.out.println("[ws] JabRefWebsocketServer is starting up...");
+            LOGGER.info("[ws] JabRefWebsocketServer is starting up...");
 
             serverStarting = true;
 
@@ -321,11 +324,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     public boolean stopServer() {
         if (serverStarting) {
-            System.out.println("[ws] JabRefWebsocketServer is currently starting up and cannot be stopped during this process");
+            LOGGER.info("[ws] JabRefWebsocketServer is currently starting up and cannot be stopped during this process");
 
             return false;
         } else if (serverStarted) {
-            System.out.println("[ws] stopping JabRefWebsocketServer...");
+            LOGGER.info("[ws] stopping JabRefWebsocketServer...");
 
             if (heartbeatExecutor != null) {
                 heartbeatExecutor.shutdown();
@@ -342,7 +345,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
             return true;
         } else {
-            System.out.println("[ws] JabRefWebsocketServer is not started");
+            LOGGER.info("[ws] JabRefWebsocketServer is not started");
 
             return false;
         }
@@ -358,7 +361,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket websocket, ClientHandshake handshake) {
-        System.out.println("[ws] @onOpen: " + websocket.getRemoteSocketAddress().getAddress().getHostAddress() + " connected.");
+        LOGGER.debug("[ws] @onOpen: " + websocket.getRemoteSocketAddress().getAddress().getHostAddress() + " connected.");
 
         websocket.setAttachment(new WsClientData(WsClientType.UNKNOWN));
 
@@ -381,12 +384,12 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket websocket, int code, String reason, boolean remote) {
-        System.out.println("[ws] @onClose: " + websocket + " has disconnected.");
+        LOGGER.debug("[ws] @onClose: " + websocket + " has disconnected.");
     }
 
     @Override
     public void onError(WebSocket websocket, Exception ex) {
-        System.out.println("[ws] @onError: " + websocket + " has caused an error.");
+        LOGGER.error("[ws] @onError: " + websocket + " has caused an error.");
 
         ex.printStackTrace();
 
@@ -400,15 +403,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
         serverStarted = true;
         serverStarting = false;
 
-        System.out.println("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
+        LOGGER.info("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
 
         if (heartbeatEnabled) {
             heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
             heartbeatExecutor.scheduleAtFixedRate(heartbeatRunnable, 0, heartbeatInterval, timeUnitHeartbeatInterval);
 
-            System.out.println("[ws] heartbeat thread is enabled...");
+            LOGGER.info("[ws] heartbeat thread is enabled...");
         } else {
-            System.out.println("[ws] heartbeat thread is disabled...");
+            LOGGER.info("[ws] heartbeat thread is disabled...");
         }
     }
 
@@ -417,7 +420,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         try {
             semaphoreWsOnMessage.acquire();
 
-            System.out.println("[ws] @onMessage: " + websocket + ": " + message);
+            LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
@@ -430,7 +433,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         try {
             semaphoreWsOnMessage.acquire();
 
-            System.out.println("[ws] @onMessage: " + websocket + ": " + message);
+            LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
 
             JsonObject messageContainer = new Gson().fromJson(message, JsonObject.class);
 
@@ -438,7 +441,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             JsonObject messagePayload = messageContainer.getAsJsonObject("payload");
 
             if (!WsAction.isValidWsAction(action)) {
-                System.out.println("[ws] unknown WsAction received: " + action);
+                LOGGER.warn("[ws] unknown WsAction received: " + action);
                 return;
             }
 
@@ -451,7 +454,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(wsAction)) {
                 HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
             } else {
-                System.out.println("[ws] unimplemented WsAction received: " + action);
+                LOGGER.warn("[ws] unimplemented WsAction received: " + action);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

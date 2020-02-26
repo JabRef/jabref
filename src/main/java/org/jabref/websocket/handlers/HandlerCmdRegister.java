@@ -7,8 +7,12 @@ import org.jabref.websocket.WsClientType;
 
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HandlerCmdRegister {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HandlerCmdRegister.class);
+
     public static void handler(WebSocket websocket, JsonObject messagePayload) {
         String wsClientTypeString = messagePayload.get("wsClientType").getAsString();
 
@@ -16,7 +20,7 @@ public class HandlerCmdRegister {
             WsClientType wsClientType = WsClientType.getClientTypeFromString(wsClientTypeString);
             websocket.<WsClientData>getAttachment().setWsClientType(wsClientType);
         } else {
-            System.out.println("[ws] invalid WsClientType: " + wsClientTypeString);
+            LOGGER.warn("[ws] invalid WsClientType: " + wsClientTypeString);
 
             JsonObject messagePayloadForClient = new JsonObject();
             messagePayloadForClient.addProperty("messageType", "warning");

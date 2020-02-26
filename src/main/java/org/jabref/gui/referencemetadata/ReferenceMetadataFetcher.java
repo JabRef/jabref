@@ -1,6 +1,5 @@
 package org.jabref.gui.referencemetadata;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.undo.UndoManager;
@@ -44,7 +43,9 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
         this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
-        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, Localization.lang("This operation fetches reference metadata for the currently selected entries online."), Localization.lang("This operation requires one or more entries to be selected.")));
+        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, Localization.lang("This operation fetches " +
+                "reference metadata for the currently selected entries online."), Localization.lang("This " +
+                "operation requires one or more entries to be selected.")));
     }
 
     @Override
@@ -60,8 +61,8 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
             protected List<BibEntry> call() {
 
                 if (USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR) {
-                    ReferenceMetadataFetcherGoogleScholar rmfgs = new ReferenceMetadataFetcherGoogleScholar();
-                    rmfgs.fetchFor(database, entries, dialogService);
+                    ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
+                    referenceMetadataFetcherGoogleScholar.fetchFor(database, entries, dialogService);
                 }
 
                 return entries;
@@ -76,7 +77,7 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
                     }
                     dialogService.notify(Localization.lang("Finished fetching reference metadata."));
                 } else {
-                    dialogService.notify(Localization.lang("Finished fetching reference metadata.") + " " + Localization.lang("There was nothing to do."));
+                    dialogService.notify(Localization.lang("Cancelled fetching reference metadata."));
                 }
             }
         };
