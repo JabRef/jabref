@@ -247,8 +247,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                         int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
                                 "Solving Capcha Needed",
-                                "Please show Google Scholar, that you are not a robot, by opening the link " +
-                                        "https://scholar.google.com/scholar?q=google and solving the shown captcha, " +
+                                "Please show Google Scholar, that you are not a robot, by opening the link \n\n" +
+                                        "https://scholar.google.com/scholar?q=google \n\nand solving the shown captcha, " +
                                         "otherwise the reference metadata cannot be fetched.",
                                 "Continue",
                                 "Cancel");

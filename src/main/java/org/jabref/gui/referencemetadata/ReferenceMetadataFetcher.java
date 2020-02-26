@@ -33,7 +33,7 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcher.class);
 
-    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = false;
+    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = true;
     private static boolean USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR = true;
     private static boolean USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS = true;
 
