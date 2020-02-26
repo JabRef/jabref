@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -48,9 +49,10 @@ public class ThemeLoader {
 
         String cssVmArgument = System.getProperty("jabref.theme.css");
         String cssPreferences = jabRefPreferences.get(JabRefPreferences.FX_THEME);
+
         if (StringUtil.isNotBlank(cssVmArgument)) {
             // First priority: VM argument
-            LOGGER.info("Using css from VM option: " + cssVmArgument);
+            LOGGER.info("Using css from VM option: {}", cssVmArgument);
             URL cssVmUrl = null;
             try {
                 cssVmUrl = Paths.get(cssVmArgument).toUri().toURL();
@@ -60,13 +62,23 @@ public class ThemeLoader {
             additionalCssToLoad = Optional.ofNullable(cssVmUrl);
         } else if (StringUtil.isNotBlank(cssPreferences) && !MAIN_CSS.equalsIgnoreCase(cssPreferences)) {
             // Otherwise load css from preference
-            URL cssResource = JabRefFrame.class.getResource(cssPreferences);
-            if (cssResource != null) {
-                LOGGER.debug("Using css " + cssResource);
-                additionalCssToLoad = Optional.of(cssResource);
+            Optional<URL> cssResource = Optional.empty();
+            if (DARK_CSS.equals(cssPreferences)) {
+                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(cssPreferences));
+            } else {
+                try {
+                    cssResource = Optional.of(new File(cssPreferences).toURI().toURL());
+                } catch (MalformedURLException e) {
+                    LOGGER.warn("Cannot load css {}", cssResource);
+                }
+            }
+
+            if (cssResource.isPresent()) {
+                LOGGER.debug("Using css {}", cssResource);
+                additionalCssToLoad = cssResource;
             } else {
                 additionalCssToLoad = Optional.empty();
-                LOGGER.warn("Cannot load css " + cssPreferences);
+                LOGGER.warn("Cannot load css {}", cssPreferences);
             }
         } else {
             additionalCssToLoad = Optional.empty();
@@ -104,7 +116,7 @@ public class ThemeLoader {
                 });
             }
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
-            LOGGER.error("Could not watch css file for changes " + cssFile, e);
+            LOGGER.error("Could not watch css file for changes {}", cssFile, e);
         }
     }
 }

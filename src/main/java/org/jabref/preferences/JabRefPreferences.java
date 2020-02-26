@@ -117,7 +117,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
-    */
+     */
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
@@ -402,6 +402,8 @@ public class JabRefPreferences implements PreferencesService {
     private static final int EXPORTER_NAME_INDEX = 0;
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
+
+    private static final String PATH_TO_CUSTOM_THEME = "pathToCustomTheme";
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -759,6 +761,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+        defaults.put(JabRefPreferences.PATH_TO_CUSTOM_THEME, "");
 
         setLanguageDependentDefaultValues();
     }
@@ -968,6 +971,14 @@ public class JabRefPreferences implements PreferencesService {
         return customFields;
     }
 
+    public void setPathToCustomTheme(String path) {
+        put(PATH_TO_CUSTOM_THEME, path);
+    }
+
+    public String getPathToCustomTheme() {
+        return get(PATH_TO_CUSTOM_THEME);
+    }
+
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
@@ -1129,7 +1140,7 @@ public class JabRefPreferences implements PreferencesService {
      * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys
      * they use.
      *
-     * @param key The preferences key.
+     * @param key   The preferences key.
      * @param value The default value.
      */
     public void putDefaultValue(String key, Object value) {
@@ -1139,7 +1150,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Stores a color in preferences.
      *
-     * @param key The key for this setting.
+     * @param key   The key for this setting.
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
@@ -1356,7 +1367,7 @@ public class JabRefPreferences implements PreferencesService {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
-                                      ex);
+                                                  ex);
         }
     }
 
@@ -2097,7 +2108,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()                                                  
+        List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()
                                                                                 .map(entryType -> entryType).collect(Collectors.toList());
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);

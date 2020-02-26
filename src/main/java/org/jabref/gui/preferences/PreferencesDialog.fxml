@@ -39,6 +39,11 @@
                     </Button>
                     <Button maxWidth="Infinity" onAction="#showAllPreferences" text="%Show preferences"/>
                     <Button maxWidth="Infinity" onAction="#resetPreferences" text="%Reset preferences"/>
+                    <Button maxWidth="Infinity" onAction="#importStyle" text="%Import CSS file">
+                        <tooltip>
+                            <Tooltip text="%Import custom CSS file" />
+                        </tooltip>
+                    </Button>
                 </VBox>
             </VBox>
             <ScrollPane fx:id="preferencesContainer" maxHeight="Infinity" maxWidth="Infinity"/>
