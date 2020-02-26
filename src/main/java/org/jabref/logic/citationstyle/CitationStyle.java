@@ -136,11 +136,9 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = JabRefMain.class.getResource("/csl-styles/academy-of-management-review.csl");
+        URL url = JabRefMain.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
         Objects.requireNonNull(url);
-        if (url == null) {
-            return Collections.emptyList();
-        }
+
         try {
             URI uri = url.toURI();
             Path path = Path.of(uri).getParent();
@@ -149,7 +147,7 @@ public class CitationStyle {
 
             return STYLES;
         } catch (URISyntaxException | IOException e) {
-            LOGGER.error("something went wrong while searching available CitationStyles. Are you running directly from source code?", e);
+            LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
     }
