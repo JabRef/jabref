@@ -34,19 +34,13 @@ public class ApsFetcher implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getDOI();
         if (doi.isPresent()) {
-            // DOI is not case sensitive, but the id for the PDF URL is,
-            // so we follow DOI.org redirects to get the proper id.
-            // https://stackoverflow.com/a/5270162/1729441
-            String doiRequest = DOI_URL + doi.get().getDOI();
-            URLConnection con = new URL(doiRequest).openConnection();
-            con.connect();
-            try (InputStream is = con.getInputStream()) {
-                // Do nothing, only need to open stream
+            String id;
+            try {
+                id = getId(doi.get().getDOI());
             } catch (FileNotFoundException e) {
                 // No such DOI
                 return Optional.empty();
             }
-            String id = con.getURL().toString().split("abstract/")[1];
 
             String pdfRequest = PDF_URL + id;
             int code = Unirest.get(pdfRequest).asJson().getStatus();
@@ -63,5 +57,26 @@ public class ApsFetcher implements FulltextFetcher {
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.PUBLISHER;
+    }
+
+    /**
+     * Convert a DOI into an appropriate APS id.
+     *
+     * @param doi A case insensitive DOI
+     * @return A DOI cased as APS likes it
+     * @throws IOException
+     */
+    private String getId(String doi) throws IOException {
+        // DOI is not case sensitive, but the id for the PDF URL is,
+        // so we follow DOI.org redirects to get the proper id.
+        // https://stackoverflow.com/a/5270162/1729441
+        String doiRequest = DOI_URL + doi;
+        URLConnection con = new URL(doiRequest).openConnection();
+        con.connect();
+
+        // Throws FileNotFoundException if DOI doesn't exist
+        InputStream is = con.getInputStream();
+
+        return con.getURL().toString().split("abstract/")[1];
     }
 }
