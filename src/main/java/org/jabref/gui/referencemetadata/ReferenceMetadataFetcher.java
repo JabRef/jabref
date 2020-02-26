@@ -33,8 +33,9 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcher.class);
 
-    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = true;
+    private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = false;
     private static boolean USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR = true;
+    private static boolean USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS = true;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -67,27 +68,34 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
             @Override
             protected List<BibEntry> call() {
 
-                boolean processCancelled = false;
+                boolean processFinished = true;
 
                 ObservableList<BibEntry> entriesWithIncompleteMetadata = entries;
 
-                // run prioritized fetcher pipeline
+                // run prioritized metadata fetcher pipeline
 
-                if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
-                    LOGGER.info("running " + ReferenceMetadataFetcherGoogleScholar.class.toString() + "...");
+                if (processFinished && USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
+                    LOGGER.info("running " + ReferenceMetadataFetcherGoogleScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
-                    processCancelled = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processFinished = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherGoogleScholar.getEntriesWithIncompleteMetadata();
                 }
 
-                if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
-                    LOGGER.info("running " + ReferenceMetadataFetcherSemanticScholar.class.toString() + "...");
+                if (processFinished && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
+                    LOGGER.info("running " + ReferenceMetadataFetcherSemanticScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherSemanticScholar referenceMetadataFetcherSemanticScholar = new ReferenceMetadataFetcherSemanticScholar();
-                    processCancelled = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processFinished = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherSemanticScholar.getEntriesWithIncompleteMetadata();
                 }
 
-                if (!processCancelled) {
+                if (processFinished && USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS && entriesWithIncompleteMetadata.size() > 0) {
+                    LOGGER.info("running " + ReferenceMetadataFetcherOpenCitations.class.getSimpleName() + "...");
+                    ReferenceMetadataFetcherOpenCitations referenceMetadataFetcherOpenCitations = new ReferenceMetadataFetcherOpenCitations();
+                    processFinished = referenceMetadataFetcherOpenCitations.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    entriesWithIncompleteMetadata = referenceMetadataFetcherOpenCitations.getEntriesWithIncompleteMetadata();
+                }
+
+                if (processFinished) {
                     return entries;
                 }
                 else {
