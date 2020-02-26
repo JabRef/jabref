@@ -2,9 +2,15 @@
 
 This page presents all development informatation around JabRef. For users documentation see <https://docs.jabref.org>.
 
+## Excersises
+
+Uni Basel offers a German (🇩🇪) Software Engineering course which uses JabRef as one example.
+Look at [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md) for an exercise where some important points of JabRef are touched.
+
 ## How tos
 
-- [Sync your fork with the JabRef repository](https://help.github.com/articles/syncing-a-fork/)
+- External: [Sync your fork with the JabRef repository](https://help.github.com/articles/syncing-a-fork/)
+- External (🇩🇪): Branches and pull requests: <https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md>
 
 ## Command Line
 
