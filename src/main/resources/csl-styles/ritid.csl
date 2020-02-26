@@ -479,7 +479,7 @@
       </if>
       <else-if type="article-journal">
         <choose>
-          <if variable="volume" match="none"></if>
+          <if variable="volume" match="none"/>
           <else-if match="any" variable="collection-title">
             <text macro="locators-note"/>
           </else-if>
