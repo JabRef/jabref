@@ -392,7 +392,7 @@ public class GroupDialogViewModel {
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
         MetaData metaData = currentDatabase.getMetaData();
-        metaData.getLaTexFileDirectory(preferencesService.getFilePreferences().getUser()).ifPresent(fileDirs::add);
+        metaData.getLatexFileDirectory(preferencesService.getFilePreferences().getUser()).ifPresent(fileDirs::add);
 
         return fileDirs;
     }

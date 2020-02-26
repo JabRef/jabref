@@ -2,9 +2,9 @@
 
 We monitor the general source code quality at three places:
 
-* [Teamscale](https://www.cqse.eu/de/produkte/teamscale/landing/) is a popular German product analyzing code quality. The analysis results are available at <https://demo.teamscale.com/dashboard.html#show//?id=kinnen%2FJabref%20Overview>.
-* [codacy](https://www.codacy.com/) is a hosted service to monitor code quality. The code quality analysis for JabRef is available at <https://www.codacy.com/app/simonharrer/jabref/dashboard>.
+* [codacy](https://www.codacy.com/) is a hosted service to monitor code quality. It thereby combines the results of available open source code quality checkers such as [Checkstyle](https://checkstyle.sourceforge.io/) or [PMD](https://pmd.github.io/). The code quality analysis for JabRef is available at <https://app.codacy.com/gh/JabRef/jabref/dashboard>, especially the [list of open issues](https://app.codacy.com/gh/JabRef/jabref/issues/index). In case a rule feels wrong, it is most likely a PMD rule. The JabRef team can change the configuration at <https://app.codacy.com/p/306789/patterns/list?engine=9ed24812-b6ee-4a58-9004-0ed183c45b8f>.
 * [codecov](https://codecov.io/) is a solution to check code coverage of test cases. The code coverage metrics for JabRef are available at <https://codecov.io/github/JabRef/jabref>.
+* [Teamscale](https://www.cqse.eu/de/produkte/teamscale/landing/) is a popular German product analyzing code quality. The analysis results are available at <https://demo.teamscale.com/findings.html#/jabref/?>.
 
 We strongly recommend to read following two books on code quality:
 
