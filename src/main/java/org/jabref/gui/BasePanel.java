@@ -1,18 +1,12 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -36,14 +30,10 @@ import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
-import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.gui.edit.CopyBibTeXKeyAndLinkAction;
 import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
@@ -51,30 +41,18 @@ import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
-import org.jabref.gui.preview.CitationStyleToClipboardWorker;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
-import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.citationstyle.CitationStyleCache;
-import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.UpdateField;
-import org.jabref.logic.util.io.FileFinder;
-import org.jabref.logic.util.io.FileFinders;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -86,15 +64,10 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -261,21 +234,6 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
 
-        // The action for copying selected entries.
-        actions.put(Actions.COPY, this::copy);
-
-        actions.put(Actions.CUT, this::cut);
-
-        actions.put(Actions.DELETE, () -> delete(false));
-
-        // The action for pasting entries or cell contents.
-        //  - more robust detection of available content flavors (doesn't only look at first one offered)
-        //  - support for parsing string-flavor clipboard contents which are bibtex entries.
-        //    This allows you to (a) paste entire bibtex entries from a text editor, web browser, etc
-        //                       (b) copy and paste entries between multiple instances of JabRef (since
-        //         only the text representation seems to get as far as the X clipboard, at least on my system)
-        actions.put(Actions.PASTE, this::paste);
-
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
         // The action for auto-generating keys.
@@ -284,91 +242,14 @@ public class BasePanel extends StackPane {
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
-        actions.put(Actions.MERGE_ENTRIES, () -> new MergeEntriesAction(frame, Globals.stateManager).execute());
-
-        // The action for copying the selected entry's key.
-        actions.put(Actions.COPY_KEY, this::copyKey);
-
-        // The action for copying the selected entry's title.
-        actions.put(Actions.COPY_TITLE, this::copyTitle);
-
-        // The action for copying a cite for the selected entry.
-        actions.put(Actions.COPY_CITE_KEY, this::copyCiteKey);
-
-        // The action for copying the BibTeX key and the title for the first selected entry
-        actions.put(Actions.COPY_KEY_AND_TITLE, this::copyKeyAndTitle);
-
-        actions.put(Actions.COPY_CITATION_ASCII_DOC, () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
-        actions.put(Actions.COPY_CITATION_XSLFO, () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
-        actions.put(Actions.COPY_CITATION_HTML, () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
-        actions.put(Actions.COPY_CITATION_RTF, () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
-        actions.put(Actions.COPY_CITATION_TEXT, () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
-
-        // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable, Globals.clipboardManager));
-
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
-
-        actions.put(Actions.OPEN_EXTERNAL_FILE, this::openExternalFile);
-
-        actions.put(Actions.OPEN_FOLDER, () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(), bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
-            for (final Path f : files) {
-                try {
-                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
-                } catch (IOException e) {
-                    LOGGER.info("Could not open folder", e);
-                }
-            }
-        }));
-
-        actions.put(Actions.OPEN_CONSOLE, () -> JabRefDesktop.openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
 
-        actions.put(Actions.OPEN_URL, new OpenURLAction());
-
-        actions.put(Actions.OPEN_SHORTSCIENCE, new OpenShortScienceAction());
-
-        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, new MergeWithFetchedEntryAction(this, frame.getDialogService()));
-
         actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.RELEVANCE, undoManager).getSpecialFieldAction(SpecialField.RELEVANCE.getValues().get(0), frame));
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.QUALITY, undoManager).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
-
-        actions.put(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getCommand(),
-                new SpecialFieldViewModel(SpecialField.PRINTED, undoManager).getSpecialFieldAction(SpecialField.PRINTED.getValues().get(0), frame));
-
-        for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(prio).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.PRIORITY, undoManager).getSpecialFieldAction(prio, this.frame));
-        }
-        for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(rank).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.RANKING, undoManager).getSpecialFieldAction(rank, this.frame));
-        }
-        for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(status).getCommand(),
-                    new SpecialFieldViewModel(SpecialField.READ_STATUS, undoManager).getSpecialFieldAction(status, this.frame));
-        }
-
-        actions.put(Actions.NEXT_PREVIEW_STYLE, () -> {
-            entryEditor.nextPreviewStyle();
-        });
-        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, () -> {
-            entryEditor.previousPreviewStyle();
-        });
-
-        actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
-
-        actions.put(Actions.WRITE_XMP, new WriteXMPAction(this)::execute);
 
         actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
@@ -376,16 +257,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
-    }
-
-    /**
-     * Generates and copies citations based on the selected entries to the clipboard
-     *
-     * @param outputFormat the desired {@link CitationStyleOutputFormat}
-     */
-    private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        CitationStyleToClipboardWorker worker = new CitationStyleToClipboardWorker(this, outputFormat, dialogService, Globals.clipboardManager, Globals.prefs.getPreviewPreferences());
-        worker.copyCitationStyleToClipboard(Globals.TASK_EXECUTOR);
     }
 
     /**
@@ -425,157 +296,6 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    private void copyTitle() {
-        List<BibEntry> selectedBibEntries = mainTable.getSelectedEntries();
-        if (!selectedBibEntries.isEmpty()) {
-            // Collect all non-null titles.
-            List<String> titles = selectedBibEntries.stream()
-                                                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                    .map(bibEntry -> bibEntry.getTitle().get())
-                                                    .collect(Collectors.toList());
-
-            if (titles.isEmpty()) {
-                output(Localization.lang("None of the selected entries have titles."));
-                return;
-            }
-            final String copiedTitles = String.join("\n", titles);
-            Globals.clipboardManager.setContent(copiedTitles);
-
-            if (titles.size() == selectedBibEntries.size()) {
-                // All entries had titles.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedTitles) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined title.", Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
-            }
-        }
-    }
-
-    private void copyCiteKey() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            List<String> keys = new ArrayList<>(bes.size());
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                be.getCiteKeyOptional().ifPresent(keys::add);
-            }
-            if (keys.isEmpty()) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
-                                         .filter(cite -> cite.contains("\\")) // must contain \
-                                         .orElse("\\cite");
-            final String copiedCiteCommand = citeCommand + "{" + String.join(",", keys) + '}';
-            Globals.clipboardManager.setContent(copiedCiteCommand);
-
-            if (keys.size() == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedCiteCommand) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void copyKey() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            List<String> keys = new ArrayList<>(bes.size());
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                be.getCiteKeyOptional().ifPresent(keys::add);
-            }
-            if (keys.isEmpty()) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            final String copiedKeys = String.join(",", keys);
-            Globals.clipboardManager.setContent(copiedKeys);
-
-            if (keys.size() == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeys) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - keys.size()), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void copyKeyAndTitle() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
-            // OK: in a future version, this string should be configurable to allow arbitrary exports
-            StringReader sr = new StringReader("\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
-            Layout layout;
-            try {
-                layout = new LayoutHelper(sr, Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                        .getLayoutFromText();
-            } catch (IOException e) {
-                LOGGER.info("Could not get layout", e);
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-
-            int copied = 0;
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                if (be.hasCiteKey()) {
-                    copied++;
-                    sb.append(layout.doLayout(be, bibDatabaseContext.getDatabase()));
-                }
-            }
-
-            if (copied == 0) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-
-            final String copiedKeysAndTitles = sb.toString();
-            Globals.clipboardManager.setContent(copiedKeysAndTitles);
-
-            if (copied == bes.size()) {
-                // All entries had keys.
-                output(Localization.lang("Copied") + " '" + JabRefDialogService.shortenDialogMessage(copiedKeysAndTitles) + "'.");
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.", Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void openExternalFile() {
-        final List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-        if (selectedEntries.size() != 1) {
-            output(Localization.lang("This operation requires exactly one item to be selected."));
-            return;
-        }
-        JabRefExecutorService.INSTANCE.execute(() -> {
-            final BibEntry entry = selectedEntries.get(0);
-            if (!entry.hasField(StandardField.FILE)) {
-                // no bibtex field
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-
-            List<LinkedFile> files = new ArrayList<>();
-            entry.getField(StandardField.FILE).map(FileFieldParser::parse).ifPresent(files::addAll);
-
-            if (files.isEmpty()) {
-                // content in BibTeX field is not readable
-                new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
-                return;
-            }
-            LinkedFile flEntry = files.get(0);
-            try {
-                JabRefDesktop.openExternalFileAnyFormat(this.getBibDatabaseContext(), flEntry.getLink(), ExternalFileTypes.getInstance().fromLinkedFile(flEntry, true));
-            } catch (IOException ex) {
-                dialogService.showErrorDialogAndWait(ex);
-            }
-        });
     }
 
     /**
@@ -1081,47 +801,6 @@ public class BasePanel extends StackPane {
         mainTable.cut();
     }
 
-    private static class SearchAndOpenFile {
-
-        private final BibEntry entry;
-        private final BasePanel basePanel;
-
-        public SearchAndOpenFile(final BibEntry entry, final BasePanel basePanel) {
-            this.entry = entry;
-            this.basePanel = basePanel;
-        }
-
-        public void searchAndOpen() {
-            if (!Globals.prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH)) {
-                /*  The search can lead to an unexpected 100% CPU usage which is perceived
-                    as a bug, if the search incidentally starts at a directory with lots
-                    of stuff below. It is now disabled by default. */
-                return;
-            }
-
-            final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
-            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
-
-            // Run the search operation:
-            FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
-            try {
-                List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
-                if (!files.isEmpty()) {
-                    Path file = files.get(0);
-                    Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
-                    if (type.isPresent()) {
-                        JabRefDesktop.openExternalFileAnyFormat(file, basePanel.getBibDatabaseContext(), type);
-                        basePanel.output(Localization.lang("External viewer called") + '.');
-                    }
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Problems with finding/or opening files ", ex);
-                basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
-            }
-        }
-    }
-
     private class GroupTreeListener {
 
         @Subscribe
@@ -1201,60 +880,6 @@ public class BasePanel extends StackPane {
             }
 
             markChangedOrUnChanged();
-        }
-    }
-
-    private class OpenURLAction implements BaseAction {
-
-        @Override
-        public void action() {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() == 1) {
-                Field field = StandardField.DOI;
-                Optional<String> link = bes.get(0).getField(StandardField.DOI);
-                if (bes.get(0).hasField(StandardField.URL)) {
-                    link = bes.get(0).getField(StandardField.URL);
-                    field = StandardField.URL;
-                }
-                if (link.isPresent()) {
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                    }
-                } else {
-                    // No URL or DOI found in the "url" and "doi" fields.
-                    // Look for web links in the "file" field as a fallback:
-
-                    List<LinkedFile> files = bes.get(0).getFiles();
-
-                    Optional<LinkedFile> linkedFile = files.stream()
-                                                           .filter(file -> (StandardField.URL.getName().equalsIgnoreCase(file.getFileType())
-                                                                   || StandardField.PS.getName().equalsIgnoreCase(file.getFileType())
-                                                                   || StandardField.PDF.getName().equalsIgnoreCase(file.getFileType())))
-                                                           .findFirst();
-
-                    if (linkedFile.isPresent()) {
-
-                        try {
-
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext,
-                                    linkedFile.get().getLink(),
-                                    ExternalFileTypes.getInstance().fromLinkedFile(linkedFile.get(), true));
-
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException e) {
-                            output(Localization.lang("Could not open link"));
-                            LOGGER.info("Could not open link", e);
-                        }
-                    } else {
-                        output(Localization.lang("No URL defined") + '.');
-                    }
-                }
-            } else {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-            }
         }
     }
 

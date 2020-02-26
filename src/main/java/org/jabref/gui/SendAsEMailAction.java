@@ -1,4 +1,4 @@
-package org.jabref.gui.worker;
+package org.jabref.gui;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -34,49 +34,50 @@ import org.slf4j.LoggerFactory;
  * are opened. This feature is disabled by default and can be switched on at
  * preferences/external programs
  */
-public class SendAsEMailAction implements BaseAction {
+public class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
-    private final JabRefFrame frame;
+    private DialogService dialogService;
+    private StateManager stateManager;
 
-    public SendAsEMailAction(JabRefFrame frame) {
-        this.frame = frame;
+    public SendAsEMailAction(DialogService dialogService, StateManager stateManager) {
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
-    public void action() {
+    public void execute() {
         BackgroundTask.wrap(this::sendEmail)
-                      .onSuccess(frame.getDialogService()::notify)
+                      .onSuccess(dialogService::notify)
                       .onFailure(e -> {
                           String message = Localization.lang("Error creating email");
                           LOGGER.warn(message, e);
-                          frame.getDialogService().notify(message);
+                          dialogService.notify(message);
                       })
                       .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private String sendEmail() throws Exception {
-        if (!Desktop.isDesktopSupported()) {
+        if (!Desktop.isDesktopSupported() || stateManager.getActiveDatabase().isEmpty()) {
             return Localization.lang("Error creating email");
         }
 
-        BasePanel panel = frame.getCurrentBasePanel();
-        if (panel == null) {
-            throw new IllegalStateException("Base panel is not available.");
-        }
-        if (panel.getSelectedEntries().isEmpty()) {
+        if (stateManager.getSelectedEntries().isEmpty()) {
             return Localization.lang("This operation requires one or more entries to be selected.");
         }
 
-        StringWriter sw = new StringWriter();
-        List<BibEntry> bes = panel.getSelectedEntries();
+        StringWriter rawEntries = new StringWriter();
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
+        List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(Globals.prefs.getFieldWriterPreferences()), Globals.entryTypesManager);
 
-        for (BibEntry entry : bes) {
+        for (BibEntry entry : entries) {
             try {
-                bibtexEntryWriter.write(entry, sw, panel.getBibDatabaseContext().getMode());
+                bibtexEntryWriter.write(entry, rawEntries, databaseContext.getMode());
             } catch (IOException e) {
                 LOGGER.warn("Problem creating BibTeX file for mailing.", e);
             }
@@ -88,20 +89,19 @@ public class SendAsEMailAction implements BaseAction {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
-                                                                      .getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
-        for (Path f : fileList) {
-            attachments.add(f.toAbsolutePath().toString());
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
+        for (Path path : fileList) {
+            attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(path.toAbsolutePath());
                 } catch (IOException e) {
                     LOGGER.debug("Cannot open file", e);
                 }
             }
         }
 
-        String mailTo = "?Body=".concat(sw.getBuffer().toString());
+        String mailTo = "?Body=".concat(rawEntries.getBuffer().toString());
         mailTo = mailTo.concat("&Subject=");
         mailTo = mailTo.concat(JabRefPreferences.getInstance().get(JabRefPreferences.EMAIL_SUBJECT));
         for (String path : attachments) {
@@ -114,6 +114,6 @@ public class SendAsEMailAction implements BaseAction {
         Desktop desktop = Desktop.getDesktop();
         desktop.mail(uriMailTo);
 
-        return String.format("%s: %d", Localization.lang("Entries added to an email"), bes.size());
+        return String.format("%s: %d", Localization.lang("Entries added to an email"), entries.size());
     }
 }
