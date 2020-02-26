@@ -6,10 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystemException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -139,7 +135,7 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource("academy-of-management-review.csl");
+        URL url = CitationStyle.class.getResource("csl-styles/academy-of-management-review.csl");
         Objects.requireNonNull(url);
         if (url == null) {
             return Collections.emptyList();
@@ -147,17 +143,10 @@ public class CitationStyle {
         try {
             URI uri = url.toURI();
             LOGGER.debug("Uri " + uri);
-            try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                Path path = fs.getPath(STYLES_ROOT);
-                STYLES.addAll(discoverCitationStylesInPath(path));
-            } catch (FileSystemAlreadyExistsException e) {
-                try (FileSystem fs = FileSystems.getFileSystem(uri)) {
-                    Path path = fs.getPath(STYLES_ROOT);
-                    STYLES.addAll(discoverCitationStylesInPath(path));
-                } catch (FileSystemException ex) {
-                    LOGGER.error("Failed to discover csl styles ", ex);
-                }
-            }
+            System.out.println(uri);
+
+            Path path = Path.of(uri).getParent();
+            STYLES.addAll(discoverCitationStylesInPath(path));
 
             return STYLES;
         } catch (URISyntaxException | IOException e) {
