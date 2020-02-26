@@ -71,9 +71,17 @@
   <macro name="title">
     <choose>
       <if type="book">
-        <group delimiter=", ">
-          <text variable="title"/>
-          <text macro="edition"/>
+        <group delimiter=". ">
+          <group delimiter=", ">
+            <text variable="title"/>
+            <text macro="edition"/>
+          </group>
+          <choose>
+            <!-- Replace with type="software" as that becomes available -->
+            <if type="book" match="any" variable="version">
+              <text variable="version" prefix="Version "/>
+            </if>
+          </choose>
         </group>
       </if>
       <else>
@@ -177,12 +185,21 @@
         <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
           <!--    Book
                South J, Blass B (2001) The future of modern genomics. Blackwell, London    -->
-          <group prefix=". " delimiter=", ">
-            <text variable="publisher"/>
-            <text variable="publisher-place"/>
+          <group delimiter=". ">
+            <group prefix=". " delimiter=", ">
+              <text variable="publisher"/>
+              <text variable="publisher-place"/>
+            </group>
+            <group>
+              <choose>
+                <if match="any" variable="version">
+                  <text variable="URL" prefix="URL "/>
+                </if>
+              </choose>
+            </group>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="webpage post-weblog post" match="any">
           <!--    Online document
                Doe J (1999) Title of subordinate document. In: The dictionary of substances and their effects.
                Royal Society of Chemistry. Available via DIALOG.

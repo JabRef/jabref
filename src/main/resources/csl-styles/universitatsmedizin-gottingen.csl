@@ -147,28 +147,28 @@
         <if type="chapter paper-conference" match="any">
           <group prefix=": " delimiter=". ">
             <text variable="title"/>
-              <group delimiter=": ">
-                <text term="in" text-case="capitalize-first" suffix=":"/>
-                <text macro="editor"/>
-                <group delimiter=" ">
+            <group delimiter=": ">
+              <text term="in" text-case="capitalize-first" suffix=":"/>
+              <text macro="editor"/>
+              <group delimiter=" ">
                 <text variable="container-title"/>
                 <group prefix="(" suffix=")" delimiter=" ">
                   <text variable="collection-title"/>
                   <text variable="collection-number"/>
                 </group>
               </group>
-              </group>
-              <group delimiter="; ">
+            </group>
+            <group delimiter="; ">
               <group delimiter=" ">
                 <label variable="volume"/>
                 <text variable="volume"/>
               </group>
               <text macro="edition"/>
-            <group delimiter=", ">
-              <text macro="publisher"/>
-              <text variable="page"/>
+              <group delimiter=", ">
+                <text macro="publisher"/>
+                <text variable="page"/>
+              </group>
             </group>
-          </group>
           </group>
         </if>
         <else-if type="report">
@@ -192,7 +192,7 @@
                 <text variable="volume"/>
               </group>
               <text macro="edition"/>
-            <text macro="publisher"/>
+              <text macro="publisher"/>
             </group>
           </group>
         </else-if>

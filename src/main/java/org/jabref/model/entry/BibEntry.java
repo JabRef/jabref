@@ -359,8 +359,8 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        this.type.setValue(newType);
         changed = true;
+        this.type.setValue(newType);
 
         FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());
         eventBus.post(new FieldChangedEvent(change, eventSource));

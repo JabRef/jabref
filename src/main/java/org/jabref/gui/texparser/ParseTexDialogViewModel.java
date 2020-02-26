@@ -66,7 +66,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
-        this.texDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+        this.texDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
                                                                     .orElseGet(preferencesService::getWorkingDir)
                                                                     .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
