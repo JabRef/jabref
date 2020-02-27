@@ -34,6 +34,7 @@ import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
+import org.jabref.logic.importer.fetcher.WorldcatFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -133,7 +134,8 @@ public class WebFetchers {
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
-        set.add(new CrossRef());
+		set.add(new CrossRef());
+		set.add(new WorldcatFetcher());
         return set;
     }
 

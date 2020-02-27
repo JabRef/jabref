@@ -43,6 +43,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
 - We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
 - We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
+- We reimplemented and improved the dialog "Customize entry types" [#4719](https://github.com/JabRef/jabref/issues/4719)
+- We added an Worldcat fetcher. [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581). [Worldcat](http://www.worldcat.org/webservices/catalog/)
 
 ### Fixed
 

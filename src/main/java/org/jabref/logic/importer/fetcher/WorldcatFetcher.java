@@ -14,6 +14,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+/**
+ * EntryBasedFetcher that searches the Worldcat database
+ * 
+ * @see https://www.oclc.org/developer/develop/web-services/worldcat-search-api/bibliographic-resource.en.html
+ */
 public class WorldcatFetcher implements EntryBasedFetcher {
 
 	private final static String NAME = "Worldcat Fetcher";

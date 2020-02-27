@@ -18,8 +18,6 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -60,7 +58,8 @@ public class WorldcatImporter extends Importer {
 	}
 
 	/**
-	 * Get more information about a article through its OCLC id
+	 * Get more information about a article through its OCLC id. Picks the first 
+	 * element with this tag
 	 * @param id the oclc id
 	 * @return the XML element that contains all tags
 	 */
@@ -87,7 +86,8 @@ public class WorldcatImporter extends Importer {
 	}
 
 	/**
-	 * Get the element of a tag in an XML element
+	 * Get the element of a tag in an XML element. Picks the first element
+	 * with this tag
 	 * @param xml the element do search trough
 	 * @param tag the tag to find
 	 * @return the tag element
@@ -113,7 +113,6 @@ public class WorldcatImporter extends Importer {
 		String url = getElementByTag(xmlEntry, "link").getAttribute("href");
 
 		String oclc = xmlEntry.getElementsByTagName("oclcterms:recordIdentifier").item(0).getTextContent();
-		System.out.println(oclc + " , " + title);
 		Element detailedInfo = getSpecificInfoOnOCLC(oclc);
 
 		String date = detailedInfo.getElementsByTagName("dc:date").item(0).getTextContent();
