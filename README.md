@@ -5,6 +5,8 @@
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/jabref/localized.svg)](https://crowdin.com/project/jabref)
+[![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/JabRef/jabref)
+
 
 JabRef is an open-source, cross-platform citation and reference management tool.
 
@@ -24,7 +26,7 @@ JabRef supports you in every step of your research work.
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
 - [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
-	
+
 #### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
@@ -35,7 +37,7 @@ JabRef supports you in every step of your research work.
 - Find and merge duplicates
 - Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
 - Automatically rename and move associated documents according to customizable rules
-- Keep track of what you read: ranking, priority, printed, quality-assured 
+- Keep track of what you read: ranking, priority, printed, quality-assured
 
 #### Cite
 
