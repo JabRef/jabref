@@ -13,6 +13,9 @@ jobs:
         with:
           java-version: 1.11
       - run: |
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin/java
           echo "$JAVA_HOME"
           echo "$JAVA_HOME_11_X64"
           which java
