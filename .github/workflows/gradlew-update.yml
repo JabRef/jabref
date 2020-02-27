@@ -13,6 +13,8 @@ jobs:
         with:
           java-version: 1.11
       - run: |
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin/java
+          /usr/lib/jvm/zulu-11-azure-amd64/bin/java -version
           ls -la /usr/lib/jvm/zulu-11-azure-amd64
           ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin
           ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin/java
