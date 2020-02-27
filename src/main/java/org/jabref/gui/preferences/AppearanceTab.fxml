@@ -29,9 +29,5 @@
     <Label styleClass="sectionHeader" text="%Visual theme"/>
     <RadioButton fx:id="themeLight" text="%Light theme" toggleGroup="$theme"/>
     <RadioButton fx:id="themeDark" text="%Dark theme" toggleGroup="$theme"/>
-<<<<<<< HEAD
-    <RadioButton fx:id="customTheme" text="%Custom theme" toggleGroup="$theme" />
-=======
     <RadioButton fx:id="customTheme" text="%Custom theme" toggleGroup="$theme"/>
->>>>>>> fixCustomCSSFile
 </fx:root>
