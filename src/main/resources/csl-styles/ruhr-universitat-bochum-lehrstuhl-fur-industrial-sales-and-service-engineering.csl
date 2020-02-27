@@ -37,7 +37,7 @@
     </terms>
   </locale>
   <locale xml:lang="en-US">
-  <style-options punctuation-in-quote="false"/>
+    <style-options punctuation-in-quote="false"/>
     <date form="text">
       <date-part name="month" suffix=" "/>
       <date-part name="day" form="numeric" suffix=", "/>
@@ -103,7 +103,7 @@
     <choose>
       <if type="article-magazine article-newspaper article-journal bill book broadcast chapter entry-dictionary figure graphic interview legislation legal_case map motion_picture musical_score pamphlet paper-conference patent personal_communication report review review-book song speech thesis treaty dataset" match="any"/>
       <else>
-        <date variable="issued" form="text" prefix=" " />
+        <date variable="issued" form="text" prefix=" "/>
         <group prefix=", URL: ">
           <text variable="URL"/>
           <choose>

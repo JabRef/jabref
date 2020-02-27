@@ -65,7 +65,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
                                                                    .orElseGet(preferencesService::getWorkingDir));
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -126,7 +126,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private Collection<Citation> searchAndParse(String citeKey) throws IOException {
-        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
                                            .orElseGet(preferencesService::getWorkingDir);
 
         if (texParserResult == null || !newDirectory.equals(directory.get())) {
@@ -168,7 +168,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
+                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
 
         init(currentEntry);
     }
