@@ -10,10 +10,11 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import static org.jabref.gui.maintable.OpenShortScienceAction.getShortScienceSearchURL;
+import static org.jabref.logic.util.ExternalLinkGenerator.getShortScienceSearchURL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class OpenShortScienceActionTest {
+class ExternalLinkGeneratorTest {
 
     /**
      * Validates URL conformance to RFC2396. Does not perform complex checks such as opening connections.
@@ -34,23 +35,22 @@ class OpenShortScienceActionTest {
         String rfc3986ReservedCharacters = "!*'();:@&=+$,/?#[]";
         entry.setField(StandardField.TITLE, rfc3986ReservedCharacters);
         Optional<String> url = getShortScienceSearchURL(entry);
-        assertTrue(url.isPresent() && urlIsValid(url.get()));
+        assertTrue(url.isPresent());
+        assertTrue(urlIsValid(url.get()));
     }
 
     @Test
     void getShortScienceSearchURLReturnsEmptyOnMissingTitle() {
         BibEntry entry = new BibEntry();
-        assertTrue(getShortScienceSearchURL(entry).isEmpty());
+        assertEquals(Optional.empty(), getShortScienceSearchURL(entry));
     }
 
     @Test
     void getShortScienceSearchURLLinksToSearchResults() {
-        BibEntry entry = new BibEntry();
         // Take an arbitrary article name
-        String title = "JabRef bibliography management";
-        entry.setField(StandardField.TITLE, title);
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "JabRef bibliography management");
         Optional<String> url = getShortScienceSearchURL(entry);
         // Expected behaviour is to link to the search results page, /internalsearch
-        assertTrue(url.isPresent() && url.get().equals("https://www.shortscience.org/internalsearch?q=JabRef+bibliography+management"));
+        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef+bibliography+management"), url);
     }
 }
