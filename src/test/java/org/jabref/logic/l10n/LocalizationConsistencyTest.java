@@ -95,7 +95,7 @@ class LocalizationConsistencyTest {
                 .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
                 .collect(Collectors.toList());
 
-        assertEquals(Collections.EMPTY_LIST, quotedEntries,
+        assertEquals(Collections.emptyList(), quotedEntries,
                 "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
                         quotedEntries

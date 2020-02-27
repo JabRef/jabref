@@ -65,9 +65,9 @@
                     <Button text="%Browse" GridPane.columnIndex="2" GridPane.rowIndex="5"
                             onAction="#browseUserSpecificFileDirectory"/>
 
-                    <Label text="%LaTex file directory" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                    <Label text="%LaTeX file directory" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
                     <TextField fx:id="laTexFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                    <Button text="%Browse" onAction="#browseLaTexFileDirectory" GridPane.columnIndex="2"
+                    <Button text="%Browse" onAction="#browseLatexFileDirectory" GridPane.columnIndex="2"
                             GridPane.rowIndex="6"/>
                 </GridPane>
 
