@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -17,9 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher implementation that attempts to find a PDF URL at APS.
- *
- * @see 'http://harvest.aps.org/docs/harvest-api'
+ * FulltextFetcher implementation that attempts to find a PDF URL at APS. Also see the <a
+ * href="https://harvest.aps.org/docs/harvest-api">API</a>, although it isn't currently used.
  */
 public class ApsFetcher implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApsFetcher.class);
@@ -32,14 +33,16 @@ public class ApsFetcher implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        Optional<DOI> doi = entry.getDOI();
-        if (doi.isPresent()) {
+        return entry.getDOI().map(doi -> {
             String id;
             try {
-                id = getId(doi.get().getDOI());
+                id = getId(doi.getDOI());
             } catch (FileNotFoundException e) {
                 // No such DOI
-                return Optional.empty();
+                return null;
+            } catch (IOException e) {
+                // Handle IOExceptions elsewhere
+                throw new UncheckedIOException(e);
             }
 
             String pdfRequest = PDF_URL + id;
@@ -47,11 +50,16 @@ public class ApsFetcher implements FulltextFetcher {
 
             if (code == 200) {
                 LOGGER.info("Fulltext PDF found @ APS.");
-                return Optional.of(new URL(pdfRequest));
+                try {
+                    return new URL(pdfRequest);
+                } catch (MalformedURLException e) {
+                    LOGGER.info("APS returned malformed URL, cannot find PDF.");
+                    return null;
+                }
+            } else {
+                return null;
             }
-        }
-
-        return Optional.empty();
+        });
     }
 
     @Override
