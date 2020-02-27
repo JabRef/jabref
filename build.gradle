@@ -238,7 +238,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.7.2b2/) {
+            if (selection.candidate.version ==~ /2.7.2b\d/) {
                 selection.reject('Release candidate')
             }
         }
