@@ -10,7 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.ExternalLinkGenerator;
+import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -38,7 +38,7 @@ public class OpenShortScienceAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
-            ExternalLinkGenerator.getShortScienceSearchURL(bibEntries.get(0)).ifPresent(url -> {
+            ExternalLinkCreator.getShortScienceSearchURL(bibEntries.get(0)).ifPresent(url -> {
                 try {
                     JabRefDesktop.openExternalViewer(databaseContext, url, StandardField.URL);
                 } catch (IOException ex) {

@@ -8,7 +8,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 
-public class ExternalLinkGenerator {
+public class ExternalLinkCreator {
     private static final String SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
 
     /**

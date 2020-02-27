@@ -10,11 +10,11 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
-import static org.jabref.logic.util.ExternalLinkGenerator.getShortScienceSearchURL;
+import static org.jabref.logic.util.ExternalLinkCreator.getShortScienceSearchURL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ExternalLinkGeneratorTest {
+class ExternalLinkCreatorTest {
 
     /**
      * Validates URL conformance to RFC2396. Does not perform complex checks such as opening connections.
