@@ -1,4 +1,4 @@
-package org.jabref.gui.maintable;
+package org.jabref.logic.util;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
