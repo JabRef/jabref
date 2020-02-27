@@ -69,6 +69,7 @@ public class CopyMoreAction extends SimpleCommand {
                 break;
             default:
                 LOGGER.info("Unknown copy command.");
+                break;
         }
     }
 
