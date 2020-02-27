@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,7 +11,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.identifier.DOI;
 
 import kong.unirest.Unirest;
 import org.slf4j.Logger;
@@ -72,7 +70,6 @@ public class ApsFetcher implements FulltextFetcher {
      *
      * @param doi A case insensitive DOI
      * @return A DOI cased as APS likes it
-     * @throws IOException
      */
     private String getId(String doi) throws IOException {
         // DOI is not case sensitive, but the id for the PDF URL is,
@@ -83,8 +80,17 @@ public class ApsFetcher implements FulltextFetcher {
         con.connect();
 
         // Throws FileNotFoundException if DOI doesn't exist
-        InputStream is = con.getInputStream();
+        con.getInputStream();
 
-        return con.getURL().toString().split("abstract/")[1];
+        // Expected URL example:
+        // https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.116.061102
+        // Expected parts: "https://journals.aps.org/prl/", "10.1103/PhysRevLett.116.061102"
+        String[] urlParts = con.getURL().toString().split("abstract/");
+
+        if (urlParts.length != 2) {
+            throw new FileNotFoundException("Unexpected URL received");
+        } else {
+            return urlParts[1];
+        }
     }
 }
