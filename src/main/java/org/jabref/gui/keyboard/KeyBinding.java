@@ -3,6 +3,21 @@ package org.jabref.gui.keyboard;
 import org.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
+    EMACS_DELETE("Emacs delete", Localization.lang("Delete text"), "ctrl+D", KeyBindingCategory.EDIT),
+    EMACS_BACKWARD("Emacs move caret left", Localization.lang("Move caret left"), "ctrl+B", KeyBindingCategory.EDIT),
+    EMACS_FORWARD("Emacs move caret right", Localization.lang("Move caret right"), "ctrl+F", KeyBindingCategory.EDIT),
+    EMACS_BEGINNING("Emacs move caret to beginning", Localization.lang("Move caret to beginning"), "ctrl+A", KeyBindingCategory.EDIT),
+    EMACS_END("Emacs move caret to end", Localization.lang("Move caret to end"), "ctrl+E", KeyBindingCategory.EDIT),
+    EMACS_BEGINNING_DOC("Emacs move caret to beginning of the document", Localization.lang("Move the caret to the beginning of the document"), "alt+LESS", KeyBindingCategory.EDIT),
+    EMACS_END_DOC("Emacs move caret to end of the document", Localization.lang("Move the caret to the end of the document"), "alt+shift+LESS", KeyBindingCategory.EDIT),
+    EMACS_UP("Emacs move caret up", Localization.lang("Move the caret up"), "ctrl+P", KeyBindingCategory.EDIT),
+    EMACS_DOWN("Emacs move caret down", Localization.lang("Move the caret down"), "ctrl+N", KeyBindingCategory.EDIT),
+    EMACS_CAPITALIZE("Emacs capitalize next word", Localization.lang("Capitalize the next word"), "alt+C", KeyBindingCategory.EDIT),
+    EMACS_LOWERCASE("Emacs lowercase next word", Localization.lang("Make all characters in the next word lowercase"), "alt+L", KeyBindingCategory.EDIT),
+    EMACS_UPPERCASE("Emacs uppercase next word", Localization.lang("Make all characters in the next word uppercase"), "alt+U", KeyBindingCategory.EDIT),
+    EMACS_KILLLINE("Emacs remove line", Localization.lang("Remove words after the cursor"), "ctrl+K", KeyBindingCategory.EDIT),
+    EMACS_KILLWORD("Emacs remove the next word", Localization.lang("Remove the next word in the line"), "alt+D", KeyBindingCategory.EDIT),
+    EMACS_BACKWARDKILLWORD("Emacs remove the previous word", Localization.lang("Remove the previous word in the line"), "alt+DELETE", KeyBindingCategory.EDIT),
 
     ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl+alt+A", KeyBindingCategory.TOOLS),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl+G", KeyBindingCategory.QUALITY),

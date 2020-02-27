@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -19,6 +20,7 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -87,6 +89,12 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
+
+        //Handle Emacs key bindings
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            EmacsKeyBindings.executeEmacs(scene, event);
+        });
+
         Globals.getThemeLoader().installCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());

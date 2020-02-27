@@ -32,6 +32,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeAbbreviatedProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableEmacsKeyBindingsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableEmacsRebindCAProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableEmacsRebindCFProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableEmacsRebindCNProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableEmacsRebindAUProperty = new SimpleBooleanProperty();
 
     private AutoCompletePreferences autoCompletePreferences;
 
@@ -52,6 +57,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         acceptRecommendationsProperty.setValue(preferences.getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS));
         enableLatexCitationsTabProperty.setValue(preferences.getBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS));
         enableValidationProperty.setValue(preferences.getBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR));
+        enableEmacsKeyBindingsProperty.setValue(preferences.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
+        enableEmacsRebindCAProperty.setValue(preferences.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
+        enableEmacsRebindCFProperty.setValue(preferences.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
+        enableEmacsRebindCNProperty.setValue(preferences.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN));
+        enableEmacsRebindAUProperty.setValue(preferences.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU));
         enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
 
@@ -84,6 +94,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendationsProperty.getValue());
         preferences.putBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS, enableLatexCitationsTabProperty.getValue());
         preferences.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, enableValidationProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, enableEmacsKeyBindingsProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, enableEmacsRebindCAProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, enableEmacsRebindCFProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN, enableEmacsRebindCNProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU, enableEmacsRebindAUProperty.getValue());
 
         autoCompletePreferences.setShouldAutoComplete(enableAutoCompleteProperty.getValue());
         autoCompletePreferences.setCompleteNames(autoCompleteFieldsProperty.getValue());
@@ -148,4 +163,15 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty firstNameModeFullProperty() { return firstNameModeFullProperty; }
 
     public BooleanProperty firstNameModeBothProperty() { return firstNameModeBothProperty; }
+
+    public BooleanProperty enableEmacsKeyBindingsProperty() { return enableEmacsKeyBindingsProperty; }
+
+    public BooleanProperty enableEmacsRebindCAProperty() { return enableEmacsRebindCAProperty; }
+
+    public BooleanProperty enableEmacsRebindCFProperty() { return enableEmacsRebindCFProperty; }
+
+    public BooleanProperty enableEmacsRebindCNProperty() { return enableEmacsRebindCNProperty; }
+
+    public BooleanProperty enableEmacsRebindAUProperty() { return enableEmacsRebindAUProperty; }
 }
+

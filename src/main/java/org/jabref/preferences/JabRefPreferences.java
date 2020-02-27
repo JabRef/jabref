@@ -200,6 +200,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
+    public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CN = "editorEMACSkeyBindingsRebindCN";
+    public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_AU = "editorEMACSkeyBindingsRebindAU";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
@@ -567,6 +569,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CN, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_AU, Boolean.TRUE);
         defaults.put(AUTO_COMPLETE, Boolean.FALSE);
         defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
