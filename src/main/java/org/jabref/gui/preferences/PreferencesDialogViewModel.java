@@ -195,23 +195,4 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
             preferencesTab.setValues();
         }
     }
-
-    public void importCSSFile() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.CSS)
-                .withDefaultExtension(StandardFileType.CSS)
-                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
-
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-
-            preferences.setPathToCustomTheme(file.toAbsolutePath().toString());
-
-            dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
-                    Localization.lang("You must restart JabRef for this to come into effect."));
-        });
-    }
-
-    public void openExportThemeDialog() {
-        new ExportThemeDialog(dialogService, preferences).showAndWait();
-    }
 }

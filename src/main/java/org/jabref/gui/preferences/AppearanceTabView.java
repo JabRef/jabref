@@ -51,4 +51,10 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize));
     }
+
+    @FXML
+    void importTheme() { viewModel.importCSSFile();}
+
+    @FXML
+    void exportTheme() { viewModel.openExportThemeDialog();}
 }

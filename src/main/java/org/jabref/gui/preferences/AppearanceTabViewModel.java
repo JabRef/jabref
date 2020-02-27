@@ -9,8 +9,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -123,4 +125,23 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty themeDarkProperty() { return themeDarkProperty; }
 
     public BooleanProperty customThemeProperty() { return themeCustomProperty; }
+
+    public void importCSSFile() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.CSS)
+                .withDefaultExtension(StandardFileType.CSS)
+                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
+
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
+
+            preferences.setPathToCustomTheme(file.toAbsolutePath().toString());
+
+            dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
+                    Localization.lang("You must restart JabRef for this to come into effect."));
+        });
+    }
+
+    public void openExportThemeDialog() {
+        new ExportThemeDialog(dialogService, preferences).showAndWait();
+    }
 }
