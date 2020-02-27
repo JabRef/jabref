@@ -15,7 +15,7 @@ jobs:
       - run: |
           echo "$JAVA_HOME"
           echo "$JAVA_HOME_11_X64"
-          ls -la /opt/hostedtoolcache/jdk/
+          ls -la /opt/hostedtoolcache/jdk/11.0.6
           which java
       - name: Update Gradle Wrapper
         uses: rahulsom/gradle-up@master
