@@ -44,7 +44,7 @@ public class FieldsUtil {
             } else if (specialField == SpecialField.QUALITY) {
                 fieldName = Localization.lang("Quality");
             } else if (specialField == SpecialField.RANKING) {
-                fieldName = Localization.lang("Ranking");
+                fieldName = Localization.lang("Rank");
             } else if (specialField == SpecialField.PRIORITY) {
                 fieldName = Localization.lang("Priority");
             } else if (specialField == SpecialField.RELEVANCE) {
