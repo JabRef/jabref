@@ -39,6 +39,7 @@ public class ThemeLoader {
 
     public static final String MAIN_CSS = "Base.css";
     public static final String DARK_CSS = "Dark.css";
+    public static String CUSTOM_CSS = "";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final Optional<URL> additionalCssToLoad;
@@ -68,8 +69,9 @@ public class ThemeLoader {
             } else {
                 try {
                     cssResource = Optional.of(new File(cssPreferences).toURI().toURL());
+                    CUSTOM_CSS = cssPreferences;
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("Cannot load css {}", cssResource);
+                    LOGGER.warn("Cannot load css {}", cssPreferences);
                 }
             }
 
