@@ -33,6 +33,6 @@ jobs:
         uses: rahulsom/gradle-up@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/jdk/11.0.6/x64.complete
+          JAVA_HOME:  /usr/lib/jvm/zulu-11-azure-amd64
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
