@@ -17,11 +17,11 @@ import org.jabref.model.entry.field.StandardField;
 import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-public class OpenShortScienceAction extends SimpleCommand {
+public class SearchShortScienceAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public OpenShortScienceAction(DialogService dialogService, StateManager stateManager) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
