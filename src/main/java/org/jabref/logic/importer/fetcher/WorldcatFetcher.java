@@ -17,7 +17,7 @@ import org.jabref.model.entry.field.StandardField;
 public class WorldcatFetcher implements EntryBasedFetcher {
 
 	private final static String NAME = "Worldcat Fetcher";
-	public final static String API_KEY = "API-KEY";
+	public final static String API_KEY = "API-KEY-GOES-HERE";
 
 	private final static String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=" + API_KEY;
 
@@ -26,11 +26,21 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 		return NAME;
 	}
 
+	/**
+	 * Create a open search query with specified title
+	 * @param title the title to include in the query
+	 * @return the earch query for the api
+	 */
 	private String getOpenSearchURL(String title){
 		String query = "&q=srw.ti+all+\"" + title.replaceAll(" ", "%20") + "\"";
 		return WORLDCAT_OPEN_SEARCH_URL + query.replace("\"", "%22");
 	}
 
+	/**
+	 * Make request to open search API of Worldcat, with specified title
+	 * @param title the title of the search
+	 * @return the body of the HTTP response
+	 */
 	private String makeOpenSearchRequest(String title) throws FetcherException{
 		try {
 			URLDownload urlDownload = new URLDownload(getOpenSearchURL(title));
@@ -44,7 +54,6 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 		}
 	}
 
-	//Example http://www.worldcat.org/webservices/catalog/search/worldcat/opensearch?q=srw.ti+all+"The very best of Glenn"&wskey={built-in-api-key}
 	@Override
 	public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
 		Optional<String> entryTitle = entry.getLatexFreeField(StandardField.TITLE);

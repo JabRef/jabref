@@ -30,15 +30,20 @@ public class WorldcatImporter extends Importer {
 
 	private String WORLDCAT_READ_URL;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WorldcatImporter.class);
-
 	private final static String NAME = "WorldcatImporter";
 	private final static String DESCRIPTION = "Takes valid XML from Worldcat Open Search and parses them to BibEntry";
 
 	public WorldcatImporter(){
+		//Used the same key as Worldcat fether
 		this.WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=" + WorldcatFetcher.API_KEY;
 	}
 
+	/**
+	 * Parse the reader to an xml document
+	 * @param s the reader to be parsed
+	 * @return XML document representing the content of s
+	 * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
+	 */
 	private Document parse(BufferedReader s){
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -54,14 +59,16 @@ public class WorldcatImporter extends Importer {
 		}
 	}
 
+	/**
+	 * Get more information about a article through its OCLC id
+	 * @param id the oclc id
+	 * @return the XML element that contains all tags
+	 */
 	private Element getSpecificInfoOnOCLC(String id) throws IOException {
 		URLDownload urlDownload = new URLDownload(WORLDCAT_READ_URL.replace("{OCLC-NUMBER}", id));
 		URLDownload.bypassSSLVerification();
 		String resp = urlDownload.asString();	
 
-		//Used when no API key is present. Comment out lines above as well
-		// String resp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><oclcdcs xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oclcterms=\"http://purl.org/oclc/terms/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"> <dc:creator>Miller, Glenn.</dc:creator> <dc:date>2010</dc:date> <dc:description>Remastered versions of Glenn Miller's original recordings which bring a freshness to his beloved classics. The album also features a version of 'In the mood' with Jodie Prenger, winner of the BBC's 'I'll do anything'.</dc:description> <dc:description>In the mood -- Moonlight serenade -- Don't sit under the apple tree (with anyone else but me) -- Tuxedo junction -- A string of pearls -- Pennsylvania 6-5000 -- Chattanooga choo-choo -- American patrol -- (I've got a gal in) Kalamazoo -- On a little street in Singapore -- The St. Louis blues march -- A nightingale sang in Berkeley Square -- Star dust -- Little brown jug -- When you wish upon a star -- The woodpecker song -- G.I. jive -- Fools rush in -- Over there -- Blueberry hill -- Over the rainbow -- Serenade in blue -- When Johnny comes marching home -- In the mood (feat. Jodie Prenger).</dc:description> <dc:format>1 CD (72 min., 18 sec.) ; 4 3/4 in.</dc:format> <dc:language xsi:type=\"http://purl.org/dc/terms/ISO639-2\">eng</dc:language> <dc:publisher>Sony Music Entertainment</dc:publisher> <dc:subject xsi:type=\"http://purl.org/dc/terms/LCSH\">Dance orchestra music.</dc:subject> <dc:subject xsi:type=\"http://purl.org/dc/terms/LCSH\">Big band music.</dc:subject> <dc:subject xsi:type=\"http://purl.org/dc/terms/LCSH\">Popular music--1931-1940.</dc:subject> <dc:subject xsi:type=\"http://purl.org/dc/terms/LCSH\">Popular music--1941-1950.</dc:subject> <dc:subject xsi:type=\"http://purl.org/dc/terms/LCSH\">Compact discs.</dc:subject> <dc:title>The very best of Glenn Miller </dc:title> <dc:type>Sound</dc:type> <oclcterms:recordCreationDate xsi:type=\"http://purl.org/oclc/terms/marc008date\">101104</oclcterms:recordCreationDate> <oclcterms:recordIdentifier>754508587</oclcterms:recordIdentifier> </oclcdcs>";
-		
 		Document mainDoc = parse(new BufferedReader(new StringReader(resp)));
 		NodeList parentElemOfTags = mainDoc.getElementsByTagName("oclcdcs");
 
@@ -79,11 +86,24 @@ public class WorldcatImporter extends Importer {
 		}
 	}
 
-	private Element getElementByTag(Element xml, String tag){
+	/**
+	 * Get the element of a tag in an XML element
+	 * @param xml the element do search trough
+	 * @param tag the tag to find
+	 * @return the tag element
+	 * @throws NullPointerException if there is no element by this tag
+	 */
+	private Element getElementByTag(Element xml, String tag) throws NullPointerException{
 		NodeList nl = xml.getElementsByTagName(tag);
 		return (Element) nl.item(0);
 	}
 
+	/**
+	 * Parse the xml entry to a bib entry
+	 * @param xmlEntry the XML element from open search
+	 * @return the correspoinding bibentry
+	 * @throws IOException if we cannot search Worldcat with the OCLC of the entry
+	 */
 	private BibEntry xmlEntryToBibEntry(Element xmlEntry) throws IOException{
 		Element authorsElem = getElementByTag(xmlEntry, "author");
 		String authors = getElementByTag(authorsElem, "name").getTextContent();
@@ -111,6 +131,13 @@ public class WorldcatImporter extends Importer {
 		return entry;
 	}
 
+	/**
+	 * Parse an XML documents with open search entries to a parserResult of 
+	 * the bibentries
+	 * @param doc the main XML document from open search
+	 * @return the ParserResult containing the BibEntries collection
+	 * @throws IOException if {@link xmlEntryToBibEntry} throws 
+	 */
 	private ParserResult docToParserRes(Document doc) throws IOException{
 		Element feed = (Element) doc.getElementsByTagName("feed").item(0);
 		NodeList entryXMLList = feed.getElementsByTagName("entry");
