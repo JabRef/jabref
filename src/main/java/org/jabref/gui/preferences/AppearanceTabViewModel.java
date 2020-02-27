@@ -63,7 +63,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);
-        } else if (ThemeLoader.MAIN_CSS.equals(currentTheme) || currentTheme.isBlank() || currentTheme.isEmpty()) {
+        } else if (ThemeLoader.MAIN_CSS.equals(currentTheme) || currentTheme.isBlank()) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
@@ -94,7 +94,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
         } else if (themeCustomProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.getCustomCss())) {
-            restartWarnings.add(Localization.lang("Theme change to a custom theme."));
+            restartWarnings.add(Localization.lang("Theme changed to a custom theme."));
             preferences.put(JabRefPreferences.FX_THEME, preferences.getPathToCustomTheme());
         }
     }

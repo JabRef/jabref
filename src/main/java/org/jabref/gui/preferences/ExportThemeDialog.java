@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences;
 
-import com.airhacks.afterburner.views.ViewLoader;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,6 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +58,7 @@ public class ExportThemeDialog extends BaseDialog<Void> {
         ObservableList<Theme> data =
                 FXCollections.observableArrayList(new Theme("Light theme", ThemeLoader.MAIN_CSS), new Theme("Dark theme", ThemeLoader.DARK_CSS));
 
-        if (!(ThemeLoader.getCustomCss().isBlank() || ThemeLoader.getCustomCss().isEmpty())) {
+        if (!(ThemeLoader.getCustomCss().isBlank())) {
             data.add(new Theme("Custom theme", ThemeLoader.getCustomCss()));
         }
 
@@ -105,23 +104,5 @@ public class ExportThemeDialog extends BaseDialog<Void> {
                              dialogService.showErrorDialogAndWait(Localization.lang("Export theme"), ex);
                          }
                      });
-    }
-
-    public static class Theme {
-        private SimpleStringProperty name;
-        private SimpleStringProperty path;
-
-        public Theme(String name, String path) {
-            this.name = new SimpleStringProperty(name);
-            this.path = new SimpleStringProperty(path);
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public String getPath() {
-            return path.get();
-        }
     }
 }
