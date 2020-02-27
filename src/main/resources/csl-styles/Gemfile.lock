@@ -31,7 +31,7 @@ GEM
       ruby-progressbar (~> 1.4)
     mini_portile2 (2.4.0)
     namae (1.0.1)
-    nokogiri (1.10.7)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     ostruct (0.1.0)
     rake (13.0.1)

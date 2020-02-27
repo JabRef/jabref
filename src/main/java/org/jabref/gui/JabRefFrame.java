@@ -60,6 +60,7 @@ import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.CopyMoreAction;
+import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
@@ -660,6 +661,7 @@ public class JabRefFrame extends BorderPane {
         Menu edit = new Menu(Localization.lang("Edit"));
         Menu library = new Menu(Localization.lang("Library"));
         Menu quality = new Menu(Localization.lang("Quality"));
+        Menu lookup = new Menu(Localization.lang("Lookup"));
         Menu view = new Menu(Localization.lang("View"));
         Menu tools = new Menu(Localization.lang("Tools"));
         Menu options = new Menu(Localization.lang("Options"));
@@ -771,6 +773,10 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR))
+        );
+
+        lookup.getItems().addAll(
+                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager))
         );
 
         // PushToApplication

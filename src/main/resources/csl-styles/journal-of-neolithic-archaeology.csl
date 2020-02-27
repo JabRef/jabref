@@ -70,7 +70,7 @@
                 <label form="short" strip-periods="false" prefix=" (" suffix="),"/>
               </names>
               <names variable="container-author">
-                <name delimiter=" &#8211; " delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
+                <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
               </names>
               <text macro="collection-title"/>
             </if>
@@ -103,7 +103,7 @@
           <if match="none" variable="editor">
             <names variable="translator" prefix=", ">
               <label form="verb-short" suffix=" "/>
-              <name delimiter=" &#8211; " delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
+              <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
             </names>
           </if>
         </choose>
@@ -140,7 +140,7 @@
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="short" delimiter=" &#8211; " et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
         </names>
       </else-if>
       <else>
@@ -157,7 +157,7 @@
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="short" delimiter=" &#8211; " delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"/>
         </names>
       </else-if>
       <else>
@@ -343,7 +343,7 @@
       <if match="any" variable="reviewed-author">
         <text term="reviewed-author" form="verb" prefix=", " suffix=" "/>
         <names variable="reviewed-author">
-          <name delimiter=" &#8211; " delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
+          <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with="."/>
         </names>
         <text variable="reviewed-title" prefix=", "/>
       </if>

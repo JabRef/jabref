@@ -53,8 +53,8 @@ public class MetaDataDiff {
         if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {
             changes.add(Localization.lang("User-specific file directory"));
         }
-        if (!Objects.equals(originalMetaData.getLaTexFileDirectories(), newMetaData.getLaTexFileDirectories())) {
-            changes.add(Localization.lang("LaTex file directory"));
+        if (!Objects.equals(originalMetaData.getLatexFileDirectories(), newMetaData.getLatexFileDirectories())) {
+            changes.add(Localization.lang("LaTeX file directory"));
         }
         if (!Objects.equals(originalMetaData.getDefaultCiteKeyPattern(), newMetaData.getDefaultCiteKeyPattern())) {
             changes.add(Localization.lang("Default pattern"));

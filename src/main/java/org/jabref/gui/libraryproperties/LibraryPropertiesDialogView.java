@@ -112,8 +112,8 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    void browseLaTexFileDirectory(ActionEvent event) {
-        viewModel.browseLaTexDir();
+    void browseLatexFileDirectory(ActionEvent event) {
+        viewModel.browseLatexDir();
     }
 
     private void storeSettings() {
@@ -143,9 +143,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         text = viewModel.laTexFileDirectoryProperty().getValue();
         if (text.isEmpty()) {
-            metaData.clearLaTexFileDirectory(preferencesService.getUser());
+            metaData.clearLatexFileDirectory(preferencesService.getUser());
         } else {
-            metaData.setLaTexFileDirectory(preferencesService.getUser(), Paths.get(text));
+            metaData.setLatexFileDirectory(preferencesService.getUser(), Paths.get(text));
         }
 
         if (viewModel.libraryProtectedProperty().getValue()) {

@@ -1,7 +1,10 @@
-package org.jabref.gui;
+package org.jabref.gui.edit;
 
 import javafx.scene.control.TextInputControl;
 
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 
@@ -19,6 +22,8 @@ public class EditAction extends SimpleCommand {
             this.action = action;
             this.frame = frame;
             this.stateManager = stateManager;
+
+            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
         }
 
         @Override
