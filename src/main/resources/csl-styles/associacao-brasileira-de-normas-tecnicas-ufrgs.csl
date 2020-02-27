@@ -102,21 +102,21 @@
   <macro name="translator">
     <text value="Tradução "/>
     <names variable="translator" delimiter="; ">
-      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"></name>
+      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"/>
       <et-al font-style="italic"/>
     </names>
   </macro>
   <macro name="composer">
     <text value="Compositor: "/>
     <names variable="composer" delimiter="; ">
-      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"></name>
+      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"/>
       <et-al font-style="italic"/>
     </names>
   </macro>
   <macro name="recipient">
     <text value="Destinatário: "/>
     <names variable="recipient" delimiter="; ">
-      <name delimiter=" e " sort-separator=" " delimiter-precedes-last="always"></name>
+      <name delimiter=" e " sort-separator=" " delimiter-precedes-last="always"/>
       <et-al font-style="italic"/>
     </names>
   </macro>
@@ -124,7 +124,7 @@
     <choose>
       <if type="motion_picture broadcast song" match="any">
         <names variable="author">
-          <name></name>
+          <name/>
         </names>
       </if>
       <else>
