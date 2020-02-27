@@ -17,10 +17,10 @@ jobs:
           echo "$JAVA_HOME_11_X64"
           ls -la /opt/hostedtoolcache/jdk
           ls -la /opt/hostedtoolcache/jdk/11.0.6
-          ls -la /opt/hostedtoolcache/jdk/11.0.6/x86
-          ls -la /opt/hostedtoolcache/jdk/11.0.6/x86/bin
-          ls -la /opt/hostedtoolcache/jdk/11.0.6/x86.complete
-          ls -la /opt/hostedtoolcache/jdk/11.0.6/x86.complete/bin
+          ls -la /opt/hostedtoolcache/jdk/11.0.6/x64
+          ls -la /opt/hostedtoolcache/jdk/11.0.6/x64/bin
+          ls -la /opt/hostedtoolcache/jdk/11.0.6/x64.complete
+          ls -la /opt/hostedtoolcache/jdk/11.0.6/x64.complete/bin
           which java
       - name: Update Gradle Wrapper
         uses: rahulsom/gradle-up@master
