@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Filenames of external files can no longer contain curly braces. [#5926](https://github.com/JabRef/jabref/pull/5926)
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
 - We reimplemented and improved the dialog "Customize entry types" [#4719](https://github.com/JabRef/jabref/issues/4719)
+- We made it possible to customise the look of JabRef by importing custom CSS files. We also made it possible to export both the standard _Light_ and _Dark_ themes as well as imported themes. [#5790](https://github.com/JabRef/jabref/issues/5790)
 
 ### Fixed
 
