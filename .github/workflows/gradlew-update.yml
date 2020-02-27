@@ -15,12 +15,11 @@ jobs:
       - run: |
           echo "$JAVA_HOME"
           echo "$JAVA_HOME_11_X64"
-          ls -la /opt/hostedtoolchache
+          ls -la /opt/hostedtoolcache/jdk/
           which java
       - name: Update Gradle Wrapper
         uses: rahulsom/gradle-up@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/jdk/11.0.5/x64/bin
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
