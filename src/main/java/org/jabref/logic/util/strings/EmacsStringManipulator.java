@@ -67,7 +67,7 @@ public class EmacsStringManipulator {
      * @param pos The index to start from.
      * @param text The text to manipulate.
      * @param dir The direction to search.
-     * @return The resulting text.
+     * @return The resulting text and caret position.
      */
     public static ResultingEmacsState deleteUntilWordBoundary(int pos, String text, Direction dir) {
         StringBuilder res = new StringBuilder();
@@ -122,33 +122,33 @@ public class EmacsStringManipulator {
     }
 
     /**
-     * Capitalize the next word on the right side of the cursor.
+     * Capitalize the word on the right side of the cursor.
      *
      * @param pos the position of the cursor
      * @param text String to analyze
-     * @return String the result text
+     * @return String The resulting text and caret position.
      */
     public static ResultingEmacsState capitalize(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.CAPITALIZED);
     }
 
     /**
-     * Make all characters in the next word uppercase.
+     * Make all characters in the word uppercase.
      *
      * @param pos the position of the cursor
      * @param text String to analyze
-     * @return String the result text
+     * @return String The resulting text and caret position.
      */
     public static ResultingEmacsState uppercase(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.UPPER);
     }
 
     /**
-     * Make all characters in the next word lowercase.
+     * Make all characters in the word lowercase.
      *
      * @param pos the position of the cursor
      * @param text String to analyze
-     * @return String the result text
+     * @return String The resulting text and caret position.
      */
     public static ResultingEmacsState lowercase(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.LOWER);
@@ -159,7 +159,7 @@ public class EmacsStringManipulator {
      *
      * @param pos the position of the cursor
      * @param text String to analyze
-     * @return String the result text
+     * @return String The resulting text and caret position.
      */
     public static ResultingEmacsState killWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.NEXT);
@@ -170,7 +170,7 @@ public class EmacsStringManipulator {
      *
      * @param pos the position of the cursor
      * @param text String to analyze
-     * @return String the result text
+     * @return String The resulting text and caret position.
      */
     public static ResultingEmacsState backwardKillWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.PREVIOUS);
