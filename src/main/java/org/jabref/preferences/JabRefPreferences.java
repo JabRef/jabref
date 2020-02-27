@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.InetAddress;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +38,7 @@ import javafx.scene.paint.Color;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -69,6 +71,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fileformat.endnote.Url;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
@@ -1389,6 +1392,25 @@ public class JabRefPreferences implements PreferencesService {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
                                       ex);
         }
+    }
+
+    public void exportTheme(Path targetFile, String theme) throws JabRefException {
+        try (OutputStream os = Files.newOutputStream(targetFile)) {
+            if (theme.equals(ThemeLoader.MAIN_CSS) || theme.equals(ThemeLoader.DARK_CSS)) {
+                Path path = new File(JabRefFrame.class.getResource(theme).toURI()).toPath();
+                writeThemeToFile(path, os);
+            } else {
+                Path path = new File(theme).toPath();
+                writeThemeToFile(path, os);
+            }
+        } catch (IOException | URISyntaxException ex) {
+            throw new JabRefException("Could not export theme", Localization.lang("Could not export theme"),
+                    ex);
+        }
+    }
+
+    private void writeThemeToFile(Path path, OutputStream os) throws IOException {
+        Files.copy(path, os);
     }
 
     /**

@@ -210,4 +210,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                     Localization.lang("You must restart JabRef for this to come into effect."));
         });
     }
+
+    public void openExportThemeDialog() {
+        new ExportThemeDialog(dialogService, preferences).showAndWait();
+    }
 }
