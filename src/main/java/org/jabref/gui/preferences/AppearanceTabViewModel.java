@@ -57,21 +57,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
         fontSizeProperty.setValue(String.valueOf(preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
 
-        switch (preferences.get(JabRefPreferences.FX_THEME)) {
-            case ThemeLoader.DARK_CSS:
-                themeLightProperty.setValue(false);
-                themeDarkProperty.setValue(true);
-                themeCustomProperty.setValue(false);
-                break;
-            case ThemeLoader.MAIN_CSS:
-                themeLightProperty.setValue(true);
-                themeDarkProperty.setValue(false);
-                themeCustomProperty.setValue(false);
-                break;
-            default:
-                themeLightProperty.setValue(false);
-                themeDarkProperty.setValue(false);
-                themeCustomProperty.setValue(true);
+        String currentTheme = preferences.get(JabRefPreferences.FX_THEME);
+
+        if (ThemeLoader.DARK_CSS.equals(currentTheme)) {
+            themeLightProperty.setValue(false);
+            themeDarkProperty.setValue(true);
+            themeCustomProperty.setValue(false);
+        } else if (ThemeLoader.MAIN_CSS.equals(currentTheme) || currentTheme.isBlank() || currentTheme.isEmpty()) {
+            themeLightProperty.setValue(true);
+            themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(false);
+        } else {
+            themeLightProperty.setValue(false);
+            themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(true);
         }
     }
 
@@ -94,7 +93,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
-        } else if (themeCustomProperty.getValue()) {
+        } else if (themeCustomProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.CUSTOM_CSS)) {
             restartWarnings.add(Localization.lang("Theme change to a custom theme."));
             preferences.put(JabRefPreferences.FX_THEME, preferences.getPathToCustomTheme());
         }
