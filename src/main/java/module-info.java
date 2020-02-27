@@ -6,6 +6,7 @@ open module org.jabref {
     requires java.sql;
 
     // JavaFX
+    requires javafx.base;
     requires javafx.graphics;
     requires javafx.swing;
     requires javafx.controls;
@@ -17,6 +18,7 @@ open module org.jabref {
     requires de.jensd.fx.fontawesomefx.commons;
     requires de.jensd.fx.fontawesomefx.materialdesignicons;
     requires org.controlsfx.controls;
+    requires org.fxmisc.richtext;
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
@@ -62,7 +64,6 @@ open module org.jabref {
     requires org.graalvm.js;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
-    requires richtextfx;
     requires com.google.gson;
     requires unirest.java;
     requires org.apache.httpcomponents.httpclient;
@@ -72,9 +73,10 @@ open module org.jabref {
     requires java.string.similarity;
     requires ojdbc10;
     requires org.postgresql.jdbc;
+    requires org.mariadb.jdbc;
+    uses org.mariadb.jdbc.credential.CredentialPlugin;
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires flowless;
     requires org.apache.tika.core;
-    requires javafx.base;
 }
