@@ -12,6 +12,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
+      - run: |
+          echo "$JAVA_HOME"
+          echo "$JAVA_HOME_11_X64"
+          ls -la /opt/hostedtoolchache
+          which java
       - name: Update Gradle Wrapper
         uses: rahulsom/gradle-up@master
         env:
