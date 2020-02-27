@@ -24,7 +24,7 @@ public class ExternalLinkCreator {
                 uriBuilder = new URIBuilder(SHORTSCIENCE_SEARCH_URL);
             } catch (URISyntaxException e) {
                 // This should never be able to happen as it would require the field to be misconfigured.
-                throw new AssertionError("ShortScience URL is invalid.");
+                throw new AssertionError("ShortScience URL is invalid.", e);
             }
             // Direct the user to the search results for the title.
             uriBuilder.addParameter("q", title);
