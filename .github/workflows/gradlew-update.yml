@@ -15,6 +15,12 @@ jobs:
       - run: |
           echo "$JAVA_HOME"
           echo "$JAVA_HOME_11_X64"
+          which java
+          which javac
+          echo JAVA_HOME_11_X64
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64
+          ls -la /usr/lib/jvm/zulu-11-azure-amd64/bin
+          echo JAVA_HOME
           ls -la /opt/hostedtoolcache/jdk
           ls -la /opt/hostedtoolcache/jdk/11.0.6
           echo "x64"
@@ -25,7 +31,6 @@ jobs:
           ls -la /opt/hostedtoolcache/jdk/11.0.6/x64.complete
           echo "COMPLETE/bin"
           ls -la /opt/hostedtoolcache/jdk/11.0.6/x64.complete/bin
-          which java
       - name: Update Gradle Wrapper
         uses: rahulsom/gradle-up@master
         env:
