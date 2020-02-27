@@ -116,8 +116,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     void resetPreferences() { viewModel.resetPreferences(); }
 
     @FXML
-    void importTheme() {viewModel.importCSSFile();}
+    void importTheme() { viewModel.importCSSFile();}
 
     @FXML
-    void exportTheme() {viewModel.openExportThemeDialog();}
+    void exportTheme() { viewModel.openExportThemeDialog();}
 }
