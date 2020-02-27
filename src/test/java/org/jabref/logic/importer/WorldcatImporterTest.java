@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.jabref.logic.importer.fileformat.WorldcatImporter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class WorldcatImporterTest {
@@ -39,6 +40,7 @@ public class WorldcatImporterTest {
 		assertFalse(isReq);
 	}
 
+	@Disabled("Will not work without API key")
 	@Test
 	public void withResultReturnsNonEmptyResult() throws IOException{
 		ParserResult res = importer.importDatabase(XML_WITH_RESULT);

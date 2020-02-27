@@ -63,7 +63,6 @@ class WebFetchersTest {
 
             expected.remove(EntryBasedParserFetcher.class);
 			expected.remove(MrDLibFetcher.class);
-			expected.remove(WorldcatFetcher.class);
 
             assertEquals(expected, getClasses(idFetchers));
         }
