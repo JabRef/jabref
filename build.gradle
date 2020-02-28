@@ -181,7 +181,7 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
-    implementation 'de.undercouch:citeproc-java:2.0.0'
+    implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
@@ -205,7 +205,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.8'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.3.0'
+    testImplementation 'org.mockito:mockito-core:3.3.1'
     testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.6.3'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.13.1'
@@ -238,14 +238,12 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.7.2b2/) {
+            if (selection.candidate.version ==~ /2.7.2b\d/) {
                 selection.reject('Release candidate')
             }
         }
         rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.0.26-9.1.2/
-                || selection.candidate.version ==~ /2.0.26-9.1.1/
-                || selection.candidate.version ==~ /2.0.26-9.1.0/) {
+            if (selection.candidate.version ==~ /2.0.26.*/) {
                 selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
         }
@@ -546,7 +544,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    options = ['--strip-debug','--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'JabRef'
     }
