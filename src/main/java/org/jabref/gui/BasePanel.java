@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
@@ -88,8 +85,6 @@ public class BasePanel extends StackPane {
 
     private final JabRefFrame frame;
     // The undo manager.
-    private final UndoAction undoAction = new UndoAction();
-    private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager;
     // Keeps track of the string dialog if it is open.
     private final Map<Actions, BaseAction> actions = new HashMap<>();
@@ -219,9 +214,6 @@ public class BasePanel extends StackPane {
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
         CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
-
-        actions.put(Actions.UNDO, undoAction);
-        actions.put(Actions.REDO, redoAction);
 
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, this::showAndEdit);
@@ -645,7 +637,7 @@ public class BasePanel extends StackPane {
         markBaseChanged();
     }
 
-    private synchronized void markChangedOrUnChanged() {
+    public synchronized void markChangedOrUnChanged() {
         if (getUndoManager().hasChanged()) {
             if (!baseChanged) {
                 markBaseChanged();
@@ -862,39 +854,6 @@ public class BasePanel extends StackPane {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
-        }
-    }
-
-    private class UndoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-                getUndoManager().undo();
-                markBaseChanged();
-                output(Localization.lang("Undo"));
-            } catch (CannotUndoException ex) {
-                LOGGER.warn("Nothing to undo", ex);
-                output(Localization.lang("Nothing to undo") + '.');
-            }
-
-            markChangedOrUnChanged();
-        }
-    }
-
-    private class RedoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-                getUndoManager().redo();
-                markBaseChanged();
-                output(Localization.lang("Redo"));
-            } catch (CannotRedoException ex) {
-                output(Localization.lang("Nothing to redo") + '.');
-            }
-
-            markChangedOrUnChanged();
         }
     }
 }
