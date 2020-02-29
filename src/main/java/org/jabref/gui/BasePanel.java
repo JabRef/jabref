@@ -32,7 +32,6 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -232,8 +231,6 @@ public class BasePanel extends StackPane {
 
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
-
-        actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
