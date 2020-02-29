@@ -105,6 +105,7 @@ import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseTexAction;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -421,7 +422,7 @@ public class JabRefFrame extends BorderPane {
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
-        mainStage.showingProperty().addListener(new ChangeListener<Boolean>() {
+        mainStage.showingProperty().addListener(new ChangeListener<>() {
 
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
@@ -489,8 +490,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
-                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
-                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
+                factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
+                factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
                 factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
                 factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
@@ -704,8 +705,8 @@ public class JabRefFrame extends BorderPane {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -1152,7 +1153,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return !response.isPresent() || !response.get().equals(cancel);
+        return response.isEmpty() || !response.get().equals(cancel);
     }
 
     private void closeTab(BasePanel panel) {

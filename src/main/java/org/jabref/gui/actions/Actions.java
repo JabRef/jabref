@@ -19,7 +19,6 @@ public enum Actions {
     MANAGE_SELECTORS,
     MERGE_DATABASE,
     PULL_CHANGES_FROM_SHARED_DATABASE,
-    REDO,
     REPLACE_ALL,
     SAVE,
     SAVE_AS,
@@ -27,5 +26,4 @@ public enum Actions {
     SELECT_ALL,
     TOGGLE_GROUPS,
     UNABBREVIATE,
-    UNDO
 }
