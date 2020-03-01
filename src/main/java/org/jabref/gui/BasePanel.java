@@ -23,7 +23,6 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.entryeditor.EntryEditor;
@@ -210,7 +209,6 @@ public class BasePanel extends StackPane {
 
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
-        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
 
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, this::showAndEdit);
@@ -223,9 +221,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
 
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
-
-        // The action for cleaning up entry.
-        actions.put(Actions.CLEANUP, cleanUpAction);
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
