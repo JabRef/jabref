@@ -5,7 +5,6 @@ package org.jabref.gui.actions;
  */
 @Deprecated
 public enum Actions {
-    PULL_CHANGES_FROM_SHARED_DATABASE,
     SAVE,
     SAVE_AS,
     SAVE_SELECTED_AS_PLAIN,

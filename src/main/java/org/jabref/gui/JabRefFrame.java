@@ -110,6 +110,7 @@ import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
+import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseTexAction;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -704,7 +705,7 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, stateManager))
+                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))
                 ),
 
                 new SeparatorMenuItem(),
