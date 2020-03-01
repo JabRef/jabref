@@ -10,7 +10,6 @@ public enum Actions {
     ABBREVIATE_SHORTEST_UNIQUE,
     ADD_FILE_LINK,
     DOWNLOAD_FULL_TEXT,
-    EDIT,
     EDIT_PREAMBLE,
     EDIT_STRINGS,
     EXPORT_TO_CLIPBOARD,
@@ -19,7 +18,6 @@ public enum Actions {
     SAVE,
     SAVE_AS,
     SAVE_SELECTED_AS_PLAIN,
-    SELECT_ALL,
     TOGGLE_GROUPS,
     UNABBREVIATE,
 }
