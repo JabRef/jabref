@@ -51,7 +51,6 @@ import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -212,11 +211,6 @@ public class BasePanel extends StackPane {
         actions.put(Actions.SAVE_AS, saveAction::saveAs);
 
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
-
-        actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
-            dbmsSynchronizer.pullChanges();
-        });
     }
 
     /**
