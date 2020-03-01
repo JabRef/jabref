@@ -438,7 +438,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="3" and="text">
+  <bibliography>
     <sort>
       <key variable="citation-number"/>
     </sort>
