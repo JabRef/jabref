@@ -27,7 +27,6 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -218,8 +217,6 @@ public class BasePanel extends StackPane {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
-
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
     }
 
     /**
