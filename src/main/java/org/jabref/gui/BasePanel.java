@@ -210,17 +210,12 @@ public class BasePanel extends StackPane {
     private void setupActions() {
         SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
 
-        // The action for opening an entry editor.
-        actions.put(Actions.EDIT, this::showAndEdit);
-
         // The action for saving a database.
         actions.put(Actions.SAVE, saveAction::save);
 
         actions.put(Actions.SAVE_AS, saveAction::saveAs);
 
         actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
-
-        actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
@@ -544,12 +539,6 @@ public class BasePanel extends StackPane {
         adjustSplitter();
     }
 
-    private void showAndEdit() {
-        if (!mainTable.getSelectedEntries().isEmpty()) {
-            showAndEdit(mainTable.getSelectedEntries().get(0));
-        }
-    }
-
     /**
      * Removes the bottom component.
      */
@@ -571,7 +560,7 @@ public class BasePanel extends StackPane {
      */
     private void clearAndSelectFirst() {
         mainTable.clearAndSelectFirst();
-        showAndEdit();
+        showAndEdit(mainTable.getSelectedEntries().get(0));
     }
 
     public void selectPreviousEntry() {
