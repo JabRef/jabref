@@ -23,11 +23,9 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
-import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
@@ -147,7 +145,7 @@ public class BasePanel extends StackPane {
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
         // Open entry editor for first entry on start up.
-        Platform.runLater(() -> clearAndSelectFirst());
+        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
@@ -226,9 +224,6 @@ public class BasePanel extends StackPane {
 
         actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
 
-        // The action for auto-generating keys.
-        actions.put(Actions.MAKE_KEY, new GenerateBibtexKeyAction(this, frame.getDialogService()));
-
         // The action for cleaning up entry.
         actions.put(Actions.CLEANUP, cleanUpAction);
 
@@ -236,8 +231,6 @@ public class BasePanel extends StackPane {
             DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
-
-        actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
 
         actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
         actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));

@@ -52,6 +52,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
+import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
@@ -64,6 +65,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
@@ -498,7 +500,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
-                factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
+                factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
                 factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
@@ -727,8 +729,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction( this, stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
