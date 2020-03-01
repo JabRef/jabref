@@ -14,6 +14,7 @@ public enum InternalField implements Field {
     TIMESTAMP("timestamp", FieldProperty.DATE),
     GROUPS("groups"),
     KEY_FIELD("bibtexkey"),
+    CITATION_COUNT("citationcount"),
     /**
      * field which indicates the entrytype
      */

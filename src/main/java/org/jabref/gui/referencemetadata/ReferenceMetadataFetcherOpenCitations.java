@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -82,7 +81,7 @@ public class ReferenceMetadataFetcherOpenCitations {
                     String citationCount = String.format("%0" + CITATION_COUNT_STRING_LENGTH + "d", citationCountNumber);
 
                     // set (updated) entry data (citation count)
-                    entry.setField(SpecialField.CITATION_COUNT, citationCount);
+                    entry.setField(InternalField.CITATION_COUNT, citationCount);
                 }
                 else {
                     entriesWithIncompleteMetadata.add(entry);

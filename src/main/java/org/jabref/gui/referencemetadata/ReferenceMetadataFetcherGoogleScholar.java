@@ -20,7 +20,6 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.websocket.JabRefWebsocketServer;
 import org.jabref.websocket.WsAction;
@@ -293,7 +292,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     }
 
                     // set (updated) entry data (citation count)
-                    entry.setField(SpecialField.CITATION_COUNT, citationCount);
+                    entry.setField(InternalField.CITATION_COUNT, citationCount);
 
                     if (UPDATE_NOTE_FIELD_WITH_CITATION_COUNT) {
                         entry.setField(StandardField.NOTE, note);
