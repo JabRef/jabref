@@ -1,6 +1,7 @@
 package org.jabref.gui.referencemetadata;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -58,7 +59,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
      * @param dialogService dialog service which can be used for showing dialogs
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
-    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
+    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService, ExtTask<List<BibEntry>> fetchReferenceMetadataTask) {
+        fetchReferenceMetadataTask.updateMessage("Fetching data from Google Scholar...");
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
 
@@ -299,6 +301,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     }
                 }
             }
+
+            fetchReferenceMetadataTask.updateProgress(Math.min(startIndexEntriesBlock + 1, entries.size()), entries.size());
 
             if (ENABLE_RANDOM_DWELL_TIME) {
                 Random randomNumberGenerator = new Random();

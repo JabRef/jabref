@@ -1,5 +1,6 @@
 package org.jabref.gui.referencemetadata;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -42,7 +43,9 @@ public class ReferenceMetadataFetcherSemanticScholar {
      * @param dialogService dialog service which can be used for showing dialogs
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
-    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService) {
+    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService, ExtTask<List<BibEntry>> fetchReferenceMetadataTask) {
+        fetchReferenceMetadataTask.updateMessage("Fetching data from Semantic Scholar...");
+
         for (int entryIndex = 0; entryIndex < entries.size(); entryIndex++) {
             BibEntry entry = entries.get(entryIndex);
 
@@ -56,6 +59,8 @@ public class ReferenceMetadataFetcherSemanticScholar {
                 HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doiString)
                                                              .queryString("httpAccept", "application/json")
                                                              .asJson();
+
+                fetchReferenceMetadataTask.updateProgress(entryIndex + 1, entries.size());
 
                 if (!jsonResponse.isSuccess()) {
                     entriesWithIncompleteMetadata.add(entry);

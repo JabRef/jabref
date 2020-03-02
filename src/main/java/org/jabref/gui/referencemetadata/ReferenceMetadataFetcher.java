@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -63,7 +62,7 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Fetch reference metadata"));
 
-        Task<List<BibEntry>> fetchReferenceMetadataTask = new Task<List<BibEntry>>() {
+        ExtTask<List<BibEntry>> fetchReferenceMetadataTask = new ExtTask<List<BibEntry>>() {
 
             @Override
             protected List<BibEntry> call() {
@@ -77,21 +76,21 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
                 if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherGoogleScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherGoogleScholar referenceMetadataFetcherGoogleScholar = new ReferenceMetadataFetcherGoogleScholar();
-                    processCancelled = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherGoogleScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService, this);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherGoogleScholar.getEntriesWithIncompleteMetadata();
                 }
 
                 if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherSemanticScholar.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherSemanticScholar referenceMetadataFetcherSemanticScholar = new ReferenceMetadataFetcherSemanticScholar();
-                    processCancelled = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherSemanticScholar.fetchFor(database, entriesWithIncompleteMetadata, dialogService, this);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherSemanticScholar.getEntriesWithIncompleteMetadata();
                 }
 
                 if (!processCancelled && USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS && entriesWithIncompleteMetadata.size() > 0) {
                     LOGGER.info("running " + ReferenceMetadataFetcherOpenCitations.class.getSimpleName() + "...");
                     ReferenceMetadataFetcherOpenCitations referenceMetadataFetcherOpenCitations = new ReferenceMetadataFetcherOpenCitations();
-                    processCancelled = referenceMetadataFetcherOpenCitations.fetchFor(database, entriesWithIncompleteMetadata, dialogService);
+                    processCancelled = referenceMetadataFetcherOpenCitations.fetchFor(database, entriesWithIncompleteMetadata, dialogService, this);
                     entriesWithIncompleteMetadata = referenceMetadataFetcherOpenCitations.getEntriesWithIncompleteMetadata();
                 }
 
@@ -120,7 +119,7 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
 
         dialogService.showProgressDialogAndWait(
                 Localization.lang("Fetching reference metadata online"),
-                Localization.lang("Querying reference metadata..."),
+                Localization.lang("Querying reference metadata:"),
                 fetchReferenceMetadataTask);
         taskExecutor.execute(fetchReferenceMetadataTask);
     }
