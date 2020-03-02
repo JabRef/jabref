@@ -302,8 +302,6 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 }
             }
 
-            fetchReferenceMetadataTask.updateProgress(Math.min(startIndexEntriesBlock + 1, entries.size()), entries.size());
-
             if (ENABLE_RANDOM_DWELL_TIME) {
                 Random randomNumberGenerator = new Random();
                 int randomDwellTimeAfterRequest = randomNumberGenerator.nextInt(UPPER_BOUND_RANDOM_DWELL_TIME_AFTER_REQUEST + 1);
@@ -324,6 +322,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
             }
 
             if (!retryFetchingMetadata) {
+                fetchReferenceMetadataTask.updateProgress(Math.min(startIndexEntriesBlock + 1, entries.size()), entries.size());
+
                 startIndexEntriesBlock += NUM_ENTRIES_PER_REQUEST; // next entries block, if any
             }
         }
