@@ -108,8 +108,8 @@ Equivalently, this can also be executed from the terminal by running `./gradlew 
 
 #### Using IntelliJ's internal build system
 
-You can use IntelliJ IDEA's internal build system for compiling and running JabRef during development which is
-usually more responsive. However, **it's important** that you understand that JabRef relies on generated sources
+You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is
+usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources
 which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble`
 Gradle task at least once.
 
