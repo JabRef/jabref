@@ -604,6 +604,7 @@ jlink {
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup'
         uses 'org.apache.logging.log4j.spi.Provider'
+        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'javax.xml.bind.JAXBContextFactory'
