@@ -170,7 +170,7 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.9'
     implementation 'org.controlsfx:controlsfx:11.0.1'
 
-    implementation 'org.jsoup:jsoup:1.12.2'
+    implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.konghq:unirest-java:3.6.00'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
@@ -213,7 +213,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.29'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
