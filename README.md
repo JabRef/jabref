@@ -16,7 +16,7 @@ Stay on top of your literature: JabRef helps you to collect and organize sources
 JabRef is a cross-platform application that works on Windows, Linux and Mac OS X. It is available free of charge and is actively developed.
 JabRef supports you in every step of your research work.
 
-#### Collect
+### Collect
 
 - Search across many online scientific catalogues like CiteSeer, CrossRef, Google Scholar, IEEEXplore, INSPIRE-HEP, Medline PubMed, MathSciNet, Springer, arXiv, and zbMATH
 - Import options for over 15 reference formats
@@ -25,7 +25,7 @@ JabRef supports you in every step of your research work.
 - Extract metadata from PDFs
 - [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
 
-#### Organize
+### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
 - Advanced search and filter features
@@ -37,14 +37,14 @@ JabRef supports you in every step of your research work.
 - Automatically rename and move associated documents according to customizable rules
 - Keep track of what you read: ranking, priority, printed, quality-assured
 
-#### Cite
+### Cite
 
 - Native [BibTeX] and [Biblatex] support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
 - Format references in one of the many thousand built-in citation styles or create your style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
 
-#### Share
+### Share
 
 - Many built-in export options or create your export format
 - Library is saved as a simple text file and thus it is easy to share with others via Dropbox and is version-control friendly
@@ -55,9 +55,9 @@ JabRef supports you in every step of your research work.
 Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
 The [latest stable release is available at FossHub](https://www.fosshub.com/JabRef.html).
 
- - Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://docs.jabref.org/faq/faqwindows)
- - Linux: Please see our [Installation Guide](https://docs.jabref.org/general/installation).
- - Mac OS X: Please see our [Mac OS X FAQ](https://docs.jabref.org/faq/faqosx).
+- Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://docs.jabref.org/faq/faqwindows)
+- Linux: Please see our [Installation Guide](https://docs.jabref.org/general/installation).
+- Mac OS X: Please see our [Mac OS X FAQ](https://docs.jabref.org/faq/faqosx).
 
 ## Bug Reports, Suggestions, Other Feedback
 
@@ -79,6 +79,7 @@ An explanation of donation possibilities and usage of donations is available at 
 > Not a programmer? [Learn how to help.](http://contribute.jabref.org)
 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day? Check out the ways you can contribute, below:
+
 - For details on how to contribute, have a look at our [guidelines for contributing](CONTRIBUTING.md).
 - You are welcome to contribute new features. To get your code included into JabRef, just [fork](https://help.github.com/en/articles/fork-a-repo) the JabRef repository, make your changes, and create a [pull request](https://help.github.com/en/articles/about-pull-requests).
 - To work on existing JabRef issues, check out our [issue tracker](https://github.com/JabRef/jabref/issues). New to open source contributing? Look for issues with the ["good first issue"](https://github.com/JabRef/jabref/labels/good%20first%20issue) label to get started.
