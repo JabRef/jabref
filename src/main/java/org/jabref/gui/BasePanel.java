@@ -2,9 +2,7 @@ package org.jabref.gui;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,8 +15,6 @@ import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -26,7 +22,6 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -77,8 +72,7 @@ public class BasePanel extends StackPane {
     private final JabRefFrame frame;
     // The undo manager.
     private final CountingUndoManager undoManager;
-    // Keeps track of the string dialog if it is open.
-    private final Map<Actions, BaseAction> actions = new HashMap<>();
+
     private final SidePaneManager sidePaneManager;
     private final ExternalFileTypes externalFileTypes;
 
@@ -124,8 +118,6 @@ public class BasePanel extends StackPane {
         annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
 
         setupMainPanel();
-
-        setupActions();
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
@@ -202,17 +194,6 @@ public class BasePanel extends StackPane {
         dialogService.notify(s);
     }
 
-    private void setupActions() {
-        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
-
-        // The action for saving a database.
-        actions.put(Actions.SAVE, saveAction::save);
-
-        actions.put(Actions.SAVE_AS, saveAction::saveAs);
-
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
-    }
-
     /**
      * Removes the selected entries from the database
      *
@@ -250,26 +231,6 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    /**
-     * This method is called from JabRefFrame if a database specific action is requested by the user. Runs the command
-     * if it is defined, or prints an error message to the standard error stream.
-     *
-     * @param command The name of the command to run.
-     */
-    public void runCommand(final Actions command) {
-        if (!actions.containsKey(command)) {
-            LOGGER.info("No action defined for '" + command + '\'');
-            return;
-        }
-
-        BaseAction action = actions.get(command);
-        try {
-            action.action();
-        } catch (Throwable ex) {
-            LOGGER.error("runCommand error: " + ex.getMessage(), ex);
-        }
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
