@@ -45,6 +45,8 @@ public class SaveAction extends SimpleCommand {
             case SAVE_SELECTED:
                 saveDatabaseAction.saveSelectedAsPlain();
                 break;
+            default:
+                // Never happens
         }
     }
 }

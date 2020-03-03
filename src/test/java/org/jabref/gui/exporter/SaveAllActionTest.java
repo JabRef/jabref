@@ -8,16 +8,12 @@ import java.util.Optional;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,15 +49,5 @@ public class SaveAllActionTest {
 
         verify(dialogService, times(1)).notify(Localization.lang("Saving all libraries..."));
         verify(dialogService, times(1)).notify(Localization.lang("Save all finished."));
-    }
-
-    @Test
-    public void executeShouldShowSaveAsWindowIfDatabaseNotSelected() {
-        when(bibDatabaseContext.getDatabasePath()).thenReturn(Optional.empty());
-        doNothing().when(dialogService).notify(anyString());
-
-        saveAllAction.execute();
-
-        verify(dialogService, times(2)).showFileSaveDialog(any(FileDialogConfiguration.class));
     }
 }
