@@ -9,7 +9,7 @@
 JabRef is an open-source, cross-platform citation and reference management tool.
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
-![main table](https://www.jabref.org/img/JabRef-4-0-MainTable.png)
+![main table](https://www.jabref.org/img/jabref-5-0-maintable.png)
 
 ## Features
 
@@ -24,7 +24,7 @@ JabRef supports you in every step of your research work.
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
 - [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
-	
+
 #### Organize
 
 - Group your research into hierarchical collections and organize research items based on keywords/tags, search terms or your manual assignments
@@ -35,7 +35,7 @@ JabRef supports you in every step of your research work.
 - Find and merge duplicates
 - Attach related documents: 20 different kinds of documents supported out of the box, completely customizable and extendable
 - Automatically rename and move associated documents according to customizable rules
-- Keep track of what you read: ranking, priority, printed, quality-assured 
+- Keep track of what you read: ranking, priority, printed, quality-assured
 
 #### Cite
 
@@ -65,7 +65,7 @@ The [latest stable release is available at FossHub](https://www.fosshub.com/JabR
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, [tell us in our forum](http://discourse.jabref.org/c/features)!
-If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first and have a look at our [community forum](https://discourse.jabref.org/c/help).
+If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first, the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also have a look at our [community forum](https://discourse.jabref.org/c/help).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
 An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
