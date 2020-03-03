@@ -8,14 +8,15 @@ import java.util.Optional;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.Actions;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -45,16 +46,6 @@ public class SaveAllActionTest {
     }
 
     @Test
-    public void executeShouldRunSaveCommandInEveryPanel() {
-        doNothing().when(dialogService).notify(anyString());
-
-        saveAllAction.execute();
-
-        verify(firstPanel, times(1)).runCommand(Actions.SAVE);
-        verify(secondPanel, times(1)).runCommand(Actions.SAVE);
-    }
-
-    @Test
     public void executeShouldNotifyAboutSavingProcess() {
         when(bibDatabaseContext.getDatabasePath()).thenReturn(databasePath);
 
@@ -71,7 +62,6 @@ public class SaveAllActionTest {
 
         saveAllAction.execute();
 
-        verify(firstPanel, times(1)).runCommand(Actions.SAVE_AS);
-        verify(secondPanel, times(1)).runCommand(Actions.SAVE_AS);
+        verify(dialogService, times(2)).showFileSaveDialog(any(FileDialogConfiguration.class));
     }
 }

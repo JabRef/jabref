@@ -46,8 +46,6 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
@@ -73,6 +71,7 @@ import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
+import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.WriteXMPAction;
@@ -485,7 +484,7 @@ public class JabRefFrame extends BorderPane {
         HBox leftSide = new HBox(
                 newLibrary,
                 factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
-                factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
+                factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager)),
                 leftSpacer
         );
 
@@ -685,8 +684,8 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, getOpenDatabaseAction()),
                 fileHistory,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this)),
 
                 new SeparatorMenuItem(),
@@ -699,7 +698,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false, Globals.prefs)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true, Globals.prefs)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, stateManager))),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, this, stateManager))),
 
                 new SeparatorMenuItem(),
 
