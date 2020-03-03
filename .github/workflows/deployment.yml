@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - master-release
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
