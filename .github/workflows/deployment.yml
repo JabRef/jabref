@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Fetch tags and master for GitVersion
@@ -55,12 +55,12 @@ jobs:
           }
         shell: pwsh
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9
         with:
-            versionSpec: '5.1.2'
+            versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -146,7 +146,7 @@ jobs:
     needs: [build]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Fetch tags and master for GitVersion
@@ -158,12 +158,12 @@ jobs:
           }
         shell: pwsh
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9
         with:
-            versionSpec: '5.1.2'
+            versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
