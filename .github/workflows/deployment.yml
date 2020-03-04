@@ -109,19 +109,18 @@ jobs:
       - name: Build snap (1) Setup snapcraft
         uses: jhenstridge/snapcraft-build-action@v1
         id: snapcraft
-        if: matrix.displayName == 'linux'
+        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
       - name: Build snap (2) Run build
         run: |
           mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-        if: matrix.displayName == 'linux'
-      - name: Build snap (3) Upload snap
         if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
-        env:
-          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-        run: |
-            mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            snapcraft push build/distribution/jabref*.snap --release edge || true
-        shell: bash
+      - name: Build snap (3) Upload snap
+        uses: jhenstridge/snapcraft-publish-action@v1
+        with:
+          store_login: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
+          snap: build/distribution/jabref*.snap
+          release: edge
+        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
       - name: Rename files
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
