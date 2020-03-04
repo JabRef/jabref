@@ -44,8 +44,6 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
@@ -141,8 +139,6 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
