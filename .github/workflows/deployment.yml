@@ -106,22 +106,15 @@ jobs:
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
-      - name: Build snap (1) Setup snapcraft
+      - name: Build snap (1) Run build
         uses: jhenstridge/snapcraft-build-action@v1
         id: snapcraft
         if: matrix.displayName == 'linux' && startsWith(github.ref,'refs/heads/master')
-      - name: Build snap (2) Run build
-        run: |
-          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-          ls -la build/distribution/
-          ls -la build/distribution/*.snap
-          ls -la build/distribution/jabref*.snap
-        if: matrix.displayName == 'linux' && startsWith(github.ref,'refs/heads/master')
-      - name: Build snap (3) Upload snap
+      - name: Build snap (2) Upload snap
         uses: jhenstridge/snapcraft-publish-action@v1
         with:
           store_login: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-          snap: build/distribution/jabref*.snap
+          snap: ${{ steps.snapcraft.outputs.snap }}
           release: edge
         if: matrix.displayName == 'linux' && startsWith(github.ref,'refs/heads/master')
       - name: Rename files
