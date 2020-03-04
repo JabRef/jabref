@@ -6,4 +6,4 @@ if [ ! -d /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts ]; then
     exit 1
 fi
 
-cp $SNAP/lib/native-messaging-host/chromium/org.jabref.jabref.json /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+cp "$SNAP/lib/native-messaging-host/chromium/org.jabref.jabref.json" /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
