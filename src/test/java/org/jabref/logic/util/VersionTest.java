@@ -282,4 +282,10 @@ public class VersionTest {
         List<Version> availableVersions = Arrays.asList(Version.parse("2.8-beta"), stable);
         assertEquals(Optional.of(stable), alpha.shouldBeUpdatedTo(availableVersions));
     }
+
+    @Test
+    public void ciSuffixShouldBeRemoved() {
+        Version v50ci = Version.parse("5.0-ci.1");
+        assertEquals("5.0", v50ci.getFullVersion());
+    }
 }
