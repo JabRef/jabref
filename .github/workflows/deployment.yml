@@ -117,11 +117,11 @@ jobs:
       - name: Build snap (1) Setup snapcraft
         uses: jhenstridge/snapcraft-build-action@v1
         id: snapcraft
-        if: matrix.displayName == 'linux'
+        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
       - name: Build snap (2) Run build
         run: |
           mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-        if: matrix.displayName == 'linux'
+        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
       - name: Build snap (3) Upload snap
         uses: jhenstridge/snapcraft-publish-action@v1
         with:
