@@ -1,26 +1,28 @@
+# External libraries
+
 This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
 One can list all dependencies by using Gradle task `dependencyReport`.
-It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
+It generates the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
 
-# Legend
+## Legend
 
-## License
+### License
 
 We follow the [SPDX license identifiers](https://spdx.org/licenses/).
 In case you add a library, please use these identifiers.
 For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
 Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
 
-# bst files
+## bst files
 
 Project: IEEEtran
 Path:    src/main/resources/bst/IEEEtran.bst
 URL:     https://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/bibtex
 License: LPPL-1.3
 
-# Fonts and Icons
+## Fonts and Icons
 
 The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under license CC0 1.0.
 
@@ -32,7 +34,7 @@ License: SIL Open Font License, Version 1.1
 Note:    It is important to include v1.5.54 or later as v1.5.54 is the first version offering fixed code points. Do not confuse with http://zavoloklom.github.io/material-design-iconic-font/
 
 
-# Libraries
+## Libraries
 
 (Sorted alphabetically by Id)
 
@@ -49,6 +51,11 @@ License: Apple License
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
+License: Apache-2.0
+
+Id:      com.google.guava:guava
+Project: Google Guava
+URL:     https://github.com/google/guava
 License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
@@ -101,6 +108,11 @@ Project: FontAwesomeFX
 URL:     https://bitbucket.org/Jerady/fontawesomefx
 License: Apache-2.0
 
+Id:      de.saxsys:mvvmfx
+Project: mvvm(fx)
+URL:     https://github.com/sialcasa/mvvmFX
+License: Apache-2.0
+
 Id:      de.saxsys:mvvmfx-validation
 Project: mvvm(fx)
 URL:     https://github.com/sialcasa/mvvmFX
@@ -120,6 +132,11 @@ Id:      io.github.java-diff-utils:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
 License: Apache-2.0
+
+Id:      jakarta.annotation:jakarata.annotation-api
+Project: Jakarta Annotations
+URL:     https://projects.eclipse.org/projects/ee4j.ca
+License: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
@@ -164,6 +181,11 @@ License: Apache-2.0
 Id:      org.apache.pdfbox:pdfbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
+License: Apache-2.0
+
+Id:      org.apache.tika:tika-core
+Project: Apache Tika
+URL:     https://tika.apache.org/
 License: Apache-2.0
 
 Id:      org.bouncycastle:bcprov-jdk15on
@@ -211,6 +233,41 @@ Project: MariaDB Java Client
 URL:     https://mariadb.com/kb/en/library/about-mariadb-connector-j/
 License: LGPL-2.1-or-later
 
+Id:      org.openjfx:javafx-base
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-controls
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-fxml
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-graphics
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-media
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-swing
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
+Id:      org.openjfx:javafx-web
+Project  JavaFX
+URL:     https://openjfx.io/
+License: GPL-2.0 WITH Classpath-exception-2.0
+
 Id:      org.openoffice:juh
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
@@ -240,5 +297,3 @@ Id:      org.xmlunit:xmlunit-matchers
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
 License: Apache-2.0
-
-The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
