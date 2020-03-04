@@ -113,6 +113,9 @@ jobs:
       - name: Build snap (2) Run build
         run: |
           mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
+          ls -la build/distribution/
+          ls -la build/distribution/*.snap
+          ls -la build/distribution/jabref*.snap
         if: matrix.displayName == 'linux' && startsWith(github.ref,'refs/heads/master')
       - name: Build snap (3) Upload snap
         uses: jhenstridge/snapcraft-publish-action@v1
