@@ -6,4 +6,4 @@ if [ ! -d /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts ]; then
     exit 1
 fi
 
-cp $SNAP/lib/org.jabref.jabref.json /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+cp $SNAP/lib/native-messaging-host/firefox/org.jabref.jabref.json /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
