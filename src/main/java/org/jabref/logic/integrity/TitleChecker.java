@@ -12,6 +12,7 @@ import org.jabref.model.strings.StringUtil;
 public class TitleChecker implements ValueChecker {
 
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
+    private static final String DELIMITERS = "(\\.|\\!|\\?|\\;|\\:)";
     private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
     private final BibDatabaseContext databaseContext;
@@ -49,17 +50,17 @@ public class TitleChecker implements ValueChecker {
         }
 
         // Delimiters are . ! ? ; :
-        String[] delimitedStr = valueOnlySpacesWithinCurlyBraces.split("(\\.|\\!|\\?|\\;|\\:)");
-        for (String subStr : delimitedStr) {
-            subStr = subStr.trim();
-            if (subStr.length() > 0) {
-                subStr = subStr.substring(1);
+        String[] splitTitle = valueOnlySpacesWithinCurlyBraces.split(DELIMITERS);
+        for (String subTitle : splitTitle) {
+            subTitle = subTitle.trim();
+            if (subTitle.length() > 0) {
+                subTitle = subTitle.substring(1);
             }
-            boolean hasCapitalLettersThatBibtexWillConvertToSmallerOnes = HAS_CAPITAL_LETTERS.test(subStr);
-            if (hasCapitalLettersThatBibtexWillConvertToSmallerOnes) {
+            if (HAS_CAPITAL_LETTERS.test(subTitle)) {
                 return Optional.of(Localization.lang("capital letters are not masked using curly brackets {}"));
             }
         }
+
         return Optional.empty();
     }
 }
