@@ -1,7 +1,6 @@
 assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
 mode: ContinuousDeployment
-continuous-delivery-fallback-tag: '' 
 
 branches:
   master:
