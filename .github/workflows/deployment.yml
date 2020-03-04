@@ -46,14 +46,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.1
         with:
@@ -149,14 +143,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.1
         with:
