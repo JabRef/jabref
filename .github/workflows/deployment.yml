@@ -43,24 +43,16 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.1
         with:
-            versionSpec: '5.1.2'
+            versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9.1
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -111,25 +103,6 @@ jobs:
           export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
           ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
-      - name: Package application image
-        run: ${{ matrix.archivePortable }}
-        shell: bash
-      - name: Build snap (1) Setup snapcraft
-        uses: jhenstridge/snapcraft-build-action@v1
-        id: snapcraft
-        if: matrix.displayName == 'linux'
-      - name: Build snap (2) Run build
-        run: |
-          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-        if: matrix.displayName == 'linux'
-      - name: Build snap (3) Upload snap
-        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
-        env:
-          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-        run: |
-            mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            snapcraft push build/distribution/jabref*.snap --release edge || true
-        shell: bash
       - name: Rename files
         run: |
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
@@ -146,24 +119,16 @@ jobs:
     needs: [build]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.1
         with:
-            versionSpec: '5.1.2'
+            versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9.1
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
@@ -191,3 +156,4 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+
