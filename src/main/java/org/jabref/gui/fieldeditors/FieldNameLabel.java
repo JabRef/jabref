@@ -10,7 +10,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 public class FieldNameLabel extends Label {
-    private Tooltip tip;
 
     public FieldNameLabel(Field field, String name) {
         super(field.getDisplayName());
@@ -22,17 +21,17 @@ public class FieldNameLabel extends Label {
     }
 
     public void setTip(String name) {
-        tip = new Tooltip();
+        Tooltip tip = new Tooltip();
         if (StandardField.AUTHOR.getName().equals(name)) {
-            tip.setText(Localization.lang("AUTHOR TIP"));
+            tip.setText(Localization.lang("Multiple authors separated with 'and', e.g. author1 and author2"));
         } else if (StandardField.BIBTEXKEY.getName().equals(name)) {
-            tip.setText(Localization.lang("BIBTEXKEY TIP"));
+            tip.setText(Localization.lang("[First author'last name][Article year] e.g. Jones2020"));
         } else if (StandardField.JOURNAL.getName().equals(name)) {
-            tip.setText(Localization.lang("JOURNAL TIP"));
+            tip.setText(Localization.lang("The name of the journal"));
         } else if (StandardField.TITLE.getName().equals(name)) {
-            tip.setText(Localization.lang("TITLE TIP"));
+            tip.setText(Localization.lang("The title of the article"));
         } else if (StandardField.YEAR.getName().equals(name)) {
-            tip.setText(Localization.lang("YEAR TIP"));
+            tip.setText(Localization.lang("The year of publication, e.g. 2005"));
         } else {
             return;
         }
