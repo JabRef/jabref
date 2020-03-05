@@ -24,15 +24,15 @@ public class FieldNameLabel extends Label {
     public void setTip(String name) {
         tip = new Tooltip();
         if (StandardField.AUTHOR.getName().equals(name)) {
-            tip.setText(Localization.lang("AUTHOR_TIP"));
+            tip.setText(Localization.lang("AUTHOR TIP"));
         } else if (StandardField.BIBTEXKEY.getName().equals(name)) {
-            tip.setText(Localization.lang("BIBTEXKEY_TIP"));
+            tip.setText(Localization.lang("BIBTEXKEY TIP"));
         } else if (StandardField.JOURNAL.getName().equals(name)) {
-            tip.setText(Localization.lang("JOURNAL_TIP"));
+            tip.setText(Localization.lang("JOURNAL TIP"));
         } else if (StandardField.TITLE.getName().equals(name)) {
-            tip.setText(Localization.lang("TITLE_TIP"));
+            tip.setText(Localization.lang("TITLE TIP"));
         } else if (StandardField.YEAR.getName().equals(name)) {
-            tip.setText(Localization.lang("YEAR_TIP"));
+            tip.setText(Localization.lang("YEAR TIP"));
         } else {
             return;
         }
