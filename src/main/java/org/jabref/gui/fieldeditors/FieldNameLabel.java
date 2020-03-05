@@ -21,7 +21,7 @@ public class FieldNameLabel extends Label {
         setTip(name);
     }
 
-    public void setTip(String name){
+    public void setTip(String name) {
         tip = new Tooltip();
         if (StandardField.AUTHOR.getName().equals(name)) {
             tip.setText(Localization.lang("AUTHOR_TIP"));
