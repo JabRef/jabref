@@ -21,6 +21,7 @@ public enum StandardField implements Field {
     ARCHIVEPREFIX("archiveprefix"),
     ASSIGNEE("assignee", FieldProperty.PERSON_NAMES),
     AUTHOR("author", FieldProperty.PERSON_NAMES),
+    BIBTEXKEY("bibtexkey"),
     BOOKAUTHOR("bookauthor", FieldProperty.PERSON_NAMES),
     BOOKPAGINATION("bookpagination", FieldProperty.PAGINATION),
     BOOKSUBTITLE("booksubtitle", FieldProperty.BOOK_NAME),
@@ -164,9 +165,7 @@ public enum StandardField implements Field {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     @Override
     public boolean isStandardField() {
