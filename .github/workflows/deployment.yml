@@ -103,6 +103,9 @@ jobs:
           export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
           ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
+      - name: Package application image
+        run: ${{ matrix.archivePortable }}
+        shell: bash
       - name: Rename files
         run: |
           get-childitem -Path build/distribution/*
