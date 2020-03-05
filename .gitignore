@@ -11,6 +11,9 @@ status.md
 # Install4J
 install4j6/
 
+# JDK14 (see .github/deployment.yml for details)
+jdk-14/
+
 # Python
 __pycache__/
 
