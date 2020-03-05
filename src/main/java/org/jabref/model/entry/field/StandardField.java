@@ -165,7 +165,9 @@ public enum StandardField implements Field {
     }
 
     @Override
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     @Override
     public boolean isStandardField() {
