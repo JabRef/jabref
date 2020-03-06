@@ -2,14 +2,9 @@ package org.jabref.gui;
 
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -20,25 +15,14 @@ import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
-import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
-import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
-import org.jabref.gui.edit.ReplaceStringAction;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.exporter.SaveDatabaseAction;
-import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.actions.AppendDatabaseAction;
-import org.jabref.gui.journals.AbbreviateAction;
-import org.jabref.gui.journals.AbbreviationType;
-import org.jabref.gui.journals.UnabbreviateAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
@@ -62,7 +46,6 @@ import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -88,11 +71,8 @@ public class BasePanel extends StackPane {
 
     private final JabRefFrame frame;
     // The undo manager.
-    private final UndoAction undoAction = new UndoAction();
-    private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager;
-    // Keeps track of the string dialog if it is open.
-    private final Map<Actions, BaseAction> actions = new HashMap<>();
+
     private final SidePaneManager sidePaneManager;
     private final ExternalFileTypes externalFileTypes;
 
@@ -139,8 +119,6 @@ public class BasePanel extends StackPane {
 
         setupMainPanel();
 
-        setupActions();
-
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
 
@@ -153,7 +131,7 @@ public class BasePanel extends StackPane {
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
         // Open entry editor for first entry on start up.
-        Platform.runLater(() -> clearAndSelectFirst());
+        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
@@ -216,48 +194,6 @@ public class BasePanel extends StackPane {
         dialogService.notify(s);
     }
 
-    private void setupActions() {
-        SaveDatabaseAction saveAction = new SaveDatabaseAction(this, Globals.prefs, Globals.entryTypesManager);
-        CleanupAction cleanUpAction = new CleanupAction(this, Globals.prefs, Globals.TASK_EXECUTOR);
-
-        actions.put(Actions.UNDO, undoAction);
-        actions.put(Actions.REDO, redoAction);
-
-        // The action for opening an entry editor.
-        actions.put(Actions.EDIT, this::showAndEdit);
-
-        // The action for saving a database.
-        actions.put(Actions.SAVE, saveAction::save);
-
-        actions.put(Actions.SAVE_AS, saveAction::saveAs);
-
-        actions.put(Actions.SAVE_SELECTED_AS_PLAIN, saveAction::saveSelectedAsPlain);
-
-        actions.put(Actions.SELECT_ALL, mainTable.getSelectionModel()::selectAll);
-
-        // The action for auto-generating keys.
-        actions.put(Actions.MAKE_KEY, new GenerateBibtexKeyAction(this, frame.getDialogService()));
-
-        // The action for cleaning up entry.
-        actions.put(Actions.CLEANUP, cleanUpAction);
-
-        actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
-
-        actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, () -> {
-            DatabaseSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
-            dbmsSynchronizer.pullChanges();
-        });
-
-        actions.put(Actions.REPLACE_ALL, () -> (new ReplaceStringAction(this)).execute());
-
-        actions.put(Actions.ABBREVIATE_DEFAULT, new AbbreviateAction(this, AbbreviationType.DEFAULT));
-        actions.put(Actions.ABBREVIATE_MEDLINE, new AbbreviateAction(this, AbbreviationType.MEDLINE));
-        actions.put(Actions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(this, AbbreviationType.SHORTEST_UNIQUE));
-        actions.put(Actions.UNABBREVIATE, new UnabbreviateAction(this));
-
-        actions.put(Actions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(this)::execute);
-    }
-
     /**
      * Removes the selected entries from the database
      *
@@ -295,26 +231,6 @@ public class BasePanel extends StackPane {
 
     public void delete(BibEntry entry) {
         delete(false, Collections.singletonList(entry));
-    }
-
-    /**
-     * This method is called from JabRefFrame if a database specific action is requested by the user. Runs the command
-     * if it is defined, or prints an error message to the standard error stream.
-     *
-     * @param command The name of the command to run.
-     */
-    public void runCommand(final Actions command) {
-        if (!actions.containsKey(command)) {
-            LOGGER.info("No action defined for '" + command + '\'');
-            return;
-        }
-
-        BaseAction action = actions.get(command);
-        try {
-            action.action();
-        } catch (Throwable ex) {
-            LOGGER.error("runCommand error: " + ex.getMessage(), ex);
-        }
     }
 
     public void registerUndoableChanges(List<FieldChange> changes) {
@@ -567,12 +483,6 @@ public class BasePanel extends StackPane {
         adjustSplitter();
     }
 
-    private void showAndEdit() {
-        if (!mainTable.getSelectedEntries().isEmpty()) {
-            showAndEdit(mainTable.getSelectedEntries().get(0));
-        }
-    }
-
     /**
      * Removes the bottom component.
      */
@@ -594,7 +504,7 @@ public class BasePanel extends StackPane {
      */
     private void clearAndSelectFirst() {
         mainTable.clearAndSelectFirst();
-        showAndEdit();
+        showAndEdit(mainTable.getSelectedEntries().get(0));
     }
 
     public void selectPreviousEntry() {
@@ -645,7 +555,7 @@ public class BasePanel extends StackPane {
         markBaseChanged();
     }
 
-    private synchronized void markChangedOrUnChanged() {
+    public synchronized void markChangedOrUnChanged() {
         if (getUndoManager().hasChanged()) {
             if (!baseChanged) {
                 markBaseChanged();
@@ -862,39 +772,6 @@ public class BasePanel extends StackPane {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
-        }
-    }
-
-    private class UndoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-                getUndoManager().undo();
-                markBaseChanged();
-                output(Localization.lang("Undo"));
-            } catch (CannotUndoException ex) {
-                LOGGER.warn("Nothing to undo", ex);
-                output(Localization.lang("Nothing to undo") + '.');
-            }
-
-            markChangedOrUnChanged();
-        }
-    }
-
-    private class RedoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-                getUndoManager().redo();
-                markBaseChanged();
-                output(Localization.lang("Redo"));
-            } catch (CannotRedoException ex) {
-                output(Localization.lang("Nothing to redo") + '.');
-            }
-
-            markChangedOrUnChanged();
         }
     }
 }

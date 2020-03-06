@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +46,13 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.OldDatabaseCommandWrapper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
+import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
+import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
@@ -64,14 +65,18 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.edit.ReplaceStringAction;
+import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
+import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
+import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -84,9 +89,11 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ManageCustomImportsAction;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
+import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
+import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.CustomizeKeyBindingAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -102,9 +109,11 @@ import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
+import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -421,7 +430,7 @@ public class JabRefFrame extends BorderPane {
         splitPane.getItems().addAll(sidePane, tabbedPane);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
-        mainStage.showingProperty().addListener(new ChangeListener<Boolean>() {
+        mainStage.showingProperty().addListener(new ChangeListener<>() {
 
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean showing) {
@@ -475,7 +484,7 @@ public class JabRefFrame extends BorderPane {
         HBox leftSide = new HBox(
                 newLibrary,
                 factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
-                factory.createIconButton(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
+                factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager)),
                 leftSpacer
         );
 
@@ -489,15 +498,15 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
                 factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
-                factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
-                factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
+                factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
+                factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
                 factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
                 factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
                 factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
-                factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
-                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
+                factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
+                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, prefs, dialogService, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                 factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
@@ -587,6 +596,7 @@ public class JabRefFrame extends BorderPane {
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
+                stateManager.setSelectedEntries(Collections.emptyList());
                 return;
             }
 
@@ -674,27 +684,27 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, getOpenDatabaseAction()),
                 fileHistory,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new OldDatabaseCommandWrapper(Actions.SAVE, this, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new OldDatabaseCommandWrapper(Actions.SAVE_AS, this, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager)),
+                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, this, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(this)),
 
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.MERGE_DATABASE, new OldDatabaseCommandWrapper(Actions.MERGE_DATABASE, this, stateManager)), // TODO: merge with import
+                        factory.createMenuItem(StandardActions.MERGE_DATABASE, new AppendDatabaseAction(this, dialogService, stateManager)), // TODO: merge with import
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, stateManager)),
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, stateManager))),
 
                 factory.createSubMenu(StandardActions.EXPORT,
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(this, false, Globals.prefs)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(this, true, Globals.prefs)),
-                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new OldDatabaseCommandWrapper(Actions.SAVE_SELECTED_AS_PLAIN, this, stateManager))),
+                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, this, stateManager))),
 
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(this)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new OldDatabaseCommandWrapper(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, this, stateManager))
+                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))
                 ),
 
                 new SeparatorMenuItem(),
@@ -704,8 +714,8 @@ public class JabRefFrame extends BorderPane {
         );
 
         edit.getItems().addAll(
-                factory.createMenuItem(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
-                factory.createMenuItem(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
+                factory.createMenuItem(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -725,8 +735,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new OldDatabaseCommandWrapper(Actions.REPLACE_ALL, this, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction( this, stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -762,17 +772,11 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
-        Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
-        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
-            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
-            lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
-        }
-
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, this.prefs, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -781,16 +785,22 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_DEFAULT, this, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_MEDLINE, this, stateManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new OldDatabaseCommandWrapper(Actions.ABBREVIATE_SHORTEST_UNIQUE, this, stateManager))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager, prefs)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new AbbreviateAction(StandardActions.ABBREVIATE_MEDLINE, this, dialogService, stateManager, prefs)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager, prefs))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new OldDatabaseCommandWrapper(Actions.UNABBREVIATE, this, stateManager))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs))
         );
 
         lookup.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager))
         );
+
+        Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
+        for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
+            LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
+            lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
+        }
 
         // PushToApplication
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
@@ -810,7 +820,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, stateManager)),
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
 
                 new SeparatorMenuItem(),
 
@@ -838,7 +848,7 @@ public class JabRefFrame extends BorderPane {
                     new SeparatorMenuItem(),
 
                     factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction()),
-                    factory.createMenuItem(StandardActions.EDIT_ENTRY, new OldDatabaseCommandWrapper(Actions.EDIT, this, stateManager)),
+                    factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(this, stateManager)),
                     factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
             );
         });
@@ -1152,7 +1162,7 @@ public class JabRefFrame extends BorderPane {
             // Save was cancelled or an error occurred.
             return false;
         }
-        return !response.isPresent() || !response.get().equals(cancel);
+        return response.isEmpty() || !response.get().equals(cancel);
     }
 
     private void closeTab(BasePanel panel) {
