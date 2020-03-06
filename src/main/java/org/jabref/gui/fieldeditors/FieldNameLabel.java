@@ -27,7 +27,7 @@ public class FieldNameLabel extends Label {
         } else if (StandardField.BIBTEXKEY.getName().equals(field.getName())) {
             tip.setText(Localization.lang("[First author'last name][Article year] e.g. Jones2020"));
         } else if (StandardField.JOURNAL.getName().equals(field.getName())) {
-            tip.setText(Localization.lang("Journal name. Abbrevations could be found in 'http://abbrv.jabref.org/journals/'"));
+            tip.setText(Localization.lang("Journal name. Abbrevations could be used."));
         } else if (StandardField.TITLE.getName().equals(field.getName())) {
             tip.setText(Localization.lang("The work's title"));
         } else if (StandardField.YEAR.getName().equals(field.getName())) {
