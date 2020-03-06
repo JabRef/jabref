@@ -22,7 +22,6 @@ open module org.jabref {
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
-
     provides com.airhacks.afterburner.injection.PresenterFactory
             with org.jabref.gui.DefaultInjector;
 
@@ -61,7 +60,11 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.graalvm.js;
+    requires org.graalvm.truffle;
+    requires org.graalvm.sdk;
+    requires transitive org.graalvm.js;
+    requires java.scripting;
+    requires jdk.internal.vm.compiler;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;

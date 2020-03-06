@@ -6,9 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -25,6 +22,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.JabRefMain;
 import org.jabref.logic.util.StandardFileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
@@ -138,28 +136,18 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT);
-        if (url == null) {
-            return Collections.emptyList();
-        }
+        URL url = JabRefMain.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
+        Objects.requireNonNull(url);
+
         try {
             URI uri = url.toURI();
-            if ("jar".equals(uri.getScheme())) {
-                try (FileSystem fs = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                    Path path = fs.getPath(STYLES_ROOT);
-                    STYLES.addAll(discoverCitationStylesInPath(path));
-                } catch (FileSystemAlreadyExistsException e) {
-                    try (FileSystem fs = FileSystems.getFileSystem(uri)) {
-                        Path path = fs.getPath(STYLES_ROOT);
-                        STYLES.addAll(discoverCitationStylesInPath(path));
-                    }
-                }
-            } else {
-                STYLES.addAll(discoverCitationStylesInPath(Paths.get(uri)));
-            }
+            Path path = Path.of(uri).getParent();
+
+            STYLES.addAll(discoverCitationStylesInPath(path));
+
             return STYLES;
         } catch (URISyntaxException | IOException e) {
-            LOGGER.error("something went wrong while searching available CitationStyles. Are you running directly from source code?", e);
+            LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
     }
