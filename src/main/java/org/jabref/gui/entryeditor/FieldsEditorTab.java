@@ -97,7 +97,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
-            labels.add(new FieldNameLabel(field, field.getName()));
+            labels.add(new FieldNameLabel(field));
         }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
