@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -71,45 +70,6 @@ public class SpecialFieldValueViewModel {
         }
     }
 
-    public Actions getCommand() {
-        switch (value) {
-            case PRINTED:
-                return Actions.TOGGLE_PRINTED;
-            case CLEAR_PRIORITY:
-                return Actions.CLEAR_PRIORITY;
-            case PRIORITY_HIGH:
-                return Actions.SET_PRIORITY_1;
-            case PRIORITY_MEDIUM:
-                return Actions.SET_PRIORITY_2;
-            case PRIORITY_LOW:
-                return Actions.SET_PRIORITY_3;
-            case QUALITY_ASSURED:
-                return Actions.TOGGLE_QUALITY_ASSURED;
-            case CLEAR_RANK:
-                return Actions.CLEAR_RANK;
-            case RANK_1:
-                return Actions.SET_RANK_1;
-            case RANK_2:
-                return Actions.SET_RANK_2;
-            case RANK_3:
-                return Actions.SET_RANK_3;
-            case RANK_4:
-                return Actions.SET_RANK_4;
-            case RANK_5:
-                return Actions.SET_RANK_5;
-            case CLEAR_READ_STATUS:
-                return Actions.CLEAR_READ_STATUS;
-            case READ:
-                return Actions.SET_READ_STATUS_TO_READ;
-            case SKIMMED:
-                return Actions.SET_READ_STATUS_TO_SKIMMED;
-            case RELEVANT:
-                return Actions.TOGGLE_RELEVANCE;
-            default:
-                throw new IllegalArgumentException("There is no action name for special field value " + value);
-        }
-    }
-
     public Action getAction() {
         switch (value) {
             case PRINTED:
@@ -145,7 +105,7 @@ public class SpecialFieldValueViewModel {
             case RELEVANT:
                 return StandardActions.RELEVANT;
             default:
-                throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
+                throw new IllegalArgumentException("There is no action name for special field value " + value);
         }
     }
 }

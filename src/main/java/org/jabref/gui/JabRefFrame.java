@@ -30,7 +30,6 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
@@ -60,14 +59,18 @@ import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
 import org.jabref.gui.dialogs.AutosaveUIManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
+import org.jabref.gui.edit.CopyMoreAction;
+import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.MassSetFieldsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
@@ -89,9 +92,11 @@ import org.jabref.gui.keyboard.CustomizeKeyBindingAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
+import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.metadata.BibtexStringEditorAction;
 import org.jabref.gui.metadata.PreambleEditor;
 import org.jabref.gui.preferences.ShowPreferencesAction;
+import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
 import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
@@ -104,6 +109,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
+import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
@@ -481,13 +487,13 @@ public class JabRefFrame extends BorderPane {
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
-                factory.createIconButton(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
+                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new OldDatabaseCommandWrapper(Actions.UNDO, this, stateManager)),
                 factory.createIconButton(StandardActions.REDO, new OldDatabaseCommandWrapper(Actions.REDO, this, stateManager)),
-                factory.createIconButton(StandardActions.CUT, new OldDatabaseCommandWrapper(Actions.CUT, this, stateManager)),
-                factory.createIconButton(StandardActions.COPY, new OldDatabaseCommandWrapper(Actions.COPY, this, stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new OldDatabaseCommandWrapper(Actions.PASTE, this, stateManager)),
+                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
+                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new OldDatabaseCommandWrapper(Actions.MAKE_KEY, this, stateManager)),
@@ -571,6 +577,9 @@ public class JabRefFrame extends BorderPane {
                     }
                 });
 
+        // Wait for the scene to be created, otherwise focusOwnerProperty is not provided
+        Platform.runLater(() -> stateManager.focusOwnerProperty().bind(
+                EasyBind.map(mainStage.getScene().focusOwnerProperty(), Optional::ofNullable)));
         /*
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
@@ -700,19 +709,19 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.CUT, new EditAction(Actions.CUT)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
 
-                factory.createMenuItem(StandardActions.COPY, new EditAction(Actions.COPY)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
                 factory.createSubMenu(StandardActions.COPY_MORE,
-                        factory.createMenuItem(StandardActions.COPY_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_TITLE, this, stateManager)),
-                        factory.createMenuItem(StandardActions.COPY_KEY, new OldDatabaseCommandWrapper(Actions.COPY_KEY, this, stateManager)),
-                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new OldDatabaseCommandWrapper(Actions.COPY_CITE_KEY, this, stateManager)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_TITLE, this, stateManager)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new OldDatabaseCommandWrapper(Actions.COPY_KEY_AND_LINK, this, stateManager)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new OldDatabaseCommandWrapper(Actions.COPY_CITATION_HTML, this, stateManager)),
+                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, Globals.clipboardManager, prefs)),
+                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, Globals.clipboardManager, prefs)),
+                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, Globals.clipboardManager, prefs)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.clipboardManager, prefs)),
+                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.clipboardManager, prefs)),
+                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.clipboardManager, prefs.getPreviewPreferences())),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(this, dialogService))),
 
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(Actions.PASTE)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -727,12 +736,14 @@ public class JabRefFrame extends BorderPane {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             edit.getItems().addAll(
                     new SeparatorMenuItem(),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.RANKING, factory, undoManager),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.RELEVANCE, factory),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.QUALITY, factory),
-                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItemForActiveDatabase(SpecialField.PRINTED, factory),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.PRIORITY, factory, undoManager),
-                    SpecialFieldMenuItemFactory.createSpecialFieldMenuForActiveDatabase(SpecialField.READ_STATUS, factory, undoManager)
+                    // ToDo: SpecialField needs the active BasePanel to mark it as changed.
+                    //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, this, dialogService, stateManager),
+                    SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, this, dialogService, stateManager)
             );
         }
 
@@ -740,7 +751,7 @@ public class JabRefFrame extends BorderPane {
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new OldDatabaseCommandWrapper(Actions.DELETE, this, stateManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -759,6 +770,7 @@ public class JabRefFrame extends BorderPane {
 
         quality.getItems().addAll(
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(this, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(this, stateManager, Globals.TASK_EXECUTOR)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new OldDatabaseCommandWrapper(Actions.CLEANUP, this, stateManager)),
 
@@ -792,7 +804,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.WRITE_XMP, new OldDatabaseCommandWrapper(Actions.WRITE_XMP, this, stateManager)),
+                factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
 
                 new SeparatorMenuItem(),
@@ -802,7 +814,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new OldDatabaseCommandWrapper(Actions.SEND_AS_EMAIL, this, stateManager)),
+                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)),
                 pushToApplicationMenuItem
         );
 
@@ -820,14 +832,14 @@ public class JabRefFrame extends BorderPane {
 
                     new SeparatorMenuItem(),
 
-                    factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.NEXT_PREVIEW_STYLE, this, stateManager)),
-                    factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new OldDatabaseCommandWrapper(Actions.PREVIOUS_PREVIEW_STYLE, this, stateManager)),
+                    factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, this, stateManager)),
+                    factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, this, stateManager)),
 
                     new SeparatorMenuItem(),
 
                     factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction()),
                     factory.createMenuItem(StandardActions.EDIT_ENTRY, new OldDatabaseCommandWrapper(Actions.EDIT, this, stateManager)),
-                    factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OldDatabaseCommandWrapper(Actions.OPEN_CONSOLE, this, stateManager))
+                    factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
             );
         });
 
@@ -1243,63 +1255,6 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             quit();
-        }
-    }
-
-    /**
-     * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
-     * Globals.focusListener, and we call the action stored under the relevant name in its action map.
-     */
-    private class EditAction extends SimpleCommand {
-
-        private final Actions command;
-
-        public EditAction(Actions command) {
-            this.command = command;
-        }
-
-        @Override
-        public String toString() {
-            return this.command.toString();
-        }
-
-        @Override
-        public void execute() {
-            Node focusOwner = mainStage.getScene().getFocusOwner();
-            if (focusOwner != null) {
-                if (focusOwner instanceof TextInputControl) {
-                    // Focus is on text field -> copy/paste/cut selected text
-                    TextInputControl textInput = (TextInputControl) focusOwner;
-                    switch (command) {
-                        case COPY:
-                            textInput.copy();
-                            break;
-                        case CUT:
-                            textInput.cut();
-                            break;
-                        case PASTE:
-                            // handled by FX in TextInputControl#paste
-                            break;
-                        default:
-                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
-                    }
-                } else {
-                    // Not sure what is selected -> copy/paste/cut selected entries
-                    switch (command) {
-                        case COPY:
-                            getCurrentBasePanel().copy();
-                            break;
-                        case CUT:
-                            getCurrentBasePanel().cut();
-                            break;
-                        case PASTE:
-                            // handled by FX in TextInputControl#paste
-                            break;
-                        default:
-                            throw new IllegalStateException("Only cut/copy/paste supported but got " + command);
-                    }
-                }
-            }
         }
     }
 

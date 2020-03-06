@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CitationStyleToClipboardWorkerTest {
+class CopyCitationActionTest {
 
     @Test
     void processPreviewText() throws Exception {
@@ -39,7 +39,7 @@ class CitationStyleToClipboardWorkerTest {
                 OS.NEWLINE +
                 "Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. ";
 
-        ClipboardContent clipboardContent = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        ClipboardContent clipboardContent = CopyCitationAction.processPreview(Arrays.asList(citation, citation));
         String actual = clipboardContent.getString();
 
         assertEquals(expected, actual);
@@ -92,7 +92,7 @@ class CitationStyleToClipboardWorkerTest {
                 "</dd>" + OS.NEWLINE +
                 "<p></p></font>";
 
-        ClipboardContent clipboardContent = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        ClipboardContent clipboardContent = CopyCitationAction.processPreview(Arrays.asList(citation, citation));
         String actual = clipboardContent.getString();
         assertEquals(expected, actual);
     }
@@ -103,7 +103,7 @@ class CitationStyleToClipboardWorkerTest {
                 "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
 
         String citation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
-        ClipboardContent textTransferable = CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
+        ClipboardContent textTransferable = CopyCitationAction.processText(Arrays.asList(citation, citation));
 
         String actual = textTransferable.getString();
         assertEquals(expected, actual);
@@ -118,7 +118,7 @@ class CitationStyleToClipboardWorkerTest {
                 "}";
 
         String citation = "[1]\\tab B. Smith, B. Jones, and J. Williams, \\uc0\\u8220{}Title of the test entry,\\uc0\\u8221{} {\\i{}BibTeX Journal}, vol. 34, no. 3, pp. 45\\uc0\\u8211{}67, Jul. 2016." + OS.NEWLINE;
-        ClipboardContent content = CitationStyleToClipboardWorker.processRtf(Arrays.asList(citation, citation));
+        ClipboardContent content = CopyCitationAction.processRtf(Arrays.asList(citation, citation));
 
         Object actual = content.getRtf();
         assertEquals(expected, actual);
@@ -191,7 +191,7 @@ class CitationStyleToClipboardWorkerTest {
                 "  </fo:table>" + OS.NEWLINE +
                 "</fo:block>" + OS.NEWLINE;
 
-        ClipboardContent xmlTransferable = CitationStyleToClipboardWorker.processXslFo(Arrays.asList(citation, citation));
+        ClipboardContent xmlTransferable = CopyCitationAction.processXslFo(Arrays.asList(citation, citation));
 
         Object actual = xmlTransferable.get(ClipBoardManager.XML);
         assertEquals(expected, actual);
@@ -221,7 +221,7 @@ class CitationStyleToClipboardWorkerTest {
         String citation = "  <div class=\"csl-entry\">" + OS.NEWLINE +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>" + OS.NEWLINE +
                 "  </div>" + OS.NEWLINE;
-        ClipboardContent htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
+        ClipboardContent htmlTransferable = CopyCitationAction.processHtml(Arrays.asList(citation, citation));
 
         Object actual = htmlTransferable.getHtml();
         assertEquals(expected, actual);
