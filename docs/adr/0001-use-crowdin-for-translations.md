@@ -14,3 +14,4 @@ The JabRef UI is offered in multiple languages. It should be easy for translator
 ## Decision Outcome
 
 Chosen option: "Use Crowdin", because Crowdin is easy to use, integrates in our GitHub workflow, and is free for OSS projects.
+

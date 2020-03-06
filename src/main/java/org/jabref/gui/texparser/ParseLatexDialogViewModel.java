@@ -28,7 +28,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.texparser.DefaultTexParser;
+import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.texparser.TexBibEntriesResolver;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -41,34 +41,34 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ParseTexDialogViewModel extends AbstractViewModel {
+public class ParseLatexDialogViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParseTexDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParseLatexDialogViewModel.class);
     private static final String TEX_EXT = ".tex";
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileMonitor;
-    private final StringProperty texDirectory;
-    private final Validator texDirectoryValidator;
+    private final StringProperty latexFileDirectory;
+    private final Validator latexDirectoryValidator;
     private final ObjectProperty<FileNodeViewModel> root;
     private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
     private final BooleanProperty noFilesFound;
     private final BooleanProperty searchInProgress;
     private final BooleanProperty successfulSearch;
 
-    public ParseTexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
-                                   TaskExecutor taskExecutor, PreferencesService preferencesService,
-                                   FileUpdateMonitor fileMonitor) {
+    public ParseLatexDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService,
+                                     TaskExecutor taskExecutor, PreferencesService preferencesService,
+                                     FileUpdateMonitor fileMonitor) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
-        this.texDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
-                                                                    .orElseGet(preferencesService::getWorkingDir)
-                                                                    .toAbsolutePath().toString());
+        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
+                                                                          .orElseGet(preferencesService::getWorkingDir)
+                                                                          .toAbsolutePath().toString());
         this.root = new SimpleObjectProperty<>();
         this.checkedFileList = FXCollections.observableArrayList();
         this.noFilesFound = new SimpleBooleanProperty(true);
@@ -76,16 +76,16 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         this.successfulSearch = new SimpleBooleanProperty(false);
 
         Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
-        texDirectoryValidator = new FunctionBasedValidator<>(texDirectory, isDirectory,
+        latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
-    public StringProperty texDirectoryProperty() {
-        return texDirectory;
+    public StringProperty latexFileDirectoryProperty() {
+        return latexFileDirectory;
     }
 
-    public ValidationStatus texDirectoryValidation() {
-        return texDirectoryValidator.getValidationStatus();
+    public ValidationStatus latexDirectoryValidation() {
+        return latexDirectoryValidator.getValidationStatus();
     }
 
     public ObjectProperty<FileNodeViewModel> rootProperty() {
@@ -110,10 +110,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
 
     public void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(texDirectory.get())).build();
+                .withInitialDirectory(Paths.get(latexFileDirectory.get())).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
-            texDirectory.set(selectedDirectory.toAbsolutePath().toString());
+            latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
             preferencesService.setWorkingDir(selectedDirectory.toAbsolutePath());
         });
     }
@@ -122,7 +122,7 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
      * Run a recursive search in a background task.
      */
     public void searchButtonClicked() {
-        BackgroundTask.wrap(() -> searchDirectory(Paths.get(texDirectory.get())))
+        BackgroundTask.wrap(() -> searchDirectory(Paths.get(latexFileDirectory.get())))
                       .onRunning(() -> {
                           root.set(null);
                           noFilesFound.set(true);
@@ -202,10 +202,10 @@ public class ParseTexDialogViewModel extends AbstractViewModel {
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
                 preferencesService.getImportFormatPreferences(), fileMonitor);
 
-        BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultTexParser().parse(fileList)))
+        BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseTexResultView(result, databaseContext, Paths.get(texDirectory.get())).showAndWait())
+                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Paths.get(latexFileDirectory.get())).showAndWait())
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

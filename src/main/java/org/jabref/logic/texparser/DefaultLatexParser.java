@@ -17,15 +17,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.texparser.TexParser;
-import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.texparser.LatexParser;
+import org.jabref.model.texparser.LatexParserResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultTexParser implements TexParser {
+public class DefaultLatexParser implements LatexParser {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTexParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLatexParser.class);
     private static final String TEX_EXT = ".tex";
     private static final String BIB_EXT = ".bib";
 
@@ -51,33 +51,33 @@ public class DefaultTexParser implements TexParser {
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(
             String.format("\\\\(?:include|input)\\{(?<%s>[^\\}]*)\\}", INCLUDE_GROUP));
 
-    private final TexParserResult texParserResult;
+    private final LatexParserResult latexParserResult;
 
-    public DefaultTexParser() {
-        this.texParserResult = new TexParserResult();
+    public DefaultLatexParser() {
+        this.latexParserResult = new LatexParserResult();
     }
 
-    public TexParserResult getTexParserResult() {
-        return texParserResult;
+    public LatexParserResult getLatexParserResult() {
+        return latexParserResult;
     }
 
     @Override
-    public TexParserResult parse(String citeString) {
+    public LatexParserResult parse(String citeString) {
         matchCitation(Paths.get(""), 1, citeString);
-        return texParserResult;
+        return latexParserResult;
     }
 
     @Override
-    public TexParserResult parse(Path texFile) {
-        return parse(Collections.singletonList(texFile));
+    public LatexParserResult parse(Path latexFile) {
+        return parse(Collections.singletonList(latexFile));
     }
 
     @Override
-    public TexParserResult parse(List<Path> texFiles) {
-        texParserResult.addFiles(texFiles);
+    public LatexParserResult parse(List<Path> latexFiles) {
+        latexParserResult.addFiles(latexFiles);
         List<Path> referencedFiles = new ArrayList<>();
 
-        for (Path file : texFiles) {
+        for (Path file : latexFiles) {
             if (!file.toFile().exists()) {
                 LOGGER.error(String.format("File does not exist: %s", file));
                 continue;
@@ -94,7 +94,7 @@ public class DefaultTexParser implements TexParser {
                     }
                     matchCitation(file, lineNumberReader.getLineNumber(), line);
                     matchBibFile(file, line);
-                    matchNestedFile(file, texFiles, referencedFiles, line);
+                    matchNestedFile(file, latexFiles, referencedFiles, line);
                 }
             } catch (ClosedChannelException e) {
                 // User changed the underlying LaTeX file
@@ -109,11 +109,11 @@ public class DefaultTexParser implements TexParser {
 
         // Parse all files referenced by TEX files, recursively.
         if (!referencedFiles.isEmpty()) {
-            // modifies class variable texParserResult
+            // modifies class variable latexParserResult
             parse(referencedFiles);
         }
 
-        return texParserResult;
+        return latexParserResult;
     }
 
     /**
@@ -124,7 +124,7 @@ public class DefaultTexParser implements TexParser {
 
         while (citeMatch.find()) {
             for (String key : citeMatch.group(CITE_GROUP).split(",")) {
-                texParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
+                latexParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);
             }
         }
     }
@@ -144,7 +144,7 @@ public class DefaultTexParser implements TexParser {
                                 : String.format("%s%s", bibString, BIB_EXT));
 
                 if (bibFile.toFile().exists()) {
-                    texParserResult.addBibFile(file, bibFile);
+                    latexParserResult.addBibFile(file, bibFile);
                 }
             }
         }
