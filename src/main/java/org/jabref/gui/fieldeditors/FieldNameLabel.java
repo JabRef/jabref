@@ -31,7 +31,7 @@ public class FieldNameLabel extends Label {
         } else if (StandardField.TITLE.getName().equals(field.getName())) {
             tip.setText(Localization.lang("The work's title"));
         } else if (StandardField.YEAR.getName().equals(field.getName())) {
-            tip.setText(Localization.lang("The year of publication or, for an unpublished work, the year it was written. Generally it should consist of four numerals, such as 1984, although the standard styles can handle any year whose last four nonpunctuation characters are numerals, such as ‘(about 1984)’."));
+            tip.setText(Localization.lang("The year of publication or, for an unpublished work, the year it was written. Generally it should consist of four numerals, such as 1984, although the standard styles can handle any year whose last four nonpunctuation characters are numerals, such as '(about 1984)'."));
         } else {
             return;
         }
