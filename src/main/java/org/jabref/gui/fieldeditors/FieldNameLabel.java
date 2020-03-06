@@ -43,8 +43,8 @@ public class FieldNameLabel extends Label {
             }
         }
         else if (field instanceof InternalField) {
-            InternalField InternalField = (InternalField) field;
-            switch (InternalField) {
+            InternalField internalField = (InternalField) field;
+            switch (internalField) {
                 case KEY_FIELD:
                     tip.setText(Localization.lang("[First author'last name][Article year] e.g. Jones2020"));
                     break;
