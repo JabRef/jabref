@@ -65,6 +65,15 @@ Project: j2objc-annotations
 URL:     https://github.com/google/j2objc
 License: Apache-2.0
 
+Id:      com.ibm.icu:icu4j
+Project: International Components for Unicode for Java (ICU4J)
+URL:     https://wiki.eclipse.org/ICU4J
+
+Id:      com.jfoenix:jfoenix
+Project: JavaFX MAterial Design Library
+URL:     https://github.com/jfoenixadmin/JFoenix
+License: Apache-2.0
+
 Id:      com.konghq.unirest
 Project: Unirest for Java
 URL:     https://github.com/Kong/unirest-java
@@ -85,9 +94,24 @@ Project: Oracle's JDBC drivers
 URL:     https://repo1.maven.org/maven2/com/oracle/ojdbc/ojdbc10/19.3.0.0/ojdbc10-19.3.0.0.pom
 License: Oracle Free Use Terms and Conditions (FUTC)
 
+Id:      com.sun.istack:istack-commons-runtime
+Project: iStack Common Utility Code
+URL:     https://github.com/eclipse-ee4j/jaxb-istack-commons
+License: BSD-3-Clause (with copyright as described in Eclipse Distribution License - v 1.0 - see https://wiki.spdx.org/view/Legal_Team/License_List/Licenses_Under_Consideration for details)
+
+Id:      com.sun.xml.fastinfoset:FastInfoset
+Project: Fast Infoset
+URL:     https://github.com/eclipse-ee4j/jaxb-fi
+License: Apache-2.0
+
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
+License: Apache-2.0
+
+Id:      commons-codec:commons-codec
+Project: Apache Commons Codec
+URL:     https://commons.apache.org/proper/commons-codec/
 License: Apache-2.0
 
 Id:      commons-logging:commons-logging
@@ -95,8 +119,13 @@ Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
 License: Apache-2.0
 
+Id:      de.jensd:fontawesomefx-commons
+Project: FontAwesomeFX Commons
+URL:     https://bitbucket.org/Jerady/fontawesomefx
+License: Apache-2.0
+
 Id:      de.jensd:fontawesomefx-materialdesignfont
-Project: FontAwesomeFX
+Project: FontAwesomeFX Material Design Font
 URL:     https://bitbucket.org/Jerady/fontawesomefx
 License: Apache-2.0
 
@@ -115,6 +144,11 @@ Project: Citeproc-Java
 URL:     http://michel-kraemer.github.io/citeproc-java/
 Licence: Apache-2.0
 
+Id:      eu.lestard:doc-annotations
+Project: doc annotations
+URL:     https://github.com/lestard/doc-annotations
+License: MIT
+
 Id:      info.debatty:java-string-similarity
 Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
@@ -125,22 +159,37 @@ Project: java-diff-utils
 URL:     https://github.com/java-diff-utils/java-diff-utils
 License: Apache-2.0
 
+Id:      jakarta.activation:jakarata.activation-api
+Project: Jakarta Activation
+URL:     https://eclipse-ee4j.github.io/jaf/
+License: BSD-3-Clause
+
 Id:      jakarta.annotation:jakarata.annotation-api
 Project: Jakarta Annotations
 URL:     https://projects.eclipse.org/projects/ee4j.ca
 License: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 
-Id:      net.java.dev.glazedlists:glazedlists_java15
-Project: Glazed Lists
-URL:     http://www.glazedlists.com/
-License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL-2.0
+Id:      jakarta.xml.bind:jakarta.xml.bind-api
+Project: Jakarta XML Binding project
+URL:     https://github.com/eclipse-ee4j/jaxb-api
+License: BSD-3-Clause; sometimes EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 
-Id:      org.antlr:antlr
+Id:      net.jcip:jcip-annotations
+Project: JCIP (Java Concurrency in Practice) Annotations under Apache License
+URL:     http://stephenc.github.io/jcip-annotations/
+License: Apache-2.0
+
+Id:      net.jodah:typetools
+Project: TypeTools
+URL:     https://github.com/jhalterman/typetools
+License: Apache-2.0
+
+Id:      org.antlr:antlr-runtime
 Project: ANTLR 3
 URL:     http://www.antlr3.org/
 License: BSD-3-Clause
 
-Id:      org.antlr:antlr4
+Id:      org.antlr:antlr4-runtime
 Project: ANTLR 4
 URL:     http://www.antlr.org/
 License: BSD-3-Clause
@@ -153,6 +202,11 @@ License: Apache-2.0
 Id:      org.apache.commons:commons-lang3
 Project: Apache Commons Lang
 URL:     https://commons.apache.org/proper/commons-lang/
+License: Apache-2.0
+
+Id:      org.apache.commons:commons-text
+Project: Apache Commons Text
+URL:     https://commons.apache.org/proper/commons-text/
 License: Apache-2.0
 
 Id:      org.apache.logging.log4j

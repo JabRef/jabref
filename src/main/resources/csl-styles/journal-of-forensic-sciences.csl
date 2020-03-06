@@ -47,11 +47,7 @@
   <macro name="access">
     <choose>
       <if type="article-journal" match="any">
-        <choose>
-          <if variable="volume page" match="none">
-            <text variable="DOI" prefix="doi: "/>
-          </if>
-        </choose>
+        <text variable="DOI" prefix="https://doi.org/"/>
       </if>
       <else-if type="webpage post post-weblog" match="any">
         <group delimiter=" ">
