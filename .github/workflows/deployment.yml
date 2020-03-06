@@ -24,17 +24,17 @@ jobs:
         include:
          - os: ubuntu-latest
            displayName: linux
-           jpackageDownload: https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_linux-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_linux-x64_bin.tar.gz
            jdk14Path: /jdk-14
            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
-           jpackageDownload: https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_windows-x64_bin.zip
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_windows-x64_bin.zip
            jdk14Path: /jdk-14
            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
-           jpackageDownload: https://download.java.net/java/GA/jdk14/076bab302c7b4508975440c56f6cc26a/36/GPL/openjdk-14_osx-x64_bin.tar.gz
+           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_osx-x64_bin.tar.gz
            jdk14Path: /jdk-14.jdk/Contents/Home
            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
