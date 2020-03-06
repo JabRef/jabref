@@ -24,13 +24,13 @@ public class FieldNameLabel extends Label {
     public void setTip(Field field) {
         Tooltip tip = new Tooltip();
         if (field.isStandardField()) {
-            StandardField standardField = (StandardField)field;
+            StandardField standardField = (StandardField) field;
             switch (standardField) {
                 case AUTHOR:
-                    tip.setText(Localization.lang("The name(s) of the author(s), in the format described in the LATEX book. Remember, all names are separated with the and keyword, and not commas."));
+                    tip.setText(Localization.lang("The name(s) of the author(s), in the format described in the LaTeX book. Remember, all names are separated with the and keyword, and not commas."));
                     break;
                 case JOURNAL:
-                    tip.setText(Localization.lang("Journal name. Abbrevations could be used."));
+                    tip.setText(Localization.lang("Journal name. Abbrevations may be used."));
                     break;
                 case TITLE:
                     tip.setText(Localization.lang("The work's title"));
@@ -41,12 +41,11 @@ public class FieldNameLabel extends Label {
                 default:
                     return;
             }
-        }
-        else if (field instanceof InternalField) {
+        } else if (field instanceof InternalField) {
             InternalField internalField = (InternalField) field;
             switch (internalField) {
                 case KEY_FIELD:
-                    tip.setText(Localization.lang("[First author'last name][Article year] e.g. Jones2020"));
+                    tip.setText(Localization.lang("[First author'last name][Article year], e.g. Jones2020"));
                     break;
                 default:
                     return;
