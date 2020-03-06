@@ -29,7 +29,7 @@ public class Version {
     private static final Version UNKNOWN_VERSION = new Version();
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
-    private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+$");
+    private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
 
