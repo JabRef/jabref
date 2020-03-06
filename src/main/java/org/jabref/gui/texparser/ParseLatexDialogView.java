@@ -28,11 +28,11 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckTreeView;
 import org.fxmisc.easybind.EasyBind;
 
-public class ParseTexDialogView extends BaseDialog<Void> {
+public class ParseLatexDialogView extends BaseDialog<Void> {
 
     private final BibDatabaseContext databaseContext;
     private final ControlsFxVisualizer validationVisualizer;
-    @FXML private TextField texDirectoryField;
+    @FXML private TextField latexDirectoryField;
     @FXML private Button browseButton;
     @FXML private Button searchButton;
     @FXML private ProgressIndicator progressIndicator;
@@ -44,9 +44,9 @@ public class ParseTexDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private PreferencesService preferencesService;
     @Inject private FileUpdateMonitor fileMonitor;
-    private ParseTexDialogViewModel viewModel;
+    private ParseLatexDialogViewModel viewModel;
 
-    public ParseTexDialogView(BibDatabaseContext databaseContext) {
+    public ParseLatexDialogView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
         this.validationVisualizer = new ControlsFxVisualizer();
 
@@ -62,7 +62,7 @@ public class ParseTexDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ParseTexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService, fileMonitor);
+        viewModel = new ParseLatexDialogViewModel(databaseContext, dialogService, taskExecutor, preferencesService, fileMonitor);
 
         fileTreeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         fileTreeView.showRootProperty().bindBidirectional(viewModel.successfulSearchProperty());
@@ -79,11 +79,11 @@ public class ParseTexDialogView extends BaseDialog<Void> {
             EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
         });
 
-        texDirectoryField.textProperty().bindBidirectional(viewModel.texDirectoryProperty());
+        latexDirectoryField.textProperty().bindBidirectional(viewModel.latexFileDirectoryProperty());
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        validationVisualizer.initVisualization(viewModel.texDirectoryValidation(), texDirectoryField);
+        validationVisualizer.initVisualization(viewModel.latexDirectoryValidation(), latexDirectoryField);
         browseButton.disableProperty().bindBidirectional(viewModel.searchInProgressProperty());
-        searchButton.disableProperty().bind(viewModel.texDirectoryValidation().validProperty().not());
+        searchButton.disableProperty().bind(viewModel.latexDirectoryValidation().validProperty().not());
         selectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         unselectAllButton.disableProperty().bindBidirectional(viewModel.noFilesFoundProperty());
         progressIndicator.visibleProperty().bindBidirectional(viewModel.searchInProgressProperty());

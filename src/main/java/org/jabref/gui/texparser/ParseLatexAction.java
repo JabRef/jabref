@@ -5,11 +5,11 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;
 
-public class ParseTexAction extends SimpleCommand {
+public class ParseLatexAction extends SimpleCommand {
 
     private final StateManager stateManager;
 
-    public ParseTexAction(StateManager stateManager) {
+    public ParseLatexAction(StateManager stateManager) {
         this.stateManager = stateManager;
         executable.bind(ActionHelper.needsDatabase(stateManager));
     }
@@ -17,7 +17,7 @@ public class ParseTexAction extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(NullPointerException::new);
-        ParseTexDialogView dialog = new ParseTexDialogView(database);
+        ParseLatexDialogView dialog = new ParseLatexDialogView(database);
         dialog.showAndWait();
     }
 }

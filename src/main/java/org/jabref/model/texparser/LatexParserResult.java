@@ -13,16 +13,16 @@ import org.jabref.model.entry.BibEntry;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-public class TexParserResult {
+public class LatexParserResult {
 
     private final List<Path> fileList;
     private final List<Path> nestedFiles;
     private final Multimap<Path, Path> bibFiles;
-  
+
     // BibTeXKey --> set of citations
     private final Multimap<String, Citation> citations;
 
-    public TexParserResult() {
+    public LatexParserResult() {
         this.fileList = new ArrayList<>();
         this.nestedFiles = new ArrayList<>();
         this.bibFiles = HashMultimap.create();
@@ -111,7 +111,7 @@ public class TexParserResult {
             return false;
         }
 
-        TexParserResult that = (TexParserResult) obj;
+        LatexParserResult that = (LatexParserResult) obj;
 
         return Objects.equals(fileList, that.fileList)
                 && Objects.equals(nestedFiles, that.nestedFiles)
