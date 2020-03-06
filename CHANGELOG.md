@@ -1,19 +1,26 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-This project **does not** adhere to [Semantic Versioning](http://semver.org/).
-This file tries to follow the conventions proposed by [keepachangelog.com](http://keepachangelog.com/).
-Here, the categories "Changed" for added and changed functionality,
-"Fixed" for fixed functionality, and
-"Removed" for removed functionality are used.
-
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
+Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
 ### Changed
 
-- We reintroduced the possibility to extract references from plain text (using GROBID) [#5614](https://github.com/JabRef/jabref/pull/5614)
+### Fixed
+
+### Removed
+
+## [5.0] – 2020-03-06
+
+### Changed
+
+- Added browser integration to the snap package for firefox/chromium browsers. [#6062](https://github.com/JabRef/jabref/pull/6062)
+- We reintroduced the possibility to extract references from plain text (using [GROBID](https://grobid.readthedocs.io/en/latest/)). [#5614](https://github.com/JabRef/jabref/pull/5614)
 - We changed the open office panel to show buttons in rows of three instead of going straight down to save space as the button expanded out to take up unnecessary horizontal space. [#5479](https://github.com/JabRef/jabref/issues/5479)
 - We cleaned up the group add/edit dialog. [#5826](https://github.com/JabRef/jabref/pull/5826)
 - We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
@@ -21,6 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
 - We reimplemented and improved the dialog "Customize entry types" [#4719](https://github.com/JabRef/jabref/issues/4719)
 - We added support for searching ShortScience for an entry through the user's browser. [#6018](https://github.com/JabRef/jabref/pull/6018)
+- We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
 
 ### Fixed
 
@@ -48,12 +56,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the group and the link column were not updated after changing the entry in the main table. [#5985](https://github.com/JabRef/jabref/issues/5985)
 - We fixed an issue where reordering the groups was not possible after inserting an article. [#6008](https://github.com/JabRef/jabref/issues/6008)
 - We fixed an issue where citation styles except the default "Preview" could not be used. [#56220](https://github.com/JabRef/jabref/issues/5622)
+- We fixed an issue where an exception was thrown when adding a save action without a selected formatter in the library properties [#6069](https://github.com/JabRef/jabref/issues/6069)
 
 ### Removed
 
 - Ampersands are no longer escaped by default in the `bib` file. If you want to keep the current behaviour, you can use the new "Escape Ampersands" formatter as a save action. [#5869](https://github.com/JabRef/jabref/issues/5869)
 - The "Merge Entries" entry was removed from the Quality Menu. Users should use the right-click menu instead. [#6021](https://github.com/JabRef/jabref/pull/6021)
-
 
 ## [5.0-beta] – 2019-12-15
 
@@ -131,12 +139,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We removed an internal step in the [ISBN-to-BibTeX fetcher](https://docs.jabref.org/import-using-publication-identifiers/isbntobibtex): The [ISBN to BibTeX Converter](https://manas.tungare.name/software/isbn-to-bibtex) by [@manastungare](https://github.com/manastungare) is not used anymore, because it is offline: "people using this tool have not been generating enough sales for Amazon."
 - We removed the option to control the default drag and drop behaviour. You can use the modifier keys (like CtrL or Alt) instead.
 
-
 ## [5.0-alpha] – 2019-08-25
 
 ### Changed
-- We added eventitle, eventdate and venue fields to @unpublished entry type.
-- We added @software and @dataSet entry type to biblatex.
+
+- We added eventitle, eventdate and venue fields to `@unpublished` entry type.
+- We added `@software` and `@dataSet` entry type to biblatex.
 - All fields are now properly sorted alphabetically (in the subgroups of required/optional fields) when the entry is written to the bib file.
 - We fixed an issue where some importers used the field `pubstatus` instead of the standard BibTeX field `pubstate`.
 - We changed the latex command removal for docbook exporter. [#3838](https://github.com/JabRef/jabref/issues/3838)
@@ -155,12 +163,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   Because of this change, the last-used cleanup operations were reset.
 - We changed the minimum required version of Java to 1.8.0_171, as this is the latest release for which the automatic Java update works.  [#4093](https://github.com/JabRef/jabref/issues/4093)
 - The special fields like `Printed` and `Read status` now show gray icons when the row is hovered.
-- We added a button in the tab header which allows you to close the database with one click. https://github.com/JabRef/jabref/issues/494
-- Sorting in the main table now takes information from cross-referenced entries into account. https://github.com/JabRef/jabref/issues/2808
+- We added a button in the tab header which allows you to close the database with one click. [#494](https://github.com/JabRef/jabref/issues/494)
+- Sorting in the main table now takes information from cross-referenced entries into account. [#2808](https://github.com/JabRef/jabref/issues/2808)
 - If a group has a color specified, then entries matched by this group have a small colored bar in front of them in the main table.
 - Change default icon for groups to a circle because a colored version of the old icon was hard to distinguish from its black counterpart.
 - In the main table, the context menu appears now when you press the "context menu" button on the keyboard. [feature request in the forum](http://discourse.jabref.org/t/how-to-enable-keyboard-context-key-windows)
-- We added icons to the group side panel to quickly switch between `union` and `intersection` group view mode https://github.com/JabRef/jabref/issues/3269.
+- We added icons to the group side panel to quickly switch between `union` and `intersection` group view mode. [#3269](https://github.com/JabRef/jabref/issues/3269).
 - We use `https` for [fetching from most online bibliographic database](https://docs.jabref.org/import-using-online-bibliographic-database).
 - We changed the default keyboard shortcuts for moving between entries when the entry editor is active to ̀<kbd>alt</kbd> + <kbd>up/down</kbd>.
 - Opening a new file now prompts the directory of the currently selected file, instead of the directory of the last opened file.
@@ -172,8 +180,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We removed the redundant new lines of markings and wrapped the summary in the File annotation tab. [#3823](https://github.com/JabRef/jabref/issues/3823)
 - We add auto URL formatting when user paste link to URL field in entry editor. [koppor#254](https://github.com/koppor/jabref/issues/254)
 - We added a minimum height for the entry editor so that it can no longer be hidden by accident. [#4279](https://github.com/JabRef/jabref/issues/4279)
-- We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl</kbd> + <kbd>E</kbd>. [#4222] (https://github.com/JabRef/jabref/issues/4222)
-- We added an option in the preference dialog box, that allows user to pick the dark or light theme option. [#4130] (https://github.com/JabRef/jabref/issues/4130)
+- We added a new keyboard shortcut so that the entry editor could be closed by <kbd>Ctrl</kbd> + <kbd>E</kbd>. [#4222](https://github.com/JabRef/jabref/issues/4222)
+- We added an option in the preference dialog box, that allows user to pick the dark or light theme option. [#4130](https://github.com/JabRef/jabref/issues/4130)
 - We updated the Related Articles tab to accept JSON from the new version of the Mr. DLib service
 - We added an option in the preference dialog box that allows user to choose behavior after dragging and dropping files in Entry Editor. [#4356](https://github.com/JabRef/jabref/issues/4356)
 - We added the ability to have an export preference where previously "File"-->"Export"/"Export selected entries" would not save the user's preference[#4495](https://github.com/JabRef/jabref/issues/4495)
@@ -206,24 +214,23 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option in preferences to allow for integers in field "edition" when running database in bibtex mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
 - We added the ability to use negation in export filter layouts. [#5138](https://github.com/JabRef/jabref/pull/5138)
 
-
 ### Fixed
 
 - We fixed an issue where JabRef died silently for the user without enough inotify instances [#4874](https://github.com/JabRef/jabref/issues/4847)
 - We fixed an issue where corresponding groups are sometimes not highlighted when clicking on entries [#3112](https://github.com/JabRef/jabref/issues/3112)
 - We fixed an issue where custom exports could not be selected in the 'Export (selected) entries' dialog [#4013](https://github.com/JabRef/jabref/issues/4013)
-- Italic text is now rendered correctly. https://github.com/JabRef/jabref/issues/3356
-- The entry editor no longer gets corrupted after using the source tab. https://github.com/JabRef/jabref/issues/3532 https://github.com/JabRef/jabref/issues/3608 https://github.com/JabRef/jabref/issues/3616
-- We fixed multiple issues where entries did not show up after import if a search was active. https://github.com/JabRef/jabref/issues/1513 https://github.com/JabRef/jabref/issues/3219
-- We fixed an issue where the group tree was not updated correctly after an entry was changed. https://github.com/JabRef/jabref/issues/3618
-- We fixed an issue where a right-click in the main table selected a wrong entry. https://github.com/JabRef/jabref/issues/3267
-- We fixed an issue where in rare cases entries where overlayed in the main table. https://github.com/JabRef/jabref/issues/3281
-- We fixed an issue where selecting a group messed up the focus of the main table and the entry editor. https://github.com/JabRef/jabref/issues/3367
-- We fixed an issue where composite author names were sorted incorrectly. https://github.com/JabRef/jabref/issues/2828
+- Italic text is now rendered correctly. [#3356](https://github.com/JabRef/jabref/issues/3356)
+- The entry editor no longer gets corrupted after using the source tab. [#3532](https://github.com/JabRef/jabref/issues/3532) [#3608](https://github.com/JabRef/jabref/issues/3608) [#3616](https://github.com/JabRef/jabref/issues/3616)
+- We fixed multiple issues where entries did not show up after import if a search was active. [#1513](https://github.com/JabRef/jabref/issues/1513) [#3219](https://github.com/JabRef/jabref/issues/3219))
+- We fixed an issue where the group tree was not updated correctly after an entry was changed. [#3618](https://github.com/JabRef/jabref/issues/3618)
+- We fixed an issue where a right-click in the main table selected a wrong entry. [#3267](https://github.com/JabRef/jabref/issues/3267)
+- We fixed an issue where in rare cases entries where overlayed in the main table. [#3281](https://github.com/JabRef/jabref/issues/3281)
+- We fixed an issue where selecting a group messed up the focus of the main table and the entry editor. [#3367](https://github.com/JabRef/jabref/issues/3367)
+- We fixed an issue where composite author names were sorted incorrectly. [#2828](https://github.com/JabRef/jabref/issues/2828)
 - We fixed an issue where commands followed by `-` didn't work. [#3805](https://github.com/JabRef/jabref/issues/3805)
 - We fixed an issue where a non-existing aux file in a group made it impossible to open the library. [#4735](https://github.com/JabRef/jabref/issues/4735)
 - We fixed an issue where some journal names were wrongly marked as abbreviated. [#4115](https://github.com/JabRef/jabref/issues/4115)
-- We fixed an issue where the custom file column were sorted incorrectly. https://github.com/JabRef/jabref/issues/3119
+- We fixed an issue where the custom file column were sorted incorrectly. [#3119](https://github.com/JabRef/jabref/issues/3119)
 - We improved the parsing of author names whose infix is abbreviated without a dot. [#4864](https://github.com/JabRef/jabref/issues/4864)
 - We fixed an issues where the entry losses focus when a field is edited and at the same time used for sorting. https://github.com/JabRef/jabref/issues/3373
 - We fixed an issue where the menu on Mac OS was not displayed in the usual Mac-specific way. https://github.com/JabRef/jabref/issues/3146
@@ -231,13 +238,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the order of fields in customized entry types was not saved correctly. [#4033](http://github.com/JabRef/jabref/issues/4033)
 - We fixed an issue where renaming a group did not change the group name in the interface. [#3189](https://github.com/JabRef/jabref/issues/3189)
 - We fixed an issue where the groups tree of the last database was still shown even after the database was already closed.
-- We fixed an issue where the "Open file dialog" may disappear behind other windows. https://github.com/JabRef/jabref/issues/3410
+- We fixed an issue where the "Open file dialog" may disappear behind other windows. [#3410](https://github.com/JabRef/jabref/issues/3410)
 - We fixed an issue where the number of entries matched was not updated correctly upon adding or removing an entry. [#3537](https://github.com/JabRef/jabref/issues/3537)
 - We fixed an issue where the default icon of a group was not colored correctly.
 - We fixed an issue where the first field in entry editor was not focused when adding a new entry. [#4024](https://github.com/JabRef/jabref/issues/4024)
-- We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files https://github.com/JabRef/jabref/issues/2970
+- We reworked the "Edit file" dialog to make it resizeable and improved the workflow for adding and editing files [#2970](https://github.com/JabRef/jabref/issues/2970)
 - We fixed an issue where custom name formatters were no longer found correctly. [#3531](https://github.com/JabRef/jabref/issues/3531)
-- We fixed an issue where the month was not shown in the preview https://github.com/JabRef/jabref/issues/3239.
+- We fixed an issue where the month was not shown in the preview. [#3239](https://github.com/JabRef/jabref/issues/3239)
 - Rewritten logic to detect a second jabref instance. [#4023](https://github.com/JabRef/jabref/issues/4023)
 - We fixed an issue where the "Convert to BibTeX-Cleanup" moved the content of the `file` field to the `pdf` field [#4120](https://github.com/JabRef/jabref/issues/4120)
 - We fixed an issue where the preview pane in entry preview in preferences wasn't showing the citation style selected [#3849](https://github.com/JabRef/jabref/issues/3849)
@@ -286,6 +293,9 @@ The changelog of JabRef 4.x is available at the [v4.x branch](https://github.com
 The changelog of JabRef 3.x is available at the [v3.8.2 tag](https://github.com/JabRef/jabref/blob/v3.8.2/CHANGELOG.md).
 The changelog of JabRef 2.11 and all previous versions is available as [text file in the v2.11.1 tag](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v5.0-beta...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v5.0...HEAD
+[5.0]: https://github.com/JabRef/jabref/compare/v5.0-beta...v5.0
 [5.0-beta]: https://github.com/JabRef/jabref/compare/v5.0-alpha...v5.0-beta
 [5.0-alpha]: https://github.com/JabRef/jabref/compare/v4.3...v5.0-alpha
+
+<!-- markdownlint-disable-file MD024 MD033 -->
