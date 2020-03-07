@@ -34,7 +34,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
     private static JabRefWebsocketServer jabRefWebsocketServerSingleton = null;
 
-    private final Semaphore semaphoreWsOnMessage = new Semaphore(MAX_ONMESSAGE_CALLS_IN_PARALLEL, true);
+    private final Semaphore semaphoreWebSocketOnMessage = new Semaphore(MAX_ONMESSAGE_CALLS_IN_PARALLEL, true);
 
     private final Runnable heartbeatRunnable = () -> {
         if (SHOW_VERBOSE_DEBUG_OUTPUT) {
@@ -43,7 +43,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
         JsonObject messagePayload = new JsonObject();
 
-        broadcastMessage(WsAction.HEARTBEAT, messagePayload);
+        broadcastMessage(WebSocketAction.HEARTBEAT, messagePayload);
     };
 
     private volatile ScheduledExecutorService heartbeatExecutor = null;
@@ -93,6 +93,13 @@ public class JabRefWebsocketServer extends WebSocketServer {
     public static synchronized JabRefWebsocketServer getInstance(int port) {
         if (jabRefWebsocketServerSingleton == null) {
             jabRefWebsocketServerSingleton = new JabRefWebsocketServer(port);
+        } else {
+            int activePort = jabRefWebsocketServerSingleton.getPort();
+
+            if (activePort != port) {
+                LOGGER.debug("[ws] JabRefWebsocketServer has already been started on a different port (" + activePort +
+                        "), thus the given port (" + port + ") will not be used.");
+            }
         }
 
         return jabRefWebsocketServerSingleton;
@@ -135,7 +142,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             messagePayload.addProperty("messageType", "info");
             messagePayload.addProperty("message", input);
 
-            jabRefWebsocketServer.broadcastMessage(WsAction.INFO_MESSAGE, messagePayload);
+            jabRefWebsocketServer.broadcastMessage(WebSocketAction.INFO_MESSAGE, messagePayload);
         }
 
         jabRefWebsocketServer.stopServer();
@@ -182,15 +189,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Checks if at least one websocket client is registered, which matches the given <code>WsClientType</code>.
+     * Checks if at least one websocket client is registered, which matches the given <code>WebSocketClientType</code>.
      *
-     * @param wsClientType wsClientType of the websocket clients to search for
+     * @param webSocketClientType webSocketClientType of the websocket clients to search for
      * @return <code>true</code>, if at least one websocket client with the given type is registered, or <code>false</code> otherwise
      */
-    public boolean isWsClientWithGivenWsClientTypeRegistered(WsClientType wsClientType) {
+    public boolean isWebSocketClientWithGivenWebSocketClientTypeRegistered(WebSocketClientType webSocketClientType) {
         for (WebSocket websocket : getConnections()) {
-            WsClientData wsClientData = websocket.getAttachment();
-            if (wsClientData != null && wsClientData.getWsClientType().equals(wsClientType)) {
+            WebSocketClientData webSocketClientData = websocket.getAttachment();
+            if (webSocketClientData != null && webSocketClientData.getWebSocketClientType().equals(webSocketClientType)) {
                 return true;
             }
         }
@@ -199,15 +206,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Gets the first websocket client, which matches the given <code>WsClientType</code>.
+     * Gets the first websocket client, which matches the given <code>WebSocketClientType</code>.
      *
-     * @param wsClientType wsClientType of the requested websocket client
+     * @param webSocketClientType webSocketClientType of the requested websocket client
      * @return the matching websocket client, or <code>null</code> otherwise
      */
-    private WebSocket getFirstWsClientByWsClientType(WsClientType wsClientType) {
+    private WebSocket getFirstWebSocketClientByWebSocketClientType(WebSocketClientType webSocketClientType) {
         for (WebSocket websocket : getConnections()) {
-            WsClientData wsClientData = websocket.getAttachment();
-            if (wsClientData != null && wsClientData.getWsClientType().equals(wsClientType)) {
+            WebSocketClientData webSocketClientData = websocket.getAttachment();
+            if (webSocketClientData != null && webSocketClientData.getWebSocketClientType().equals(webSocketClientType)) {
                 return websocket;
             }
         }
@@ -218,13 +225,13 @@ public class JabRefWebsocketServer extends WebSocketServer {
     /**
      * Checks if a websocket client is registered, which matches the given websocket's <code>uid</code>.
      *
-     * @param wsUid wsUid of the websocket client to search for
+     * @param webSocketUID webSocketUID of the websocket client to search for
      * @return <code>true</code>, if a websocket client with the given uid is registered, or <code>false</code> otherwise
      */
-    public boolean isWsClientWithGivenWsUidRegistered(String wsUid) {
+    public boolean isWebSocketClientWithGivenWebSocketUIDRegistered(String webSocketUID) {
         for (WebSocket websocket : getConnections()) {
-            WsClientData wsClientData = websocket.getAttachment();
-            if (wsClientData != null && wsClientData.getWsUID().equals(wsUid)) {
+            WebSocketClientData webSocketClientData = websocket.getAttachment();
+            if (webSocketClientData != null && webSocketClientData.getWebSocketUID().equals(webSocketUID)) {
                 return true;
             }
         }
@@ -233,15 +240,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     /**
-     * Gets the websocket client, which matches the given websocket's <code>uid</code>.
+     * Gets the websocket client, which matches the given websocket's <code>UID</code>.
      *
-     * @param wsUid wsUid of the requested websocket client
+     * @param webSocketUID webSocketUID of the requested websocket client
      * @return the matching websocket client, or <code>null</code> otherwise
      */
-    private WebSocket getWsClientByWsUid(String wsUid) {
+    private WebSocket getWebSocketClientByWebSocketUID(String webSocketUID) {
         for (WebSocket websocket : getConnections()) {
-            WsClientData wsClientData = websocket.getAttachment();
-            if (wsClientData != null && wsClientData.getWsUID().equals(wsUid)) {
+            WebSocketClientData webSocketClientData = websocket.getAttachment();
+            if (webSocketClientData != null && webSocketClientData.getWebSocketUID().equals(webSocketUID)) {
                 return websocket;
             }
         }
@@ -267,35 +274,35 @@ public class JabRefWebsocketServer extends WebSocketServer {
         }
     }
 
-    public boolean sendMessage(WebSocket websocketOfRecipient, WsAction wsAction, JsonObject messagePayload) {
-        JsonObject messageContainer = WsServerUtils.createMessageContainer(wsAction, messagePayload);
+    public boolean sendMessage(WebSocket websocketOfRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
+        JsonObject messageContainer = WebSocketServerUtils.createMessageContainer(webSocketAction, messagePayload);
 
         return sendJsonString(websocketOfRecipient, new Gson().toJson(messageContainer));
     }
 
-    public boolean sendMessage(WsClientType wsClientTypeOfRecipient, WsAction wsAction, JsonObject messagePayload) {
-        WebSocket websocket = getFirstWsClientByWsClientType(wsClientTypeOfRecipient);
+    public boolean sendMessage(WebSocketClientType webSocketClientTypeOfRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
+        WebSocket websocket = getFirstWebSocketClientByWebSocketClientType(webSocketClientTypeOfRecipient);
 
         if (websocket != null) {
-            return sendMessage(websocket, wsAction, messagePayload);
+            return sendMessage(websocket, webSocketAction, messagePayload);
         }
 
         return false;
     }
 
-    public boolean sendMessage(String wsUIDofRecipient, WsAction wsAction, JsonObject messagePayload) {
-        WebSocket websocket = getWsClientByWsUid(wsUIDofRecipient);
+    public boolean sendMessage(String webSocketUIDofRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
+        WebSocket websocket = getWebSocketClientByWebSocketUID(webSocketUIDofRecipient);
 
         if (websocket != null) {
-            return sendMessage(websocket, wsAction, messagePayload);
+            return sendMessage(websocket, webSocketAction, messagePayload);
         }
 
         return false;
     }
 
-    public void broadcastMessage(WsAction wsAction, JsonObject messagePayload) {
+    public void broadcastMessage(WebSocketAction webSocketAction, JsonObject messagePayload) {
         for (WebSocket websocket : getConnections()) {
-            sendMessage(websocket, wsAction, messagePayload);
+            sendMessage(websocket, webSocketAction, messagePayload);
         }
     }
 
@@ -363,13 +370,13 @@ public class JabRefWebsocketServer extends WebSocketServer {
     public void onOpen(WebSocket websocket, ClientHandshake handshake) {
         LOGGER.debug("[ws] @onOpen: " + websocket.getRemoteSocketAddress().getAddress().getHostAddress() + " connected.");
 
-        websocket.setAttachment(new WsClientData(WsClientType.UNKNOWN));
+        websocket.setAttachment(new WebSocketClientData(WebSocketClientType.UNKNOWN));
 
         JsonObject messagePayload = new JsonObject();
         messagePayload.addProperty("messageType", "info");
         messagePayload.addProperty("message", "welcome!");
 
-        sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayload);
+        sendMessage(websocket, WebSocketAction.INFO_MESSAGE, messagePayload);
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
 
@@ -379,7 +386,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         messagePayload.addProperty("heartbeatInterval", (int) TimeUnit.MILLISECONDS.convert(jabRefWebsocketServer.getHeartbeatInterval(), jabRefWebsocketServer.getTimeUnitHeartbeatInterval())); // [ms]
         messagePayload.addProperty("heartbeatToleranceFactor", jabRefWebsocketServer.getHeartbeatToleranceFactor());
 
-        sendMessage(websocket, WsAction.INFO_CONFIGURATION, messagePayload);
+        sendMessage(websocket, WebSocketAction.INFO_CONFIGURATION, messagePayload);
     }
 
     @Override
@@ -418,7 +425,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket websocket, ByteBuffer message) {
         try {
-            semaphoreWsOnMessage.acquire();
+            semaphoreWebSocketOnMessage.acquire();
 
             if (SHOW_VERBOSE_DEBUG_OUTPUT) {
                 LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
@@ -426,14 +433,14 @@ public class JabRefWebsocketServer extends WebSocketServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            semaphoreWsOnMessage.release();
+            semaphoreWebSocketOnMessage.release();
         }
     }
 
     @Override
     public void onMessage(WebSocket websocket, String message) {
         try {
-            semaphoreWsOnMessage.acquire();
+            semaphoreWebSocketOnMessage.acquire();
 
             if (SHOW_VERBOSE_DEBUG_OUTPUT) {
                 LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
@@ -444,26 +451,26 @@ public class JabRefWebsocketServer extends WebSocketServer {
             String action = messageContainer.get("action").getAsString();
             JsonObject messagePayload = messageContainer.getAsJsonObject("payload");
 
-            if (!WsAction.isValidWsAction(action)) {
-                LOGGER.warn("[ws] unknown WsAction received: " + action);
+            if (!WebSocketAction.isValidWebSocketAction(action)) {
+                LOGGER.warn("[ws] unknown WebSocketAction received: " + action);
                 return;
             }
 
-            WsAction wsAction = WsAction.getWsActionFromString(action);
+            WebSocketAction webSocketAction = WebSocketAction.getWebSocketActionFromString(action);
 
-            if (WsAction.CMD_REGISTER.equals(wsAction)) {
+            if (WebSocketAction.CMD_REGISTER.equals(webSocketAction)) {
                 HandlerCmdRegister.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_MESSAGE.equals(wsAction)) {
+            } else if (WebSocketAction.INFO_MESSAGE.equals(webSocketAction)) {
                 HandlerInfoMessage.handler(websocket, messagePayload);
-            } else if (WsAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(wsAction)) {
+            } else if (WebSocketAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(webSocketAction)) {
                 HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
             } else {
-                LOGGER.warn("[ws] unimplemented WsAction received: " + action);
+                LOGGER.warn("[ws] unimplemented WebSocketAction received: " + action);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            semaphoreWsOnMessage.release();
+            semaphoreWebSocketOnMessage.release();
         }
     }
 }

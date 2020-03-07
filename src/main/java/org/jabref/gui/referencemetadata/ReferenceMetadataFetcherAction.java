@@ -28,9 +28,9 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 /**
  * This class allows fetching the reference metadata (e.g. citation counts) from the web for the currently selected entries in a library.
  */
-public class ReferenceMetadataFetcher extends SimpleCommand {
+public class ReferenceMetadataFetcherAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcherAction.class);
 
     private static boolean USE_REFERENCE_METADATA_FETCHER_GOOGLE_SCHOLAR = true;
     private static boolean USE_REFERENCE_METADATA_FETCHER_SEMANTIC_SCHOLAR = true;
@@ -42,7 +42,7 @@ public class ReferenceMetadataFetcher extends SimpleCommand {
     private UndoManager undoManager;
     private TaskExecutor taskExecutor;
 
-    public ReferenceMetadataFetcher(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public ReferenceMetadataFetcherAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;

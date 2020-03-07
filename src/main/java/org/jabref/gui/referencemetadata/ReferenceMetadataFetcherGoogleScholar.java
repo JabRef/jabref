@@ -23,8 +23,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.websocket.JabRefWebsocketServer;
-import org.jabref.websocket.WsAction;
-import org.jabref.websocket.WsClientType;
+import org.jabref.websocket.WebSocketAction;
+import org.jabref.websocket.WebSocketClientType;
 import org.jabref.websocket.handlers.HandlerInfoGoogleScholarCitationCounts;
 
 import com.google.gson.JsonArray;
@@ -65,7 +65,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
 
         while (true) {
-            if (jabRefWebsocketServer.isWsClientWithGivenWsClientTypeRegistered(WsClientType.JABREF_BROWSER_EXTENSION)) {
+            if (jabRefWebsocketServer.isWebSocketClientWithGivenWebSocketClientTypeRegistered(WebSocketClientType.JABREF_BROWSER_EXTENSION)) {
                 break;
             }
             else {
@@ -160,8 +160,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
             synchronized (HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT) {
                 // submit request object
-                jabRefWebsocketServer.sendMessage(WsClientType.JABREF_BROWSER_EXTENSION,
-                        WsAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
+                jabRefWebsocketServer.sendMessage(WebSocketClientType.JABREF_BROWSER_EXTENSION,
+                        WebSocketAction.CMD_FETCH_GOOGLE_SCHOLAR_CITATION_COUNTS, requestObject);
 
                 // wait for response object
                 try {

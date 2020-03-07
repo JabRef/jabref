@@ -95,7 +95,7 @@ import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.protectedterms.ManageProtectedTermsAction;
 import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
-import org.jabref.gui.referencemetadata.ReferenceMetadataFetcher;
+import org.jabref.gui.referencemetadata.ReferenceMetadataFetcherAction;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -801,7 +801,7 @@ public class JabRefFrame extends BorderPane {
                 lookupIdentifiers,
                 factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new OldDatabaseCommandWrapper(Actions.DOWNLOAD_FULL_TEXT, this, stateManager)),
 
-                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcher(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
+                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcherAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
 
                 new SeparatorMenuItem(),
 

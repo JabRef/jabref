@@ -1,9 +1,9 @@
 package org.jabref.websocket.handlers;
 
 import org.jabref.websocket.JabRefWebsocketServer;
-import org.jabref.websocket.WsAction;
-import org.jabref.websocket.WsClientData;
-import org.jabref.websocket.WsClientType;
+import org.jabref.websocket.WebSocketAction;
+import org.jabref.websocket.WebSocketClientData;
+import org.jabref.websocket.WebSocketClientType;
 
 import com.google.gson.JsonObject;
 import org.java_websocket.WebSocket;
@@ -14,19 +14,19 @@ public class HandlerCmdRegister {
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerCmdRegister.class);
 
     public static void handler(WebSocket websocket, JsonObject messagePayload) {
-        String wsClientTypeString = messagePayload.get("wsClientType").getAsString();
+        String webSocketClientTypeString = messagePayload.get("webSocketClientType").getAsString();
 
-        if (WsClientType.isValidWsClientType(wsClientTypeString)) {
-            WsClientType wsClientType = WsClientType.getClientTypeFromString(wsClientTypeString);
-            websocket.<WsClientData>getAttachment().setWsClientType(wsClientType);
+        if (WebSocketClientType.isValidWebSocketClientType(webSocketClientTypeString)) {
+            WebSocketClientType webSocketClientType = WebSocketClientType.getClientTypeFromString(webSocketClientTypeString);
+            websocket.<WebSocketClientData>getAttachment().setWebSocketClientType(webSocketClientType);
         } else {
-            LOGGER.warn("[ws] invalid WsClientType: " + wsClientTypeString);
+            LOGGER.warn("[ws] invalid WebSocketClientType: " + webSocketClientTypeString);
 
             JsonObject messagePayloadForClient = new JsonObject();
             messagePayloadForClient.addProperty("messageType", "warning");
-            messagePayloadForClient.addProperty("message", "invalid WsClientType: " + wsClientTypeString);
+            messagePayloadForClient.addProperty("message", "invalid WebSocketClientType: " + webSocketClientTypeString);
 
-            JabRefWebsocketServer.getInstance().sendMessage(websocket, WsAction.INFO_MESSAGE, messagePayloadForClient);
+            JabRefWebsocketServer.getInstance().sendMessage(websocket, WebSocketAction.INFO_MESSAGE, messagePayloadForClient);
         }
     }
 }
