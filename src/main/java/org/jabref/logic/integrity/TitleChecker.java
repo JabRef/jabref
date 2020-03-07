@@ -24,11 +24,12 @@ public class TitleChecker implements ValueChecker {
     /**
      * Algorithm:
      * - remove everything that is in brackets
-     * - split the title into subTitles based on the delimiters
-     * - for each subTitle:
+     * - split the title into sub titles based on the delimiters
+     * (defined in the local variable DELIMITERS, currently . ! ? ; :)
+     * - for each sub title:
      * -    remove trailing whitespaces
      * -    ignore first letter as this can always be written in caps
-     * -    check if at least one capital letter is in the title
+     * -    check if at least one capital letter is in the sub title
      */
     @Override
     public Optional<String> checkValue(String value) {
@@ -49,15 +50,14 @@ public class TitleChecker implements ValueChecker {
             valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
         }
 
-        // Delimiters are . ! ? ; :
         String[] splitTitle = valueOnlySpacesWithinCurlyBraces.split(DELIMITERS);
         for (String subTitle : splitTitle) {
             subTitle = subTitle.trim();
-            if (subTitle.length() > 0) {
+            if (!subTitle.isEmpty()) {
                 subTitle = subTitle.substring(1);
-            }
-            if (HAS_CAPITAL_LETTERS.test(subTitle)) {
-                return Optional.of(Localization.lang("capital letters are not masked using curly brackets {}"));
+                if (HAS_CAPITAL_LETTERS.test(subTitle)) {
+                    return Optional.of(Localization.lang("capital letters are not masked using curly brackets {}"));
+                }
             }
         }
 
