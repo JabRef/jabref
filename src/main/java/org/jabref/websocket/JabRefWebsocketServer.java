@@ -74,10 +74,8 @@ public class JabRefWebsocketServer extends WebSocketServer {
              * run() is invoked, when JabRef gets terminated.
              */
             public void run() {
-                if (jabRefWebsocketServerSingleton != null) {
-                    if (jabRefWebsocketServerSingleton.isServerStarted()) {
-                        jabRefWebsocketServerSingleton.stopServer();
-                    }
+                if (jabRefWebsocketServerSingleton != null && jabRefWebsocketServerSingleton.isServerStarted()) {
+                    jabRefWebsocketServerSingleton.stopServer();
                 }
             }
         });
@@ -135,7 +133,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         while (true) {
             String input = systemIn.readLine();
 
-            if (input.equals("quit")) {
+            if ("quit".equals(input)) {
                 break;
             }
 
