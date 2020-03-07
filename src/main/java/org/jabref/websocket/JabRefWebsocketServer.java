@@ -23,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple, robust websocket server implementation for JabRef for bidirectional communication with arbitrarily many websocket clients
+ * A simple, robust websocket server implementation for JabRef for bidirectional communication with arbitrarily many
+ * websocket clients
  */
 public class JabRefWebsocketServer extends WebSocketServer {
     // internals
@@ -192,7 +193,8 @@ public class JabRefWebsocketServer extends WebSocketServer {
      * Checks if at least one websocket client is registered, which matches the given <code>WebSocketClientType</code>.
      *
      * @param webSocketClientType webSocketClientType of the websocket clients to search for
-     * @return <code>true</code>, if at least one websocket client with the given type is registered, or <code>false</code> otherwise
+     * @return <code>true</code>, if at least one websocket client with the given type is registered, or
+     * <code>false</code> otherwise
      */
     public boolean isWebSocketClientWithGivenWebSocketClientTypeRegistered(WebSocketClientType webSocketClientType) {
         for (WebSocket websocket : getConnections()) {
@@ -226,7 +228,8 @@ public class JabRefWebsocketServer extends WebSocketServer {
      * Checks if a websocket client is registered, which matches the given websocket's <code>uid</code>.
      *
      * @param webSocketUID webSocketUID of the websocket client to search for
-     * @return <code>true</code>, if a websocket client with the given uid is registered, or <code>false</code> otherwise
+     * @return <code>true</code>, if a websocket client with the given uid is registered, or <code>false</code>
+     * otherwise
      */
     public boolean isWebSocketClientWithGivenWebSocketUIDRegistered(String webSocketUID) {
         for (WebSocket websocket : getConnections()) {
@@ -311,8 +314,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             LOGGER.info("[ws] JabRefWebsocketServer is already starting");
 
             return false;
-        }
-        else if (serverStarted) {
+        } else if (serverStarted) {
             LOGGER.info("[ws] JabRefWebsocketServer has already been started");
 
             return false;

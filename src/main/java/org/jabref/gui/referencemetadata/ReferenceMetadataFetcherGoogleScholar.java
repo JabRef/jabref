@@ -54,8 +54,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
     /**
      * fetches reference metadata for the given entries
      *
-     * @param database database from which the given <code>entries</code> come from
-     * @param entries entries for which some reference metadata should be fetched
+     * @param database      database from which the given <code>entries</code> come from
+     * @param entries       entries for which some reference metadata should be fetched
      * @param dialogService dialog service which can be used for showing dialogs
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
@@ -67,8 +67,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
         while (true) {
             if (jabRefWebsocketServer.isWebSocketClientWithGivenWebSocketClientTypeRegistered(WebSocketClientType.JABREF_BROWSER_EXTENSION)) {
                 break;
-            }
-            else {
+            } else {
                 LOGGER.warn("JabRef cannot connect to the JabRef-Browser-Extension");
 
                 int result = showCustomDialogAndWait(dialogService, Alert.AlertType.ERROR,
@@ -241,8 +240,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 return true; // cancel fetching metadata
                             }
                         }
-                    }
-                    else if (_status_solvingCaptchaNeeded) {
+                    } else if (_status_solvingCaptchaNeeded) {
                         LOGGER.info("solving captcha needed: reference metadata could not be fetched, since " +
                                 "solving the captcha is needed");
 
@@ -257,13 +255,11 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         if (result == 1) {
                             retryFetchingMetadata = true; // retry fetching metadata
                             break;
-                        }
-                        else {
+                        } else {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return true; // cancel fetching metadata
                         }
-                    }
-                    else if (_status_tooManyRequests) {
+                    } else if (_status_tooManyRequests) {
                         LOGGER.info("too many requests: Google Scholar asks you to wait some time before " +
                                 "sending further requests");
 
@@ -276,8 +272,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                         if (result == 1) {
                             retryFetchingMetadata = true; // retry fetching metadata
                             break;
-                        }
-                        else {
+                        } else {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return true; // cancel fetching metadata
                         }
@@ -353,7 +348,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                 Platform.runLater(() -> {
                     dialogService.showInformationDialogAndWait(Localization.lang("Potentially Incomplete " +
-                            singularPluralChooser(numIncompleteItems, "Item", "Items") + " Found"),
+                                    singularPluralChooser(numIncompleteItems, "Item", "Items") + " Found"),
                             Localization.lang(content));
                 });
             }
@@ -373,13 +368,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
     }
 
     /**
-     * @param dialogService existing dialog service
-     * @param alertType type of alert
-     * @param title title
-     * @param content description
-     * @param buttonNameYes button for confirmation/continuation
+     * @param dialogService         existing dialog service
+     * @param alertType             type of alert
+     * @param title                 title
+     * @param content               description
+     * @param buttonNameYes         button for confirmation/continuation
      * @param ButtonNameCancelClose button for cancelling/skipping
-     *
      * @return returns <code>0</code> for "cancel" and  <code>1</code> for "retry/continue"
      */
     private int showCustomDialogAndWait(DialogService dialogService, Alert.AlertType alertType, String title, String content, String buttonNameYes, String ButtonNameCancelClose) {
@@ -421,8 +415,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
     public static String singularPluralChooser(int number, String singular, String plural) {
         if (number == 1) {
             return singular;
-        }
-        else {
+        } else {
             return plural;
         }
     }

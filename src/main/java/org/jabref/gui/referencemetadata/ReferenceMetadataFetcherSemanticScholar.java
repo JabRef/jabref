@@ -38,8 +38,8 @@ public class ReferenceMetadataFetcherSemanticScholar {
     /**
      * fetches reference metadata for the given entries
      *
-     * @param database database from which the given <code>entries</code> come from
-     * @param entries entries for which some reference metadata should be fetched
+     * @param database      database from which the given <code>entries</code> come from
+     * @param entries       entries for which some reference metadata should be fetched
      * @param dialogService dialog service which can be used for showing dialogs
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
@@ -77,13 +77,11 @@ public class ReferenceMetadataFetcherSemanticScholar {
 
                     // set (updated) entry data (citation count)
                     entry.setField(InternalField.CITATION_COUNT, citationCount);
-                }
-                else {
+                } else {
                     entriesWithIncompleteMetadata.add(entry);
                     LOGGER.info("reference with citation key \"" + citationKey + "\" does not have the required metadata");
                 }
-            }
-            else {
+            } else {
                 entriesWithIncompleteMetadata.add(entry);
                 LOGGER.info("skipping reference with citation key \"" + citationKey + "\", since it does not have a DOI");
             }

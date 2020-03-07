@@ -26,7 +26,8 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
- * This class allows fetching the reference metadata (e.g. citation counts) from the web for the currently selected entries in a library.
+ * This class allows fetching the reference metadata (e.g. citation counts) from the web for the currently selected
+ * entries in a library.
  */
 public class ReferenceMetadataFetcherAction extends SimpleCommand {
 
@@ -96,8 +97,7 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
 
                 if (!processCancelled) {
                     return entries;
-                }
-                else {
+                } else {
                     return new LinkedList<BibEntry>();
                 }
             }
