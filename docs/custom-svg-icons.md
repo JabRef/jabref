@@ -4,7 +4,7 @@ JabRef uses [Material Design Icons](https://materialdesignicons.com/) for most b
 
 ![toolbar](http://i.imgur.com/KlyYrNn.png)
 
-This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a *true type font* (TTF) to fit seamlessly into the JabRef framework. Already existing custom icons will be published (link is coming soon) as they need to be repacked as well.
+This tutorial aims to describe the process of adding missing icons created in a vector drawing tool like Adobe Illustrator and packing them into a _true type font_ \(TTF\) to fit seamlessly into the JabRef framework. Already existing custom icons will be published \(link is coming soon\) as they need to be repacked as well.
 
 The process consists of 5 steps:
 
@@ -20,7 +20,7 @@ Good icon design requires years of experience and cannot be covered here. Adapti
 
 ## Step 2. Packing the icons into a font
 
-Use the [IcoMoon](https://icomoon.io) tool for packing the icons. Create a new set and import *all* icons. Rearrange them so that they have the same order as in `org.jabref.gui.JabRefMaterialDesignIcon`. This will avoid that you have to change the code points for the existing glyphs. In the settings for your icon set, set the *Grid* to 24. This is important to get the correct spacing. The name of the font is `JabRefMaterialDesign`. When your icon-set is ready, select all of them and download the font-package.
+Use the [IcoMoon](https://icomoon.io) tool for packing the icons. Create a new set and import _all_ icons. Rearrange them so that they have the same order as in `org.jabref.gui.JabRefMaterialDesignIcon`. This will avoid that you have to change the code points for the existing glyphs. In the settings for your icon set, set the _Grid_ to 24. This is important to get the correct spacing. The name of the font is `JabRefMaterialDesign`. When your icon-set is ready, select all of them and download the font-package.
 
 ## Step 3. Replace the existing `JabRefMaterialDesign.ttf`
 
@@ -28,7 +28,7 @@ Unpack the downloaded font-package and copy the `.ttf` file under `fonts` to `sr
 
 ## Step 4. Adapt the class `org.jabref.gui.JabRefMaterialDesignIcon`
 
-Inside the font-package will be a CSS file that specifies which icon (glyph) is at which code point. If you have ordered them correctly, you newly designed icon(s) will be at the end and you can simply append them to `org.jabref.gui.JabRefMaterialDesignIcon`:
+Inside the font-package will be a CSS file that specifies which icon \(glyph\) is at which code point. If you have ordered them correctly, you newly designed icon\(s\) will be at the end and you can simply append them to `org.jabref.gui.JabRefMaterialDesignIcon`:
 
 ```java
     TEX_STUDIO("\ue900"),
@@ -43,8 +43,9 @@ Inside the font-package will be a CSS file that specifies which icon (glyph) is 
 
 ## Step 5. Adapt the class `org.jabref.gui.IconTheme`
 
-If you added an icon that already existed (but not as flat Material Design Icon), then you need to change the appropriate line in `org.jabref.gui.IconTheme`, where the icon is assigned. If you created a new one, then you need to add a line. You can specify the icon like this:
+If you added an icon that already existed \(but not as flat Material Design Icon\), then you need to change the appropriate line in `org.jabref.gui.IconTheme`, where the icon is assigned. If you created a new one, then you need to add a line. You can specify the icon like this:
 
 ```java
 APPLICATION_EMACS(JabRefMaterialDesignIcon.EMACS)
 ```
+
