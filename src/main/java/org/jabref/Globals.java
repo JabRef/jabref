@@ -28,7 +28,6 @@ import org.jabref.websocket.JabRefWebsocketServer;
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
-import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 import kong.unirest.Unirest;
 
@@ -108,9 +107,6 @@ public class Globals {
         getTelemetryClient().ifPresent(client -> {
             client.trackSessionState(SessionState.End);
             client.flush();
-
-            //FIXME: Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
-            SDKShutdownActivity.INSTANCE.stopAll();
         });
     }
 

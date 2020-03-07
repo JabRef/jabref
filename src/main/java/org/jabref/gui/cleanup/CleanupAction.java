@@ -4,49 +4,66 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.CleanupWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
-public class CleanupAction implements BaseAction {
+public class CleanupAction extends SimpleCommand {
 
-    private final BasePanel panel;
+    private final JabRefFrame frame;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
-    private final TaskExecutor taskExecutor;
+    private final StateManager stateManager;
 
     private boolean isCanceled;
     private int modifiedEntriesCount;
-    private final JabRefPreferences preferences;
 
-    public CleanupAction(BasePanel panel, JabRefPreferences preferences, TaskExecutor taskExecutor) {
-        this.panel = panel;
+    public CleanupAction(JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService, StateManager stateManager) {
+        this.frame = frame;
         this.preferences = preferences;
-        this.dialogService = panel.frame().getDialogService();
-        this.taskExecutor = taskExecutor;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
-    public void action() {
-        init();
-        if (isCanceled) {
+    public void execute() {
+        if (stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
-        CleanupDialog cleanupDialog = new CleanupDialog(panel.getBibDatabaseContext(), preferences.getCleanupPreset(), preferences.getFilePreferences());
 
-        Optional<CleanupPreset> chosenPreset = cleanupDialog.showAndWait();
+        if (stateManager.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
+            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
+            return;
+        }
 
-        if (chosenPreset.isPresent()) {
-            if (chosenPreset.get().isRenamePDFActive() && preferences.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+        dialogService.notify(Localization.lang("Doing a cleanup for %0 entries...",
+                Integer.toString(stateManager.getSelectedEntries().size())));
+
+        isCanceled = false;
+        modifiedEntriesCount = 0;
+
+        Optional<CleanupPreset> chosenPreset = new CleanupDialog(
+                stateManager.getActiveDatabase().get(),
+                preferences.getCleanupPreset(),
+                preferences.getFilePreferences()).showAndWait();
+
+        chosenPreset.ifPresent(preset -> {
+            if (preset.isRenamePDFActive() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
                 boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                         Localization.lang("Autogenerate PDF Names"),
@@ -60,38 +77,24 @@ public class CleanupAction implements BaseAction {
                 }
             }
 
-            preferences.setCleanupPreset(chosenPreset.get());
+            preferences.setCleanupPreset(preset);
 
-            BackgroundTask.wrap(() -> cleanup(chosenPreset.get()))
+            BackgroundTask.wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                           .onSuccess(result -> showResults())
-                          .executeWith(taskExecutor);
-        }
-    }
-
-    public void init() {
-        isCanceled = false;
-        modifiedEntriesCount = 0;
-        if (panel.getSelectedEntries().isEmpty()) { // None selected. Inform the user to select entries first.
-            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up."));
-            isCanceled = true;
-            return;
-        }
-        dialogService.notify(Localization.lang("Doing a cleanup for %0 entries...",
-                Integer.toString(panel.getSelectedEntries().size())));
+                          .executeWith(Globals.TASK_EXECUTOR);
+        });
     }
 
     /**
      * Runs the cleanup on the entry and records the change.
      */
-    private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
+    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
-        CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
-                Globals.journalAbbreviationLoader));
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+        CleanupWorker cleaner = new CleanupWorker(
+                databaseContext,
+                preferences.getCleanupPreferences(Globals.journalAbbreviationLoader));
 
-        if (changes.isEmpty()) {
-            return;
-        }
+        List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         // Register undo action
         for (FieldChange change : changes) {
@@ -105,37 +108,32 @@ public class CleanupAction implements BaseAction {
         }
 
         if (modifiedEntriesCount > 0) {
-            panel.updateEntryEditorIfShowing();
-            panel.markBaseChanged();
+            frame.getCurrentBasePanel().updateEntryEditorIfShowing();
+            frame.getCurrentBasePanel().markBaseChanged();
         }
-        String message;
-        switch (modifiedEntriesCount) {
-            case 0:
-                message = Localization.lang("No entry needed a clean up");
-                break;
-            case 1:
-                message = Localization.lang("One entry needed a clean up");
-                break;
-            default:
-                message = Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
-                break;
+
+        if (modifiedEntriesCount == 0) {
+            dialogService.notify(Localization.lang("No entry needed a clean up"));
+        } else if (modifiedEntriesCount == 1) {
+            dialogService.notify(Localization.lang("One entry needed a clean up"));
+        } else {
+            dialogService.notify(Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount)));
         }
-        dialogService.notify(message);
     }
 
-    private void cleanup(CleanupPreset cleanupPreset) {
+    private void cleanup(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
         preferences.setCleanupPreset(cleanupPreset);
 
-        for (BibEntry entry : panel.getSelectedEntries()) {
+        for (BibEntry entry : stateManager.getSelectedEntries()) {
             // undo granularity is on entry level
             NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
-            doCleanup(cleanupPreset, entry, ce);
+            doCleanup(databaseContext, cleanupPreset, entry, ce);
 
             ce.end();
             if (ce.hasEdits()) {
                 modifiedEntriesCount++;
-                panel.getUndoManager().addEdit(ce);
+                frame.getUndoManager().addEdit(ce);
             }
         }
     }

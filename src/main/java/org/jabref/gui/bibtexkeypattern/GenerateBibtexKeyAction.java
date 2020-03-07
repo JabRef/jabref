@@ -3,9 +3,11 @@ package org.jabref.gui.bibtexkeypattern;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
@@ -14,27 +16,38 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class GenerateBibtexKeyAction implements BaseAction {
+public class GenerateBibtexKeyAction extends SimpleCommand {
 
+    private final JabRefFrame frame;
     private final DialogService dialogService;
-    private final BasePanel basePanel;
+    private final StateManager stateManager;
+
     private List<BibEntry> entries;
     private boolean isCanceled;
 
-    public GenerateBibtexKeyAction(BasePanel basePanel, DialogService dialogService) {
-        this.basePanel = basePanel;
+    public GenerateBibtexKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+        this.frame = frame;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
-    public void init() {
-        entries = basePanel.getSelectedEntries();
+    @Override
+    public void execute() {
+        entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
             dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate BibTeX keys"),
-                                                   Localization.lang("First select the entries you want keys to be generated for."));
+                    Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
         dialogService.notify(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
+
+        checkOverwriteKeysChosen();
+
+        BackgroundTask.wrap(this::generateKeys)
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
@@ -73,34 +86,29 @@ public class GenerateBibtexKeyAction implements BaseAction {
         if (isCanceled) {
             return;
         }
-        // generate the new cite keys for each entry
-        final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-        BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
-        for (BibEntry entry : entries) {
-            keyGenerator.generateAndSetKey(entry)
-                        .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
-        }
-        compound.end();
 
-        // register the undo event only if new cite keys were generated
-        if (compound.hasEdits()) {
-            basePanel.getUndoManager().addEdit(compound);
-        }
+        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+            // generate the new cite keys for each entry
+            final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
+            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(databaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
+            for (BibEntry entry : entries) {
+                keyGenerator.generateAndSetKey(entry)
+                            .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
+            }
+            compound.end();
 
-        basePanel.markBaseChanged();
-        dialogService.notify(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
+            // register the undo event only if new cite keys were generated
+            if (compound.hasEdits()) {
+                frame.getUndoManager().addEdit(compound);
+            }
+
+            frame.getCurrentBasePanel().markBaseChanged();
+            dialogService.notify(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
+        });
     }
 
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
                              (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
-    }
-
-    @Override
-    public void action() {
-        init();
-        checkOverwriteKeysChosen();
-        BackgroundTask.wrap(this::generateKeys)
-                      .executeWith(Globals.TASK_EXECUTOR);
     }
 }

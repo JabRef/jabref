@@ -85,7 +85,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                                                       panel.showAndEdit(entry.getEntry());
                                                                   }
                                                               })
-                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService()))
+                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService(), Globals.stateManager, Globals.prefs))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
