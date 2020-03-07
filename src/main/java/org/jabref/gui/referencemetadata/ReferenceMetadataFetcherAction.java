@@ -63,7 +63,7 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Fetch reference metadata"));
 
-        ExtTask<List<BibEntry>> fetchReferenceMetadataTask = new ExtTask<List<BibEntry>>() {
+        ExtendedTask<List<BibEntry>> fetchReferenceMetadataTask = new ExtendedTask<List<BibEntry>>() {
 
             @Override
             protected List<BibEntry> call() {

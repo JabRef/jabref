@@ -54,12 +54,13 @@ public class ReferenceMetadataFetcherGoogleScholar {
     /**
      * fetches reference metadata for the given entries
      *
-     * @param database      database from which the given <code>entries</code> come from
-     * @param entries       entries for which some reference metadata should be fetched
-     * @param dialogService dialog service which can be used for showing dialogs
+     * @param database                   database from which the given <code>entries</code> come from
+     * @param entries                    entries for which some reference metadata should be fetched
+     * @param dialogService              dialog service which can be used for showing dialogs
+     * @param fetchReferenceMetadataTask general task for fetching reference metadata
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
-    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService, ExtTask<List<BibEntry>> fetchReferenceMetadataTask) {
+    public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService, ExtendedTask<List<BibEntry>> fetchReferenceMetadataTask) {
         fetchReferenceMetadataTask.updateMessage("Fetching data from Google Scholar...");
 
         JabRefWebsocketServer jabRefWebsocketServer = JabRefWebsocketServer.getInstance();
