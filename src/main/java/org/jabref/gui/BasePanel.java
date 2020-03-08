@@ -504,7 +504,9 @@ public class BasePanel extends StackPane {
      */
     private void clearAndSelectFirst() {
         mainTable.clearAndSelectFirst();
-        showAndEdit(mainTable.getSelectedEntries().get(0));
+        if (!mainTable.getSelectedEntries().isEmpty()) {
+            showAndEdit(mainTable.getSelectedEntries().get(0));
+        }
     }
 
     public void selectPreviousEntry() {
