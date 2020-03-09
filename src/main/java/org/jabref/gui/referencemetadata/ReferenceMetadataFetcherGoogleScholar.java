@@ -72,13 +72,13 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 LOGGER.warn("JabRef cannot connect to the JabRef-Browser-Extension");
 
                 int result = showCustomDialogAndWait(dialogService, Alert.AlertType.ERROR,
-                        "JabRef-Browser-Extension Required",
-                        "JabRef cannot connect to the JabRef-Browser-Extension.\n\nIn order to use this " +
-                                "functionality, please make sure that a web browser is running, where the " +
-                                "JabRef-Browser-Extension is installed. Furthermore, a Internet connection is " +
-                                "required in order to fetch metadata online.",
-                        "Retry",
-                        "Cancel");
+                        Localization.lang("JabRef-Browser-Extension Required"),
+                        Localization.lang("JabRef cannot connect to the JabRef-Browser-Extension.") + "\n\n" +
+                                Localization.lang("In order to use this functionality, please make sure that a " +
+                                        "web browser is running, where the JabRef-Browser-Extension is installed. " +
+                                        "Furthermore, a Internet connection is required in order to fetch metadata online."),
+                        Localization.lang("Retry"),
+                        Localization.lang("Cancel"));
 
                 if (result != 1) {
                     entriesWithIncompleteMetadata.addAll(entries);
@@ -225,14 +225,15 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                         if (SHOW_EVERY_POTENTIALLY_INCOMPLETE_ENTRY_INTERACTIVELY) {
                             int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
-                                    "Potentially Incomplete Item Found",
-                                    "No metadata could be fetched for the following reference, since it " +
-                                            "doesn't have sufficient information for reliably fetching it (DOI or " +
-                                            "title and author(s) are needed).\n\nCitation Key: \"" + key +
-                                            "\"\nItem Title: \"" + title + "\"\n\nIn some cases, like references of " +
-                                            "web pages, this is usually fine.",
-                                    "Skip and continue",
-                                    "Cancel");
+                                    Localization.lang("Potentially Incomplete Item Found"),
+                                    Localization.lang("No metadata could be fetched for the following " +
+                                            "reference, since it doesn't have sufficient information for reliably " +
+                                            "fetching it (DOI or title and author(s) are needed).") + "\n\n" +
+                                            Localization.lang("Citation Key:") + " \"" + key + "\"\n" +
+                                            Localization.lang("Item Title:") + " \"" + title + "\"\n\n" +
+                                            Localization.lang("In some cases, like references of web pages, this is usually fine."),
+                                    Localization.lang("Skip and continue"),
+                                    Localization.lang("Cancel"));
 
                             if (result == 1) {
                                 // skip and continue process
@@ -246,12 +247,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 "solving the captcha is needed");
 
                         int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
-                                "Solving Capcha Needed",
-                                "Please show Google Scholar, that you are not a robot, by opening the link \n\n" +
-                                        "https://scholar.google.com/scholar?q=google \n\nand solving the shown captcha, " +
-                                        "otherwise the reference metadata cannot be fetched.",
-                                "Continue",
-                                "Cancel");
+                                Localization.lang("Solving Captcha Needed"),
+                                Localization.lang("Please show Google Scholar, that you are not a robot, by opening the link") + "\n\n" +
+                                        "https://scholar.google.com/scholar?q=google \n\n" +
+                                        Localization.lang("and solving the shown captcha, otherwise the reference metadata cannot be fetched."),
+                                Localization.lang("Continue"),
+                                Localization.lang("Cancel"));
 
                         if (result == 1) {
                             retryFetchingMetadata = true; // retry fetching metadata
@@ -265,10 +266,10 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 "sending further requests");
 
                         int result = showCustomDialogAndWait(dialogService, Alert.AlertType.INFORMATION,
-                                "Too Many Requests",
-                                "Google Scholar asks you to wait some time before sending further requests.",
-                                "Continue",
-                                "Cancel");
+                                Localization.lang("Too Many Requests"),
+                                Localization.lang("Google Scholar asks you to wait some time before sending further requests."),
+                                Localization.lang("Continue"),
+                                Localization.lang("Cancel"));
 
                         if (result == 1) {
                             retryFetchingMetadata = true; // retry fetching metadata
@@ -338,19 +339,20 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     keysString.append("\"" + incompleteItem.getKey() + "\"");
                 }
 
-                String content = "For " + numIncompleteItems + " " +
-                        singularPluralChooser(numIncompleteItems, "reference", "references") +
-                        " no metadata could be fetched, since " +
-                        singularPluralChooser(numIncompleteItems, "it doesn't", "they don't") +
-                        " have sufficient information for reliably fetching it (DOI or title and author(s) are needed).\n" +
-                        "The citation " + singularPluralChooser(numIncompleteItems, "key", "keys") + " of the affected " +
-                        singularPluralChooser(numIncompleteItems, "reference is", "references are") + ":\n\n" +
-                        keysString.toString() + "\n\n" + "In some cases, like references of web pages, this is usually fine.\n";
+                String content = Localization.lang("For") + " " + numIncompleteItems + " " +
+                        singularPluralChooser(numIncompleteItems, Localization.lang("reference"), Localization.lang("references")) +
+                        " " + Localization.lang("no metadata could be fetched, since") + " " +
+                        singularPluralChooser(numIncompleteItems, Localization.lang("it doesn't"), Localization.lang("they don't")) + " " +
+                        Localization.lang("have sufficient information for reliably fetching it (DOI or title and author(s) are needed).") + "\n" +
+                        Localization.lang("The citation") + " " + singularPluralChooser(numIncompleteItems, Localization.lang("key"), Localization.lang("keys")) +
+                        " " + Localization.lang("of the affected") + " " +
+                        singularPluralChooser(numIncompleteItems, Localization.lang("reference is"), Localization.lang("references are")) + ":\n\n" +
+                        keysString.toString() + "\n\n" + Localization.lang("In some cases, like references of web pages, this is usually fine.") + "\n";
 
                 Platform.runLater(() -> {
-                    dialogService.showInformationDialogAndWait(Localization.lang("Potentially Incomplete " +
-                                    singularPluralChooser(numIncompleteItems, "Item", "Items") + " Found"),
-                            Localization.lang(content));
+                    dialogService.showInformationDialogAndWait(Localization.lang("Potentially Incomplete") + " " +
+                                    singularPluralChooser(numIncompleteItems, Localization.lang("Item"), Localization.lang("Items")) + " " + Localization.lang("Found"),
+                            content);
                 });
             }
         }
@@ -380,14 +382,11 @@ public class ReferenceMetadataFetcherGoogleScholar {
     private int showCustomDialogAndWait(DialogService dialogService, Alert.AlertType alertType, String title, String content, String buttonNameYes, String ButtonNameCancelClose) {
         synchronized (ATOMIC_INTEGER_DIALOG_RESULT) {
             Platform.runLater(() -> {
-                ButtonType buttonYes = new ButtonType(Localization.lang(buttonNameYes), ButtonBar.ButtonData.YES);
-                ButtonType buttonCancelClose = new ButtonType(Localization.lang(ButtonNameCancelClose), ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonType buttonYes = new ButtonType(buttonNameYes, ButtonBar.ButtonData.YES);
+                ButtonType buttonCancelClose = new ButtonType(ButtonNameCancelClose, ButtonBar.ButtonData.CANCEL_CLOSE);
 
-                Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(alertType,
-                        Localization.lang(title),
-                        Localization.lang(content),
-                        buttonYes,
-                        buttonCancelClose);
+                Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(alertType, title, content,
+                        buttonYes, buttonCancelClose);
 
                 synchronized (ATOMIC_INTEGER_DIALOG_RESULT) {
                     if (answer.isPresent()) {
