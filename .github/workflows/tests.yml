@@ -13,10 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -42,10 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -89,10 +83,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -138,10 +129,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -185,10 +173,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
