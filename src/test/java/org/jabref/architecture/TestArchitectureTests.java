@@ -28,6 +28,7 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
     private static final String CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST = "LinkedFileViewModelTest";
     private static final String CLASS_ORG_JABREF_SCREENSHOTS_TEST = "Screenshots";
+    private static final String CLASS_ORG_JABREF_SCREENSHOT_DARK_THEME_TEST = "ScreenshotDarkTheme";
 
     private final List<String> exceptions;
 
@@ -41,7 +42,8 @@ public class TestArchitectureTests {
                 CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST,
                 CLASS_ORG_JABREF_ENTRY_EDITOR_TEST,
                 CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST,
-                CLASS_ORG_JABREF_SCREENSHOTS_TEST);
+                CLASS_ORG_JABREF_SCREENSHOTS_TEST,
+                CLASS_ORG_JABREF_SCREENSHOT_DARK_THEME_TEST);
     }
 
     public static Stream<String> forbiddenPackages() {

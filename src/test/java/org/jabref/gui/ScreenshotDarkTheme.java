@@ -16,7 +16,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -27,11 +26,14 @@ import org.testfx.framework.junit5.Start;
 import org.testfx.framework.junit5.Stop;
 import org.testfx.util.DebugUtils;
 
+/**
+ * JabRef requires a restart to apply the dark theme. Thus, screenshotting is is implemented in a separate class
+ */
 @GUITest
 @ExtendWith(ApplicationExtension.class)
-class Screenshots {
+class ScreenshotDarkTheme {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Screenshots.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotDarkTheme.class);
     final static Path root = Path.of("build/screenshots").toAbsolutePath();
 
     @BeforeAll
@@ -45,7 +47,7 @@ class Screenshots {
     public void onStart(Stage stage) throws JabRefException {
         final JabRefPreferences preferences = JabRefPreferences.getInstance();
         Globals.prefs = preferences;
-        Globals.prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+        Globals.prefs.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
         preferences.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, false);
         preferences.putDouble(JabRefPreferences.POS_X, 0);
         preferences.putDouble(JabRefPreferences.POS_Y, 0);
@@ -62,15 +64,6 @@ class Screenshots {
     }
 
     @Test
-    @Order(1)
-    void screenshotMainMenu() {
-        StringBuilder stringBuilder = new StringBuilder();
-        DebugUtils.saveScreenshot(() -> root.resolve("main-empty.png"), "").apply(stringBuilder);
-        LOGGER.debug(stringBuilder.toString());
-    }
-
-    @Test
-    @Order(2)
     void screenshotOpenedDatabase(FxRobot robot) throws Exception {
         StringBuilder stringBuilder = new StringBuilder();
         Path jabrefAuthorsBib = Path.of("src/test/resources/testbib/jabref-authors.bib");
@@ -79,7 +72,7 @@ class Screenshots {
         JabRefGUI.getMainFrame().getOpenDatabaseAction().openFile(jabrefAuthorsBib, true);
         // give database some time load
         robot.interrupt(100);
-        DebugUtils.saveScreenshot(() -> root.resolve("opened-database.png"), "").apply(stringBuilder);
+        DebugUtils.saveScreenshot(() -> root.resolve("opened-database-dark-theme.png"), "").apply(stringBuilder);
         LOGGER.debug(stringBuilder.toString());
     }
 }
