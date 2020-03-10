@@ -276,7 +276,7 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private Void showTrackingNotification() {
+    private void showTrackingNotification() {
         if (!Globals.prefs.shouldCollectTelemetry()) {
             boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
@@ -287,13 +287,10 @@ public class JabRefFrame extends BorderPane {
         }
 
         Globals.prefs.askedToCollectTelemetry();
-
-        return null;
     }
 
     public void refreshTitleAndTabs() {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-
             setWindowTitle();
             updateAllTabTitles();
         });
@@ -326,22 +323,6 @@ public class JabRefFrame extends BorderPane {
             //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
             //        + Localization.lang("shared") + "]" + modeInfo);
         }
-    }
-
-    /**
-     * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
-     */
-    public void openAction(String filePath) {
-        Path file = Paths.get(filePath);
-        // all the logic is done in openIt. Even raising an existing panel
-        getOpenDatabaseAction().openFile(file, true);
-    }
-
-    /**
-     * The MacAdapter calls this method when "About" is selected from the application menu.
-     */
-    public void about() {
-        HelpAction.getMainHelpPageCommand().execute();
     }
 
     public JabRefPreferences prefs() {
