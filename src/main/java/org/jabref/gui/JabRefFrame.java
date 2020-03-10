@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -143,14 +142,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The main window of the application.
+ * The main window of JabRef's UI
  */
 public class JabRefFrame extends BorderPane {
 
-    // Frame titles.
-    public static final String FRAME_TITLE = "JabRef";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+
+    public static final String FRAME_TITLE = "JabRef";
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
