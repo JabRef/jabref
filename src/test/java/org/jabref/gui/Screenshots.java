@@ -32,12 +32,12 @@ import org.testfx.util.DebugUtils;
 class Screenshots {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Screenshots.class);
-    final static Path root = Path.of("build/screenshots").toAbsolutePath();
+    private static final Path ROOT = Path.of("build/screenshots").toAbsolutePath();
 
     @BeforeAll
     static void createDirectory() throws IOException {
-        if (!Files.exists(root)) {
-            Files.createDirectory(root);
+        if (!Files.exists(ROOT)) {
+            Files.createDirectory(ROOT);
         }
     }
 
@@ -65,7 +65,7 @@ class Screenshots {
     @Order(1)
     void screenshotMainMenu() {
         StringBuilder stringBuilder = new StringBuilder();
-        DebugUtils.saveScreenshot(() -> root.resolve("main-empty.png"), "").apply(stringBuilder);
+        DebugUtils.saveScreenshot(() -> ROOT.resolve("main-empty.png"), "").apply(stringBuilder);
         LOGGER.debug(stringBuilder.toString());
     }
 
@@ -79,7 +79,7 @@ class Screenshots {
         JabRefGUI.getMainFrame().getOpenDatabaseAction().openFile(jabrefAuthorsBib, true);
         // give database some time load
         robot.interrupt(100);
-        DebugUtils.saveScreenshot(() -> root.resolve("opened-database.png"), "").apply(stringBuilder);
+        DebugUtils.saveScreenshot(() -> ROOT.resolve("opened-database.png"), "").apply(stringBuilder);
         LOGGER.debug(stringBuilder.toString());
     }
 }

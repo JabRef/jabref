@@ -34,12 +34,12 @@ import org.testfx.util.DebugUtils;
 class ScreenshotDarkTheme {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScreenshotDarkTheme.class);
-    final static Path root = Path.of("build/screenshots").toAbsolutePath();
+    private static final Path ROOT = Path.of("build/screenshots").toAbsolutePath();
 
     @BeforeAll
     static void createDirectory() throws IOException {
-        if (!Files.exists(root)) {
-            Files.createDirectory(root);
+        if (!Files.exists(ROOT)) {
+            Files.createDirectory(ROOT);
         }
     }
 
@@ -72,7 +72,7 @@ class ScreenshotDarkTheme {
         JabRefGUI.getMainFrame().getOpenDatabaseAction().openFile(jabrefAuthorsBib, true);
         // give database some time load
         robot.interrupt(100);
-        DebugUtils.saveScreenshot(() -> root.resolve("opened-database-dark-theme.png"), "").apply(stringBuilder);
+        DebugUtils.saveScreenshot(() -> ROOT.resolve("opened-database-dark-theme.png"), "").apply(stringBuilder);
         LOGGER.debug(stringBuilder.toString());
     }
 }

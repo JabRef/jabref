@@ -146,9 +146,9 @@ import org.slf4j.LoggerFactory;
  */
 public class JabRefFrame extends BorderPane {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
-
     public static final String FRAME_TITLE = "JabRef";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
