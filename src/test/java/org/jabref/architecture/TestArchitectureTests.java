@@ -27,32 +27,29 @@ public class TestArchitectureTests {
     private static final String CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST = "UpdateTimestampListenerTest";
     private static final String CLASS_ORG_JABREF_ENTRY_EDITOR_TEST = "EntryEditorTest";
     private static final String CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST = "LinkedFileViewModelTest";
+    private static final String CLASS_ORG_JABREF_SCREENSHOTS_TEST = "Screenshots";
 
     private final List<String> exceptions;
 
     public TestArchitectureTests() {
-
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
-        exceptions = new ArrayList<>();
-        exceptions.add(CLASS_ORG_JABREF_PREFERENCES_TEST);
-        exceptions.add(CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST);
-        exceptions.add(CLASS_ORG_JABREF_SAVE_DATABASE_ACTION_TEST);
-        exceptions.add(CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST);
-        exceptions.add(CLASS_ORG_JABREF_ENTRY_EDITOR_TEST);
-        exceptions.add(CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST);
+        exceptions = List.of(
+                CLASS_ORG_JABREF_PREFERENCES_TEST,
+                CLASS_ORG_JABREF_PREFERENCES_MIGRATIONS_TEST,
+                CLASS_ORG_JABREF_SAVE_DATABASE_ACTION_TEST,
+                CLASS_ORG_JABREF_UPDATE_TIMESTAMP_LISTENER_TEST,
+                CLASS_ORG_JABREF_ENTRY_EDITOR_TEST,
+                CLASS_ORG_JABREF_LINKED_FILE_VIEW_MODEL_TEST,
+                CLASS_ORG_JABREF_SCREENSHOTS_TEST);
     }
 
-    public static Stream<String[]> data() {
-        return Stream.of(
-                new String[][]{
-                        {CLASS_ORG_JABREF_PREFERENCES},
-                        {CLASS_ORG_JABREF_GLOBALS}
-                });
+    public static Stream<String> forbiddenPackages() {
+        return Stream.of(CLASS_ORG_JABREF_PREFERENCES, CLASS_ORG_JABREF_GLOBALS);
     }
 
     @ParameterizedTest
-    @MethodSource("data")
+    @MethodSource("forbiddenPackages")
     public void testsAreIndependent(String forbiddenPackage) throws IOException {
         Predicate<String> isForbiddenPackage = (s) -> s.startsWith("import " + forbiddenPackage);
         Predicate<String> isExceptionClass = (s) -> exceptions.stream().anyMatch(exception -> s.startsWith("class " + exception));

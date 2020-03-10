@@ -36,7 +36,7 @@ import org.testfx.util.DebugUtils;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
-public class Screenshots {
+class Screenshots {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Screenshots.class);
     final static Path root = Path.of("build/screenshots").toAbsolutePath();
