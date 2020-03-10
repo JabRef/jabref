@@ -229,8 +229,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                     Localization.lang("No metadata could be fetched for the following " +
                                             "reference, since it doesn't have sufficient information for reliably " +
                                             "fetching it (DOI or title and author(s) are needed).") + "\n\n" +
-                                            Localization.lang("Citation Key:") + " \"" + key + "\"\n" +
-                                            Localization.lang("Item Title:") + " \"" + title + "\"\n\n" +
+                                            Localization.lang("Citation Key") + ": \"" + key + "\"\n" +
+                                            Localization.lang("Item Title") + ": \"" + title + "\"\n\n" +
                                             Localization.lang("In some cases, like references of web pages, this is usually fine."),
                                     Localization.lang("Skip and continue"),
                                     Localization.lang("Cancel"));
