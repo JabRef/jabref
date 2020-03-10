@@ -193,7 +193,7 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Update test coverage metrics
-        run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
+        run: xvfb-run --server-args="-screen 0 1024x768x24" --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
           CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
