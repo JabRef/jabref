@@ -339,19 +339,21 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     keysString.append("\"" + incompleteItem.getKey() + "\"");
                 }
 
-                String content = Localization.lang("For") + " " + numIncompleteItems + " " +
-                        singularPluralChooser(numIncompleteItems, Localization.lang("reference"), Localization.lang("references")) +
-                        " " + Localization.lang("no metadata could be fetched, since") + " " +
-                        singularPluralChooser(numIncompleteItems, Localization.lang("it doesn't"), Localization.lang("they don't")) + " " +
-                        Localization.lang("have sufficient information for reliably fetching it (DOI or title and author(s) are needed).") + "\n" +
-                        Localization.lang("The citation") + " " + singularPluralChooser(numIncompleteItems, Localization.lang("key"), Localization.lang("keys")) +
-                        " " + Localization.lang("of the affected") + " " +
-                        singularPluralChooser(numIncompleteItems, Localization.lang("reference is"), Localization.lang("references are")) + ":\n\n" +
-                        keysString.toString() + "\n\n" + Localization.lang("In some cases, like references of web pages, this is usually fine.") + "\n";
+                String content = Localization.lang("For %0 %1 no metadata could be fetched, since %2 have " +
+                                "sufficient information for reliably fetching it (DOI or title and author(s) are needed).",
+                        Integer.toString(numIncompleteItems),
+                        singularPluralChooser(numIncompleteItems, Localization.lang("reference"), Localization.lang("references")),
+                        singularPluralChooser(numIncompleteItems, Localization.lang("it doesn't"), Localization.lang("they don't"))) + "\n" +
+                        Localization.lang("The citation %0 of the affected %1",
+                                singularPluralChooser(numIncompleteItems, Localization.lang("key"), Localization.lang("keys")),
+                                singularPluralChooser(numIncompleteItems, Localization.lang("reference is"), Localization.lang("references are"))) + ":\n\n" +
+                        keysString.toString() + "\n\n" +
+                        Localization.lang("In some cases, like references of web pages, this is usually fine.") + "\n";
 
                 Platform.runLater(() -> {
-                    dialogService.showInformationDialogAndWait(Localization.lang("Potentially Incomplete") + " " +
-                                    singularPluralChooser(numIncompleteItems, Localization.lang("Item"), Localization.lang("Items")) + " " + Localization.lang("Found"),
+                    dialogService.showInformationDialogAndWait(
+                            Localization.lang("Potentially Incomplete %0 Found",
+                                    singularPluralChooser(numIncompleteItems, Localization.lang("Item"), Localization.lang("Items"))),
                             content);
                 });
             }
