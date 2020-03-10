@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.commonfxcontrols;
 
 import javax.inject.Inject;
 
@@ -18,7 +18,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class SaveOrderConfigDisplayView extends VBox {
+public class SaveOrderConfigPanel extends VBox {
 
     @FXML private ToggleGroup saveOrderToggleGroup;
     @FXML private RadioButton exportInSpecifiedOrder;
@@ -32,9 +32,9 @@ public class SaveOrderConfigDisplayView extends VBox {
     @FXML private CheckBox saveTerDesc;
     @Inject private PreferencesService preferencesService;
 
-    private SaveOrderConfigDisplayViewModel viewModel;
+    private SaveOrderConfigPanelViewModel viewModel;
 
-    public SaveOrderConfigDisplayView() {
+    public SaveOrderConfigPanel() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -43,7 +43,7 @@ public class SaveOrderConfigDisplayView extends VBox {
     @FXML
     private void initialize() {
 
-        viewModel = new SaveOrderConfigDisplayViewModel(preferencesService);
+        viewModel = new SaveOrderConfigPanelViewModel(preferencesService);
 
         exportInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());

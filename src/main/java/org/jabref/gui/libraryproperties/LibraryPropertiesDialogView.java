@@ -17,8 +17,8 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.SaveOrderConfigDisplayView;
-import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
+import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
@@ -43,7 +43,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     private LibraryPropertiesDialogViewModel viewModel;
     private final DialogService dialogService;
     private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
-    private SaveOrderConfigDisplayView saveOrderConfigDisplayView;
+    private SaveOrderConfigPanel saveOrderConfigPanel;
     private SaveOrderConfig oldSaveOrderConfig;
 
     public LibraryPropertiesDialogView(BasePanel panel, DialogService dialogService) {
@@ -80,16 +80,16 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
-        saveOrderConfigDisplayView = new SaveOrderConfigDisplayView();
+        saveOrderConfigPanel = new SaveOrderConfigPanel();
         Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
         oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
 
-        saveOrderConfigDisplayView.changeExportDescriptionToSave();
+        saveOrderConfigPanel.changeExportDescriptionToSave();
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"));
         Label saveActions = new Label(Localization.lang("Save actions"));
         saveActions.getStyleClass().add("sectionHeader");
 
-        contentVbox.getChildren().addAll(saveOrderConfigDisplayView, saveActions, fieldFormatterCleanupsPanel);
+        contentVbox.getChildren().addAll(saveOrderConfigPanel, saveActions, fieldFormatterCleanupsPanel);
 
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
 
@@ -98,7 +98,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     private void setValues() {
         fieldFormatterCleanupsPanel.setValues(panel.getBibDatabaseContext().getMetaData());
-        saveOrderConfigDisplayView.setValues(oldSaveOrderConfig);
+        saveOrderConfigPanel.setValues(oldSaveOrderConfig);
     }
 
     @FXML
@@ -154,7 +154,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig = saveOrderConfigDisplayView.getSaveOrderConfig();
+        SaveOrderConfig newSaveOrderConfig = saveOrderConfigPanel.getSaveOrderConfig();
 
         boolean saveOrderConfigChanged = !newSaveOrderConfig.equals(oldSaveOrderConfig);
 

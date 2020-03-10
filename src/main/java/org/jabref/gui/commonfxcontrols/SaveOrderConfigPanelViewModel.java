@@ -1,4 +1,4 @@
-package org.jabref.gui;
+package org.jabref.gui.commonfxcontrols;
 
 import java.util.Objects;
 import java.util.Set;
@@ -17,7 +17,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
 import org.jabref.preferences.PreferencesService;
 
-public class SaveOrderConfigDisplayViewModel {
+public class SaveOrderConfigPanelViewModel {
 
     private final ListProperty<Field> priSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Field> secSortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -37,7 +37,7 @@ public class SaveOrderConfigDisplayViewModel {
 
     private final PreferencesService prefs;
 
-    public SaveOrderConfigDisplayViewModel(PreferencesService prefs) {
+    public SaveOrderConfigPanelViewModel(PreferencesService prefs) {
         this.prefs = prefs;
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();

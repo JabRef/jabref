@@ -1,4 +1,4 @@
-package org.jabref.gui.cleanup;
+package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
 import java.util.Objects;

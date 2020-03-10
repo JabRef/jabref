@@ -14,8 +14,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableItemModel;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableViewModel;
+import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelItemModel;
+import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelViewModel;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -32,9 +32,9 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
-    private ListProperty<BibtexKeyPatternTableItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private ObjectProperty<BibtexKeyPatternTableItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
-            new BibtexKeyPatternTableItemModel(new BibtexKeyPatternTableViewModel.DefaultEntryType(), ""));
+    private ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+            new BibtexKeyPatternPanelItemModel(new BibtexKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -133,7 +133,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty keyPatternReplacementProperty() { return keyPatternReplacementProperty; }
 
-    public ListProperty<BibtexKeyPatternTableItemModel> patternListProperty() { return patternListProperty; }
+    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() { return patternListProperty; }
 
-    public ObjectProperty<BibtexKeyPatternTableItemModel> defaultKeyPatternProperty() { return defaultKeyPatternProperty; }
+    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() { return defaultKeyPatternProperty; }
 }
