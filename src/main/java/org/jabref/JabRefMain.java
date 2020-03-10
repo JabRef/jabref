@@ -159,7 +159,7 @@ public class JabRefMain extends Application {
         return true;
     }
 
-    private static void applyPreferences(JabRefPreferences preferences) {
+    public static void applyPreferences(JabRefPreferences preferences) {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 

@@ -164,6 +164,11 @@ jobs:
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
           CI: "true"
+      - name: Upload screenshots to GitHub workflow artifacts store
+        uses: actions/upload-artifact@master
+        with:
+          name: screenshots
+          path: build/screenshots
   codecoverage:
     name: Code coverage
     runs-on: ubuntu-latest
