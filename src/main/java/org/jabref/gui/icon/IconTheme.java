@@ -19,8 +19,6 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
-import org.jabref.preferences.JabRefPreferences;
-
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.slf4j.Logger;
@@ -86,7 +84,7 @@ public class IconTheme {
         String key = Objects.requireNonNull(name, "icon name");
         if (!KEY_TO_ICON.containsKey(key)) {
             LOGGER.warn("Could not find icon url by name " + name + ", so falling back on default icon "
-                        + DEFAULT_ICON_PATH);
+                    + DEFAULT_ICON_PATH);
         }
         String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
@@ -110,7 +108,7 @@ public class IconTheme {
         Map<String, String> result = new HashMap<>();
 
         try (BufferedReader in = new BufferedReader(
-                                                    new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1))) {
+                new InputStreamReader(url.openStream(), StandardCharsets.ISO_8859_1))) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (!line.contains("=")) {
@@ -345,7 +343,6 @@ public class IconTheme {
         @Override
         public JabRefIcon withColor(Color color) {
             return icon.withColor(color);
-
         }
 
         @Override
@@ -353,5 +350,4 @@ public class IconTheme {
             return icon.disabled();
         }
     }
-
 }
