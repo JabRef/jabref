@@ -16,6 +16,8 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+<?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
+
 <DialogPane minHeight="-Infinity" prefHeight="700.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -74,6 +76,9 @@
                 <Label text="%Library protection" styleClass="sectionHeader"/>
                 <CheckBox fx:id="protect"
                           text="%Refuse to save the library before external changes have been reviewed."/>
+                <Label styleClass="sectionHeader" text="%Save actions"/>
+                <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel" />
+
                 <Label styleClass="sectionHeader" text="%Export sort order"/>
             </VBox>
         </ScrollPane>

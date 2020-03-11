@@ -1,252 +1,135 @@
 package org.jabref.gui.commonfxcontrols;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.FieldsUtil;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.metadata.MetaData;
 
-import org.fxmisc.easybind.EasyBind;
+import com.airhacks.afterburner.views.ViewLoader;
 
-public class FieldFormatterCleanupsPanel extends GridPane {
+public class FieldFormatterCleanupsPanel extends VBox {
 
-    private static final String DESCRIPTION = Localization.lang("Description") + ": ";
-    private final CheckBox cleanupEnabled;
-    private final List<Formatter> availableFormatters;
-    private FieldFormatterCleanups fieldFormatterCleanups;
-    private ListView<FieldFormatterCleanup> actionsList;
-    private ComboBox<Formatter> formattersCombobox;
-    private ComboBox<String> selectFieldCombobox;
-    private Button addButton;
-    private Label descriptionAreaText;
-    private Button removeSelectedButton;
-    private Button removeAllButton;
-    private Button recommendButton;
-    private ObservableList<FieldFormatterCleanup> actions;
+    @FXML private CheckBox cleanupsEnabled;
+    @FXML private TableView<FieldFormatterCleanup> cleanupsList;
+    @FXML private TableColumn<FieldFormatterCleanup, Field> fieldColumn;
+    @FXML private TableColumn<FieldFormatterCleanup, Formatter> formatterColumn;
+    @FXML private TableColumn<FieldFormatterCleanup, Field> actionsColumn;
+    @FXML private ComboBox<Field> addableFields;
+    @FXML private ComboBox<Formatter> addableFormatters;
 
-    public FieldFormatterCleanupsPanel(String description) {
-        cleanupEnabled = new CheckBox(description);
-        availableFormatters = Cleanups.getBuiltInFormatters();
-        availableFormatters.add(new ProtectTermsFormatter(Globals.protectedTermsLoader));
+    private FieldFormatterCleanupsPanelViewModel viewModel;
+
+    public FieldFormatterCleanupsPanel() {
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
     }
 
-    public void setValues(MetaData metaData) {
-        Objects.requireNonNull(metaData);
-        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
-        setValues(saveActions.orElse(Cleanups.DEFAULT_SAVE_ACTIONS));
+    @FXML
+    private void initialize() {
+        this.viewModel = new FieldFormatterCleanupsPanelViewModel();
+
+        setupTable();
+        setupCombos();
+        setupBindings();
     }
 
-    public void setValues(FieldFormatterCleanups formatterCleanups) {
-        fieldFormatterCleanups = formatterCleanups;
+    private void setupTable() {
+        cleanupsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        // first clear existing content
-        this.getChildren().clear();
+        // ToDo: To be editable the list needs a view model wrapper for FieldFormatterCleanup
 
-        List<FieldFormatterCleanup> configuredActions = fieldFormatterCleanups.getConfiguredActions();
-        actions = FXCollections.observableArrayList(configuredActions);
-        buildLayout();
+        fieldColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
+        new ValueTableCellFactory<FieldFormatterCleanup, Field>()
+                .withText(Field::getDisplayName)
+                .install(fieldColumn);
+
+        formatterColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getFormatter()));
+        new ValueTableCellFactory<FieldFormatterCleanup, Formatter>()
+                .withText(Formatter::getName)
+                .install(formatterColumn);
+
+        actionsColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getField()));
+        new ValueTableCellFactory<FieldFormatterCleanup, Field>()
+                .withGraphic(field -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(field -> Localization.lang("Remove formatter for %0", field.getDisplayName()))
+                .withOnMouseClickedEvent(item -> event -> viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem()))
+                .install(actionsColumn);
+
+        viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
+
+        cleanupsList.setOnKeyPressed(event -> {
+           if (event.getCode() == KeyCode.DELETE) {
+               viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem());
+           }
+        });
     }
 
-    private void buildLayout() {
-        setHgap(10.0);
-        setVgap(4.0);
-
-        ColumnConstraints first = new ColumnConstraints();
-        first.setPrefWidth(25);
-        ColumnConstraints second = new ColumnConstraints();
-        second.setPrefWidth(175);
-        ColumnConstraints third = new ColumnConstraints();
-        third.setPrefWidth(200);
-        ColumnConstraints fourth = new ColumnConstraints();
-        fourth.setPrefWidth(200);
-        getColumnConstraints().addAll(first, second, third, fourth);
-        RowConstraints firstR = new RowConstraints();
-        firstR.setPrefHeight(25);
-        RowConstraints secondR = new RowConstraints();
-        secondR.setPrefHeight(100);
-        RowConstraints thirdR = new RowConstraints();
-        thirdR.setPrefHeight(50);
-        RowConstraints fourthR = new RowConstraints();
-        fourthR.setPrefHeight(50);
-        RowConstraints fifthR = new RowConstraints();
-        fifthR.setPrefHeight(50);
-        getRowConstraints().addAll(firstR, secondR, thirdR, fourthR, fifthR);
-        add(cleanupEnabled, 0, 0, 4, 1);
-
-        actionsList = new ListView<>(actions);
-        actionsList.setMinHeight(100.0);
-        actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-        new ViewModelListCellFactory<FieldFormatterCleanup>()
-                .withText(action -> action.getField().getDisplayName() + ": " + action.getFormatter().getName())
-                .withStringTooltip(action -> action.getFormatter().getDescription())
-                .install(actionsList);
-        add(actionsList, 1, 1, 3, 1);
-
-        removeAllButton = new Button(Localization.lang("Remove all"));
-        removeAllButton.setOnAction(e -> actions.clear());
-
-        BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
-
-        recommendButton = new Button(Localization.lang("Reset to recommended"));
-        boolean isBiblatex = databaseContext.isBiblatexMode();
-
-        recommendButton.setOnAction(e -> {
-            if (isBiblatex) {
-                actions.setAll(Cleanups.RECOMMEND_BIBLATEX_ACTIONS.getConfiguredActions());
-            } else {
-                actions.setAll(Cleanups.RECOMMEND_BIBTEX_ACTIONS.getConfiguredActions());
-            }
+    private void setupCombos() {
+        new ViewModelListCellFactory<Field>()
+                .withText(Field::getDisplayName)
+                .install(addableFields);
+        addableFields.setConverter(FieldsUtil.fieldStringConverter);
+        addableFields.setOnKeyPressed(event -> {
+           if (event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.ENTER) {
+               addableFormatters.requestFocus();
+               event.consume();
+           }
         });
 
-        removeSelectedButton = new Button(Localization.lang("Remove selected"));
-        removeSelectedButton.setOnAction(e -> actions.remove(actionsList.getSelectionModel().getSelectedItem()));
-        descriptionAreaText = new Label(DESCRIPTION);
-        descriptionAreaText.setWrapText(true);
-
-        add(recommendButton, 1, 2, 1, 1);
-        add(removeSelectedButton, 2, 2, 1, 1);
-        add(removeAllButton, 3, 2, 1, 1);
-        add(getSelectorPanel(), 1, 3, 3, 1);
-        add(descriptionAreaText, 1, 4, 3, 1);
-
-        updateDescription();
-
-        // make sure the layout is set according to the checkbox
-        cleanupEnabled.selectedProperty().addListener(new EnablementStatusListener<>(fieldFormatterCleanups.isEnabled()));
-        cleanupEnabled.setSelected(fieldFormatterCleanups.isEnabled());
-    }
-
-    private void updateDescription() {
-        FieldFormatterCleanup formatterCleanup = getFieldFormatterCleanup();
-        if (formatterCleanup.getFormatter() != null) {
-            descriptionAreaText.setText(DESCRIPTION + formatterCleanup.getFormatter().getDescription());
-        } else {
-            Formatter selectedFormatter = formattersCombobox.getValue();
-            if (selectedFormatter != null) {
-                descriptionAreaText.setText(DESCRIPTION + selectedFormatter.getDescription());
-            } else {
-                descriptionAreaText.setText(DESCRIPTION);
-            }
-        }
-    }
-
-    /**
-     * This panel contains the two comboboxes and the Add button
-     */
-    private GridPane getSelectorPanel() {
-        GridPane builder = new GridPane();
-        builder.setHgap(10.0);
-        Set<Field> fields = FieldFactory.getCommonFields();
-        fields.add(InternalField.KEY_FIELD);
-        Set<String> fieldsString = fields.stream().map(Field::getDisplayName).sorted().collect(Collectors.toCollection(TreeSet::new));
-        selectFieldCombobox = new ComboBox<>(FXCollections.observableArrayList(fieldsString));
-        selectFieldCombobox.setEditable(true);
-        builder.add(selectFieldCombobox, 1, 1);
-
-        formattersCombobox = new ComboBox<>(FXCollections.observableArrayList(availableFormatters));
         new ViewModelListCellFactory<Formatter>()
                 .withText(Formatter::getName)
                 .withStringTooltip(Formatter::getDescription)
-                .install(formattersCombobox);
-        EasyBind.subscribe(formattersCombobox.valueProperty(), e -> updateDescription());
-        formattersCombobox.getSelectionModel().selectFirst();
-        builder.add(formattersCombobox, 3, 1);
-
-        addButton = new Button(Localization.lang("Add"));
-        addButton.setOnAction(e -> {
-            FieldFormatterCleanup newAction = getFieldFormatterCleanup();
-
-            if (!actions.contains(newAction)) {
-                actions.add(newAction);
-            }
+                .install(addableFormatters);
+        addableFormatters.setOnKeyPressed(event -> {
+           if (event.getCode() == KeyCode.ENTER) {
+               viewModel.addCleanup();
+               event.consume();
+           }
         });
-        builder.add(addButton, 5, 1);
-
-        return builder;
     }
 
-    public void storeSettings(MetaData metaData) {
-        Objects.requireNonNull(metaData);
-
-        FieldFormatterCleanups formatterCleanups = getFormatterCleanups();
-
-        // if all actions have been removed, remove the save actions from the MetaData
-        if (formatterCleanups.getConfiguredActions().isEmpty()) {
-            metaData.clearSaveActions();
-            return;
-        }
-
-        metaData.setSaveActions(formatterCleanups);
+    private void setupBindings() {
+        cleanupsEnabled.selectedProperty().bindBidirectional(cleanupsDisableProperty());
+        cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
+        addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
+        addableFields.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
+        addableFormatters.itemsProperty().bind(viewModel.availableFormattersProperty());
+        addableFormatters.valueProperty().bindBidirectional(viewModel.selectedFormatterProperty());
     }
 
-    public FieldFormatterCleanups getFormatterCleanups() {
-        return new FieldFormatterCleanups(cleanupEnabled.isSelected(), actions);
+    @FXML
+    private void resetToRecommended() {
+        viewModel.resetToRecommended();
     }
 
-    public boolean hasChanged() {
-        return !fieldFormatterCleanups.equals(getFormatterCleanups());
+    @FXML
+    private void clearAll() {
+        viewModel.clearAll();
     }
 
-    public boolean isDefaultSaveActions() {
-        return Cleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
+    @FXML
+    private void addCleanup() {
+        viewModel.addCleanup();
     }
 
-    private FieldFormatterCleanup getFieldFormatterCleanup() {
-        Formatter selectedFormatter = formattersCombobox.getValue();
-        Field field = FieldFactory.parseField(selectFieldCombobox.getSelectionModel().getSelectedItem());
-        return new FieldFormatterCleanup(field, selectedFormatter);
-    }
+    public BooleanProperty cleanupsDisableProperty() { return viewModel.cleanupsDisableProperty(); }
 
-    class EnablementStatusListener<T> implements ChangeListener<T> {
-
-        public EnablementStatusListener(boolean initialStatus) {
-            setStatus(initialStatus);
-        }
-
-        private void setStatus(boolean status) {
-            actionsList.setDisable(!status);
-            selectFieldCombobox.setDisable(!status);
-            formattersCombobox.setDisable(!status);
-            addButton.setDisable(!status);
-            removeSelectedButton.setDisable(!status);
-            removeAllButton.setDisable(!status);
-            recommendButton.setDisable(!status);
-        }
-
-        @Override
-        public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
-            setStatus(cleanupEnabled.isSelected());
-        }
-    }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return viewModel.cleanupsListProperty(); }
 }

@@ -11,7 +11,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
+import org.jabref.gui.commonfxcontrols.OldFieldFormatterCleanupsPanel;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -35,7 +35,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
     @FXML private VBox formatterContainer;
-    private FieldFormatterCleanupsPanel cleanUpFormatters;
+    private OldFieldFormatterCleanupsPanel cleanUpFormatters;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -64,7 +64,7 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
-        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"));
+        cleanUpFormatters = new OldFieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"));
         formatterContainer.getChildren().setAll(cleanUpFormatters);
 
         String currentPattern = Localization.lang("Filename format pattern")
