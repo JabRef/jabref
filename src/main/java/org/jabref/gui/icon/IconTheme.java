@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import org.jabref.preferences.JabRefPreferences;
 
@@ -27,22 +28,21 @@ import org.slf4j.LoggerFactory;
 
 public class IconTheme {
 
-    public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
-    public static final javafx.scene.paint.Color SELECTED_COLOR = javafx.scene.paint.Color.web("#50618F");
+    public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
+    public static final Color SELECTED_COLOR = Color.web("#50618F");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
-    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
-                                                                             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
+    private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
     public static void loadFonts() {
         try (InputStream stream = getMaterialDesignIconsStream()) {
-            javafx.scene.text.Font.loadFont(stream, 7);
+            Font.loadFont(stream, 7);
         } catch (IOException e) {
             LOGGER.error("Error loading Material Design Icons TTF font", e);
         }
 
         try (InputStream stream = getJabRefMaterialDesignIconsStream()) {
-            javafx.scene.text.Font.loadFont(stream, 7);
+            Font.loadFont(stream, 7);
         } catch (IOException e) {
             LOGGER.error("Error loading custom font for custom JabRef icons", e);
         }

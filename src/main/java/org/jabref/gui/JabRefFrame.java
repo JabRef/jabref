@@ -243,18 +243,6 @@ public class JabRefFrame extends BorderPane {
                         tabbedPane.getSelectionModel().selectPrevious();
                         event.consume();
                         break;
-                    case INCREASE_TABLE_FONT_SIZE:
-                        increaseTableFontSize();
-                        event.consume();
-                        break;
-                    case DECREASE_TABLE_FONT_SIZE:
-                        decreaseTableFontSize();
-                        event.consume();
-                        break;
-                    case DEFAULT_TABLE_FONT_SIZE:
-                        setDefaultTableFontSize();
-                        event.consume();
-                        break;
                     case SEARCH:
                         getGlobalSearchBar().focus();
                         break;
@@ -320,7 +308,7 @@ public class JabRefFrame extends BorderPane {
             String databaseFile = panel.getBibDatabaseContext()
                                        .getDatabaseFile()
                                        .map(File::getPath)
-                                       .orElse(GUIGlobals.UNTITLED_TITLE);
+                                       .orElse(Localization.lang("untitled"));
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
             //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
@@ -1134,7 +1122,7 @@ public class JabRefFrame extends BorderPane {
                                .getDatabasePath()
                                .map(Path::toAbsolutePath)
                                .map(Path::toString)
-                               .orElse(GUIGlobals.UNTITLED_TITLE);
+                               .orElse(Localization.lang("untitled"));
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
@@ -1227,34 +1215,6 @@ public class JabRefFrame extends BorderPane {
 
     public DialogService getDialogService() {
         return dialogService;
-    }
-
-    private void setDefaultTableFontSize() {
-        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void increaseTableFontSize() {
-        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void decreaseTableFontSize() {
-        double currentSize = GUIGlobals.currentFont.getSize();
-        if (currentSize < 2) {
-            return;
-        }
-        GUIGlobals.setFont(currentSize - 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     /**

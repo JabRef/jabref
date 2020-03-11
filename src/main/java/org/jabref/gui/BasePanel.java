@@ -157,7 +157,7 @@ public class BasePanel extends StackPane {
                 String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
                 title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
             } else {
-                title.append(GUIGlobals.UNTITLED_TITLE);
+                title.append(Localization.lang("untitled"));
 
                 if (getDatabase().hasEntries()) {
                     // if the database is not empty and no file is assigned,
@@ -290,16 +290,10 @@ public class BasePanel extends StackPane {
         });
     }
 
-    public void updateTableFont() {
-        mainTable.updateFont();
-    }
-
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
         mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, preferences.getKeyBindings());
-
-        mainTable.updateFont();
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -567,7 +561,7 @@ public class BasePanel extends StackPane {
             if (getBibDatabaseContext().getDatabaseFile().isPresent()) {
                 frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
             } else {
-                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
+                frame.setTabTitle(this, Localization.lang("untitled"), null);
             }
         }
         frame.setWindowTitle();
