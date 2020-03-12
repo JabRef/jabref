@@ -9,9 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.metadata.SaveOrderConfig.SortCriterion;
-import org.jabref.preferences.PreferencesService;
 
 public class SaveOrderConfigPanelViewModel {
 
@@ -31,19 +28,7 @@ public class SaveOrderConfigPanelViewModel {
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
 
-    private final PreferencesService prefs;
-
-    public SaveOrderConfigPanelViewModel(PreferencesService prefs) {
-        this.prefs = prefs;
-    }
-
-    public void storeConfigInPrefs() {
-        SortCriterion primary = new SortCriterion(savePrimarySortSelectedValueProperty.get(), savePrimaryDescPropertySelected.getValue());
-        SortCriterion secondary = new SortCriterion(saveSecondarySortSelectedValueProperty.get(), saveSecondaryDescPropertySelected.getValue());
-        SortCriterion tertiary = new SortCriterion(saveTertiarySortSelectedValueProperty.get(), saveTertiaryDescPropertySelected.getValue());
-
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(saveInOriginalProperty.getValue(), saveInSpecifiedOrderProperty.getValue(), primary, secondary, tertiary);
-        prefs.storeExportSaveOrder(saveOrderConfig);
+    public SaveOrderConfigPanelViewModel() {
     }
 
     public BooleanProperty saveInOriginalProperty() {

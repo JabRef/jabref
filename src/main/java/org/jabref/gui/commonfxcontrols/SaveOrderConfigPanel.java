@@ -1,7 +1,5 @@
 package org.jabref.gui.commonfxcontrols;
 
-import javax.inject.Inject;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -15,7 +13,6 @@ import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -30,7 +27,6 @@ public class SaveOrderConfigPanel extends VBox {
     @FXML private CheckBox savePriDesc;
     @FXML private CheckBox saveSecDesc;
     @FXML private CheckBox saveTerDesc;
-    @Inject private PreferencesService preferencesService;
 
     private SaveOrderConfigPanelViewModel viewModel;
 
@@ -42,7 +38,7 @@ public class SaveOrderConfigPanel extends VBox {
 
     @FXML
     private void initialize() {
-        viewModel = new SaveOrderConfigPanelViewModel(preferencesService);
+        viewModel = new SaveOrderConfigPanelViewModel();
 
         exportInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
@@ -78,10 +74,6 @@ public class SaveOrderConfigPanel extends VBox {
         exportInOriginalOrder.setText(Localization.lang("Save entries in their original order"));
         exportInSpecifiedOrder.setText(Localization.lang("Save entries ordered as specified"));
         exportInTableOrder.setText(Localization.lang("Save in current table sort order"));
-    }
-
-    public void storeConfig() {
-        viewModel.storeConfigInPrefs();
     }
 
     public BooleanProperty saveInOriginalProperty() {
