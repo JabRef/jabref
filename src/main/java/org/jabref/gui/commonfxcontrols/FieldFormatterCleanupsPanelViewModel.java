@@ -1,5 +1,7 @@
 package org.jabref.gui.commonfxcontrols;
 
+import java.util.Objects;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -9,7 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SelectionModel;
 
-import org.jabref.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
@@ -27,11 +29,14 @@ public class FieldFormatterCleanupsPanelViewModel {
     private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Cleanups.getBuiltInFormatters()));
     private final ObjectProperty<Formatter> selectedFormatterProperty = new SimpleObjectProperty<>();
 
-    public FieldFormatterCleanupsPanelViewModel() {
+    private final StateManager stateManager;
+
+    public FieldFormatterCleanupsPanelViewModel(StateManager stateManager) {
+        this.stateManager = Objects.requireNonNull(stateManager);
     }
 
     public void resetToRecommended() {
-        Globals.stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             if (databaseContext.isBiblatexMode()) {
                 cleanupsListProperty.setAll(Cleanups.RECOMMEND_BIBLATEX_ACTIONS.getConfiguredActions());
             } else {
