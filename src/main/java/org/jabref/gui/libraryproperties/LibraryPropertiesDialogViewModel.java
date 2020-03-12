@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -24,7 +25,10 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
 public class LibraryPropertiesDialogViewModel {
@@ -40,6 +44,22 @@ public class LibraryPropertiesDialogViewModel {
     private final BooleanProperty protectDisableProperty = new SimpleBooleanProperty();
     private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();
 
+    // SaveOrderConfigPanel
+    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    // ToDo: The single criterions should really be a map or a list.
+    private final ListProperty<Field> primarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> secondarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> tertiarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty savePrimaryDescPropertySelected = new SimpleBooleanProperty();
+    private final BooleanProperty saveSecondaryDescPropertySelected = new SimpleBooleanProperty();
+    private final BooleanProperty saveTertiaryDescPropertySelected = new SimpleBooleanProperty();
+    private final ObjectProperty<Field> savePrimarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveSecondarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveTertiarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+
+    // FieldFormatterCleanupsPanel
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> cleanupsProperty = new SimpleListProperty<>(FXCollections.emptyObservableList());
 
@@ -49,15 +69,19 @@ public class LibraryPropertiesDialogViewModel {
 
     private final DirectoryDialogConfiguration directoryDialogConfiguration;
     private final MetaData initialMetaData;
+    private final SaveOrderConfig initialSaveOrderConfig;
 
     public LibraryPropertiesDialogViewModel(BibDatabaseContext databaseContext, DialogService dialogService, PreferencesService preferences) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();
+        this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferences::loadExportSaveOrder);
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getWorkingDir()).build();
+
+        setValues();
     }
 
     void setValues() {
@@ -71,6 +95,31 @@ public class LibraryPropertiesDialogViewModel {
         userSpecificFileDirectoryProperty.setValue(initialMetaData.getUserFileDirectory(preferences.getUser()).orElse("").trim());
         laTexFileDirectoryProperty.setValue(initialMetaData.getLatexFileDirectory(preferences.getUser()).map(Path::toString).orElse(""));
         libraryProtectedProperty.setValue(initialMetaData.isProtected());
+
+        // SaveOrderConfigPanel
+
+        if (initialSaveOrderConfig.saveInOriginalOrder()) {
+            saveInOriginalProperty.setValue(true);
+        } else if (initialSaveOrderConfig.saveInSpecifiedOrder()) {
+            saveInSpecifiedOrderProperty.setValue(true);
+        } else {
+            saveInTableOrderProperty.setValue(true);
+        }
+
+        Set<Field> fieldNames = FieldFactory.getCommonFields();
+        primarySortFieldsProperty.addAll(fieldNames);
+        secondarySortFieldsProperty.addAll(fieldNames);
+        tertiarySortFieldsProperty.addAll(fieldNames);
+
+        savePrimarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(0).field);
+        saveSecondarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(1).field);
+        saveTertiarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(2).field);
+
+        savePrimaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(0).descending);
+        saveSecondaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(1).descending);
+        saveTertiaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(2).descending);
+
+        // FieldFormatterCleanupsPanel
 
         Optional<FieldFormatterCleanups> saveActions = initialMetaData.getSaveActions();
         saveActions.ifPresentOrElse(value -> {
@@ -127,6 +176,27 @@ public class LibraryPropertiesDialogViewModel {
                 newMetaData.clearSaveActions();
             } else {
                 newMetaData.setSaveActions(fieldFormatterCleanups);
+            }
+        }
+
+        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
+                saveInOriginalProperty.getValue(),
+                saveInSpecifiedOrderProperty.getValue(),
+                new SaveOrderConfig.SortCriterion(
+                        savePrimarySortSelectedValueProperty.get(),
+                        savePrimaryDescPropertySelected.getValue()),
+                new SaveOrderConfig.SortCriterion(
+                        saveSecondarySortSelectedValueProperty.get(),
+                        saveSecondaryDescPropertySelected.getValue()),
+                new SaveOrderConfig.SortCriterion(
+                        saveTertiarySortSelectedValueProperty.get(),
+                        saveTertiaryDescPropertySelected.getValue()));
+
+        if (!newSaveOrderConfig.equals(initialSaveOrderConfig)) {
+            if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
+                newMetaData.clearSaveOrderConfig();
+            } else {
+                newMetaData.setSaveOrderConfig(newSaveOrderConfig);
             }
         }
 
@@ -192,6 +262,58 @@ public class LibraryPropertiesDialogViewModel {
     public BooleanProperty libraryProtectedProperty() {
         return libraryProtectedProperty;
     }
+
+    // SaveOrderConfigPanel
+
+    public BooleanProperty saveInOriginalProperty() {
+        return saveInOriginalProperty;
+    }
+
+    public BooleanProperty saveInTableOrderProperty() {
+        return saveInTableOrderProperty;
+    }
+
+    public BooleanProperty saveInSpecifiedOrderProperty() {
+        return saveInSpecifiedOrderProperty;
+    }
+
+    public ListProperty<Field> primarySortFieldsProperty() {
+        return primarySortFieldsProperty;
+    }
+
+    public ListProperty<Field> secondarySortFieldsProperty() {
+        return secondarySortFieldsProperty;
+    }
+
+    public ListProperty<Field> tertiarySortFieldsProperty() {
+        return tertiarySortFieldsProperty;
+    }
+
+    public ObjectProperty<Field> savePrimarySortSelectedValueProperty() {
+        return savePrimarySortSelectedValueProperty;
+    }
+
+    public ObjectProperty<Field> saveSecondarySortSelectedValueProperty() {
+        return saveSecondarySortSelectedValueProperty;
+    }
+
+    public ObjectProperty<Field> saveTertiarySortSelectedValueProperty() {
+        return saveTertiarySortSelectedValueProperty;
+    }
+
+    public BooleanProperty savePrimaryDescPropertySelected() {
+        return savePrimaryDescPropertySelected;
+    }
+
+    public BooleanProperty saveSecondaryDescPropertySelected() {
+        return saveSecondaryDescPropertySelected;
+    }
+
+    public BooleanProperty saveTertiaryDescPropertySelected() {
+        return saveTertiaryDescPropertySelected;
+    }
+
+    // FieldFormatterCleanupsPanel
 
     public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
 

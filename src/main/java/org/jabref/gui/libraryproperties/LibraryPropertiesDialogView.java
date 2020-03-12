@@ -1,7 +1,6 @@
 package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -20,7 +19,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -43,8 +41,6 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     private final BasePanel panel;
     private LibraryPropertiesDialogViewModel viewModel;
 
-    private SaveOrderConfig oldSaveOrderConfig;
-
     public LibraryPropertiesDialogView(BasePanel panel) {
         this.panel = panel;
 
@@ -54,7 +50,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         setResultConverter(btn -> {
             if (btn == ButtonType.OK) {
-                storeSettings();
+                viewModel.storeSettings();
             }
             return null;
         });
@@ -83,35 +79,22 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
         protect.disableProperty().bind(viewModel.protectDisableProperty());
         protect.selectedProperty().bindBidirectional(viewModel.libraryProtectedProperty());
 
-        Optional<SaveOrderConfig> storedSaveOrderConfig = panel.getBibDatabaseContext().getMetaData().getSaveOrderConfig();
-        oldSaveOrderConfig = storedSaveOrderConfig.orElseGet(preferencesService::loadExportSaveOrder);
         saveOrderConfigPanel.changeExportDescriptionToSave();
+        saveOrderConfigPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
+        saveOrderConfigPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
+        saveOrderConfigPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        saveOrderConfigPanel.primarySortFieldsProperty().bind(viewModel.primarySortFieldsProperty());
+        saveOrderConfigPanel.secondarySortFieldsProperty().bind(viewModel.secondarySortFieldsProperty());
+        saveOrderConfigPanel.tertiarySortFieldsProperty().bind(viewModel.tertiarySortFieldsProperty());
+        saveOrderConfigPanel.savePrimaryDescPropertySelected().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
+        saveOrderConfigPanel.saveSecondaryDescPropertySelected().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
+        saveOrderConfigPanel.saveTertiaryDescPropertySelected().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
+        saveOrderConfigPanel.savePrimarySortSelectedValueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
+        saveOrderConfigPanel.saveSecondarySortSelectedValueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
+        saveOrderConfigPanel.saveTertiarySortSelectedValueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
 
         fieldFormatterCleanupsPanel.cleanupsDisableProperty().bindBidirectional(viewModel.cleanupsDisableProperty());
         fieldFormatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanupsProperty());
-
-        setValues();
-    }
-
-    private void setValues() {
-        viewModel.setValues();
-
-        saveOrderConfigPanel.setValues(oldSaveOrderConfig);
-    }
-
-    private void storeSettings() {
-        viewModel.storeSettings();
-
-        /*
-        SaveOrderConfig newSaveOrderConfig = saveOrderConfigPanel.getSaveOrderConfig();
-        boolean saveOrderConfigChanged = !newSaveOrderConfig.equals(oldSaveOrderConfig);
-        if (saveOrderConfigChanged) {
-            if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
-                metaData.clearSaveOrderConfig();
-            } else {
-                metaData.setSaveOrderConfig(newSaveOrderConfig);
-            }
-        } */
     }
 
     @FXML

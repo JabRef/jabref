@@ -2,25 +2,25 @@ package org.jabref.gui.commonfxcontrols;
 
 import javax.inject.Inject;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class SaveOrderConfigPanel extends VBox {
 
-    @FXML private ToggleGroup saveOrderToggleGroup;
     @FXML private RadioButton exportInSpecifiedOrder;
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;
@@ -42,7 +42,6 @@ public class SaveOrderConfigPanel extends VBox {
 
     @FXML
     private void initialize() {
-
         viewModel = new SaveOrderConfigPanelViewModel(preferencesService);
 
         exportInOriginalOrder.selectedProperty().bindBidirectional(viewModel.saveInOriginalProperty());
@@ -52,32 +51,27 @@ public class SaveOrderConfigPanel extends VBox {
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(savePriSort);
-        savePriSort.itemsProperty().bindBidirectional(viewModel.priSortFieldsProperty());
-        savePriSort.valueProperty().bindBidirectional(viewModel.savePriSortSelectedValueProperty());
+        savePriSort.itemsProperty().bindBidirectional(viewModel.primarySortFieldsProperty());
+        savePriSort.valueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
         savePriSort.setConverter(FieldsUtil.fieldStringConverter);
 
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(saveSecSort);
-        saveSecSort.itemsProperty().bindBidirectional(viewModel.secSortFieldsProperty());
-        saveSecSort.valueProperty().bindBidirectional(viewModel.saveSecSortSelectedValueProperty());
+        saveSecSort.itemsProperty().bindBidirectional(viewModel.secondarySortFieldsProperty());
+        saveSecSort.valueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
         saveSecSort.setConverter(FieldsUtil.fieldStringConverter);
 
         new ViewModelListCellFactory<Field>()
                 .withText(FieldsUtil::getNameWithType)
                 .install(saveTerSort);
-        saveTerSort.itemsProperty().bindBidirectional(viewModel.terSortFieldsProperty());
-        saveTerSort.valueProperty().bindBidirectional(viewModel.saveTerSortSelectedValueProperty());
+        saveTerSort.itemsProperty().bindBidirectional(viewModel.tertiarySortFieldsProperty());
+        saveTerSort.valueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
         saveTerSort.setConverter(FieldsUtil.fieldStringConverter);
 
-        savePriDesc.selectedProperty().bindBidirectional(viewModel.savePriDescPropertySelected());
-        saveSecDesc.selectedProperty().bindBidirectional(viewModel.saveSecDescPropertySelected());
-        saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTerDescPropertySelected());
-
-    }
-
-    public void setValues(SaveOrderConfig config) {
-        viewModel.setSaveOrderConfig(config);
+        savePriDesc.selectedProperty().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
+        saveSecDesc.selectedProperty().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
+        saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
     }
 
     public void changeExportDescriptionToSave() {
@@ -90,8 +84,51 @@ public class SaveOrderConfigPanel extends VBox {
         viewModel.storeConfigInPrefs();
     }
 
-    public SaveOrderConfig getSaveOrderConfig() {
-        return viewModel.getSaveOrderConfig();
+    public BooleanProperty saveInOriginalProperty() {
+        return viewModel.saveInOriginalProperty();
     }
 
+    public BooleanProperty saveInTableOrderProperty() {
+        return viewModel.saveInTableOrderProperty();
+    }
+
+    public BooleanProperty saveInSpecifiedOrderProperty() {
+        return viewModel.saveInSpecifiedOrderProperty();
+    }
+
+    public ListProperty<Field> primarySortFieldsProperty() {
+        return viewModel.primarySortFieldsProperty();
+    }
+
+    public ListProperty<Field> secondarySortFieldsProperty() {
+        return viewModel.secondarySortFieldsProperty();
+    }
+
+    public ListProperty<Field> tertiarySortFieldsProperty() {
+        return viewModel.tertiarySortFieldsProperty();
+    }
+
+    public ObjectProperty<Field> savePrimarySortSelectedValueProperty() {
+        return viewModel.savePrimarySortSelectedValueProperty();
+    }
+
+    public ObjectProperty<Field> saveSecondarySortSelectedValueProperty() {
+        return viewModel.saveSecondarySortSelectedValueProperty();
+    }
+
+    public ObjectProperty<Field> saveTertiarySortSelectedValueProperty() {
+        return viewModel.saveTertiarySortSelectedValueProperty();
+    }
+
+    public BooleanProperty savePrimaryDescPropertySelected() {
+        return viewModel.savePrimaryDescPropertySelected();
+    }
+
+    public BooleanProperty saveSecondaryDescPropertySelected() {
+        return viewModel.saveSecondaryDescPropertySelected();
+    }
+
+    public BooleanProperty saveTertiaryDescPropertySelected() {
+        return viewModel.saveTertiaryDescPropertySelected();
+    }
 }
