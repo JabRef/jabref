@@ -15,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -32,6 +33,7 @@ import org.jabref.model.util.OptionalUtil;
  */
 public class StateManager {
 
+    private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -42,6 +44,10 @@ public class StateManager {
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+    }
+
+    public CustomLocalDragboard getLocalDragboard() {
+        return localDragboard;
     }
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {
