@@ -34,7 +34,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -77,7 +76,7 @@ public class GroupTreeView {
 
     @FXML
     public void initialize() {
-        this.localDragboard = GUIGlobals.localDragboard;
+        this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
 
         // Set-up groups tree
