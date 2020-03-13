@@ -508,7 +508,7 @@ public class BibEntry implements Cloneable {
     /**
      * Set a field, and notify listeners about the change.
      *
-     * @param field        The field to set
+     * @param field       The field to set
      * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
@@ -543,7 +543,7 @@ public class BibEntry implements Cloneable {
     /**
      * Set a field, and notify listeners about the change.
      *
-     * @param field  The field to set.
+     * @param field The field to set.
      * @param value The value to set.
      */
     public Optional<FieldChange> setField(Field field, String value) {
@@ -551,8 +551,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Remove the mapping for the field name, and notify listeners about
-     * the change.
+     * Remove the mapping for the field name, and notify listeners about the change.
      *
      * @param field The field to clear.
      */
@@ -588,9 +587,9 @@ public class BibEntry implements Cloneable {
      * database argument is given, this method will try to look up missing fields in
      * entries linked by the "crossref" field, if any.
      *
-     * @param fields An array of field names to be checked.
-     * @param database  The database in which to look up crossref'd entries, if any. This
-     *                  argument can be null, meaning that no attempt will be made to follow crossrefs.
+     * @param fields   An array of field names to be checked.
+     * @param database The database in which to look up crossref'd entries, if any. This argument can be null, meaning
+     *                 that no attempt will be made to follow crossrefs.
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     public boolean allFieldsPresent(Collection<OrFields> fields, BibDatabase database) {
@@ -610,9 +609,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
-     * as is
+     * as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
+     * used, it is output as "field = {#value#}", which may cause headaches in debugging. We nevertheless do it this way
+     * to a) enable debugging the internal representation and b) save time at this method.
      * <p>
-     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key
+     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
      */
     @Override
     public String toString() {

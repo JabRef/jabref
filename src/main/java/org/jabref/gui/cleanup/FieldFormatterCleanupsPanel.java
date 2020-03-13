@@ -106,6 +106,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         actionsList = new ListView<>(actions);
         actionsList.setMinHeight(100.0);
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
         new ViewModelListCellFactory<FieldFormatterCleanup>()
                 .withText(action -> action.getField().getDisplayName() + ": " + action.getFormatter().getName())
                 .withStringTooltip(action -> action.getFormatter().getDescription())
@@ -179,6 +180,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
                 .withStringTooltip(Formatter::getDescription)
                 .install(formattersCombobox);
         EasyBind.subscribe(formattersCombobox.valueProperty(), e -> updateDescription());
+        formattersCombobox.getSelectionModel().selectFirst();
         builder.add(formattersCombobox, 3, 1);
 
         addButton = new Button(Localization.lang("Add"));

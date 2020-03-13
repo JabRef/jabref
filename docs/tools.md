@@ -11,26 +11,25 @@ This page lists some software we consider useful.
 
 Here, we collect some helpful git hints
 
-* https://github.com/blog/2019-how-to-undo-almost-anything-with-git
-* https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md
-* awesome hints and tools regarding git: https://github.com/dictcp/awesome-git
+* [https://github.com/blog/2019-how-to-undo-almost-anything-with-git](https://github.com/blog/2019-how-to-undo-almost-anything-with-git)
+* [https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md](https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md)
+* awesome hints and tools regarding git: [https://github.com/dictcp/awesome-git](https://github.com/dictcp/awesome-git)
 
 ### Rebase everything as one commit on master
 
-* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/). 
+* Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
+* Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
+* Merge recent commits: `git merge upstream/master`
+* If there are conflicts, resolve them
+* Reset index to upstream/master: `git reset upstream/master`
+* Review the changes and create a new commit using git gui: `git gui&`
+* Do a force push: `git push -f origin`
 
-1. Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
-2. Merge recent commits: `git merge upstream/master`
-3. If there are conflicts, resolve them
-4. Reset index to upstream/master: `git reset upstream/master`
-5. Review the changes and create a new commit using git gui: `git gui&`
-6. Do a force push: `git push -f origin`
-
-See also: https://help.github.com/articles/syncing-a-fork/
+See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github.com/articles/syncing-a-fork/)
 
 ## Tooling for Windows
 
-(As Administrator - one time)
+\(As Administrator - one time\)
 
 1. Install [chocolatey](https://chocolatey.org/)
 2. `choco install git`
@@ -50,30 +49,27 @@ Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 
 #### ConEmu plus clink
 
-* [ConEmu] -> Preview Version  - Aim: Colorful console with tabs
+* [ConEmu](http://conemu.github.io/) -&gt; Preview Version  - Aim: Colorful console with tabs
   * At first start:
-    * "Choose your startup task ...": `{Bash::Git bash}}
+    * "Choose your startup task ...": \`{Bash::Git bash}}
     * `OK`
-    * Upper right corner: "Settings..." (third entrry Eintrag)
-    * Startup/Tasks: Choose task no. 7 ("Bash::Git bash"). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
+    * Upper right corner: "Settings..." \(third entrry Eintrag\)
+    * Startup/Tasks: Choose task no. 7 \("Bash::Git bash"\). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
     * `Save Settings`
-* [clink] - Aim: Unix keys (<kbd>Alt</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, etc.) also available at the prompt of `cmd.exe`
+* [clink](http://mridgers.github.io/clink/) - Aim: Unix keys \(Alt+B, Ctrl+S, etc.\) also available at the prompt of `cmd.exe`
 
 #### Other bundles
 
-* [Cmder] - bundles ConEmu plus clink
+* [Cmder](http://cmder.net/) - bundles ConEmu plus clink
 
 ### Tools for working with XMP
-- Validate XMP: http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/
+
+* Validate XMP: [http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/](http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/)
 
 ### Some useful keyboard shortcuts
 
 * [AutoHotkey](http://autohotkey.com/) - Preparation for the next step
-* <https://github.com/koppor/autohotkey-scripts> - Aim: Have <kbd>Win</kbd>+<kbd>C</kbd> opening ConEmu
-
+* [https://github.com/koppor/autohotkey-scripts](https://github.com/koppor/autohotkey-scripts) - Aim: Have Win+C opening ConEmu
   1. Clone the repository locally.
-  2. Then link `ConEmu.ahk` and `WindowsExplorer.ahk` at the startup menu (Link creation works with drag'n'drop using the right mouse key and then choosing "Create link" when dropping). Hint: Startup is in the folder `Startup` (German: `Autostart`) at `%APPDATA%\Microsoft\Windows\Start Menu\Programs\` - accessible via `Win+r`: `shell:startup`
+  2. Then link `ConEmu.ahk` and `WindowsExplorer.ahk` at the startup menu \(Link creation works with drag'n'drop using the right mouse key and then choosing "Create link" when dropping\). Hint: Startup is in the folder `Startup` \(German: `Autostart`\) at `%APPDATA%\Microsoft\Windows\Start Menu\Programs\` - accessible via `Win+r`: `shell:startup`
 
-  [ConEmu]: http://conemu.github.io/
-  [clink]: http://mridgers.github.io/clink/
-  [Cmder]: http://cmder.net/
