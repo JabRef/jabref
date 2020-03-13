@@ -13,7 +13,6 @@ import org.jabref.logic.l10n.Localization;
 public class BackupUIManager {
 
     private BackupUIManager() {
-
     }
 
     public static void showRestoreBackupDialog(DialogService dialogService, Path originalPath) {

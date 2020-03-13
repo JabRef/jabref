@@ -247,7 +247,7 @@ public class JabRefGUI {
                 continue;
             }
 
-            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 
