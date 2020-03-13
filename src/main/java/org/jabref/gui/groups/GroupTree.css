@@ -102,13 +102,17 @@
     -fx-translate-x: -0.4em;
 }
 
-#barBottom {
+#newGroupButton {
+    -fx-padding: 0.1em 1.5em 0.1em 1.5em;
+}
+
+#groupFilterBar {
     -fx-background-color: -jr-sidepane-header-background;
     -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
-#barBottom .glyph-icon {
+#groupFilterBar .glyph-icon {
     -fx-font-size: 2em;
 }
