@@ -29,7 +29,7 @@
     -fx-fill: -jr-group-hits-fg;
 }
 
-.disclosureNodeColumn {
+.expansionNodeColumn {
     -fx-alignment: top-right;
 }
 
@@ -73,7 +73,7 @@
     -fx-padding: 0.40em 0.2em 0.40em 0em;
 }
 
-.tree-table-row-cell:root > .disclosureNodeColumn {
+.tree-table-row-cell:root > .expansionNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
