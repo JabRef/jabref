@@ -12,7 +12,7 @@ import org.jabref.model.strings.StringUtil;
 public class TitleChecker implements ValueChecker {
 
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
-    private static final String DELIMITERS = "(\\.|\\!|\\?|\\;|\\:)";
+    private static final Pattern DELIMITERS = Pattern.compile("\\.|\\!|\\?|\\;|\\:");
     private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
     private final BibDatabaseContext databaseContext;
@@ -50,7 +50,7 @@ public class TitleChecker implements ValueChecker {
             valueOnlySpacesWithinCurlyBraces = matcher.replaceAll("");
         }
 
-        String[] splitTitle = valueOnlySpacesWithinCurlyBraces.split(DELIMITERS);
+        String[] splitTitle = DELIMITERS.split(valueOnlySpacesWithinCurlyBraces);
         for (String subTitle : splitTitle) {
             subTitle = subTitle.trim();
             if (!subTitle.isEmpty()) {
