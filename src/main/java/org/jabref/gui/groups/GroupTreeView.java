@@ -61,7 +61,7 @@ public class GroupTreeView {
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
+    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     @FXML private CustomTextField searchField;
 
     @Inject private StateManager stateManager;
@@ -158,7 +158,7 @@ public class GroupTreeView {
                     group.toggleExpansion();
                     event.consume();
                 })
-                .install(disclosureNodeColumn);
+                .install(expansionNodeColumn);
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
