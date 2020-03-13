@@ -13,9 +13,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We moved the group search bar and the button "New group" from bottom to top position to make it more prominent. [#6112](https://github.com/JabRef/jabref/pull/6112)
+
 ### Fixed
 
-- We fixed an issue where opening a library from the recent libraries menu was not possible [#5939](https://github.com/JabRef/jabref/issues/5939)
+- We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
 
 ### Removed
 
