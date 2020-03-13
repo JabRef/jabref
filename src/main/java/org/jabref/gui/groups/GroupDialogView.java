@@ -135,11 +135,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.searchSearchTermEmptyValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
+            validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
         });
 
         // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
-        viewModel.validationStatus().validProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue) {
+        viewModel.validationStatus().validProperty().addListener((obs, _oldValue, validationStatus) -> {
+            if (validationStatus) {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
             } else {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(true);

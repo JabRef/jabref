@@ -95,6 +95,7 @@ public class GroupDialogViewModel {
     private Validator nameContainsDelimiterValidator;
     private Validator sameNameValidator;
     private Validator keywordRegexValidator;
+    private Validator keywordFieldEmptyValidator;
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
@@ -173,6 +174,11 @@ public class GroupDialogViewModel {
                         Localization.lang("Keywords"),
                         Localization.lang("Invalid regular expression."))));
 
+        keywordFieldEmptyValidator = new FunctionBasedValidator<>(
+                keywordGroupSearchFieldProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a field name to search for keywords.")));
+
         keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
@@ -214,19 +220,19 @@ public class GroupDialogViewModel {
 
         validator.addValidators(nameValidator, sameNameValidator);
 
-        typeSearchProperty.addListener((obs,oldVal,newVal) -> {
-            if (newVal) {
+        typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
+            if (isSelected) {
                 validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
             }
         });
 
-        typeKeywordsProperty.addListener((obs,oldVal,newVal) -> {
-            if (newVal) {
-                validator.addValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+        typeKeywordsProperty.addListener((obs, _oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
-                validator.removeValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+                validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             }
         });
     }
@@ -304,7 +310,6 @@ public class GroupDialogViewModel {
                 } else {
                     return null;
                 }
-
             } catch (IllegalArgumentException | IOException exception) {
                 dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
                 return null;
@@ -397,69 +402,139 @@ public class GroupDialogViewModel {
         return fileDirs;
     }
 
-    public ValidationStatus validationStatus() { return validator.getValidationStatus(); }
+    public ValidationStatus validationStatus() {
+        return validator.getValidationStatus();
+    }
 
-    public ValidationStatus nameValidationStatus() { return nameValidator.getValidationStatus(); }
+    public ValidationStatus nameValidationStatus() {
+        return nameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus nameContainsDelimiterValidationStatus() { return nameContainsDelimiterValidator.getValidationStatus(); }
+    public ValidationStatus nameContainsDelimiterValidationStatus() {
+        return nameContainsDelimiterValidator.getValidationStatus();
+    }
 
-    public ValidationStatus sameNameValidationStatus() { return sameNameValidator.getValidationStatus(); }
+    public ValidationStatus sameNameValidationStatus() {
+        return sameNameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus searchRegexValidationStatus() { return searchRegexValidator.getValidationStatus(); }
+    public ValidationStatus searchRegexValidationStatus() {
+        return searchRegexValidator.getValidationStatus();
+    }
 
-    public ValidationStatus searchSearchTermEmptyValidationStatus() { return searchSearchTermEmptyValidator.getValidationStatus(); }
+    public ValidationStatus searchSearchTermEmptyValidationStatus() {
+        return searchSearchTermEmptyValidator.getValidationStatus();
+    }
 
-    public ValidationStatus keywordRegexValidationStatus() { return keywordRegexValidator.getValidationStatus(); }
+    public ValidationStatus keywordRegexValidationStatus() {
+        return keywordRegexValidator.getValidationStatus();
+    }
 
-    public ValidationStatus keywordSearchTermEmptyValidationStatus() { return keywordSearchTermEmptyValidator.getValidationStatus(); }
+    public ValidationStatus keywordFieldEmptyValidationStatus() {
+        return keywordFieldEmptyValidator.getValidationStatus();
+    }
 
-    public StringProperty nameProperty() { return nameProperty; }
+    public ValidationStatus keywordSearchTermEmptyValidationStatus() {
+        return keywordSearchTermEmptyValidator.getValidationStatus();
+    }
 
-    public StringProperty descriptionProperty() { return descriptionProperty; }
+    public StringProperty nameProperty() {
+        return nameProperty;
+    }
 
-    public StringProperty iconProperty() { return iconProperty; }
+    public StringProperty descriptionProperty() {
+        return descriptionProperty;
+    }
 
-    public ObjectProperty<Color> colorFieldProperty() { return colorProperty; }
+    public StringProperty iconProperty() {
+        return iconProperty;
+    }
 
-    public ListProperty<GroupHierarchyType> groupHierarchyListProperty() { return groupHierarchyListProperty; }
+    public ObjectProperty<Color> colorFieldProperty() {
+        return colorProperty;
+    }
 
-    public ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty() { return groupHierarchySelectedProperty; }
+    public ListProperty<GroupHierarchyType> groupHierarchyListProperty() {
+        return groupHierarchyListProperty;
+    }
 
-    public BooleanProperty typeExplicitProperty() { return typeExplicitProperty; }
+    public ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty() {
+        return groupHierarchySelectedProperty;
+    }
 
-    public BooleanProperty typeKeywordsProperty() { return typeKeywordsProperty; }
+    public BooleanProperty typeExplicitProperty() {
+        return typeExplicitProperty;
+    }
 
-    public BooleanProperty typeSearchProperty() { return typeSearchProperty; }
+    public BooleanProperty typeKeywordsProperty() {
+        return typeKeywordsProperty;
+    }
 
-    public BooleanProperty typeAutoProperty() { return typeAutoProperty; }
+    public BooleanProperty typeSearchProperty() {
+        return typeSearchProperty;
+    }
 
-    public BooleanProperty typeTexProperty() { return typeTexProperty; }
+    public BooleanProperty typeAutoProperty() {
+        return typeAutoProperty;
+    }
 
-    public StringProperty keywordGroupSearchTermProperty() { return keywordGroupSearchTermProperty; }
+    public BooleanProperty typeTexProperty() {
+        return typeTexProperty;
+    }
 
-    public StringProperty keywordGroupSearchFieldProperty() { return keywordGroupSearchFieldProperty; }
+    public StringProperty keywordGroupSearchTermProperty() {
+        return keywordGroupSearchTermProperty;
+    }
 
-    public BooleanProperty keywordGroupCaseSensitiveProperty() { return keywordGroupCaseSensitiveProperty; }
+    public StringProperty keywordGroupSearchFieldProperty() {
+        return keywordGroupSearchFieldProperty;
+    }
 
-    public BooleanProperty keywordGroupRegexProperty() { return keywordGroupRegexProperty; }
+    public BooleanProperty keywordGroupCaseSensitiveProperty() {
+        return keywordGroupCaseSensitiveProperty;
+    }
 
-    public StringProperty searchGroupSearchTermProperty() { return searchGroupSearchTermProperty; }
+    public BooleanProperty keywordGroupRegexProperty() {
+        return keywordGroupRegexProperty;
+    }
 
-    public BooleanProperty searchGroupCaseSensitiveProperty() { return searchGroupCaseSensitiveProperty; }
+    public StringProperty searchGroupSearchTermProperty() {
+        return searchGroupSearchTermProperty;
+    }
 
-    public BooleanProperty searchGroupRegexProperty() { return searchGroupRegexProperty; }
+    public BooleanProperty searchGroupCaseSensitiveProperty() {
+        return searchGroupCaseSensitiveProperty;
+    }
 
-    public BooleanProperty autoGroupKeywordsOptionProperty() { return autoGroupKeywordsOptionProperty; }
+    public BooleanProperty searchGroupRegexProperty() {
+        return searchGroupRegexProperty;
+    }
 
-    public StringProperty autoGroupKeywordsFieldProperty() { return autoGroupKeywordsFieldProperty; }
+    public BooleanProperty autoGroupKeywordsOptionProperty() {
+        return autoGroupKeywordsOptionProperty;
+    }
 
-    public StringProperty autoGroupKeywordsDeliminatorProperty() { return autoGroupKeywordsDelimiterProperty; }
+    public StringProperty autoGroupKeywordsFieldProperty() {
+        return autoGroupKeywordsFieldProperty;
+    }
 
-    public StringProperty autoGroupKeywordsHierarchicalDeliminatorProperty() { return autoGroupKeywordsHierarchicalDelimiterProperty; }
+    public StringProperty autoGroupKeywordsDeliminatorProperty() {
+        return autoGroupKeywordsDelimiterProperty;
+    }
 
-    public BooleanProperty autoGroupPersonsOptionProperty() { return autoGroupPersonsOptionProperty; }
+    public StringProperty autoGroupKeywordsHierarchicalDeliminatorProperty() {
+        return autoGroupKeywordsHierarchicalDelimiterProperty;
+    }
 
-    public StringProperty autoGroupPersonsFieldProperty() { return autoGroupPersonsFieldProperty; }
+    public BooleanProperty autoGroupPersonsOptionProperty() {
+        return autoGroupPersonsOptionProperty;
+    }
 
-    public StringProperty texGroupFilePathProperty() { return texGroupFilePathProperty; }
+    public StringProperty autoGroupPersonsFieldProperty() {
+        return autoGroupPersonsFieldProperty;
+    }
+
+    public StringProperty texGroupFilePathProperty() {
+        return texGroupFilePathProperty;
+    }
 }
