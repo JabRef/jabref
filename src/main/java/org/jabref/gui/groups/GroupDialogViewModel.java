@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
@@ -56,7 +57,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GroupDialogViewModel {
-
     // Basic Settings
     private final StringProperty nameProperty = new SimpleStringProperty("");
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
@@ -237,85 +237,89 @@ public class GroupDialogViewModel {
         });
     }
 
-    public AbstractGroup resultConverter(ButtonType button) {
-        if (button == ButtonType.OK) {
-            ValidationStatus validationStatus = validator.getValidationStatus();
-            if (validationStatus.getHighestMessage().isPresent()) {
-                dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
-                return null;
-            }
-
-            AbstractGroup resultingGroup = null;
-            try {
-                String groupName = nameProperty.getValue().trim();
-                if (typeExplicitProperty.getValue()) {
-                    resultingGroup = new ExplicitGroup(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            preferencesService.getKeywordDelimiter());
-                } else if (typeKeywordsProperty.getValue()) {
-                    if (keywordGroupRegexProperty.getValue()) {
-                        resultingGroup = new RegexKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
-                                keywordGroupSearchTermProperty.getValue().trim(),
-                                keywordGroupCaseSensitiveProperty.getValue());
-                    } else {
-                        resultingGroup = new WordKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
-                                keywordGroupSearchTermProperty.getValue().trim(),
-                                keywordGroupCaseSensitiveProperty.getValue(),
-                                preferencesService.getKeywordDelimiter(),
-                                false);
-                    }
-                } else if (typeSearchProperty.getValue()) {
-                    resultingGroup = new SearchGroup(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            searchGroupSearchTermProperty.getValue().trim(),
-                            searchGroupCaseSensitiveProperty.getValue(),
-                            searchGroupRegexProperty.getValue());
-                } else if (typeAutoProperty.getValue()) {
-                    if (autoGroupKeywordsOptionProperty.getValue()) {
-                        resultingGroup = new AutomaticKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                                autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                                autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
-                    } else {
-                        resultingGroup = new AutomaticPersonsGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
-                    }
-                } else if (typeTexProperty.getValue()) {
-                    resultingGroup = TexGroup.create(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            Paths.get(texGroupFilePathProperty.getValue().trim()),
-                            new DefaultAuxParser(new BibDatabase()),
-                            Globals.getFileUpdateMonitor(),
-                            currentDatabase.getMetaData());
-                }
-
-                if (resultingGroup != null) {
-                    resultingGroup.setColor(colorProperty.getValue());
-                    resultingGroup.setDescription(descriptionProperty.getValue());
-                    resultingGroup.setIconName(iconProperty.getValue());
-                    return resultingGroup;
-                } else {
-                    return null;
-                }
-            } catch (IllegalArgumentException | IOException exception) {
-                dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
-                return null;
-            }
+    public void validationHandler(Event event) {
+        ValidationStatus validationStatus = validator.getValidationStatus();
+        if (validationStatus.getHighestMessage().isPresent()) {
+            dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
+            // consume the event to prevent the dialog to close
+            event.consume();
         }
-        return null;
+    }
+
+    public AbstractGroup resultConverter(ButtonType button) {
+        if (button != ButtonType.OK) {
+            return null;
+        }
+
+        AbstractGroup resultingGroup = null;
+        try {
+            String groupName = nameProperty.getValue().trim();
+            if (typeExplicitProperty.getValue()) {
+                resultingGroup = new ExplicitGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        preferencesService.getKeywordDelimiter());
+            } else if (typeKeywordsProperty.getValue()) {
+                if (keywordGroupRegexProperty.getValue()) {
+                    resultingGroup = new RegexKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
+                            keywordGroupSearchTermProperty.getValue().trim(),
+                            keywordGroupCaseSensitiveProperty.getValue());
+                } else {
+                    resultingGroup = new WordKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
+                            keywordGroupSearchTermProperty.getValue().trim(),
+                            keywordGroupCaseSensitiveProperty.getValue(),
+                            preferencesService.getKeywordDelimiter(),
+                            false);
+                }
+            } else if (typeSearchProperty.getValue()) {
+                resultingGroup = new SearchGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        searchGroupSearchTermProperty.getValue().trim(),
+                        searchGroupCaseSensitiveProperty.getValue(),
+                        searchGroupRegexProperty.getValue());
+            } else if (typeAutoProperty.getValue()) {
+                if (autoGroupKeywordsOptionProperty.getValue()) {
+                    resultingGroup = new AutomaticKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
+                            autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
+                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
+                } else {
+                    resultingGroup = new AutomaticPersonsGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
+                }
+            } else if (typeTexProperty.getValue()) {
+                resultingGroup = TexGroup.create(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        Paths.get(texGroupFilePathProperty.getValue().trim()),
+                        new DefaultAuxParser(new BibDatabase()),
+                        Globals.getFileUpdateMonitor(),
+                        currentDatabase.getMetaData());
+            }
+
+            if (resultingGroup != null) {
+                resultingGroup.setColor(colorProperty.getValue());
+                resultingGroup.setDescription(descriptionProperty.getValue());
+                resultingGroup.setIconName(iconProperty.getValue());
+                return resultingGroup;
+            }
+
+            return null;
+        } catch (IllegalArgumentException | IOException exception) {
+            dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
+            return null;
+        }
     }
 
     public void setValues() {
