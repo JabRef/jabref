@@ -39,7 +39,13 @@ public class ActionHelper {
             return Bindings.createBooleanBinding(() -> false, selectedEntries);
         }
 
-        BibEntry entry = selectedEntries.get(0);
+        ObjectBinding<BibEntry> entry = Bindings.valueAt(selectedEntries, 0);
+        return Bindings.createBooleanBinding(() -> {
+            if (entry.get() == null)
+                return false;
+            else
+               return entry.get().getFields().stream().anyMatch(fields::contains);
+        }, entry, entry.getFieldsObserable());
         return Bindings.createBooleanBinding(
                 () -> entry.getFields().stream().anyMatch(fields::contains),
                 entry.getFieldsObservable(),
