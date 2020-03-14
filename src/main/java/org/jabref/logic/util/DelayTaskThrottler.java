@@ -32,6 +32,7 @@ public class DelayTaskThrottler {
         this.delay = delay;
         this.executor = new ScheduledThreadPoolExecutor(1);
         this.executor.setRemoveOnCancelPolicy(true);
+        this.executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
     }
 
     public void schedule(Runnable command) {
@@ -47,5 +48,19 @@ public class DelayTaskThrottler {
 
     public void shutdown() {
         executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                LOGGER.debug("One minute passed, saving still not completed. Trying forced shutdown.");
+                executor.shutdownNow();
+                if (executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    LOGGER.debug("One minute passed again - forced shutdown worked.");
+                } else {
+                    LOGGER.error("DelayedTaskThrottler did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
