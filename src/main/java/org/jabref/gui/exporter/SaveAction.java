@@ -37,7 +37,7 @@ public class SaveAction extends SimpleCommand {
 
         switch (saveMethod) {
             case SAVE:
-                saveDatabaseAction.save();
+                saveDatabaseAction.save(frame.getCurrentBasePanel().getBibDatabaseContext());
                 break;
             case SAVE_AS:
                 saveDatabaseAction.saveAs();

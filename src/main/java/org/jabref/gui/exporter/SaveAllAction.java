@@ -23,13 +23,10 @@ public class SaveAllAction extends SimpleCommand {
 
         for (BasePanel panel : frame.getBasePanelList()) {
             SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
-            if (panel.getBibDatabaseContext().getDatabasePath().isEmpty()) {
-                //It will ask a path before saving.
-                saveDatabaseAction.saveAs();
-            } else {
-                saveDatabaseAction.save();
-                // TODO: can we find out whether the save was actually done or not?
-            }
+            boolean saveResult = saveDatabaseAction.save(panel.getBibDatabaseContext());
+            if (!saveResult) {
+                 dialogService.notify(Localization.lang("Could not save file."));
+             }
         }
 
         dialogService.notify(Localization.lang("Save all finished."));

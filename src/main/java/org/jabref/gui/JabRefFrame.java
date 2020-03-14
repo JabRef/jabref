@@ -1137,8 +1137,7 @@ public class JabRefFrame extends BorderPane {
             // The user wants to save.
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
-                if (saveAction.save()) {
-                    // Saved, now exit.
+                if (saveAction.save(panel.getBibDatabaseContext())) {
                     return true;
                 }
                 // The action was either canceled or unsuccessful.
