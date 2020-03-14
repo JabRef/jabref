@@ -421,10 +421,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                    String suggestedTypeName = suggestedType.orElse(StandardExternalFileType.PDF).getName();
+                    ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
+                    String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
-
-                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
