@@ -69,8 +69,6 @@ jobs:
             ${{ runner.OS }}-
       - uses: actions/cache@v1
         name: Cache gradle wrapper
-        # cache at Mac OS X is 2 GB (too large)
-        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
