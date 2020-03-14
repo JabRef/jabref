@@ -1997,7 +1997,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (application.getApplicationName() != get(PUSH_TO_APPLICATION)) {
+        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
             put(PUSH_TO_APPLICATION, application.getApplicationName());
             manager.updateApplicationAction();
         }
@@ -2008,7 +2008,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.getEscapeChars();
+        String escapeChars = newLineSeparator.toString();
         put(JabRefPreferences.NEWLINE, escapeChars);
 
         // we also have to change Globals variable as globals is not a getter, but a constant
