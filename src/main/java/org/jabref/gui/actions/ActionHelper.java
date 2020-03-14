@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
@@ -30,10 +31,18 @@ public class ActionHelper {
     }
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
-        BibEntry entry = stateManager.getSelectedEntries().get(0);
+        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+
+        // binding should be recreated on every right click
+        // not sure why selectedEntries might be empty, see https://github.com/JabRef/jabref/issues/6085
+        if (selectedEntries.isEmpty()) {
+            return Bindings.createBooleanBinding(() -> false, selectedEntries);
+        }
+
+        BibEntry entry = selectedEntries.get(0);
         return Bindings.createBooleanBinding(
                 () -> entry.getFields().stream().anyMatch(fields::contains),
                 entry.getFieldsObservable(),
-                stateManager.getSelectedEntries());
+                selectedEntries);
     }
 }
