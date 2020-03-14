@@ -216,8 +216,6 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBLATEX));
-
-
     }
 
     @Test
