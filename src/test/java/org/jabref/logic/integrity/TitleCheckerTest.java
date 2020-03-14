@@ -16,64 +16,64 @@ public class TitleCheckerTest {
     private TitleChecker checker;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new TitleChecker(databaseContext);
     }
 
     @Test
-    public void FirstLetterAsOnlyCapitalLetterInSubTitle2() throws Exception {
+    public void FirstLetterAsOnlyCapitalLetterInSubTitle2() {
         assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is a sub title 2"));
     }
 
     @Test
-    public void NoCapitalLetterInSubTitle2() throws Exception {
+    public void NoCapitalLetterInSubTitle2() {
         assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is a sub title 2"));
     }
 
     @Test
-    public void TwoCapitalLettersInSubTitle2() throws Exception {
+    public void TwoCapitalLettersInSubTitle2() {
         assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is A sub title 2"));
     }
 
     @Test
-    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2() throws Exception {
+    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2() {
         assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is A sub title 2"));
     }
 
     @Test
-    public void TwoCapitalLettersInSubTitle2WithCurlyBrackets() throws Exception {
+    public void TwoCapitalLettersInSubTitle2WithCurlyBrackets() {
         assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is {A} sub title 2"));
     }
 
     @Test
-    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2WithCurlyBrackets() throws Exception {
+    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2WithCurlyBrackets() {
         assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is {A} sub title 2"));
     }
 
     @Test
-    public void FirstLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() throws Exception {
+    public void FirstLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
         assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1...This is a sub title 2"));
     }
 
     @Test
-    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() throws Exception {
+    public void MiddleLetterAsOnlyCapitalLetterInSubTitle2AfterContinuousDelimiters() {
         assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1... this is a sub Title 2"));
     }
 
     @Test
-    public void FirstLetterAsOnlyCapitalLetterInEverySubTitleWithContinuousDelimiters() throws Exception {
+    public void FirstLetterAsOnlyCapitalLetterInEverySubTitleWithContinuousDelimiters() {
         assertEquals(Optional.empty(), checker.checkValue("This is; A sub title 1.... This is a sub title 2"));
     }
 
     @Test
-    public void FirstLetterAsOnlyCapitalLetterInEverySubTitleWithRandomDelimiters() throws Exception {
+    public void FirstLetterAsOnlyCapitalLetterInEverySubTitleWithRandomDelimiters() {
         assertEquals(Optional.empty(), checker.checkValue("This!is!!A!Title??"));
     }
 
     @Test
-    public void MoreThanOneCapitalLetterInSubTitleWithoutCurlyBrackets() throws Exception {
+    public void MoreThanOneCapitalLetterInSubTitleWithoutCurlyBrackets() {
         assertNotEquals(Optional.empty(), checker.checkValue("This!is!!A!TitlE??"));
     }
 }
