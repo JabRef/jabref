@@ -112,12 +112,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 String creatorsString = "";
                 String creatorsType = "";
 
-                creatorsString = entry.getField(StandardField.AUTHOR).orElse("").trim();
+                creatorsString = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.AUTHOR).orElse("").trim());
 
                 if (creatorsString.length() != 0) {
                     creatorsType = "author";
                 } else {
-                    creatorsString = entry.getField(StandardField.EDITOR).orElse("").trim();
+                    creatorsString = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.EDITOR).orElse("").trim());
 
                     if (creatorsString.length() != 0) {
                         creatorsType = "editor";
