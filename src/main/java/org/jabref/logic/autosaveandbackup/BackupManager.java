@@ -102,7 +102,7 @@ public class BackupManager {
         }
 
         try {
-            return !com.google.common.io.Files.equal(originalPath.toFile(), backupPath.toFile());
+            return Files.mismatch(originalPath, backupPath) != -1L;
         } catch (IOException e) {
             LOGGER.debug("Could not compare original file and backup file.", e);
             // User has to investigate in this case
