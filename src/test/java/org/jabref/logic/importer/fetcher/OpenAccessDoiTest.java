@@ -36,4 +36,14 @@ class OpenAccessDoiTest {
         entry.setField(StandardField.DOI, "10.1186/unknown-doi");
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
+
+    @Test
+    void entryWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.META_SEARCH, finder.getTrustLevel());
+    }
 }
