@@ -11,7 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
  */
 public class SaveAction extends SimpleCommand {
 
-    public enum SaveMethod { SAVE, SAVE_AS, SAVE_SELECTED }
+    public enum SaveMethod {SAVE, SAVE_AS, SAVE_SELECTED}
 
     private final SaveMethod saveMethod;
     private final JabRefFrame frame;
@@ -19,7 +19,6 @@ public class SaveAction extends SimpleCommand {
     public SaveAction(SaveMethod saveMethod, JabRefFrame frame, StateManager stateManager) {
         this.saveMethod = saveMethod;
         this.frame = frame;
-
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
             this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -37,7 +36,7 @@ public class SaveAction extends SimpleCommand {
 
         switch (saveMethod) {
             case SAVE:
-                saveDatabaseAction.save(frame.getCurrentBasePanel().getBibDatabaseContext());
+                saveDatabaseAction.save();
                 break;
             case SAVE_AS:
                 saveDatabaseAction.saveAs();

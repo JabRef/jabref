@@ -23,10 +23,10 @@ public class SaveAllAction extends SimpleCommand {
 
         for (BasePanel panel : frame.getBasePanelList()) {
             SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
-            boolean saveResult = saveDatabaseAction.save(panel.getBibDatabaseContext());
+            boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
-                 dialogService.notify(Localization.lang("Could not save file."));
-             }
+                dialogService.notify(Localization.lang("Could not save file."));
+            }
         }
 
         dialogService.notify(Localization.lang("Save all finished."));
