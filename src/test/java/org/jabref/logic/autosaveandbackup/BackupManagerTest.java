@@ -12,15 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BackupManagerTest {
 
     @Test
-    public void backupFileNameIsCorrectlyGeneratedWithinTmpDirectory() {
+    public void autosaveFileNameIsCorrectlyGeneratedWithinTmpDirectory() {
         Path bibPath = Paths.get("tmp", "test.bib");
         Path savPath = BackupManager.getBackupPath(bibPath);
         assertEquals(Paths.get("tmp", "test.bib.sav"), savPath);
     }
 
     @Test
-    public void backupFileIsEqualForNonExistingBackup() throws Exception {
-        Path originalFile = Path.of(BackupManagerTest.class.getResource("no-backup.bib").toURI());
+    public void autosaveFileIsEqualForNonExistingBackup() throws Exception {
+        Path originalFile = Path.of(BackupManagerTest.class.getResource("no-autosave.bib").toURI());
         assertFalse(BackupManager.backupFileDiffers(originalFile));
     }
 
