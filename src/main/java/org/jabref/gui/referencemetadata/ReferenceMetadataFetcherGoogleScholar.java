@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
@@ -48,6 +49,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMetadataFetcherGoogleScholar.class);
 
     private static final AtomicInteger ATOMIC_INTEGER_DIALOG_RESULT = new AtomicInteger();
+
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     private final ObservableList<BibEntry> entriesWithIncompleteMetadata = FXCollections.observableArrayList(); // this list contains all entries with still incomplete metadata
 
@@ -141,9 +144,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 entryObject.addProperty("_lastEntry", entryIndex == entries.size() - 1);
                 // entry data
                 entryObject.addProperty("key", entry.getField(InternalField.KEY_FIELD).orElse("").trim());
-                entryObject.addProperty("title", entry.getField(StandardField.TITLE).orElse("").trim());
-                entryObject.addProperty("year", entry.getField(StandardField.YEAR).orElse("").trim());
-                entryObject.addProperty("date", entry.getField(StandardField.DATE).orElse("").trim());
+                entryObject.addProperty("title", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.TITLE).orElse("").trim()));
+                entryObject.addProperty("year", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.YEAR).orElse("").trim()));
+                entryObject.addProperty("date", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.DATE).orElse("").trim()));
                 entryObject.addProperty("DOI", entry.getField(StandardField.DOI).orElse("").trim());
                 entryObject.addProperty("extra", entry.getField(StandardField.NOTE).orElse("").trim()); // send note field as extra field
                 entryObject.add("creators", creatorsArray);
