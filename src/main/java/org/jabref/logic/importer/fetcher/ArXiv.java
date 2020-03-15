@@ -74,10 +74,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
                                                           .filter(Optional::isPresent)
                                                           .map(Optional::get)
                                                           .findFirst();
+            pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
 
-            if (pdfUrl.isPresent()) {
-                LOGGER.info("Fulltext PDF found @ arXiv.");
-            }
             return pdfUrl;
         } catch (FetcherException e) {
             LOGGER.warn("arXiv API request failed", e);
