@@ -70,7 +70,6 @@ public class BasePanel extends StackPane {
     private final FileAnnotationCache annotationCache;
 
     private final JabRefFrame frame;
-    // The undo manager.
     private final CountingUndoManager undoManager;
 
     private final SidePaneManager sidePaneManager;
@@ -80,13 +79,10 @@ public class BasePanel extends StackPane {
     private final DialogService dialogService;
     private MainTable mainTable;
     private BasePanelPreferences preferences;
-    // To contain instantiated entry editors. This is to save time
-    // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
     private boolean saving;
-    // AutoCompleter used in the search bar
     private PersonNameSuggestionProvider searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
@@ -539,11 +535,12 @@ public class BasePanel extends StackPane {
         }
     }
 
+    /**
+     * Put an asterisk behind the filename to indicate the database has changed.
+     */
     public void markBaseChanged() {
         baseChanged = true;
-        // Put an asterisk behind the filename to indicate the database has changed.
-        frame.setWindowTitle();
-        DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
+        frame.refreshTitleAndTabs();
     }
 
     public void markNonUndoableBaseChanged() {
@@ -558,13 +555,8 @@ public class BasePanel extends StackPane {
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-            } else {
-                frame.setTabTitle(this, Localization.lang("untitled"), null);
-            }
         }
-        frame.setWindowTitle();
+        frame.refreshTitleAndTabs();
     }
 
     public BibDatabase getDatabase() {

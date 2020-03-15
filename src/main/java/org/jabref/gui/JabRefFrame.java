@@ -147,7 +147,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JabRefFrame extends BorderPane {
 
-    // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
@@ -164,7 +163,6 @@ public class JabRefFrame extends BorderPane {
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
-    private final JabRefExecutorService executorService;
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
@@ -176,7 +174,6 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
-        this.executorService = JabRefExecutorService.INSTANCE;
     }
 
     private static BasePanel getBasePanel(Tab tab) {
@@ -281,39 +278,26 @@ public class JabRefFrame extends BorderPane {
 
     public void refreshTitleAndTabs() {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-
-            setWindowTitle();
             updateAllTabTitles();
+            setWindowTitle();
         });
     }
 
     /**
      * Sets the title of the main window.
+     *
+     * Relies on the result of updateAllTabTitles().
      */
-    public void setWindowTitle() {
+    private void setWindowTitle() {
         BasePanel panel = getCurrentBasePanel();
 
         // no database open
         if (panel == null) {
-            //setTitle(FRAME_TITLE);
+            mainStage.setTitle(FRAME_TITLE);
             return;
         }
 
-        String mode = panel.getBibDatabaseContext().getMode().getFormattedName();
-        String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
-        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
-
-        if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
-            String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
-            String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabaseFile()
-                                       .map(File::getPath)
-                                       .orElse(Localization.lang("untitled"));
-            //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
-        } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
-            //        + Localization.lang("shared") + "]" + modeInfo);
-        }
+        mainStage.setTitle(tabbedPane.getSelectionModel().getSelectedItem().getText() + " \u2013 " + FRAME_TITLE);
     }
 
     /**
@@ -961,7 +945,7 @@ public class JabRefFrame extends BorderPane {
                     dbPaths.add("");
                 }
             } catch (IOException ex) {
-                LOGGER.error("Invalid database file path: " + ex.getMessage());
+                LOGGER.error("Invalid database file path", ex);
             }
         }
         return dbPaths;
@@ -969,34 +953,35 @@ public class JabRefFrame extends BorderPane {
 
     private List<String> getUniquePathParts() {
         List<String> dbPaths = collectDatabaseFilePaths();
-
         return FileUtil.uniquePathSubstrings(dbPaths);
     }
 
-    public void updateAllTabTitles() {
+    private void updateAllTabTitles() {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
             Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
 
+            String newTitle;
+
             if (file.isPresent()) {
                 if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                    newTitle = getBasePanelAt(i).getTabTitle() + " \u2013 " + uniqPath;
                 } else {
                     // set original filename (again)
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                    newTitle = getBasePanelAt(i).getTabTitle();
                 }
             } else {
-                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                newTitle = getBasePanelAt(i).getTabTitle();
             }
+            tabbedPane.getTabs().get(i).setText(newTitle);
             tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(File::getAbsolutePath).orElse(null)));
         }
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
-        // add tab
         Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
         tabbedPane.getTabs().add(newTab);
         newTab.setOnCloseRequest(event -> {
@@ -1004,14 +989,12 @@ public class JabRefFrame extends BorderPane {
             event.consume();
         });
 
-        // update all tab titles
         updateAllTabTitles();
 
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(newTab);
         }
 
-        // Register undo/redo listener
         basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
@@ -1023,7 +1006,6 @@ public class JabRefFrame extends BorderPane {
 
         BackupManager.start(context, Globals.entryTypesManager, prefs);
 
-        // Track opening
         trackOpenNewDatabase(basePanel);
     }
 
