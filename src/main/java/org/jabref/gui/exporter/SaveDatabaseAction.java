@@ -129,7 +129,7 @@ public class SaveDatabaseAction {
             // we managed to successfully save the file
             // thus, we can store the store the path into the context
             context.setDatabasePath(file);
-            frame.refreshTitleAndTabs();
+            frame.refreshWindowAndTabTitles();
 
             // Reinstall AutosaveManager and BackupManager for the new file name
             panel.resetChangeMonitorAndChangePane();
@@ -200,9 +200,7 @@ public class SaveDatabaseAction {
                 panel.setNonUndoableChange(false);
                 panel.setBaseChanged(false);
 
-                frame.setTabTitle(panel, panel.getTabTitle(), targetPath.toAbsolutePath().toString());
-                frame.setWindowTitle();
-                frame.updateAllTabTitles();
+                frame.refreshWindowAndTabTitles();
             }
             return success;
         } catch (SaveException ex) {

@@ -142,34 +142,6 @@ public class BasePanel extends StackPane {
         return suggestionProviders;
     }
 
-    public String getTabTitle() {
-        StringBuilder title = new StringBuilder();
-        DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
-        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
-
-        if (databaseLocation == DatabaseLocation.LOCAL) {
-            if (this.bibDatabaseContext.getDatabaseFile().isPresent()) {
-                // check if file is modified
-                String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
-                title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
-            } else {
-                title.append(Localization.lang("untitled"));
-
-                if (getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    // This also happens internally at basepanel to ensure consistency line 224
-                    title.append('*');
-                }
-            }
-        } else if (databaseLocation == DatabaseLocation.SHARED) {
-            title.append(this.bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
-        }
-
-        return title.toString();
-    }
-
     public boolean isModified() {
         return baseChanged;
     }
@@ -540,7 +512,7 @@ public class BasePanel extends StackPane {
      */
     public void markBaseChanged() {
         baseChanged = true;
-        frame.refreshTitleAndTabs();
+        frame.refreshWindowAndTabTitles();
     }
 
     public void markNonUndoableBaseChanged() {
@@ -556,7 +528,7 @@ public class BasePanel extends StackPane {
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
         }
-        frame.refreshTitleAndTabs();
+        frame.refreshWindowAndTabTitles();
     }
 
     public BibDatabase getDatabase() {

@@ -67,7 +67,7 @@ public class SharedDatabaseUIManager {
 
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
-                jabRefFrame.refreshTitleAndTabs();
+                jabRefFrame.refreshWindowAndTabTitles();
                 jabRefFrame.getDialogService().notify(Localization.lang("Working offline."));
             }
         } else {
