@@ -129,6 +129,7 @@ public class SaveDatabaseAction {
             // we managed to successfully save the file
             // thus, we can store the store the path into the context
             context.setDatabasePath(file);
+            frame.refreshTitleAndTabs();
 
             // Reinstall AutosaveManager and BackupManager for the new file name
             panel.resetChangeMonitorAndChangePane();
