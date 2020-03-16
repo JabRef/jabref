@@ -85,16 +85,7 @@ public class BibDatabaseContext {
         return file.map(Path::toFile);
     }
 
-    /**
-     * @param file the database file
-     * @deprecated use {@link #setDatabaseFile(Path)}
-     */
-    @Deprecated
-    public void setDatabaseFile(File file) {
-        this.file = Optional.ofNullable(file).map(File::toPath);
-    }
-
-    public void setDatabaseFile(Path file) {
+    public void setDatabasePath(Path file) {
         this.file = Optional.ofNullable(file);
     }
 

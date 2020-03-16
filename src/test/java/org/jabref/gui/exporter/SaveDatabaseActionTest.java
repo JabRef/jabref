@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -65,7 +65,7 @@ class SaveDatabaseActionTest {
     public void saveAsShouldSetWorkingDirectory() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
-        doNothing().when(saveDatabaseAction).saveAs(any());
+        doReturn(true).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
@@ -76,22 +76,11 @@ class SaveDatabaseActionTest {
     public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
         when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
-        doNothing().when(saveDatabaseAction).saveAs(any());
+        doReturn(false).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
         verify(preferences, times(0)).setWorkingDir(file.getParent());
-    }
-
-    @Test
-    public void saveAsShouldSetNewDatabasePathIntoContext() {
-        when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
-        when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
-        when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
-
-        saveDatabaseAction.saveAs(file);
-
-        verify(dbContext, times(1)).setDatabaseFile(file);
     }
 
     @Test
@@ -100,11 +89,11 @@ class SaveDatabaseActionTest {
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
-        doNothing().when(saveDatabaseAction).saveAs(file);
+        doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
 
-        saveDatabaseAction.save();
+        saveDatabaseAction.save(dbContext);
 
-        verify(saveDatabaseAction, times(1)).saveAs(file);
+        verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
     }
 
     private SaveDatabaseAction createSaveDatabaseActionForBibDatabase(BibDatabase database) throws IOException {
@@ -151,7 +140,7 @@ class SaveDatabaseActionTest {
         BibDatabase database = new BibDatabase(List.of(firstEntry, secondEntry));
 
         saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
-        saveDatabaseAction.save();
+        saveDatabaseAction.save(dbContext);
 
         assertEquals(database
                         .getEntries().stream()
@@ -162,9 +151,7 @@ class SaveDatabaseActionTest {
     @Test
     public void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
-
-        boolean result = saveDatabaseAction.save();
-
+        boolean result = saveDatabaseAction.save(dbContext);
         assertFalse(result);
     }
 }

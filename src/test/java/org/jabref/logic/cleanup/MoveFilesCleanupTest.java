@@ -49,7 +49,7 @@ class MoveFilesCleanupTest {
         metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
-        databaseContext.setDatabaseFile(bibFolder.resolve("test.bib"));
+        databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");

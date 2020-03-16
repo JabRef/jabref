@@ -431,7 +431,7 @@ public class ArgumentProcessor {
                 theFile = theFile.getAbsoluteFile();
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
-            databaseContext.setDatabaseFile(theFile);
+            databaseContext.setDatabasePath(theFile.toPath());
             Globals.prefs.fileDirForDatabase = databaseContext
                     .getFileDirectories(Globals.prefs.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
