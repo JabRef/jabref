@@ -11,7 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
  */
 public class SaveAction extends SimpleCommand {
 
-    public enum SaveMethod {SAVE, SAVE_AS, SAVE_SELECTED}
+    public enum SaveMethod { SAVE, SAVE_AS, SAVE_SELECTED }
 
     private final SaveMethod saveMethod;
     private final JabRefFrame frame;
