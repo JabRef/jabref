@@ -104,7 +104,7 @@ public class SaveDatabaseAction {
      *             successful save.
      * @return true on successful save
      */
-    private boolean saveAs(Path file, SaveDatabaseMode mode) {
+    boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = panel.getBibDatabaseContext();
 
         // Close AutosaveManager and BackupManager for original library

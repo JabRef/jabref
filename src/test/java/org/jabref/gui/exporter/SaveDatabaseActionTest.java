@@ -91,7 +91,7 @@ class SaveDatabaseActionTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any(), any());
 
-        saveDatabaseAction.save(dbContext);
+        saveDatabaseAction.save();
 
         verify(saveDatabaseAction, times(1)).saveAs(file, SaveDatabaseAction.SaveDatabaseMode.NORMAL);
     }
@@ -140,7 +140,7 @@ class SaveDatabaseActionTest {
         BibDatabase database = new BibDatabase(List.of(firstEntry, secondEntry));
 
         saveDatabaseAction = createSaveDatabaseActionForBibDatabase(database);
-        saveDatabaseAction.save(dbContext);
+        saveDatabaseAction.save();
 
         assertEquals(database
                         .getEntries().stream()
@@ -151,7 +151,7 @@ class SaveDatabaseActionTest {
     @Test
     public void saveShouldNotSaveDatabaseIfPathNotSet() {
         when(dbContext.getDatabasePath()).thenReturn(Optional.empty());
-        boolean result = saveDatabaseAction.save(dbContext);
+        boolean result = saveDatabaseAction.save();
         assertFalse(result);
     }
 }
