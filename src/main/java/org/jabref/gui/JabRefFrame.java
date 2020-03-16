@@ -488,9 +488,9 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
                 factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
-                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
+                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
+                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
@@ -723,7 +723,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction( this, stateManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
@@ -780,15 +780,20 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs))
         );
 
-        lookup.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager))
-        );
-
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
+
+        lookup.getItems().addAll(
+                lookupIdentifiers,
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager))
+        );
 
         // PushToApplication
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
@@ -801,14 +806,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
-
-                new SeparatorMenuItem(),
-
-                lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
 
                 new SeparatorMenuItem(),
 
@@ -895,6 +894,7 @@ public class JabRefFrame extends BorderPane {
                 edit,
                 library,
                 quality,
+                lookup,
                 tools,
                 view,
                 options,

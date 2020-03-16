@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>American Chemical Society</title>
-    <title-short>ACS</title-short>
-    <id>http://www.zotero.org/styles/american-chemical-society</id>
-    <link href="http://www.zotero.org/styles/american-chemical-society" rel="self"/>
-    <link href="https://pubs.acs.org/doi/pdf/10.1021/bk-2006-STYG.ch014" rel="documentation"/>
-    <author>
-      <name>Julian Onions</name>
-      <email>julian.onions@gmail.com</email>
-    </author>
+    <title>Beilstein Journal of Organic Chemistry</title>
+    <title-short>Beilstein</title-short>
+    <id>http://www.zotero.org/styles/beilstein-journal-of-organic-chemistry</id>
+    <link href="http://www.zotero.org/styles/beilstein-journal-of-organic-chemistry" rel="self"/>
+    <link href="http://www.zotero.org/styles/american-chemical-society" rel="template"/>
+    <link href="https://www.beilstein-journals.org/bjoc/authorInstructions" rel="documentation"/>
     <contributor>
-      <name>Ivan Bushmarinov</name>
-      <email>ib@ineos.ac.ru</email>
-    </contributor>
-    <contributor>
-      <name>Sebastian Karcher</name>
+      <name>Beilstein-Institut zur Foerderung der Chemischen Wissenschaften</name>
+      <email>journals-support@beilstein-institut.de</email>
     </contributor>
     <category citation-format="numeric"/>
     <category field="chemistry"/>
-    <summary>The American Chemical Society style</summary>
-    <updated>2020-03-10T12:00:00+00:00</updated>
+    <issn>1860-5397</issn>
+    <updated>2020-03-09T13:43:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -141,18 +136,17 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout delimiter="," vertical-align="sup">
+    <layout vertical-align="baseline" delimiter="," prefix="[" suffix="]">
       <text variable="citation-number"/>
     </layout>
   </citation>
   <bibliography second-field-align="flush" entry-spacing="0">
-    <layout suffix=".">
+    <layout>
       <text variable="citation-number" prefix="(" suffix=") "/>
       <text macro="author" suffix=" "/>
       <choose>
         <if type="article-journal review" match="any">
           <group delimiter=" ">
-            <text macro="title" suffix="."/>
             <text variable="container-title" font-style="italic" form="short"/>
             <group delimiter=", ">
               <text macro="issued" font-weight="bold"/>
@@ -273,7 +267,7 @@
           </group>
         </else>
       </choose>
-      <text variable="DOI" prefix=". https://doi.org/"/>
+      <text variable="DOI" prefix=". doi:"/>
     </layout>
   </bibliography>
 </style>
