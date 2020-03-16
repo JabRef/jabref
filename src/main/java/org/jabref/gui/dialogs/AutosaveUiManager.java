@@ -10,16 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class has an abstract UI role as it listens for an {@link AutosaveEvent}
- * and saves the bib file associated with the given {@link BasePanel}.
+ * This class has an abstract UI role as it listens for an {@link AutosaveEvent} and saves the bib file associated with
+ * the given {@link BasePanel}.
  */
-public class AutosaveUIManager {
+public class AutosaveUiManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUIManager.class);
     private final BasePanel panel;
 
-
-    public AutosaveUIManager(BasePanel panel) {
+    public AutosaveUiManager(BasePanel panel) {
         this.panel = panel;
     }
 
