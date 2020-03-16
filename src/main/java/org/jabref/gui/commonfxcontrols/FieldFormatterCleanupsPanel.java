@@ -1,7 +1,5 @@
 package org.jabref.gui.commonfxcontrols;
 
-import javax.inject.Inject;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -14,7 +12,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -36,7 +33,6 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML private ComboBox<Field> addableFields;
     @FXML private ComboBox<Formatter> addableFormatters;
 
-    @Inject private StateManager stateManager;
     private FieldFormatterCleanupsPanelViewModel viewModel;
 
     public FieldFormatterCleanupsPanel() {
@@ -47,7 +43,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
     @FXML
     private void initialize() {
-        this.viewModel = new FieldFormatterCleanupsPanelViewModel(stateManager);
+        this.viewModel = new FieldFormatterCleanupsPanelViewModel();
 
         setupTable();
         setupCombos();
