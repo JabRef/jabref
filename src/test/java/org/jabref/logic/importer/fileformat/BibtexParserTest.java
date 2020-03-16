@@ -1489,7 +1489,7 @@ class BibtexParserTest {
 
         assertEquals("\\Literature\\", result.getMetaData().getDefaultFileDirectory().get());
         assertEquals("D:\\Documents", result.getMetaData().getUserFileDirectory("defaultOwner-user").get());
-        assertEquals("D:\\Latex", result.getMetaData().getLaTexFileDirectory("defaultOwner-user").get().toString());
+        assertEquals("D:\\Latex", result.getMetaData().getLatexFileDirectory("defaultOwner-user").get().toString());
     }
 
     @Test

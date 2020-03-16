@@ -21,9 +21,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
@@ -31,25 +31,28 @@ import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+
 public class WriteXMPAction extends SimpleCommand {
 
-    private final BasePanel basePanel;
+    private final StateManager stateManager;
+    private final DialogService dialogService;
+
     private OptionsDialog optionsDialog;
 
+    private BibDatabase database;
     private Collection<BibEntry> entries;
 
-    private BibDatabase database;
-
     private boolean shouldContinue = true;
-
     private int skipped;
     private int entriesChanged;
     private int errors;
-    private final DialogService dialogService;
 
-    public WriteXMPAction(BasePanel basePanel) {
-        this.basePanel = basePanel;
-        dialogService = basePanel.frame().getDialogService();
+    public WriteXMPAction(StateManager stateManager, DialogService dialogService) {
+        this.stateManager = stateManager;
+        this.dialogService = dialogService;
+
+        this.executable.bind(needsDatabase(stateManager));
     }
 
     @Override
@@ -60,9 +63,13 @@ public class WriteXMPAction extends SimpleCommand {
     }
 
     public void init() {
-        database = basePanel.getDatabase();
+        if (stateManager.getActiveDatabase().isEmpty()) {
+            return;
+        }
+
+        database = stateManager.getActiveDatabase().get().getDatabase();
         // Get entries and check if it makes sense to perform this operation
-        entries = basePanel.getSelectedEntries();
+        entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
 
@@ -70,15 +77,15 @@ public class WriteXMPAction extends SimpleCommand {
 
             if (entries.isEmpty()) {
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
+                        Localization.lang("Write XMP metadata"),
                         Localization.lang("This operation requires one or more entries to be selected."));
                 shouldContinue = false;
                 return;
 
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
-                        Localization.lang("Write XMP-metadata"),
-                        Localization.lang("Write XMP-metadata for all PDFs in current library?"));
+                        Localization.lang("Write XMP metadata"),
+                        Localization.lang("Write XMP metadata for all PDFs in current library?"));
                 if (confirm) {
                     shouldContinue = false;
                     return;
@@ -93,11 +100,11 @@ public class WriteXMPAction extends SimpleCommand {
         }
         optionsDialog.open();
 
-        dialogService.notify(Localization.lang("Writing XMP-metadata..."));
+        dialogService.notify(Localization.lang("Writing XMP metadata..."));
     }
 
     private void writeXMP() {
-        if (!shouldContinue) {
+        if (!shouldContinue || stateManager.getActiveDatabase().isEmpty()) {
             return;
         }
 
@@ -105,7 +112,7 @@ public class WriteXMPAction extends SimpleCommand {
             // Make a list of all PDFs linked from this entry:
             List<Path> files = entry.getFiles().stream()
                                     .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
-                                    .map(file -> file.findIn(basePanel.getBibDatabaseContext(), Globals.prefs.getFilePreferences()))
+                                    .map(file -> file.findIn(stateManager.getActiveDatabase().get(), Globals.prefs.getFilePreferences()))
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .collect(Collectors.toList());
@@ -176,7 +183,7 @@ public class WriteXMPAction extends SimpleCommand {
         private final TextArea progressArea;
 
         public OptionsDialog() {
-            super(AlertType.NONE, Localization.lang("Writing XMP-metadata for selected entries..."), false);
+            super(AlertType.NONE, Localization.lang("Writing XMP metadata for selected entries..."), false);
             okButton.setDisable(true);
             okButton.setOnAction(e -> dispose());
             okButton.setPrefSize(100, 30);

@@ -43,7 +43,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
     }
 
     @Override
-    public String getTabName() { return Localization.lang("XMP-metadata"); }
+    public String getTabName() { return Localization.lang("XMP metadata"); }
 
     public void initialize () {
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);

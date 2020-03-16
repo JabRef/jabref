@@ -18,6 +18,7 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
+import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -98,6 +99,7 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
+        set.add(new GrobidCitationFetcher(importFormatPreferences));
         return set;
     }
 

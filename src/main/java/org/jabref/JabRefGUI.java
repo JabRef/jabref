@@ -12,7 +12,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
@@ -57,7 +56,7 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-        GUIGlobals.init();
+        IconTheme.loadFonts();
 
         LOGGER.debug("Initializing frame");
         mainFrame.init();

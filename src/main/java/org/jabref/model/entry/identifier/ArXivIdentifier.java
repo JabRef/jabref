@@ -9,49 +9,59 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Identifier for the arXiv. See https://arxiv.org/help/arxiv_identifier
  */
 public class ArXivIdentifier implements Identifier {
 
+    private static final String ARXIV_PREFIX = "http(s)?://arxiv.org/(abs|pdf)/|arxiv|arXiv";
     private final String identifier;
     private final String classification;
+    private final String version;
 
     ArXivIdentifier(String identifier) {
-        this(identifier, "");
+        this(identifier, "", "");
     }
 
     ArXivIdentifier(String identifier, String classification) {
+        this(identifier, "", classification);
+    }
+
+    ArXivIdentifier(String identifier, String version, String classification) {
         this.identifier = identifier.trim();
+        this.version = version.trim();
         this.classification = classification.trim();
     }
 
     public static Optional<ArXivIdentifier> parse(String value) {
-        Pattern identifierPattern = Pattern.compile("(arxiv|arXiv)?\\s?:?\\s?(?<id>\\d{4}.\\d{4,5}(v\\d+)?)\\s?(\\[(?<classification>\\S+)\\])?");
-        Matcher identifierMatcher = identifierPattern.matcher(value);
+        String identifier = value.replaceAll(" ", "");
+        Pattern identifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>\\d{4}.\\d{4,5})(v(?<version>\\d+))?\\s?(\\[(?<classification>\\S+)\\])?");
+        Matcher identifierMatcher = identifierPattern.matcher(identifier);
         if (identifierMatcher.matches()) {
             String id = identifierMatcher.group("id");
             String classification = identifierMatcher.group("classification");
             if (classification == null) {
                 classification = "";
             }
-            return Optional.of(new ArXivIdentifier(id, classification));
+            String version = identifierMatcher.group("version");
+            if (version == null) {
+                version = "";
+            }
+            return Optional.of(new ArXivIdentifier(id, version, classification));
         }
 
-        Pattern oldIdentifierPattern = Pattern.compile("(arxiv|arXiv)?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})");
-        Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(value);
+        Pattern oldIdentifierPattern = Pattern.compile("(" + ARXIV_PREFIX + ")?\\s?:?\\s?(?<id>(?<classification>[a-z\\-]+(\\.[A-Z]{2})?)/\\d{7})(v(?<version>\\d+))?");
+        Matcher oldIdentifierMatcher = oldIdentifierPattern.matcher(identifier);
         if (oldIdentifierMatcher.matches()) {
             String id = oldIdentifierMatcher.group("id");
             String classification = oldIdentifierMatcher.group("classification");
-            return Optional.of(new ArXivIdentifier(id, classification));
-        }
-
-        Pattern urlPattern = Pattern.compile("(http://arxiv.org/abs/)(?<id>\\S+)");
-        Matcher urlMatcher = urlPattern.matcher(value);
-        if (urlMatcher.matches()) {
-            String id = urlMatcher.group("id");
-            return Optional.of(new ArXivIdentifier(id));
+            String version = oldIdentifierMatcher.group("version");
+            if (version == null) {
+                version = "";
+            }
+            return Optional.of(new ArXivIdentifier(id, version, classification));
         }
 
         return Optional.empty();
@@ -99,6 +109,14 @@ public class ArXivIdentifier implements Identifier {
 
     @Override
     public String getNormalized() {
+        if (StringUtil.isNotBlank(version)) {
+            return identifier + "v" + version;
+        } else {
+            return identifier;
+        }
+    }
+
+    public String getNormalizedWithoutVersion() {
         return identifier;
     }
 

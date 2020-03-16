@@ -34,7 +34,6 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ControlHelper;
@@ -62,7 +61,7 @@ public class GroupTreeView {
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
+    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     @FXML private CustomTextField searchField;
 
     @Inject private StateManager stateManager;
@@ -77,7 +76,7 @@ public class GroupTreeView {
 
     @FXML
     public void initialize() {
-        this.localDragboard = GUIGlobals.localDragboard;
+        this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
 
         // Set-up groups tree
@@ -159,7 +158,7 @@ public class GroupTreeView {
                     group.toggleExpansion();
                     event.consume();
                 })
-                .install(disclosureNodeColumn);
+                .install(expansionNodeColumn);
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
@@ -199,6 +198,10 @@ public class GroupTreeView {
                     if ((selectedItem != null) && (selectedItem.getValue() != null)) {
                         groupsToMove.add(selectedItem.getValue().getPath());
                     }
+                }
+
+                if (groupsToMove.size() > 0) {
+                    localDragboard.clearAll();
                 }
 
                 // Put the group nodes as content

@@ -12,7 +12,9 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.AppendDatabaseDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -41,18 +43,22 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AppendDatabaseAction implements BaseAction {
+public class AppendDatabaseAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppendDatabaseAction.class);
 
-    private final BasePanel panel;
+    private final JabRefFrame frame;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
 
     private final List<Path> filesToOpen = new ArrayList<>();
-    private final DialogService dialogService;
 
-    public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
-        this.panel = panel;
-        dialogService = frame.getDialogService();
+    public AppendDatabaseAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+        this.frame = frame;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
     private static void mergeFromBibtex(BasePanel panel, ParserResult parserResult, boolean importEntries,
@@ -131,9 +137,9 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         Globals.stateManager.getActiveDatabase()
-                .map(BibDatabaseContext::getMetaData)
-                .flatMap(MetaData::getGroups)
-                .ifPresent(newGroups::moveTo);
+                            .map(BibDatabaseContext::getMetaData)
+                            .flatMap(MetaData::getGroups)
+                            .ifPresent(newGroups::moveTo);
 
         //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
         //        new GroupTreeNodeViewModel(newGroups), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -141,7 +147,13 @@ public class AppendDatabaseAction implements BaseAction {
     }
 
     @Override
-    public void action() {
+    public void execute() {
+        if (stateManager.getActiveDatabase().isEmpty()) {
+            return;
+        }
+
+        BasePanel panel = frame.getCurrentBasePanel();
+
         filesToOpen.clear();
         final AppendDatabaseDialog dialog = new AppendDatabaseDialog();
         Optional<Boolean> response = dialog.showAndWait();
@@ -163,25 +175,25 @@ public class AppendDatabaseAction implements BaseAction {
 
             for (Path file : filesToOpen) {
                 // Run the actual open in a thread to prevent the program locking until the file is loaded.
-                BackgroundTask.wrap(() -> openIt(file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
+                BackgroundTask.wrap(() -> openIt(panel, file, dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()))
                               .onSuccess(fileName -> dialogService.notify(Localization.lang("Imported from library") + " '" + fileName + "'"))
                               .onFailure(exception -> {
                                   LOGGER.warn("Could not open database", exception);
-                                  dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);})
+                                  dialogService.showErrorDialogAndWait(Localization.lang("Open library"), exception);
+                              })
                               .executeWith(Globals.TASK_EXECUTOR);
             }
         }
     }
 
-    private String openIt(Path file, boolean importEntries, boolean importStrings, boolean importGroups,
-                        boolean importSelectorWords) throws IOException, KeyCollisionException {
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
-            // Should this be done _after_ we know it was successfully opened?
+    private String openIt(BasePanel panel, Path file, boolean importEntries, boolean importStrings, boolean importGroups,
+                          boolean importSelectorWords) throws IOException, KeyCollisionException {
+        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
+        // Should this be done _after_ we know it was successfully opened?
         ParserResult parserResult = OpenDatabase.loadDatabase(file,
-                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
-            AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
-                    importSelectorWords);
-            return file.toString();
+                Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
+                importSelectorWords);
+        return file.toString();
     }
-
 }

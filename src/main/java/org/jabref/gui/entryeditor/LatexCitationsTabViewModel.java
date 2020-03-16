@@ -26,11 +26,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.texparser.DefaultTexParser;
+import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
-import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private final ObjectProperty<Status> status;
     private final StringProperty searchError;
     private Future<?> searchTask;
-    private TexParserResult texParserResult;
+    private LatexParserResult latexParserResult;
     private BibEntry currentEntry;
 
     public LatexCitationsTabViewModel(BibDatabaseContext databaseContext, PreferencesService preferencesService,
@@ -65,7 +65,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         this.preferencesService = preferencesService;
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
                                                                    .orElseGet(preferencesService::getWorkingDir));
         this.citationList = FXCollections.observableArrayList();
         this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
@@ -126,10 +126,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     }
 
     private Collection<Citation> searchAndParse(String citeKey) throws IOException {
-        Path newDirectory = databaseContext.getMetaData().getLaTexFileDirectory(preferencesService.getUser())
+        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferencesService.getUser())
                                            .orElseGet(preferencesService::getWorkingDir);
 
-        if (texParserResult == null || !newDirectory.equals(directory.get())) {
+        if (latexParserResult == null || !newDirectory.equals(directory.get())) {
             directory.set(newDirectory);
 
             if (!newDirectory.toFile().exists()) {
@@ -137,10 +137,10 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             }
 
             List<Path> texFiles = searchDirectory(newDirectory, new ArrayList<>());
-            texParserResult = new DefaultTexParser().parse(texFiles);
+            latexParserResult = new DefaultLatexParser().parse(texFiles);
         }
 
-        return texParserResult.getCitationsByKey(citeKey);
+        return latexParserResult.getCitationsByKey(citeKey);
     }
 
     private List<Path> searchDirectory(Path directory, List<Path> texFiles) {
@@ -168,7 +168,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLaTexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
+                databaseContext.getMetaData().setLatexFileDirectory(preferencesService.getUser(), selectedDirectory.toAbsolutePath()));
 
         init(currentEntry);
     }

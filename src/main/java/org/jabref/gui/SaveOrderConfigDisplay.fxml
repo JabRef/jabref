@@ -24,37 +24,38 @@
     <RadioButton fx:id="exportInSpecifiedOrder"
                  text="%Export entries ordered as specified" toggleGroup="$saveOrderToggleGroup"/>
 
-    <GridPane alignment="CENTER_LEFT" hgap="10.0">
+    <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="-Infinity" prefWidth="100.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+            <ColumnConstraints hgrow="NEVER" minWidth="25.0" maxWidth="25.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" halignment="LEFT"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints prefHeight="30.0"/>
-            <RowConstraints prefHeight="30.0"/>
-            <RowConstraints prefHeight="30.0"/>
-            <RowConstraints prefHeight="30.0"/>
-            <RowConstraints prefHeight="30.0"/>
-            <RowConstraints prefHeight="30.0"/>
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
 
-        <Label disable="${!exportInSpecifiedOrder.selected}" text="%Primary sort criterion" GridPane.rowIndex="0"/>
-        <Label disable="${!exportInSpecifiedOrder.selected}" text="%Secondary sort criterion" GridPane.rowIndex="1"/>
-        <Label disable="${!exportInSpecifiedOrder.selected}" text="%Tertiary sort criterion" GridPane.rowIndex="2"/>
+        <Label text="%Primary sort criterion" GridPane.columnIndex="1" GridPane.rowIndex="0"
+               disable="${!exportInSpecifiedOrder.selected}"/>
+        <Label text="%Secondary sort criterion" GridPane.columnIndex="1" GridPane.rowIndex="1"
+               disable="${!exportInSpecifiedOrder.selected}"/>
+        <Label text="%Tertiary sort criterion" GridPane.columnIndex="1" GridPane.rowIndex="2"
+               disable="${!exportInSpecifiedOrder.selected}"/>
 
-        <ComboBox fx:id="savePriSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="0"
+        <ComboBox fx:id="savePriSort" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="0"
                   disable="${!exportInSpecifiedOrder.selected}"/>
-        <ComboBox fx:id="saveSecSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="1"
+        <ComboBox fx:id="saveSecSort" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1"
                   disable="${!exportInSpecifiedOrder.selected}"/>
-        <ComboBox fx:id="saveTerSort" editable="true" GridPane.columnIndex="1" GridPane.rowIndex="2"
+        <ComboBox fx:id="saveTerSort" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="2"
                   disable="${!exportInSpecifiedOrder.selected}"/>
 
         <CheckBox fx:id="savePriDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false"
-                  text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                  text="%Descending" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
         <CheckBox fx:id="saveSecDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false"
-                  text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                  text="%Descending" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
         <CheckBox fx:id="saveTerDesc" disable="${!exportInSpecifiedOrder.selected}" mnemonicParsing="false"
-                  text="%Descending" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                  text="%Descending" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
     </GridPane>
 </fx:root>

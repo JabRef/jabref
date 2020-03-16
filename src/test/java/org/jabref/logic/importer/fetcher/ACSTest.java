@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
 class ACSTest {
-
     private ACS finder;
     private BibEntry entry;
 
@@ -43,5 +42,15 @@ class ACSTest {
         entry.setField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.PUBLISHER, finder.getTrustLevel());
     }
 }

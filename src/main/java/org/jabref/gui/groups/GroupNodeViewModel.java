@@ -39,6 +39,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -204,7 +205,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(IconTheme.JabRefIcons.class, iconCode.toUpperCase(Locale.ENGLISH))
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
                     .toJavaUtil()
                     .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
@@ -291,10 +292,14 @@ public class GroupNodeViewModel {
     }
 
     public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+        // No action, if the target is the same as the source
+        if (this.equals(target)) {
+            return;
+        }
+
         Optional<GroupTreeNode> targetParent = target.getParent();
         if (targetParent.isPresent()) {
             int targetIndex = target.getPositionInParent();
-
             // In case we want to move an item in the same parent
             // and the item is moved down, we need to adjust the target index
             if (targetParent.equals(getParent())) {

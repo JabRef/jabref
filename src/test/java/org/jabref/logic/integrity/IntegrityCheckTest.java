@@ -232,7 +232,7 @@ class IntegrityCheckTest {
         Files.createFile(pdfFile);
 
         BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
-        databaseContext.setDatabaseFile(bibFile);
+        databaseContext.setDatabasePath(bibFile);
 
         assertCorrect(databaseContext);
     }

@@ -33,14 +33,14 @@ class ArXivIdentifierTest {
     void parseWithClassification() throws Exception {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("0706.0001v1 [q-bio.CB]");
 
-        assertEquals(Optional.of(new ArXivIdentifier("0706.0001v1", "q-bio.CB")), parsed);
+        assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "1", "q-bio.CB")), parsed);
     }
 
     @Test
     void parseWithArXivPrefixAndClassification() throws Exception {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("arXiv:0706.0001v1 [q-bio.CB]");
 
-        assertEquals(Optional.of(new ArXivIdentifier("0706.0001v1", "q-bio.CB")), parsed);
+        assertEquals(Optional.of(new ArXivIdentifier("0706.0001", "1", "q-bio.CB")), parsed);
     }
 
     @Test
@@ -62,5 +62,33 @@ class ArXivIdentifierTest {
         Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/abs/1502.05795");
 
         assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "")), parsed);
+    }
+
+    @Test
+    void parseHttpsUrl() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("https://arxiv.org/abs/1502.05795");
+
+        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "")), parsed);
+    }
+
+    @Test
+    void parsePdfUrl() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/pdf/1502.05795");
+
+        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "")), parsed);
+    }
+
+    @Test
+    void parseUrlWithVersion() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/abs/1502.05795v1");
+
+        assertEquals(Optional.of(new ArXivIdentifier("1502.05795", "1", "")), parsed);
+    }
+
+    @Test
+    void parseOldUrlWithVersion() throws Exception {
+        Optional<ArXivIdentifier> parsed = ArXivIdentifier.parse("http://arxiv.org/pdf/hep-ex/0307015v1");
+
+        assertEquals(Optional.of(new ArXivIdentifier("hep-ex/0307015", "1", "hep-ex")), parsed);
     }
 }
