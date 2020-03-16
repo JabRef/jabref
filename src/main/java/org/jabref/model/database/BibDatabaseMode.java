@@ -17,7 +17,7 @@ public enum BibDatabaseMode {
         if (this == BIBTEX) {
             return "BibTeX";
         } else {
-            return "BibLaTeX";
+            return "biblatex";
         }
     }
 

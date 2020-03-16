@@ -21,11 +21,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
 - We fixed an issue with inconsistent capitalization of file extensions when downloading files [#6115](https://github.com/JabRef/jabref/issues/6115)
-- We fixed the display of language, encoding and bibliography mode in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ### Removed
 
-- We removed the obsolete `External programs -> Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ## [5.0] – 2020-03-06
 
