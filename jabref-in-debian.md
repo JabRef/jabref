@@ -6,6 +6,10 @@ Since Ubuntu is based on Debian, the JabRef version available in ubuntu (<https:
 
 At [koppor's repository](https://github.com/koppor/jabref/), required Debian adaptions to branches are tracked in `debian_x.y` branches.
 
+In the following, libraries needing packaging are tracked.
+
+- [ ] Update the list based on https://github.com/JabRef/jabref/blob/master/external-libraries.txt.
+
 ## JavaFX libraries
 
 - [x] packaging of [afterburner.fx](http://afterburner.adam-bien.com/): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=848398
@@ -31,7 +35,9 @@ At [koppor's repository](https://github.com/koppor/jabref/), required Debian ada
 - [x] CSL styles - locale files: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841019
   - [x] https://github.com/citation-style-language/locales/issues/151 needs to be solved
   - Resulting package: https://packages.debian.org/sid/citation-style-language-locales
-- [ ] CSL styles - citeproc-java: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841020
+- [ ] CSL styles - citeproc-java
+  - [ ] close https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841020
+  - [ ] Switch to pure-java implementation https://github.com/JabRef/jabref/pull/5997
   - [ ] depends on [jbibtex](https://github.com/jbibtex/jbibtex) - https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=888087
 - [x] packaging of [LGoodDatePicker](https://github.com/LGoodDatePicker/LGoodDatePicker): https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=847591
 - [x] <s>packaging of https://github.com/JabRef/org.jabref.gui.customjfx.support - or</s> including an OpenJDK fix (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=872619)
@@ -39,4 +45,4 @@ At [koppor's repository](https://github.com/koppor/jabref/), required Debian ada
 ## Other issues
 
 - [x] Remove `org.json` dependency: https://github.com/JabRef/jabref/issues/3703
-- [x] Make JabRef running on Java 9. JabRef now runs on jdk12https://github.com/JabRef/jabref/pull/5426
+- [x] Make JabRef running on Java 9. JabRef now runs on jdk12: https://github.com/JabRef/jabref/pull/5426
