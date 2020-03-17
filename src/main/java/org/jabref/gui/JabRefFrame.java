@@ -306,8 +306,8 @@ public class JabRefFrame extends BorderPane {
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabaseFile()
-                                       .map(File::getPath)
+                                       .getDatabasePath()
+                                       .map(Path::toString)
                                        .orElse(Localization.lang("untitled"));
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
