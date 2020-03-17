@@ -103,7 +103,7 @@ configurations {
 }
 
 javafx {
-    version = "13.0.2"
+    version = "14"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
