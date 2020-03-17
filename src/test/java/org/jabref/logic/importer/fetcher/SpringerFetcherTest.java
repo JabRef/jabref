@@ -26,7 +26,7 @@ class SpringerFetcherTest {
         fetcher = new SpringerFetcher();
     }
 
-    //@DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
+    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article);
@@ -49,7 +49,7 @@ class SpringerFetcherTest {
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
-    //@DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
+    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void testSpringerJSONToBibtex() {
         String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
@@ -73,7 +73,7 @@ class SpringerFetcherTest {
         assertEquals(Optional.of("1992-09-01"), bibEntry.getField(StandardField.DATE));
     }
 
-    //@DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
+    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void searchByEmptyQueryFindsNothing() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
