@@ -19,11 +19,11 @@ on:
     - cron: '2 3 * * 3'
 
 jobs:
-  env:
-    SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   oracletests:
     name: Oracle tests
     runs-on: ubuntu-latest
+    env:
+      SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v1
