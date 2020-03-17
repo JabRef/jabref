@@ -28,29 +28,24 @@ class ApsFetcherTest {
 
     private static Stream<Arguments> provideBibEntriesWithDois() throws IOException {
         // Standard DOI works
-        BibEntry easy = new BibEntry();
-        easy.setField(StandardField.DOI, "10.1103/PhysRevLett.116.061102");
+        BibEntry easy = new BibEntry().withField(StandardField.DOI, "10.1103/PhysRevLett.116.061102");
         Optional<URL> pdfUrl1 = Optional.of(new URL("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.116.061102"));
 
         // DOI in lowercase works
-        BibEntry lowercase = new BibEntry();
-        lowercase.setField(StandardField.DOI, "10.1103/physrevlett.124.029002");
+        BibEntry lowercase = new BibEntry().withField(StandardField.DOI, "10.1103/physrevlett.124.029002");
         Optional<URL> pdfUrl2 = Optional.of(new URL("https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.124.029002"));
 
         // Article behind paywall returns empty
-        BibEntry unauthorized = new BibEntry();
-        unauthorized.setField(StandardField.DOI, "10.1103/PhysRevLett.89.127401");
+        BibEntry unauthorized = new BibEntry().withField(StandardField.DOI, "10.1103/PhysRevLett.89.127401");
 
         // Unavailable article returns empty
-        BibEntry notFoundByDoi = new BibEntry();
-        notFoundByDoi.setField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
+        BibEntry notFoundByDoi = new BibEntry().withField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
 
         return Stream.of(
-                Arguments.of(pdfUrl1, easy),
-                Arguments.of(pdfUrl2, lowercase),
-                Arguments.of(Optional.empty(), unauthorized),
-                Arguments.of(Optional.empty(), notFoundByDoi)
-        );
+                         Arguments.of(pdfUrl1, easy),
+                         Arguments.of(pdfUrl2, lowercase),
+                         Arguments.of(Optional.empty(), unauthorized),
+                         Arguments.of(Optional.empty(), notFoundByDoi));
     }
 
     @ParameterizedTest
