@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -306,8 +305,8 @@ public class JabRefFrame extends BorderPane {
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabaseFile()
-                                       .map(File::getPath)
+                                       .getDatabasePath()
+                                       .map(Path::toString)
                                        .orElse(Localization.lang("untitled"));
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
@@ -355,7 +354,7 @@ public class JabRefFrame extends BorderPane {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
+                Path focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabasePath().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
         }
@@ -394,7 +393,7 @@ public class JabRefFrame extends BorderPane {
             }
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context);
-            context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
+            context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
@@ -953,15 +952,11 @@ public class JabRefFrame extends BorderPane {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
         for (BasePanel basePanel : getBasePanelList()) {
-            try {
-                // db file exists
-                if (basePanel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().get().getCanonicalPath());
-                } else {
-                    dbPaths.add("");
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Invalid database file path: " + ex.getMessage());
+            // db file exists
+            if (basePanel.getBibDatabaseContext().getDatabasePath().isPresent()) {
+                dbPaths.add(basePanel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
+            } else {
+                dbPaths.add("");
             }
         }
         return dbPaths;
@@ -977,10 +972,10 @@ public class JabRefFrame extends BorderPane {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
+            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
             if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
+                if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
@@ -991,7 +986,7 @@ public class JabRefFrame extends BorderPane {
             } else {
                 tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
             }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(File::getAbsolutePath).orElse(null)));
+            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
         }
     }
 
@@ -1047,7 +1042,7 @@ public class JabRefFrame extends BorderPane {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
-                context.getDatabaseFile().isPresent();
+                context.getDatabasePath().isPresent();
     }
 
     /**
