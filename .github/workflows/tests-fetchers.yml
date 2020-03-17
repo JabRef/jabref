@@ -22,6 +22,8 @@ on:
     - cron: '2 3 * * 3'
 
 jobs:
+  env:
+    SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   fetchertests:
     name: Fetcher tests
     runs-on: ubuntu-latest

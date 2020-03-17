@@ -8,6 +8,8 @@ on:
     # always run on pull requests
 
 jobs:
+  env:
+    SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   checkstyle:
     name: Checkstyle
     runs-on: ubuntu-latest

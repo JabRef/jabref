@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Properties;
 
-public class BuildInfo {
+public final class BuildInfo {
 
     public static final String UNKNOWN_VERSION = "*unknown*";
 
@@ -21,6 +21,7 @@ public class BuildInfo {
     private final String developers;
     private final String year;
     private final String azureInstrumentationKey;
+    private final String springerNatureAPIKey;
     private final String minRequiredJavaVersion;
     private final boolean allowJava9;
 
@@ -47,6 +48,7 @@ public class BuildInfo {
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
         azureInstrumentationKey = properties.getProperty("azureInstrumentationKey", "");
+        springerNatureAPIKey = properties.getProperty("springerNatureAPIKey","");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", ""));
     }
@@ -69,6 +71,10 @@ public class BuildInfo {
 
     public String getAzureInstrumentationKey() {
         return azureInstrumentationKey;
+    }
+
+    public String getSpringerNatureAPIKey() {
+        return springerNatureAPIKey;
     }
 
     public String getMinRequiredJavaVersion() {
