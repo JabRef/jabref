@@ -21,9 +21,10 @@ on:
     # run on each Wednesday
     - cron: '2 3 * * 3'
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
-  env:
-    SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   fetchertests:
     name: Fetcher tests
     runs-on: ubuntu-latest

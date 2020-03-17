@@ -18,12 +18,13 @@ on:
     # run on each Wednesday
     - cron: '2 3 * * 3'
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
   oracletests:
     name: Oracle tests
     runs-on: ubuntu-latest
-    env:
-      SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v1
