@@ -1,6 +1,5 @@
 package org.jabref.preferences;
 
-import java.io.File;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterAll;

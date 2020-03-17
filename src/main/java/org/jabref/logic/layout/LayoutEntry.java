@@ -1,6 +1,5 @@
 package org.jabref.logic.layout;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
