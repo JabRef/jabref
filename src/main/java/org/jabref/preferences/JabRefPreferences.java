@@ -205,9 +205,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String CONSOLE_COMMAND = "consoleCommand";
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
-    public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
-    public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
-    public static final String USE_PDF_READER = "usePDFReader";
     public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
 
@@ -644,15 +641,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
-            defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
-            defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
-            defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
             defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
             defaults.put(CONSOLE_COMMAND, "");
-            defaults.put(ADOBE_ACROBAT_COMMAND, "");
-            defaults.put(SUMATRA_PDF_COMMAND, "");
-            defaults.put(USE_PDF_READER, "");
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
@@ -1997,7 +1988,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (application.getApplicationName() != get(PUSH_TO_APPLICATION)) {
+        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
             put(PUSH_TO_APPLICATION, application.getApplicationName());
             manager.updateApplicationAction();
         }
@@ -2008,7 +1999,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.getEscapeChars();
+        String escapeChars = newLineSeparator.toString();
         put(JabRefPreferences.NEWLINE, escapeChars);
 
         // we also have to change Globals variable as globals is not a getter, but a constant

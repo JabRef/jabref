@@ -1,4 +1,4 @@
-# JabRef's development strategy
+# JabRef's Development Strategy
 
 We aim to keep up to high-quality code standards and use code quality tools wherever possible.
 
@@ -6,13 +6,13 @@ To ensure high code-quality,
 
 * we follow the principles of [Java by Comparison](https://java.by-comparison.com/).
 * we follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
-* we use [Design Pattners](https://java-design-patterns.com/patterns/) when applicable.
+* we use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
 * we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
 * we review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
-Read on on our automated quality checks at [Code Quality](code-quality.md).
+Read on about our automated quality checks at [Code Quality](code-quality.md).
 
-## Continuos integration
+## Continuous integration
 
 Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are create using [gradle](https://gradle.org/) and are uploaded to to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
 
@@ -22,7 +22,7 @@ The branch [master](https://builds.jabref.org/master/) is the main development l
 
 Other branches are used for discussing improvements with the help of [pull requests](https://github.com/JabRef/jabref/pulls). One can see the binaries of each branch at [https://builds.jabref.org/](https://builds.jabref.org/). Releases mark milestones and are based on the master at a point in time.
 
-## How JabRef aquires contributors
+## How JabRef acquires contributors
 
 * We participate in [Hacktoberfest](https://hacktoberfest.digitalocean.com/). See [https://www.jabref.org/hacktoberfest/](https://www.jabref.org/hacktoberfest/) for details.
 * We participate in [Google Summer of Code](https://developers.google.com/open-source/gsoc/).

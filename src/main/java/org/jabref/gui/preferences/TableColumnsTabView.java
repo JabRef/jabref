@@ -9,6 +9,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -83,9 +84,10 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
                 .install(actionsColumn);
 
         viewModel.selectedColumnModelProperty().setValue(columnsList.getSelectionModel());
-        columnsList.setOnKeyPressed(event -> {
+        columnsList.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.DELETE) {
                 viewModel.removeColumn(columnsList.getSelectionModel().getSelectedItem());
+                event.consume();
             }
         });
 
@@ -97,7 +99,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         addColumnName.itemsProperty().bind(viewModel.availableColumnsProperty());
         addColumnName.valueProperty().bindBidirectional(viewModel.addColumnProperty());
         addColumnName.setConverter(TableColumnsTabViewModel.columnNameStringConverter);
-        addColumnName.setOnKeyPressed(event -> {
+        addColumnName.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 viewModel.insertColumnInList();
                 event.consume();

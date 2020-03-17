@@ -57,7 +57,7 @@ import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
-import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.CopyMoreAction;
@@ -1018,7 +1018,7 @@ public class JabRefFrame extends BorderPane {
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUIManager(basePanel));
+            autosaver.registerListener(new AutosaveUiManager(basePanel));
         }
 
         BackupManager.start(context, Globals.entryTypesManager, prefs);
@@ -1138,7 +1138,6 @@ public class JabRefFrame extends BorderPane {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
-                    // Saved, now exit.
                     return true;
                 }
                 // The action was either canceled or unsuccessful.

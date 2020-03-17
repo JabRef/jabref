@@ -33,32 +33,32 @@ public class SpringerLink implements FulltextFetcher {
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (doi.isPresent()) {
-            // Available in catalog?
-            try {
-                HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                             .queryString("api_key", API_KEY)
-                                                             .queryString("q", String.format("doi:%s", doi.get().getDOI()))
-                                                             .asJson();
-                if (jsonResponse.getBody() != null) {
-                    JSONObject json = jsonResponse.getBody().getObject();
-                    int results = json.getJSONArray("result").getJSONObject(0).getInt("total");
-
-                    if (results > 0) {
-                        LOGGER.info("Fulltext PDF found @ Springer.");
-                        pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
-                    }
-                }
-            } catch (UnirestException e) {
-                LOGGER.warn("SpringerLink API request failed", e);
-            }
+        if (!doi.isPresent()) {
+            return Optional.empty();
         }
-        return pdfLink;
+        // Available in catalog?
+        try {
+            HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
+                                                         .queryString("api_key", API_KEY)
+                                                         .queryString("q", String.format("doi:%s", doi.get().getDOI()))
+                                                         .asJson();
+            if (jsonResponse.getBody() != null) {
+                JSONObject json = jsonResponse.getBody().getObject();
+                int results = json.getJSONArray("result").getJSONObject(0).getInt("total");
+
+                if (results > 0) {
+                    LOGGER.info("Fulltext PDF found @ Springer.");
+                    return Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
+                }
+            }
+        } catch (UnirestException e) {
+            LOGGER.warn("SpringerLink API request failed", e);
+        }
+        return Optional.empty();
     }
 
     @Override

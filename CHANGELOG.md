@@ -15,14 +15,18 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We improved the arXiv fetcher. Now it should find entries even more reliably and does no longer include the version (e.g `v1`) in the `eprint` field. [forum#1941](https://discourse.jabref.org/t/remove-version-in-arxiv-import/1941)
 - We moved the group search bar and the button "New group" from bottom to top position to make it more prominent. [#6112](https://github.com/JabRef/jabref/pull/6112)
-
 - When JabRef finds a `.sav` file without changes, there is no dialog asking for acceptance of changes anymore.
+- We changed the buttons for import/export/show all/reset of preferences to smaller icon buttons in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ### Fixed
 
 - We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
+- We fixed an issue with inconsistent capitalization of file extensions when downloading files [#6115](https://github.com/JabRef/jabref/issues/6115)
+- We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ### Removed
+
+- We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ## [5.0] – 2020-03-06
 
