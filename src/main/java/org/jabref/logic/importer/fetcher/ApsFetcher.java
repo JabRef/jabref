@@ -50,7 +50,7 @@ public class ApsFetcher implements FulltextFetcher {
                 try {
                     return Optional.of(new URL(pdfRequestUrl));
                 } catch (MalformedURLException e) {
-                    LOGGER.info("APS returned malformed URL, cannot find PDF.");
+                    LOGGER.warn("APS returned malformed URL, cannot find PDF.");
                 }
             }
         }
@@ -86,7 +86,7 @@ public class ApsFetcher implements FulltextFetcher {
             }
 
         } catch (IOException e) {
-            LOGGER.error("Error connecting to APS", e);
+            LOGGER.warn("Error connecting to APS", e);
         }
         return Optional.empty();
     }
