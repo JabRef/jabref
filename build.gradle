@@ -217,10 +217,6 @@ dependencies {
     jython 'org.python:jython-standalone:2.7.1'
 }
 
-jacoco {
-    toolVersion = '0.8.3'
-}
-
 dependencyUpdates {
     outputFormatter = "json"
 }
