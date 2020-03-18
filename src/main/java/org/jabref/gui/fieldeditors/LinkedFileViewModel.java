@@ -45,6 +45,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 
 import org.slf4j.Logger;
@@ -161,8 +162,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void open() {
         try {
+            Optional<Path> resolvedPath = FileHelper.expandFilename(
+                    databaseContext,
+                    linkedFile.getLink(),
+                    filePreferences);
+
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
-            boolean successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
+
+            boolean successful = false;
+            if (resolvedPath.isPresent()) {
+                 successful = JabRefDesktop.openExternalFileAnyFormat(databaseContext, resolvedPath.get().toString(), type);
+            }
+
             if (!successful) {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"), Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
             }
@@ -173,22 +184,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void openFolder() {
         try {
-            Path path = null;
-            // absolute path
-            if (Paths.get(linkedFile.getLink()).isAbsolute()) {
-                path = Paths.get(linkedFile.getLink());
-            } else {
-                // relative to file folder
-                for (Path folder : databaseContext.getFileDirectoriesAsPaths(filePreferences)) {
-                    Path file = folder.resolve(linkedFile.getLink());
-                    if (Files.exists(file)) {
-                        path = file;
-                        break;
-                    }
-                }
-            }
-            if (path != null) {
-                JabRefDesktop.openFolderAndSelectFile(path);
+            Optional<Path> resolvedPath = FileHelper.expandFilename(
+                    databaseContext,
+                    linkedFile.getLink(),
+                    filePreferences);
+
+            if (resolvedPath.isPresent()) {
+                JabRefDesktop.openFolderAndSelectFile(resolvedPath.get());
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
             }
