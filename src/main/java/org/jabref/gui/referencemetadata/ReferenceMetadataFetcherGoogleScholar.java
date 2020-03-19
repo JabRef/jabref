@@ -178,15 +178,15 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                     // extract data
                     // - metadata
-                    String _entryId = rxEntryObject.get("_entryId").getAsString();
-                    boolean _lastEntry = rxEntryObject.get("_lastEntry").getAsBoolean();
+                    String entryId = rxEntryObject.get("_entryId").getAsString();
+                    boolean lastEntry = rxEntryObject.get("_lastEntry").getAsBoolean();
 
                     JsonObject _status = rxEntryObject.getAsJsonObject("_status");
 
-                    boolean _status_success = _status.get("success").getAsBoolean();
-                    boolean _status_itemComplete = _status.get("itemComplete").getAsBoolean();
-                    boolean _status_solvingCaptchaNeeded = _status.get("solvingCaptchaNeeded").getAsBoolean();
-                    boolean _status_tooManyRequests = _status.get("tooManyRequests").getAsBoolean();
+                    boolean status_success = _status.get("success").getAsBoolean();
+                    boolean status_itemComplete = _status.get("itemComplete").getAsBoolean();
+                    boolean status_solvingCaptchaNeeded = _status.get("solvingCaptchaNeeded").getAsBoolean();
+                    boolean status_tooManyRequests = _status.get("tooManyRequests").getAsBoolean();
 
                     // - entry data
                     String key = rxEntryObject.get("key").getAsString();
@@ -195,12 +195,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     String note = rxEntryObject.get("extra").getAsString();
                     String citationCount = rxEntryObject.get("citationCount").getAsString();
 
-                    LOGGER.debug("success: " + _status_success);
-                    LOGGER.debug("itemComplete: " + _status_itemComplete);
-                    LOGGER.debug("solvingCaptchaNeeded: " + _status_solvingCaptchaNeeded);
-                    LOGGER.debug("tooManyRequests: " + _status_tooManyRequests);
+                    LOGGER.debug("success: " + status_success);
+                    LOGGER.debug("itemComplete: " + status_itemComplete);
+                    LOGGER.debug("solvingCaptchaNeeded: " + status_solvingCaptchaNeeded);
+                    LOGGER.debug("tooManyRequests: " + status_tooManyRequests);
 
-                    if (!_status_itemComplete) {
+                    if (!status_itemComplete) {
                         LOGGER.info("item incomplete: the citation count could not be determined, since the " +
                                 "item data is potentially incomplete");
 
@@ -227,7 +227,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 return true; // cancel fetching metadata
                             }
                         }
-                    } else if (_status_solvingCaptchaNeeded) {
+                    } else if (status_solvingCaptchaNeeded) {
                         LOGGER.info("solving captcha needed: reference metadata could not be fetched, since " +
                                 "solving the captcha is needed");
 
@@ -246,7 +246,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return true; // cancel fetching metadata
                         }
-                    } else if (_status_tooManyRequests) {
+                    } else if (status_tooManyRequests) {
                         LOGGER.info("too many requests: Google Scholar asks you to wait some time before " +
                                 "sending further requests");
 
@@ -266,10 +266,10 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     }
 
                     // find entry to update
-                    Optional<BibEntry> entry = getBibEntryWithGivenEntryId(database, _entryId);
+                    Optional<BibEntry> entry = getBibEntryWithGivenEntryId(database, entryId);
 
                     if (entry.isEmpty()) {
-                        LOGGER.info("skipping bibEntry, since entry with entryId=" + _entryId + " could not " +
+                        LOGGER.info("skipping bibEntry, since entry with entryId=" + entryId + " could not " +
                                 "be found");
 
                         continue;
