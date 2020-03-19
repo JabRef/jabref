@@ -139,61 +139,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
         int startIndexEntriesBlock = 0;
 
         while (startIndexEntriesBlock < entries.size()) {
-            // prepare request object
-            JsonArray entriesArray = new JsonArray();
-
-            for (int entryIndex = startIndexEntriesBlock; entryIndex - startIndexEntriesBlock < NUM_ENTRIES_PER_REQUEST && entryIndex < entries.size(); entryIndex++) {
-                BibEntry entry = entries.get(entryIndex);
-
-                String creatorsString = "";
-                String creatorsType = "";
-
-                creatorsString = entry.getLatexFreeField(StandardField.AUTHOR).orElse("").trim();
-
-                if (creatorsString.length() != 0) {
-                    creatorsType = "author";
-                } else {
-                    creatorsString = entry.getLatexFreeField(StandardField.EDITOR).orElse("").trim();
-
-                    if (creatorsString.length() != 0) {
-                        creatorsType = "editor";
-                    } else {
-                        creatorsType = "";
-                    }
-                }
-
-                AuthorList authorList = AuthorList.parse(creatorsString);
-
-                JsonArray creatorsArray = new JsonArray();
-
-                for (Author author : authorList.getAuthors()) {
-                    JsonObject creator = new JsonObject();
-                    creator.addProperty("firstName", REMOVE_BRACES_FORMATTER.format(author.getFirst().orElse("").trim())); // remove braces after parsing
-                    creator.addProperty("lastName", REMOVE_BRACES_FORMATTER.format(author.getLast().orElse("").trim())); // remove braces after parsing
-                    creator.addProperty("creatorType", creatorsType);
-                    creatorsArray.add(creator);
-                }
-
-                JsonObject entryObject = new JsonObject();
-                // metadata
-                entryObject.addProperty("_entryId", entry.getId());
-                entryObject.addProperty("_lastEntry", entryIndex == entries.size() - 1);
-                // entry data
-                entryObject.addProperty("key", entry.getField(InternalField.KEY_FIELD).orElse("").trim());
-                entryObject.addProperty("title", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.TITLE).orElse("").trim()));
-                entryObject.addProperty("year", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.YEAR).orElse("").trim()));
-                entryObject.addProperty("date", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.DATE).orElse("").trim()));
-                entryObject.addProperty("DOI", entry.getField(StandardField.DOI).orElse("").trim());
-                entryObject.addProperty("extra", entry.getField(StandardField.NOTE).orElse("").trim()); // send note field as extra field
-                entryObject.add("creators", creatorsArray);
-
-                entriesArray.add(entryObject);
-            }
-
-            JsonObject requestObject = new JsonObject();
-
-            requestObject.addProperty("databasePath", databasePath);
-            requestObject.add("entries", entriesArray);
+            JsonObject requestObject = prepareRequestObject(databasePath, entries, startIndexEntriesBlock);
 
             boolean retryFetchingMetadata = false;
 
@@ -399,6 +345,64 @@ public class ReferenceMetadataFetcherGoogleScholar {
         }
 
         return false;
+    }
+
+    private JsonObject prepareRequestObject(String databasePath, ObservableList<BibEntry> entries, int startIndexEntriesBlock) {
+        JsonArray entriesArray = new JsonArray();
+
+        for (int entryIndex = startIndexEntriesBlock; entryIndex - startIndexEntriesBlock < NUM_ENTRIES_PER_REQUEST && entryIndex < entries.size(); entryIndex++) {
+            BibEntry entry = entries.get(entryIndex);
+
+            String creatorsString = "";
+            String creatorsType = "";
+
+            creatorsString = entry.getLatexFreeField(StandardField.AUTHOR).orElse("").trim();
+
+            if (creatorsString.length() != 0) {
+                creatorsType = "author";
+            } else {
+                creatorsString = entry.getLatexFreeField(StandardField.EDITOR).orElse("").trim();
+
+                if (creatorsString.length() != 0) {
+                    creatorsType = "editor";
+                } else {
+                    creatorsType = "";
+                }
+            }
+
+            AuthorList authorList = AuthorList.parse(creatorsString);
+
+            JsonArray creatorsArray = new JsonArray();
+
+            for (Author author : authorList.getAuthors()) {
+                JsonObject creator = new JsonObject();
+                creator.addProperty("firstName", REMOVE_BRACES_FORMATTER.format(author.getFirst().orElse("").trim())); // remove braces after parsing
+                creator.addProperty("lastName", REMOVE_BRACES_FORMATTER.format(author.getLast().orElse("").trim())); // remove braces after parsing
+                creator.addProperty("creatorType", creatorsType);
+                creatorsArray.add(creator);
+            }
+
+            JsonObject entryObject = new JsonObject();
+            // metadata
+            entryObject.addProperty("_entryId", entry.getId());
+            entryObject.addProperty("_lastEntry", entryIndex == entries.size() - 1);
+            // entry data
+            entryObject.addProperty("key", entry.getField(InternalField.KEY_FIELD).orElse("").trim());
+            entryObject.addProperty("title", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.TITLE).orElse("").trim()));
+            entryObject.addProperty("year", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.YEAR).orElse("").trim()));
+            entryObject.addProperty("date", REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.DATE).orElse("").trim()));
+            entryObject.addProperty("DOI", entry.getField(StandardField.DOI).orElse("").trim());
+            entryObject.addProperty("extra", entry.getField(StandardField.NOTE).orElse("").trim()); // send note field as extra field
+            entryObject.add("creators", creatorsArray);
+
+            entriesArray.add(entryObject);
+        }
+
+        JsonObject requestObject = new JsonObject();
+
+        requestObject.addProperty("databasePath", databasePath);
+        requestObject.add("entries", entriesArray);
+        return requestObject;
     }
 
     private static Optional<BibEntry> getBibEntryWithGivenEntryId(BibDatabaseContext database, String entryId) {
