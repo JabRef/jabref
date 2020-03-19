@@ -1,5 +1,7 @@
 package org.jabref.websocket.handlers;
 
+import java.util.Optional;
+
 import org.jabref.websocket.JabRefWebsocketServer;
 import org.jabref.websocket.WebSocketAction;
 import org.jabref.websocket.WebSocketClientData;
@@ -16,9 +18,10 @@ public class HandlerCmdRegister {
     public static void handler(WebSocket websocket, JsonObject messagePayload) {
         String webSocketClientTypeString = messagePayload.get("webSocketClientType").getAsString();
 
-        if (WebSocketClientType.isValidWebSocketClientType(webSocketClientTypeString)) {
-            WebSocketClientType webSocketClientType = WebSocketClientType.getClientTypeFromString(webSocketClientTypeString);
-            websocket.<WebSocketClientData>getAttachment().setWebSocketClientType(webSocketClientType);
+        Optional<WebSocketClientType> webSocketClientType = WebSocketClientType.getClientTypeFromString(webSocketClientTypeString);
+
+        if (webSocketClientType.isPresent()) {
+            websocket.<WebSocketClientData>getAttachment().setWebSocketClientType(webSocketClientType.get());
         } else {
             LOGGER.warn("[ws] invalid WebSocketClientType: " + webSocketClientTypeString);
 

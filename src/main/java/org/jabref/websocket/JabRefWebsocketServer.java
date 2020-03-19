@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
@@ -209,17 +210,17 @@ public class JabRefWebsocketServer extends WebSocketServer {
      * Gets the first websocket client, which matches the given <code>WebSocketClientType</code>.
      *
      * @param webSocketClientType webSocketClientType of the requested websocket client
-     * @return the matching websocket client, or <code>null</code> otherwise
+     * @return the matching websocket client
      */
-    private WebSocket getFirstWebSocketClientByWebSocketClientType(WebSocketClientType webSocketClientType) {
+    private Optional<WebSocket> getFirstWebSocketClientByWebSocketClientType(WebSocketClientType webSocketClientType) {
         for (WebSocket websocket : getConnections()) {
             WebSocketClientData webSocketClientData = websocket.getAttachment();
             if (webSocketClientData != null && webSocketClientData.getWebSocketClientType().equals(webSocketClientType)) {
-                return websocket;
+                return Optional.of(websocket);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -244,17 +245,17 @@ public class JabRefWebsocketServer extends WebSocketServer {
      * Gets the websocket client, which matches the given websocket's <code>UID</code>.
      *
      * @param webSocketUID webSocketUID of the requested websocket client
-     * @return the matching websocket client, or <code>null</code> otherwise
+     * @return the matching websocket client
      */
-    private WebSocket getWebSocketClientByWebSocketUID(String webSocketUID) {
+    private Optional<WebSocket> getWebSocketClientByWebSocketUID(String webSocketUID) {
         for (WebSocket websocket : getConnections()) {
             WebSocketClientData webSocketClientData = websocket.getAttachment();
             if (webSocketClientData != null && webSocketClientData.getWebSocketUID().equals(webSocketUID)) {
-                return websocket;
+                return Optional.of(websocket);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private boolean sendJsonString(WebSocket websocketOfRecipient, String jsonString) {
@@ -282,20 +283,20 @@ public class JabRefWebsocketServer extends WebSocketServer {
     }
 
     public boolean sendMessage(WebSocketClientType webSocketClientTypeOfRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
-        WebSocket websocket = getFirstWebSocketClientByWebSocketClientType(webSocketClientTypeOfRecipient);
+        Optional<WebSocket> websocket = getFirstWebSocketClientByWebSocketClientType(webSocketClientTypeOfRecipient);
 
-        if (websocket != null) {
-            return sendMessage(websocket, webSocketAction, messagePayload);
+        if (websocket.isPresent()) {
+            return sendMessage(websocket.get(), webSocketAction, messagePayload);
         }
 
         return false;
     }
 
     public boolean sendMessage(String webSocketUIDofRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
-        WebSocket websocket = getWebSocketClientByWebSocketUID(webSocketUIDofRecipient);
+        Optional<WebSocket> websocket = getWebSocketClientByWebSocketUID(webSocketUIDofRecipient);
 
-        if (websocket != null) {
-            return sendMessage(websocket, webSocketAction, messagePayload);
+        if (websocket.isPresent()) {
+            return sendMessage(websocket.get(), webSocketAction, messagePayload);
         }
 
         return false;
@@ -456,16 +457,18 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 return;
             }
 
-            WebSocketAction webSocketAction = WebSocketAction.getWebSocketActionFromString(action);
+            Optional<WebSocketAction> webSocketAction = WebSocketAction.getWebSocketActionFromString(action);
 
-            if (WebSocketAction.CMD_REGISTER.equals(webSocketAction)) {
-                HandlerCmdRegister.handler(websocket, messagePayload);
-            } else if (WebSocketAction.INFO_MESSAGE.equals(webSocketAction)) {
-                HandlerInfoMessage.handler(websocket, messagePayload);
-            } else if (WebSocketAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(webSocketAction)) {
-                HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
-            } else {
-                LOGGER.warn("[ws] unimplemented WebSocketAction received: " + action);
+            if (webSocketAction.isPresent()) {
+                if (WebSocketAction.CMD_REGISTER.equals(webSocketAction.get())) {
+                    HandlerCmdRegister.handler(websocket, messagePayload);
+                } else if (WebSocketAction.INFO_MESSAGE.equals(webSocketAction.get())) {
+                    HandlerInfoMessage.handler(websocket, messagePayload);
+                } else if (WebSocketAction.INFO_GOOGLE_SCHOLAR_CITATION_COUNTS.equals(webSocketAction.get())) {
+                    HandlerInfoGoogleScholarCitationCounts.handler(websocket, messagePayload);
+                } else {
+                    LOGGER.warn("[ws] unimplemented WebSocketAction received: " + action);
+                }
             }
         } catch (InterruptedException e) {
             LOGGER.error(e.getMessage(), e);

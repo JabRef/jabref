@@ -1,5 +1,7 @@
 package org.jabref.websocket;
 
+import java.util.Optional;
+
 public enum WebSocketClientType {
     UNKNOWN("unknown"),
     JABREF_BROWSER_EXTENSION("JabRefBrowserExtension");
@@ -20,14 +22,14 @@ public enum WebSocketClientType {
         return false;
     }
 
-    public static WebSocketClientType getClientTypeFromString(String webSocketClientType) {
+    public static Optional<WebSocketClientType> getClientTypeFromString(String webSocketClientType) {
         for (WebSocketClientType lWebSocketClientType : WebSocketClientType.values()) {
             if (lWebSocketClientType.toString().equals(webSocketClientType)) {
-                return lWebSocketClientType;
+                return Optional.of(lWebSocketClientType);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override

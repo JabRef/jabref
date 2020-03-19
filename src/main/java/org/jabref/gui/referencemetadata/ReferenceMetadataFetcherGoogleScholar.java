@@ -320,9 +320,9 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     }
 
                     // find entry to update
-                    BibEntry entry = getBibEntryWithGivenEntryId(database, _entryId);
+                    Optional<BibEntry> entry = getBibEntryWithGivenEntryId(database, _entryId);
 
-                    if (entry == null) {
+                    if (entry.isEmpty()) {
                         LOGGER.info("skipping bibEntry, since entry with entryId=" + _entryId + " could not " +
                                 "be found");
 
@@ -330,10 +330,10 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     }
 
                     // set (updated) entry data (citation count)
-                    entry.setField(InternalField.CITATION_COUNT, citationCount);
+                    entry.get().setField(InternalField.CITATION_COUNT, citationCount);
 
                     if (UPDATE_NOTE_FIELD_WITH_CITATION_COUNT) {
-                        entry.setField(StandardField.NOTE, note);
+                        entry.get().setField(StandardField.NOTE, note);
                     }
                 }
             }
@@ -401,14 +401,14 @@ public class ReferenceMetadataFetcherGoogleScholar {
         return false;
     }
 
-    private static BibEntry getBibEntryWithGivenEntryId(BibDatabaseContext database, String entryId) {
+    private static Optional<BibEntry> getBibEntryWithGivenEntryId(BibDatabaseContext database, String entryId) {
         for (BibEntry bibEntry : database.getEntries()) {
             if (bibEntry.getId().equals(entryId)) {
-                return bibEntry;
+                return Optional.of(bibEntry);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     /**

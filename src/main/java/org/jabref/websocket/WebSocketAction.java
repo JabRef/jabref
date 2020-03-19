@@ -1,5 +1,7 @@
 package org.jabref.websocket;
 
+import java.util.Optional;
+
 public enum WebSocketAction {
     // send only
     HEARTBEAT("heartbeat"),
@@ -29,14 +31,14 @@ public enum WebSocketAction {
         return false;
     }
 
-    public static WebSocketAction getWebSocketActionFromString(String webSocketAction) {
+    public static Optional<WebSocketAction> getWebSocketActionFromString(String webSocketAction) {
         for (WebSocketAction lWebSocketAction : WebSocketAction.values()) {
             if (lWebSocketAction.toString().equals(webSocketAction)) {
-                return lWebSocketAction;
+                return Optional.of(lWebSocketAction);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     @Override
