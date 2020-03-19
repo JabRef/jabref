@@ -34,7 +34,7 @@ public class BibDatabaseContextTest {
     @Test
     public void getFileDirectoriesWithEmptyDbParent() {
         BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(Paths.get("biblio.bib").toFile());
+        dbContext.setDatabasePath(Paths.get("biblio.bib"));
         List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.toString()),
                 fileDirectories);
@@ -45,7 +45,7 @@ public class BibDatabaseContextTest {
         Path file = Paths.get("relative/subdir").resolve("biblio.bib");
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
+        dbContext.setDatabasePath(file);
         List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);
@@ -56,7 +56,7 @@ public class BibDatabaseContextTest {
         Path file = Paths.get("./relative/subdir").resolve("biblio.bib");
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
+        dbContext.setDatabasePath(file);
         List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);
@@ -67,7 +67,7 @@ public class BibDatabaseContextTest {
         Path file = Paths.get("/absolute/subdir").resolve("biblio.bib");
 
         BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
+        dbContext.setDatabasePath(file);
         List<String> fileDirectories = dbContext.getFileDirectories(StandardField.FILE, fileDirPrefs);
         assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
                 fileDirectories);

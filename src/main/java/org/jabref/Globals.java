@@ -31,6 +31,10 @@ import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 import kong.unirest.Unirest;
 
+/**
+ * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
+ */
+@Deprecated
 public class Globals {
 
     /**

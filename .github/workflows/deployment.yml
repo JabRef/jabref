@@ -18,7 +18,7 @@ on:
 jobs:
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
@@ -69,8 +69,6 @@ jobs:
             ${{ runner.OS }}-
       - uses: actions/cache@v1
         name: Cache gradle wrapper
-        # cache at Mac OS X is 2 GB (too large)
-        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
@@ -160,3 +158,4 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+

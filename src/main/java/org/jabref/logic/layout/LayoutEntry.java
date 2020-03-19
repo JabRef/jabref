@@ -1,7 +1,7 @@
 package org.jabref.logic.layout;
 
-import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -366,10 +366,8 @@ class LayoutEntry {
                 return encoding.displayName();
 
             case LayoutHelper.IS_FILENAME:
-                return databaseContext.getDatabaseFile().map(File::getName).orElse("");
-
             case LayoutHelper.IS_FILEPATH:
-                return databaseContext.getDatabaseFile().map(File::getPath).orElse("");
+                return databaseContext.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).orElse("");
 
             default:
                 break;

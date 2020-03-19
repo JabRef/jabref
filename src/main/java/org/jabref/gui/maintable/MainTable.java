@@ -26,7 +26,6 @@ import javafx.scene.input.TransferMode;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -56,7 +55,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private final MainTableDataModel model;
     private final ImportHandler importHandler;
-    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
+    private final CustomLocalDragboard localDragboard;
 
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
@@ -76,6 +75,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.getFileUpdateMonitor(),
                 undoManager,
                 Globals.stateManager);
+        localDragboard = Globals.stateManager.getLocalDragboard();
 
         this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 
@@ -324,13 +324,5 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     .stream()
                     .filter(viewModel -> viewModel.getEntry().equals(entry))
                     .findFirst();
-    }
-
-    /**
-     * Repaints the table with the most recent font configuration
-     */
-    public void updateFont() {
-        // TODO: Font & padding customization
-        // setFont(GUIGlobals.currentFont);
     }
 }
