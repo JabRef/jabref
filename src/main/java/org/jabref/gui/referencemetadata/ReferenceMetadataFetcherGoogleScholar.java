@@ -112,12 +112,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 String creatorsString = "";
                 String creatorsType = "";
 
-                creatorsString = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.AUTHOR).orElse("").trim());
+                creatorsString = entry.getLatexFreeField(StandardField.AUTHOR).orElse("").trim();
 
                 if (creatorsString.length() != 0) {
                     creatorsType = "author";
                 } else {
-                    creatorsString = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(StandardField.EDITOR).orElse("").trim());
+                    creatorsString = entry.getLatexFreeField(StandardField.EDITOR).orElse("").trim();
 
                     if (creatorsString.length() != 0) {
                         creatorsType = "editor";
@@ -132,8 +132,8 @@ public class ReferenceMetadataFetcherGoogleScholar {
 
                 for (Author author : authorList.getAuthors()) {
                     JsonObject creator = new JsonObject();
-                    creator.addProperty("firstName", author.getFirst().orElse("").trim());
-                    creator.addProperty("lastName", author.getLast().orElse("").trim());
+                    creator.addProperty("firstName", REMOVE_BRACES_FORMATTER.format(author.getFirst().orElse("").trim())); // remove braces after parsing
+                    creator.addProperty("lastName", REMOVE_BRACES_FORMATTER.format(author.getLast().orElse("").trim())); // remove braces after parsing
                     creator.addProperty("creatorType", creatorsType);
                     creatorsArray.add(creator);
                 }
