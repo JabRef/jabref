@@ -14,6 +14,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -38,7 +39,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
     private static final String API_URL = "http://api.springernature.com/meta/v1/json";
-    private static final String API_KEY = "a98b4a55181ffcd27259bea45edad12e";
+    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry

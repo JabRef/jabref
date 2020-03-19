@@ -280,6 +280,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 
