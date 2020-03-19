@@ -181,12 +181,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     String entryId = rxEntryObject.get("_entryId").getAsString();
                     boolean lastEntry = rxEntryObject.get("_lastEntry").getAsBoolean();
 
-                    JsonObject _status = rxEntryObject.getAsJsonObject("_status");
+                    JsonObject status = rxEntryObject.getAsJsonObject("_status");
 
-                    boolean status_success = _status.get("success").getAsBoolean();
-                    boolean status_itemComplete = _status.get("itemComplete").getAsBoolean();
-                    boolean status_solvingCaptchaNeeded = _status.get("solvingCaptchaNeeded").getAsBoolean();
-                    boolean status_tooManyRequests = _status.get("tooManyRequests").getAsBoolean();
+                    boolean statusSuccess = status.get("success").getAsBoolean();
+                    boolean statusItemComplete = status.get("itemComplete").getAsBoolean();
+                    boolean statusSolvingCaptchaNeeded = status.get("solvingCaptchaNeeded").getAsBoolean();
+                    boolean statusTooManyRequests = status.get("tooManyRequests").getAsBoolean();
 
                     // - entry data
                     String key = rxEntryObject.get("key").getAsString();
@@ -195,12 +195,12 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     String note = rxEntryObject.get("extra").getAsString();
                     String citationCount = rxEntryObject.get("citationCount").getAsString();
 
-                    LOGGER.debug("success: " + status_success);
-                    LOGGER.debug("itemComplete: " + status_itemComplete);
-                    LOGGER.debug("solvingCaptchaNeeded: " + status_solvingCaptchaNeeded);
-                    LOGGER.debug("tooManyRequests: " + status_tooManyRequests);
+                    LOGGER.debug("success: " + statusSuccess);
+                    LOGGER.debug("itemComplete: " + statusItemComplete);
+                    LOGGER.debug("solvingCaptchaNeeded: " + statusSolvingCaptchaNeeded);
+                    LOGGER.debug("tooManyRequests: " + statusTooManyRequests);
 
-                    if (!status_itemComplete) {
+                    if (!statusItemComplete) {
                         LOGGER.info("item incomplete: the citation count could not be determined, since the " +
                                 "item data is potentially incomplete");
 
@@ -227,7 +227,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                                 return true; // cancel fetching metadata
                             }
                         }
-                    } else if (status_solvingCaptchaNeeded) {
+                    } else if (statusSolvingCaptchaNeeded) {
                         LOGGER.info("solving captcha needed: reference metadata could not be fetched, since " +
                                 "solving the captcha is needed");
 
@@ -246,7 +246,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                             entriesWithIncompleteMetadata.addAll(ReferenceMetadataUtils.getAllEntriesStartingWithGivenIndex(startIndexEntriesBlock + rxEntryIndex, entries));
                             return true; // cancel fetching metadata
                         }
-                    } else if (status_tooManyRequests) {
+                    } else if (statusTooManyRequests) {
                         LOGGER.info("too many requests: Google Scholar asks you to wait some time before " +
                                 "sending further requests");
 
