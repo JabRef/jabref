@@ -345,7 +345,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
             try {
                 stop(1000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
 
             serverStarted = false;
@@ -431,7 +431,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 LOGGER.debug("[ws] @onMessage: " + websocket + ": " + message);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         } finally {
             semaphoreWebSocketOnMessage.release();
         }
@@ -468,7 +468,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
                 LOGGER.warn("[ws] unimplemented WebSocketAction received: " + action);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         } finally {
             semaphoreWebSocketOnMessage.release();
         }
