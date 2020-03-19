@@ -7,6 +7,9 @@ on:
   pull_request:
     # always run on pull requests
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
   checkstyle:
     name: Checkstyle
