@@ -317,7 +317,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
             return false;
         } else {
-            LOGGER.info("[ws] JabRefWebsocketServer is starting up...");
+            LOGGER.debug("[ws] JabRefWebsocketServer is starting up...");
 
             serverStarting = true;
 
@@ -335,7 +335,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
             return false;
         } else if (serverStarted) {
-            LOGGER.info("[ws] stopping JabRefWebsocketServer...");
+            LOGGER.debug("[ws] stopping JabRefWebsocketServer...");
 
             if (heartbeatExecutor != null) {
                 heartbeatExecutor.shutdown();
@@ -410,15 +410,15 @@ public class JabRefWebsocketServer extends WebSocketServer {
         serverStarted = true;
         serverStarting = false;
 
-        LOGGER.info("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
+        LOGGER.debug("[ws] JabRefWebsocketServer has started on port " + getPort() + ".");
 
         if (heartbeatEnabled) {
             heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
             heartbeatExecutor.scheduleAtFixedRate(heartbeatRunnable, 0, heartbeatInterval, timeUnitHeartbeatInterval);
 
-            LOGGER.info("[ws] heartbeat thread is enabled...");
+            LOGGER.debug("[ws] heartbeat thread is enabled...");
         } else {
-            LOGGER.info("[ws] heartbeat thread is disabled...");
+            LOGGER.debug("[ws] heartbeat thread is disabled...");
         }
     }
 
