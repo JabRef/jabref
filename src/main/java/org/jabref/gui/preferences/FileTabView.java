@@ -13,6 +13,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -68,6 +69,9 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
         resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolvStringsExceptProperty());
         resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
+        new ViewModelListCellFactory<NewLineSeparator>()
+                .withText(NewLineSeparator::getDisplayName)
+                .install(newLineSeparator);
         newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());

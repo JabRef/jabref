@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class ArXivTest {
-
     private ArXiv finder;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
@@ -119,6 +118,16 @@ class ArXivTest {
         entry.setField(StandardField.TITLE, "Superspace formulation of supergravity");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextEntityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextTrustLevel() {
+        assertEquals(TrustLevel.PREPRINT, finder.getTrustLevel());
     }
 
     @Test

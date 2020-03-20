@@ -7,6 +7,9 @@ on:
   pull_request:
     # always run on pull requests
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
   checkstyle:
     name: Checkstyle
@@ -17,7 +20,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13.0.2
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
@@ -43,7 +46,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -87,7 +90,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -133,7 +136,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -172,7 +175,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:

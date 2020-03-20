@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="history"/>
     <category field="anthropology"/>
-    <updated>2020-01-22T01:24:22+00:00</updated>
+    <updated>2020-03-05T03:30:20+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -31,7 +31,7 @@
   </locale>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -71,7 +71,7 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -81,7 +81,7 @@
   <macro name="collection-editor">
     <group>
       <names variable="collection-editor">
-        <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+        <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
           <name-part name="family"/>
           <name-part name="given"/>
         </name>
@@ -91,7 +91,7 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -273,7 +273,7 @@
   <macro name="issue">
     <text variable="volume" prefix=" "/>
     <group delimiter=", ">
-      <text variable="issue" prefix="-"/>
+      <text variable="issue" prefix=" (" suffix=")"/>
       <group delimiter="&#160;">
         <text variable="page" prefix=", "/>
       </group>
@@ -313,6 +313,20 @@
         <group delimiter=" ">
           <text term="online" suffix=". "/>
           <text macro="url"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="accessed">
+    <choose>
+      <if variable="URL">
+        <group>
+          <text term="accessed"/>
+          <date variable="accessed">
+            <date-part name="day" prefix="&#160;"/>
+            <date-part name="month" prefix="&#160;"/>
+            <date-part name="year" prefix="&#160;"/>
+          </date>
         </group>
       </if>
     </choose>
@@ -383,6 +397,7 @@
             <group delimiter=", ">
               <text macro="title"/>
               <text macro="URLaccess"/>
+              <text macro="accessed"/>
               <text macro="edition"/>
               <text macro="archive"/>
             </group>
@@ -432,7 +447,7 @@
               <text macro="genre"/>
               <text macro="edition" suffix=". "/>
               <group delimiter=", ">
-                <text macro="publi_place"/>
+                <text macro="publisher"/>
                 <text macro="archive"/>
                 <text variable="note"/>
               </group>

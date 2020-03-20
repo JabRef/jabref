@@ -8,9 +8,9 @@ For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have 
 
 ## Prerequisites
 
-### Java Development Kit 13
+### Java Development Kit 14
 
-A working Java 13 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 13 \(e.g `javac 13.0.1`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA\_HOME environment variable or install the most recent JDK.
+A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA\_HOME environment variable or install the most recent JDK.
 
 ### git
 
@@ -23,7 +23,7 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) \(`2019-12` or newer\).
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for advanced users)](https://eclipse.org/) \(`2020-03` or newer\).
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
@@ -57,16 +57,16 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
   the _Gradle_ and _Gradle Extension_ enabled.
 
-After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 13 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
+After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-* Ensure you have a Java 13 SDK configured by navigating to
+* Ensure you have a Java 14 SDK configured by navigating to
 
   **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
 
-  location of a JDK 13.
+  location of a JDK 14.
 
-* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 13
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 13 SDK as
+* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
 
   the Gradle JVM at the bottom.
 
@@ -119,7 +119,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
 To use the "JabRef Main" run configuration, open **Run \| Edit Configurations... \| Application \| JabRef Main** and
 
-* Verify, that your JDK 13 is used
+* Verify, that your JDK 14 is used
 * Set "VM Options" to the following:
 
   ```text
@@ -190,12 +190,13 @@ If you have configured Eclipse for the same project \(the required steps are des
 
 ### Setup for Eclipse
 
-Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is required.
+Make sure your Eclipse installation us up to date, Eclipse 2020-03 or newer is required.
+For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
 
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
-2. Run `./gradlew eclipse`
+2. Run `./gradlew eclipse` 
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
@@ -239,7 +240,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 13 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 14 is installed is following error message:
 
 ```text
 compileJava FAILED

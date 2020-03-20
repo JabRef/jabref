@@ -20,7 +20,6 @@ public class SaveAction extends SimpleCommand {
         this.saveMethod = saveMethod;
         this.frame = frame;
 
-
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
             this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
         } else {

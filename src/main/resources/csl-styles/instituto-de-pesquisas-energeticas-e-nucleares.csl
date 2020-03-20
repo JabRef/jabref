@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" default-locale="pt-BR" demote-non-dropping-particle="never">
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" demote-non-dropping-particle="never" default-locale="pt-BR">
   <info>
     <title>Instituto de Pesquisas Energéticas e Nucleares (Portuguese - Brazil)</title>
     <title-short>IPEN</title-short>
@@ -22,7 +22,7 @@
     <category citation-format="author-date"/>
     <category field="science"/>
     <summary>The Brazilian standard style</summary>
-    <updated>2019-10-02T01:05:23+00:00</updated>
+    <updated>2020-03-11T08:37:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="pt-BR">
@@ -165,7 +165,7 @@
     <choose>
       <if is-numeric="edition">
         <number variable="edition" form="numeric" suffix=". "/>
-        <text term="edition" form="short" suffix="."/>
+        <text term="edition" form="short" suffix=".,"/>
       </if>
       <else>
         <text variable="edition" text-case="capitalize-first" suffix=","/>
@@ -260,7 +260,8 @@
       <else-if match="any" type="chapter">
         <group delimiter=", ">
           <group>
-            <text variable="volume" prefix="v. " suffix=". "/>
+            <text variable="volume" prefix="v. " suffix=", "/>
+            <text variable="chapter-number" prefix="cap. " suffix=", "/>
             <text variable="page" prefix="p. "/>
           </group>
         </group>
@@ -454,6 +455,7 @@
             <text macro="title" suffix=". "/>
             <text macro="translator" suffix=". "/>
             <text macro="edition" suffix=" "/>
+            <text variable="number" suffix=". "/>
             <text macro="publisher" prefix=" " suffix=", "/>
             <text macro="issued-year" suffix=". "/>
             <text macro="locators"/>
@@ -462,7 +464,6 @@
               <text variable="collection-number" prefix=", "/>
             </group>
             <text variable="number-of-pages" suffix=" p. "/>
-            <text variable="number" suffix=". "/>
             <text macro="access"/>
           </group>
         </else-if>
@@ -475,10 +476,10 @@
             <text macro="container-title" suffix=". "/>
             <text macro="translator" suffix=". "/>
             <text macro="edition" suffix=" "/>
+            <text variable="number" suffix=". "/>
             <group suffix=". " prefix=" ">
               <text macro="publisher" suffix=", "/>
               <text macro="issued-year" suffix=". "/>
-              <text variable="chapter-number" prefix="Cap. " suffix=". "/>
               <text macro="locators"/>
             </group>
             <text variable="collection-title" suffix=". "/>
