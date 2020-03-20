@@ -23,7 +23,7 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) \(`2019-12` or newer\).
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for advanced users)](https://eclipse.org/) \(`2020-03` or newer\).
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
@@ -190,12 +190,13 @@ If you have configured Eclipse for the same project \(the required steps are des
 
 ### Setup for Eclipse
 
-Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is required.
+Make sure your Eclipse installation us up to date, Eclipse 2020-03 or newer is required.
+For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
 
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
-2. Run `./gradlew eclipse`
+2. Run `./gradlew eclipse` 
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
