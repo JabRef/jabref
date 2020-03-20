@@ -109,19 +109,19 @@ public class JabRefMain extends Application {
         // Check if we are running an acceptable version of Java
         final BuildInfo buildInfo = Globals.BUILD_INFO;
         JavaVersion checker = new JavaVersion();
-        final boolean java9Fail = !buildInfo.isAllowJava9() && checker.isJava9();
-        final boolean versionFail = !checker.isAtLeast(buildInfo.getMinRequiredJavaVersion());
+        final boolean java9Fail = !buildInfo.allowJava9 && checker.isJava9();
+        final boolean versionFail = !checker.isAtLeast(buildInfo.minRequiredJavaVersion);
 
         if (java9Fail || versionFail) {
             StringBuilder versionError = new StringBuilder(
                                                            Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
                                                                              checker.getJavaVersion(),
-                                                                             buildInfo.getMinRequiredJavaVersion()));
+                                                                   buildInfo.minRequiredJavaVersion));
 
             versionError.append("\n");
             versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
 
-            if (!buildInfo.isAllowJava9()) {
+            if (!buildInfo.allowJava9) {
                 versionError.append("\n");
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
