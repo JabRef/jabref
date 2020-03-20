@@ -22,7 +22,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.2'
+    id 'org.beryx.jlink' version '2.17.3'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -87,7 +87,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     jcenter()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
@@ -104,7 +103,7 @@ configurations {
 }
 
 javafx {
-    version = "13.0.2"
+    version = "14"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -144,7 +143,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.4'
 
-    implementation 'org.postgresql:postgresql:42.2.10'
+    implementation 'org.postgresql:postgresql:42.2.11'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -170,8 +169,8 @@ dependencies {
     implementation 'com.jfoenix:jfoenix:9.0.9'
     implementation 'org.controlsfx:controlsfx:11.0.1'
 
-    implementation 'org.jsoup:jsoup:1.12.2'
-    implementation 'com.konghq:unirest-java:3.6.00'
+    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'com.konghq:unirest-java:3.6.01'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -205,15 +204,15 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.8'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.3.1'
-    testImplementation 'org.xmlunit:xmlunit-core:2.6.3'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.6.3'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.xmlunit:xmlunit-core:2.6.4'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.6.4'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.13.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.29'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
 }
@@ -238,7 +237,7 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.7.2b\d/) {
+            if (selection.candidate.version ==~ /2.7.2b\d/ || selection.candidate.version ==~ /2.7.2rc\d/) {
                 selection.reject('Release candidate')
             }
         }
@@ -285,6 +284,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 
@@ -604,6 +604,7 @@ jlink {
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup'
         uses 'org.apache.logging.log4j.spi.Provider'
+        uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'javax.xml.bind.JAXBContextFactory'

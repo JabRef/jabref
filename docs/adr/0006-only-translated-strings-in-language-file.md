@@ -2,15 +2,13 @@
 
 ## Context and Problem Statement
 
-JabRef has translation files `JabRef_it.properties`, ...
-There are translated and unstranslated strings.
-Which ones should be in the translation file?
+JabRef has translation files `JabRef_it.properties`, ... There are translated and unstranslated strings. Which ones should be in the translation file?
 
 ## Decision Drivers
 
 * Translators should find new strings to translate easily
 * New strings to translate should be written into `JabRef_en.properties` to enable translation by the translators
-* Crowdin should be kept as translation platform, because 1) it is much easier for the translators than the GitHub workflow and 2) it is free for OSS projects.
+* Crowdin should be kept as translation platform, because 1\) it is much easier for the translators than the GitHub workflow and 2\) it is free for OSS projects.
 
 ## Considered Options
 
@@ -20,7 +18,7 @@ Which ones should be in the translation file?
 
 ## Decision Outcome
 
-Chosen option: "Only translated strings in language file", because comes out best (see below.
+Chosen option: "Only translated strings in language file", because comes out best \(see below.
 
 ## Pros and Cons of the Options
 
@@ -28,7 +26,7 @@ Chosen option: "Only translated strings in language file", because comes out bes
 
 * Good, because Crowdin supports it
 * Bad, because translators need tooling to see untranslated strings
-* Bad, because issues with FXML (https://github.com/JabRef/jabref/issues/3796)
+* Bad, because issues with FXML \([https://github.com/JabRef/jabref/issues/3796](https://github.com/JabRef/jabref/issues/3796)\)
 
 ### Translated and untranslated strings in language file, have value the untranslated string to indicate untranslated
 
@@ -39,9 +37,10 @@ Chosen option: "Only translated strings in language file", because comes out bes
 ### Translated and untranslated strings in language file, have empty to indicate untranslated
 
 * Good, because untranslated strings can be identified easily
-* Good, because works with FMXL (?)
+* Good, because works with FMXL \(?\)
 * Bad, because Crowdin does not support it
 
 ## Links
 
 * Related to [ADR-0001](0001-use-crowdin-for-translations.md).
+

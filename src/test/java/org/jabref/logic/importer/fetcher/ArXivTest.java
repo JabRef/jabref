@@ -22,14 +22,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class ArXivTest {
-
+class ArXivTest {
     private ArXiv finder;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         finder = new ArXiv(importFormatPreferences);
@@ -41,7 +40,7 @@ public class ArXivTest {
         sliceTheoremPaper.setField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory");
         sliceTheoremPaper.setField(StandardField.DATE, "2014-05-09");
         sliceTheoremPaper.setField(StandardField.ABSTRACT, "A general slice theorem for the action of a Fr\\'echet Lie group on a Fr\\'echet manifolds is established. The Nash-Moser theorem provides the fundamental tool to generalize the result of Palais to this infinite-dimensional setting. The presented slice theorem is illustrated by its application to gauge theories: the action of the gauge transformation group admits smooth slices at every point and thus the gauge orbit space is stratified by Fr\\'echet manifolds. Furthermore, a covariant and symplectic formulation of classical field theory is proposed and extensively discussed. At the root of this novel framework is the incorporation of field degrees of freedom F and spacetime M into the product manifold F * M. The induced bigrading of differential forms is used in order to carry over the usual symplectic theory to this new setting. The examples of the Klein-Gordon field and general Yang-Mills theory illustrate that the presented approach conveniently handles the occurring symmetries.");
-        sliceTheoremPaper.setField(StandardField.EPRINT, "1405.2249v1");
+        sliceTheoremPaper.setField(StandardField.EPRINT, "1405.2249");
         sliceTheoremPaper.setField(StandardField.FILE, ":http\\://arxiv.org/pdf/1405.2249v1:PDF");
         sliceTheoremPaper.setField(StandardField.EPRINTTYPE, "arXiv");
         sliceTheoremPaper.setField(StandardField.EPRINTCLASS, "math-ph");
@@ -49,17 +48,17 @@ public class ArXivTest {
     }
 
     @Test
-    public void findFullTextForEmptyEntryResultsEmptyOptional() throws IOException {
+    void findFullTextForEmptyEntryResultsEmptyOptional() throws IOException {
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void findFullTextRejectsNullParameter() {
+    void findFullTextRejectsNullParameter() {
         assertThrows(NullPointerException.class, () -> finder.findFullText(null));
     }
 
     @Test
-    public void findFullTextByDOI() throws IOException {
+    void findFullTextByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1529/biophysj.104.047340");
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
@@ -67,19 +66,19 @@ public class ArXivTest {
     }
 
     @Test
-    public void findFullTextByEprint() throws IOException {
+    void findFullTextByEprint() throws IOException {
         entry.setField(StandardField.EPRINT, "1603.06570");
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
     @Test
-    public void findFullTextByEprintWithPrefix() throws IOException {
+    void findFullTextByEprintWithPrefix() throws IOException {
         entry.setField(StandardField.EPRINT, "arXiv:1603.06570");
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
     @Test
-    public void findFullTextByEprintWithUnknownDOI() throws IOException {
+    void findFullTextByEprintWithUnknownDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1529/unknown");
         entry.setField(StandardField.EPRINT, "1603.06570");
 
@@ -87,14 +86,14 @@ public class ArXivTest {
     }
 
     @Test
-    public void findFullTextByTitle() throws IOException {
+    void findFullTextByTitle() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
     }
 
     @Test
-    public void findFullTextByTitleAndPartOfAuthor() throws IOException {
+    void findFullTextByTitleAndPartOfAuthor() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
 
@@ -102,19 +101,19 @@ public class ArXivTest {
     }
 
     @Test
-    public void notFindFullTextByUnknownDOI() throws IOException {
+    void notFindFullTextByUnknownDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1529/unknown");
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void notFindFullTextByUnknownId() throws IOException {
+    void notFindFullTextByUnknownId() throws IOException {
         entry.setField(StandardField.EPRINT, "1234.12345");
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void findFullTextByDOINotAvailableInCatalog() throws IOException {
+    void findFullTextByDOINotAvailableInCatalog() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/0370-2693(77)90015-6");
         entry.setField(StandardField.TITLE, "Superspace formulation of supergravity");
 
@@ -122,26 +121,36 @@ public class ArXivTest {
     }
 
     @Test
-    public void searchEntryByPartOfTitle() throws Exception {
+    void findFullTextEntityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextTrustLevel() {
+        assertEquals(TrustLevel.PREPRINT, finder.getTrustLevel());
+    }
+
+    @Test
+    void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
                 finder.performSearch("ti:\"slice theorem for Frechet\""));
     }
 
     @Test
-    public void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
+    void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
                 finder.performSearch("ti:\"slice theorem for Fréchet\""));
     }
 
     @Test
-    public void searchEntryByOldId() throws Exception {
+    void searchEntryByOldId() throws Exception {
         BibEntry expected = new BibEntry();
         expected.setType(StandardEntryType.Article);
         expected.setField(StandardField.AUTHOR, "H1 Collaboration");
         expected.setField(StandardField.TITLE, "Multi-Electron Production at High Transverse Momenta in ep Collisions at HERA");
         expected.setField(StandardField.DATE, "2003-07-07");
         expected.setField(StandardField.ABSTRACT, "Multi-electron production is studied at high electron transverse momentum in positron- and electron-proton collisions using the H1 detector at HERA. The data correspond to an integrated luminosity of 115 pb-1. Di-electron and tri-electron event yields are measured. Cross sections are derived in a restricted phase space region dominated by photon-photon collisions. In general good agreement is found with the Standard Model predictions. However, for electron pair invariant masses above 100 GeV, three di-electron events and three tri-electron events are observed, compared to Standard Model expectations of 0.30 \\pm 0.04 and 0.23 \\pm 0.04, respectively.");
-        expected.setField(StandardField.EPRINT, "hep-ex/0307015v1");
+        expected.setField(StandardField.EPRINT, "hep-ex/0307015");
         expected.setField(StandardField.FILE, ":http\\://arxiv.org/pdf/hep-ex/0307015v1:PDF");
         expected.setField(StandardField.EPRINTTYPE, "arXiv");
         expected.setField(StandardField.EPRINTCLASS, "hep-ex");
@@ -153,61 +162,61 @@ public class ArXivTest {
     }
 
     @Test
-    public void searchEntryByIdWith4DigitsAndVersion() throws Exception {
+    void searchEntryByIdWith4DigitsAndVersion() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249v1"));
     }
 
     @Test
-    public void searchEntryByIdWith4Digits() throws Exception {
+    void searchEntryByIdWith4Digits() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249"));
     }
 
     @Test
-    public void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
+    void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv:1405.2249"));
     }
 
     @Test
-    public void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws Exception {
+    void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv : 1405. 2249"));
     }
 
     @Test
-    public void searchEntryByIdWith5Digits() throws Exception {
+    void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
                 finder.performSearchById("1503.06747").flatMap(entry -> entry.getField(StandardField.TITLE)));
     }
 
     @Test
-    public void searchWithMalformedIdThrowsException() throws Exception {
+    void searchWithMalformedIdThrowsException() throws Exception {
         assertThrows(FetcherException.class, () -> finder.performSearchById("123412345"));
     }
 
     @Test
-    public void searchIdentifierForSlicePaper() throws Exception {
+    void searchIdentifierForSlicePaper() throws Exception {
         sliceTheoremPaper.clearField(StandardField.EPRINT);
 
-        assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
+        assertEquals(ArXivIdentifier.parse("1405.2249"), finder.findIdentifier(sliceTheoremPaper));
     }
 
     @Test
-    public void searchEmptyId() throws Exception {
+    void searchEmptyId() throws Exception {
         assertEquals(Optional.empty(), finder.performSearchById(""));
     }
 
     @Test
-    public void searchWithHttpUrl() throws Exception {
+    void searchWithHttpUrl() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("http://arxiv.org/abs/1405.2249"));
     }
 
     @Test
-    public void searchWithHttpsUrl() throws Exception {
+    void searchWithHttpsUrl() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("https://arxiv.org/abs/1405.2249"));
     }
 
     @Test
-    public void searchWithHttpsUrlNotTrimmed() throws Exception {
+    void searchWithHttpsUrlNotTrimmed() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 }

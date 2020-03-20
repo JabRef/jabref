@@ -599,6 +599,11 @@
         <text macro="locators-article"/>
       </group>
       <text macro="access" prefix=", "/>
+      <choose>
+        <if variable="DOI URL" match="none">
+          <text value="."/>
+        </if>
+      </choose>
     </layout>
   </bibliography>
 </style>
