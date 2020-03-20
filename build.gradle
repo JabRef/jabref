@@ -46,8 +46,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
-    targetCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
 }
 
 application {
@@ -215,10 +215,6 @@ dependencies {
     checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
     jython 'org.python:jython-standalone:2.7.1'
-}
-
-jacoco {
-    toolVersion = '0.8.3'
 }
 
 dependencyUpdates {
