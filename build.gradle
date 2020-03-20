@@ -46,8 +46,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
-    targetCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
 }
 
 application {
@@ -217,10 +217,6 @@ dependencies {
     jython 'org.python:jython-standalone:2.7.1'
 }
 
-jacoco {
-    toolVersion = '0.8.3'
-}
-
 dependencyUpdates {
     outputFormatter = "json"
 }
@@ -284,6 +280,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 

@@ -51,7 +51,7 @@ public class JabRefGUI {
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionDelayed();
     }
 
