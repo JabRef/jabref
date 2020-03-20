@@ -53,6 +53,7 @@ public class EditionChecker implements ValueChecker {
 
         //BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode()) {
+           if(!isFirstCharDigit(value))
             if (!allowIntegerEdition) {
                 if (!FIRST_LETTER_CAPITALIZED.test(value.trim())) {
                     return Optional.of(Localization.lang("should have the first letter capitalized"));
@@ -65,5 +66,10 @@ public class EditionChecker implements ValueChecker {
         }
 
         return Optional.empty();
+    }
+    boolean isFirstCharDigit (String input){
+        char[] array = input.toCharArray();
+        return Character.isDigit(array[0]);
+
     }
 }
