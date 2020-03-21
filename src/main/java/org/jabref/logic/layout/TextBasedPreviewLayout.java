@@ -11,6 +11,9 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the preview based JabRef's <a href="https://docs.jabref.org/import-export/export/customexports">Custom export fitlters</a>.
+ */
 public class TextBasedPreviewLayout implements PreviewLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
 
