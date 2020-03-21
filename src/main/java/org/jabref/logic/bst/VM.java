@@ -843,11 +843,14 @@ public class VM implements Warn {
     }
 
     /**
-     * @param bibtex      list of entries to convert
+     * Transforms the given list of BibEntries to a rendered list of references using the underlying bst file
+     *
+     * @param bibEntries  list of entries to convert
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+     * @return list of references in plain text form
      */
-    public String run(Collection<BibEntry> bibtex, BibDatabase bibDatabase) {
-        Objects.requireNonNull(bibtex);
+    public String run(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
+        Objects.requireNonNull(bibEntries);
 
         // Reset
         bbl = new StringBuilder();
@@ -864,8 +867,8 @@ public class VM implements Warn {
         stack = new Stack<>();
 
         // Create entries
-        entries = new ArrayList<>(bibtex.size());
-        for (BibEntry entry : bibtex) {
+        entries = new ArrayList<>(bibEntries.size());
+        for (BibEntry entry : bibEntries) {
             entries.add(new BstEntry(entry));
         }
 
