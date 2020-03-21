@@ -5,7 +5,8 @@ coverage:
     patch: false
   project:
     default:
-      threshold: 0.005
+      threshold: 0.01
 comment:
   branches:
     - "do-not-add-comment-to-any-branch-please"
+  require_changes: true
