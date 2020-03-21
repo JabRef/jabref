@@ -270,7 +270,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
             }
-            VM.this.execute(context.getBibtexEntry().getType().getName(), context);
+            VM.this.execute(context.entry.getType().getName(), context);
         });
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));
@@ -303,7 +303,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
+            stack.push(context.entry.getCiteKeyOptional().orElse(null));
         });
 
         /*
@@ -581,7 +581,7 @@ public class VM implements Warn {
                 throw new VMException("type$ need a context.");
             }
 
-            stack.push(context.getBibtexEntry().getType().getName());
+            stack.push(context.entry.getType().getName());
         });
 
         /*
@@ -925,16 +925,16 @@ public class VM implements Warn {
      */
     private void read(BibDatabase bibDatabase) {
         for (BstEntry e : entries) {
-            for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
+            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
-                String fieldValue = e.getBibtexEntry().getResolvedFieldOrAlias(field, bibDatabase).orElse(null);
+                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bibDatabase).orElse(null);
                 mEntry.setValue(fieldValue);
             }
         }
 
         for (BstEntry e : entries) {
-            if (!e.getFields().containsKey(StandardField.CROSSREF.getName())) {
-                e.getFields().put(StandardField.CROSSREF.getName(), null);
+            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
+                e.fields.put(StandardField.CROSSREF.getName(), null);
             }
         }
     }
@@ -981,7 +981,7 @@ public class VM implements Warn {
             String name = t.getChild(i).getText();
 
             for (BstEntry entry : entries) {
-                entry.getFields().put(name, null);
+                entry.fields.put(name, null);
             }
         }
 
@@ -1106,8 +1106,8 @@ public class VM implements Warn {
 
         if (context != null) {
 
-            if (context.getFields().containsKey(name)) {
-                stack.push(context.getFields().get(name));
+            if (context.fields.containsKey(name)) {
+                stack.push(context.fields.get(name));
                 return;
             }
             if (context.localStrings.containsKey(name)) {
@@ -1174,24 +1174,16 @@ public class VM implements Warn {
 
     public static class BstEntry {
 
-        private final BibEntry entry;
+        public final BibEntry entry;
 
-        private final Map<String, String> localStrings = new HashMap<>();
+        public final Map<String, String> localStrings = new HashMap<>();
 
-        private final Map<String, String> fields = new HashMap<>();
+        public final Map<String, String> fields = new HashMap<>();
 
-        private final Map<String, Integer> localIntegers = new HashMap<>();
+        public final Map<String, Integer> localIntegers = new HashMap<>();
 
         public BstEntry(BibEntry e) {
             this.entry = e;
-        }
-
-        public Map<String, String> getFields() {
-            return fields;
-        }
-
-        public BibEntry getBibtexEntry() {
-            return entry;
         }
     }
 
