@@ -2,16 +2,15 @@ package org.jabref.logic.bst;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
-import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.logic.layout.format.RemoveTilde;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
