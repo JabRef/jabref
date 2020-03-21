@@ -6,20 +6,29 @@ import javax.inject.Inject;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.RadioButtonCell;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -95,10 +104,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
         new ValueTableCellFactory<BibEntryType, String>()
-             .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-             .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
-             .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
-             .install(entryTypeActionsColumn);
+                                                         .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                                                         .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
+                                                         .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
+                                                         .install(entryTypeActionsColumn);
 
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldType());
@@ -121,13 +130,68 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
 
         new ValueTableCellFactory<FieldViewModel, String>()
-           .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
-           .install(fieldTypeActionColumn);
+                                                           .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                                                           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
+                                                           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
+                                                           .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
+
+        new ViewModelTableRowFactory<FieldViewModel>()
+                                                      .setOnDragDetected(this::handleOnDragDetected)
+                                                      .setOnDragDropped(this::handleOnDragDropped)
+                                                      .setOnDragOver(this::handleOnDragOver)
+                                                      .install(fields);
+
+    }
+
+    private void handleOnDragOver(FieldViewModel originalItem, DragEvent event) {
+        if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+    }
+
+    private void handleOnDragDetected(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, MouseEvent event) {
+        // Start drag'n'drop
+        row.startFullDrag();
+
+        Field field = fields.getSelectionModel().getSelectedItem().getField();
+
+        ClipboardContent content = new ClipboardContent();
+        Dragboard dragboard = fields.startDragAndDrop(TransferMode.MOVE);
+        content.put(DragAndDropDataFormats.FIELD, field);
+        dragboard.setContent(content);
+        event.consume();
+    }
+
+    private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
+        boolean success = false;
+        Dragboard dragboard = event.getDragboard();
+
+        ObservableList<FieldViewModel> items = fields.itemsProperty().get();
+
+        if (dragboard.hasContent(DragAndDropDataFormats.FIELD)) {
+
+            Field field = (Field) dragboard.getContent(DragAndDropDataFormats.FIELD);
+            FieldViewModel transferedItem = null;
+            int draggedIdx = 0;
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i).getField().equals(field)) {
+                    draggedIdx = i;
+                    transferedItem = items.get(i);
+                    break;
+                }
+            }
+            int thisIdx = items.indexOf(originalItem);
+            items.set(draggedIdx, originalItem);
+            items.set(thisIdx, transferedItem);
+            success = true;
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
+
     }
 
     @FXML
