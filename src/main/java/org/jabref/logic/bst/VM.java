@@ -136,7 +136,7 @@ public class VM implements Warn {
             stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
         });
 
-        /* Analogous. */
+        /* Analogous to >. */
         buildInFunctions.put("<", context -> {
             if (stack.size() < 2) {
                 throw new VMException("Not enough operands on stack for operation <");
@@ -1178,6 +1178,7 @@ public class VM implements Warn {
 
         public final Map<String, String> localStrings = new HashMap<>();
 
+        // keys filled by org.jabref.logic.bst.VM.entry based on the contents of the bst file
         public final Map<String, String> fields = new HashMap<>();
 
         public final Map<String, Integer> localIntegers = new HashMap<>();

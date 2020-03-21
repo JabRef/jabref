@@ -7,10 +7,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Obeys following settings:
- * * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS
- * * JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR
- * * JabRefPreferences.WRITEFIELD_WRAPFIELD
+ * Converts JabRef's internal BibTeX representation of a BibTeX field to BibTeX text representation
  */
 public class FieldWriter {
 
