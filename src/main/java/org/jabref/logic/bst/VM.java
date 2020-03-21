@@ -14,9 +14,13 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -924,10 +928,33 @@ public class VM implements Warn {
      * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
+        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences());
         for (BstEntry e : entries) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
-                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bibDatabase).orElse(null);
+                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bibDatabase)
+                                           .map(content -> {
+                                               try {
+                                                   String result = fieldWriter.write(field, content);
+                                                   if (result.startsWith("{")) {
+                                                       // Strip enclosing {} from the output
+                                                       return result.substring(1, result.length() - 1);
+                                                   }
+                                                   if (field == StandardField.MONTH) {
+                                                       // We don't have the internal BibTeX strings at hand.
+                                                       // We nevertheless want to have the full month name.
+                                                       // Thus, we lookup the full month name here.
+                                                       return Month.parse(result)
+                                                                   .map(month -> month.getFullName())
+                                                                   .orElse(result);
+                                                   }
+                                                   return result;
+                                               } catch (InvalidFieldValueException invalidFieldValueException) {
+                                                   // in case there is something wrong with the content, just return the content itself
+                                                   return content;
+                                               }
+                                           })
+                                           .orElse(null);
                 mEntry.setValue(fieldValue);
             }
         }

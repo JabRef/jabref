@@ -27,10 +27,6 @@ public class BstPreviewLayout implements PreviewLayout {
     private VM vm;
     private String error;
 
-    public BstPreviewLayout(String filename) {
-        this(Paths.get(filename));
-    }
-
     public BstPreviewLayout(Path path) {
         name = path.getFileName().toString();
         if (!Files.exists(path)) {
