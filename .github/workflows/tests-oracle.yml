@@ -38,11 +38,7 @@ jobs:
         env:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CCRYPT }}
       - name: Checkout source
-        if: ${{ steps.checksecrets.outputs.secretspresent }}
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: actions/setup-java@v1
