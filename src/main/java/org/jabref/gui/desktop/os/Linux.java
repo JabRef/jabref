@@ -6,19 +6,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.StringJoiner;
 
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.util.StreamGobbler;
 
-import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Linux implements NativeDesktop {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
+
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
@@ -29,8 +31,13 @@ public class Linux implements NativeDesktop {
         } else {
             viewer = "xdg-open";
         }
-        String[] cmdArray = { viewer, filePath };
-        Runtime.getRuntime().exec(cmdArray);
+        ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
+        Process process = processBuilder.start();
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
@@ -42,11 +49,18 @@ public class Linux implements NativeDesktop {
         } else {
             openWith = new String[] {"xdg-open"};
         }
-
         String[] cmdArray = new String[openWith.length + 1];
         System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
         cmdArray[cmdArray.length - 1] = filePath;
-        Runtime.getRuntime().exec(cmdArray);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
+        Process process = processBuilder.start();
+
+        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
@@ -85,23 +99,6 @@ public class Linux implements NativeDesktop {
             } else {
                 runtime.exec(emulatorName, null, new File(absolutePath));
             }
-        }
-    }
-
-    @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-
-        String application;
-        if (JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))) {
-            application = "acroread";
-
-            StringJoiner sj = new StringJoiner(" ");
-            sj.add(application);
-            parameters.forEach((param) -> sj.add(param));
-
-            openFileWithApplication(filePath, sj.toString());
-        } else {
-            openFile( filePath, "PDF");
         }
     }
 

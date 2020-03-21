@@ -6,10 +6,9 @@
 
 To quickly host a local PostgreSQL database, execute following statement:
 
-```shell command
-docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 --name db postgres:10 postgres -c log_statement=all
-```
+\`\`\`shell command docker run -d -e POSTGRES\_USER=postgres -e POSTGRES\_PASSWORD=postgres -e POSTGRES\_DB=postgres -p 5432:5432 --name db postgres:10 postgres -c log\_statement=all
 
+```text
 Set the environment variable `DBMS` to `postgres` (or leave it unset)
 
 Then, all DBMS Tests (annotated with `@org.jabref.testutils.category.DatabaseTest`) run properly.
@@ -23,3 +22,4 @@ docker run -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=jabref -p 3800:3307 mys
 ```
 
 Set the environment variable `DBMS` to `mysql`.
+

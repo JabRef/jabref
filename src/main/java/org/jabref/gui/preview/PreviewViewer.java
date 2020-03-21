@@ -85,7 +85,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private boolean registered;
 
     private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
 
@@ -131,7 +131,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
-            String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+            String pattern = searchHighlightPattern.get().pattern();
 
             previewView.getEngine().executeScript(
                     "var markInstance = new Mark(document.getElementById(\"content\"));" +

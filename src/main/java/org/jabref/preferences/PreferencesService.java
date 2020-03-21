@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -19,6 +21,8 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -104,4 +108,12 @@ public interface PreferencesService {
     boolean getAllowIntegerEdition();
 
     EntryEditorPreferences getEntryEditorPreferences();
+
+    List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
+
+    CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader);
+
+    CleanupPreset getCleanupPreset();
+
+    void setCleanupPreset(CleanupPreset cleanupPreset);
 }

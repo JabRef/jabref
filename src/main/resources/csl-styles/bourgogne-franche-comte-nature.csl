@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" demote-non-dropping-particle="never" default-locale="fr-FR">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="fr-FR">
   <info>
     <title>Bourgogne-Franche-Comté Nature (French)</title>
     <title-short>BFCN</title-short>
@@ -13,8 +13,10 @@
     </author>
     <category citation-format="author-date"/>
     <category field="biology"/>
+    <category field="zoology"/>
+    <category field="geography"/>
     <issn>2648-692X</issn>
-    <updated>2019-12-30T10:52:12+00:00</updated>
+    <updated>2020-02-10T16:58:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container">
@@ -22,7 +24,9 @@
       <if type="chapter paper-conference" match="any">
         <text term="in" prefix=", " suffix=": "/>
         <names variable="editor translator" delimiter=", " suffix=", ">
-          <name name-as-sort-order="all" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="always"/>
+          <name name-as-sort-order="all" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="always">
+            <name-part name="family" font-variant="small-caps"/>
+          </name>
           <label form="short" text-case="capitalize-first" prefix=" (" suffix=")"/>
         </names>
         <group delimiter=", ">
@@ -47,7 +51,7 @@
   <macro name="author">
     <names variable="author">
       <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", " delimiter-precedes-last="always">
-        <name-part name="family" text-case="uppercase"/>
+        <name-part name="family" font-variant="small-caps"/>
       </name>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
       <substitute>
@@ -60,7 +64,7 @@
   <macro name="author-short">
     <names variable="author">
       <name form="short" and="symbol" delimiter=", " initialize-with=". ">
-        <name-part name="family" text-case="uppercase"/>
+        <name-part name="family" font-variant="small-caps"/>
       </name>
       <et-al font-style="italic"/>
       <substitute>
@@ -195,7 +199,7 @@
       <key macro="author"/>
       <key macro="issued" sort="descending"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter="; ">
+    <layout prefix="(" suffix=")" delimiter=" ; ">
       <group delimiter=", ">
         <text macro="author-short"/>
         <text macro="issued"/>

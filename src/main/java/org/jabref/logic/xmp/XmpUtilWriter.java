@@ -192,12 +192,12 @@ public class XmpUtilWriter {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             XmpSerializer serializer = new XmpSerializer();
             serializer.serialize(meta, os, true);
-            return os.toString(StandardCharsets.UTF_8.name());
+            return os.toString(StandardCharsets.UTF_8);
         } catch (TransformerException e) {
-            LOGGER.warn("Tranformation into xmp not possible: " + e.getMessage(), e);
+            LOGGER.warn("Transformation into XMP not possible: " + e.getMessage(), e);
             return "";
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in xmp metadata.", e);
+            LOGGER.warn("Unsupported encoding to UTF-8 of bib entries in XMP metadata.", e);
             return "";
         } catch (IOException e) {
             LOGGER.warn("IO Exception thrown by closing the output stream.", e);

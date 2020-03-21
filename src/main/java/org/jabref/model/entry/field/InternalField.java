@@ -14,6 +14,9 @@ public enum InternalField implements Field {
     TIMESTAMP("timestamp", FieldProperty.DATE),
     GROUPS("groups"),
     KEY_FIELD("bibtexkey"),
+    /**
+     * field which indicates the entrytype
+     */
     TYPE_HEADER("entrytype"),
     OBSOLETE_TYPE_HEADER("bibtextype"),
     MARKED_INTERNAL("__markedentry"), // used in old versions of JabRef. Currently used for conversion only

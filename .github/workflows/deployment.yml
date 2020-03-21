@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - master-release
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
@@ -14,27 +15,24 @@ on:
       - 'src/test/**'
       - 'README.md'
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
          - os: ubuntu-latest
            displayName: linux
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_linux-x64_bin.tar.gz
-           jdk14Path: /jdk-14
            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
          - os: windows-latest
            displayName: windows
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_windows-x64_bin.zip
-           jdk14Path: /jdk-14
            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
          - os: macOS-latest
            displayName: macOS
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/30/GPL/openjdk-14-ea+30_osx-x64_bin.tar.gz
-           jdk14Path: /jdk-14.jdk/Contents/Home
            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
@@ -42,28 +40,20 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.1
         with:
-            versionSpec: '5.1.2'
+          versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9.1
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         name: Restore gradle cache
@@ -76,61 +66,20 @@ jobs:
             ${{ runner.OS }}-
       - uses: actions/cache@v1
         name: Cache gradle wrapper
-        # cache at Mac OS X is 2 GB (too large)
-        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Download jpackage
-        # We need to download jpackage from https://jdk.java.net/jpackage/
-        run: |
-          import tarfile
-          import zipfile
-          import sys
-          if sys.version_info[0] >= 3:
-            from urllib.request import urlretrieve
-          else:
-            from urllib import urlretrieve
-
-          url = "${{ matrix.jpackageDownload }}"
-          tmpfile, headers = urlretrieve(url)
-          if (url.endswith("tar.gz")):
-            tar = tarfile.open(tmpfile)
-            tar.extractall()
-            tar.close()
-          elif (url.endswith("zip")):
-            zip = zipfile.ZipFile(tmpfile)
-            zip.extractall()
-            zip.close()
-        shell: python
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
-        run: |
-          export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
-      - name: Build snap (1) Setup snapcraft
-        uses: jhenstridge/snapcraft-build-action@v1
-        id: snapcraft
-        if: matrix.displayName == 'linux'
-      - name: Build snap (2) Run build
-        run: |
-          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-        if: matrix.displayName == 'linux'
-      - name: Build snap (3) Upload snap
-        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
-        env:
-          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-        run: |
-            mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            snapcraft push build/distribution/jabref*.snap --release edge || true
-        shell: bash
       - name: Rename files
         run: |
+          get-childitem -Path build/distribution/*
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
         shell: pwsh
@@ -145,24 +94,16 @@ jobs:
     needs: [build]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.1
         with:
-            versionSpec: '5.1.2'
+          versionSpec: '5.1.3'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9.1
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
@@ -190,3 +131,4 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+

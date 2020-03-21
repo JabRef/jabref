@@ -3,4 +3,9 @@ coverage:
   - src/gen/.*
   status:
     patch: false
-comment: off
+  project:
+    default:
+      threshold: 0.005
+comment:
+  branches:
+    - "do-not-add-comment-to-any-branch-please"

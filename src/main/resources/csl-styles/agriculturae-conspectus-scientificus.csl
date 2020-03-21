@@ -14,7 +14,7 @@
     <category field="science"/>
     <issn>1331-7768</issn>
     <eissn>1331-7776</eissn>
-    <updated>2020-01-13T13:20:01+00:00</updated>
+    <updated>2020-01-15T11:50:40+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container">
@@ -41,7 +41,7 @@
         </group>
       </else-if>
       <else>
-        <group delimiter=", ">
+        <group delimiter=", " prefix=". ">
           <text variable="container-title" form="short" strip-periods="true"/>
           <text variable="collection-title"/>
         </group>

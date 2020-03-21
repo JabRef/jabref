@@ -43,34 +43,76 @@
       </term>
     </terms>
   </locale>
+  <locale xml:lang="af">
+    <terms>
+      <term name="letter">persoonlike kommunikasie</term>
+      <term name="letter" form="short">brief</term>
+    </terms>
+  </locale>
+  <locale xml:lang="ar">
+    <terms>
+      <term name="letter">اتصال شخصي</term>
+      <term name="letter" form="short">خطاب</term>
+    </terms>
+  </locale>
   <locale xml:lang="da">
     <terms>
       <term name="et-al">et al.</term>
+      <term name="letter">personlig kommunikation</term>
+      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <locale xml:lang="de">
     <terms>
       <term name="et-al">et al.</term>
+      <term name="letter">persönliche Kommunikation</term>
+      <term name="letter" form="short">Brief</term>
     </terms>
   </locale>
   <locale xml:lang="es">
     <terms>
       <term name="from">de</term>
+      <term name="letter">comunicación personal</term>
+      <term name="letter" form="short">carta</term>
+    </terms>
+  </locale>
+  <locale xml:lang="fr">
+    <terms>
+      <term name="letter">communication personnelle</term>
+      <term name="letter" form="short">lettre</term>
     </terms>
   </locale>
   <locale xml:lang="nb">
     <terms>
       <term name="et-al">et al.</term>
+      <term name="letter">personlig kommunikasjon</term>
+      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <locale xml:lang="nl">
     <terms>
       <term name="et-al">et al.</term>
+      <term name="letter">persoonlijke communicatie</term>
+      <term name="letter" form="short">brief</term>
     </terms>
   </locale>
   <locale xml:lang="nn">
     <terms>
       <term name="et-al">et al.</term>
+      <term name="letter">personlig kommunikasjon</term>
+      <term name="letter" form="short">brev</term>
+    </terms>
+  </locale>
+  <locale xml:lang="ru">
+    <terms>
+      <term name="letter">личная переписка</term>
+      <term name="letter" form="short">письмо</term>
+    </terms>
+  </locale>
+  <locale xml:lang="tr">
+    <terms>
+      <term name="letter">kişisel iletişim</term>
+      <term name="letter" form="short">mektup</term>
     </terms>
   </locale>
   <!-- General categories of item types:

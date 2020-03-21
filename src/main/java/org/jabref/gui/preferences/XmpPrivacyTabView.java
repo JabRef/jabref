@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
@@ -42,7 +43,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
     }
 
     @Override
-    public String getTabName() { return Localization.lang("XMP-metadata"); }
+    public String getTabName() { return Localization.lang("XMP metadata"); }
 
     public void initialize () {
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
@@ -69,9 +70,10 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
                         item -> evt -> viewModel.removeFilter(filterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
-        filterList.setOnKeyPressed(event -> {
+        filterList.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.DELETE) {
                 viewModel.removeFilter(filterList.getSelectionModel().getSelectedItem());
+                event.consume();
             }
         });
 
@@ -84,6 +86,12 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
         addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());
         addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());
         addFieldName.setConverter(FieldsUtil.fieldStringConverter);
+        addFieldName.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.addField();
+                event.consume();
+            }
+        });
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));

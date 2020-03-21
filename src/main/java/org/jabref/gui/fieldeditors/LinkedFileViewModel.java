@@ -29,6 +29,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -85,7 +86,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
         this.xmpPreferences = xmpPreferences;
-        
+
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
     }
@@ -222,30 +223,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private void performRenameWithConflictCheck(String targetFileName) {
-        Optional<Path> fileConflictCheck = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
-        if (fileConflictCheck.isPresent()) {
-            boolean confirmOverwrite = dialogService.showConfirmationDialogAndWait(
+        Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
+        boolean overwriteFile = false;
+
+        if (existingFile.isPresent()) {
+            overwriteFile = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
                     Localization.lang("Overwrite"));
 
-            if (confirmOverwrite) {
-                try {
-                    Files.delete(fileConflictCheck.get());
-                } catch (IOException e) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Rename failed"),
-                            Localization.lang("JabRef cannot access the file because it is being used by another process."),
-                            e);
-                    return;
-                }
-            } else {
+            if (!overwriteFile) {
                 return;
             }
         }
 
         try {
-            linkedFileHandler.renameToName(targetFileName);
+            linkedFileHandler.renameToName(targetFileName, overwriteFile);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
@@ -283,6 +276,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     /**
      * Gets the filename for the current linked file and compares it to the new suggested filename.
+     *
      * @return true if the suggested filename is same as current filename.
      */
     public boolean isGeneratedNameSameAsOriginal() {
@@ -295,6 +289,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     /**
      * Compares suggested filepath of current linkedFile with existing filepath.
+     *
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
@@ -368,7 +363,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void writeXMPMetadata() {
-        // Localization.lang("Writing XMP-metadata...")
+        // Localization.lang("Writing XMP metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (!file.isPresent()) {
@@ -385,7 +380,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return null;
         });
 
-        // Localization.lang("Finished writing XMP-metadata.")
+        // Localization.lang("Finished writing XMP metadata.")
 
         // TODO: Show progress
         taskExecutor.execute(writeTask);
@@ -397,7 +392,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
         try {
             Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
-            if (!targetDirectory.isPresent()) {
+            if (targetDirectory.isEmpty()) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Download file"), Localization.lang("File directory is not set or does not exist!"));
                 return;
             }
@@ -420,10 +415,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                    String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
+                    ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
+                    String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
-
-                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
@@ -435,7 +430,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         Optional<ExternalFileType> suggestedType = inferFileTypeFromMimeType(urlDownload);
 
         // If we did not find a file type from the MIME type, try based on extension:
-        if (!suggestedType.isPresent()) {
+        if (suggestedType.isEmpty()) {
             suggestedType = inferFileTypeFromURL(urlDownload.getSource().toExternalForm());
         }
         return suggestedType;
@@ -454,7 +449,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     private Optional<ExternalFileType> inferFileTypeFromURL(String url) {
         return URLUtil.getSuffix(url)
-                      .flatMap(extension -> externalFileTypes.getExternalFileTypeByExt(extension));
+                      .flatMap(externalFileTypes::getExternalFileTypeByExt);
     }
 
     public LinkedFile getFile() {

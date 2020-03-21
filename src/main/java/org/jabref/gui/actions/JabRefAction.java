@@ -58,7 +58,11 @@ class JabRefAction extends org.controlsfx.control.action.Action {
             return action.getText();
         } else {
             String commandName = command.getClass().getSimpleName();
-            if ((command instanceof OldDatabaseCommandWrapper) || (command instanceof OldCommandWrapper) || commandName.contains("EditAction")) {
+            if ( commandName.contains("EditAction")
+                    || commandName.contains("CopyMoreAction")
+                    || commandName.contains("CopyCitationAction")
+                    || commandName.contains("PreviewSwitchAction")
+                    || commandName.contains("SaveAction")) {
                 return command.toString();
             } else {
                 return commandName;

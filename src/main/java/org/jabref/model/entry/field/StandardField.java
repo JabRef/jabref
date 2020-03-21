@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Standard BibTeX and BibLaTex fields
+ * Standard BibTeX and BibLaTeX fields
  */
 public enum StandardField implements Field {
 
@@ -72,6 +72,8 @@ public enum StandardField implements Field {
     KEY("key"),
     KEYWORDS("keywords"),
     LANGUAGE("language", FieldProperty.LANGUAGE),
+    LABEL("label"),
+    LIBRARY("library"),
     LOCATION("location"),
     MAINSUBTITLE("mainsubtitle", FieldProperty.BOOK_NAME),
     MAINTITLE("maintitle", FieldProperty.BOOK_NAME),

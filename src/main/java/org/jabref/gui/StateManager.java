@@ -9,10 +9,13 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.scene.Node;
 
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,18 +29,25 @@ import org.jabref.model.util.OptionalUtil;
  * - currently selected group
  * - active search
  * - active number of search results
+ * - focus owner
  */
 public class StateManager {
 
+    private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<BibDatabaseContext, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
+    private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
+    }
+
+    public CustomLocalDragboard getLocalDragboard() {
+        return localDragboard;
     }
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {
@@ -53,7 +63,7 @@ public class StateManager {
     }
 
     public IntegerProperty getSearchResultSize() {
-        return searchResultMap.get(activeDatabase.getValue().orElse(new BibDatabaseContext()));
+        return searchResultMap.getOrDefault(activeDatabase.getValue().orElse(new BibDatabaseContext()), new SimpleIntegerProperty(0));
     }
 
     public ReadOnlyListProperty<GroupTreeNode> activeGroupProperty() {
@@ -98,4 +108,8 @@ public class StateManager {
     public void setSearchQuery(SearchQuery searchQuery) {
         activeSearchQuery.setValue(Optional.of(searchQuery));
     }
+
+    public OptionalObjectProperty<Node> focusOwnerProperty() { return focusOwner; }
+
+    public Optional<Node> getFocusOwner() { return focusOwner.get(); }
 }

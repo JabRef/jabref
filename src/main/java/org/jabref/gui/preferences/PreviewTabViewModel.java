@@ -27,7 +27,7 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
@@ -65,14 +65,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final JabRefPreferences preferences;
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
-    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
+    private final CustomLocalDragboard localDragboard;
     private Validator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
 
-    public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
+    public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.localDragboard = stateManager.getLocalDragboard();
         previewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
