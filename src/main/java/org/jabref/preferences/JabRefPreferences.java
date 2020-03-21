@@ -58,7 +58,6 @@ import org.jabref.logic.PreviewLayout;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -652,7 +651,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(VERSION_IGNORED_UPDATE, "");
 
         // preview
-        defaults.put(CYCLE_PREVIEW, "Preview;" + "bst/IEEEtran.bst;" + CitationStyle.DEFAULT);
+        defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
@@ -1493,8 +1492,6 @@ public class JabRefPreferences implements PreferencesService {
                                                    return CitationStyle.createCitationStyleFromFile(layout)
                                                                        .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
                                                                        .orElse(null);
-                                               } else if (layout.endsWith(".bst")) {
-                                                   return new BstPreviewLayout(layout);
                                                } else {
                                                    return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
                                                }
