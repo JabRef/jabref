@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.jabref.logic.PreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -47,12 +47,12 @@ public class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String generatePreview(BibEntry entry, BibDatabase database) {
+    public String generatePreview(BibEntry originalEntry, BibDatabase database) {
         if (error != null) {
             return error;
         }
         // ensure that the entry is of BibTeX format (and do not modify the original entry)
-        entry = (BibEntry) entry.clone();
+        BibEntry entry = (BibEntry) originalEntry.clone();
         new ConvertToBibtexCleanup().cleanup(entry);
         String result = vm.run(List.of(entry));
         // Remove all comments
