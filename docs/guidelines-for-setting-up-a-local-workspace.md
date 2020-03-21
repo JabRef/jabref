@@ -2,9 +2,10 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
-```diff
-- The most important step is to configure your IDE. Please scroll down to see these steps.
-+ For a step-by-step instruction, please just read on.
+```text
+The most important step is to configure your IDE.
+In case you know how to install JDK14 and to fork JabRef's code,
+        please scroll down to the IDE setup.
 ```
 
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
