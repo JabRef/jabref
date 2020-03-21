@@ -93,14 +93,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - name: Check variable presence
-        id: checkpresence
+      - name: Check secrets presence
+        id: checksecrets
         shell: bash
         run: |
           if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo ::set-output name=HAS_BUILDJABREFPRIVATEKEY::false
+            echo ::set-output name=secretspresent::false
           else
-            echo ::set-output name=HAS_BUILDJABREFPRIVATEKEY::true
+            echo ::set-output name=secretspresent::true
           fi
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
@@ -132,7 +132,7 @@ jobs:
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
-        if: ${{ steps.checkpresence.outputs.HAS_BUILDJABREFPRIVATEKEY }}
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: Pendect/action-rsyncer@v1.1.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}
