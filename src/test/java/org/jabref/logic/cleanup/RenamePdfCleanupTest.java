@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,8 +34,8 @@ class RenamePdfCleanupTest {
     void setUp(@TempDir Path testFolder) {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
-        context.setDatabaseFile(path);
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
+        context.setDatabasePath(path);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");

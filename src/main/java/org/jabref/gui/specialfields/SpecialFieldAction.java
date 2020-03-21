@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.BaseAction;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -17,16 +20,16 @@ import org.jabref.model.entry.field.SpecialField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SpecialFieldAction implements BaseAction {
+public class SpecialFieldAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecialFieldAction.class);
     private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
     private final boolean nullFieldIfValueIsTheSame;
-
     private final String undoText;
-
+    private final DialogService dialogService;
+    private final StateManager stateManager;
 
     /**
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
@@ -36,18 +39,24 @@ public class SpecialFieldAction implements BaseAction {
             SpecialField specialField,
             String value,
             boolean nullFieldIfValueIsTheSame,
-            String undoText) {
+            String undoText,
+            DialogService dialogService,
+            StateManager stateManager) {
         this.frame = frame;
         this.specialField = specialField;
         this.value = value;
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
         this.undoText = undoText;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+
+        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
     @Override
-    public void action() {
+    public void execute() {
         try {
-            List<BibEntry> bes = frame.getCurrentBasePanel().getSelectedEntries();
+            List<BibEntry> bes = stateManager.getSelectedEntries();
             if ((bes == null) || bes.isEmpty()) {
                 return;
             }
@@ -70,7 +79,7 @@ public class SpecialFieldAction implements BaseAction {
                 } else {
                     outText = getTextDone(specialField, value, Integer.toString(bes.size()));
                 }
-                frame.getDialogService().notify(outText);
+                dialogService.notify(outText);
             } else {
                 // if user does not change anything with his action, we do not do anything either
                 // even no output message
@@ -83,7 +92,7 @@ public class SpecialFieldAction implements BaseAction {
     private String getTextDone(SpecialField field, String... params) {
         Objects.requireNonNull(params);
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getCurrentBasePanel().getUndoManager());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getUndoManager());
 
         if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only

@@ -216,16 +216,16 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<Path> getLaTexFileDirectory(String user) {
+    public Optional<Path> getLatexFileDirectory(String user) {
         return Optional.ofNullable(laTexFileDirectory.get(user));
     }
 
-    public void setLaTexFileDirectory(String user, Path path) {
+    public void setLatexFileDirectory(String user, Path path) {
         laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
         postChange();
     }
 
-    public void clearLaTexFileDirectory(String user) {
+    public void clearLatexFileDirectory(String user) {
         laTexFileDirectory.remove(user);
         postChange();
     }
@@ -294,7 +294,7 @@ public class MetaData {
         }
     }
 
-    private Optional<String> getDefaultCiteKeyPattern() {
+    public Optional<String> getDefaultCiteKeyPattern() {
         return Optional.ofNullable(defaultCiteKeyPattern);
     }
 
@@ -306,7 +306,7 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, Path> getLaTexFileDirectories() {
+    public Map<String, Path> getLatexFileDirectories() {
         return Collections.unmodifiableMap(laTexFileDirectory);
     }
 
@@ -314,7 +314,7 @@ public class MetaData {
         return Collections.unmodifiableMap(unkownMetaData);
     }
 
-    public void putUnkownMetaDataItem(String key, List<String> value) {
+    public void putUnknownMetaDataItem(String key, List<String> value) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
@@ -330,14 +330,16 @@ public class MetaData {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected) && Objects.equals(groupsRoot, metaData.groupsRoot)
+        return (isProtected == metaData.isProtected)
+                && Objects.equals(groupsRoot, metaData.groupsRoot)
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-               && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
+                && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
+                && Objects.equals(saveActions, metaData.saveActions)
+                && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
                 && Objects.equals(contentSelectors, metaData.contentSelectors);
     }

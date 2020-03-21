@@ -39,8 +39,8 @@ class BibEntryWriterTest {
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), new BibEntryTypesManager());
+        FieldWriterPreferences fieldWriterPreferences = mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        writer = new BibEntryWriter(new FieldWriter(fieldWriterPreferences), new BibEntryTypesManager());
     }
 
     @Test
@@ -510,24 +510,6 @@ class BibEntryWriterTest {
 
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
                 "  note   = {some note}," + OS.NEWLINE +
-                "}" + OS.NEWLINE;
-
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void trimFieldContents() throws IOException {
-        StringWriter stringWriter = new StringWriter();
-
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.NOTE, "        some note    \t");
-
-        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-
-        String actual = stringWriter.toString();
-
-        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
-                "  note = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
 
         assertEquals(expected, actual);

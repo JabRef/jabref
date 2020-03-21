@@ -15,7 +15,6 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
     private final List<BibEntry> bibEntries;
     private final EntriesEventSource location;
 
-
     /**
      * @param bibEntries List of BibEntry objects which are involved in this event
      */
@@ -31,9 +30,6 @@ public abstract class EntriesEvent extends BibDatabaseContextChangedEvent {
         this.bibEntries = Objects.requireNonNull(bibEntries);
         this.location = Objects.requireNonNull(location);
     }
-
-    //Temporary fix, while we change to plural entries
-    public BibEntry getBibEntry() { return this.bibEntries.get(0); }
 
     public List<BibEntry> getBibEntries() {
         return this.bibEntries;

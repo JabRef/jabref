@@ -4,8 +4,8 @@
     <title>IEEE (with URL)</title>
     <id>http://www.zotero.org/styles/ieee-with-url</id>
     <link href="http://www.zotero.org/styles/ieee-with-url" rel="self"/>
-    <link href="http://www.ieee.org/documents/style_manual.pdf" rel="documentation"/>
-    <link href="http://www.ieee.org/documents/auinfo07.pdf" rel="documentation"/>
+    <link href="https://ieeeauthorcenter.ieee.org/wp-content/uploads/IEEE-Reference-Guide.pdf" rel="documentation"/>
+    <link href="https://journals.ieeeauthorcenter.ieee.org/your-role-in-article-production/ieee-editorial-style-manual/" rel="documentation"/>
     <author>
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
@@ -28,7 +28,8 @@
     <category citation-format="numeric"/>
     <category field="engineering"/>
     <category field="generic-base"/>
-    <updated>2017-11-14T12:30:00+00:00</updated>
+    <summary>IEEE style with URLs as per the 2018 guidelines, V 11.12.2018.</summary>
+    <updated>2019-12-20T09:20:25+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -205,6 +206,9 @@
       <text variable="locator"/>
     </group>
   </macro>
+  <macro name="doi">
+    <text variable="DOI" prefix="doi: "/>
+  </macro>
   <!-- Citation -->
   <citation collapse="citation-number">
     <sort>
@@ -235,6 +239,7 @@
               <text macro="locators"/>
               <text macro="page"/>
               <text macro="issued"/>
+              <text macro="doi" suffix="."/>
             </group>
           </if>
           <else-if type="paper-conference">
@@ -244,6 +249,7 @@
               <text macro="issued"/>
               <text macro="locators"/>
               <text macro="page"/>
+              <text macro="doi"/>
             </group>
           </else-if>
           <else-if type="report">
@@ -265,7 +271,7 @@
               <text macro="issued"/>
             </group>
           </else-if>
-          <else-if type="webpage">
+          <else-if type="webpage post post-weblog" match="any">
             <group delimiter=", " suffix=". ">
               <text macro="title"/>
               <text variable="container-title" font-style="italic"/>

@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/canadian-geotechnical-journal</id>
     <link href="http://www.zotero.org/styles/canadian-geotechnical-journal" rel="self"/>
     <link href="http://www.zotero.org/styles/canadian-journal-of-fisheries-and-aquatic-sciences" rel="template"/>
-    <link href="http://www.nrcresearchpress.com/page/cgj/authors" rel="documentation"/>
+    <link href="https://www.nrcresearchpress.com/page/cgj/authors#9d" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -17,13 +17,21 @@
       <name>Libor Ansorge</name>
       <uri>http://www.ansorge.website</uri>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien, PhD</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="geology"/>
     <issn>0008-3674</issn>
     <eissn>1208-6010</eissn>
-    <updated>2016-05-22T17:28:58+00:00</updated>
+    <updated>2019-12-12T13:45:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="available at">available from</term>
+    </terms>
+  </locale>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference" match="any">
@@ -38,8 +46,8 @@
     <choose>
       <if type="chapter paper-conference" match="none">
         <names variable="editor translator" delimiter=", ">
-          <label form="verb" font-style="italic" text-case="title"/>
-          <name and="text" initialize-with="." delimiter=", "/>
+          <label form="verb" text-case="capitalize-first" font-style="italic"/>
+          <name prefix=" " and="text" initialize-with="."/>
         </names>
       </if>
     </choose>
@@ -74,17 +82,16 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="DOI">
+      <if type="article-journal">
         <text variable="DOI" prefix="doi:"/>
       </if>
-      <else>
-        <group>
-          <group delimiter=" ">
-            <text value="Available"/>
-            <text term="from"/>
+      <else-if type="webpage post post-weblog" match="any">
+        <group delimiter=". ">
+          <group font-variant="normal" delimiter=" ">
+            <text term="available at" text-case="capitalize-first"/>
             <text variable="URL"/>
           </group>
-          <group prefix=" [" suffix="]">
+          <group prefix="[" suffix="]">
             <text term="accessed" suffix=" "/>
             <date variable="accessed" delimiter=" ">
               <date-part name="day"/>
@@ -93,7 +100,7 @@
             </date>
           </group>
         </group>
-      </else>
+      </else-if>
     </choose>
   </macro>
   <macro name="publisher">
@@ -116,19 +123,9 @@
   <macro name="issued">
     <choose>
       <if variable="issued">
-        <group>
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
-          <choose>
-            <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
-              <date variable="issued">
-                <date-part prefix=", " name="month"/>
-                <date-part prefix=" " name="day"/>
-              </date>
-            </if>
-          </choose>
-        </group>
+        <date date-parts="year" form="text" variable="issued">
+          <date-part name="year"/>
+        </date>
       </if>
       <else>
         <text prefix=" (" term="no date" suffix=")" form="short"/>

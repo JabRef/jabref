@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.model.Defaults;
 import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
@@ -27,7 +26,6 @@ import org.jabref.model.metadata.MetaData;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private final Defaults defaults;
     private MetaData metaData;
 
     /**
@@ -40,36 +38,26 @@ public class BibDatabaseContext {
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
-        this(new Defaults());
-    }
-
-    public BibDatabaseContext(Defaults defaults) {
-        this(new BibDatabase(), defaults);
+        this(new BibDatabase());
     }
 
     public BibDatabaseContext(BibDatabase database) {
-        this(database, new Defaults());
+        this(database, new MetaData());
     }
 
-    public BibDatabaseContext(BibDatabase database, Defaults defaults) {
-        this(database, new MetaData(), defaults);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
-        this.defaults = Objects.requireNonNull(defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
         this.file = Optional.empty();
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData) {
-        this(database, metaData, new Defaults());
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
+        this(database, metaData, file, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults,
-                              DatabaseLocation location) {
-        this(database, metaData, defaults);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, DatabaseLocation location) {
+        this(database, metaData);
         Objects.requireNonNull(location);
         this.file = Optional.ofNullable(file);
 
@@ -78,57 +66,23 @@ public class BibDatabaseContext {
         }
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, Defaults defaults) {
-        this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
-    }
-
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
-        this(database, metaData, file, new Defaults());
-    }
-
     public BibDatabaseMode getMode() {
-        Optional<BibDatabaseMode> mode = metaData.getMode();
-
-        if (!mode.isPresent()) {
-            BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
-            BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
-            if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                newMode = BibDatabaseMode.BIBLATEX;
-            }
-            this.setMode(newMode);
-            return newMode;
-        }
-        return mode.get();
+        return metaData.getMode().orElse(BibDatabaseMode.BIBLATEX);
     }
 
     public void setMode(BibDatabaseMode bibDatabaseMode) {
         metaData.setMode(bibDatabaseMode);
     }
 
+    public void setDatabasePath(Path file) {
+        this.file = Optional.ofNullable(file);
+    }
+
     /**
      * Get the file where this database was last saved to or loaded from, if any.
      *
      * @return Optional of the relevant File, or Optional.empty() if none is defined.
-     * @deprecated use {@link #getDatabasePath()} instead
      */
-    @Deprecated
-    public Optional<File> getDatabaseFile() {
-        return file.map(Path::toFile);
-    }
-
-    /**
-     * @param file the database file
-     * @deprecated use {@link #setDatabaseFile(Path)}
-     */
-    @Deprecated
-    public void setDatabaseFile(File file) {
-        this.file = Optional.ofNullable(file).map(File::toPath);
-    }
-
-    public void setDatabaseFile(Path file) {
-        this.file = Optional.ofNullable(file);
-    }
-
     public Optional<Path> getDatabasePath() {
         return file;
     }
@@ -235,19 +189,19 @@ public class BibDatabaseContext {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
         // the file path of this BIB file:
-        Optional<File> databaseFile = getDatabaseFile();
+        Optional<Path> databaseFile = getDatabasePath();
         if (!new File(dir).isAbsolute() && databaseFile.isPresent()) {
-            String relDir;
+            Path relDir;
             if (".".equals(dir)) {
                 // if dir is only "current" directory, just use its parent (== real current directory) as path
                 relDir = databaseFile.get().getParent();
             } else {
-                relDir = databaseFile.get().getParent() + File.separator + dir;
+                relDir = databaseFile.get().getParent().resolve(dir);
             }
             // If this directory actually exists, it is very likely that the
             // user wants us to use it:
-            if (new File(relDir).exists()) {
-                dir = relDir;
+            if (Files.exists(relDir)) {
+                dir = relDir.toString();
             }
         }
         return dir;

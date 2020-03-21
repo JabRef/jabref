@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
+import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CiteSeer;
@@ -19,6 +19,7 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
+import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -90,7 +91,8 @@ public class WebFetchers {
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new ACMPortalFetcher(importFormatPreferences));
+        // see https://github.com/JabRef/jabref/issues/5804
+        // set.add(new ACMPortalFetcher(importFormatPreferences));
         set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher());
@@ -98,6 +100,7 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
+        set.add(new GrobidCitationFetcher(importFormatPreferences));
         return set;
     }
 
@@ -157,6 +160,7 @@ public class WebFetchers {
         fetchers.add(new ACS());
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new ApsFetcher());
         // Meta search
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());

@@ -42,7 +42,7 @@ public class LibraryPropertiesDialogViewModel {
 
     private final String oldUserSpecificFileDir;
     private final String oldGeneralFileDir;
-    private final String oldLaTexFileDir;
+    private final String oldLatexFileDir;
     private final boolean oldLibraryProtected;
 
     public LibraryPropertiesDialogViewModel(BasePanel panel, DialogService dialogService, PreferencesService preferencesService) {
@@ -67,11 +67,11 @@ public class LibraryPropertiesDialogViewModel {
         Optional<String> fileDI = metaData.getUserFileDirectory(preferencesService.getUser());
         fileDI.ifPresent(userSpecificFileDirectoryProperty::setValue);
 
-        metaData.getLaTexFileDirectory(preferencesService.getUser()).map(Path::toString).ifPresent(laTexFileDirectoryProperty::setValue);
+        metaData.getLatexFileDirectory(preferencesService.getUser()).map(Path::toString).ifPresent(laTexFileDirectoryProperty::setValue);
 
         oldUserSpecificFileDir = generalFileDirectoryProperty.getValue();
         oldGeneralFileDir = userSpecificFileDirectoryProperty.getValue();
-        oldLaTexFileDir = laTexFileDirectoryProperty.getValue();
+        oldLatexFileDir = laTexFileDirectoryProperty.getValue();
 
         libraryProtectedProperty.setValue(metaData.isProtected());
         oldLibraryProtected = libraryProtectedProperty.getValue();
@@ -117,7 +117,7 @@ public class LibraryPropertiesDialogViewModel {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
-    public void browseLaTexDir() {
+    public void browseLatexDir() {
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
     }
 
@@ -134,7 +134,7 @@ public class LibraryPropertiesDialogViewModel {
     }
 
     public boolean laTexFileDirChanged() {
-        return !oldLaTexFileDir.equals(laTexFileDirectoryProperty.getValue());
+        return !oldLatexFileDir.equals(laTexFileDirectoryProperty.getValue());
     }
 
     public boolean protectedValueChanged() {

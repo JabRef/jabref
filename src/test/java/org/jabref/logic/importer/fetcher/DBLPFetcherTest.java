@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -28,8 +28,8 @@ public class DBLPFetcherTest {
     @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences())
-                .thenReturn(mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences())
+                .thenReturn(mock(FieldContentFormatterPreferences.class));
         dblpFetcher = new DBLPFetcher(importFormatPreferences);
         entry = new BibEntry();
 
@@ -44,7 +44,7 @@ public class DBLPFetcherTest {
         entry.setField(StandardField.YEAR, "2016");
         entry.setField(StandardField.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField(new UnknownField("biburl"), "https://dblp.org/rec/bib/journals/stt/GeigerHL16");
+        entry.setField(new UnknownField("biburl"), "https://dblp.org/rec/journals/stt/GeigerHL16.bib");
         entry.setField(new UnknownField("bibsource"), "dblp computer science bibliography, https://dblp.org");
     }
 

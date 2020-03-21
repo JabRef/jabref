@@ -7,6 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ThemeLoader;
@@ -16,8 +17,12 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AppearanceTabViewModel implements PreferenceTabViewModel {
+
+    public static SpinnerValueFactory<Integer> fontSizeValueFactory =
+            new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
@@ -27,7 +32,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    private FunctionBasedValidator fontSizeValidator;
+    private Validator fontSizeValidator;
 
     private List<String> restartWarnings = new ArrayList<>();
 
@@ -93,12 +98,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        if (fontOverrideProperty.getValue()) {
-            if (!fontSizeValidator.getValidationStatus().isValid()) {
-                fontSizeValidator.getValidationStatus().getHighestMessage().ifPresent(message ->
-                        dialogService.showErrorDialogAndWait(message.getMessage()));
-                return false;
-            }
+        if (fontOverrideProperty.getValue() && !fontSizeValidator.getValidationStatus().isValid()) {
+            fontSizeValidator.getValidationStatus().getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
+            return false;
         }
         return true;
     }

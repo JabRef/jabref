@@ -21,9 +21,8 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
@@ -225,27 +224,21 @@ public class BibDatabase {
 
     public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(newEntries);
-
-        BibEntry firstEntry = null;
         for (BibEntry entry : newEntries) {
             String id = entry.getId();
             if (containsEntryWithId(id)) {
-                throw new KeyCollisionException("ID is already in use, please choose another");
+                throw new KeyCollisionException("ID is already in use, please choose another", id);
             }
 
             internalIDs.add(id);
             entry.registerListener(this);
-
-            eventBus.post(new EntryAddedEvent(entry, eventSource));
-
-            if (firstEntry == null) {
-                firstEntry = entry;
-            }
+        }
+        if (newEntries.isEmpty()) {
+            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
+        } else {
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
-        if (firstEntry != null) {
-            eventBus.post(new AllInsertsFinishedEvent(firstEntry, eventSource));
-        }
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -309,15 +302,17 @@ public class BibDatabase {
      * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
+        String id = string.getId();
+
         if (hasStringByName(string.getName())) {
-            throw new KeyCollisionException("A string with that label already exists");
+            throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibTeX string id.");
+        if (bibtexStrings.containsKey(id)) {
+            throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(string.getId(), string);
+        bibtexStrings.put(id, string);
     }
 
     /**
@@ -589,8 +584,7 @@ public class BibDatabase {
      *
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
-     *   - {@link EntryRemovedEvent}
-     *   - {@link AllInsertsFinishedEvent}
+     *   - {@link EntriesRemovedEvent}
      *
      * @param listener listener (subscriber) to add
      */

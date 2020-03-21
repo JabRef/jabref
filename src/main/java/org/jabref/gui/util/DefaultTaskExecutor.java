@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -15,6 +16,8 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import org.jabref.logic.util.DelayTaskThrottler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +31,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+    private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
     /**
      *
@@ -110,6 +114,14 @@ public class DefaultTaskExecutor implements TaskExecutor {
     public void shutdown() {
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
+        throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
+    }
+
+    @Override
+    public DelayTaskThrottler createThrottler(int delay) {
+        DelayTaskThrottler throttler = new DelayTaskThrottler(delay);
+        throttlers.put(throttler, null);
+        return throttler;
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {

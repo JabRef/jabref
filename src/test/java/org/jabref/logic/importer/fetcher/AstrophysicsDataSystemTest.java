@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -28,8 +28,8 @@ public class AstrophysicsDataSystemTest {
     @BeforeEach
     public void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                mock(FieldContentFormatterPreferences.class));
         fetcher = new AstrophysicsDataSystem(importFormatPreferences);
 
         diezSliceTheoremEntry = new BibEntry();
@@ -42,7 +42,7 @@ public class AstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField(StandardField.EPRINT, "1812.04698");
         diezSliceTheoremEntry.setField(StandardField.JOURNAL, "arXiv e-prints");
         diezSliceTheoremEntry.setField(StandardField.KEYWORDS, "Mathematics - Differential Geometry, Mathematical Physics, 58B25, (58D19, 58B20, 22E99, 58A35)");
-        diezSliceTheoremEntry.setField(StandardField.MONTH, "Dec");
+        diezSliceTheoremEntry.setField(StandardField.MONTH, "#dec#");
         diezSliceTheoremEntry.setField(StandardField.PAGES, "arXiv:1812.04698");
         diezSliceTheoremEntry.setField(StandardField.EID, "arXiv:1812.04698");
         diezSliceTheoremEntry.setField(StandardField.PRIMARYCLASS, "math.DG");
@@ -58,7 +58,7 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField(StandardField.JOURNAL, "Living Reviews in Relativity");
         famaeyMcGaughEntry.setField(StandardField.YEAR, "2012");
         famaeyMcGaughEntry.setField(StandardField.VOLUME, "15");
-        famaeyMcGaughEntry.setField(StandardField.MONTH, "Sep");
+        famaeyMcGaughEntry.setField(StandardField.MONTH, "#sep#");
         famaeyMcGaughEntry.setField(StandardField.NUMBER, "1");
         famaeyMcGaughEntry.setField(StandardField.ARCHIVEPREFIX, "arXiv");
         famaeyMcGaughEntry.setField(StandardField.DOI, "10.12942/lrr-2012-10");
@@ -75,7 +75,7 @@ public class AstrophysicsDataSystemTest {
         sunWelchEntry.setField(StandardField.AUTHOR, "Sun, Yanming and Welch, Gregory C. and Leong, Wei Lin and Takacs, Christopher J. and Bazan, Guillermo C. and Heeger, Alan J.");
         sunWelchEntry.setField(StandardField.DOI, "10.1038/nmat3160");
         sunWelchEntry.setField(StandardField.JOURNAL, "Nature Materials");
-        sunWelchEntry.setField(StandardField.MONTH, "Jan");
+        sunWelchEntry.setField(StandardField.MONTH, "#jan#");
         sunWelchEntry.setField(StandardField.NUMBER, "1");
         sunWelchEntry.setField(StandardField.PAGES, "44-48");
         sunWelchEntry.setField(StandardField.TITLE, "Solution-processed small-molecule solar cells with 6.7\\% efficiency");
@@ -89,7 +89,7 @@ public class AstrophysicsDataSystemTest {
         xiongSunEntry.setField(StandardField.AUTHOR, "Xiong, Xiaoxiong and Sun, Junqiang and Barnes, William and Salomonson, Vincent and Esposito, Joseph and Erives, Hector and Guenther, Bruce");
         xiongSunEntry.setField(StandardField.DOI, "10.1109/TGRS.2006.890567");
         xiongSunEntry.setField(StandardField.JOURNAL, "IEEE Transactions on Geoscience and Remote Sensing");
-        xiongSunEntry.setField(StandardField.MONTH, "Apr");
+        xiongSunEntry.setField(StandardField.MONTH, "#apr#");
         xiongSunEntry.setField(StandardField.NUMBER, "4");
         xiongSunEntry.setField(StandardField.PAGES, "879-889");
         xiongSunEntry.setField(StandardField.TITLE, "Multiyear On-Orbit Calibration and Performance of Terra MODIS Reflective Solar Bands");
@@ -105,7 +105,7 @@ public class AstrophysicsDataSystemTest {
         ingersollPollardEntry.setField(StandardField.DOI, "10.1016/0019-1035(82)90169-5");
         ingersollPollardEntry.setField(StandardField.JOURNAL, "\\icarus");
         ingersollPollardEntry.setField(StandardField.KEYWORDS, "Atmospheric Circulation, Barotropic Flow, Convective Flow, Flow Stability, Jupiter Atmosphere, Rotating Fluids, Saturn Atmosphere, Adiabatic Flow, Anelasticity, Compressible Fluids, Planetary Rotation, Rotating Cylinders, Scaling Laws, Wind Profiles, PLANETS, JUPITER, SATURN, MOTION, INTERIORS, ATMOSPHERE, ANALYSIS, SCALE, BAROTROPY, CHARACTERISTICS, STRUCTURE, WINDS, VISCOSITY, DATA, CONVECTION, ROTATION, EDDY EFFECTS, ENERGY, ADIABATICITY, DIAGRAMS, REVIEW, LATITUDE, ZONES, VELOCITY, MATHEMATICAL MODELS, HEAT FLOW, EQUATIONS OF MOTION, FLUIDS, DYNAMICS, TEMPERATURE, GRADIENTS, Lunar and Planetary Exploration; Planets");
-        ingersollPollardEntry.setField(StandardField.MONTH, "Oct");
+        ingersollPollardEntry.setField(StandardField.MONTH, "#oct#");
         ingersollPollardEntry.setField(StandardField.NUMBER, "1");
         ingersollPollardEntry.setField(StandardField.PAGES, "62-80");
         ingersollPollardEntry.setField(StandardField.TITLE, "Motion in the interiors and atmospheres of Jupiter and Saturn: scale analysis, anelastic equations, barotropic stability criterion");
@@ -125,7 +125,7 @@ public class AstrophysicsDataSystemTest {
         luceyPaulEntry.setField(StandardField.VOLUME, "105");
         luceyPaulEntry.setField(StandardField.YEAR, "2000");
         luceyPaulEntry.setField(StandardField.URL, "https://ui.adsabs.harvard.edu/abs/2000JGR...10520297L");
-        luceyPaulEntry.setField(StandardField.MONTH, "Jan");
+        luceyPaulEntry.setField(StandardField.MONTH, "#jan#");
         luceyPaulEntry.setField(StandardField.NUMBER, "E8");
     }
 

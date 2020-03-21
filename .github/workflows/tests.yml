@@ -1,6 +1,14 @@
 name: Tests
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    # always run on pull requests
+
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
 
 jobs:
   checkstyle:
@@ -8,14 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
@@ -37,14 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -84,14 +86,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -128,50 +127,16 @@ jobs:
         env:
           CI: "true"
           DBMS: "mysql"
-  fetchertests:
-    name: Fetcher tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 13
-      - uses: actions/cache@v1
-        name: Restore gradle chache
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run fetcher tests
-        run: ./gradlew fetcherTest
-        env:
-          CI: "true"
   guitests:
     name: GUI tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -206,14 +171,11 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -234,3 +196,11 @@ jobs:
           CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
+  # This is https://github.com/marketplace/actions/gradle-wrapper-validation
+  # It ensures that the jar file is from gradle and not by a strange third party.
+  gradlevalidation:
+    name: "Validate Gradle Wrapper"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1

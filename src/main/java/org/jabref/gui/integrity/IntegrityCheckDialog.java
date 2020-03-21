@@ -5,8 +5,11 @@ import java.util.List;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 
 import org.jabref.gui.BasePanel;
@@ -25,7 +28,11 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private TableColumn<IntegrityMessage, String> keyColumn;
     @FXML private TableColumn<IntegrityMessage, String> fieldColumn;
     @FXML private TableColumn<IntegrityMessage, String> messageColumn;
+    @FXML private MenuButton keyFilterButton;
+    @FXML private MenuButton fieldFilterButton;
+    @FXML private MenuButton messageFilterButton;
     private IntegrityCheckDialogViewModel viewModel;
+    private TableFilter<IntegrityMessage> tableFilter;
 
     public IntegrityCheckDialog(List<IntegrityMessage> messages, BasePanel basePanel) {
         this.messages = messages;
@@ -59,7 +66,68 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName()));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
 
-        TableFilter.forTableView(messagesTable)
-                   .apply();
+        tableFilter = TableFilter.forTableView(messagesTable)
+                                 .apply();
+
+        tableFilter.getColumnFilter(keyColumn).ifPresent(columnFilter -> {
+            ContextMenu keyContextMenu = keyColumn.getContextMenu();
+            if (keyContextMenu != null) {
+                keyFilterButton.setContextMenu(keyContextMenu);
+                keyFilterButton.setOnMouseClicked(event -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (keyContextMenu.isShowing()) {
+                            keyContextMenu.setX(event.getScreenX());
+                            keyContextMenu.setY(event.getScreenY());
+                        } else {
+                            keyContextMenu.show(keyFilterButton, event.getScreenX(), event.getScreenY());
+                        }
+                    }
+                });
+            }
+        });
+
+        tableFilter.getColumnFilter(fieldColumn).ifPresent(columnFilter -> {
+            ContextMenu fieldContextMenu = fieldColumn.getContextMenu();
+            if (fieldContextMenu != null) {
+                fieldFilterButton.setContextMenu(fieldContextMenu);
+                fieldFilterButton.setOnMouseClicked(event -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (fieldContextMenu.isShowing()) {
+                            fieldContextMenu.setX(event.getScreenX());
+                            fieldContextMenu.setY(event.getScreenY());
+                        } else {
+                            fieldContextMenu.show(fieldFilterButton, event.getScreenX(), event.getScreenY());
+                        }
+                    }
+                });
+            }
+        });
+
+        tableFilter.getColumnFilter(messageColumn).ifPresent(columnFilter -> {
+            ContextMenu messageContextMenu = messageColumn.getContextMenu();
+            if (messageContextMenu != null) {
+                messageFilterButton.setContextMenu(messageContextMenu);
+                messageFilterButton.setOnMouseClicked(event -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (messageContextMenu.isShowing()) {
+                            messageContextMenu.setX(event.getScreenX());
+                            messageContextMenu.setY(event.getScreenY());
+                        } else {
+                            messageContextMenu.show(messageFilterButton, event.getScreenX(), event.getScreenY());
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void clearFilters() {
+        if (tableFilter != null) {
+            tableFilter.resetFilter();
+            messagesTable.getColumns().forEach(column -> {
+                tableFilter.selectAllValues(column);
+                column.setGraphic(null);
+            });
+        }
     }
 }

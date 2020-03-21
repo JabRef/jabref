@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
@@ -143,6 +144,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
 
         // Remove ADS note
         new FieldFormatterCleanup(new UnknownField("adsnote"), new ClearFormatter()).cleanup(entry);
@@ -249,7 +251,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
      * bibcodes
      */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
-
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();

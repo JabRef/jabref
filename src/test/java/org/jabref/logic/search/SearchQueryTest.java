@@ -203,4 +203,38 @@ public class SearchQueryTest {
         //We can't directly compare the pattern objects
         assertEquals(Optional.of(pattern.toString()), result.getPatternForWords().map(Pattern::toString));
     }
+
+    @Test
+    public void testGetRegexpPattern() {
+        String queryText = "[a-c]\\d* \\d*";
+        SearchQuery regexQuery = new SearchQuery(queryText, false, true);
+        Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
+        assertEquals(Optional.of(pattern.toString()), regexQuery.getPatternForWords().map(Pattern::toString));
+    }
+
+    @Test
+    public void testGetRegexpJavascriptPattern() {
+        String queryText = "[a-c]\\d* \\d*";
+        SearchQuery regexQuery = new SearchQuery(queryText, false, true);
+        Pattern pattern = Pattern.compile("([a-c]\\d* \\d*)");
+        assertEquals(Optional.of(pattern.toString()), regexQuery.getJavaScriptPatternForWords().map(Pattern::toString));
+    }
+
+    @Test
+    public void testEscapingInPattern() {
+        //first word contain all java special regex characters
+        String queryText = "<([{\\\\^-=$!|]})?*+.> word1 word2.";
+        SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, false, false);
+        String pattern = "(\\Q<([{\\^-=$!|]})?*+.>\\E)|(\\Qword1\\E)|(\\Qword2.\\E)";
+        assertEquals(Optional.of(pattern), textQueryWithSpecialChars.getPatternForWords().map(Pattern::toString));
+    }
+
+    @Test
+    public void testEscapingInJavascriptPattern() {
+        //first word contain all javascript special regex characters that should be escaped individually in text based search
+        String queryText = "([{\\\\^$|]})?*+./ word1 word2.";
+        SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, false, false);
+        String pattern = "(\\(\\[\\{\\\\\\^\\$\\|\\]\\}\\)\\?\\*\\+\\.\\/)|(word1)|(word2\\.)";
+        assertEquals(Optional.of(pattern), textQueryWithSpecialChars.getJavaScriptPatternForWords().map(Pattern::toString));
+    }
 }

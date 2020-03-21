@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,9 +47,9 @@ class MoveFilesCleanupTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
-        databaseContext.setDatabaseFile(bibFolder.resolve("test.bib"));
+        databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");

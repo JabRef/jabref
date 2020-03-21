@@ -44,7 +44,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -392,8 +391,7 @@ public class ArgumentProcessor {
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
-            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-            databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults));
+            databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
@@ -433,7 +431,7 @@ public class ArgumentProcessor {
                 theFile = theFile.getAbsoluteFile();
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
-            databaseContext.setDatabaseFile(theFile);
+            databaseContext.setDatabasePath(theFile.toPath());
             Globals.prefs.fileDirForDatabase = databaseContext
                     .getFileDirectories(Globals.prefs.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);

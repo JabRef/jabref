@@ -23,7 +23,6 @@ import org.jabref.gui.push.PushToApplicationSettings;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -74,17 +73,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         useTerminalCommandProperty.setValue(preferences.get(JabRefPreferences.CONSOLE_COMMAND));
         useTerminalSpecialProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
 
-        usePDFAcrobatCommandProperty.setValue(preferences.get(JabRefPreferences.ADOBE_ACROBAT_COMMAND));
-        if (OS.WINDOWS) {
-            usePDFSumatraCommandProperty.setValue(preferences.get(JabRefPreferences.SUMATRA_PDF_COMMAND));
-
-            if (preferences.get(JabRefPreferences.USE_PDF_READER).equals(usePDFAcrobatCommandProperty.getValue())) {
-                usePDFAcrobatProperty.setValue(true);
-            } else if (preferences.get(JabRefPreferences.USE_PDF_READER).equals(usePDFSumatraCommandProperty.getValue())) {
-                usePDFSumatraProperty.setValue(true);
-            }
-        }
-
         useFileBrowserDefaultProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION));
         useFileBrowserSpecialProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION));
         useFileBrowserSpecialCommandProperty.setValue(preferences.get(JabRefPreferences.FILE_BROWSER_COMMAND));
@@ -99,16 +87,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, useTerminalDefaultProperty.getValue());
         preferences.put(JabRefPreferences.CONSOLE_COMMAND, useTerminalCommandProperty.getValue());
-
-        preferences.put(JabRefPreferences.ADOBE_ACROBAT_COMMAND, usePDFAcrobatCommandProperty.getValue());
-        if (OS.WINDOWS) {
-            preferences.put(JabRefPreferences.SUMATRA_PDF_COMMAND, usePDFSumatraCommandProperty.getValue());
-        }
-        if (usePDFAcrobatProperty.getValue()) {
-            preferences.put(JabRefPreferences.USE_PDF_READER, usePDFAcrobatCommandProperty.getValue());
-        } else if (usePDFSumatraProperty.getValue()) {
-            preferences.put(JabRefPreferences.USE_PDF_READER, usePDFSumatraCommandProperty.getValue());
-        }
 
         preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, useFileBrowserDefaultProperty.getValue());
         if (StringUtil.isNotBlank(useFileBrowserSpecialCommandProperty.getValue())) {

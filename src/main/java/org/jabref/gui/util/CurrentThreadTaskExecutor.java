@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -7,6 +8,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javafx.concurrent.Task;
+
+import org.jabref.logic.util.DelayTaskThrottler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public class CurrentThreadTaskExecutor implements TaskExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentThreadTaskExecutor.class);
+    private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
 
     /**
      * Executes the task on the current thread. The code is essentially taken from {@link
@@ -60,7 +64,14 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
 
     @Override
     public void shutdown() {
-        // Nothing to do here
+        throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
+    }
+
+    @Override
+    public DelayTaskThrottler createThrottler(int delay) {
+        DelayTaskThrottler throttler = new DelayTaskThrottler(delay);
+        throttlers.put(throttler, null);
+        return throttler;
     }
 
     private class FailedFuture<T> implements Future<T> {

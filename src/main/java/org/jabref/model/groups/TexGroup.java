@@ -52,7 +52,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
     }
-    
+
     @Override
     public boolean contains(BibEntry entry) {
         if (keysUsedInAux == null) {
@@ -132,7 +132,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
 
-        metaData.getLaTexFileDirectory(user)
+        metaData.getLatexFileDirectory(user)
                 .ifPresent(fileDirs::add);
 
         return fileDirs;

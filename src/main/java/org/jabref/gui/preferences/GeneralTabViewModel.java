@@ -25,6 +25,7 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
@@ -50,7 +51,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty markTimeStampFieldNameProperty = new SimpleStringProperty("");
     private final BooleanProperty updateTimeStampProperty = new SimpleBooleanProperty();
 
-    private FunctionBasedValidator markTimeStampFormatValidator;
+    private Validator markTimeStampFormatValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;

@@ -82,13 +82,11 @@
   <macro name="author">
     <names variable="author">
       <name sort-separator=", " delimiter=" and " delimiter-precedes-last="always" name-as-sort-order="all"/>
-      <label form="long" text-case="capitalize-first"/>
     </names>
   </macro>
   <macro name="editor-translator">
     <names variable="editor translator" delimiter=", ">
       <name sort-separator=", " delimiter=" and " delimiter-precedes-last="always" name-as-sort-order="all"/>
-      <label form="long" text-case="capitalize-first"/>
     </names>
   </macro>
   <macro name="title">

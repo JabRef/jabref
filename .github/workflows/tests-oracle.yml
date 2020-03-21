@@ -2,6 +2,13 @@ name: Oracle Tests
 
 on:
   push:
+    # we need to trigger on all branches, because sometimes need copy of branches, because secrets are only available on "internal" pull requests
+    paths:
+      - 'src/test/java/org/jabref/model/database/**'
+      - 'src/test/java/org/jabref/logic/shared/**'
+      - '.github/workflows/tests-oracle.yml'
+      - 'build.gradle'
+  pull_request:
     paths:
       - 'src/test/java/org/jabref/model/database/**'
       - 'src/test/java/org/jabref/logic/shared/**'
@@ -10,6 +17,9 @@ on:
   schedule:
     # run on each Wednesday
     - cron: '2 3 * * 3'
+
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
 
 jobs:
   oracletests:
@@ -24,7 +34,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:

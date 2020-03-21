@@ -15,7 +15,8 @@ import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import kong.unirest.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A fulltext fetcher that uses <a href="https://oadoi.org/">oaDOI</a>.
@@ -23,7 +24,9 @@ import kong.unirest.json.JSONObject;
  * @implSpec API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
-    private static String API_URL = "https://api.oadoi.org/v2/";
+    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);
+
+    private static final String API_URL = "https://api.oadoi.org/v2/";
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -31,14 +34,15 @@ public class OpenAccessDoi implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI)
                                  .flatMap(DOI::parse);
-        if (doi.isPresent()) {
-            try {
-                return findFullText(doi.get());
-            } catch (UnirestException e) {
-                throw new IOException(e);
-            }
-        } else {
+
+        if (!doi.isPresent()) {
             return Optional.empty();
+        }
+
+        try {
+            return findFullText(doi.get());
+        } catch (UnirestException e) {
+            throw new IOException(e);
         }
     }
 
@@ -47,17 +51,26 @@ public class OpenAccessDoi implements FulltextFetcher {
         return TrustLevel.META_SEARCH;
     }
 
-    public Optional<URL> findFullText(DOI doi) throws UnirestException, MalformedURLException {
-        HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
-                                                     .header("accept", "application/json")
-                                                     .asJson();
-        JSONObject root = jsonResponse.getBody().getObject();
-        Optional<String> url = Optional.ofNullable(root.optJSONObject("best_oa_location"))
-                .map(location -> location.optString("url"));
-        if (url.isPresent()) {
-            return Optional.of(new URL(url.get()));
-        } else {
-            return Optional.empty();
-        }
+    public Optional<URL> findFullText(DOI doi) throws UnirestException {
+        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
+                                                .header("accept", "application/json")
+                                                .asJson();
+
+        return Optional.of(request)
+                       .map(HttpResponse::getBody)
+                       .filter(Objects::nonNull)
+                       .map(JsonNode::getObject)
+                       .filter(Objects::nonNull)
+                       .map(root -> root.optJSONObject("best_oa_location"))
+                       .filter(Objects::nonNull)
+                       .map(location -> location.optString("url"))
+                       .flatMap(url -> {
+                           try {
+                               return Optional.of(new URL(url));
+                           } catch (MalformedURLException e) {
+                               LOGGER.debug("Could not determine URL to fetch full text from", e);
+                               return Optional.empty();
+                           }
+                       });
     }
 }

@@ -8,7 +8,6 @@ import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -35,9 +34,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<Charset> encoding;
     @FXML private ComboBox<String> databaseMode;
     @FXML private TextField generalFileDirectory;
-    @FXML private Button browseGeneralFileDir;
     @FXML private TextField userSpecificFileDirectory;
-    @FXML private Button browseUserSpefiicFileDir;
     @FXML private TextField laTexFileDirectory;
     @FXML private CheckBox protect;
     @Inject private PreferencesService preferencesService;
@@ -115,8 +112,8 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    void browseLaTexFileDirectory(ActionEvent event) {
-        viewModel.browseLaTexDir();
+    void browseLatexFileDirectory(ActionEvent event) {
+        viewModel.browseLatexDir();
     }
 
     private void storeSettings() {
@@ -146,9 +143,9 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
         text = viewModel.laTexFileDirectoryProperty().getValue();
         if (text.isEmpty()) {
-            metaData.clearLaTexFileDirectory(preferencesService.getUser());
+            metaData.clearLatexFileDirectory(preferencesService.getUser());
         } else {
-            metaData.setLaTexFileDirectory(preferencesService.getUser(), Paths.get(text));
+            metaData.setLatexFileDirectory(preferencesService.getUser(), Paths.get(text));
         }
 
         if (viewModel.libraryProtectedProperty().getValue()) {

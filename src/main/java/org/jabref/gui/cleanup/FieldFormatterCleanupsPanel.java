@@ -78,6 +78,9 @@ public class FieldFormatterCleanupsPanel extends GridPane {
     }
 
     private void buildLayout() {
+        setHgap(10.0);
+        setVgap(4.0);
+
         ColumnConstraints first = new ColumnConstraints();
         first.setPrefWidth(25);
         ColumnConstraints second = new ColumnConstraints();
@@ -101,7 +104,9 @@ public class FieldFormatterCleanupsPanel extends GridPane {
         add(cleanupEnabled, 0, 0, 4, 1);
 
         actionsList = new ListView<>(actions);
+        actionsList.setMinHeight(100.0);
         actionsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
         new ViewModelListCellFactory<FieldFormatterCleanup>()
                 .withText(action -> action.getField().getDisplayName() + ": " + action.getFormatter().getName())
                 .withStringTooltip(action -> action.getFormatter().getDescription())
@@ -161,6 +166,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
      */
     private GridPane getSelectorPanel() {
         GridPane builder = new GridPane();
+        builder.setHgap(10.0);
         Set<Field> fields = FieldFactory.getCommonFields();
         fields.add(InternalField.KEY_FIELD);
         Set<String> fieldsString = fields.stream().map(Field::getDisplayName).sorted().collect(Collectors.toCollection(TreeSet::new));
@@ -174,6 +180,7 @@ public class FieldFormatterCleanupsPanel extends GridPane {
                 .withStringTooltip(Formatter::getDescription)
                 .install(formattersCombobox);
         EasyBind.subscribe(formattersCombobox.valueProperty(), e -> updateDescription());
+        formattersCombobox.getSelectionModel().selectFirst();
         builder.add(formattersCombobox, 3, 1);
 
         addButton = new Button(Localization.lang("Add"));

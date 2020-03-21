@@ -1,19 +1,23 @@
 package org.jabref.gui.edit;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 
 public class ReplaceStringAction extends SimpleCommand
 {
-    private BasePanel basePanel;
+    private final JabRefFrame frame;
 
-    public ReplaceStringAction(BasePanel basePanel) {
-        this.basePanel = basePanel;
+    public ReplaceStringAction(JabRefFrame frame, StateManager stateManager) {
+        this.frame = frame;
+
+        this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
     @Override
     public void execute() {
-        ReplaceStringView dialog = new ReplaceStringView(basePanel);
+        ReplaceStringView dialog = new ReplaceStringView(frame.getCurrentBasePanel());
         dialog.showAndWait();
     }
 }

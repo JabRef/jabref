@@ -12,7 +12,6 @@ import java.util.UUID;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -187,6 +186,17 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is A sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is {A} sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1... this is a sub Title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBTEX));
 
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBLATEX));
@@ -195,6 +205,17 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is A sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is {A} sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1... this is a sub Title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -233,7 +254,7 @@ class IntegrityCheckTest {
         Files.createFile(pdfFile);
 
         BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
-        databaseContext.setDatabaseFile(bibFile);
+        databaseContext.setDatabasePath(bibFile);
 
         assertCorrect(databaseContext);
     }
@@ -343,7 +364,7 @@ class IntegrityCheckTest {
 
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
-        BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
@@ -367,7 +388,7 @@ class IntegrityCheckTest {
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
-        return new BibDatabaseContext(bibDatabase, new Defaults());
+        return new BibDatabaseContext(bibDatabase);
     }
 
     private BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
@@ -375,11 +396,13 @@ class IntegrityCheckTest {
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntry(entry);
-        return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
+        return new BibDatabaseContext(bibDatabase, metaData);
     }
 
     private BibDatabaseContext createContext(Field field, String value) {
-        return createContext(field, value, new MetaData());
+        MetaData metaData = new MetaData();
+        metaData.setMode(BibDatabaseMode.BIBTEX);
+        return createContext(field, value, metaData);
     }
 
     private void assertWrong(BibDatabaseContext context) {

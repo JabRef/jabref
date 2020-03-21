@@ -5,15 +5,14 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 public class MergeEntriesDialog extends BaseDialog<BibEntry> {
 
     private final MergeEntries mergeEntries;
 
-    public MergeEntriesDialog(BibEntry one, BibEntry two, BibDatabaseMode databaseMode) {
-        mergeEntries = new MergeEntries(one, two, databaseMode);
+    public MergeEntriesDialog(BibEntry one, BibEntry two) {
+        mergeEntries = new MergeEntries(one, two);
 
         init();
     }

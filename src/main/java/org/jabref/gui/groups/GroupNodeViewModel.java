@@ -28,6 +28,7 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -38,6 +39,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -56,6 +58,7 @@ public class GroupNodeViewModel {
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
+    private final DelayTaskThrottler throttler;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -88,6 +91,7 @@ public class GroupNodeViewModel {
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
+        throttler = taskExecutor.createThrottler(1000);
 
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
@@ -201,7 +205,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(IconTheme.JabRefIcons.class, iconCode.toUpperCase(Locale.ENGLISH))
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
                     .toJavaUtil()
                     .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
@@ -218,7 +222,7 @@ public class GroupNodeViewModel {
      * Gets invoked if an entry in the current database changes.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
-        calculateNumberOfMatches();
+        throttler.schedule(this::calculateNumberOfMatches);
     }
 
     private void calculateNumberOfMatches() {
@@ -288,10 +292,14 @@ public class GroupNodeViewModel {
     }
 
     public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+        // No action, if the target is the same as the source
+        if (this.equals(target)) {
+            return;
+        }
+
         Optional<GroupTreeNode> targetParent = target.getParent();
         if (targetParent.isPresent()) {
             int targetIndex = target.getPositionInParent();
-
             // In case we want to move an item in the same parent
             // and the item is moved down, we need to adjust the target index
             if (targetParent.equals(getParent())) {
