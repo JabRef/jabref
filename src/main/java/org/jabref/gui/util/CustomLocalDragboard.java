@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.PreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.entry.BibEntry;
 
 /**

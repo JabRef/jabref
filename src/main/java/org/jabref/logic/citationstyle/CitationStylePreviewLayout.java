@@ -1,6 +1,6 @@
 package org.jabref.logic.citationstyle;
 
-import org.jabref.logic.PreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 

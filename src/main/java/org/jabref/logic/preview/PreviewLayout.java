@@ -1,4 +1,4 @@
-package org.jabref.logic;
+package org.jabref.logic.preview;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
