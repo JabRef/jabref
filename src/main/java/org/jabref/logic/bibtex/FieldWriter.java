@@ -6,17 +6,22 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Converts JabRef's internal BibTeX representation of a BibTeX field to BibTeX text representation
  */
 public class FieldWriter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FieldWriter.class);
+
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
+
     private final boolean neverFailOnHashes;
     private final FieldWriterPreferences preferences;
     private final FieldContentFormatter formatter;
-    private StringBuilder stringBuilder;
 
     public FieldWriter(FieldWriterPreferences preferences) {
         this(true, preferences);
@@ -55,12 +60,15 @@ public class FieldWriter {
 
         // Then we throw an exception if the error criteria are met.
         if (!(right == 0) && (left == 0)) {
+            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text );
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (!(right == 0) && (right < left)) {
+            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (left != right) {
+            LOGGER.error("Braces don't match. Field value: {}", text);
             throw new InvalidFieldValueException("Braces don't match. Field value: " + text);
         }
     }
@@ -92,8 +100,9 @@ public class FieldWriter {
      * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
      */
     private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
-        stringBuilder = new StringBuilder();
         checkBraces(content);
+
+        StringBuilder stringBuilder = new StringBuilder();
 
         // Here we assume that the user encloses any bibtex strings in #, e.g.:
         // #jan# - #feb#
@@ -123,6 +132,9 @@ public class FieldWriter {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
+                        LOGGER.error("The # character is not allowed in BibTeX strings unless escaped as in '\\#'. "
+                                + "In JabRef, use pairs of # characters to indicate a string. "
+                                + "Note that the entry causing the problem has been selected. Field value: {}", content);
                         throw new InvalidFieldValueException(
                                                              "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                                              + "In JabRef, use pairs of # characters to indicate a string.\n"
@@ -132,13 +144,13 @@ public class FieldWriter {
             }
 
             if (pos1 > pivot) {
-                writeText(content, pivot, pos1);
+                writeText(stringBuilder, content, pivot, pos1);
             }
             if ((pos1 < content.length()) && ((pos2 - 1) > pos1)) {
                 // We check that the string label is not empty. That means
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
-                writeStringLabel(content, pos1 + 1, pos2, pos1 == pivot,
+                writeStringLabel(stringBuilder, content, pos1 + 1, pos2, pos1 == pivot,
                                  (pos2 + 1) == content.length());
             }
 
@@ -165,28 +177,33 @@ public class FieldWriter {
     private String formatWithoutResolvingStrings(String content, Field field) throws InvalidFieldValueException {
         checkBraces(content);
 
-        stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
-
+        StringBuilder stringBuilder = new StringBuilder(String.valueOf(FIELD_START));
         stringBuilder.append(formatter.format(content, field));
-
         stringBuilder.append(FIELD_END);
-
         return stringBuilder.toString();
     }
 
-    private void writeText(String text, int startPos, int endPos) {
+    /**
+     * @param stringBuilder the StringBuilder to append the text to
+     * @param text the text to append
+     */
+    private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);
         stringBuilder.append(text, startPos, endPos);
         stringBuilder.append(FIELD_END);
     }
 
-    private void writeStringLabel(String text, int startPos, int endPos, boolean first, boolean last) {
-        putIn((first ? "" : " # ") + text.substring(startPos, endPos)
-              + (last ? "" : " # "));
+    /**
+     * @param stringBuilder the StringBuilder to append the text to
+     * @param text          the text use as basis to get the text to append
+     * @param startPos      the position in text where the text to add starts
+     * @param endPos        the position in text where the text to add ends
+     * @param isFirst       true if the label to write is the first one to write
+     * @param isLast        true if the label to write is the last one to write
+     */
+    private void writeStringLabel(StringBuilder stringBuilder, String text, int startPos, int endPos, boolean isFirst, boolean isLast) {
+        String line = (isFirst ? "" : " # ") + text.substring(startPos, endPos) + (isLast ? "" : " # ");
+        String wrappedLine = StringUtil.wrap(line, preferences.getLineLength(), OS.NEWLINE);
+        stringBuilder.append(wrappedLine);
     }
-
-    private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, preferences.getLineLength(), OS.NEWLINE));
-    }
-
 }
