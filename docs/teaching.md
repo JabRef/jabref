@@ -1,0 +1,75 @@
+# JabRef as Basis for Teaching Material
+
+JabRef can be used as training object for software engineering.
+
+As instructor, please follow following check list:
+
+1. Be aware that JabRef is run by volunteers. This implies that the development team cannot ensure to provide feedback on code within hours.
+2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
+3. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](development-strategy.md) for more details.
+4. Choose tasks from one of the folowing boards. Write a comment to each issue so that it can be reserved to your course.
+
+   - Feature Board: <https://github.com/JabRef/jabref/projects/7>
+   - Bug Board: <https://github.com/JabRef/jabref/projects/5>
+
+5. Be aware that the difficuly of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
+6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discort. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
+
+## Process for contributions
+
+There is no special process for student contributions. We want to discuss it nevertheless to increase awareness of the time required from starting the contribution until the inclusion in a release of JabRef.
+
+The process for accepting contributions is as below.
+The syntax is [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) modeled using [bpmn.io](https://bpmn.io/).
+
+[![process](images/contribution-process-reviews.svg)](images/contribution-process-reviews.svg)
+
+In short, the contribution is **reviewed by two JabRef developers**.
+Typically, they have constructive feedback on the contribution.
+This means, that the contributors get comments on their contriubiton enabling them to level-up their coding skill.
+Incorporating the improvments takes time, too.
+The benifit is two fold: a) contributors improve their coding skills and b) JabRef's code quality improves.
+All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comemnts
+
+## Process for Java newcomers
+
+Newcomers are invited to follow the process described above.
+In case the capacity of the instructing university allows, we propose a three step approach.
+First the contributors prepare their contribution as usual.
+Then, they submit the pull request *to a separate repository*.
+There, the instructor reviews the pull request and provides feedback.
+This happens in a loop until the instructor shows the green light.
+Then, the pull request can be submitted to the main JabRef repository.
+This will help to reduce the load on the JabRef team and improve the quality of the initial pull request.
+
+[![process with instructor](images/contribution-process-reviews-with-instructor.svg)](images/contribution-process-reviews-with-instructor.svg)
+
+## Past courses
+
+> In case your course is missing, feel free to add it.
+
+### German
+
+#### Universität Basel
+
+- Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/computer-science-informatik/lehrangebot-hs18/vorlesung-software-engineering/)
+- Lecture Materials: <https://github.com/unibas-marcelluethi/software-engineering>
+- Successfully run Q3 2019.
+- Excercise touching JabRef:
+  - General idea: identify a feature missing in JabRef and develop specification, system design, and implementiation of the feature.
+  - Introduction to JabRef's code: [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md): Introduction into JabRef code.
+  - Prominent feature implenented: Parse full text references using Grobid. PR [#5614](https://github.com/JabRef/jabref/pull/5614).
+
+#### University of Stuttgart
+
+- Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
+- Supervisor: [Dr. Oliver Kopp](https://github.com/koppor/)
+- Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
+- Successfully run 2015/2016.
+
+### Swedish
+
+#### KTH Royal Institute of Technology
+
+- Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
+- Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.

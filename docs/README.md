@@ -2,9 +2,10 @@
 
 This page presents all development informatation around JabRef. For users documentation see [https://docs.jabref.org](https://docs.jabref.org).
 
-## Excersises
+## Teaching Excersises
 
-Uni Basel offers a German \(🇩🇪\) Software Engineering course which uses JabRef as one example. Look at [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md) for an exercise where some important points of JabRef are touched.
+We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings.
+Please head to [Teaching](teaching.md) for more information on using JabRef as teaching object and on previous courses where JabRef was used.
 
 ## How tos
 

@@ -68,7 +68,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<NameFormatterItemModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove formatter %0", name))
+                .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
