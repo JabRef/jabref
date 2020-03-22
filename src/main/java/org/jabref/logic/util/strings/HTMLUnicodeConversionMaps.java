@@ -22,12 +22,33 @@ public class HTMLUnicodeConversionMaps {
      conforming SGML systems and applications as defined in
      ISO 8879, provided this notice is included in all copies.
      */
-
     // as well as http://www.w3.org/Math/characters/unicode.xml
-    // An array of arrays of strings in the format:
-    // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
-    // Leaving a field empty is OK as it then will not be included
-    private static final String[][] CONVERSION_LIST = new String[][] {{"160", "nbsp", "{~}"}, // no-break space = non-breaking space,
+
+    /**
+     * We need to have lookup table, because the unicode table does not follow an easy scheme.
+     * For instance, there is no a with a lower dot, but a b.
+     * See https://www.utf8-chartable.de/unicode-utf8-table.pl
+     *
+     * An array of arrays of strings in the format:
+     * {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
+     * Leaving a field empty is OK as it then will not be included.
+     *
+     * Aim for this format is easy addition of data by a developer.
+     * It is not possible to create a multi-dimensional array of different content types.
+     * When creating an enum (e.g., <code>Inverted_Exclamation_Mark(161, "iexcl", "{\\textexclamdown}");</code>, then one needs to assign a name to each entry. This is unnecessary overhead.
+     *
+     * We need to keep the triple together as HTML encoding closely relates to LaTeX encoding - and we want to support LaTeX to HTML as well as LaTeX to Unicode
+     *
+     * Mappings from unicode to latex, unicode to HTML, HTML to unicode, ... are generated based on these entries.
+     *
+     * Helper scripts to gernerate entries:
+     *
+     *   - copy table from https://www.utf8-chartable.de/unicode-utf8-table.pl to input.txt
+     *   -  grep "DOT BELOW" input.txt > input-dot-below.txt
+     *   - sed "s#..\(....\)..............\(LATIN SMALL LETTER \(.\).*\)#{\"0x\1\", \"\", \"\\\\\\\\d{\L\3}\"}, // \2#" input-dot-below.txt  | grep {
+     */
+    private static final String[][] CONVERSION_LIST = new String[][] {
+            {"160", "nbsp", "{~}"}, // no-break space = non-breaking space,
             //                                 U+00A0 ISOnum
             {"161", "iexcl", "{\\textexclamdown}"}, // inverted exclamation mark, U+00A1 ISOnum
             {"162", "cent", "{\\textcent}"}, // cent sign, U+00A2 ISOnum
@@ -292,6 +313,70 @@ public class HTMLUnicodeConversionMaps {
             {"978", "upsih", "{{$\\Upsilon$}}"}, // greek upsilon with hook symbol,
             //                                   U+03D2 NEW
             {"982", "piv", "$\\varphi$"}, // greek pi symbol, U+03D6 ISOgrk3
+
+            // Dot Below
+            {"7717", "", "\\d{h}"}, // ḥ, https://unicode-table.com/de/1E25/
+            {"7751", "", "\\d{n}"}, // ṇ, https://unicode-table.com/de/1E47/
+
+            {"0x1E05", "", "\\d{b}"}, // latin small letter b with dot below
+            {"0x1E0D", "", "\\d{d}"}, // latin small letter d with dot below
+            {"0x1E25", "", "\\d{h}"}, // latin small letter h with dot below
+            {"0x1E33", "", "\\d{k}"}, // latin small letter k with dot below
+            {"0x1E37", "", "\\d{l}"}, // latin small letter l with dot below
+            {"0x1E39", "", "\\d{l}"}, // latin small letter l with dot below and macron
+            {"0x1E43", "", "\\d{m}"}, // latin small letter m with dot below
+            {"0x1E47", "", "\\d{n}"}, // latin small letter n with dot below
+            {"0x1E5B", "", "\\d{r}"}, // latin small letter r with dot below
+            {"0x1E5D", "", "\\d{r}"}, // latin small letter r with dot below and macron
+            {"0x1E63", "", "\\d{s}"}, // latin small letter s with dot below
+            {"0x1E69", "", "\\d{s}"}, // latin small letter s with dot below and dot above
+            {"0x1E6D", "", "\\d{t}"}, // latin small letter t with dot below
+            {"0x1E7F", "", "\\d{v}"}, // latin small letter v with dot below
+            {"0x1E89", "", "\\d{w}"}, // latin small letter w with dot below
+            {"0x1E93", "", "\\d{z}"}, // latin small letter z with dot below
+            {"0x1EA1", "", "\\d{a}"}, // latin small letter a with dot below
+            {"0x1EAD", "", "\\d{a}"}, // latin small letter a with circumflex and dot below
+            {"0x1EB7", "", "\\d{a}"}, // latin small letter a with breve and dot below
+            {"0x1EB9", "", "\\d{e}"}, // latin small letter e with dot below
+            {"0x1EC7", "", "\\d{e}"}, // latin small letter e with circumflex and dot below
+            {"0x1ECB", "", "\\d{i}"}, // latin small letter i with dot below
+            {"0x1ECD", "", "\\d{o}"}, // latin small letter o with dot below
+            {"0x1ED9", "", "\\d{o}"}, // latin small letter o with circumflex and dot below
+            {"0x1EE3", "", "\\d{o}"}, // latin small letter o with horn and dot below
+            {"0x1EE5", "", "\\d{u}"}, // latin small letter u with dot below
+            {"0x1EF1", "", "\\d{u}"}, // latin small letter u with horn and dot below
+            {"0x1EF5", "", "\\d{y}"}, // latin small letter y with dot below
+
+            // TODO macrons and dots above --> special cases
+
+            {"0x1E04", "", "\\d{B}"}, // LATIN CAPITAL LETTER B WITH DOT BELOW
+            {"0x1E0C", "", "\\d{D}"}, // LATIN CAPITAL LETTER D WITH DOT BELOW
+            {"0x1E24", "", "\\d{H}"}, // LATIN CAPITAL LETTER H WITH DOT BELOW
+            {"0x1E32", "", "\\d{K}"}, // LATIN CAPITAL LETTER K WITH DOT BELOW
+            {"0x1E36", "", "\\d{L}"}, // LATIN CAPITAL LETTER L WITH DOT BELOW
+            {"0x1E38", "", "\\d{L}"}, // LATIN CAPITAL LETTER L WITH DOT BELOW AND MACRON
+            {"0x1E42", "", "\\d{M}"}, // LATIN CAPITAL LETTER M WITH DOT BELOW
+            {"0x1E46", "", "\\d{N}"}, // LATIN CAPITAL LETTER N WITH DOT BELOW
+            {"0x1E5A", "", "\\d{R}"}, // LATIN CAPITAL LETTER R WITH DOT BELOW
+            {"0x1E5C", "", "\\d{R}"}, // LATIN CAPITAL LETTER R WITH DOT BELOW AND MACRON
+            {"0x1E62", "", "\\d{S}"}, // LATIN CAPITAL LETTER S WITH DOT BELOW
+            {"0x1E68", "", "\\d{S}"}, // LATIN CAPITAL LETTER S WITH DOT BELOW AND DOT ABOVE
+            {"0x1E6C", "", "\\d{T}"}, // LATIN CAPITAL LETTER T WITH DOT BELOW
+            {"0x1E7E", "", "\\d{V}"}, // LATIN CAPITAL LETTER V WITH DOT BELOW
+            {"0x1E88", "", "\\d{W}"}, // LATIN CAPITAL LETTER W WITH DOT BELOW
+            {"0x1E92", "", "\\d{Z}"}, // LATIN CAPITAL LETTER Z WITH DOT BELOW
+            {"0x1EA0", "", "\\d{A}"}, // LATIN CAPITAL LETTER A WITH DOT BELOW
+            {"0x1EAC", "", "\\d{A}"}, // LATIN CAPITAL LETTER A WITH CIRCUMFLEX AND DOT BELOW
+            {"0x1EB6", "", "\\d{A}"}, // LATIN CAPITAL LETTER A WITH BREVE AND DOT BELOW
+            {"0x1EB8", "", "\\d{E}"}, // LATIN CAPITAL LETTER E WITH DOT BELOW
+            {"0x1EC6", "", "\\d{E}"}, // LATIN CAPITAL LETTER E WITH CIRCUMFLEX AND DOT BELOW
+            {"0x1ECA", "", "\\d{I}"}, // LATIN CAPITAL LETTER I WITH DOT BELOW
+            {"0x1ECC", "", "\\d{O}"}, // LATIN CAPITAL LETTER O WITH DOT BELOW
+            {"0x1ED8", "", "\\d{O}"}, // LATIN CAPITAL LETTER O WITH CIRCUMFLEX AND DOT BELOW
+            {"0x1EE2", "", "\\d{O}"}, // LATIN CAPITAL LETTER O WITH HORN AND DOT BELOW
+            {"0x1EE4", "", "\\d{U}"}, // LATIN CAPITAL LETTER U WITH DOT BELOW
+            {"0x1EF0", "", "\\d{U}"}, // LATIN CAPITAL LETTER U WITH HORN AND DOT BELOW
+            {"0x1EF4", "", "\\d{Y}"}, // LATIN CAPITAL LETTER Y WITH DOT BELOW
 
             /* General Punctuation */
             {"8211", "ndash", "$\\textendash$"},
@@ -765,8 +850,13 @@ public class HTMLUnicodeConversionMaps {
 
     };
 
-    // List of combining accents
-    private static final String[][] ACCENT_LIST = new String[][] {{"768", "`"}, // Grave
+    /**
+     * List of combining accents
+     *
+     * See https://de.wikibooks.org/wiki/LaTeX/_Akzente_und_Sonderzeichen for the LaTeX commands
+     */
+    private static final String[][] ACCENT_LIST = new String[][] {
+            {"768", "`"}, // Grave
             {"769", "'"}, // Acute
             {"770", "^"}, // Circumflex
             {"771", "~"}, // Tilde
