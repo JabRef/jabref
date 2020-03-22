@@ -6,6 +6,7 @@ src/main/generated/
 /buildres/jabref-cert-2016.p12
 
 # GitBook assets
+docs/book.pdf
 docs/_book/
 
 # ignore the generated markdown file if the user forgets to delete it

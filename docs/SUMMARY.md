@@ -14,6 +14,7 @@
   * [Recommendations for UI design](ui-recommendations.md)
   * [Custom SVG icons](custom-svg-icons.md)
   * [Creating a binary and debug it](jpackage.md)
+* [JabRef and Software Engineering](teaching.md)
 * Readings on Coding
   * [Readings on JavaFX](javafx.md)
   * [Useful development tooling](tools.md)
