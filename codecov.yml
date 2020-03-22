@@ -6,6 +6,4 @@ coverage:
   project:
     default:
       threshold: 0.005
-comment:
-  branches:
-    - "do-not-add-comment-to-any-branch-please"
+comment: false
