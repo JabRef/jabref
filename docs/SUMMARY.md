@@ -1,6 +1,7 @@
 # Table of contents
 
 * [Overview on Developing](README.md)
+  * [Contributing](contributing.md)
 * [Architectural Decisions](adr/README.md)
 * Getting into the code
   * [Set up a local workspace](guidelines-for-setting-up-a-local-workspace.md)
