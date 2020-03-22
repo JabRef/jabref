@@ -379,7 +379,7 @@ public class JabRefFrame extends BorderPane {
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
-            BibDatabaseContext context = panel.getBibDatabaseContext();
+            final BibDatabaseContext context = panel.getBibDatabaseContext();
 
             if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
@@ -1153,7 +1153,7 @@ public class JabRefFrame extends BorderPane {
             return;
         }
 
-        BibDatabaseContext context = panel.getBibDatabaseContext();
+        final BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {

@@ -181,7 +181,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
 
-        if (BackupManager.checkForBackupFile(fileToLoad)) {
+        if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
 
