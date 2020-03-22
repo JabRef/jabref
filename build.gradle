@@ -54,14 +54,6 @@ application {
     mainClassName = "$moduleName/org.jabref.JabRefLauncher"
 }
 
-// TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
-// These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-patchModules.config = [
-        "test=fastparse_2.12-1.0.0.jar",
-        "test2=fastparse-utils_2.12-1.0.0.jar",
-        "test3=sourcecode_2.12-0.1.4.jar"
-]
-
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
 ext.allowJava9 = true
@@ -185,10 +177,6 @@ dependencies {
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
-
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
-        exclude module: 'fastparse_2.12'
-    }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
     implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
