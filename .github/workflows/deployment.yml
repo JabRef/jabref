@@ -93,6 +93,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Fetch all history for all tags and branches
@@ -121,6 +132,7 @@ jobs:
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: Pendect/action-rsyncer@v1.1.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}

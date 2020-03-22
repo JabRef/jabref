@@ -5,5 +5,5 @@ coverage:
     patch: false
     project:
       default:
-        threshold: 0.005
+        threshold: 0.01
 comment: false

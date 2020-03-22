@@ -26,17 +26,27 @@ jobs:
     name: Oracle tests
     runs-on: ubuntu-latest
     steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "CCRYPT" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          SNAPCRAFT_LOGIN_FILE: ${{ secrets.CCRYPT }}
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
+      - name: Restore gradle chache
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -44,12 +54,14 @@ jobs:
             ${{ runner.OS }}-gradle-${{ env.cache-name }}-
             ${{ runner.OS }}-gradle-
             ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
+      - name: Restore gradle wrapper
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        uses: actions/cache@v1
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Start Oracle XE
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: |
           mkdir ~/oracle-xe || true
           cd ~/oracle-xe
@@ -71,6 +83,7 @@ jobs:
         env:
           CCRYPT: ${{ secrets.CCRYPT }}
       - name: Run database test
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: ./gradlew databaseTest --rerun-tasks
         env:
           DBMS: "oracle"
