@@ -34,7 +34,6 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
@@ -870,7 +869,9 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
-                String latexFreeField = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                // FIXME
+                // String latexFreeField = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                String latexFreeField = fieldValue.get();
                 latexFreeFields.put(field, latexFreeField);
                 return Optional.of(latexFreeField);
             } else {

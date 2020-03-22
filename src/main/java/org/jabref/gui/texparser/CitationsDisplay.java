@@ -18,7 +18,6 @@ import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.texparser.Citation;
 
 public class CitationsDisplay extends ListView<Citation> {
@@ -44,7 +43,9 @@ public class CitationsDisplay extends ListView<Citation> {
         }
 
         Node citationIcon = IconTheme.JabRefIcons.LATEX_COMMENT.getGraphicNode();
-        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
+        // FIXME
+        Text contextText = null;
+        // Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
         contextText.wrappingWidthProperty().bind(this.widthProperty().subtract(85));
         HBox contextBox = new HBox(8, citationIcon, contextText);
         contextBox.getStyleClass().add("contextBox");
