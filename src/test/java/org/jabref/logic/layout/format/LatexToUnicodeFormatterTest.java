@@ -27,7 +27,7 @@ class LatexToUnicodeFormatterTest {
 
     @Test
     void testFormatTextit() {
-        // See #1464
+        // See https://github.com/JabRef/jabref/pull/1464
         assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
     }
 
