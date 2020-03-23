@@ -325,6 +325,10 @@ You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor
   * Return result of calculations \(either explicitly or via a `BlackHole` object\)
 * [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
 
+## Measure performance
+
+Try out the [YourKit JAva Profiler](https://www.yourkit.com/).
+
 ## equals
 
 When creating an `equals` method follow:
