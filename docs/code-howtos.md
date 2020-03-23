@@ -227,13 +227,11 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
   testFormat() {
    assertEqual("test", format("test"));
    assertEqual("{test", format("{test"));
-   assertEqual("test", format("{{test"));
    assertEqual("test", format("test}}"));
-   assertEqual("test", format("{{test}}"));
   }
   ```
 
-  we would have five tests containing a single `assert` statement and named accordingly \(`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, `formatRemovesDoubleBracesAtBeginning`, etc.\). See [JUnit AntiPattern](http://www.exubero.com/junit/antipatterns.html#Multiple_Assertions) for background.
+  we would have five tests containing a single `assert` statement and named accordingly \(`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, , etc.\). See [JUnit AntiPattern](https://exubero.com/junit/anti-patterns/#Multiple_Assertions) for background.
 
 * Do _not just test happy paths_, but also wrong/weird input.
 * It is recommend to write tests _before_ you actually implement the functionality \(test driven development\).

@@ -2,11 +2,20 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
+```text
+The most important step is to configure your IDE.
+In case you know how to install JDK14 and to fork JabRef's code,
+        please scroll down to the IDE setup.
+```
+
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
  [![](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
 ## Prerequisites
+
+This section list the prerequisites you need to get started to develop JabRef.
+After this section, you are ready to get the code.
 
 ### Java Development Kit 14
 
@@ -58,6 +67,8 @@ See our [tool recommendations](tools.md).
 
 ## Get the code
 
+This section explains how you get the JabRef code onto your machine in a form allowing you to make contributions.
+
 ### Fork JabRef into your GitHub account
 
 1. Log into your GitHub account
@@ -75,6 +86,10 @@ See our [tool recommendations](tools.md).
   * The JabRef's GUI should now start up.
 
 ## Configure your IDE
+
+These steps are very important.
+They allow you to focus on the content and ensure that the code formatting always goes well.
+Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
 
 ### Setup for IntelliJ IDEA
 
