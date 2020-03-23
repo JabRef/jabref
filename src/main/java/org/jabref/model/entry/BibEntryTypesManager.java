@@ -1,9 +1,10 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -62,7 +62,6 @@ public class BibEntryTypesManager {
                 entryType.getOptionalFields()
                          .stream()
                          .map(BibField::getField)
-                         .sorted(Comparator.comparing(Field::getName))
                          .collect(Collectors.toList())));
         builder.append("]");
         return builder.toString();
@@ -183,8 +182,8 @@ public class BibEntryTypesManager {
             customOrModifiedType.remove(type);
         }
 
-        public SortedSet<BibEntryType> getAllTypes() {
-            SortedSet<BibEntryType> allTypes = new TreeSet<>(customOrModifiedType);
+        public Set<BibEntryType> getAllTypes() {
+            Set<BibEntryType> allTypes = new LinkedHashSet<>(customOrModifiedType);
             allTypes.addAll(standardTypes);
             return allTypes;
         }

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -92,14 +93,16 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a sorted List with all standard fields and including some common internal fields
+     * Returns a  List with all standard fields and including some common internal fields
      */
     public static Set<Field> getCommonFields() {
-        TreeSet<Field> publicAndInternalFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
+        
+        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size());
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
-        publicAndInternalFields.addAll(EnumSet.allOf(StandardField.class));
+        publicAndInternalFields.addAll(allFields);
 
         return publicAndInternalFields;
     }
