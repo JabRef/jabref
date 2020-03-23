@@ -17,6 +17,8 @@ For a near-to-perfect preparation and effect of the course, we ask you to get in
 
 It is also possible to just direct students to our [Contribution Guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#contributing-guide). The learning effect may be lower as time of the students has to be spend to a) learn about JabRef and b) select an appropriate issue.
 
+Since a huge fraction of software costs is spend on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance<sup id="a1">[1](#LientzSwanson)</sup> is trained. When fixing bugs, corrective maintenance<sup>[1](#LientzSwanson)</sup> is trained.
+
 ## Process for contributions
 
 There is no special process for student contributions. We want to discuss it nevertheless to increase awareness of the time required from starting the contribution until the inclusion in a release of JabRef.
@@ -75,3 +77,9 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 
 - Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 - Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.
+
+## References
+
+<a id="LientzSwanson" href="#a1">1</a>: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
+
+<!-- markdownlint-disable-file MD033 -->
