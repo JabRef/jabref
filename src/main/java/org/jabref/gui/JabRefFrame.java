@@ -264,7 +264,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private Void showTrackingNotification() {
-        if (!Globals.prefs.shouldCollectTelemetry()) {
+        if (!Globals.prefs.getShouldCollectTelemetry()) {
             boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
                     Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
