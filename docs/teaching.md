@@ -2,18 +2,20 @@
 
 JabRef can be used as training object for software engineering.
 
-As instructor, please follow following check list:
+As instructor, please follow this check list:
 
 1. Be aware that JabRef is run by volunteers. This implies that the development team cannot ensure to provide feedback on code within hours.
 2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
 3. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](development-strategy.md) for more details.
 4. Choose tasks from one of the folowing boards. Write a comment to each issue so that it can be reserved to your course.
-
    - Feature Board: <https://github.com/JabRef/jabref/projects/7>
    - Bug Board: <https://github.com/JabRef/jabref/projects/5>
-
 5. Be aware that the difficuly of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
 6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discort. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
+
+For a near-to-perfect preparation and effect of the course, we ask you to get in touch with us **four weeks** in advance. Then, the JabRef team can a) learn about the starting skill level of the students, b) the aimed skill level at the end of the course, c) the amount of time the students are given to learn about and contribute to JabRef, d) check the [feature board](https://github.com/JabRef/jabref/projects/7) for appropriate tasks (and fill it as needed), e) recommend appropriate features.
+
+It is also possible to just direct students to our [Contribution Guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#contributing-guide). The learning effect may be lower as time of the students has to be spend to a) learn about JabRef and b) select an appropriate issue.
 
 ## Process for contributions
 
