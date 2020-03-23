@@ -3,13 +3,11 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -49,20 +47,20 @@ public class FieldFactory {
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
                      .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
     public static Set<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .map(FieldFactory::parseOrFields)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
                      .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static String serializeFieldsList(Collection<Field> fields) {
