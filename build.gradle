@@ -113,7 +113,7 @@ dependencies {
 
     implementation 'org.apache.pdfbox:pdfbox:2.0.18'
     implementation 'org.apache.pdfbox:fontbox:2.0.19'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.18'
+    implementation 'org.apache.pdfbox:xmpbox:2.0.19'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
 
