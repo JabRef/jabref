@@ -4,11 +4,11 @@ We aim to keep up to high-quality code standards and use code quality tools wher
 
 To ensure high code-quality,
 
-* we follow the principles of [Java by Comparison](https://java.by-comparison.com/).
-* we follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
-* we use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
-* we document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
-* we review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
+* We follow the principles of [Java by Comparison](https://java.by-comparison.com/).
+* We follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
+* We use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
+* We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
+* We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
 Read on about our automated quality checks at [Code Quality](code-quality.md).
 
