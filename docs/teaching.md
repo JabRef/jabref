@@ -67,7 +67,6 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 #### University of Stuttgart
 
 - Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
-- Supervisor: [Dr. Oliver Kopp](https://github.com/koppor/)
 - Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
 - Successfully run 2015/2016.
 
