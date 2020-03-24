@@ -2,24 +2,58 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
+```text
+The most important step is to configure your IDE.
+In case you know how to install JDK14 and to fork JabRef's code,
+        please scroll down to the IDE setup.
+```
+
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
  [![](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
 ## Prerequisites
 
+This section list the prerequisites you need to get started to develop JabRef.
+After this section, you are ready to get the code.
+
 ### Java Development Kit 14
 
-A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA\_HOME environment variable or install the most recent JDK.
+A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+
+Download the JDK from <https://jdk.java.net/>. On Windows, you can execute `choco install openjdk` (requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)).
+
+### GitHub Account
+
+If you do not yet have a GitHub account, please [create one](https://github.com/join).
+
+Proposals for account names:
+
+- Login similar to your university account. Example: `koppor`
+- Use your last name prefixed by the first letter of your first name. Example: `okopp`
+- Use `firstname.lastname`. Example: `oliver.kopp`
+
+You can hide your email adress by following the recommendations at <https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/>.
+
+Most developers, though, do not hide their email adress. They use one mich may get public.
+Mostly, they create a new email account for development only.
+That account then be used for develoment mailing lists, mail exchange with other developers, etc.
+
+Examples:
+
+- Same login as in GitHub (see above). Example: `koppor@gmail.com`
+- "`it`" in the name. Example:  `kopp.it@gmail.com`
+- Use the university login. Example: `st342435@stud.uni-stuttgart.de`
 
 ### git
 
-It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+It is strongly recommend that you have git installed.
 
 * In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/). - See also our [tool recommendations](tools.md) for installation hints including [chocolatey](https://chocolatey.org/).
-
-If you do not yet have a GitHub account, please [create one](https://github.com/join).
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
+  Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a) install git and b) have linux commands such as `grep` available in your `PATH`.
+  For more advanced tooling, you may use [Fork - a fast and friendly git client for Mac and Windows](https://git-fork.com/): `choco install git-fork`.
+* [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### IDE
 
@@ -27,7 +61,13 @@ We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for adv
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
+### Other Tooling
+
+See our [tool recommendations](tools.md).
+
 ## Get the code
+
+This section explains how you get the JabRef code onto your machine in a form allowing you to make contributions.
 
 ### Fork JabRef into your GitHub account
 
@@ -46,6 +86,10 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
   * The JabRef's GUI should now start up.
 
 ## Configure your IDE
+
+These steps are very important.
+They allow you to focus on the content and ensure that the code formatting always goes well.
+Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
 
 ### Setup for IntelliJ IDEA
 
