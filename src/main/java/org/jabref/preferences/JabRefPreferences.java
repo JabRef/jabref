@@ -1967,7 +1967,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getShouldCollectTelemetry() {
+    public boolean shouldCollectTelemetry() {
         return getBoolean(COLLECT_TELEMETRY);
     }
 
@@ -2006,7 +2006,7 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
-                getShouldCollectTelemetry(),
+                shouldCollectTelemetry(),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
 

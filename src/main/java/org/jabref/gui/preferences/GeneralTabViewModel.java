@@ -108,7 +108,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         enforceLegalKeysProperty.setValue(initialGeneralPreferences.isEnforceLegalBibtexKey());
         allowIntegerEditionProperty.setValue(initialGeneralPreferences.isAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
-        collectTelemetryProperty.setValue(preferencesService.getShouldCollectTelemetry());
+        collectTelemetryProperty.setValue(preferencesService.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.isShowAdvancedHints());
 
         markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());

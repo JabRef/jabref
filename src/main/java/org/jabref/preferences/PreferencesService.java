@@ -117,7 +117,7 @@ public interface PreferencesService {
 
     void setLanguage(Language language);
 
-    boolean getShouldCollectTelemetry();
+    boolean shouldCollectTelemetry();
 
     void setShouldCollectTelemetry(boolean value);
 
