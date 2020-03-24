@@ -48,6 +48,10 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +73,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final LinkedFileHandler linkedFileHandler;
     private final ExternalFileTypes externalFileTypes;
 
+    private final Validator fileExistsValidator;
+
     public LinkedFileViewModel(LinkedFile linkedFile,
                                BibEntry entry,
                                BibDatabaseContext databaseContext,
@@ -87,6 +93,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
         this.xmpPreferences = xmpPreferences;
+
+        fileExistsValidator = new FunctionBasedValidator<>(
+                linkedFile.linkProperty(),
+                link -> {
+                    Optional<Path> path = FileHelper.expandFilename(databaseContext, link, filePreferences);
+                    return path.isPresent() && Files.exists(path.get());
+                },
+                ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
@@ -457,4 +471,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public LinkedFile getFile() {
         return linkedFile;
     }
+
+    public ValidationStatus fileExistsValidationStatus() { return fileExistsValidator.getValidationStatus(); }
 }
