@@ -2,32 +2,72 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
+```text
+The most important step is to configure your IDE.
+In case you know how to install JDK14 and to fork JabRef's code,
+        please scroll down to the IDE setup.
+```
+
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
  [![](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
 ## Prerequisites
 
-### Java Development Kit 13
+This section list the prerequisites you need to get started to develop JabRef.
+After this section, you are ready to get the code.
 
-A working Java 13 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 13 \(e.g `javac 13.0.1`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA\_HOME environment variable or install the most recent JDK.
+### Java Development Kit 14
 
-### git
+A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+Download the JDK from <https://jdk.java.net/>. On Windows, you can execute `choco install openjdk` (requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)).
 
-* In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/). - See also our [tool recommendations](tools.md) for installation hints including [chocolatey](https://chocolatey.org/).
+### GitHub Account
 
 If you do not yet have a GitHub account, please [create one](https://github.com/join).
 
+Proposals for account names:
+
+- Login similar to your university account. Example: `koppor`
+- Use your last name prefixed by the first letter of your first name. Example: `okopp`
+- Use `firstname.lastname`. Example: `oliver.kopp`
+
+You can hide your email adress by following the recommendations at <https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/>.
+
+Most developers, though, do not hide their email adress. They use one mich may get public.
+Mostly, they create a new email account for development only.
+That account then be used for develoment mailing lists, mail exchange with other developers, etc.
+
+Examples:
+
+- Same login as in GitHub (see above). Example: `koppor@gmail.com`
+- "`it`" in the name. Example:  `kopp.it@gmail.com`
+- Use the university login. Example: `st342435@stud.uni-stuttgart.de`
+
+### git
+
+It is strongly recommend that you have git installed.
+
+* In Debian-based distros: `sudo apt-get install git`
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
+  Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a) install git and b) have linux commands such as `grep` available in your `PATH`.
+  For more advanced tooling, you may use [Fork - a fast and friendly git client for Mac and Windows](https://git-fork.com/): `choco install git-fork`.
+* [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) \(`2019-12` or newer\).
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for advanced users)](https://eclipse.org/) \(`2020-03` or newer\).
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
+### Other Tooling
+
+See our [tool recommendations](tools.md).
+
 ## Get the code
+
+This section explains how you get the JabRef code onto your machine in a form allowing you to make contributions.
 
 ### Fork JabRef into your GitHub account
 
@@ -47,6 +87,10 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ## Configure your IDE
 
+These steps are very important.
+They allow you to focus on the content and ensure that the code formatting always goes well.
+Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
+
 ### Setup for IntelliJ IDEA
 
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
@@ -57,16 +101,16 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
   the _Gradle_ and _Gradle Extension_ enabled.
 
-After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 13 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
+After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-* Ensure you have a Java 13 SDK configured by navigating to
+* Ensure you have a Java 14 SDK configured by navigating to
 
   **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
 
-  location of a JDK 13.
+  location of a JDK 14.
 
-* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 13
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 13 SDK as
+* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
 
   the Gradle JVM at the bottom.
 
@@ -119,7 +163,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
 To use the "JabRef Main" run configuration, open **Run \| Edit Configurations... \| Application \| JabRef Main** and
 
-* Verify, that your JDK 13 is used
+* Verify, that your JDK 14 is used
 * Set "VM Options" to the following:
 
   ```text
@@ -190,12 +234,13 @@ If you have configured Eclipse for the same project \(the required steps are des
 
 ### Setup for Eclipse
 
-Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is required.
+Make sure your Eclipse installation us up to date, Eclipse 2020-03 or newer is required.
+For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
 
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
-2. Run `./gradlew eclipse`
+2. Run `./gradlew eclipse` 
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
@@ -239,7 +284,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 13 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 14 is installed is following error message:
 
 ```text
 compileJava FAILED

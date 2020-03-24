@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Properties;
 
-public class BuildInfo {
+public final class BuildInfo {
 
     public static final String UNKNOWN_VERSION = "*unknown*";
 
@@ -16,14 +16,14 @@ public class BuildInfo {
     public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
     public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
 
-    private final Version version;
-    private final String authors;
-    private final String developers;
-    private final String year;
-    private final String azureInstrumentationKey;
-    private final String minRequiredJavaVersion;
-    private final boolean allowJava9;
-
+    public final Version version;
+    public final String authors;
+    public final String developers;
+    public final String year;
+    public final String azureInstrumentationKey;
+    public final String springerNatureAPIKey;
+    public final String minRequiredJavaVersion;
+    public final boolean allowJava9;
 
     public BuildInfo() {
         this("/build.properties");
@@ -47,35 +47,8 @@ public class BuildInfo {
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
         azureInstrumentationKey = properties.getProperty("azureInstrumentationKey", "");
+        springerNatureAPIKey = properties.getProperty("springerNatureAPIKey", "");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", ""));
-    }
-
-    public Version getVersion() {
-        return version;
-    }
-
-    public String getAuthors() {
-        return authors;
-    }
-
-    public String getDevelopers() {
-        return developers;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public String getAzureInstrumentationKey() {
-        return azureInstrumentationKey;
-    }
-
-    public String getMinRequiredJavaVersion() {
-        return minRequiredJavaVersion;
-    }
-
-    public boolean isAllowJava9() {
-        return allowJava9;
     }
 }
