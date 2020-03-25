@@ -84,13 +84,10 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 - Summary: A group of three students experienced the full software engineering process within one semester. They worked part-time for the project.
 - Successfully run in 2012
 
-<p></p>
 
-- Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
-- Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
-- Successfully run in 2015/2016
-
-<p></p>
++ Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
++ Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
++ Successfully run in 2015/2016
 
 - Course "Programming and Software Development" as part of the [BSc Software Engineering](https://www.uni-stuttgart.de/en/study/study-programs/Software-Engineering-B.Sc-00001./)
 - Summary: One excersice to contribute a minor fix or feature to JabRef. Goal: learn contribution to an open source project using git and GitHub.
