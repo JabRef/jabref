@@ -82,13 +82,19 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 
 - Course "Softwarepraktikum"
 - Summary: A group of three students experienced the full software engineering process within one semester. They worked part-time for the project.
-- Course offered 2012
+- Successfully run in 2012
 
 <p></p>
 
 - Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
 - Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
-- Successfully run 2015/2016.
+- Successfully run in 2015/2016
+
+<p></p>
+
+- Course "Programming and Software Development" as part of the [BSc Software Engineering](https://www.uni-stuttgart.de/en/study/study-programs/Software-Engineering-B.Sc-00001./)
+- Summary: One excersice to contribute a minor fix or feature to JabRef. Goal: learn contribution to an open source project using git and GitHub.
+- Successfuly run in 2018
 
 ### Swedish
 
@@ -96,6 +102,7 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 
 - Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 - Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.
+- Successfuly run in 2020
 
 ### Portuguese
 
