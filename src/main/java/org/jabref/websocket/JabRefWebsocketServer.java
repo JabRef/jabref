@@ -308,7 +308,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         }
     }
 
-    public boolean startServer() {
+    public synchronized boolean startServer() {
         if (serverStarting) {
             LOGGER.info("[ws] JabRefWebsocketServer is already starting");
 
@@ -332,7 +332,7 @@ public class JabRefWebsocketServer extends WebSocketServer {
         return true;
     }
 
-    public boolean stopServer() {
+    public synchronized boolean stopServer() {
         if (serverStarting) {
             LOGGER.info("[ws] JabRefWebsocketServer is currently starting up and cannot be stopped during this process");
 
@@ -363,11 +363,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
         return false;
     }
 
-    public boolean isServerStarting() {
+    public synchronized boolean isServerStarting() {
         return serverStarting;
     }
 
-    public boolean isServerStarted() {
+    public synchronized boolean isServerStarted() {
         return serverStarted;
     }
 
