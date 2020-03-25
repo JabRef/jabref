@@ -313,21 +313,23 @@ public class JabRefWebsocketServer extends WebSocketServer {
             LOGGER.info("[ws] JabRefWebsocketServer is already starting");
 
             return false;
-        } else if (serverStarted) {
+        }
+
+        if (serverStarted) {
             LOGGER.info("[ws] JabRefWebsocketServer has already been started");
 
             return false;
-        } else {
-            LOGGER.debug("[ws] JabRefWebsocketServer is starting up...");
-
-            serverStarting = true;
-
-            addShutdownHook();
-            setConnectionLostTimeout(connectionLostTimeoutValue);
-            start();
-
-            return true;
         }
+
+        LOGGER.debug("[ws] JabRefWebsocketServer is starting up...");
+
+        serverStarting = true;
+
+        addShutdownHook();
+        setConnectionLostTimeout(connectionLostTimeoutValue);
+        start();
+
+        return true;
     }
 
     public boolean stopServer() {
@@ -335,7 +337,9 @@ public class JabRefWebsocketServer extends WebSocketServer {
             LOGGER.info("[ws] JabRefWebsocketServer is currently starting up and cannot be stopped during this process");
 
             return false;
-        } else if (serverStarted) {
+        }
+
+        if (serverStarted) {
             LOGGER.debug("[ws] stopping JabRefWebsocketServer...");
 
             if (heartbeatExecutor != null) {
@@ -352,11 +356,11 @@ public class JabRefWebsocketServer extends WebSocketServer {
             serverStarted = false;
 
             return true;
-        } else {
-            LOGGER.info("[ws] JabRefWebsocketServer is not started");
-
-            return false;
         }
+
+        LOGGER.info("[ws] JabRefWebsocketServer is not started");
+
+        return false;
     }
 
     public boolean isServerStarting() {
