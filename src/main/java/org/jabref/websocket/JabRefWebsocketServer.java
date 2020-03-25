@@ -271,9 +271,9 @@ public class JabRefWebsocketServer extends WebSocketServer {
             websocketOfRecipient.send(jsonString);
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public boolean sendMessage(WebSocket websocketOfRecipient, WebSocketAction webSocketAction, JsonObject messagePayload) {
