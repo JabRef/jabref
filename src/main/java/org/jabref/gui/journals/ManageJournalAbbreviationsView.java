@@ -52,7 +52,9 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     public ManageJournalAbbreviationsView() {
         this.setTitle(Localization.lang("Journal abbreviations"));
 
-        ViewLoader.view(this).load().setAsDialogPane(this);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> saveAbbreviationsAndCloseDialog());
     }

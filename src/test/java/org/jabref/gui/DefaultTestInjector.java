@@ -1,0 +1,84 @@
+package org.jabref.gui;
+
+import java.util.function.Function;
+
+import javax.swing.undo.UndoManager;
+
+import org.jabref.Globals;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.injection.Injector;
+import com.airhacks.afterburner.injection.PresenterFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.mockito.Mockito.mock;
+
+public class DefaultTestInjector implements PresenterFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTestInjector.class);
+
+    /**
+     * This method takes care of creating dependencies.
+     * By default, it just creates a new instance of the class.
+     * Dependencies without default constructor are constructed by hand.
+     */
+    private static Object createDependency(Class<?> clazz) {
+        if (clazz == DialogService.class) {
+            return mock(DialogService.class);
+        } else if (clazz == BuildInfo.class) {
+            return new BuildInfo("buildTest.properties");
+        } else if (clazz == TaskExecutor.class) {
+            return Globals.TASK_EXECUTOR;
+        } else if (clazz == PreferencesService.class) {
+            return Globals.prefs;
+        } else if (clazz == KeyBindingRepository.class) {
+            return Globals.getKeyPrefs();
+        } else if (clazz == JournalAbbreviationLoader.class) {
+            return Globals.journalAbbreviationLoader;
+        } else if (clazz == StateManager.class) {
+            return Globals.stateManager;
+        } else if (clazz == FileUpdateMonitor.class) {
+            return Globals.getFileUpdateMonitor();
+        } else if (clazz == ProtectedTermsLoader.class) {
+            return Globals.protectedTermsLoader;
+        } else if (clazz == ClipBoardManager.class) {
+            return Globals.clipboardManager;
+        } else if (clazz == UndoManager.class) {
+            return Globals.undoManager;
+        } else {
+            try {
+                return clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+                LOGGER.error("Cannot instantiate dependency: " + clazz, ex);
+                return null;
+            }
+        }
+    }
+
+    @Override
+    public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
+        LOGGER.debug("Instantiate " + clazz.getName());
+
+        // Use our own method to construct dependencies
+        Injector.setInstanceSupplier(DefaultTestInjector::createDependency);
+
+        return Injector.instantiatePresenter(clazz, injectionContext);
+    }
+
+    @Override
+    public void injectMembers(Object instance, Function<String, Object> injectionContext) {
+        LOGGER.debug("Inject into " + instance.getClass().getName());
+
+        // Use our own method to construct dependencies
+        Injector.setInstanceSupplier(DefaultTestInjector::createDependency);
+
+        Injector.injectMembers(instance, injectionContext);
+    }
+}
