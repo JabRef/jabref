@@ -77,6 +77,22 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 - Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 - Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.
 
+### English
+
+#### Northern Arizona University (NAU) - US
+
+- Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
+- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
+- Course offered in 2018
+
+
+### Portuguese
+
+#### Federal University of Technology, Paraná - Brazil
+- Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
+- Summary: Students are requested to contribute to an Open Source project to learn about maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
+- Course offered from 2013 to 2016 with different names
+
 ## References
 
 <a id="LientzSwanson" href="#a1">1</a>: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
