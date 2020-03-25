@@ -52,9 +52,23 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 
 > In case your course is missing, feel free to add it.
 
+### English
+
+#### Harbin Institute of Technology (HIT), China
+
+- Course: Open Source Software Development
+- Summary: In this course, students will be introduced to the processes and tools specific to Open Source Software development, and they will analyze existing projects to understand the architecture and processes of these projects. In addition, students will attempt to contribute source code to a large existing Open Source Software project.
+- Course offered in 2018 and 2019. Examples of merged pull requests: [4217](https://github.com/JabRef/jabref/pull/4217), [4255](https://github.com/JabRef/jabref/pull/4255), [4227](https://github.com/JabRef/jabref/pull/4227), [4260](https://github.com/JabRef/jabref/pull/4260), [5150](https://github.com/JabRef/jabref/pull/5150)
+
+#### Northern Arizona University (NAU), USA
+
+- Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
+- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
+- Course offered in 2018
+
 ### German
 
-#### Universität Basel
+#### Universität Basel, Switzerland
 
 - Course [10915-01: Software Engineering](https://dmi.unibas.ch/de/studium/computer-science-informatik/lehrangebot-hs18/vorlesung-software-engineering/)
 - Lecture Materials: <https://github.com/unibas-marcelluethi/software-engineering>
@@ -64,7 +78,13 @@ This will help to reduce the load on the JabRef team and improve the quality of 
   - Introduction to JabRef's code: [Exercise 5](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week5/exercises/practical-exercises.md): Introduction into JabRef code.
   - Prominent feature implenented: Parse full text references using Grobid. PR [#5614](https://github.com/JabRef/jabref/pull/5614).
 
-#### University of Stuttgart
+#### University of Stuttgart, Germany
+
+- Course "Softwarepraktikum"
+- Summary: A group of three students experienced the full software engineering process within one semester. They worked part-time for the project.
+- Course offered 2012
+
+<p></p>
 
 - Course [Studienprojekt](https://www.f05.uni-stuttgart.de/informatik/studierende/bachelor/stupro/)
 - Summary: A group of nine students experienced the full software engineering process within one year. They worked part-time for the project.
@@ -72,28 +92,14 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 
 ### Swedish
 
-#### KTH Royal Institute of Technology
+#### KTH Royal Institute of Technology, Sweden
 
 - Course [DD2480 Software Engineering Fundamentals](https://www.kth.se/student/kurser/kurs/DD2480?l=en)
 - Summary: Groups of students from three to five persons experienced the whole software engineering process within a week: From the requirements specification to the final pull request.
 
-### English
-
-#### Northern Arizona University (NAU) - US
-
-- Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
-- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
-- Course offered in 2018
-
-#### Harbin Institute of Technology (HIT), China
-
-- Course: Open Source Software Development
-- Summary: In this course, students will be introduced to the processes and tools specific to Open Source Software development, and they will analyze existing projects to understand the architecture and processes of these projects. In addition, students will attempt to contribute source code to a large existing Open Source Software project.
-- Course offered in 2018 and 2019. Examples of merged pull requests: [4217](https://github.com/JabRef/jabref/pull/4217), [4255](https://github.com/JabRef/jabref/pull/4255), [4227](https://github.com/JabRef/jabref/pull/4227), [4260](https://github.com/JabRef/jabref/pull/4260), [5150](https://github.com/JabRef/jabref/pull/5150)
-
 ### Portuguese
 
-#### Federal University of Technology, Paraná - Brazil
+#### Federal University of Technology, Paraná, Brazil
 - Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 - Summary: Students are requested to contribute to an Open Source project to learn about maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
 - Course offered from 2013 to 2016 with different names
