@@ -85,6 +85,11 @@ This will help to reduce the load on the JabRef team and improve the quality of 
 - Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
 - Course offered in 2018
 
+#### Harbin Institute of Technology (HIT), China
+
+- Course: Open Source Software Development
+- Summary: In this course, students will be introduced to the processes and tools specific to Open Source Software development, and they will analyze existing projects to understand the architecture and processes of these projects. In addition, students will attempt to contribute source code to a large existing Open Source Software project.
+- Course offered in 2018 and 2019. Examples of merged pull requests: [4217](https://github.com/JabRef/jabref/pull/4217), [4255](https://github.com/JabRef/jabref/pull/4255), [4227](https://github.com/JabRef/jabref/pull/4227), [4260](https://github.com/JabRef/jabref/pull/4260), [5150](https://github.com/JabRef/jabref/pull/5150)
 
 ### Portuguese
 
