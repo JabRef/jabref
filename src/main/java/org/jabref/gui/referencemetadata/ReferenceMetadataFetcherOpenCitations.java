@@ -56,45 +56,46 @@ public class ReferenceMetadataFetcherOpenCitations {
 
             Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-            if (doi.isPresent()) {
-                String doiString = doi.get().getDOI();
-
-                HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doiString)
-                                                             .queryString("httpAccept", "application/json")
-                                                             .asJson();
-
-                fetchReferenceMetadataTask.updateProgress(entryIndex + 1, entries.size());
-
-                if (!jsonResponse.isSuccess()) {
-                    entriesWithIncompleteMetadata.add(entry);
-                    LOGGER.info("fetching metadata for reference with citation key \"" + citationKey + "\" was not successful");
-                    continue;
-                }
-
-                JSONArray jsonArray = jsonResponse.getBody().getArray();
-
-                if (jsonArray.length() == 0) {
-                    entriesWithIncompleteMetadata.add(entry);
-                    LOGGER.info("fetching metadata for reference with citation key \"" + citationKey + "\" returned empty result");
-                    continue;
-                }
-
-                JSONObject jsonData = jsonArray.getJSONObject(0);
-
-                if (jsonData != null && jsonData.has("citation_count")) {
-                    int citationCountNumber = Integer.parseInt(jsonData.getString("citation_count"));
-
-                    String citationCount = String.format("%0" + CITATION_COUNT_STRING_LENGTH + "d", citationCountNumber);
-
-                    // set (updated) entry data (citation count)
-                    entry.setField(InternalField.CITATION_COUNT, citationCount);
-                } else {
-                    entriesWithIncompleteMetadata.add(entry);
-                    LOGGER.info("reference with citation key \"" + citationKey + "\" does not have the required metadata");
-                }
-            } else {
+            if (doi.isEmpty()) {
                 entriesWithIncompleteMetadata.add(entry);
                 LOGGER.info("skipping reference with citation key \"" + citationKey + "\", since it does not have a DOI");
+                continue;
+            }
+
+            String doiString = doi.get().getDOI();
+
+            HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL + doiString)
+                                                         .queryString("httpAccept", "application/json")
+                                                         .asJson();
+
+            fetchReferenceMetadataTask.updateProgress(entryIndex + 1, entries.size());
+
+            if (!jsonResponse.isSuccess()) {
+                entriesWithIncompleteMetadata.add(entry);
+                LOGGER.info("fetching metadata for reference with citation key \"" + citationKey + "\" was not successful");
+                continue;
+            }
+
+            JSONArray jsonArray = jsonResponse.getBody().getArray();
+
+            if (jsonArray.length() == 0) {
+                entriesWithIncompleteMetadata.add(entry);
+                LOGGER.info("fetching metadata for reference with citation key \"" + citationKey + "\" returned empty result");
+                continue;
+            }
+
+            JSONObject jsonData = jsonArray.getJSONObject(0);
+
+            if (jsonData != null && jsonData.has("citation_count")) {
+                int citationCountNumber = Integer.parseInt(jsonData.getString("citation_count"));
+
+                String citationCount = String.format("%0" + CITATION_COUNT_STRING_LENGTH + "d", citationCountNumber);
+
+                // set (updated) entry data (citation count)
+                entry.setField(InternalField.CITATION_COUNT, citationCount);
+            } else {
+                entriesWithIncompleteMetadata.add(entry);
+                LOGGER.info("reference with citation key \"" + citationKey + "\" does not have the required metadata");
             }
         }
 
