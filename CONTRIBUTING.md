@@ -2,6 +2,8 @@
 
 After reading through this guide, check out some good first issues to contribute to by clicking here: [Good First Issues](https://github.com/JabRef/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22)
 
+In case you are an instructor and want to use JabRef as software engineering example, please head to <https://devdocs.jabref.org/teaching>.
+
 ## Understanding the basics
 
 We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
@@ -21,14 +23,14 @@ We should also be online at [gitter](https://gitter.im/JabRef/jabref).
 
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
 
-### Add your change to CHANGELOG.md
+### Add your change to `CHANGELOG.md`
 
 You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory of the JabRef source.
 Add a line with your changes in the appropriate section.
 
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
 
-#### Key format
+#### Format of keyboard shortcuts
 
 Example: `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`
 
@@ -95,7 +97,7 @@ accepting <downside / undesired consequences>,
 because <additional rationale>.
 ```
 
-### When adding a new Localization.lang entry
+### When adding a new `Localization.lang` entry
 
 Add new `Localization.lang("KEY")` to a Java file.
 The tests will fail. In the test output a snippet is generated, which must be added to the English translation file.
@@ -119,9 +121,9 @@ You can also directly run the specific test in your IDE.
 The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
 Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
-### Create a pull request
+## Create a pull request
 
-Create a pull request on GitHub.
+Create a pull request on GitHub following GitHub's guide "[Creating a pull request from a fork](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork)".
 For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
 
 If you want to indicate that a pull request is not yet complete **before** creating the pull request, you may consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/).

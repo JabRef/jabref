@@ -380,7 +380,7 @@ public class JabRefFrame extends BorderPane {
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
-            BibDatabaseContext context = panel.getBibDatabaseContext();
+            final BibDatabaseContext context = panel.getBibDatabaseContext();
 
             if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
@@ -754,7 +754,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
                 factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
@@ -1158,7 +1158,7 @@ public class JabRefFrame extends BorderPane {
             return;
         }
 
-        BibDatabaseContext context = panel.getBibDatabaseContext();
+        final BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
