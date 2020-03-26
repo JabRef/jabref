@@ -383,7 +383,7 @@ class MainTableColumnFactory {
 
     private String createFileTooltip(List<LinkedFile> linkedFiles) {
         if (linkedFiles.size() > 0) {
-            return Localization.lang("Open file %0", linkedFiles.get(0).getLink());
+            return Localization.lang("Open file %0", linkedFiles.get(0).getTruncatedLink());
         }
         return null;
     }
