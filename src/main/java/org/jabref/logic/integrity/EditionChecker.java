@@ -49,12 +49,8 @@ public class EditionChecker implements ValueChecker {
 
         //BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode()) {
-            if (!isFirstCharDigit(value)) {
-                if (!allowIntegerEdition) {
-                    if (!FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-                        return Optional.of(Localization.lang("should have the first letter capitalized"));
-                    }
-                }
+            if (!isFirstCharDigit(value)&&(!allowIntegerEdition)&&!FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+                return Optional.of(Localization.lang("should have the first letter capitalized"));
             } else {
                 if (!ONLY_NUMERALS.test(value.trim()) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
                     return Optional.of(Localization.lang("should have the first letter capitalized"));
