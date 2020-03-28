@@ -7,15 +7,13 @@ import java.util.Optional;
 public class FileNameUniqueness {
 
     /**
-     * Returns an absolute path to a file which does not match with any existing file names
+     * Returns a file-name such that it does not match any existing files in targetDirectory
      *
      * @param targetDirectory The directory in which file name should be unique
      * @param fileName Suggested name for the file
      * @return a file-name such that it does not match any existing files in targetDirectory.
      * */
     public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
-//        String absoluteName = targetDirectory.resolve(fileName)
-//                .toString();
 
         Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
 
@@ -32,7 +30,6 @@ public class FileNameUniqueness {
             fileNameWithoutExtension = fileName;
         }
 
-//        Path absolutePath = Paths.get(absoluteName);
         String newFileName = fileName;
 
         int counter = 1;

@@ -16,15 +16,14 @@ public class FileNameUniquenessTest {
     protected Path tempDir;
 
     @Test
-    public void testGetNonOverWritingFileNameReturnsSameName(@TempDir Path tempDirectory) throws IOException {
+    public void testGetNonOverWritingFileNameReturnsSameName() throws IOException {
 
         assertFalse(
-                Files.exists(tempDirectory.resolve("sameFile.txt"))
+                Files.exists(tempDir.resolve("sameFile.txt"))
         );
 
-        String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDirectory, "sameFile.txt");
+        String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDir, "sameFile.txt");
         assertEquals("sameFile.txt", outputFileName);
-
     }
 
     @Test
@@ -35,8 +34,6 @@ public class FileNameUniquenessTest {
 
         String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDir, "differentFile.txt");
         assertEquals("differentFile (1).txt", outputFileName);
-
-        Files.delete(dummyFilePath1);
     }
 
     @Test
@@ -49,8 +46,5 @@ public class FileNameUniquenessTest {
 
         String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDir, "manyfiles.txt");
         assertEquals("manyfiles (2).txt", outputFileName);
-
-        Files.delete(dummyFilePath1);
-        Files.delete(dummyFilePath2);
     }
 }
