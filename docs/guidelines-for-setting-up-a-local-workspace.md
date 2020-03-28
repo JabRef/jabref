@@ -214,13 +214,14 @@ Contributions to JabRef's source code need to have a code formatting that is con
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
-* Go to **File \| Settings \| Other Settings \| Checkstyle \| Configuration File**
+* Go to **File \| Settings \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide e.g. "CheckStyle"
+  2. For the description provide e.g. "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Click "Next" and "Finish"
-  5. Activate the CheckStyle configuration file by ticking it in the list
-  6. Save settings by clicking "OK"
+  4. Check "Store relative to project location"
+  5. Click "Next" and "Finish"
+  6. Activate the CheckStyle configuration file by ticking it in the list
+  7. Save settings by clicking "OK"
 
 #### Troubleshooting when using both IDEA and Eclipse
 
