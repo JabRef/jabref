@@ -19,8 +19,10 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -896,14 +898,16 @@ public class BibEntry implements Cloneable {
      * @return the list of linked files, is never null but can be empty.
      * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
      */
-    public List<LinkedFile> getFiles() {
-        //Extract the path
-        Optional<String> oldValue = getField(StandardField.FILE);
-        if (!oldValue.isPresent()) {
-            return new ArrayList<>(); //Return new ArrayList because emptyList is immutable
-        }
+    public ObservableList<LinkedFile> getFiles() {
+        return BindingsHelper.map(getFieldBinding(StandardField.FILE), fieldBinding -> {
+            //Extract the path
+            Optional<String> oldValue = getField(StandardField.FILE);
+            if (oldValue.isEmpty()) {
+                return new ArrayList<>(); //Return new ArrayList because emptyList is immutable
+            }
 
-        return FileFieldParser.parse(oldValue.get());
+            return FileFieldParser.parse(oldValue.get());
+        });
     }
 
     public void setDate(Date date) {
