@@ -32,6 +32,8 @@ import org.fxmisc.easybind.Subscription;
  */
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
 
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
+
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
     private Callback<T, Tooltip> toTooltip;
@@ -68,10 +70,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     }
 
     public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon, Callback<T, Color> toColor) {
-        this.toGraphic = viewModel -> {
-
-            return toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
-        };
+        this.toGraphic = viewModel -> toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
         return this;
     }
 
@@ -185,12 +184,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         getStyleClass().setAll(toStyleClass.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        Tooltip tooltip = toTooltip.call(viewModel);
-                        if (validationStatusProperty != null) {
-                            validationStatusProperty.call(viewModel).getHighestMessage().ifPresent(
-                                    message -> tooltip.setText(message.getMessage()));
-                        }
-                        setTooltip(tooltip);
+                        setTooltip(toTooltip.call(viewModel));
                     }
                     if (toContextMenu != null) {
                         setContextMenu(toContextMenu.call(viewModel));
@@ -215,8 +209,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
                         subscriptions.add(subscription);
                     }
-                    if ((validationStatusProperty != null) && validationStatusProperty.call(viewModel).getHighestMessage().isPresent()) {
-                        setStyle("-fx-background-color: -jr-warn");
+                    if (validationStatusProperty != null) {
+                        validationStatusProperty.call(viewModel).getHighestMessage().ifPresent(message -> {
+                            setTooltip(new Tooltip(message.getMessage()));
+                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS, validationStatusProperty.call(viewModel).validProperty().not()));
+                        });
                     }
                 }
             }
