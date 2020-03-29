@@ -12,6 +12,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 
 import org.jabref.Globals;
@@ -26,6 +27,8 @@ import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -92,6 +95,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             entryButton.setUserData(entryType);
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
             pane.getChildren().add(entryButton);
+
+            String description = getDescription(entryType);
+            if (StringUtil.isNotBlank(description)) {
+                Tooltip tooltip = new Tooltip();
+                tooltip.setText(description);
+                entryButton.setTooltip(tooltip);
+            }
         }
     }
 
@@ -168,4 +178,82 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         viewModel.stopFetching();
         this.close();
     }
+
+    public String getDescription(BibEntryType selectedType) {
+        EntryType entryType = selectedType.getType();
+        try {
+            StandardEntryType entry = (StandardEntryType) entryType;
+            switch (entry) {
+                case Article:
+                    return Localization.lang("An article from a journal or magazine.");
+                case Book:
+                    return Localization.lang("A book with an explicit publisher.");
+                case Booklet:
+                    return Localization.lang("A work that is printed and bound, but without a named publisher orsponsoring institution.");
+                case Collection:
+                    return Localization.lang("A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.");
+                case Conference:
+                    return Localization.lang("The same as Inproceedings, included for Scribe compatibility.");
+                case InBook:
+                    return Localization.lang("A part of a book, which may be a chapter(or section or whatever) and/or a range of pages.");
+                case InCollection:
+                    return Localization.lang("A part of a book having its own title.");
+                case InProceedings:
+                    return Localization.lang("An article in a conference proceedings.");
+                case Manual:
+                    return Localization.lang("Technical documentation.");
+                case MastersThesis:
+                    return Localization.lang("A Masterβ€™s thesis.");
+                case Misc:
+                    return Localization.lang("Use this type when nothing else fits");
+                case PhdThesis:
+                    return Localization.lang("A PhD thesis.");
+                case Proceedings:
+                    return Localization.lang("The proceedings of a conference.");
+                case TechReport:
+                    return Localization.lang("A report published by a school or other institution, usually numbered within a series.");
+                case Unpublished:
+                    return Localization.lang("A document having an author and title, but not formally published.");
+                case BookInBook:
+                    return Localization.lang("This type is similar to inbook but intended for works originally published as astand-alone book.");
+                case InReference:
+                    return Localization.lang("An article in a work of reference.");
+                case MvBook:
+                    return Localization.lang("A multi-volume book.");
+                case MvCollection:
+                    return Localization.lang("A multi-volume collection.");
+                case MvProceedings:
+                    return Localization.lang("A multi-volume proceedings entry.");
+                case MvReference:
+                    return Localization.lang("A multi-volume reference entry. The standard styles will treat this entry typeas an alias for mvcollection.");
+                case Online:
+                    return Localization.lang("This entry type is intended for sources such as web sites which are intrinsically online resources.");
+                case Reference:
+                    return Localization.lang("A single-volume work of reference such as an encyclopedia or a dictionary.");
+                case Report:
+                    return Localization.lang("A technical report, research report, or white paper published by a university or someother institution.");
+                case Set:
+                    return Localization.lang("An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.");
+                case SuppBook:
+                    return Localization.lang("Supplemental material in a book. This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
+                case SuppCollection:
+                    return Localization.lang("Supplemental material in a collection.");
+                case SuppPeriodical:
+                    return Localization.lang("Supplemental material in a periodical. This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
+                case Thesis:
+                    return Localization.lang("A thesis written for an educational institution to satisfy the requirements for a degree.");
+                case WWW:
+                    return Localization.lang("An alias for online, provided for jurabib compatibility.");
+                case Software:
+                    return Localization.lang("Computer software. The standard styles will treat this entry type as an alias for misc.");
+                case DATESET:
+                    return Localization.lang("A data set or a similar collection of (mostly) raw data.");
+            }
+            return "";
+        } catch (Exception e) {
+            return "";
+        }
+
+    }
+
 }
