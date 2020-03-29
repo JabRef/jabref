@@ -7,6 +7,7 @@ import java.util.Set;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.importer.APIKeyPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.field.Field;
 
@@ -15,7 +16,8 @@ public class EntryEditorPreferences {
     private final Map<String, Set<Field>> entryEditorTabList;
     private final FieldWriterPreferences fieldWriterPreferences;
     private final ImportFormatPreferences importFormatPreferences;
-    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+	private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+	private final APIKeyPreferences apiKeyPreferences;
     private final List<Field> customTabFieldNames;
     private final boolean shouldShowRecommendationsTab;
     private final boolean isMrdlibAccepted;
@@ -24,7 +26,7 @@ public class EntryEditorPreferences {
     private boolean avoidOverwritingCiteKey;
     private final boolean shouldShowLatexCitationsTab;
 
-    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey, APIKeyPreferences apiKeyPreferences) {
         this.entryEditorTabList = entryEditorTabList;
         this.fieldWriterPreferences = fieldWriterPreferences;
         this.importFormatPreferences = importFormatPreferences;
@@ -35,7 +37,8 @@ public class EntryEditorPreferences {
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
         this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
-        this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
+		this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
+		this.apiKeyPreferences = apiKeyPreferences;
     }
 
     public Map<String, Set<Field>> getEntryEditorTabList() {
@@ -48,7 +51,11 @@ public class EntryEditorPreferences {
 
     public ImportFormatPreferences getImportFormatPreferences() {
         return importFormatPreferences;
-    }
+	}
+	
+	public APIKeyPreferences getAPIApiKeyPreferences() {
+		return apiKeyPreferences;
+	}
 
     public List<Field> getCustomTabFieldNames() {
         return customTabFieldNames;

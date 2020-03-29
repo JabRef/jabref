@@ -14,6 +14,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jabref.logic.importer.APIKeyPreferences;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -25,9 +27,13 @@ import java.net.MalformedURLException;
 public class WorldcatFetcher implements EntryBasedFetcher {
 
 	private final static String NAME = "Worldcat Fetcher";
-	public final static String API_KEY = "API-KEY-GOES-HERE";
+	public static String API_KEY;
 
 	private final static String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=" + API_KEY;
+
+	public WorldcatFetcher(APIKeyPreferences apiKeyPreferences){
+		API_KEY = apiKeyPreferences.getWorldcatKey();
+	}
 
 	@Override
 	public String getName() {

@@ -65,6 +65,7 @@ import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.APIKeyPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -247,7 +248,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
-    public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+	public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+	public static final String IMPORT_API_WORLDCAT = "importAPIWorldcat";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -627,7 +629,9 @@ public class JabRefPreferences implements PreferencesService {
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         //Default empty String to be backwards compatible
-        defaults.put(IMPORT_FILEDIRPATTERN, "");
+		defaults.put(IMPORT_FILEDIRPATTERN, "");
+		
+		defaults.put(IMPORT_API_WORLDCAT, "");
 
         customImports = new CustomImportList(this);
 
@@ -775,8 +779,9 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(DEFAULT_SHOW_SOURCE),
                 getBibtexKeyPatternPreferences(),
                 Globals.getKeyPrefs(),
-                getBoolean(AVOID_OVERWRITING_KEY));
-    }
+				getBoolean(AVOID_OVERWRITING_KEY),
+				getApiKeyPreferences());
+	}
 
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
@@ -812,7 +817,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public String getTheme() {
         return get(FX_THEME);
-    }
+	}
 
     /**
      * Get a Map of default tab names to deafult tab fields.
@@ -1285,7 +1290,11 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN));
-    }
+	}
+		
+	public APIKeyPreferences getApiKeyPreferences() {
+		return new APIKeyPreferences(get(IMPORT_API_WORLDCAT));
+	}
 
     public FieldWriterPreferences getFieldWriterPreferences() {
         return new FieldWriterPreferences(

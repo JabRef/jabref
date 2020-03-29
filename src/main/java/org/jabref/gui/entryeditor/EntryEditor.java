@@ -97,7 +97,7 @@ public class EntryEditor extends BorderPane {
                   .root(this)
                   .load();
 
-        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+		this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
                 databaseContext);
 
@@ -335,7 +335,7 @@ public class EntryEditor extends BorderPane {
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(entryEditorPreferences.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(entryEditorPreferences.getImportFormatPreferences(), entryEditorPreferences.getAPIApiKeyPreferences())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);

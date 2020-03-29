@@ -22,8 +22,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class WorldcatImporterTest {
-	private final String XML_WITH_RESULT_PATH = "";
-	private final String XML_WITHOUT_RESULT_PATH = "";
 	
 	WorldcatImporter importer;
 
