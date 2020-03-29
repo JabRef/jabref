@@ -9,7 +9,6 @@ import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
-import org.jabref.logic.importer.fetcher.WorldcatFetcher;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfoList;
@@ -22,12 +21,15 @@ import static org.mockito.Mockito.mock;
 
 class WebFetchersTest {
 
-    private ImportFormatPreferences importFormatPreferences;
+	private APIKeyPreferences apiKeyPreferences;
+	private ImportFormatPreferences importFormatPreferences;
+	
     private ClassGraph classGraph = new ClassGraph().enableAllInfo().whitelistPackages("org.jabref");
 
     @BeforeEach
     void setUp() throws Exception {
-        importFormatPreferences = mock(ImportFormatPreferences.class);
+		importFormatPreferences = mock(ImportFormatPreferences.class);
+		apiKeyPreferences = mock(APIKeyPreferences.class);
     }
 
     @Test
@@ -55,7 +57,7 @@ class WebFetchersTest {
 
     @Test
     void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
+        Set<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences, apiKeyPreferences);
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(EntryBasedFetcher.class.getCanonicalName());

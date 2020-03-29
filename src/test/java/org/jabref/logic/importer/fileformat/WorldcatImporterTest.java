@@ -1,42 +1,39 @@
 package org.jabref.logic.importer.fileformat;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
-
-import java.util.function.Predicate;
-import java.util.Collection;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.function.Predicate;
 
-import org.jabref.logic.importer.fileformat.WorldcatImporter;
 import org.jabref.logic.importer.ParserResult;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class WorldcatImporterTest {
 	
 	WorldcatImporter importer;
 
-	private String getFilePath(String filename) throws IOException{
+	private String getFilePath(String filename) throws IOException {
 		Predicate<String> filePredicate = name -> {
 			return name.startsWith(filename) && name.endsWith(".xml");
 		};
 		Collection<String> paths = ImporterTestEngine.getTestFiles(filePredicate);
-		if(paths.size() > 1 || paths.size() == 0){
+		if (paths.size() > 1 || paths.size() == 0) {
 			throw new IllegalArgumentException("Filename returned 0 or more than 1 result: " + filename);
 		}
 		return paths.iterator().next();
 	}
 
-	private String getFileContent(String filename) throws IOException{
+	private String getFileContent(String filename) throws IOException {
 		String path = getFilePath(filename);
 		String content = Files.readString(getPath(path));
 		return content;
@@ -51,30 +48,30 @@ public class WorldcatImporterTest {
     }
 
 	@BeforeEach
-	public void setUp(){
+	public void setUp() {
 		importer = new WorldcatImporter();
 		
 	}
 	
 	@Test
-	public void withResultIsRecognizedFormat() throws IOException{
+	public void withResultIsRecognizedFormat() throws IOException {
 		ImporterTestEngine.testIsRecognizedFormat(new WorldcatImporter(), getFilePath("WorldcatImporterTestWithResult"));
 	}
 
 	@Test
-	public void withoutResultIsRecognizedFormat() throws IOException{
+	public void withoutResultIsRecognizedFormat() throws IOException {
 		ImporterTestEngine.testIsRecognizedFormat(new WorldcatImporter(), getFilePath("WorldcatImporterTestWithoutResult"));
 	}
 
 	@Test
-	public void badXMLIsNotRecognizedFormat() throws IOException{
+	public void badXMLIsNotRecognizedFormat() throws IOException {
 		boolean isReq = importer.isRecognizedFormat("Nah bruh");
 		assertFalse(isReq);
 	}
 
 	@Disabled("Will not work without API key")
 	@Test
-	public void withResultReturnsNonEmptyResult() throws IOException{
+	public void withResultReturnsNonEmptyResult() throws IOException {
 		String withResultXML = getFileContent("WorldcatImporterTestWithResult");
 		ParserResult res = importer.importDatabase(withResultXML);
 		assertTrue(res.getDatabase().getEntries().size() > 0);
@@ -82,7 +79,7 @@ public class WorldcatImporterTest {
 
 	@Disabled("Will not work without API key")
 	@Test
-	public void withoutResultReturnsEmptyResult() throws IOException{
+	public void withoutResultReturnsEmptyResult() throws IOException {
 		String withoutResultXML = getFileContent("WorldcatImporterTestWithResult");
 		ParserResult res = importer.importDatabase(withoutResultXML);
 		assertEquals(0, res.getDatabase().getEntries().size());
