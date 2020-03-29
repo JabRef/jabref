@@ -12,7 +12,6 @@ import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
-import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
