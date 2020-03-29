@@ -59,8 +59,6 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
@@ -74,19 +72,21 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -185,9 +185,12 @@ public class JabRefPreferences implements PreferencesService {
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
-    public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
-    // Timestamp preferences
+
+    public static final String USE_OWNER = "useOwner";
+    public static final String DEFAULT_OWNER = "defaultOwner";
+    public static final String OVERWRITE_OWNER = "overwriteOwner";
+
     public static final String USE_TIME_STAMP = "useTimeStamp";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
@@ -215,8 +218,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
-    public static final String OVERWRITE_OWNER = "overwriteOwner";
-    public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
@@ -1207,16 +1208,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getEnforceLegalKeys() {
-        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
-    }
-
-    @Override
-    public boolean getAllowIntegerEdition() {
-        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
-    }
-
-    @Override
     public void updateEntryEditorTabList() {
         tabList = EntryEditorTabList.create(this);
     }
@@ -1274,16 +1265,6 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
-    @Override
-    public Charset getDefaultEncoding() {
-        return Charset.forName(get(DEFAULT_ENCODING));
-    }
-
-    @Override
-    public void setDefaultEncoding(Charset encoding) {
-        put(DEFAULT_ENCODING, encoding.name());
-    }
-
     public FileHistory getFileHistory() {
         return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
     }
@@ -1299,18 +1280,11 @@ public class JabRefPreferences implements PreferencesService {
         Map<Field, String> fieldDirectories = Stream.of(StandardField.FILE, StandardField.PDF, StandardField.PS)
                                                     .collect(Collectors.toMap(field -> field, field -> get(field.getName() + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
-                                   getUser(),
-                                   fieldDirectories,
-                                   getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
-                                   get(IMPORT_FILENAMEPATTERN),
+                getUser(),
+                fieldDirectories,
+                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN));
-    }
-
-    @Override
-    public UpdateFieldPreferences getUpdateFieldPreferences() {
-        return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT));
     }
 
     public FieldWriterPreferences getFieldWriterPreferences() {
@@ -1396,10 +1370,6 @@ public class JabRefPreferences implements PreferencesService {
                                                getKeywordDelimiter());
     }
 
-    public TimestampPreferences getTimestampPreferences() {
-        return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
-    }
-
     @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         Objects.requireNonNull(journalAbbreviationLoader);
@@ -1416,26 +1386,26 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                                         this.get(JabRefPreferences.OO_JARS_PATH),
-                                         this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                                         this.get(JabRefPreferences.OO_PATH),
-                                         this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                                         this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                                         this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                                         this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                                         this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(JabRefPreferences.OO_JARS_PATH),
+                get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                get(JabRefPreferences.OO_PATH),
+                getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
-        this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
-        this.put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
-        this.putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
-        this.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        this.putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
-        this.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
-        this.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
+        put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
+        put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
+        put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
+        putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
+        putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
+        putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
+        putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
+        put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
     private NameFormatterPreferences getNameFormatterPreferences() {
@@ -1655,22 +1625,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public Boolean shouldCollectTelemetry() {
-        return getBoolean(COLLECT_TELEMETRY);
-    }
-
-    public void setShouldCollectTelemetry(boolean value) {
-        putBoolean(COLLECT_TELEMETRY, value);
-    }
-
-    public Boolean shouldAskToCollectTelemetry() {
-        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
-    }
-
-    public void askedToCollectTelemetry() {
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
-    }
-
     @Override
     public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
         putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
@@ -1864,33 +1818,12 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public String getFontFamily() {
-        return get(FONT_FAMILY);
-    }
-
     public String setLastPreferencesExportPath() {
         return get(PREFS_EXPORT_PATH);
     }
 
     public void setLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
-    public Language getLanguage() {
-        String languageId = get(LANGUAGE);
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
-    }
-
-    public void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setLanguageDependentDefaultValues();
-        }
     }
 
     public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
@@ -1980,7 +1913,6 @@ public class JabRefPreferences implements PreferencesService {
                                                                                 .map(entryType -> entryType).collect(Collectors.toList());
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
-
     }
 
     public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
@@ -2004,5 +1936,124 @@ public class JabRefPreferences implements PreferencesService {
 
         // we also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = escapeChars;
+    }
+
+    //*************************************************************************************************************
+    // GeneralPreferences
+    //*************************************************************************************************************
+
+    @Override
+    public Language getLanguage() {
+        String languageId = get(LANGUAGE);
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
+    }
+
+    @Override
+    public void setLanguage(Language language) {
+        Language oldLanguage = getLanguage();
+        put(LANGUAGE, language.getId());
+        if (language != oldLanguage) {
+            // Update any defaults that might be language dependent:
+            setLanguageDependentDefaultValues();
+        }
+    }
+
+    @Override
+    public Charset getDefaultEncoding() {
+        return Charset.forName(get(DEFAULT_ENCODING));
+    }
+
+    @Override
+    public boolean shouldCollectTelemetry() {
+        return getBoolean(COLLECT_TELEMETRY);
+    }
+
+    @Override
+    public void setShouldCollectTelemetry(boolean value) {
+        putBoolean(COLLECT_TELEMETRY, value);
+    }
+
+    @Override
+    public boolean shouldAskToCollectTelemetry() {
+        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
+    }
+
+    @Override
+    public void askedToCollectTelemetry() {
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
+    }
+
+    @Override
+    public boolean getEnforceLegalKeys() {
+        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    }
+
+    @Override
+    public boolean getAllowIntegerEdition() {
+        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
+    }
+
+    @Override
+    public GeneralPreferences getGeneralPreferences() {
+        return new GeneralPreferences(
+                getDefaultEncoding(),
+                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
+                getBoolean(MEMORY_STICK_MODE),
+                shouldCollectTelemetry(),
+                getBoolean(SHOW_ADVANCED_HINTS));
+    }
+
+    @Override
+    public void storeGeneralPreferences(GeneralPreferences preferences) {
+        put(DEFAULT_ENCODING, preferences.getDefaultEncoding().name());
+        putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
+        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
+        putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
+        putBoolean(ENFORCE_LEGAL_BIBTEX_KEY, preferences.isEnforceLegalBibtexKey());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
+        putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
+        setShouldCollectTelemetry(preferences.isCollectTelemetry());
+        putBoolean(SHOW_ADVANCED_HINTS, preferences.isShowAdvancedHints());
+    }
+
+    @Override
+    public OwnerPreferences getOwnerPreferences() {
+        return new OwnerPreferences(
+                getBoolean(USE_OWNER),
+                get(DEFAULT_OWNER),
+                getBoolean(OVERWRITE_OWNER));
+    }
+
+    @Override
+    public void storeOwnerPreferences(OwnerPreferences preferences) {
+        putBoolean(USE_OWNER, preferences.isUseOwner());
+        put(DEFAULT_OWNER, preferences.getDefaultOwner());
+        putBoolean(OVERWRITE_OWNER, preferences.isOverwriteOwner());
+    }
+
+    @Override
+    public TimestampPreferences getTimestampPreferences() {
+        return new TimestampPreferences(
+                getBoolean(USE_TIME_STAMP),
+                getBoolean(UPDATE_TIMESTAMP),
+                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
+                get(TIME_STAMP_FORMAT),
+                getBoolean(OVERWRITE_TIME_STAMP));
+    }
+
+    @Override
+    public void storeTimestampPreferences(TimestampPreferences preferences) {
+        putBoolean(USE_TIME_STAMP, preferences.isUseTimestamps());
+        putBoolean(UPDATE_TIMESTAMP, preferences.isUpdateTimestamp());
+        put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
+        put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
+        putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
     }
 }

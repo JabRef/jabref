@@ -4,7 +4,7 @@ import java.util.List;
 
 import javafx.scene.input.DataFormat;
 
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 
 /**
  * Contains all the different {@link DataFormat}s that may occur in JabRef.
