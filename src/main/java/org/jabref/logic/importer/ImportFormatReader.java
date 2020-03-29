@@ -71,9 +71,7 @@ public class ImportFormatReader {
         formats.add(new SilverPlatterImporter());
 
         // Get custom import formats
-        for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
-            formats.add(importer);
-        }
+        formats.addAll(importFormatPreferences.getCustomImportList());
     }
 
     /**

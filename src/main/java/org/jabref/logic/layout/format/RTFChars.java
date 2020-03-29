@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  *   1.) Remove LaTeX-Command sequences.
  *
- *   2.) Replace LaTeX-Special chars with RTF aquivalents.
+ *   2.) Replace LaTeX-Special chars with RTF equivalents.
  *
  *   3.) Replace emph and textit and textbf with their RTF replacements.
  *
