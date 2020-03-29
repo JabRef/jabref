@@ -9,6 +9,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.base.Strings;
+
 public class EditionChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
@@ -61,7 +63,6 @@ public class EditionChecker implements ValueChecker {
     }
 
     boolean isFirstCharDigit(String input) {
-        char[] array = input.toCharArray();
-        return Character.isDigit(array[0]);
+        return !Strings.isNullOrEmpty(input) && Character.isDigit(input.charAt(0));
     }
 }
