@@ -41,8 +41,10 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Fetch all history for all tags and branches
-        run: git fetch --prune --unshallow
+      - name: Fetch infomration required for GitVersion
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.1
         with:
