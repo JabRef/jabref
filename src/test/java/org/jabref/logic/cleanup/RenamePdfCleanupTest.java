@@ -35,7 +35,7 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
-        context.setDatabaseFile(path);
+        context.setDatabasePath(path);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");

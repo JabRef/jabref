@@ -3,7 +3,7 @@
 [![Deployment Status](https://github.com/JabRef/jabref/workflows/Deployment/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ADeployment)
 [![Build Status](https://github.com/JabRef/jabref/workflows/Tests/badge.svg)](https://github.com/JabRef/jabref/actions?query=workflow%3ATests)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
-[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
+[![Paypal Donate](https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square)](https://paypal.me/JabRef)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/jabref/localized.svg)](https://crowdin.com/project/jabref)
 
 JabRef is an open-source, cross-platform citation and reference management tool.
@@ -90,7 +90,7 @@ We will discuss improvements with you and agree to merge them once the [develope
 
 If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/guidelines-for-setting-up-a-local-workspace/).
 
-To compile JabRef from source, you need a Java Development Kit 13 and `JAVA_HOME` pointing to this JDK.
+To compile JabRef from source, you need a Java Development Kit 14 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.
 When you want to develop, it is necessary to generate additional sources using `gradlew generateSource`
 and then generate the Eclipse `gradlew eclipse`.

@@ -74,30 +74,15 @@ public class BibDatabaseContext {
         metaData.setMode(bibDatabaseMode);
     }
 
+    public void setDatabasePath(Path file) {
+        this.file = Optional.ofNullable(file);
+    }
+
     /**
      * Get the file where this database was last saved to or loaded from, if any.
      *
      * @return Optional of the relevant File, or Optional.empty() if none is defined.
-     * @deprecated use {@link #getDatabasePath()} instead
      */
-    @Deprecated
-    public Optional<File> getDatabaseFile() {
-        return file.map(Path::toFile);
-    }
-
-    /**
-     * @param file the database file
-     * @deprecated use {@link #setDatabaseFile(Path)}
-     */
-    @Deprecated
-    public void setDatabaseFile(File file) {
-        this.file = Optional.ofNullable(file).map(File::toPath);
-    }
-
-    public void setDatabaseFile(Path file) {
-        this.file = Optional.ofNullable(file);
-    }
-
     public Optional<Path> getDatabasePath() {
         return file;
     }
@@ -204,19 +189,19 @@ public class BibDatabaseContext {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
         // the file path of this BIB file:
-        Optional<File> databaseFile = getDatabaseFile();
+        Optional<Path> databaseFile = getDatabasePath();
         if (!new File(dir).isAbsolute() && databaseFile.isPresent()) {
-            String relDir;
+            Path relDir;
             if (".".equals(dir)) {
                 // if dir is only "current" directory, just use its parent (== real current directory) as path
                 relDir = databaseFile.get().getParent();
             } else {
-                relDir = databaseFile.get().getParent() + File.separator + dir;
+                relDir = databaseFile.get().getParent().resolve(dir);
             }
             // If this directory actually exists, it is very likely that the
             // user wants us to use it:
-            if (new File(relDir).exists()) {
-                dir = relDir;
+            if (Files.exists(relDir)) {
+                dir = relDir.toString();
             }
         }
         return dir;

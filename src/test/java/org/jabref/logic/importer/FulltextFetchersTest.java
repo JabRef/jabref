@@ -59,7 +59,7 @@ public class FulltextFetchersTest {
     }
 
     @Test
-    public void higherTrustLevelWins() throws MalformedURLException, IOException, FetcherException {
+    public void higherTrustLevelWins() throws IOException, FetcherException {
         final URL lowUrl = new URL("http://docs.oasis-open.org/opencsa/sca-bpel/sca-bpel-1.1-spec-cd-01.pdf");
         final URL highUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
 

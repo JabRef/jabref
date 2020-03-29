@@ -23,7 +23,7 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;

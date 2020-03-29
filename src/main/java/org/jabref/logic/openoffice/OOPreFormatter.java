@@ -19,7 +19,7 @@ public class OOPreFormatter implements LayoutFormatter {
         int i;
         String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+                .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;

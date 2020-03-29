@@ -30,12 +30,25 @@ public class BibtexExtractorViewModel {
     private TaskExecutor taskExecutor;
     private ImportHandler importHandler;
 
-    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext, DialogService dialogService,
-                                    JabRefPreferences jabRefPreferences, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, UndoManager undoManager, StateManager stateManager) {
+    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
+                                    DialogService dialogService,
+                                    JabRefPreferences jabRefPreferences,
+                                    FileUpdateMonitor fileUpdateMonitor,
+                                    TaskExecutor taskExecutor,
+                                    UndoManager undoManager,
+                                    StateManager stateManager) {
+
         this.dialogService = dialogService;
         currentCitationfetcher = new GrobidCitationFetcher(jabRefPreferences.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
-        this.importHandler = new ImportHandler(dialogService, bibdatabaseContext, ExternalFileTypes.getInstance(), jabRefPreferences.getFilePreferences(), jabRefPreferences.getImportFormatPreferences(), jabRefPreferences.getUpdateFieldPreferences(), fileUpdateMonitor, undoManager, stateManager);
+        this.importHandler = new ImportHandler(
+                dialogService,
+                bibdatabaseContext,
+                ExternalFileTypes.getInstance(),
+                jabRefPreferences,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager);
     }
 
     public StringProperty inputTextProperty() {

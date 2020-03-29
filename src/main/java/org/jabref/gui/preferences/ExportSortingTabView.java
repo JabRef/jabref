@@ -3,42 +3,45 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.Label;
+import javafx.fxml.FXML;
 
-import org.jabref.gui.SaveOrderConfigDisplayView;
+import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ExportSortingTabView extends AbstractPreferenceTabView implements PreferencesTab {
+import com.airhacks.afterburner.views.ViewLoader;
 
-    private final SaveOrderConfigDisplayView exportOrderPanel;
+public class ExportSortingTabView extends AbstractPreferenceTabView<ExportSortingTabViewModel> implements PreferencesTab {
+
+    @FXML private SaveOrderConfigPanel exportOrderPanel;
 
     public ExportSortingTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
-        Label title = new Label(Localization.lang("Export sorting"));
-        title.getStyleClass().add("titleHeader");
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+    }
 
-        exportOrderPanel = new SaveOrderConfigDisplayView();
-        exportOrderPanel.setValues(preferences.loadExportSaveOrder());
+    public void initialize() {
+        this.viewModel = new ExportSortingTabViewModel(preferences);
 
-        this.setWidth(650.0);
-        this.setSpacing(10.0);
-        this.getChildren().addAll(title, exportOrderPanel);
+        exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
+        exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
+        exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        exportOrderPanel.primarySortFieldsProperty().bind(viewModel.primarySortFieldsProperty());
+        exportOrderPanel.secondarySortFieldsProperty().bind(viewModel.secondarySortFieldsProperty());
+        exportOrderPanel.tertiarySortFieldsProperty().bind(viewModel.tertiarySortFieldsProperty());
+        exportOrderPanel.savePrimaryDescPropertySelected().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
+        exportOrderPanel.saveSecondaryDescPropertySelected().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
+        exportOrderPanel.saveTertiaryDescPropertySelected().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
+        exportOrderPanel.savePrimarySortSelectedValueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
+        exportOrderPanel.saveSecondarySortSelectedValueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
+        exportOrderPanel.saveTertiarySortSelectedValueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
     }
 
     @Override
     public String getTabName() { return Localization.lang("Export sorting"); }
-
-    @Override
-    public void setValues() {
-        exportOrderPanel.setValues(preferences.loadExportSaveOrder());
-    }
-
-    @Override
-    public void storeSettings() {
-        exportOrderPanel.storeConfig();
-    }
 
     @Override
     public boolean validateSettings() {
