@@ -17,10 +17,7 @@ public class FileNameUniquenessTest {
 
     @Test
     public void testGetNonOverWritingFileNameReturnsSameName() throws IOException {
-
-        assertFalse(
-                Files.exists(tempDir.resolve("sameFile.txt"))
-        );
+        assertFalse(Files.exists(tempDir.resolve("sameFile.txt")));
 
         String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDir, "sameFile.txt");
         assertEquals("sameFile.txt", outputFileName);
