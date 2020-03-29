@@ -3,6 +3,8 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.fxml.FXML;
@@ -20,14 +22,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
 import org.jabref.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
@@ -51,6 +54,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     @FXML private Button resetDefaultButton;
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
+    @Inject private StateManager stateManager;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -101,7 +105,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     public String getTabName() { return Localization.lang("Entry preview"); }
 
     public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager);
 
         lastKeyPressTime = System.currentTimeMillis();
 

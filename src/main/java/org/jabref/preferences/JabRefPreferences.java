@@ -59,8 +59,6 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
@@ -74,19 +72,21 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -125,7 +125,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String VIM = "vim";
     public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
-    public static final String FONT_FAMILY = "fontFamily";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
@@ -137,13 +136,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeightFX";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
-    public static final String USE_DEFAULT_LOOK_AND_FEEL = "useDefaultLookAndFeel";
-    public static final String PROXY_PORT = "proxyPort";
-    public static final String PROXY_HOSTNAME = "proxyHostname";
-    public static final String PROXY_USE = "useProxy";
-    public static final String PROXY_USERNAME = "proxyUsername";
-    public static final String PROXY_PASSWORD = "proxyPassword";
-    public static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
     public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = "reformatFileOnSaveAndExport";
     public static final String EXPORT_IN_ORIGINAL_ORDER = "exportInOriginalOrder";
@@ -159,7 +151,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String COLUMN_WIDTHS = "columnWidths";
     public static final String COLUMN_SORT_TYPES = "columnSortTypes";
     public static final String COLUMN_SORT_ORDER = "columnSortOrder";
-
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
@@ -171,24 +162,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIZE_X = "mainWindowSizeX";
     public static final String POS_Y = "mainWindowPosY";
     public static final String POS_X = "mainWindowPosX";
-    public static final String STRINGS_SIZE_Y = "stringsSizeY";
-    public static final String STRINGS_SIZE_X = "stringsSizeX";
-    public static final String STRINGS_POS_Y = "stringsPosY";
-    public static final String STRINGS_POS_X = "stringsPosX";
-    public static final String DUPLICATES_SIZE_Y = "duplicatesSizeY";
-    public static final String DUPLICATES_SIZE_X = "duplicatesSizeX";
-    public static final String DUPLICATES_POS_Y = "duplicatesPosY";
-    public static final String DUPLICATES_POS_X = "duplicatesPosX";
-    public static final String MERGEENTRIES_SIZE_Y = "mergeEntriesSizeY";
-    public static final String MERGEENTRIES_SIZE_X = "mergeEntriesSizeX";
-    public static final String MERGEENTRIES_POS_Y = "mergeEntriesPosY";
-    public static final String MERGEENTRIES_POS_X = "mergeEntriesPosX";
-    public static final String PREAMBLE_SIZE_Y = "preambleSizeY";
-    public static final String PREAMBLE_SIZE_X = "preambleSizeX";
-    public static final String PREAMBLE_POS_Y = "preamblePosY";
-    public static final String PREAMBLE_POS_X = "preamblePosX";
-    public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
-    public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -205,25 +178,19 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
-    // Colors
-    public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
-    public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
-    public static final String INVALID_FIELD_BACKGROUND_COLOR = "invalidFieldBackgroundColor";
-    public static final String VALID_FIELD_BACKGROUND_COLOR = "validFieldBackgroundColor";
-    public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
-    public static final String FONT_SIZE = "fontSize";
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
-    public static final String FONT_STYLE = "fontStyle";
 
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
-    public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
-    public static final String TOOLBAR_VISIBLE = "toolbarVisible";
-    // Timestamp preferences
+
+    public static final String USE_OWNER = "useOwner";
+    public static final String DEFAULT_OWNER = "defaultOwner";
+    public static final String OVERWRITE_OWNER = "overwriteOwner";
+
     public static final String USE_TIME_STAMP = "useTimeStamp";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
@@ -241,9 +208,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String CONSOLE_COMMAND = "consoleCommand";
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
-    public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
-    public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
-    public static final String USE_PDF_READER = "usePDFReader";
     public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
 
@@ -254,8 +218,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
-    public static final String OVERWRITE_OWNER = "overwriteOwner";
-    public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
@@ -296,14 +258,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEND_OS_DATA = "sendOSData";
     public static final String SEND_TIMEZONE_DATA = "sendTimezoneData";
     public static final String VALIDATE_IN_ENTRY_EDITOR = "validateInEntryEditor";
-    // Dropped file handler
-    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
-    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    // Remote
-    public static final String USE_REMOTE_SERVER = "useRemoteServer";
-    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     /**
      * The OpenOffice/LibreOffice connection preferences are:
@@ -326,10 +280,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
 
-    public static final String STYLES_SIZE_Y = "stylesSizeY";
-    public static final String STYLES_SIZE_X = "stylesSizeX";
-    public static final String STYLES_POS_Y = "stylesPosY";
-    public static final String STYLES_POS_X = "stylesPosX";
     // Special field preferences
     public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
@@ -355,12 +305,23 @@ public class JabRefPreferences implements PreferencesService {
     // String delimiter
     public static final Character STRINGLIST_DELIMITER = ';';
 
+    // UI
+    private static final String FONT_FAMILY = "fontFamily";
+
     // Preview
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
     private static final String CYCLE_PREVIEW = "cyclePreview";
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeightFX";
     private static final String PREVIEW_AS_TAB = "previewAsTab";
+
+    // Proxy
+    private static final String PROXY_PORT = "proxyPort";
+    private static final String PROXY_HOSTNAME = "proxyHostname";
+    private static final String PROXY_USE = "useProxy";
+    private static final String PROXY_USERNAME = "proxyUsername";
+    private static final String PROXY_PASSWORD = "proxyPassword";
+    private static final String PROXY_USE_AUTHENTICATION = "useProxyAuthentication";
 
     // Auto completion
     private static final String AUTO_COMPLETE = "autoComplete";
@@ -402,6 +363,10 @@ public class JabRefPreferences implements PreferencesService {
     private static final int EXPORTER_NAME_INDEX = 0;
     private static final int EXPORTER_FILENAME_INDEX = 1;
     private static final int EXPORTER_EXTENSION_INDEX = 2;
+
+    // Remote
+    private static final String USE_REMOTE_SERVER = "useRemoteServer";
+    private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -482,7 +447,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
-        defaults.put(USE_DEFAULT_LOOK_AND_FEEL, Boolean.TRUE);
         defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
         defaults.put(VIM, "vim");
         defaults.put(VIM_SERVER, "vim");
@@ -535,22 +499,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
         defaults.put(LAST_FOCUSED, "");
-        defaults.put(STRINGS_POS_X, 0);
-        defaults.put(STRINGS_POS_Y, 0);
-        defaults.put(STRINGS_SIZE_X, 600);
-        defaults.put(STRINGS_SIZE_Y, 400);
-        defaults.put(DUPLICATES_POS_X, 0);
-        defaults.put(DUPLICATES_POS_Y, 0);
-        defaults.put(DUPLICATES_SIZE_X, 800);
-        defaults.put(DUPLICATES_SIZE_Y, 600);
-        defaults.put(MERGEENTRIES_POS_X, 0);
-        defaults.put(MERGEENTRIES_POS_Y, 0);
-        defaults.put(MERGEENTRIES_SIZE_X, 800);
-        defaults.put(MERGEENTRIES_SIZE_Y, 600);
-        defaults.put(PREAMBLE_POS_X, 0);
-        defaults.put(PREAMBLE_POS_Y, 0);
-        defaults.put(PREAMBLE_SIZE_X, 600);
-        defaults.put(PREAMBLE_SIZE_Y, 400);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
@@ -576,23 +524,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
-        defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
-
-        defaults.put(FONT_STYLE, 0); //for backwards compatibility, is equal to java.awt.Font.PLAIN
-        defaults.put(FONT_SIZE, 12);
-        // Main table color settings:
-        defaults.put(VALID_FIELD_BACKGROUND_COLOR, "255:255:255");
-        defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
-        defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
-        defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
-
-        // default icon colors
-        defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -621,10 +557,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
-        defaults.put(STYLES_POS_X, 0);
-        defaults.put(STYLES_POS_Y, 0);
-        defaults.put(STYLES_SIZE_X, 600);
-        defaults.put(STYLES_SIZE_Y, 400);
 
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
         defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.TRUE);
@@ -692,12 +624,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertDefaultCleanupPreset(defaults);
 
-        // defaults for DroppedFileHandler UI
-        defaults.put(DROPPEDFILEHANDLER_LEAVE, Boolean.FALSE);
-        defaults.put(DROPPEDFILEHANDLER_COPY, Boolean.TRUE);
-        defaults.put(DROPPEDFILEHANDLER_MOVE, Boolean.FALSE);
-        defaults.put(DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
-
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         //Default empty String to be backwards compatible
@@ -716,15 +642,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
-            defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
-            defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
-            defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
             defaults.put(FILE_BROWSER_COMMAND, "explorer.exe /select, \"%DIR\"");
         } else {
             defaults.put(CONSOLE_COMMAND, "");
-            defaults.put(ADOBE_ACROBAT_COMMAND, "");
-            defaults.put(SUMATRA_PDF_COMMAND, "");
-            defaults.put(USE_PDF_READER, "");
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
@@ -772,28 +692,6 @@ public class JabRefPreferences implements PreferencesService {
 
     private static String convertListToString(List<String> value) {
         return value.stream().map(val -> StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), '\\')).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));
-    }
-
-    /**
-     * Looks up a color definition in preferences, and returns an array containing the RGB values.
-     *
-     * @param value The key for this setting.
-     * @return The RGB values corresponding to this color setting.
-     */
-    private static int[] getRgb(String value) {
-        int[] values = new int[3];
-
-        if ((value != null) && !value.isEmpty()) {
-            String[] elements = value.split(":");
-            values[0] = Integer.parseInt(elements[0]);
-            values[1] = Integer.parseInt(elements[1]);
-            values[2] = Integer.parseInt(elements[2]);
-        } else {
-            values[0] = 0;
-            values[1] = 0;
-            values[2] = 0;
-        }
-        return values;
     }
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
@@ -1095,24 +993,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Looks up a color definition in preferences, and returns the Color object.
-     *
-     * @param key The key for this setting.
-     * @return The color corresponding to the setting.
-     */
-    public Color getColor(String key) {
-        String value = get(key);
-        int[] rgb = getRgb(value);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
-    }
-
-    public Color getDefaultColor(String key) {
-        String value = (String) defaults.get(key);
-        int[] rgb = getRgb(value);
-        return Color.rgb(rgb[0], rgb[1], rgb[2]);
-    }
-
-    /**
      * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
      *
      * @return the default BibDatabaseMode
@@ -1328,16 +1208,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getEnforceLegalKeys() {
-        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
-    }
-
-    @Override
-    public boolean getAllowIntegerEdition() {
-        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
-    }
-
-    @Override
     public void updateEntryEditorTabList() {
         tabList = EntryEditorTabList.create(this);
     }
@@ -1395,16 +1265,6 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
-    @Override
-    public Charset getDefaultEncoding() {
-        return Charset.forName(get(DEFAULT_ENCODING));
-    }
-
-    @Override
-    public void setDefaultEncoding(Charset encoding) {
-        put(DEFAULT_ENCODING, encoding.name());
-    }
-
     public FileHistory getFileHistory() {
         return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
     }
@@ -1420,18 +1280,11 @@ public class JabRefPreferences implements PreferencesService {
         Map<Field, String> fieldDirectories = Stream.of(StandardField.FILE, StandardField.PDF, StandardField.PS)
                                                     .collect(Collectors.toMap(field -> field, field -> get(field.getName() + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
-                                   getUser(),
-                                   fieldDirectories,
-                                   getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
-                                   get(IMPORT_FILENAMEPATTERN),
+                getUser(),
+                fieldDirectories,
+                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN));
-    }
-
-    @Override
-    public UpdateFieldPreferences getUpdateFieldPreferences() {
-        return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
-                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT));
     }
 
     public FieldWriterPreferences getFieldWriterPreferences() {
@@ -1517,10 +1370,6 @@ public class JabRefPreferences implements PreferencesService {
                                                getKeywordDelimiter());
     }
 
-    public TimestampPreferences getTimestampPreferences() {
-        return new TimestampPreferences(getBoolean(USE_TIME_STAMP), getBoolean(UPDATE_TIMESTAMP), FieldFactory.parseField(get(TIME_STAMP_FIELD)), get(TIME_STAMP_FORMAT), getBoolean(OVERWRITE_TIME_STAMP));
-    }
-
     @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         Objects.requireNonNull(journalAbbreviationLoader);
@@ -1537,26 +1386,26 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                                         this.get(JabRefPreferences.OO_JARS_PATH),
-                                         this.get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                                         this.get(JabRefPreferences.OO_PATH),
-                                         this.getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                                         this.getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                                         this.getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                                         this.getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                                         this.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(JabRefPreferences.OO_JARS_PATH),
+                get(JabRefPreferences.OO_EXECUTABLE_PATH),
+                get(JabRefPreferences.OO_PATH),
+                getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
+                getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
+                getBoolean(JabRefPreferences.OO_SHOW_PANEL),
+                getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
+                get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        this.put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
-        this.put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
-        this.put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
-        this.putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
-        this.putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        this.putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
-        this.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
-        this.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
+        put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
+        put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
+        put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
+        putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
+        putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
+        putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
+        putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
+        put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
     private NameFormatterPreferences getNameFormatterPreferences() {
@@ -1776,22 +1625,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public Boolean shouldCollectTelemetry() {
-        return getBoolean(COLLECT_TELEMETRY);
-    }
-
-    public void setShouldCollectTelemetry(boolean value) {
-        putBoolean(COLLECT_TELEMETRY, value);
-    }
-
-    public Boolean shouldAskToCollectTelemetry() {
-        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
-    }
-
-    public void askedToCollectTelemetry() {
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
-    }
-
     @Override
     public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
         putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
@@ -1985,33 +1818,12 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public String getFontFamily() {
-        return get(FONT_FAMILY);
-    }
-
     public String setLastPreferencesExportPath() {
         return get(PREFS_EXPORT_PATH);
     }
 
     public void setLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
-    public Language getLanguage() {
-        String languageId = get(LANGUAGE);
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
-    }
-
-    public void setLanguage(Language language) {
-        Language oldLanguage = getLanguage();
-        put(LANGUAGE, language.getId());
-        if (language != oldLanguage) {
-            // Update any defaults that might be language dependent:
-            setLanguageDependentDefaultValues();
-        }
     }
 
     public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
@@ -2097,11 +1909,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()                                                  
+        List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()
                                                                                 .map(entryType -> entryType).collect(Collectors.toList());
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
-
     }
 
     public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
@@ -2109,7 +1920,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (application.getApplicationName() != get(PUSH_TO_APPLICATION)) {
+        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
             put(PUSH_TO_APPLICATION, application.getApplicationName());
             manager.updateApplicationAction();
         }
@@ -2120,10 +1931,129 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.getEscapeChars();
+        String escapeChars = newLineSeparator.toString();
         put(JabRefPreferences.NEWLINE, escapeChars);
 
         // we also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = escapeChars;
+    }
+
+    //*************************************************************************************************************
+    // GeneralPreferences
+    //*************************************************************************************************************
+
+    @Override
+    public Language getLanguage() {
+        String languageId = get(LANGUAGE);
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
+    }
+
+    @Override
+    public void setLanguage(Language language) {
+        Language oldLanguage = getLanguage();
+        put(LANGUAGE, language.getId());
+        if (language != oldLanguage) {
+            // Update any defaults that might be language dependent:
+            setLanguageDependentDefaultValues();
+        }
+    }
+
+    @Override
+    public Charset getDefaultEncoding() {
+        return Charset.forName(get(DEFAULT_ENCODING));
+    }
+
+    @Override
+    public boolean shouldCollectTelemetry() {
+        return getBoolean(COLLECT_TELEMETRY);
+    }
+
+    @Override
+    public void setShouldCollectTelemetry(boolean value) {
+        putBoolean(COLLECT_TELEMETRY, value);
+    }
+
+    @Override
+    public boolean shouldAskToCollectTelemetry() {
+        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
+    }
+
+    @Override
+    public void askedToCollectTelemetry() {
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
+    }
+
+    @Override
+    public boolean getEnforceLegalKeys() {
+        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    }
+
+    @Override
+    public boolean getAllowIntegerEdition() {
+        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
+    }
+
+    @Override
+    public GeneralPreferences getGeneralPreferences() {
+        return new GeneralPreferences(
+                getDefaultEncoding(),
+                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
+                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
+                getBoolean(CONFIRM_DELETE),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
+                getBoolean(MEMORY_STICK_MODE),
+                shouldCollectTelemetry(),
+                getBoolean(SHOW_ADVANCED_HINTS));
+    }
+
+    @Override
+    public void storeGeneralPreferences(GeneralPreferences preferences) {
+        put(DEFAULT_ENCODING, preferences.getDefaultEncoding().name());
+        putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
+        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
+        putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
+        putBoolean(ENFORCE_LEGAL_BIBTEX_KEY, preferences.isEnforceLegalBibtexKey());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
+        putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
+        setShouldCollectTelemetry(preferences.isCollectTelemetry());
+        putBoolean(SHOW_ADVANCED_HINTS, preferences.isShowAdvancedHints());
+    }
+
+    @Override
+    public OwnerPreferences getOwnerPreferences() {
+        return new OwnerPreferences(
+                getBoolean(USE_OWNER),
+                get(DEFAULT_OWNER),
+                getBoolean(OVERWRITE_OWNER));
+    }
+
+    @Override
+    public void storeOwnerPreferences(OwnerPreferences preferences) {
+        putBoolean(USE_OWNER, preferences.isUseOwner());
+        put(DEFAULT_OWNER, preferences.getDefaultOwner());
+        putBoolean(OVERWRITE_OWNER, preferences.isOverwriteOwner());
+    }
+
+    @Override
+    public TimestampPreferences getTimestampPreferences() {
+        return new TimestampPreferences(
+                getBoolean(USE_TIME_STAMP),
+                getBoolean(UPDATE_TIMESTAMP),
+                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
+                get(TIME_STAMP_FORMAT),
+                getBoolean(OVERWRITE_TIME_STAMP));
+    }
+
+    @Override
+    public void storeTimestampPreferences(TimestampPreferences preferences) {
+        putBoolean(USE_TIME_STAMP, preferences.isUseTimestamps());
+        putBoolean(UPDATE_TIMESTAMP, preferences.isUpdateTimestamp());
+        put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
+        put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
+        putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
     }
 }

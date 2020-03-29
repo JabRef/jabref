@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
-import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
 import org.jabref.gui.edit.CopyMoreAction;
@@ -243,18 +242,6 @@ public class JabRefFrame extends BorderPane {
                         tabbedPane.getSelectionModel().selectPrevious();
                         event.consume();
                         break;
-                    case INCREASE_TABLE_FONT_SIZE:
-                        increaseTableFontSize();
-                        event.consume();
-                        break;
-                    case DECREASE_TABLE_FONT_SIZE:
-                        decreaseTableFontSize();
-                        event.consume();
-                        break;
-                    case DEFAULT_TABLE_FONT_SIZE:
-                        setDefaultTableFontSize();
-                        event.consume();
-                        break;
                     case SEARCH:
                         getGlobalSearchBar().focus();
                         break;
@@ -318,9 +305,9 @@ public class JabRefFrame extends BorderPane {
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabaseFile()
-                                       .map(File::getPath)
-                                       .orElse(GUIGlobals.UNTITLED_TITLE);
+                                       .getDatabasePath()
+                                       .map(Path::toString)
+                                       .orElse(Localization.lang("untitled"));
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
             //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
@@ -367,7 +354,7 @@ public class JabRefFrame extends BorderPane {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
+                Path focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabasePath().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
         }
@@ -392,7 +379,7 @@ public class JabRefFrame extends BorderPane {
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
-            BibDatabaseContext context = panel.getBibDatabaseContext();
+            final BibDatabaseContext context = panel.getBibDatabaseContext();
 
             if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
@@ -406,7 +393,7 @@ public class JabRefFrame extends BorderPane {
             }
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context);
-            context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
+            context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
@@ -500,9 +487,9 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
                 factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT,this, stateManager)),
-                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY,this, stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE,this, stateManager)),
+                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
+                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
+                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
                 new Separator(Orientation.VERTICAL),
                 pushToApplicationButton,
                 factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
@@ -735,12 +722,13 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction( this, stateManager)),
+                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager))
+                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
+                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
@@ -765,11 +753,10 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
         );
 
         quality.getItems().addAll(
@@ -792,15 +779,20 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs))
         );
 
-        lookup.getItems().addAll(
-                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(this, dialogService, stateManager))
-        );
-
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
         for (IdFetcher<?> fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             LookupIdentifierAction<?> identifierAction = new LookupIdentifierAction<>(this, fetcher, stateManager, undoManager);
             lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));
         }
+
+        lookup.getItems().addAll(
+                lookupIdentifiers,
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager))
+        );
 
         // PushToApplication
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
@@ -813,14 +805,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
-
-                new SeparatorMenuItem(),
-
-                lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, prefs)),
 
                 new SeparatorMenuItem(),
 
@@ -907,6 +893,7 @@ public class JabRefFrame extends BorderPane {
                 edit,
                 library,
                 quality,
+                lookup,
                 tools,
                 view,
                 options,
@@ -965,15 +952,11 @@ public class JabRefFrame extends BorderPane {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
         for (BasePanel basePanel : getBasePanelList()) {
-            try {
-                // db file exists
-                if (basePanel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().get().getCanonicalPath());
-                } else {
-                    dbPaths.add("");
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Invalid database file path: " + ex.getMessage());
+            // db file exists
+            if (basePanel.getBibDatabaseContext().getDatabasePath().isPresent()) {
+                dbPaths.add(basePanel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
+            } else {
+                dbPaths.add("");
             }
         }
         return dbPaths;
@@ -989,10 +972,10 @@ public class JabRefFrame extends BorderPane {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
+            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
             if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
+                if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
@@ -1003,7 +986,7 @@ public class JabRefFrame extends BorderPane {
             } else {
                 tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
             }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(File::getAbsolutePath).orElse(null)));
+            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
         }
     }
 
@@ -1030,7 +1013,7 @@ public class JabRefFrame extends BorderPane {
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUIManager(basePanel));
+            autosaver.registerListener(new AutosaveUiManager(basePanel));
         }
 
         BackupManager.start(context, Globals.entryTypesManager, prefs);
@@ -1059,7 +1042,7 @@ public class JabRefFrame extends BorderPane {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
-                context.getDatabaseFile().isPresent();
+                context.getDatabasePath().isPresent();
     }
 
     /**
@@ -1134,7 +1117,7 @@ public class JabRefFrame extends BorderPane {
                                .getDatabasePath()
                                .map(Path::toAbsolutePath)
                                .map(Path::toString)
-                               .orElse(GUIGlobals.UNTITLED_TITLE);
+                               .orElse(Localization.lang("untitled"));
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
@@ -1150,7 +1133,6 @@ public class JabRefFrame extends BorderPane {
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
-                    // Saved, now exit.
                     return true;
                 }
                 // The action was either canceled or unsuccessful.
@@ -1171,7 +1153,7 @@ public class JabRefFrame extends BorderPane {
             return;
         }
 
-        BibDatabaseContext context = panel.getBibDatabaseContext();
+        final BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
@@ -1227,34 +1209,6 @@ public class JabRefFrame extends BorderPane {
 
     public DialogService getDialogService() {
         return dialogService;
-    }
-
-    private void setDefaultTableFontSize() {
-        GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void increaseTableFontSize() {
-        GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
-    }
-
-    private void decreaseTableFontSize() {
-        double currentSize = GUIGlobals.currentFont.getSize();
-        if (currentSize < 2) {
-            return;
-        }
-        GUIGlobals.setFont(currentSize - 1);
-        for (BasePanel basePanel : getBasePanelList()) {
-            basePanel.updateTableFont();
-        }
-        dialogService.notify(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
     }
 
     /**

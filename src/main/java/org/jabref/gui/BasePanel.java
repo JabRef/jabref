@@ -70,7 +70,6 @@ public class BasePanel extends StackPane {
     private final FileAnnotationCache annotationCache;
 
     private final JabRefFrame frame;
-    // The undo manager.
     private final CountingUndoManager undoManager;
 
     private final SidePaneManager sidePaneManager;
@@ -80,13 +79,10 @@ public class BasePanel extends StackPane {
     private final DialogService dialogService;
     private MainTable mainTable;
     private BasePanelPreferences preferences;
-    // To contain instantiated entry editors. This is to save time
-    // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
     private boolean saving;
-    // AutoCompleter used in the search bar
     private PersonNameSuggestionProvider searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
@@ -152,12 +148,12 @@ public class BasePanel extends StackPane {
         boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
-            if (this.bibDatabaseContext.getDatabaseFile().isPresent()) {
+            if (this.bibDatabaseContext.getDatabasePath().isPresent()) {
                 // check if file is modified
                 String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
-                title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
+                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName()).append(changeFlag);
             } else {
-                title.append(GUIGlobals.UNTITLED_TITLE);
+                title.append(Localization.lang("untitled"));
 
                 if (getDatabase().hasEntries()) {
                     // if the database is not empty and no file is assigned,
@@ -265,7 +261,11 @@ public class BasePanel extends StackPane {
 
                 // Set owner and timestamp
                 for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry, true, true, Globals.prefs.getUpdateFieldPreferences());
+                    UpdateField.setAutomaticFields(entry,
+                            true,
+                            true,
+                            Globals.prefs.getOwnerPreferences(),
+                            Globals.prefs.getTimestampPreferences());
                 }
                 // Create an UndoableInsertEntries object.
                 getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
@@ -290,16 +290,10 @@ public class BasePanel extends StackPane {
         });
     }
 
-    public void updateTableFont() {
-        mainTable.updateFont();
-    }
-
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
         mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, preferences.getKeyBindings());
-
-        mainTable.updateFont();
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -564,10 +558,10 @@ public class BasePanel extends StackPane {
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+            if (getBibDatabaseContext().getDatabasePath().isPresent()) {
+                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
             } else {
-                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
+                frame.setTabTitle(this, Localization.lang("untitled"), null);
             }
         }
         frame.setWindowTitle();

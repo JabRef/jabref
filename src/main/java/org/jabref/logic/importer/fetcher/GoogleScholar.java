@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
- *
+ * <p>
  * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
  */
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
@@ -58,11 +58,10 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
         if (!entry.hasField(StandardField.TITLE)) {
-            return pdfLink;
+            return Optional.empty();
         }
 
         try {
@@ -74,12 +73,10 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             // as_occt field to search in
             uriBuilder.addParameter("as_occt", "title");
 
-            pdfLink = search(uriBuilder.toString());
+            return search(uriBuilder.toString());
         } catch (URISyntaxException e) {
             throw new FetcherException("Building URI failed.", e);
         }
-
-        return pdfLink;
     }
 
     @Override
@@ -91,6 +88,11 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         Document doc = Jsoup.connect(url).userAgent(URLDownload.USER_AGENT).get();
+
+        if (needsCaptcha(doc.body().html())) {
+            LOGGER.warn("Hit Google traffic limitation. Captcha prevents automatic fetching.");
+            return Optional.empty();
+        }
         // Check results for PDF link
         // TODO: link always on first result or none?
         for (int i = 0; i < NUM_RESULTS; i++) {
@@ -109,6 +111,10 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             }
         }
         return pdfLink;
+    }
+
+    private boolean needsCaptcha(String body) {
+        return body.contains("id=\"gs_captcha_ccl\"");
     }
 
     @Override
@@ -157,6 +163,11 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
         String content = new URLDownload(queryURL).asString();
+
+        if (needsCaptcha(content)) {
+            throw new FetcherException("Fetching from Google Scholar failed.",
+                    Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
+        }
 
         Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
         while (matcher.find()) {

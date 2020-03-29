@@ -20,7 +20,7 @@ public class HTMLChars implements LayoutFormatter {
                 .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                 .replace("\n", "<br>") // Replace single line breaks with <br>
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+                .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
