@@ -1,6 +1,9 @@
 name: Snap
 
 on:
+  push:
+    branches:
+      - snapcraft
   schedule:
     # run on each day
     - cron: '33 4 * * *'
