@@ -8,6 +8,9 @@
         <property name="header" value=""/>
     </module>
 
+    <!-- Don't stop on exceptions - enables checking Java 14 syntax in checkstyle 8.31 -->
+    <property name="haltOnException" value="false"/>
+
     <module name="SuppressionFilter">
         <property name="file" value="${config_loc}/suppressions.xml"/>
     </module>
