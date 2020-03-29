@@ -15,6 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * EntryBasedFetcher that searches the Worldcat database
@@ -38,7 +39,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 	 * @param title the title to include in the query
 	 * @return the earch query for the api
 	 */
-	private String getOpenSearchURL(String title){
+	private String getOpenSearchURL(String title) throws MalformedURLException{
 		String query = "&q=srw.ti+all+\"" + title + "\"";
 		URL url = new URL(WORLDCAT_OPEN_SEARCH_URL + query);
 		return url.toString();
@@ -56,10 +57,11 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 			String resp = urlDownload.asString();
 
 			return resp;
+		} catch (MalformedURLException e) {
+			throw new FetcherException("Bad url", e);
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new FetcherException("IO Exception", e);
-		}
+			throw new FetcherException("Error with Open Search Request (Worldcat)", e);
+		} 
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 				return parserResult.getDatabase().getEntries();
 			}
 			catch(IOException e){
-				throw new FetcherException("IO Exception " + e.getMessage(), e);
+				throw new FetcherException("Could not perform search (Worldcat) ", e);
 			}
 		} else {
 			return new ArrayList<>();
