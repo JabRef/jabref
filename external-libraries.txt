@@ -334,6 +334,11 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
+Id:      com.vladsch.flexmark:flexmark-all
+Project: flexmark-java
+URL:     https://github.com/vsch/flexmark-java
+License: BSD-2-Clause
+
 ## Sorted list of runtime dependencies output by gradle
 
 ```text
