@@ -14,6 +14,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import java.net.URL;
+
 /**
  * EntryBasedFetcher that searches the Worldcat database
  * 
@@ -37,8 +39,9 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 	 * @return the earch query for the api
 	 */
 	private String getOpenSearchURL(String title){
-		String query = "&q=srw.ti+all+\"" + title.replaceAll(" ", "%20") + "\"";
-		return WORLDCAT_OPEN_SEARCH_URL + query.replace("\"", "%22");
+		String query = "&q=srw.ti+all+\"" + title + "\"";
+		URL url = new URL(WORLDCAT_OPEN_SEARCH_URL + query);
+		return url.toString();
 	}
 
 	/**
