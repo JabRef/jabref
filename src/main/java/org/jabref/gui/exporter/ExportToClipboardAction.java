@@ -150,7 +150,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         }
     }
 
-    private class ExportResult {
+    private static class ExportResult {
         final String content;
         final FileType fileType;
 
