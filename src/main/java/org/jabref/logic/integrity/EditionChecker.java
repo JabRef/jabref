@@ -52,7 +52,7 @@ public class EditionChecker implements ValueChecker {
             if (!isFirstCharDigit(value) && (!allowIntegerEdition) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
                 return Optional.of(Localization.lang("should have the first letter capitalized"));
             } else {
-                if (ONLY_NUMERALS.test(value.trim()) && (!allowIntegerEdition) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+                if (ONLY_NUMERALS.test(value.trim()) && (!allowIntegerEdition)) {
                     return Optional.of(Localization.lang("should have the first letter capitalized"));
                 }
             }
