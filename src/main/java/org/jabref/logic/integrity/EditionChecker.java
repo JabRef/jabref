@@ -9,8 +9,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
-import com.google.common.base.Strings;
-
 public class EditionChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
@@ -30,7 +28,7 @@ public class EditionChecker implements ValueChecker {
     /**
      * Checks, if field contains only an integer or a literal (biblatex mode) Checks, if the first letter is capitalized
      * (BibTeX mode) biblatex package documentation: The edition of a printed publication. This must be an integer, not
-     * an ordinal. It is also possible to give the edition as a literal string, for example "Third, revised and expanded
+     * aninal. It is also possible to give the edition as a literal string, for example "Third, revised and expanded
      * edition". Official BibTeX specification: The edition of a book-for example, "Second". This should be an ordinal,
      * and should have the first letter capitalized.
      */
@@ -54,7 +52,7 @@ public class EditionChecker implements ValueChecker {
             if (!isFirstCharDigit(value) && (!allowIntegerEdition) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
                 return Optional.of(Localization.lang("should have the first letter capitalized"));
             } else {
-                if (!ONLY_NUMERALS.test(value.trim()) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+                if (ONLY_NUMERALS.test(value.trim()) && (!allowIntegerEdition) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
                     return Optional.of(Localization.lang("should have the first letter capitalized"));
                 }
             }
@@ -63,6 +61,6 @@ public class EditionChecker implements ValueChecker {
     }
 
     boolean isFirstCharDigit(String input) {
-        return !Strings.isNullOrEmpty(input) && Character.isDigit(input.charAt(0));
+        return !StringUtil.isNullOrEmpty(input) && Character.isDigit(input.charAt(0));
     }
 }
