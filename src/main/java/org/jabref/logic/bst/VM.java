@@ -510,7 +510,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("stack$", context -> {
             while (!stack.empty()) {
-                LOGGER.debug("Stack entry", stack.pop());
+                LOGGER.debug("Stack entry {}", stack.pop());
             }
         });
 
@@ -574,7 +574,7 @@ public class VM implements Warn {
         /*
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
-        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry", stack.pop()));
+        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry {}", stack.pop()));
 
         /*
          * Pushes the current entry's type (book, article, etc.), but pushes
