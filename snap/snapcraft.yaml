@@ -5,7 +5,7 @@ license: MIT
 summary: Bibliography manager
 description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
 
-grade: devel
+grade: stable
 confinement: strict
 base: core18
 license: MIT

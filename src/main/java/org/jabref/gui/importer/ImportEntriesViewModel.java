@@ -106,9 +106,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 dialogService,
                 database,
                 ExternalFileTypes.getInstance(),
-                preferences.getFilePreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getUpdateFieldPreferences(),
+                preferences,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager);

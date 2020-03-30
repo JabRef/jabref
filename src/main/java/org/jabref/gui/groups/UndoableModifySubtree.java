@@ -43,9 +43,7 @@ public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
         m_modifiedSubtree.clear();
         // get node to edit
         final GroupTreeNode subtreeRoot = m_groupRoot.getDescendant(m_subtreeRootPath).get(); //TODO: NULL
-        for (GroupTreeNode child : subtreeRoot.getChildren()) {
-            m_modifiedSubtree.add(child);
-        }
+        m_modifiedSubtree.addAll(subtreeRoot.getChildren());
         // keep subtree handle, but restore everything else from backup
         subtreeRoot.removeAllChildren();
         for (GroupTreeNode child : m_subtreeBackup.getChildren()) {

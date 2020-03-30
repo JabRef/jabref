@@ -247,7 +247,7 @@ public class TemplateExporter extends Exporter {
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn("Missing formatters found ", missingFormatters);
+                    LOGGER.warn("Missing formatters found: {}", missingFormatters);
                 }
             }
             Map<EntryType, Layout> layouts = new HashMap<>();
@@ -310,10 +310,10 @@ public class TemplateExporter extends Exporter {
             // Clear custom name formatters:
             layoutPreferences.clearCustomExportNameFormatters();
 
-            if (!missingFormatters.isEmpty()) {
+            if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
                 sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn("Formatters not found", sb);
+                LOGGER.warn("Formatters {} not found", sb.toString());
             }
         }
     }

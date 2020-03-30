@@ -69,9 +69,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         importHandler = new ImportHandler(
                 frame.getDialogService(), database, externalFileTypes,
-                Globals.prefs.getFilePreferences(),
-                Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getUpdateFieldPreferences(),
+                Globals.prefs,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
                 Globals.stateManager);

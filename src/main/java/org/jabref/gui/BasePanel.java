@@ -261,7 +261,11 @@ public class BasePanel extends StackPane {
 
                 // Set owner and timestamp
                 for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry, true, true, Globals.prefs.getUpdateFieldPreferences());
+                    UpdateField.setAutomaticFields(entry,
+                            true,
+                            true,
+                            Globals.prefs.getOwnerPreferences(),
+                            Globals.prefs.getTimestampPreferences());
                 }
                 // Create an UndoableInsertEntries object.
                 getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
