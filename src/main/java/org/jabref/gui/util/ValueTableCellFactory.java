@@ -4,6 +4,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.OverrunStyle;
@@ -13,6 +14,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
@@ -103,8 +105,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);
                         if (StringUtil.isNotBlank(tooltipText)) {
+                            Screen currentScreen = Screen.getPrimary();
+                            Rectangle2D bounds = currentScreen.getBounds();
+                            double maxWidth = bounds.getWidth();
                             Tooltip tooltip = new Tooltip(tooltipText);
-                            tooltip.setMaxWidth(800);
+                            tooltip.setMaxWidth(maxWidth - maxWidth / 3);
                             //tooltip.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS); // info: can be enabled instead of wrapping the text
                             tooltip.setWrapText(true);
                             setTooltip(tooltip);
