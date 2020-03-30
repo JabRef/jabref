@@ -18,6 +18,8 @@ public class EditionChecker implements ValueChecker {
     private static final String FIRST_EDITION = "1";
 
     private final BibDatabaseContext bibDatabaseContextEdition;
+
+    // Allow integers in 'edition' field in BibTeX mode --> see GeneralTab.fml
     private final boolean allowIntegerEdition;
 
     public EditionChecker(BibDatabaseContext bibDatabaseContext, boolean allowIntegerEdition) {
@@ -42,20 +44,17 @@ public class EditionChecker implements ValueChecker {
             return Optional.of(Localization.lang("edition of book reported as just 1"));
         }
 
-        //biblatex
-        if (bibDatabaseContextEdition.isBiblatexMode() && !ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
-            return Optional.of(Localization.lang("should contain an integer or a literal"));
-        }
-
-        //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode()) {
-            if (!isFirstCharDigit(value) && (!allowIntegerEdition) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-                return Optional.of(Localization.lang("should have the first letter capitalized"));
-            } else {
-                if (ONLY_NUMERALS.test(value.trim()) && (!allowIntegerEdition)) {
-                    return Optional.of(Localization.lang("should have the first letter capitalized"));
-                }
+        if (bibDatabaseContextEdition.isBiblatexMode()) {
+            if (!ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
+                return Optional.of(Localization.lang("should contain an integer or a literal"));
             }
+        } else {
+            if (ONLY_NUMERALS.test(value) && (!allowIntegerEdition)) {
+                return Optional.of(Localization.lang("no integer as values for edition allowed"));
+            }
+        }
+        if (!isFirstCharDigit(value) && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+            return Optional.of(Localization.lang("should have the first letter capitalized"));
         }
         return Optional.empty();
     }
