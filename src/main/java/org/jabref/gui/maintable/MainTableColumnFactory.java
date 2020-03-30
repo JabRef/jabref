@@ -394,6 +394,7 @@ class MainTableColumnFactory {
         }
 
         ContextMenu contextMenu = new ContextMenu();
+        contextMenu.setMaxWidth(800);
 
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
