@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice;
 
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -39,7 +38,11 @@ public class OOPreFormatter implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     String result = OOPreFormatter.CHARS.get(command);
-                    sb.append(Objects.requireNonNullElse(result, command));
+                    if (result == null) {
+                        sb.append(command);
+                    } else {
+                        sb.append(result);
+                    }
                 }
                 escaped = true;
                 incommand = true;
@@ -91,7 +94,11 @@ public class OOPreFormatter implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            sb.append(Objects.requireNonNullElse(result, command));
+                            if (result == null) {
+                                sb.append(command);
+                            } else {
+                                sb.append(result);
+                            }
 
                         }
                     }
@@ -121,17 +128,29 @@ public class OOPreFormatter implements LayoutFormatter {
                         // If found, then use translated version. If not, then keep
                         // the
                         // text of the parameter intact.
-                        sb.append(Objects.requireNonNullElse(result, argument));
+                        if (result == null) {
+                            sb.append(argument);
+                        } else {
+                            sb.append(result);
+                        }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         String result = OOPreFormatter.CHARS.get(command);
-                        // If the command is unknown, just print it:
-                        sb.append(Objects.requireNonNullElse(result, command));
+                        if (result == null) {
+                            // If the command is unknown, just print it:
+                            sb.append(command);
+                        } else {
+                            sb.append(result);
+                        }
                     } else {
                         String result = OOPreFormatter.CHARS.get(command);
-                        sb.append(Objects.requireNonNullElse(result, command));
+                        if (result == null) {
+                            sb.append(command);
+                        } else {
+                            sb.append(result);
+                        }
                         sb.append(' ');
                     }
                 } /* else if (c == '}') {

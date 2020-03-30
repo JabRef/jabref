@@ -31,7 +31,7 @@ public class RTFChars implements LayoutFormatter {
 
     @Override
     public String format(String field) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("");
         StringBuilder currentCommand = null;
         boolean escaped = false;
         boolean incommand = false;
