@@ -36,13 +36,15 @@ public class Cleanups {
         defaultFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
-        List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>(defaultFormatters);
+        List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
+        recommendedBibTeXFormatters.addAll(defaultFormatters);
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new HtmlToLatexFormatter()));
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter()));
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
-        List<FieldFormatterCleanup> recommendedBiblatexFormatters = new ArrayList<>(defaultFormatters);
+        List<FieldFormatterCleanup> recommendedBiblatexFormatters = new ArrayList<>();
+        recommendedBiblatexFormatters.addAll(defaultFormatters);
         recommendedBiblatexFormatters.add(new FieldFormatterCleanup(StandardField.TITLE, new HtmlToUnicodeFormatter()));
         recommendedBiblatexFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
         // DO NOT ADD OrdinalsToSuperscriptFormatter here, because this causes issues. See https://github.com/JabRef/jabref/issues/2596.

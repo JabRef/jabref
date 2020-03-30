@@ -215,11 +215,11 @@ public class JabRefGUI {
         if (LOGGER.isDebugEnabled()) {
             StringBuilder debugLogString = new StringBuilder();
             debugLogString.append("SCREEN DATA:");
-            debugLogString.append("mainStage.WINDOW_MAXIMISED: ").append(mainStage.isMaximized()).append("\n");
-            debugLogString.append("mainStage.POS_X: ").append(mainStage.getX()).append("\n");
-            debugLogString.append("mainStage.POS_Y: ").append(mainStage.getY()).append("\n");
-            debugLogString.append("mainStage.SIZE_X: ").append(mainStage.getWidth()).append("\n");
-            debugLogString.append("mainStages.SIZE_Y: ").append(mainStage.getHeight()).append("\n");
+            debugLogString.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+            debugLogString.append("mainStage.POS_X: " + mainStage.getX() + "\n");
+            debugLogString.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
+            debugLogString.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
+            debugLogString.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
             LOGGER.debug(debugLogString.toString());
         }
     }

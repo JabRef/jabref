@@ -23,7 +23,8 @@ class CaseChangeMenu extends Menu {
         Objects.requireNonNull(text);
 
         // create menu items, one for each case changer
-        List<Formatter> caseChangers = new ArrayList<>(Formatters.getCaseChangers());
+        List<Formatter> caseChangers = new ArrayList<>();
+        caseChangers.addAll(Formatters.getCaseChangers());
         caseChangers.add(new ProtectTermsFormatter(Globals.protectedTermsLoader));
         for (final Formatter caseChanger : caseChangers) {
             CustomMenuItem menuItem = new CustomMenuItem(new Label(caseChanger.getName()));

@@ -164,7 +164,7 @@ public class BasePanel extends StackPane {
                 }
             }
         } else if (databaseLocation == DatabaseLocation.SHARED) {
-            title.append(this.bibDatabaseContext.getDBMSSynchronizer().getDBName()).append(" [").append(Localization.lang("shared")).append("]");
+            title.append(this.bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
         }
 
         return title.toString();
