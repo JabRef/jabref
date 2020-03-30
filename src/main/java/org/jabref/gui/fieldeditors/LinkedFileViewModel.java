@@ -38,6 +38,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -223,30 +224,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     private void performRenameWithConflictCheck(String targetFileName) {
-        Optional<Path> fileConflictCheck = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
-        if (fileConflictCheck.isPresent()) {
-            boolean confirmOverwrite = dialogService.showConfirmationDialogAndWait(
+        Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
+        boolean overwriteFile = false;
+
+        if (existingFile.isPresent()) {
+            overwriteFile = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
                     Localization.lang("'%0' exists. Overwrite file?", targetFileName),
                     Localization.lang("Overwrite"));
 
-            if (confirmOverwrite) {
-                try {
-                    Files.delete(fileConflictCheck.get());
-                } catch (IOException e) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Rename failed"),
-                            Localization.lang("JabRef cannot access the file because it is being used by another process."),
-                            e);
-                    return;
-                }
-            } else {
+            if (!overwriteFile) {
                 return;
             }
         }
 
         try {
-            linkedFileHandler.renameToName(targetFileName);
+            linkedFileHandler.renameToName(targetFileName, overwriteFile);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
@@ -284,6 +277,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     /**
      * Gets the filename for the current linked file and compares it to the new suggested filename.
+     *
      * @return true if the suggested filename is same as current filename.
      */
     public boolean isGeneratedNameSameAsOriginal() {
@@ -296,6 +290,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     /**
      * Compares suggested filepath of current linkedFile with existing filepath.
+     *
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
@@ -421,10 +416,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
-                    String suggestedTypeName = suggestedType.orElse(StandardExternalFileType.PDF).getName();
+                    ExternalFileType externalFileType = suggestedType.orElse(StandardExternalFileType.PDF);
+                    String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
-
-                    String suggestedName = linkedFileHandler.getSuggestedFileName(suggestedTypeName);
+                    String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
+                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, suggestedName);
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))

@@ -51,7 +51,7 @@ public class JabRefGUI {
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionDelayed();
     }
 
@@ -247,7 +247,7 @@ public class JabRefGUI {
                 continue;
             }
 
-            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 

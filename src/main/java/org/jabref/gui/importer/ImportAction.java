@@ -153,7 +153,7 @@ public class ImportAction {
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
-                UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
+                UpdateField.setAutomaticFields(entries, Globals.prefs.getOwnerPreferences(), Globals.prefs.getTimestampPreferences()); // set timestamp and owner
 
                 database.insertEntries(entries);
             }

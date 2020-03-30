@@ -393,7 +393,7 @@ public class GroupTreeView {
         }
     }
 
-    private class DragExpansionHandler {
+    private static class DragExpansionHandler {
         private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
         private TreeItem<GroupNodeViewModel> draggedItem;
         private long dragStarted;

@@ -143,7 +143,7 @@ public class JabRefExecutorService {
         timer.cancel();
     }
 
-    private class NamedRunnable implements Runnable {
+    private static class NamedRunnable implements Runnable {
 
         private final String name;
 

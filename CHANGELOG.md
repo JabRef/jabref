@@ -10,19 +10,28 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added support for searching ShortScience for an entry through the user's browser. [#6018](https://github.com/JabRef/jabref/pull/6018)
+- We updated EditionChecker to permit edition to start with a number. [#6144](https://github.com/JabRef/jabref/issues/6144)
+- We added tooltips for most fields in the entry editor containing a short description. [#5847](https://github.com/JabRef/jabref/issues/5847)
 
 ### Changed
 
 - We improved the arXiv fetcher. Now it should find entries even more reliably and does no longer include the version (e.g `v1`) in the `eprint` field. [forum#1941](https://discourse.jabref.org/t/remove-version-in-arxiv-import/1941)
 - We moved the group search bar and the button "New group" from bottom to top position to make it more prominent. [#6112](https://github.com/JabRef/jabref/pull/6112)
-
+- When JabRef finds a `.sav` file without changes, there is no dialog asking for acceptance of changes anymore.
+- We changed the buttons for import/export/show all/reset of preferences to smaller icon buttons in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We moved the functionality "Manage field names & content" from the "Library" menu to the "Edit" menu, because it affects the selected entries and not the whole library
 
 ### Fixed
 
 - We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
 - We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
+- We fixed an issue with inconsistent capitalization of file extensions when downloading files [#6115](https://github.com/JabRef/jabref/issues/6115)
+- We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We fixed an issue where search full-text documents downloaded files with same name, overwriting existing files. [#6174](https://github.com/JabRef/jabref/pull/6174)
 
 ### Removed
+
+- We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 
 ## [5.0] – 2020-03-06
 
@@ -36,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - Filenames of external files can no longer contain curly braces. [#5926](https://github.com/JabRef/jabref/pull/5926)
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
 - We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
+- We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
 
 ### Fixed
 
@@ -62,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the group and the link column were not updated after changing the entry in the main table. [#5985](https://github.com/JabRef/jabref/issues/5985)
 - We fixed an issue where reordering the groups was not possible after inserting an article. [#6008](https://github.com/JabRef/jabref/issues/6008)
 - We fixed an issue where citation styles except the default "Preview" could not be used. [#56220](https://github.com/JabRef/jabref/issues/5622)
+- We fixed an issue where a warning was displayed when the title content is made up of two sentences. [#5832](https://github.com/JabRef/jabref/issues/5832)
 - We fixed an issue where an exception was thrown when adding a save action without a selected formatter in the library properties [#6069](https://github.com/JabRef/jabref/issues/6069)
 
 ### Removed

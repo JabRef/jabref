@@ -5,7 +5,7 @@
 
 <fx:root editable="true" minWidth="280.0" type="TableView"
          xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableView">
+         fx:controller="org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanel">
     <columns>
         <TableColumn fx:id="entryTypeColumn" editable="false" minWidth="100.0" text="%Name"/>
         <TableColumn fx:id="patternColumn" minWidth="100.0" text="%Key pattern"/>

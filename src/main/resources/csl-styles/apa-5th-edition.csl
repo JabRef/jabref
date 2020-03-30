@@ -30,6 +30,14 @@
     <updated>2012-09-27T22:06:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="fr">
+    <terms>
+      <term name="editor" form="short">
+        <single>éd.</single>
+        <multiple>éds.</multiple>
+      </term>
+    </terms>
+  </locale>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference" match="any">

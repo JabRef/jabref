@@ -80,6 +80,10 @@
     <terms>
       <term name="letter">communication personnelle</term>
       <term name="letter" form="short">lettre</term>
+      <term name="editor" form="short">
+        <single>éd.</single>
+        <multiple>éds.</multiple>
+      </term>
     </terms>
   </locale>
   <locale xml:lang="nb">

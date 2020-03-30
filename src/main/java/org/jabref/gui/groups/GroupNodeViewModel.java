@@ -39,6 +39,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -204,7 +205,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(IconTheme.JabRefIcons.class, iconCode.toUpperCase(Locale.ENGLISH))
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
                     .toJavaUtil()
                     .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }

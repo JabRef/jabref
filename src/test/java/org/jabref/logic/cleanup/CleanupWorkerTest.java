@@ -60,7 +60,7 @@ class CleanupWorkerTest {
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
-        context.setDatabaseFile(bibFolder.resolve("test.bib").toFile());
+        context.setDatabasePath(bibFolder.resolve("test.bib"));
 
         FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
         //Biblocation as Primary overwrites all other dirs
