@@ -214,7 +214,7 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
-    jython 'org.python:jython-standalone:2.7.1'
+    jython 'org.python:jython-standalone:2.7.2'
 }
 
 dependencyUpdates {
