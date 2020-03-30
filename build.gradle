@@ -214,7 +214,7 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.31'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
-    jython 'org.python:jython-standalone:2.7.1'
+    jython 'org.python:jython-standalone:2.7.2'
 }
 
 dependencyUpdates {
@@ -229,11 +229,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
             }
             if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-        rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.7.2b\d/ || selection.candidate.version ==~ /2.7.2rc\d/) {
                 selection.reject('Release candidate')
             }
         }
