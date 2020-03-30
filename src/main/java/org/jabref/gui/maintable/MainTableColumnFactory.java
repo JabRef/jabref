@@ -404,7 +404,7 @@ class MainTableColumnFactory {
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
-            menuItem.setStyle("-fx-pref-width: " + maxWidth * 2 / 3 + "; -fx-text-overrun: 'center-ellipses';");
+            menuItem.setStyle("-fx-pref-width: " + maxWidth * 2 / 3 + "; -fx-text-overrun: center-ellipses;");
             // -fx-min-width; -fx-pref-width; -fx-max-width; -fx-text-overrun: center-ellipses; -fx-wrap-text: true;
             contextMenu.getItems().add(menuItem);
         }
