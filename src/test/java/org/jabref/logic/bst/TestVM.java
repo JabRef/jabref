@@ -54,7 +54,7 @@ public class TestVM {
         assertEquals(2, vm.getStrings().size());
         assertEquals(7, vm.getIntegers().size());
         assertEquals(1, vm.getEntries().size());
-        assertEquals(5, vm.getEntries().get(0).getFields().size());
+        assertEquals(5, vm.getEntries().get(0).fields.size());
         assertEquals(38, vm.getFunctions().size());
     }
 
@@ -366,10 +366,10 @@ public class TestVM {
         vm.run(v);
 
         List<BstEntry> v2 = vm.getEntries();
-        assertEquals(Optional.of("a"), v2.get(0).getBibtexEntry().getCiteKeyOptional());
-        assertEquals(Optional.of("b"), v2.get(1).getBibtexEntry().getCiteKeyOptional());
-        assertEquals(Optional.of("c"), v2.get(2).getBibtexEntry().getCiteKeyOptional());
-        assertEquals(Optional.of("d"), v2.get(3).getBibtexEntry().getCiteKeyOptional());
+        assertEquals(Optional.of("a"), v2.get(0).entry.getCiteKeyOptional());
+        assertEquals(Optional.of("b"), v2.get(1).entry.getCiteKeyOptional());
+        assertEquals(Optional.of("c"), v2.get(2).entry.getCiteKeyOptional());
+        assertEquals(Optional.of("d"), v2.get(3).entry.getCiteKeyOptional());
     }
 
     @Test

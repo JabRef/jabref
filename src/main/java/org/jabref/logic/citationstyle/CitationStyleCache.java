@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.util.Objects;
 
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;

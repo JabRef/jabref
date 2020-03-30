@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -67,7 +68,7 @@ public class OpenOfficeFileSearch {
     }
 
     private static List<Path> findOSXOpenOfficeDirs() {
-        List<Path> sourceList = Arrays.asList(Paths.get("/Applications"));
+        List<Path> sourceList = Collections.singletonList(Paths.get("/Applications"));
 
         return findOpenOfficeDirectories(sourceList);
     }

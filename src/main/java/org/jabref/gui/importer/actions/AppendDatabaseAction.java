@@ -73,12 +73,15 @@ public class AppendDatabaseAction extends SimpleCommand {
 
         if (importEntries) { // Add entries
             boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
-            boolean overwriteTimeStamp = Globals.prefs.getTimestampPreferences().overwriteTimestamp();
+            boolean overwriteTimeStamp = Globals.prefs.getTimestampPreferences().isOverwriteTimestamp();
 
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry entry = (BibEntry) originalEntry.clone();
-                UpdateField.setAutomaticFields(entry, overwriteOwner, overwriteTimeStamp,
-                        Globals.prefs.getUpdateFieldPreferences());
+                UpdateField.setAutomaticFields(entry,
+                        overwriteOwner,
+                        overwriteTimeStamp,
+                        Globals.prefs.getOwnerPreferences(),
+                        Globals.prefs.getTimestampPreferences());
                 entriesToAppend.add(entry);
             }
             database.insertEntries(entriesToAppend);
