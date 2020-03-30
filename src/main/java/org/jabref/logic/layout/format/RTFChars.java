@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  *   1.) Remove LaTeX-Command sequences.
  *
- *   2.) Replace LaTeX-Special chars with RTF aquivalents.
+ *   2.) Replace LaTeX-Special chars with RTF equivalents.
  *
  *   3.) Replace emph and textit and textbf with their RTF replacements.
  *
@@ -31,7 +31,7 @@ public class RTFChars implements LayoutFormatter {
 
     @Override
     public String format(String field) {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
         boolean escaped = false;
         boolean incommand = false;

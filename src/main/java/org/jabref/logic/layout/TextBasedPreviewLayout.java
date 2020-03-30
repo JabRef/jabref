@@ -1,18 +1,19 @@
-package org.jabref.logic.citationstyle;
+package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implements the preview based JabRef's <a href="https://docs.jabref.org/import-export/export/customexports">Custom export fitlters</a>.
+ */
 public class TextBasedPreviewLayout implements PreviewLayout {
     private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);
 
