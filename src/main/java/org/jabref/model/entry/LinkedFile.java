@@ -75,32 +75,12 @@ public class LinkedFile implements Serializable {
         return description.get();
     }
 
-    public String getTruncatedDescription() {
-        String storedDescription = description.get();
-
-        if (storedDescription.length() > 95) {
-            return storedDescription.substring(0, 45) + "..." + storedDescription.substring(storedDescription.length() - 45);
-        }
-
-        return storedDescription;
-    }
-
     public void setDescription(String description) {
         this.description.setValue(description);
     }
 
     public String getLink() {
         return link.get();
-    }
-
-    public String getTruncatedLink() {
-        String storedLink = link.get();
-
-        if (storedLink.length() > 95) {
-            return storedLink.substring(0, 45) + "..." + storedLink.substring(storedLink.length() - 45);
-        }
-
-        return storedLink;
     }
 
     public void setLink(String link) {
