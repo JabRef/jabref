@@ -44,7 +44,6 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -72,7 +71,6 @@ public class GroupTreeView {
 
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
-    private JabRefPreferences preferences;
 
     private DragExpansionHandler dragExpansionHandler;
 
@@ -80,7 +78,6 @@ public class GroupTreeView {
     public void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
-        preferences = JabRefPreferences.getInstance();
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -123,13 +120,13 @@ public class GroupTreeView {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
-        // Number of hits (only if user wants to see them)
+        // Number of hits
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(group -> {
                     final StackPane node = new StackPane();
-
+                    node.getStyleClass().setAll("hits");
                     if (!group.isRoot()) {
                         BindingsHelper.includePseudoClassWhen(node, anySelected,
                                 group.anySelectedEntriesMatchedProperty());
@@ -137,10 +134,7 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    if (preferences.getBoolean(JabRefPreferences.DISPLAY_GROUP_QUANTITY)) {
-                        node.getStyleClass().setAll("hits");
-                        text.textProperty().bind(group.getHits().asString());
-                    }
+                    text.textProperty().bind(group.getHits().asString());
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);

@@ -30,7 +30,7 @@
             <columns>
                 <TreeTableColumn fx:id="mainColumn"/>
                 <TreeTableColumn fx:id="numberColumn" minWidth="50.0" maxWidth="70.0" prefWidth="60.0"
-                                 styleClass="numberColumn" />
+                                 styleClass="numberColumn"/>
                 <TreeTableColumn fx:id="expansionNodeColumn" maxWidth="25.0" minWidth="25.0"
                                  styleClass="expansionNodeColumn"/>
             </columns>
