@@ -27,7 +27,7 @@ import org.xml.sax.SAXException;
 
 public class WorldcatImporter extends Importer {
 
-	private static final String DESCRIPTION = "Takes valid XML from Worldcat Open Search and parses them to BibEntry";
+	private static final String DESCRIPTION = "Importer for Worldcat Open Search XML format";
 	private static final String NAME = "WorldcatImporter";
 
 	private String WORLDCAT_READ_URL;
