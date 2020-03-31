@@ -135,7 +135,7 @@ public class WebFetchers {
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
-        set.add(new WorldcatFetcher(apiKeyPreferences));
+        set.add(new WorldcatFetcher(apiKeyPreferences.getWorldcatKey()));
         return set;
     }
 

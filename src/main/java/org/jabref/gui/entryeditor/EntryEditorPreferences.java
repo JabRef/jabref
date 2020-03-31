@@ -16,8 +16,8 @@ public class EntryEditorPreferences {
     private final Map<String, Set<Field>> entryEditorTabList;
     private final FieldWriterPreferences fieldWriterPreferences;
     private final ImportFormatPreferences importFormatPreferences;
-	private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
-	private final APIKeyPreferences apiKeyPreferences;
+    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final APIKeyPreferences apiKeyPreferences;
     private final List<Field> customTabFieldNames;
     private final boolean shouldShowRecommendationsTab;
     private final boolean isMrdlibAccepted;
@@ -37,8 +37,8 @@ public class EntryEditorPreferences {
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.keyBindings = keyBindings;
         this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
-		this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
-		this.apiKeyPreferences = apiKeyPreferences;
+        this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
+        this.apiKeyPreferences = apiKeyPreferences;
     }
 
     public Map<String, Set<Field>> getEntryEditorTabList() {
@@ -51,11 +51,11 @@ public class EntryEditorPreferences {
 
     public ImportFormatPreferences getImportFormatPreferences() {
         return importFormatPreferences;
-	}
-	
-	public APIKeyPreferences getAPIApiKeyPreferences() {
-		return apiKeyPreferences;
-	}
+    }
+    
+    public APIKeyPreferences getAPIApiKeyPreferences() {
+        return apiKeyPreferences;
+    }
 
     public List<Field> getCustomTabFieldNames() {
         return customTabFieldNames;

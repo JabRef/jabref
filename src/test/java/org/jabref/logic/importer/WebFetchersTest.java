@@ -21,15 +21,15 @@ import static org.mockito.Mockito.mock;
 
 class WebFetchersTest {
 
-	private APIKeyPreferences apiKeyPreferences;
-	private ImportFormatPreferences importFormatPreferences;
-	
+    private APIKeyPreferences apiKeyPreferences;
+    private ImportFormatPreferences importFormatPreferences;
+    
     private ClassGraph classGraph = new ClassGraph().enableAllInfo().whitelistPackages("org.jabref");
 
     @BeforeEach
     void setUp() throws Exception {
-		importFormatPreferences = mock(ImportFormatPreferences.class);
-		apiKeyPreferences = mock(APIKeyPreferences.class);
+        importFormatPreferences = mock(ImportFormatPreferences.class);
+        apiKeyPreferences = mock(APIKeyPreferences.class);
     }
 
     @Test
@@ -64,7 +64,7 @@ class WebFetchersTest {
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
             expected.remove(EntryBasedParserFetcher.class);
-			expected.remove(MrDLibFetcher.class);
+            expected.remove(MrDLibFetcher.class);
 
             assertEquals(expected, getClasses(idFetchers));
         }

@@ -97,7 +97,7 @@ public class EntryEditor extends BorderPane {
                   .root(this)
                   .load();
 
-		this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
                 databaseContext);
 
