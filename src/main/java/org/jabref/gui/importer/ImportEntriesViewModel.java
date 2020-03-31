@@ -43,7 +43,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
-    private final BackgroundTask<ParserResult> task;
     private final StringProperty message;
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
@@ -59,7 +58,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param task     the task executed for parsing the selected files(s).
      */
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task, TaskExecutor taskExecutor, BibDatabaseContext databaseContext, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
-        this.task = task;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
