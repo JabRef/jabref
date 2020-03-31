@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Removed
 
 - We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/general/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
 
 ## [5.0] – 2020-03-06
 
