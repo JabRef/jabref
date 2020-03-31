@@ -146,6 +146,9 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Year of publication.");
                 case KEYWORDS:
                     return Localization.lang("Separated list of keywords.");
+                case CROSSREF:
+                    return Localization.lang("Linking entries together (child parent relation).") + "\n" +
+                            Localization.lang("Enter the key of the other entry.");
             }
         } else if (field instanceof InternalField) {
             InternalField internalField = (InternalField) field;
