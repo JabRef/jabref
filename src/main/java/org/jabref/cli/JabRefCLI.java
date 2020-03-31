@@ -255,7 +255,7 @@ public class JabRefCLI {
     }
 
     private String getVersionInfo() {
-        return String.format("JabRef %s", Globals.BUILD_INFO.getVersion());
+        return String.format("JabRef %s", Globals.BUILD_INFO.version);
     }
 
     public List<String> getLeftOver() {

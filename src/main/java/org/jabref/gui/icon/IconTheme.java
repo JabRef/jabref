@@ -228,6 +228,7 @@ public class IconTheme {
         GITHUB(MaterialDesignIcon.GITHUB_CIRCLE), /*css: github-circle*/
         TOGGLE_ENTRY_PREVIEW(MaterialDesignIcon.LIBRARY_BOOKS), /*css: library-books */
         TOGGLE_GROUPS(MaterialDesignIcon.VIEW_LIST), /*css: view-list */
+        SHOW_PREFERENCES_LIST(MaterialDesignIcon.VIEW_LIST), /*css: view-list */
         WRITE_XMP(MaterialDesignIcon.IMPORT), /* css: import */
         FILE_WORD(MaterialDesignIcon.FILE_WORD), /*css: file-word */
         FILE_EXCEL(MaterialDesignIcon.FILE_EXCEL), /*css: file-excel */

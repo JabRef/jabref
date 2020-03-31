@@ -3,7 +3,7 @@ coverage:
   - src/gen/.*
   status:
     patch: false
-  project:
-    default:
-      threshold: 0.005
+    project:
+      default:
+        threshold: 0.01
 comment: false

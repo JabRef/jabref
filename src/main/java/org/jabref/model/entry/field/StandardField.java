@@ -72,6 +72,8 @@ public enum StandardField implements Field {
     KEY("key"),
     KEYWORDS("keywords"),
     LANGUAGE("language", FieldProperty.LANGUAGE),
+    LABEL("label"),
+    LIBRARY("library"),
     LOCATION("location"),
     MAINSUBTITLE("mainsubtitle", FieldProperty.BOOK_NAME),
     MAINTITLE("maintitle", FieldProperty.BOOK_NAME),

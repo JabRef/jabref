@@ -19,6 +19,10 @@ public class FieldWriterPreferences {
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
     }
 
+    /**
+     * Creates an instance with default values (not obeying any user preferences). This constructor should be used with
+     * caution. The other constructor has to be preferred.
+     */
     public FieldWriterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
         this(true, Collections.emptyList(), new FieldContentFormatterPreferences());
