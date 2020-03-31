@@ -71,7 +71,8 @@ public class BibEntryAssert {
             result = parser.parse(reader);
         }
         assertNotNull(result);
-        assertFalse(result.isEmpty());
+        assertNotNull(result.getDatabase());
+        assertNotNull(result.getDatabase().getEntries());
         return result.getDatabase().getEntries();
     }
 
