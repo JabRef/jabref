@@ -32,9 +32,9 @@ public class WorldcatImporter extends Importer {
 
     private String WORLDCAT_READ_URL;
     
-    public WorldcatImporter () {
+    public WorldcatImporter (String worldcatKey) {
         //Used the same key as Worldcat fether
-        this.WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=" + WorldcatFetcher.API_KEY;
+        this.WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=" + worldcatKey;
     }
 
     /**

@@ -21,7 +21,7 @@ public class WorldcatFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new WorldcatFetcher(mock(String.class));
+        fetcher = new WorldcatFetcher("API_KEY");
     }
 
     @Test

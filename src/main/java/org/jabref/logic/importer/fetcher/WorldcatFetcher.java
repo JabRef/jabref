@@ -23,13 +23,14 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class WorldcatFetcher implements EntryBasedFetcher {
 
-    public static String API_KEY;
+    private String API_KEY;
     private static final String NAME = "Worldcat Fetcher";
 
-    private static final String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=" + API_KEY;
+    private static String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
 
     public WorldcatFetcher (String worldcatKey) {
-        API_KEY = worldcatKey;
+		this.API_KEY = worldcatKey;
+		WORLDCAT_OPEN_SEARCH_URL += API_KEY;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
         Optional<String> entryTitle = entry.getLatexFreeField (StandardField.TITLE);
         if (entryTitle.isPresent ()) {
             String xmlResponse = makeOpenSearchRequest (entryTitle.get ());
-            WorldcatImporter importer = new WorldcatImporter (); 
+            WorldcatImporter importer = new WorldcatImporter (this.API_KEY); 
             ParserResult parserResult;
             try { 
                 if (importer.isRecognizedFormat (xmlResponse)) {

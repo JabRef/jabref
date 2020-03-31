@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class WorldcatImporterTest {
     
@@ -49,18 +50,18 @@ public class WorldcatImporterTest {
 
     @BeforeEach
     public void setUp() {
-        importer = new WorldcatImporter();
+        importer = new WorldcatImporter("API_KEY");
         
     }
     
     @Test
     public void withResultIsRecognizedFormat() throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new WorldcatImporter(), getFilePath("WorldcatImporterTestWithResult"));
+        ImporterTestEngine.testIsRecognizedFormat(importer, getFilePath("WorldcatImporterTestWithResult"));
     }
 
     @Test
     public void withoutResultIsRecognizedFormat() throws IOException {
-        ImporterTestEngine.testIsRecognizedFormat(new WorldcatImporter(), getFilePath("WorldcatImporterTestWithoutResult"));
+        ImporterTestEngine.testIsRecognizedFormat(importer, getFilePath("WorldcatImporterTestWithoutResult"));
     }
 
     @Test
