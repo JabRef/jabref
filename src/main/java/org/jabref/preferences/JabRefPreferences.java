@@ -165,7 +165,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
-    public static final String BACKUP = "backup";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
@@ -495,7 +494,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
         defaults.put(LAST_FOCUSED, "");
@@ -1326,7 +1324,6 @@ public class JabRefPreferences implements PreferencesService {
                 saveInOriginalOrder,
                 saveOrder,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -1341,7 +1338,6 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 null,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
