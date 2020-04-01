@@ -179,7 +179,10 @@ public class ParserResult {
     }
 
     public boolean isEmpty() {
-        return this == new ParserResult();
+        return !this.getDatabase().hasEntries() &&
+                this.getDatabase().hasNoStrings() &&
+                this.getDatabase().getPreamble().isEmpty() &&
+                this.getMetaData().isEmpty();
     }
 
     public boolean wasChangedOnMigration() {

@@ -24,7 +24,7 @@ public class SavePreferences {
     private final Boolean generateBibtexKeysBeforeSaving;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
 
-    public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
+    private SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
                            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
                            FieldWriterPreferences fieldWriterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern,
                            Boolean generateBibtexKeysBeforeSaving, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
@@ -39,6 +39,13 @@ public class SavePreferences {
         this.globalCiteKeyPattern = globalCiteKeyPattern;
         this.generateBibtexKeysBeforeSaving = generateBibtexKeysBeforeSaving;
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
+    }
+
+    public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding,
+                           DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
+                           FieldWriterPreferences fieldWriterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern,
+                           Boolean generateBibtexKeysBeforeSaving, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+        this(saveInOriginalOrder, saveOrder, encoding, true, saveType, takeMetadataSaveOrderInAccount, reformatFile, fieldWriterPreferences, globalCiteKeyPattern, generateBibtexKeysBeforeSaving, bibtexKeyPatternPreferences);
     }
 
     public Boolean takeMetadataSaveOrderInAccount() {
@@ -63,6 +70,11 @@ public class SavePreferences {
         return makeBackup;
     }
 
+    /**
+     * Required by {@link org.jabref.logic.autosaveandbackup.BackupManager}. Should not be used in other settings
+     *
+     * @param newMakeBackup whether a backup (.bak file) should be made
+     */
     public SavePreferences withMakeBackup(Boolean newMakeBackup) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, newMakeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.fieldWriterPreferences,
@@ -97,10 +109,6 @@ public class SavePreferences {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup,
                 this.saveType, this.takeMetadataSaveOrderInAccount, newReformatFile, this.fieldWriterPreferences,
                 this.globalCiteKeyPattern, this.generateBibtexKeysBeforeSaving, this.bibtexKeyPatternPreferences);
-    }
-
-    public Charset getEncodingOrDefault() {
-        return encoding == null ? Charset.defaultCharset() : encoding;
     }
 
     public FieldWriterPreferences getFieldWriterPreferences() {

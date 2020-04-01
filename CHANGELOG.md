@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - When JabRef finds a `.sav` file without changes, there is no dialog asking for acceptance of changes anymore.
 - We changed the buttons for import/export/show all/reset of preferences to smaller icon buttons in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We moved the functionality "Manage field names & content" from the "Library" menu to the "Edit" menu, because it affects the selected entries and not the whole library
+- We merged the functionality "Append contents from a BibTeX library into the currently viewed library" into the "Import into database" functionality. Fixes [#6049](https://github.com/JabRef/jabref/issues/6049).
 
 ### Fixed
 
@@ -33,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Removed
 
 - We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
+- We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/general/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
 
 ## [5.0] – 2020-03-06
 
