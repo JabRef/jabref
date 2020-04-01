@@ -26,7 +26,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
     private final String apiKey;
     private static final String NAME = "Worldcat Fetcher";
 
-    private static String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
+    private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
 
     public WorldcatFetcher (String worldcatKey) {
 		this.API_KEY = worldcatKey;
