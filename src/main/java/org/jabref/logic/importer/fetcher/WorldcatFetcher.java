@@ -28,8 +28,8 @@ public class WorldcatFetcher implements EntryBasedFetcher {
     private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
 
     public WorldcatFetcher (String worldcatKey) {
-		this.API_KEY = worldcatKey;
-		WORLDCAT_OPEN_SEARCH_URL += API_KEY;
+		this.apiKey = worldcatKey;
+		WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
         Optional<String> entryTitle = entry.getLatexFreeField (StandardField.TITLE);
         if (entryTitle.isPresent ()) {
             String xmlResponse = makeOpenSearchRequest (entryTitle.get ());
-            WorldcatImporter importer = new WorldcatImporter (this.API_KEY); 
+            WorldcatImporter importer = new WorldcatImporter (this.apiKey); 
             ParserResult parserResult;
             try { 
                 if (importer.isRecognizedFormat (xmlResponse)) {
