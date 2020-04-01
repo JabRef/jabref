@@ -24,7 +24,6 @@ import org.jabref.model.entry.field.StandardField;
 public class WorldcatFetcher implements EntryBasedFetcher {
 
     private final String apiKey;
-    private static final String NAME = "Worldcat Fetcher";
 
     private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
 
