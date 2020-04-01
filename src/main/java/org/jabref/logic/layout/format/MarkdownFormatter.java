@@ -23,7 +23,6 @@ public class MarkdownFormatter implements LayoutFormatter {
                 StrikethroughExtension.create(),
                 TaskListExtension.create()
         ));
-        options.set(HtmlRenderer.NO_P_TAGS_USE_BR, true);
 
         parser = Parser.builder(options).build();
         renderer = HtmlRenderer.builder(options).build();
