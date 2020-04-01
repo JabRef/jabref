@@ -22,7 +22,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.4'
+    id 'org.beryx.jlink' version '2.17.3'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -117,7 +117,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.23'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.64'
@@ -191,17 +191,17 @@ dependencies {
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.0'
-    implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
+    implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.6.0') {
         exclude module: "log4j-core"
     }
 
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.66'
+    testImplementation 'io.github.classgraph:classgraph:4.8.65'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.9'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.8'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.3.3'
@@ -212,9 +212,9 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.31'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
-    jython 'org.python:jython-standalone:2.7.2'
+    jython 'org.python:jython-standalone:2.7.1'
 }
 
 dependencyUpdates {
@@ -229,6 +229,11 @@ dependencyUpdates.resolutionStrategy = {
                 selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
             }
             if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+        rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
+            if (selection.candidate.version ==~ /2.7.2b\d/ || selection.candidate.version ==~ /2.7.2rc\d/) {
                 selection.reject('Release candidate')
             }
         }
@@ -603,9 +608,7 @@ jlink {
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
         provides 'com.oracle.truffle.js.runtime.Evaluator' with 'com.oracle.truffle.js.parser.GraalJSEvaluator'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
                 'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
         provides 'java.sql.Driver' with 'org.postgresql.Driver'
@@ -626,7 +629,6 @@ jlink {
         provides 'org.apache.logging.log4j.spi.Provider' with 'org.apache.logging.log4j.core.impl.Log4jProvider'
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
-        provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
         provides 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup' with 'com.oracle.truffle.js.builtins.JSDefaultBuiltinLookup'
     }
 
