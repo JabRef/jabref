@@ -24,16 +24,7 @@ class MarkdownFormatterTest {
 
     @Test
     void formatWhenFormattingComplexMarkupThenReturnsOnlyOneLine() {
-        String source = "Markup\n\n* list item one\n* list item 2\n\n rest";
-
-        String actual = markdownFormatter.format(source);
-
-        // Only test relevant bits and ignore possible whitespace introduced by html-renderer
-        assertTrue(actual.contains("Markup<br />"));
-        assertTrue(actual.contains("<li>list item one</li>"));
-        assertTrue(actual.contains("<li>list item 2</li>"));
-        assertTrue(actual.contains("> rest"));
-        assertFalse(actual.contains("\n"));
+        assertFalse(markdownFormatter.format("Markup\n\n* list item one\n* list item 2\n\n rest").contains("\n"));
     }
 
     @Test
