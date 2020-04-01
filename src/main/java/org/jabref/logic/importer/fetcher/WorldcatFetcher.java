@@ -34,7 +34,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 
     @Override
     public String getName () {
-        return NAME;
+        return "Worldcat Fetcher";
     }
 
     /**
