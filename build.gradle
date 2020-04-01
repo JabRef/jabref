@@ -191,6 +191,9 @@ dependencies {
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.0'
+    implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.6.0') {
+        exclude module: "log4j-core"
+    }
 
     testImplementation 'io.github.classgraph:classgraph:4.8.66'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.1'
