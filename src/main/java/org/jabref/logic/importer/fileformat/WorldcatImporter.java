@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.WorldcatFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
