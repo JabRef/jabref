@@ -119,7 +119,7 @@ class PreferencesMigrationsTest {
     }
 
     @Test
-    void upgradePreviewStyleAllowMarkup() {
+    void upgradePreviewStyleAllowMarkupDefault() {
         String oldPreviewStyle = "<font face=\"sans-serif\">"
                 + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                 + "\\end{bibtexkey}</b><br>__NEWLINE__"
@@ -167,6 +167,27 @@ class PreferencesMigrationsTest {
 
         verify(prefs).setPreviewStyle(newPreviewStyle);
     }
+
+    @Test
+    void upgradePreviewStyleAllowMarkupCustomized() {
+        String oldPreviewStyle = "<font face=\"sans-serif\">"
+                + "My highly customized format only using comments:<br>"
+                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        String newPreviewStyle = "<font face=\"sans-serif\">"
+                + "My highly customized format only using comments:<br>"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        prefs.setPreviewStyle(oldPreviewStyle);
+        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyleAllowMarkdown(prefs);
+
+        verify(prefs).setPreviewStyle(newPreviewStyle);
+    }
+
 
     @Test
     void testUpgradeColumnPreferencesAlreadyMigrated() {

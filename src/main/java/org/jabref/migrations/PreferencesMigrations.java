@@ -304,7 +304,7 @@ public class PreferencesMigrations {
 
     static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.getPreviewStyle();
-        String migratedStyle = currentPreviewStyle.replace("\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}");
+        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}");
         prefs.setPreviewStyle(migratedStyle);
     }
 
