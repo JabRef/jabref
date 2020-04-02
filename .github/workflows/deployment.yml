@@ -54,19 +54,27 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle') }}
+          # in case there is no cache for the current OS, fall back to any other OS
           restore-keys: |
             ${{ runner.os }}-gradle-cache-
+            Linux-gradle-cache-${{ hashFiles('**/*.gradle') }}
+            Windows-gradle-cache-${{ hashFiles('**/*.gradle') }}
+            macOS-gradle-cache-${{ hashFiles('**/*.gradle') }}
       - uses: actions/cache@v1
         name: Cache gradle wrapper
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          # in case there is no cache for the current OS, fall back to any other OS
+          restore-keys: |
+            Linux-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            Windows-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            macOS-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
