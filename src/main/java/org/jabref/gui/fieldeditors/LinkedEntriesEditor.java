@@ -17,6 +17,8 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
+import java.util.Collection;
+
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     @FXML
@@ -31,16 +33,15 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                 .root(this)
                 .load();
 
-//        chipView.getSuggestions().addAll(viewModel.linkedEntriesProperty());
-
         chipView.setConverter(viewModel.getStringConverter());
+        chipView.getSuggestions().addAll((Collection<? extends ParsedEntryLink>) suggestionProvider.getPossibleSuggestions());
 
-        chipView.setChipFactory(
-                (view, item) -> {
-                    JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
-                    chip.setOnMouseClicked(event -> viewModel.jumpToEntry(item) );
-                    return chip;
-                });
+            chipView.setChipFactory(
+                    (view, item) -> {
+                            JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
+                            chip.setOnMouseClicked(event -> viewModel.jumpToEntry(item));
+                            return chip;
+                    });
 
         Bindings.bindContentBidirectional(chipView.getChips(), viewModel.linkedEntriesProperty());
     }

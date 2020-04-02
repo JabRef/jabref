@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-
 import javafx.util.Callback;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest;
@@ -109,6 +108,16 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
                 }
             }
             suggestions.sort(getComparator());
+        }
+        return suggestions;
+    }
+
+    public final Collection<T> getPossibleSuggestions(){
+        List<T> suggestions = new ArrayList<>();
+        synchronized (possibleSuggestionsLock) {
+            for (T possibleSuggestion : possibleSuggestions) {
+                    suggestions.add(possibleSuggestion);
+            }
         }
         return suggestions;
     }

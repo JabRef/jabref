@@ -37,4 +37,14 @@ public class ContentSelectorSuggestionProvider implements AutoCompleteSuggestion
     public void indexEntry(BibEntry entry) {
         suggestionProvider.indexEntry(entry);
     }
+
+    @Override
+    public Collection<String> getPossibleSuggestions() {
+        List<String> suggestions = new ArrayList<>();
+        if (suggestionProvider != null) {
+            suggestions.addAll(suggestionProvider.getPossibleSuggestions());
+        }
+        suggestions.addAll(contentSelectorValues);
+        return suggestions;
+    }
 }
