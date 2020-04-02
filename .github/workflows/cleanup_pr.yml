@@ -29,7 +29,7 @@ jobs:
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: appleboy/ssh-action@v0.0.6
         with:
-          script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }}
+          script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }} || true
           host: build-upload.jabref.org
           port: 9922
           username: jrrsync

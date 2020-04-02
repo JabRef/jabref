@@ -33,7 +33,11 @@ Typically, they have constructive feedback on their contribution.
 This means, that the contributors get comments on their contribution enabling them to level-up their coding skill.
 Incorporating improvements takes time, too.
 The benefit is two-fold: a) contributors improve their coding skills and b) JabRef's code quality improves.
-All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments
+All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
+
+GitHub describes that in their page [Unterstanding the GitHub flow](https://guides.github.com/introduction/flow/):
+
+[![GitHub flow](images/github-flow.png)](images/github-flow.png)
 
 ## Process for Java newcomers
 
