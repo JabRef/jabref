@@ -59,16 +59,14 @@ jobs:
         name: Restore gradle cache
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
+            ${{ runner.os }}-gradle-cache-
       - uses: actions/cache@v1
         name: Cache gradle wrapper
         with:
           path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
