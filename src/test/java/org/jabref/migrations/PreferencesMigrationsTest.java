@@ -188,7 +188,6 @@ class PreferencesMigrationsTest {
         verify(prefs).setPreviewStyle(newPreviewStyle);
     }
 
-
     @Test
     void testUpgradeColumnPreferencesAlreadyMigrated() {
         List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
