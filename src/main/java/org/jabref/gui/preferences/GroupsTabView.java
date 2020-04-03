@@ -16,7 +16,7 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
     @FXML private RadioButton groupViewModeIntersection;
     @FXML private RadioButton groupViewModeUnion;
     @FXML private CheckBox autoAssignGroup;
-    @FXML private CheckBox displayGroupQuantity;
+    @FXML private CheckBox displayGroupCount;
     @FXML private TextField defaultGroupingField;
     @FXML private TextField keywordSeparator;
 
@@ -38,7 +38,7 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
         groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
         groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
         autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
-        displayGroupQuantity.selectedProperty().bindBidirectional(viewModel.displayGroupQuantity());
+        displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
         defaultGroupingField.textProperty().bindBidirectional(viewModel.defaultGroupingFieldProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
     }
