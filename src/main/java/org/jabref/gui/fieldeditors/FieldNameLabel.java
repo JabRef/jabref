@@ -80,11 +80,11 @@ public class FieldNameLabel extends Label {
                 case EDITORTYPE:
                     return Localization.lang("The type of editorial role performed by the editor. Roles supported by default are \"editor\", \"compiler\", \"founder\", \"continuator\", \"redactor\", \"reviser\", \"collaborator\", \"organizer\". The role \"editor\" is the default. In this case, the field is omissible.");
                 case EDITORATYPE:
-                    return Localization.lang("Similar to \"editortype\" but referring to the editora field.");
+                    return Localization.lang("Similar to \"Editortype\" but referring to the editora field.");
                 case EDITORBTYPE:
-                    return Localization.lang("Similar to \"editortype\" but referring to the editorb field.");
+                    return Localization.lang("Similar to \"Editortype\" but referring to the editorb field.");
                 case EDITORCTYPE:
-                    return Localization.lang("Similar to \"editortype\" but referring to the editorc field.");
+                    return Localization.lang("Similar to \"Editortype\" but referring to the editorc field.");
                 case EID:
                     return Localization.lang("Electronic identifier of a work.") + "\n" +
                             Localization.lang("This field may replace the pages field for journals deviating from the classic pagination scheme of printed journals by only enumerating articles or papers and not pages.");
