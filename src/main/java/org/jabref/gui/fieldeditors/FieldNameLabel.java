@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Screen;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -22,8 +23,11 @@ public class FieldNameLabel extends Label {
 
         String description = getDescription(field);
         if (StringUtil.isNotBlank(description)) {
-            Tooltip tooltip = new Tooltip();
-            tooltip.setText(description);
+            Screen currentScreen = Screen.getPrimary();
+            double maxWidth = currentScreen.getBounds().getWidth();
+            Tooltip tooltip = new Tooltip(description);
+            tooltip.setMaxWidth(maxWidth * 2 / 3);
+            tooltip.setWrapText(true);
             this.setTooltip(tooltip);
         }
     }
