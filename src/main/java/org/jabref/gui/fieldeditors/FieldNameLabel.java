@@ -120,6 +120,8 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Author(s) of an introduction to the work.");
                 case ISBN:
                     return Localization.lang("International Standard Book Number of a book.");
+                case ISRN:
+                    return Localization.lang("The International Standard Technical Report Number of a technical report.");
                 case ISSN:
                     return Localization.lang("The International Standard Serial Number of a periodical.");
                 case ISSUE:
