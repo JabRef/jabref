@@ -64,7 +64,6 @@ public enum StandardActions implements Action {
     OPEN_LIBRARY(Localization.lang("Open library"), IconTheme.JabRefIcons.OPEN, KeyBinding.OPEN_DATABASE),
     IMPORT(Localization.lang("Import"), IconTheme.JabRefIcons.IMPORT),
     EXPORT(Localization.lang("Export"), IconTheme.JabRefIcons.EXPORT, KeyBinding.EXPORT),
-    MERGE_DATABASE(Localization.lang("Append library"), Localization.lang("Append contents from a BibTeX library into the currently viewed library")),
     SAVE_LIBRARY(Localization.lang("Save library"), IconTheme.JabRefIcons.SAVE, KeyBinding.SAVE_DATABASE),
     SAVE_LIBRARY_AS(Localization.lang("Save library as..."), KeyBinding.SAVE_DATABASE_AS),
     SAVE_SELECTED_AS_PLAIN_BIBTEX(Localization.lang("Save selected as plain BibTeX...")),

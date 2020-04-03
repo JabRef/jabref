@@ -88,7 +88,6 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ManageCustomImportsAction;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -679,7 +678,6 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.MERGE_DATABASE, new AppendDatabaseAction(this, dialogService, stateManager)), // TODO: merge with import
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, stateManager)),
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, stateManager))),
 
@@ -907,27 +905,26 @@ public class JabRefFrame extends BorderPane {
         return menu;
     }
 
-    public void addParserResult(ParserResult pr, boolean focusPanel) {
-        if (pr.toOpenTab()) {
+    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
+        if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), focusPanel);
+                addTab(parserResult.getDatabaseContext(), focusPanel);
             } else {
-                List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
-                addImportedEntries(panel, entries);
+                addImportedEntries(panel, parserResult);
             }
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(pr.getFile()))
+                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(parserResult.getFile()))
                                                           .findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.getSelectionModel().select(getTab(panel.get()));
             } else {
-                addTab(pr.getDatabaseContext(), focusPanel);
+                addTab(parserResult.getDatabaseContext(), focusPanel);
             }
         }
     }
@@ -1053,11 +1050,11 @@ public class JabRefFrame extends BorderPane {
     /**
      * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
-     * @param panel   The BasePanel to add to.
-     * @param entries The entries to add.
+     * @param panel        The BasePanel to add to.
+     * @param parserResult The entries to add.
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries) {
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> entries);
+    private void addImportedEntries(final BasePanel panel, final ParserResult parserResult) {
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();

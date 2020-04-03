@@ -149,9 +149,10 @@ public class BasePanel extends StackPane {
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
             if (this.bibDatabaseContext.getDatabasePath().isPresent()) {
-                // check if file is modified
-                String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
-                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName()).append(changeFlag);
+                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName());
+                if (isModified() && !isAutosaveEnabled) {
+                    title.append("*");
+                }
             } else {
                 title.append(Localization.lang("untitled"));
 
@@ -261,7 +262,11 @@ public class BasePanel extends StackPane {
 
                 // Set owner and timestamp
                 for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry, true, true, Globals.prefs.getUpdateFieldPreferences());
+                    UpdateField.setAutomaticFields(entry,
+                            true,
+                            true,
+                            Globals.prefs.getOwnerPreferences(),
+                            Globals.prefs.getTimestampPreferences());
                 }
                 // Create an UndoableInsertEntries object.
                 getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
