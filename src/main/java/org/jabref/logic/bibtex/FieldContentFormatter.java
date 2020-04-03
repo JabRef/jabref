@@ -43,7 +43,6 @@ public class FieldContentFormatter {
      */
     public String format(String fieldContent, Field field) {
         if (multiLineFields.contains(field)) {
-            // Unify line breaks
             return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
         }
 

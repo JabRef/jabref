@@ -161,47 +161,6 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   "Test using" is set to "IntelliJ IDEA".
 
-To use the "JabRef Main" run configuration, open **Run \| Edit Configurations... \| Application \| JabRef Main** and
-
-* Verify, that your JDK 14 is used
-* Set "VM Options" to the following:
-
-  ```text
-    --patch-module org.jabref=build/resources/main
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-    --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-    --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-    --add-opens javafx.controls/javafx.scene.control=org.jabref
-    --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
-    --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls
-    --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-    --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-opens javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.binding=com.jfoenix
-    --add-opens javafx.graphics/com.sun.javafx.stage=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.event=com.jfoenix
-  ```
-
-  Optionally the following entries can also be added \(but they currently only produce warnings and they are not needed\):
-
-  ```text
-    --patch-module test=fastparse_2.12-1.0.0.jar
-    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-    --patch-module test3=sourcecode_2.12-0.1.4.jar
-  ```
-
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
 #### Using JabRef's code-style
@@ -214,13 +173,14 @@ Contributions to JabRef's source code need to have a code formatting that is con
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
-* Go to **File \| Settings \| Other Settings \| Checkstyle \| Configuration File**
+* Go to **File \| Settings \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide e.g. "CheckStyle"
+  2. For the description provide e.g. "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Click "Next" and "Finish"
-  5. Activate the CheckStyle configuration file by ticking it in the list
-  6. Save settings by clicking "OK"
+  4. Check "Store relative to project location"
+  5. Click "Next" and "Finish"
+  6. Activate the CheckStyle configuration file by ticking it in the list
+  7. Save settings by clicking "OK"
 
 #### Troubleshooting when using both IDEA and Eclipse
 

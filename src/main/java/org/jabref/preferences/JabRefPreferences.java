@@ -59,8 +59,6 @@ import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
@@ -74,6 +72,7 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
@@ -81,6 +80,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -165,7 +165,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
-    public static final String BACKUP = "backup";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
@@ -495,7 +494,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
         defaults.put(LAST_FOCUSED, "");
@@ -1326,7 +1324,6 @@ public class JabRefPreferences implements PreferencesService {
                 saveInOriginalOrder,
                 saveOrder,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -1341,7 +1338,6 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 null,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
