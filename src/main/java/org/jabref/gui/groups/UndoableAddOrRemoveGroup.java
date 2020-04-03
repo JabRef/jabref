@@ -6,7 +6,7 @@ import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.GroupTreeNode;
 
-class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
+public class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
 
     /** Adding of a single node (group). */
     public static final int ADD_NODE = 0;
