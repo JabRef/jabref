@@ -25,15 +25,15 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
-         - os: ubuntu-latest
-           displayName: linux
-           archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-         - os: windows-latest
-           displayName: windows
-           archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-         - os: macOS-latest
-           displayName: macOS
-           archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
+          - os: ubuntu-latest
+            displayName: linux
+            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+          - os: windows-latest
+            displayName: windows
+            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
+          - os: macOS-latest
+            displayName: macOS
+            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
 
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
@@ -44,31 +44,37 @@ jobs:
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.1
+        uses: gittools/actions/gitversion/setup@v0.9.2
         with:
-          versionSpec: '5.1.3'
+          versionSpec: '5.2.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.1
+        uses: gittools/actions/gitversion/execute@v0.9.2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 14
-      # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('**/*.gradle') }}
+          # in case there is no cache for the current OS, fall back to any other OS
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
+            ${{ runner.os }}-gradle-cache-
+            Linux-gradle-cache-${{ hashFiles('**/*.gradle') }}
+            Windows-gradle-cache-${{ hashFiles('**/*.gradle') }}
+            macOS-gradle-cache-${{ hashFiles('**/*.gradle') }}
       - uses: actions/cache@v1
         name: Cache gradle wrapper
         with:
           path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          # in case there is no cache for the current OS, fall back to any other OS
+          restore-keys: |
+            Linux-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            Windows-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            macOS-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
@@ -109,12 +115,12 @@ jobs:
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.1
+        uses: gittools/actions/gitversion/setup@v0.9.2
         with:
-          versionSpec: '5.1.3'
+          versionSpec: '5.2.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.1
+        uses: gittools/actions/gitversion/execute@v0.9.2
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
