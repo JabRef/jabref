@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
+import javafx.stage.Screen;
 
 import org.jabref.Globals;
 import org.jabref.gui.util.BaseDialog;
@@ -98,8 +99,11 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
             String description = getDescription(entryType);
             if (StringUtil.isNotBlank(description)) {
-                Tooltip tooltip = new Tooltip();
-                tooltip.setText(description);
+                Screen currentScreen = Screen.getPrimary();
+                double maxWidth = currentScreen.getBounds().getWidth();
+                Tooltip tooltip = new Tooltip(description);
+                tooltip.setMaxWidth((maxWidth * 2) / 3);
+                tooltip.setWrapText(true);
                 entryButton.setTooltip(tooltip);
             }
         }
@@ -184,8 +188,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     //since bibtex is a subset of biblatex and biblatex is better documented.
     public String getDescription(BibEntryType selectedType) {
         EntryType entryType = selectedType.getType();
-        try {
-            StandardEntryType entry = (StandardEntryType) entryType;
+        if (entryType instanceof StandardEntryType entry) {
             switch (entry) {
                 case Article -> {
                     return Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
@@ -200,7 +203,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     return Localization.lang("A single-volume collection with multiple, self-contained contributions by distinct authors which have their own title. The work as a whole has no overall author but it will usually have an editor.");
                 }
                 case Conference -> {
-                    return Localization.lang("A legacy alias for inproceedings.");
+                    return Localization.lang("A legacy alias for \"InProceedings\".");
                 }
                 case InBook -> {
                     return Localization.lang("A part of a book which forms a self-contained unit with its own title.");
@@ -215,40 +218,40 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     return Localization.lang("Technical or other documentation, not necessarily in printed form.");
                 }
                 case MastersThesis -> {
-                    return Localization.lang("Similar to thesis except that the type field is optional and defaults to the localised term  Master's thesis.");
+                    return Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term  Master's thesis.");
                 }
                 case Misc -> {
                     return Localization.lang("A fallback type for entries which do not fit into any other category.");
                 }
                 case PhdThesis -> {
-                    return Localization.lang("Similar to thesis except that the type field is optional and defaults to the localised term PhD thesis.");
+                    return Localization.lang("Similar to \"Thesis\" except that the type field is optional and defaults to the localised term PhD thesis.");
                 }
                 case Proceedings -> {
-                    return Localization.lang("A single-volume conference proceedings. This type is very similar to collection.");
+                    return Localization.lang("A single-volume conference proceedings. This type is very similar to \"Collection\".");
                 }
                 case TechReport -> {
-                    return Localization.lang("Similar to report except that the type field is optional and defaults to the localised term technical report.");
+                    return Localization.lang("Similar to \"Report\" except that the type field is optional and defaults to the localised term technical report.");
                 }
                 case Unpublished -> {
                     return Localization.lang("A work with an author and a title which has not been formally published, such as a manuscript or the script of a talk.");
                 }
                 case BookInBook -> {
-                    return Localization.lang("This type is similar to inbook but intended for works originally published as a stand-alone book.");
+                    return Localization.lang("This type is similar to \"InBook\" but intended for works originally published as a stand-alone book.");
                 }
                 case InReference -> {
-                    return Localization.lang("An article in a work of reference. This is a more specific variant of the generic incollection entry type.");
+                    return Localization.lang("An article in a work of reference. This is a more specific variant of the generic \"InCollection\" entry type.");
                 }
                 case MvBook -> {
-                    return Localization.lang("A multi-volume book.");
+                    return Localization.lang("A multi-volume \"Book\".");
                 }
                 case MvCollection -> {
-                    return Localization.lang("A multi-volume collection.");
+                    return Localization.lang("A multi-volume \"Collection\".");
                 }
                 case MvProceedings -> {
-                    return Localization.lang("A multi-volume proceedings entry.");
+                    return Localization.lang("A multi-volume \"Proceedings\" entry.");
                 }
                 case MvReference -> {
-                    return Localization.lang("A multi-volume reference entry. The standard styles will treat this entry type as an alias for mvcollection.");
+                    return Localization.lang("A multi-volume \"Reference\" entry. The standard styles will treat this entry type as an alias for \"MvCollection\".");
                 }
                 case Online -> {
                     return Localization.lang("This entry type is intended for sources such as web sites which are intrinsically online resources.");
@@ -263,22 +266,22 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     return Localization.lang("An entry set is a group of entries which are cited as a single reference and listed as a single item in the bibliography.");
                 }
                 case SuppBook -> {
-                    return Localization.lang("Supplemental material in a book. This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
+                    return Localization.lang("Supplemental material in a \"Book\". This type is provided for elements such as prefaces, introductions, forewords, afterwords, etc. which often have a generic title only.");
                 }
                 case SuppCollection -> {
-                    return Localization.lang("Supplemental material in a collection.");
+                    return Localization.lang("Supplemental material in a \"Collection\".");
                 }
                 case SuppPeriodical -> {
-                    return Localization.lang("Supplemental material in a periodical. This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
+                    return Localization.lang("Supplemental material in a \"Periodical\". This type may be useful when referring to items such as regular columns, obituaries, letters to the editor, etc. which only have a generic title.");
                 }
                 case Thesis -> {
                     return Localization.lang("A thesis written for an educational institution to satisfy the requirements for a degree.");
                 }
                 case WWW -> {
-                    return Localization.lang("An alias for online, provided for jurabib compatibility.");
+                    return Localization.lang("An alias for \"Online\", provided for jurabib compatibility.");
                 }
                 case Software -> {
-                    return Localization.lang("Computer software. The standard styles will treat this entry type as an alias for misc.");
+                    return Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
                 }
                 case DATESET -> {
                     return Localization.lang("A data set or a similar collection of (mostly) raw data.");
@@ -287,10 +290,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                     return "";
                 }
             }
-        } catch (Exception e) {
+        } else {
             return "";
         }
-
     }
 
 }
