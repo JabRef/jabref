@@ -173,8 +173,7 @@ class IntegrityCheckTest {
         assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "10"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(
-                      withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBLATEX));
         assertWrong(createContext(StandardField.EDITION, "1"));
@@ -485,8 +484,8 @@ class IntegrityCheckTest {
     @Test
     void testASCIIChecks() {
         assertCorrect(createContext(StandardField.TITLE, "Only ascii characters!'@12"));
-        assertWrong(createContext(StandardField.MONTH, "Umlauts are nΓ¶t Γ¤llowed"));
-        assertWrong(createContext(StandardField.AUTHOR, "Some unicode β�•"));
+        assertWrong(createContext(StandardField.MONTH, "Umlauts are nöt ällowed"));
+        assertWrong(createContext(StandardField.AUTHOR, "Some unicode ⊕"));
     }
 
     private BibDatabaseContext createContext(Field field, String value, EntryType type) {
