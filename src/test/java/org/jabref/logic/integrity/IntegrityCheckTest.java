@@ -39,40 +39,127 @@ import static org.mockito.Mockito.mock;
 class IntegrityCheckTest {
 
     @Test
-    void testEntryTypeChecks() {
+    void bibTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptIEEETranEntryType() {
         assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibLaTexAcceptsIEEETranEntryType() {
         assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
+    }
+
+    @Test
+    void bibLaTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
-    void testUrlChecks() {
+    void urlFieldAcceptsHttpAddress() {
         assertCorrect(createContext(StandardField.URL, "http://www.google.com"));
-        assertCorrect(createContext(StandardField.URL, "file://c:/asdf/asdf"));
-        assertCorrect(createContext(StandardField.URL, "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
+    }
 
+    @Test
+    void urlFieldAcceptsFullLocalPath() {
+        assertCorrect(createContext(StandardField.URL, "file://c:/asdf/asdf"));
+    }
+
+    @Test
+    void urlFieldAcceptsFullPathHttpAddress() {
+        assertCorrect(createContext(StandardField.URL, "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
+    }
+
+    @Test
+    void urlFieldDoesNotAcceptHttpAddressWithoutTheHttp() {
         assertWrong(createContext(StandardField.URL, "www.google.com"));
+    }
+
+    @Test
+    void urlFieldDoesNotAcceptPartialHttpAddress() {
         assertWrong(createContext(StandardField.URL, "google.com"));
+    }
+
+    @Test
+    void urlFieldDoesNotAcceptPartialLocalPath() {
         assertWrong(createContext(StandardField.URL, "c:/asdf/asdf"));
     }
 
     @Test
-    void testYearChecks() {
+    void yearFieldAccepts21stCenturyDate() {
         assertCorrect(createContext(StandardField.YEAR, "2014"));
+    }
+
+    @Test
+    void yearFieldAccepts20thCenturyDate() {
         assertCorrect(createContext(StandardField.YEAR, "1986"));
+    }
+
+    @Test
+    void yearFieldAcceptsApproximateDate() {
         assertCorrect(createContext(StandardField.YEAR, "around 1986"));
+    }
+
+    @Test
+    void yearFieldAcceptsApproximateDateWithParenthesis() {
         assertCorrect(createContext(StandardField.YEAR, "(around 1986)"));
+    }
+
+    @Test
+    void yearFieldRemovesCommaFromYear() {
         assertCorrect(createContext(StandardField.YEAR, "1986,"));
+    }
+
+    @Test
+    void yearFieldRemovesBraceAndPercentageFromYear() {
         assertCorrect(createContext(StandardField.YEAR, "1986}%"));
+    }
+
+    @Test
+    void yearFieldRemovesSpecialCharactersFromYear() {
         assertCorrect(createContext(StandardField.YEAR, "1986(){},.;!?<>%&$"));
+    }
+
+    @Test
+    void yearFieldDoesNotAcceptStringAsInput() {
         assertWrong(createContext(StandardField.YEAR, "abc"));
+    }
+
+    @Test
+    void yearFieldDoesNotAcceptDoubleDigitNumber() {
         assertWrong(createContext(StandardField.YEAR, "86"));
+    }
+
+    @Test
+    void yearFieldDoesNotAcceptTripleDigitNumber() {
         assertWrong(createContext(StandardField.YEAR, "204"));
+    }
+
+    @Test
+    void yearFieldDoesNotRemoveStringInYear() {
         assertWrong(createContext(StandardField.YEAR, "1986a"));
+    }
+
+    @Test
+    void yearFieldDoesNotRemoveStringInParenthesis() {
         assertWrong(createContext(StandardField.YEAR, "(1986a)"));
+    }
+
+    @Test
+    void yearFieldDoesNotRemoveStringBeforeComma() {
         assertWrong(createContext(StandardField.YEAR, "1986a,"));
+    }
+
+    @Test
+    void yearFieldDoesNotRemoveStringInsideBraceAndPercentage() {
         assertWrong(createContext(StandardField.YEAR, "1986}a%"));
+    }
+
+    @Test
+    void yearFieldDoesNotRemoveStringBeforeSpecialCharacters() {
         assertWrong(createContext(StandardField.YEAR, "1986a(){},.;!?<>%&$"));
     }
 
@@ -87,19 +174,39 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "10"), BibDatabaseMode.BIBLATEX));
         assertCorrect(
-                withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+                      withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBLATEX));
         assertWrong(createContext(StandardField.EDITION, "1"));
     }
 
     @Test
-    void testNoteChecks() {
+    void bibTexAcceptsNoteWithFirstCapitalLetter() {
         assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibTexAcceptsNoteWithFirstCapitalLetterAndDoesNotCareAboutTheRest() {
         assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptFirstLowercaseLetter() {
         assertWrong(withMode(createContext(StandardField.NOTE, "lorem ipsum"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibLaTexAcceptsNoteWithFirstCapitalLetter() {
         assertCorrect(withMode(createContext(StandardField.NOTE, "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void bibLaTexAcceptsUrl() {
         assertCorrect(withMode(createContext(StandardField.NOTE, "\\url{someurl}"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    void bibLaTexAcceptsFirstLowercaseLetter() {
         assertCorrect(withMode(createContext(StandardField.NOTE, "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
 
@@ -186,6 +293,17 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is A sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is {A} sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This is a sub title 1... this is a sub Title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBTEX));
 
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBLATEX));
@@ -194,6 +312,17 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.TITLE, "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is A sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: This is {A} sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is a sub title 1... this is a sub Title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -356,8 +485,8 @@ class IntegrityCheckTest {
     @Test
     void testASCIIChecks() {
         assertCorrect(createContext(StandardField.TITLE, "Only ascii characters!'@12"));
-        assertWrong(createContext(StandardField.MONTH, "Umlauts are nöt ällowed"));
-        assertWrong(createContext(StandardField.AUTHOR, "Some unicode ⊕"));
+        assertWrong(createContext(StandardField.MONTH, "Umlauts are nΓ¶t Γ¤llowed"));
+        assertWrong(createContext(StandardField.AUTHOR, "Some unicode β�•"));
     }
 
     private BibDatabaseContext createContext(Field field, String value, EntryType type) {
