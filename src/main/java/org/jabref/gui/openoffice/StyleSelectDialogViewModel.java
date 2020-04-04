@@ -51,7 +51,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isFromResource() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
     public OOBibStyle toOOBibStyle(StyleSelectItemViewModel item) {
@@ -121,6 +121,9 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
+
+        List<String> externalStyles = styles.stream().filter(style -> !style.internalStyleProperty().get()).map(this::toOOBibStyle).map(OOBibStyle::getPath).collect(Collectors.toList());
+        preferences.setExternalStyles(externalStyles);
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
     }

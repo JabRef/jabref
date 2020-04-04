@@ -44,6 +44,7 @@ public class StyleLoader {
         loadExternalStyles();
     }
 
+
     public List<OOBibStyle> getStyles() {
         List<OOBibStyle> result = new ArrayList<>(internalStyles);
         result.addAll(externalStyles);
@@ -120,7 +121,7 @@ public class StyleLoader {
 
     public boolean removeStyle(OOBibStyle style) {
         Objects.requireNonNull(style);
-        if (!style.isFromResource()) {
+        if (!style.isInternalStyle()) {
             boolean result = externalStyles.remove(style);
             storeExternalStyles();
             return result;
