@@ -191,7 +191,7 @@ public class FieldNameLabel extends Label {
                 case TRANSLATOR:
                     return Localization.lang("The translator(s) of the \"Title\" or \"Booktitle\", depending on the entry type. If the translator is identical to the \"Editor\", the standard styles will automatically concatenate these fields in the bibliography.");
                 case TYPE:
-                    return Localization.lang("The type of a \"manual\", \"patent\", \"report\", or \"thesis\".");
+                    return Localization.lang("The type of a \"Manual\", \"Patent\", \"Report\", or \"Thesis\".");
                 case URL:
                     return Localization.lang("URL of an online publication.");
                 case URLDATE:
@@ -244,7 +244,7 @@ public class FieldNameLabel extends Label {
                 case READ_STATUS:
                     return Localization.lang("A user-specific read status for this entry.");
                 case RELEVANCE:
-                    return Localization.lang("A user-specific relevance flag for this entry.");
+                    return Localization.lang("A user-specific relevance flag for this entry, in case the entry is relevant.");
             }
         }
         return "";
