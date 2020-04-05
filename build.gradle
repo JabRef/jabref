@@ -195,7 +195,9 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark-all:0.60.2'
+    implementation 'com.vladsch.flexmark:flexmark:0.61.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.0'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.66'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.1'
