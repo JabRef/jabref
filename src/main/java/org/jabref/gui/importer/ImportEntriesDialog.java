@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
@@ -110,18 +111,8 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     });
                     addToggle.getStyleClass().add("addEntryButton");
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
-                    addToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                        int numberOfSelectedItems = entriesListView.getCheckModel().getItemCount();
-                        if (observable.getValue()) {
-                            ++numberOfSelectedItems;
-                            selectedItems.setText(String.valueOf(numberOfSelectedItems));
-                        } else if (numberOfSelectedItems == 0) {
-                            return;
-                        } else {
-                            --numberOfSelectedItems;
-                            selectedItems.setText(String.valueOf(numberOfSelectedItems));
-                        }
-                    });
+                    addToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
+                         selectedItems.setText(String.valueOf(entriesListView.getCheckModel().getCheckedItems().size())));
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = getEntryNode(entry);
@@ -139,19 +130,20 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     }).executeWith(Globals.TASK_EXECUTOR);
 
                     /*
-                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    inserted the if-statement here, since a Platform.runLater() call did not work.
                     also tried to move it to the end of the initialize method, but it did not select the entry.
                     */
                     if (entriesListView.getItems().size() == 1) {
                         selectAllNewEntries();
                     }
 
-                    totalItems.textProperty().setValue(String.valueOf(entriesListView.getItems().size()));
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
+        entriesListView.itemsProperty().get().addListener((InvalidationListener) listener ->
+                totalItems.textProperty().setValue(String.valueOf(entriesListView.getItems().size())));
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
