@@ -94,9 +94,7 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
         } catch (IOException e) {
@@ -105,7 +103,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void viewStyle(StyleSelectItemViewModel item) {
-
         DialogPane pane = new DialogPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
@@ -121,8 +118,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
-
-        List<String> externalStyles = styles.stream().filter(style -> !style.internalStyleProperty().get()).map(this::toOOBibStyle).map(OOBibStyle::getPath).collect(Collectors.toList());
+        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style->!style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
         preferences.setExternalStyles(externalStyles);
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
