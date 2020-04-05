@@ -24,7 +24,17 @@ public class EntryEditorPreferences {
     private boolean avoidOverwritingCiteKey;
     private final boolean shouldShowLatexCitationsTab;
 
-    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, List<Field> customTabFieldNames, boolean shouldShowRecommendationsTab, boolean isMrdlibAccepted, boolean shouldShowLatexCitationsTab, boolean showSourceTabByDefault, BibtexKeyPatternPreferences bibtexKeyPatternPreferences, KeyBindingRepository keyBindings, boolean avoidOverwritingCiteKey) {
+    public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
+                                  FieldWriterPreferences fieldWriterPreferences,
+                                  ImportFormatPreferences importFormatPreferences,
+                                  List<Field> customTabFieldNames,
+                                  boolean shouldShowRecommendationsTab,
+                                  boolean isMrdlibAccepted,
+                                  boolean shouldShowLatexCitationsTab,
+                                  boolean showSourceTabByDefault,
+                                  BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+                                  KeyBindingRepository keyBindings,
+                                  boolean avoidOverwritingCiteKey) {
         this.entryEditorTabList = entryEditorTabList;
         this.fieldWriterPreferences = fieldWriterPreferences;
         this.importFormatPreferences = importFormatPreferences;

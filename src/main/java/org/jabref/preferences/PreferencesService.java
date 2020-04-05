@@ -59,15 +59,7 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    Map<String, Set<Field>> getEntryEditorTabList();
-
-    Map<String, String> getCustomTabsNamesAndFields();
-
-    void setCustomTabsNameAndFields(String name, String fields, int defNumber);
-
     void purgeSeries(String prefix, int number);
-
-    void updateEntryEditorTabList();
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
 
@@ -100,8 +92,6 @@ public interface PreferencesService {
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
     void saveCustomEntryTypes();
-
-    EntryEditorPreferences getEntryEditorPreferences();
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
@@ -141,4 +131,19 @@ public interface PreferencesService {
 
     void storeTimestampPreferences(TimestampPreferences preferences);
 
+    // Entry Editor
+
+    Map<String, Set<Field>> getEntryEditorTabList();
+
+    void updateEntryEditorTabList();
+
+    Map<String, Set<Field>> getDefaultTabNamesAndFields();
+
+    List<Field> getAllDefaultTabFieldNames();
+
+    void storeEntryEditorTabList(Map<String,Set<Field>> customTabsMap);
+
+    EntryEditorPreferences getEntryEditorPreferences();
+
+    void storeEntryEditorPreferences(EntryEditorPreferences preferences);
 }

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,7 +43,6 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -763,21 +763,6 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
     }
 
-    @Override
-    public EntryEditorPreferences getEntryEditorPreferences() {
-        return new EntryEditorPreferences(getEntryEditorTabList(),
-                getFieldWriterPreferences(),
-                getImportFormatPreferences(),
-                getCustomTabFieldNames(),
-                getBoolean(SHOW_RECOMMENDATIONS),
-                getBoolean(ACCEPT_RECOMMENDATIONS),
-                getBoolean(SHOW_LATEX_CITATIONS),
-                getBoolean(DEFAULT_SHOW_SOURCE),
-                getBibtexKeyPatternPreferences(),
-                Globals.getKeyPrefs(),
-                getBoolean(AVOID_OVERWRITING_KEY));
-    }
-
     public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
         Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
 
@@ -812,58 +797,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public String getTheme() {
         return get(FX_THEME);
-    }
-
-    /**
-     * Get a Map of default tab names to deafult tab fields.
-     * The fields are returned as a String with fields separated by ;
-     * They are combined into one string in order to feed into CustomizeGeneralFieldsDialogViewModel.resetFields()
-     * so that they do not have to be parsed in order to fit there
-     *
-     * @return A map of keys with tab names and values as a string containing
-     * fields for the given name separated by ;
-     */
-    @Override
-    public Map<String, String> getCustomTabsNamesAndFields() {
-        Map<String, String> customTabsMap = new HashMap<>();
-
-        int defNumber = 0;
-        while (true) {
-            //Saved as CUSTOMTABNAME_def{number} and ; separated
-            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-            customTabsMap.put(name, fields);
-            defNumber++;
-        }
-        return customTabsMap;
-    }
-
-    @Override
-    public void setCustomTabsNameAndFields(String name, String fields, int defNumber) {
-        prefs.put(CUSTOM_TAB_NAME + defNumber, name);
-        prefs.put(CUSTOM_TAB_FIELDS + defNumber, fields);
-    }
-
-    private List<Field> getCustomTabFieldNames() {
-        List<Field> customFields = new ArrayList<>();
-
-        int defNumber = 0;
-        while (true) {
-            // saved as CUSTOMTABNAME_def{number} and ; separated
-            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
-
-            if (StringUtil.isNullOrEmpty(fields)) {
-                break;
-            }
-
-            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
-            defNumber++;
-        }
-        return customFields;
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1199,19 +1132,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    @Override
-    public Map<String, Set<Field>> getEntryEditorTabList() {
-        if (tabList == null) {
-            updateEntryEditorTabList();
-        }
-        return tabList;
-    }
-
-    @Override
-    public void updateEntryEditorTabList() {
-        tabList = EntryEditorTabList.create(this);
-    }
-
     /**
      * Exports Preferences to an XML file.
      *
@@ -1285,13 +1205,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN));
-    }
-
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return new FieldWriterPreferences(
-                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
-                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
     }
 
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
@@ -1909,8 +1822,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = Globals.entryTypesManager.getAllTypes(bibDatabaseMode).stream()
-                                                                                .map(entryType -> entryType).collect(Collectors.toList());
+        List<BibEntryType> customBiblatexBibTexTypes = new ArrayList<>(Globals.entryTypesManager.getAllTypes(bibDatabaseMode));
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
@@ -2055,5 +1967,149 @@ public class JabRefPreferences implements PreferencesService {
         put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
         put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
         putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
+    }
+
+    //*************************************************************************************************************
+    // EntryEditorPreferences
+    //*************************************************************************************************************
+
+    /**
+     * Cache a list of defined tabs in the entry editor
+     *
+     * @return a list of defined tabs
+     */
+    @Override
+    public Map<String, Set<Field>> getEntryEditorTabList() {
+        if (tabList == null) {
+            updateEntryEditorTabList();
+        }
+        return tabList;
+    }
+
+    /**
+     * Create a list of currently defined tabs in the entry editor
+     */
+    @Override
+    public void updateEntryEditorTabList() {
+        Map<String, Set<Field>> tabs = new LinkedHashMap<>();
+        int i = 0;
+        String name;
+        if (hasKey(CUSTOM_TAB_NAME + 0)) {
+            // The user has modified from the default values:
+            while (hasKey(CUSTOM_TAB_NAME + i)) {
+                name = get(CUSTOM_TAB_NAME + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        } else {
+            // Nothing set, so we use the default values:
+            while (get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
+                name = get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+                Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
+                tabs.put(name, entry);
+                i++;
+            }
+        }
+        tabList = tabs;
+    }
+
+    /**
+     * Stores the defined tabs and corresponding fields in the preferences.
+     *
+     * @param customTabs a map of tab names and the corresponding set of fields to be displayed in
+     */
+    @Override
+    public void storeEntryEditorTabList(Map<String, Set<Field>> customTabs) {
+        String[] names = customTabs.keySet().toArray(String[]::new);
+        String[] fields = customTabs.values().stream()
+                                    .map(set -> set.stream()
+                                                   .map(Field::getName)
+                                                   .collect(Collectors.joining(STRINGLIST_DELIMITER.toString())))
+                                    .toArray(String[]::new);
+
+        for (int i = 0; i < customTabs.size(); i++) {
+            put(CUSTOM_TAB_NAME + i, names[i]);
+            put(CUSTOM_TAB_FIELDS + i, fields[i]);
+        }
+
+        purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
+        purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
+    }
+
+    /**
+     * Get a Map of default tab names to default tab fields.
+     *
+     * @return A map of keys with tab names and a set of corresponding fields
+     */
+    @Override
+    public Map<String, Set<Field>> getDefaultTabNamesAndFields() {
+        Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
+
+        int defNumber = 0;
+        while (true) {
+            // Saved as 'CUSTOMTABNAME_def{number}' and seperated by ';'
+            String name = (String) defaults.get(CUSTOM_TAB_NAME + "_def" + defNumber);
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            if (StringUtil.isNullOrEmpty(name) || StringUtil.isNullOrEmpty(fields)) {
+                break;
+            }
+
+            customTabsMap.put(name, FieldFactory.parseFieldList((String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber)));
+            defNumber++;
+        }
+        return customTabsMap;
+    }
+
+    /**
+     * Get a Map of default tab names to default tab fields.
+     *
+     * @return A map of keys with tab names and a set of corresponding fields
+     */
+    @Override
+    public List<Field> getAllDefaultTabFieldNames() {
+        List<Field> customFields = new ArrayList<>();
+
+        int defNumber = 0;
+        while (true) {
+            // saved as CUSTOMTABNAME_def{number} and ; separated
+            String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
+
+            if (StringUtil.isNullOrEmpty(fields)) {
+                break;
+            }
+
+            customFields.addAll(Arrays.stream(fields.split(STRINGLIST_DELIMITER.toString())).map(FieldFactory::parseField).collect(Collectors.toList()));
+            defNumber++;
+        }
+        return customFields;
+    }
+
+    @Override
+    public EntryEditorPreferences getEntryEditorPreferences() {
+        return new EntryEditorPreferences(getEntryEditorTabList(),
+                getFieldWriterPreferences(),
+                getImportFormatPreferences(),
+                getAllDefaultTabFieldNames(),
+                getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(ACCEPT_RECOMMENDATIONS),
+                getBoolean(SHOW_LATEX_CITATIONS),
+                getBoolean(DEFAULT_SHOW_SOURCE),
+                getBibtexKeyPatternPreferences(),
+                Globals.getKeyPrefs(),
+                getBoolean(AVOID_OVERWRITING_KEY));
+    }
+
+    @Override
+    public void storeEntryEditorPreferences(EntryEditorPreferences preferences) {
+        // ToDo
+    }
+
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return new FieldWriterPreferences(
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getFieldContentParserPreferences());
     }
 }
