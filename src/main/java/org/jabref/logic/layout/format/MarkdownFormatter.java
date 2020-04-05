@@ -19,6 +19,7 @@ public class MarkdownFormatter implements LayoutFormatter {
 
     public MarkdownFormatter() {
         MutableDataSet options = new MutableDataSet();
+        // in case a new extension is added here, the depedency has to be added to build.gradle, too.
         options.set(Parser.EXTENSIONS, List.of(
                 StrikethroughExtension.create(),
                 TaskListExtension.create()
