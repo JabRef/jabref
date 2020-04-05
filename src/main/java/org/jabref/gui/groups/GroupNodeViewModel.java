@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -37,6 +39,8 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.base.Enums;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
@@ -59,6 +63,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final DelayTaskThrottler throttler;
+    @Inject private PreferencesService preferencesService;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -66,6 +71,7 @@ public class GroupNodeViewModel {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
+        this.preferencesService = JabRefPreferences.getInstance();
 
         displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
@@ -229,10 +235,12 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        BackgroundTask
-                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                .onSuccess(hits::setValue)
-                .executeWith(taskExecutor);
+        if (preferencesService.getDisplayGroupCount()) {
+            BackgroundTask
+                    .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
+                    .onSuccess(hits::setValue)
+                    .executeWith(taskExecutor);
+        }
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
