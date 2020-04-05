@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -19,7 +20,7 @@ public class OOPreFormatter implements LayoutFormatter {
         int i;
         String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+                .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -38,11 +39,7 @@ public class OOPreFormatter implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     String result = OOPreFormatter.CHARS.get(command);
-                    if (result == null) {
-                        sb.append(command);
-                    } else {
-                        sb.append(result);
-                    }
+                    sb.append(Objects.requireNonNullElse(result, command));
                 }
                 escaped = true;
                 incommand = true;
@@ -94,11 +91,7 @@ public class OOPreFormatter implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            if (result == null) {
-                                sb.append(command);
-                            } else {
-                                sb.append(result);
-                            }
+                            sb.append(Objects.requireNonNullElse(result, command));
 
                         }
                     }
@@ -128,29 +121,17 @@ public class OOPreFormatter implements LayoutFormatter {
                         // If found, then use translated version. If not, then keep
                         // the
                         // text of the parameter intact.
-                        if (result == null) {
-                            sb.append(argument);
-                        } else {
-                            sb.append(result);
-                        }
+                        sb.append(Objects.requireNonNullElse(result, argument));
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         String result = OOPreFormatter.CHARS.get(command);
-                        if (result == null) {
-                            // If the command is unknown, just print it:
-                            sb.append(command);
-                        } else {
-                            sb.append(result);
-                        }
+                        // If the command is unknown, just print it:
+                        sb.append(Objects.requireNonNullElse(result, command));
                     } else {
                         String result = OOPreFormatter.CHARS.get(command);
-                        if (result == null) {
-                            sb.append(command);
-                        } else {
-                            sb.append(result);
-                        }
+                        sb.append(Objects.requireNonNullElse(result, command));
                         sb.append(' ');
                     }
                 } /* else if (c == '}') {
