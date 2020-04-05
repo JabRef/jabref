@@ -121,28 +121,29 @@ public class GroupTreeView {
                 .install(mainColumn);
 
         // Number of hits (only if user wants to see them)
-        if (preferencesService.getDisplayGroupCount()) {
-            PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
-            PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
-            new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
-                    .withGraphic(group -> {
-                        final StackPane node = new StackPane();
-                        node.getStyleClass().setAll("hits");
-                        if (!group.isRoot()) {
-                            BindingsHelper.includePseudoClassWhen(node, anySelected,
-                                    group.anySelectedEntriesMatchedProperty());
-                            BindingsHelper.includePseudoClassWhen(node, allSelected,
-                                    group.allSelectedEntriesMatchedProperty());
-                        }
-                        Text text = new Text();
+        PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
+        PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
+        new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
+                .withGraphic(group -> {
+                    final StackPane node = new StackPane();
+                    node.getStyleClass().setAll("hits");
+                    if (!group.isRoot()) {
+                        BindingsHelper.includePseudoClassWhen(node, anySelected,
+                                group.anySelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, allSelected,
+                                group.allSelectedEntriesMatchedProperty());
+                    }
+                    Text text = new Text();
+                    if (preferencesService.getDisplayGroupCount()) {
                         text.textProperty().bind(group.getHits().asString());
-                        text.getStyleClass().setAll("text");
-                        node.getChildren().add(text);
-                        node.setMaxWidth(Control.USE_PREF_SIZE);
-                        return node;
-                    })
-                    .install(numberColumn);
-        }
+                    }
+                    text.getStyleClass().setAll("text");
+                    node.getChildren().add(text);
+                    node.setMaxWidth(Control.USE_PREF_SIZE);
+                    return node;
+                })
+                .install(numberColumn);
+
 
         // Arrow indicating expanded status
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
