@@ -57,6 +57,7 @@ import org.jabref.logic.layout.format.Iso690NamesAuthors;
 import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NotFoundFormatter;
@@ -536,6 +537,8 @@ class LayoutEntry {
                 return new WrapContent();
             case "WrapFileLinks":
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
+            case "Markdown":
+                return new MarkdownFormatter();
             default:
                 return null;
         }
