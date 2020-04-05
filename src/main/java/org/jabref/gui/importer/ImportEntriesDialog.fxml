@@ -12,12 +12,20 @@
             fx:controller="org.jabref.gui.importer.ImportEntriesDialog"
             prefHeight="700.0" prefWidth="1000.0">
     <content>
-        <VBox spacing="10">
+        <VBox spacing="20">
             <Label text="%Select the entries to be imported:"/>
             <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
             <HBox>
                 <Button text="%Select all new entries" styleClass="text-button" onAction="#selectAllNewEntries"/>
                 <Button text="%Unselect all" styleClass="text-button" onAction="#unselectAll"/>
+            </HBox>
+            <HBox>
+                <Label text="%Total items found:" styleClass="info-section"/>
+                <Label fx:id="totalItems" />
+            </HBox>
+            <HBox>
+                <Label text="%Selected items:" styleClass="info-section"/>
+                <Label fx:id="selectedItems"/>
             </HBox>
         </VBox>
     </content>
