@@ -186,7 +186,7 @@
     <choose>
       <if type="article-journal article-magazine article-newspaper review review-book" match="any">
         <group suffix=";" delimiter=" ">
-          <date variable="issued" form="text"/>
+          <date variable="issued" form="text" date-parts="year"/>
           <text macro="accessed-date"/>
         </group>
       </if>
