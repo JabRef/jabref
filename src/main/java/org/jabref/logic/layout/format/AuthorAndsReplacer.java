@@ -18,6 +18,7 @@ public class AuthorAndsReplacer implements LayoutFormatter {
             return null;
         }
         String[] authors = fieldText.split(" and ");
+        //CHECKSTYLE:OFF
         String s = switch (authors.length) {
             case 1 -> authors[0]; // just no action
             case 2 ->  authors[0] + " & " + authors[1];
@@ -32,6 +33,7 @@ public class AuthorAndsReplacer implements LayoutFormatter {
                 yield sb.toString();
             }
         };
+        //CHECKSTYLE:ON
 
         return s;
 
