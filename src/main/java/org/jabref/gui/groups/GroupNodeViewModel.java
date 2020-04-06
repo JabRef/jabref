@@ -259,7 +259,6 @@ public class GroupNodeViewModel {
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
         if (displayItemsCount) {
-            System.out.println("calculating....");
             BackgroundTask
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
