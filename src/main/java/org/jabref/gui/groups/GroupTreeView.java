@@ -134,7 +134,10 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    text.textProperty().bind(group.getHits().asString());
+                    if (preferencesService.getDisplayGroupCount()) {
+                        group.setDisplayItemsCount(preferencesService.getDisplayGroupCount());
+                        text.textProperty().bind(group.getHits().asString());
+                    }
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
