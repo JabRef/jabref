@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
@@ -96,8 +95,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
-        totalItems.setText("0");
-        selectedItems.setText("0");
+
         PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
         new ViewModelListCellFactory<BibEntry>()
                 .withGraphic(entry -> {
@@ -111,8 +109,6 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     });
                     addToggle.getStyleClass().add("addEntryButton");
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
-                    addToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
-                         selectedItems.setText(String.valueOf(entriesListView.getCheckModel().getCheckedItems().size())));
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = getEntryNode(entry);
@@ -142,8 +138,9 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
-        entriesListView.itemsProperty().get().addListener((InvalidationListener) listener ->
-                totalItems.textProperty().setValue(String.valueOf(entriesListView.getItems().size())));
+
+        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
+        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
