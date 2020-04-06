@@ -15,4 +15,4 @@ The title of the PR must not reference an issue, because GitHub does not support
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
 - [ ] Screenshots added in PR description (for UI changes)
-- [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not created an issue at <https://github.com/JabRef/user-documentation/issues> or even better provided a pull request.
+- [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, submitted a pull request to the documentation repository.
