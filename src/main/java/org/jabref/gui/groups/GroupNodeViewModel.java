@@ -62,7 +62,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final DelayTaskThrottler throttler;
-    @Inject private PreferencesService preferencesService;
+    private boolean displayItemsCount;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -70,7 +70,7 @@ public class GroupNodeViewModel {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
-        this.preferencesService = JabRefPreferences.getInstance();
+        this.displayItemsCount = false;
 
         displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
@@ -258,7 +258,8 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        if (preferencesService.getDisplayGroupCount()) {
+        if (displayItemsCount) {
+            System.out.println("calculating....");
             BackgroundTask
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
@@ -365,5 +366,13 @@ public class GroupNodeViewModel {
 
     private int getPositionInParent() {
         return groupNode.getPositionInParent();
+    }
+
+    public void setDisplayItemsCount(boolean displayItemsCount) {
+        this.displayItemsCount = displayItemsCount;
+
+        if (displayItemsCount) {
+            calculateNumberOfMatches();
+        }
     }
 }
