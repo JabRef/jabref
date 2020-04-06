@@ -120,7 +120,7 @@ public class GroupTreeView {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
-        // Number of hits
+        // Number of hits (only if user wants to see them)
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
@@ -134,7 +134,9 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    text.textProperty().bind(group.getHits().asString());
+                    if (preferencesService.getDisplayGroupCount()) {
+                        text.textProperty().bind(group.getHits().asString());
+                    }
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -393,7 +395,7 @@ public class GroupTreeView {
         }
     }
 
-    private class DragExpansionHandler {
+    private static class DragExpansionHandler {
         private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
         private TreeItem<GroupNodeViewModel> draggedItem;
         private long dragStarted;

@@ -1,7 +1,6 @@
 package org.jabref.gui.importer;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
@@ -31,6 +30,7 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +48,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
-    private final BackgroundTask<List<BibEntry>> task;
+    private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -58,7 +58,13 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     private BibDatabaseContext database;
 
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<List<BibEntry>> task) {
+    /**
+     * Imports the given entries into the given database. The entries are provided using the BackgroundTask
+     *
+     * @param database the database to import into
+     * @param task     the task executed for parsing the selected files(s).
+     */
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
 

@@ -50,7 +50,7 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         this.databaseContext = databaseContext;
         this.entries = entries;
         this.exportPath = path;
-        totalFilesCount = entries.stream().flatMap(entry -> entry.getFiles().stream()).count();
+        totalFilesCount = entries.stream().mapToLong(entry -> entry.getFiles().size()).sum();
     }
 
     @Override

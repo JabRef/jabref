@@ -38,6 +38,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -435,6 +436,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
+                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, suggestedName);
                     return targetDirectory.resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
