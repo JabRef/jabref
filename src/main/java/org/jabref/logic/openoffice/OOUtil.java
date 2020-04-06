@@ -227,7 +227,7 @@ public class OOUtil {
         } */
         if (formatting.contains(Formatting.SUBSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
-                    (byte) -101);
+                    (byte) -33);
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT_HEIGHT,
                     (byte) 58);
         } else if (formatting.contains(Formatting.SUPERSCRIPT)) {
