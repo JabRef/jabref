@@ -34,7 +34,6 @@ public class StyleLoader {
     private final List<OOBibStyle> internalStyles = new ArrayList<>();
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
-
     public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
             Charset encoding) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -75,7 +74,6 @@ public class StyleLoader {
             LOGGER.info("Problem reading external style file " + filename, e);
         }
         return false;
-
     }
 
     private void loadExternalStyles() {
@@ -120,7 +118,7 @@ public class StyleLoader {
 
     public boolean removeStyle(OOBibStyle style) {
         Objects.requireNonNull(style);
-        if (!style.isFromResource()) {
+        if (!style.isInternalStyle()) {
             boolean result = externalStyles.remove(style);
             storeExternalStyles();
             return result;

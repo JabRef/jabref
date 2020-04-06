@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for searching ShortScience for an entry through the user's browser. [#6018](https://github.com/JabRef/jabref/pull/6018)
 - We updated EditionChecker to permit edition to start with a number. [#6144](https://github.com/JabRef/jabref/issues/6144)
 - We added tooltips for most fields in the entry editor containing a short description. [#5847](https://github.com/JabRef/jabref/issues/5847)
+- We added support for basic markdown in custom formatted previews [#6194](https://github.com/JabRef/jabref/issues/6194)
 
 ### Changed
 
@@ -30,6 +31,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with inconsistent capitalization of file extensions when downloading files [#6115](https://github.com/JabRef/jabref/issues/6115)
 - We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We fixed an issue where search full-text documents downloaded files with same name, overwriting existing files. [#6174](https://github.com/JabRef/jabref/pull/6174)
+- We fixe an issue where custom jstyles for Open/LibreOffice where not saved correctly [#6170](https://github.com/JabRef/jabref/issues/6170)
+
 
 ### Removed
 
@@ -49,6 +52,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
 - We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
 - We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
+- We added possibility to enable/disable items quantity in groups. [#6042](https://github.com/JabRef/jabref/issues/6042)
 
 ### Fixed
 

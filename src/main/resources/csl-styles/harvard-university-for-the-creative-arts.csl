@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>University for the Creative Arts Harvard style</summary>
-    <updated>2019-10-14T08:17:05+00:00</updated>
+    <updated>2020-04-02T11:12:33+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -31,10 +31,10 @@
       <else>
         <names variable="author">
           <name and="text" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". " name-as-sort-order="all"/>
-          <label form="short" prefix=" (" suffix=")"/>
+          <label form="short" prefix=" "/>
           <et-al font-style="italic"/>
           <substitute>
-            <names variable="editor"/>
+            <text macro="editor"/>
             <text variable="title" font-style="italic"/>
           </substitute>
         </names>
@@ -300,7 +300,7 @@
       </else-if>
       <else>
         <choose>
-          <if variable="volume issue page" match="any" type="article-newspaper article-magazine">
+          <if variable="volume issue page" match="any" type="article-newspaper article-magazine article-journal">
             <text variable="container-title" font-style="italic" prefix="In: " suffix=" "/>
           </if>
         </choose>
