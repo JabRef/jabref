@@ -44,7 +44,6 @@ public class WorldcatFetcher implements EntryBasedFetcher {
     private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
     private String WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
    
-
     public WorldcatFetcher (String worldcatKey) {
         WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
         WORLDCAT_READ_URL += worldcatKey;
@@ -109,8 +108,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
      * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
      */
     private Document parse (String s) {
-        try { 
-            BufferedReader r = new BufferedReader (new StringReader(s));
+        try (BufferedReader r = new BufferedReader (new StringReader(s))){ 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
             DocumentBuilder builder = factory.newDocumentBuilder ();
 
@@ -179,19 +177,17 @@ public class WorldcatFetcher implements EntryBasedFetcher {
 
             Document detailedXML = parseOpenSearchXML (openSearchDocument);
             String detailedXMLString;
-            try {
+            try (StringWriter sw = new StringWriter ()){
                 //Transform XML to String
                 TransformerFactory tf = TransformerFactory.newInstance ();
                 Transformer t = tf.newTransformer ();
-                StringWriter sw = new StringWriter ();
                 t.transform(new DOMSource (detailedXML), new StreamResult (sw));
                 detailedXMLString = sw.toString ();
             } catch (TransformerException e) {
                 throw new FetcherException ("Could not transform XML", e);
+            } catch (IOException e) {
+                throw new FetcherException("Could not close StringWriter", e);
             }
-
-            //TODO: - Send xml as string to Importer
-            //      - Parse the new kind of XML in importer
 
             WorldcatImporter importer = new WorldcatImporter (); 
             ParserResult parserResult;
