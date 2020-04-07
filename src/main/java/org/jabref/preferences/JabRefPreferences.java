@@ -166,7 +166,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
-    public static final String BACKUP = "backup";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
@@ -178,6 +177,7 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
+    public static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
     public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
@@ -497,7 +497,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
-        defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
         defaults.put(LAST_FOCUSED, "");
@@ -524,6 +523,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         defaults.put(GROUPS_DEFAULT_FIELD, StandardField.KEYWORDS.getName());
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
+        defaults.put(DISPLAY_GROUP_COUNT, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_UNION_VIEW_MODE, GroupViewMode.INTERSECTION.name());
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
@@ -678,7 +678,7 @@ public class JabRefPreferences implements PreferencesService {
                                     + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
                                     + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
                                     + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                                    + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
+                                    + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
                                     + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
@@ -1335,7 +1335,6 @@ public class JabRefPreferences implements PreferencesService {
                 saveInOriginalOrder,
                 saveOrder,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -1350,7 +1349,6 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 null,
                 this.getDefaultEncoding(),
-                this.getBoolean(JabRefPreferences.BACKUP),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
@@ -2064,5 +2062,10 @@ public class JabRefPreferences implements PreferencesService {
         put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
         put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
         putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
+    }
+
+    @Override
+    public boolean getDisplayGroupCount() {
+        return getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT);
     }
 }

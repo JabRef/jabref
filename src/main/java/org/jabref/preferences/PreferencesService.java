@@ -141,4 +141,6 @@ public interface PreferencesService {
 
     void storeTimestampPreferences(TimestampPreferences preferences);
 
+    boolean getDisplayGroupCount();
+
 }
