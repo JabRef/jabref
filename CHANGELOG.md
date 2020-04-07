@@ -53,7 +53,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a WorldCcat fetcher. [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581). [WorldCat](http://www.worldcat.org/webservices/catalog/)
 - We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
 - We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
-- We added an Worldcat fetcher. [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581). [Worldcat](http://www.worldcat.org/webservices/catalog/)
 - We added possibility to enable/disable items quantity in groups. [#6042](https://github.com/JabRef/jabref/issues/6042)
 
 ### Fixed
