@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,6 +27,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -41,14 +41,11 @@ import org.xml.sax.SAXException;
  */
 public class WorldcatFetcher implements EntryBasedFetcher {
 
-    private final String apiKey;
-
     private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
     private String WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
    
 
     public WorldcatFetcher (String worldcatKey) {
-        this.apiKey = worldcatKey;
         WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
         WORLDCAT_READ_URL += worldcatKey;
     }
@@ -142,7 +139,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
      * @return  the new xml document
      * @throws FetcherException
      */
-    private Document parseOpenSearchXML(Document doc) throws FetcherException{
+    private Document parseOpenSearchXML(Document doc) throws FetcherException {
         try {
             Element feed = (Element) doc.getElementsByTagName ("feed").item (0);
             NodeList entryXMLList = feed.getElementsByTagName ("entry");
@@ -166,7 +163,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
                 root.appendChild (newEntry);
             }
             return newDoc;
-        } catch(ParserConfigurationException e) {
+        } catch (ParserConfigurationException e) {
             throw new FetcherException("Error with XML creation (Worldcat fetcher)", e);
         } catch (IOException e) {
             throw new FetcherException("Error with OCLC parsing (Worldcat fetcher)", e);

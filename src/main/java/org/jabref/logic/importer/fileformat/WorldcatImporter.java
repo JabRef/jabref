@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
@@ -84,9 +82,9 @@ public class WorldcatImporter extends Importer {
 
         String title = getElementByTag (xmlEntry, "dc:title").getTextContent ();
 
-		String oclcNr = getElementByTag (xmlEntry, "oclcterms:recordIdentifie").getTextContent();
-		String url = "http://worldcat.org/oclc/" + oclcNr;
-		
+        String oclcNr = getElementByTag (xmlEntry, "oclcterms:recordIdentifie").getTextContent ();
+        String url = "http://worldcat.org/oclc/" + oclcNr;
+        
         String date = getElementByTag (xmlEntry, "dc:date").getTextContent ();
 
         String publisher =  getElementByTag (xmlEntry, "dc:publisher").getTextContent ();
