@@ -1,11 +1,24 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -15,6 +28,11 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * EntryBasedFetcher that searches the Worldcat database
@@ -26,10 +44,13 @@ public class WorldcatFetcher implements EntryBasedFetcher {
     private final String apiKey;
 
     private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
+    private String WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
+   
 
     public WorldcatFetcher (String worldcatKey) {
-		this.apiKey = worldcatKey;
-		WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
+        this.apiKey = worldcatKey;
+        WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
+        WORLDCAT_READ_URL += worldcatKey;
     }
 
     @Override
@@ -67,16 +88,119 @@ public class WorldcatFetcher implements EntryBasedFetcher {
         } 
     }
 
+     /**
+     * Get more information about a article through its OCLC id. Picks the first 
+     * element with this tag
+     * @param id the oclc id
+     * @return the XML element that contains all tags
+     */
+    private Element getSpecificInfoOnOCLC (String id) throws IOException {
+        URLDownload urlDownload = new URLDownload (WORLDCAT_READ_URL.replace ("{OCLC-NUMBER}", id));
+        URLDownload.bypassSSLVerification ();
+        String resp = urlDownload.asString ();	
+
+        Document mainDoc = parse (resp);
+        NodeList parentElemOfTags = mainDoc.getElementsByTagName ("oclcdcs");
+
+        return (Element) parentElemOfTags.item (0);
+    }
+    
+     /**
+     * Parse a string to an xml document
+     * @param s the string to be parsed
+     * @return XML document representing the content of s
+     * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
+     */
+    private Document parse (String s) {
+        try { 
+            BufferedReader r = new BufferedReader (new StringReader(s));
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
+            DocumentBuilder builder = factory.newDocumentBuilder ();
+
+            return builder.parse (new InputSource (r));
+        } catch (ParserConfigurationException e) {
+            throw new IllegalArgumentException ("Parser Config Exception: " + e.getMessage (), e);
+        } catch (SAXException e) {
+            throw new IllegalArgumentException ("SAX Exception: " + e.getMessage (), e);
+        } catch (IOException e) {
+            throw new IllegalArgumentException ("IO Exception: " + e.getMessage (), e);
+        }
+    }
+    
+    /**
+     * Parse OpenSearch XML to retrieve OCLC-ids and fetch details about those. 
+     * Returns new XML doc in the form
+     * <pre>
+     * {@literal <entries>}
+     *      {@literal <entry>}
+     *          OCLC DETAIL
+     *      {@literal </entry>}
+     *      ...
+     * {@literal </entries>}
+     * </pre>
+     * @param doc the open search result
+     * @return  the new xml document
+     * @throws FetcherException
+     */
+    private Document parseOpenSearchXML(Document doc) throws FetcherException{
+        try {
+            Element feed = (Element) doc.getElementsByTagName ("feed").item (0);
+            NodeList entryXMLList = feed.getElementsByTagName ("entry");
+
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance ();
+            DocumentBuilder docBuilder = docFactory.newDocumentBuilder ();
+            
+            Document newDoc = docBuilder.newDocument ();
+
+            Element root = newDoc.createElement ("entries");
+            newDoc.appendChild (root);
+            for (int i = 0; i < entryXMLList.getLength (); i++) {
+                Element xmlEntry = (Element) entryXMLList.item (i);
+                
+                String oclc = xmlEntry.getElementsByTagName ("oclcterms:recordIdentifier").item (0).getTextContent ();
+                Element detailedInfo = getSpecificInfoOnOCLC (oclc);
+
+                Element newEntry = newDoc.createElement ("entry");
+                newEntry.appendChild (detailedInfo);
+
+                root.appendChild (newEntry);
+            }
+            return newDoc;
+        } catch(ParserConfigurationException e) {
+            throw new FetcherException("Error with XML creation (Worldcat fetcher)", e);
+        } catch (IOException e) {
+            throw new FetcherException("Error with OCLC parsing (Worldcat fetcher)", e);
+        }
+    }
+
     @Override
     public List<BibEntry> performSearch (BibEntry entry) throws FetcherException {
         Optional<String> entryTitle = entry.getLatexFreeField (StandardField.TITLE);
         if (entryTitle.isPresent ()) {
-            String xmlResponse = makeOpenSearchRequest (entryTitle.get ());
-            WorldcatImporter importer = new WorldcatImporter (this.apiKey); 
+            String openSearchXMLResponse = makeOpenSearchRequest (entryTitle.get ());
+            Document openSearchDocument = parse (openSearchXMLResponse);
+
+            Document detailedXML = parseOpenSearchXML (openSearchDocument);
+            String detailedXMLString;
+            try {
+                //Transform XML to String
+                TransformerFactory tf = TransformerFactory.newInstance ();
+                Transformer t = tf.newTransformer ();
+                StringWriter sw = new StringWriter ();
+                t.transform(new DOMSource (detailedXML), new StreamResult (sw));
+                detailedXMLString = sw.toString ();
+            } catch (TransformerException e) {
+                throw new FetcherException ("Could not transform XML", e);
+            }
+
+            //TODO: - Send xml as string to Importer
+            //      - Parse the new kind of XML in importer
+
+            WorldcatImporter importer = new WorldcatImporter (); 
             ParserResult parserResult;
             try { 
-                if (importer.isRecognizedFormat (xmlResponse)) {
-                    parserResult = importer.importDatabase (xmlResponse);
+                if (importer.isRecognizedFormat (detailedXMLString)) {
+                    parserResult = importer.importDatabase (detailedXMLString);
                 } else { 
                     // For displaying An ErrorMessage
                     BibDatabase errorBibDataBase = new BibDatabase ();

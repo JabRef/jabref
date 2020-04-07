@@ -49,7 +49,7 @@ public class WorldcatImporterTest {
 
     @BeforeEach
     public void setUp() {
-        importer = new WorldcatImporter("API_KEY");
+        importer = new WorldcatImporter();
         
     }
     

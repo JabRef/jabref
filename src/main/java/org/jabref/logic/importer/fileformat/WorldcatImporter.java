@@ -29,13 +29,6 @@ public class WorldcatImporter extends Importer {
     private static final String DESCRIPTION = "Importer for Worldcat Open Search XML format";
     private static final String NAME = "WorldcatImporter";
 
-    private String WORLDCAT_READ_URL;
-    
-    public WorldcatImporter (String worldcatKey) {
-        //Used the same key as Worldcat fether
-        this.WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=" + worldcatKey;
-    }
-
     /**
      * Parse the reader to an xml document
      * @param s the reader to be parsed
@@ -49,29 +42,12 @@ public class WorldcatImporter extends Importer {
 
             return builder.parse (new InputSource (s));
         } catch (ParserConfigurationException e) {
-            throw new IllegalArgumentException ("Parser Config Exception: " + e.getMessage (), e);
+            throw new IllegalArgumentException ("Parser Config Exception: ", e);
         } catch (SAXException e) {
-            throw new IllegalArgumentException ("SAX Exception: " + e.getMessage (), e);
+            throw new IllegalArgumentException ("SAX Exception: ", e);
         } catch (IOException e) {
-            throw new IllegalArgumentException ("IO Exception: " + e.getMessage (), e);
+            throw new IllegalArgumentException ("IO Exception: ", e);
         }
-    }
-
-    /**
-     * Get more information about a article through its OCLC id. Picks the first 
-     * element with this tag
-     * @param id the oclc id
-     * @return the XML element that contains all tags
-     */
-    private Element getSpecificInfoOnOCLC (String id) throws IOException {
-        URLDownload urlDownload = new URLDownload (WORLDCAT_READ_URL.replace ("{OCLC-NUMBER}", id));
-        URLDownload.bypassSSLVerification ();
-        String resp = urlDownload.asString ();	
-
-        Document mainDoc = parse (new BufferedReader (new StringReader (resp)));
-        NodeList parentElemOfTags = mainDoc.getElementsByTagName ("oclcdcs");
-
-        return (Element) parentElemOfTags.item (0);
     }
 
     @Override
@@ -104,19 +80,16 @@ public class WorldcatImporter extends Importer {
      * @throws IOException if we cannot search Worldcat with the OCLC of the entry
      */
     private BibEntry xmlEntryToBibEntry (Element xmlEntry) throws IOException { 
-        Element authorsElem = getElementByTag (xmlEntry, "author");
-        String authors = getElementByTag (authorsElem, "name").getTextContent ();
+        String authors = getElementByTag (xmlEntry, "dc:creator").getTextContent ();
 
-        String title = getElementByTag (xmlEntry, "title").getTextContent ();
+        String title = getElementByTag (xmlEntry, "dc:title").getTextContent ();
 
-        String url = getElementByTag (xmlEntry, "link").getAttribute ("href");
+		String oclcNr = getElementByTag (xmlEntry, "oclcterms:recordIdentifie").getTextContent();
+		String url = "http://worldcat.org/oclc/" + oclcNr;
+		
+        String date = getElementByTag (xmlEntry, "dc:date").getTextContent ();
 
-        String oclc = xmlEntry.getElementsByTagName ("oclcterms:recordIdentifier").item (0).getTextContent ();
-        Element detailedInfo = getSpecificInfoOnOCLC (oclc);
-
-        String date = detailedInfo.getElementsByTagName ("dc:date").item (0).getTextContent ();
-
-        String publisher = detailedInfo.getElementsByTagName ("dc:publisher").item (0).getTextContent ();
+        String publisher =  getElementByTag (xmlEntry, "dc:publisher").getTextContent ();
 
         BibEntry entry = new BibEntry ();
 
@@ -137,7 +110,7 @@ public class WorldcatImporter extends Importer {
      * @throws IOException if {@link xmlEntryToBibEntry} throws 
      */
     private ParserResult docToParserRes (Document doc) throws IOException { 
-        Element feed = (Element) doc.getElementsByTagName ("feed").item (0);
+        Element feed = (Element) doc.getElementsByTagName ("entries").item (0);
         NodeList entryXMLList = feed.getElementsByTagName ("entry");
 
         List<BibEntry> bibList = new ArrayList<>(entryXMLList.getLength ());
