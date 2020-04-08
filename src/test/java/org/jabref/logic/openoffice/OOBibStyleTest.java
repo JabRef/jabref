@@ -43,7 +43,7 @@ class OOBibStyleTest {
     void testAuthorYear() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
         assertTrue(style.isValid());
-        assertTrue(style.isFromResource());
+        assertTrue(style.isInternalStyle());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
@@ -58,7 +58,7 @@ class OOBibStyleTest {
                             .toFile();
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
-        assertFalse(style.isFromResource());
+        assertFalse(style.isInternalStyle());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());

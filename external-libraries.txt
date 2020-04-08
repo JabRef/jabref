@@ -341,6 +341,10 @@ License: BSD-2-Clause
 
 ## Sorted list of runtime dependencies output by gradle
 
+1. ` gradlew dependencies > build\reports\project\dependencies.txt`
+2. Manually edit depedencies.txt to contain the tree of "runtimeDepedencies" only
+3. sed 's/^.* //' < dependencies.txt | sort | uniq
+
 ```text
 com.github.tomtung:latex2unicode_2.12:0.2.6
 com.google.code.gson:gson:2.8.6
@@ -351,7 +355,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
 com.ibm.icu:icu4j:62.1
 com.jfoenix:jfoenix:9.0.9
-com.konghq:unirest-java:3.6.00
+com.konghq:unirest-java:3.7.00
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1
 com.oracle.ojdbc:ojdbc10:19.3.0.0
@@ -362,6 +366,21 @@ com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
 com.sun.istack:istack-commons-runtime:3.0.8
 com.sun.xml.fastinfoset:FastInfoset:1.2.16
+com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.0
+com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.0
+com.vladsch.flexmark:flexmark-util-ast:0.61.0
+com.vladsch.flexmark:flexmark-util-builder:0.61.0
+com.vladsch.flexmark:flexmark-util-collection:0.61.0
+com.vladsch.flexmark:flexmark-util-data:0.61.0
+com.vladsch.flexmark:flexmark-util-dependency:0.61.0
+com.vladsch.flexmark:flexmark-util-format:0.61.0
+com.vladsch.flexmark:flexmark-util-html:0.61.0
+com.vladsch.flexmark:flexmark-util-misc:0.61.0
+com.vladsch.flexmark:flexmark-util-options:0.61.0
+com.vladsch.flexmark:flexmark-util-sequence:0.61.0
+com.vladsch.flexmark:flexmark-util-visitor:0.61.0
+com.vladsch.flexmark:flexmark-util:0.61.0
+com.vladsch.flexmark:flexmark:0.61.0
 commons-cli:commons-cli:1.4
 commons-codec:commons-codec:1.11
 commons-logging:commons-logging:1.2
@@ -393,10 +412,10 @@ org.apache.logging.log4j:log4j-core:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-plugins:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
-org.apache.pdfbox:fontbox:2.0.18
-org.apache.pdfbox:pdfbox:2.0.18
-org.apache.pdfbox:xmpbox:2.0.18
-org.apache.tika:tika-core:1.23
+org.apache.pdfbox:fontbox:2.0.19
+org.apache.pdfbox:pdfbox:2.0.19
+org.apache.pdfbox:xmpbox:2.0.19
+org.apache.tika:tika-core:1.24
 org.bouncycastle:bcprov-jdk15on:1.64
 org.checkerframework:checker-qual:2.10.0
 org.controlsfx:controlsfx:11.0.1
@@ -413,22 +432,23 @@ org.graalvm.regex:regex:19.2.1
 org.graalvm.sdk:graal-sdk:19.2.1
 org.graalvm.truffle:truffle-api:19.2.1
 org.jbibtex:jbibtex:1.0.17
+org.jetbrains:annotations:15.0
 org.jsoup:jsoup:1.13.1
 org.jvnet.staxex:stax-ex:1.8.1
-org.mariadb.jdbc:mariadb-java-client:2.5.4
-org.openjfx:javafx-base:13.0.2
-org.openjfx:javafx-controls:13.0.2
-org.openjfx:javafx-fxml:13.0.2
-org.openjfx:javafx-graphics:13.0.2
-org.openjfx:javafx-media:13.0.2
-org.openjfx:javafx-swing:13.0.2
-org.openjfx:javafx-web:13.0.2
+org.mariadb.jdbc:mariadb-java-client:2.6.0
+org.openjfx:javafx-base:14
+org.openjfx:javafx-controls:14
+org.openjfx:javafx-fxml:14
+org.openjfx:javafx-graphics:14
+org.openjfx:javafx-media:14
+org.openjfx:javafx-swing:14
+org.openjfx:javafx-web:14
 org.ow2.asm:asm-analysis:6.2.1
 org.ow2.asm:asm-commons:6.2.1
 org.ow2.asm:asm-tree:6.2.1
 org.ow2.asm:asm-util:6.2.1
 org.ow2.asm:asm:6.2.1
-org.postgresql:postgresql:42.2.10
+org.postgresql:postgresql:42.2.11
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.12.8
 org.slf4j:slf4j-api:2.0.0-alpha1
