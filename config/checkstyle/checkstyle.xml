@@ -8,8 +8,10 @@
         <property name="header" value=""/>
     </module>
 
-    <!-- Don't stop on exceptions - enables checking Java 14 syntax in checkstyle 8.31 -->
-    <property name="haltOnException" value="false"/>
+    <!-- BeforeExecutionFileFilters is required for sources that are based on java14 -->
+    <module name="BeforeExecutionExclusionFileFilter">
+      <property name="fileNamePattern" value="AuthorAndsReplacer.java|Ordinal.java" />
+    </module>
 
     <module name="SuppressionFilter">
         <property name="file" value="${config_loc}/suppressions.xml"/>
