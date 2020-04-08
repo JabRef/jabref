@@ -97,7 +97,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             entryButton.setOnAction(event -> setEntryTypeForReturnAndClose(Optional.of(entryType)));
             pane.getChildren().add(entryButton);
 
-            String description = getDescription(entryType);
+            EntryType selectedType = entryType.getType();
+            String description = getDescription(selectedType);
             if (StringUtil.isNotBlank(description)) {
                 Screen currentScreen = Screen.getPrimary();
                 double maxWidth = currentScreen.getBounds().getWidth();
@@ -186,9 +187,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     //The description is coming from biblatex manual chapter 2
     //Biblatex documentation is favored over the bibtex,
     //since bibtex is a subset of biblatex and biblatex is better documented.
-    public String getDescription(BibEntryType selectedType) {
-        EntryType entryType = selectedType.getType();
-        if (entryType instanceof StandardEntryType entry) {
+    public static String getDescription(EntryType selectedType) {
+        if (selectedType instanceof StandardEntryType entry) {
             switch (entry) {
                 case Article -> {
                     return Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
@@ -283,7 +283,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 case Software -> {
                     return Localization.lang("Computer software. The standard styles will treat this entry type as an alias for \"Misc\".");
                 }
-                case DATESET -> {
+                case Dataset -> {
                     return Localization.lang("A data set or a similar collection of (mostly) raw data.");
                 }
                 default -> {
