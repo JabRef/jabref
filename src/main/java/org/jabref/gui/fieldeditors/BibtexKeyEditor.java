@@ -28,7 +28,14 @@ public class BibtexKeyEditor extends HBox implements FieldEditorFX {
 
     public BibtexKeyEditor(Field field, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
         this.preferences = preferences;
-        this.viewModel = new BibtexKeyEditorViewModel(field, suggestionProvider, fieldCheckers, preferences.getEntryEditorPreferences(), databaseContext, undoManager, dialogService);
+        this.viewModel = new BibtexKeyEditorViewModel(
+                field,
+                suggestionProvider,
+                fieldCheckers,
+                preferences,
+                databaseContext,
+                undoManager,
+                dialogService);
 
         ViewLoader.view(this)
                   .root(this)

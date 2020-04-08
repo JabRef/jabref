@@ -1123,8 +1123,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param number or higher.
      */
-    @Override
-    public void purgeSeries(String prefix, int number) {
+    private void purgeSeries(String prefix, int number) {
         int n = number;
         while (get(prefix + n) != null) {
             remove(prefix + n);
@@ -1207,6 +1206,14 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILEDIRPATTERN));
     }
 
+    @Override
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return new FieldWriterPreferences(
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getFieldContentParserPreferences());
+    }
+
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
@@ -1219,9 +1226,14 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
-        return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
-                                           getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(), getXMPPreferences(),
-                                           isKeywordSyncEnabled());
+        return new ImportFormatPreferences(
+                customImports,
+                getDefaultEncoding(),
+                getKeywordDelimiter(),
+                getBibtexKeyPatternPreferences(),
+                getFieldContentParserPreferences(),
+                getXMPPreferences(),
+                isKeywordSyncEnabled());
     }
 
     @Override
@@ -1270,15 +1282,17 @@ public class JabRefPreferences implements PreferencesService {
         return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
     }
 
+    @Override
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(
-                                               get(KEY_PATTERN_REGEX),
-                                               get(KEY_PATTERN_REPLACEMENT),
-                                               getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                                               getBoolean(KEY_GEN_FIRST_LETTER_A),
-                                               getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
-                                               getKeyPattern(),
-                                               getKeywordDelimiter());
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
+                getKeyPattern(),
+                getKeywordDelimiter(),
+                getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     @Override
@@ -1560,24 +1574,6 @@ public class JabRefPreferences implements PreferencesService {
                                        get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                                        getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
                                        getKeywordDelimiter());
-    }
-
-    public AutoCompletePreferences getAutoCompletePreferences() {
-        return new AutoCompletePreferences(
-                getBoolean(AUTO_COMPLETE),
-                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                getBoolean(AUTOCOMPLETER_LAST_FIRST),
-                getBoolean(AUTOCOMPLETER_FIRST_LAST),
-                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getJournalAbbreviationPreferences());
-    }
-
-    public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
-        putBoolean(AUTO_COMPLETE, autoCompletePreferences.shouldAutoComplete());
-        put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
-        putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
-        putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
     }
 
     public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
@@ -1967,6 +1963,10 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
     }
 
+    //*************************************************************************************************************
+    // ToDo: GroupPreferences
+    //*************************************************************************************************************
+
     @Override
     public boolean getDisplayGroupCount() {
         return getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT);
@@ -2092,27 +2092,46 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public EntryEditorPreferences getEntryEditorPreferences() {
         return new EntryEditorPreferences(getEntryEditorTabList(),
-                getFieldWriterPreferences(),
-                getImportFormatPreferences(),
-                getAllDefaultTabFieldNames(),
+                getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
-                getBibtexKeyPatternPreferences(),
-                Globals.getKeyPrefs(),
-                getBoolean(AVOID_OVERWRITING_KEY));
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR));
     }
 
     @Override
     public void storeEntryEditorPreferences(EntryEditorPreferences preferences) {
-        // ToDo
+        storeEntryEditorTabList(preferences.getEntryEditorTabList());
+        putBoolean(AUTO_OPEN_FORM, preferences.shouldOpenOnNewEntry());
+        putBoolean(SHOW_RECOMMENDATIONS, preferences.shouldShowRecommendationsTab());
+        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
+        putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
+        putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
+        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
     }
 
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return new FieldWriterPreferences(
-                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
-                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
+    //*************************************************************************************************************
+    // ToDo: Misc preferences
+    //*************************************************************************************************************
+
+    @Override
+    public AutoCompletePreferences getAutoCompletePreferences() {
+        return new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
+                getBoolean(AUTOCOMPLETER_LAST_FIRST),
+                getBoolean(AUTOCOMPLETER_FIRST_LAST),
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
+                getJournalAbbreviationPreferences());
+    }
+
+    @Override
+    public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
+        putBoolean(AUTO_COMPLETE, autoCompletePreferences.shouldAutoComplete());
+        put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
+        putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
+        putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
     }
 }

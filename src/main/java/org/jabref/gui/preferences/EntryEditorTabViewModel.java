@@ -11,7 +11,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
 import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
@@ -33,37 +34,42 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
 
-    private AutoCompletePreferences autoCompletePreferences;
-
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferencesService;
+    private final EntryEditorPreferences initialEntryEditorPreferences;
+    private final AutoCompletePreferences initialAutoCompletePreferences;
 
-    public EntryEditorTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.autoCompletePreferences = preferences.getAutoCompletePreferences();
+        this.preferencesService = preferencesService;
+        this.initialEntryEditorPreferences = preferencesService.getEntryEditorPreferences();
+        this.initialAutoCompletePreferences = preferencesService.getAutoCompletePreferences();
     }
 
     @Override
     public void setValues() {
-        openOnNewEntryProperty.setValue(preferences.getBoolean(JabRefPreferences.AUTO_OPEN_FORM));
-        defaultSourceProperty.setValue(preferences.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE));
-        enableRelatedArticlesTabProperty.setValue(preferences.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
-        acceptRecommendationsProperty.setValue(preferences.getBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS));
-        enableLatexCitationsTabProperty.setValue(preferences.getBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS));
-        enableValidationProperty.setValue(preferences.getBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR));
-        enableAutoCompleteProperty.setValue(autoCompletePreferences.shouldAutoComplete());
-        autoCompleteFieldsProperty.setValue(autoCompletePreferences.getCompleteNamesAsString());
+        // ToDo: Include EntryEditorFieldsEditor in PreferencesDialog
+        // unused: initialEntryEditorPreferences.getEntryEditorTabList();
 
-        if (autoCompletePreferences.getOnlyCompleteFirstLast()) {
+        openOnNewEntryProperty.setValue(initialEntryEditorPreferences.shouldOpenOnNewEntry());
+        defaultSourceProperty.setValue(initialEntryEditorPreferences.showSourceTabByDefault());
+        enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
+        acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
+        enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
+        enableValidationProperty.setValue(initialEntryEditorPreferences.isEnableValidation());
+
+        enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
+        autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
+
+        if (initialAutoCompletePreferences.getOnlyCompleteFirstLast()) {
             autoCompleteFirstLastProperty.setValue(true);
-        } else if (autoCompletePreferences.getOnlyCompleteLastFirst()) {
+        } else if (initialAutoCompletePreferences.getOnlyCompleteLastFirst()) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
             autoCompleteBothProperty.setValue(true);
         }
 
-        switch (autoCompletePreferences.getFirstNameMode()) {
+        switch (initialAutoCompletePreferences.getFirstNameMode()) {
             case ONLY_ABBREVIATED:
                 firstNameModeAbbreviatedProperty.setValue(true);
                 break;
@@ -78,37 +84,39 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, openOnNewEntryProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defaultSourceProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, enableRelatedArticlesTabProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, acceptRecommendationsProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.SHOW_LATEX_CITATIONS, enableLatexCitationsTabProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR, enableValidationProperty.getValue());
+        preferencesService.storeEntryEditorPreferences(new EntryEditorPreferences(
+                initialEntryEditorPreferences.getEntryEditorTabList(),
+                openOnNewEntryProperty.getValue(),
+                enableRelatedArticlesTabProperty.getValue(),
+                acceptRecommendationsProperty.getValue(),
+                enableLatexCitationsTabProperty.getValue(),
+                defaultSourceProperty.getValue(),
+                enableValidationProperty.getValue()));
 
-        autoCompletePreferences.setShouldAutoComplete(enableAutoCompleteProperty.getValue());
-        autoCompletePreferences.setCompleteNames(autoCompleteFieldsProperty.getValue());
+        initialAutoCompletePreferences.setShouldAutoComplete(enableAutoCompleteProperty.getValue());
+        initialAutoCompletePreferences.setCompleteNames(autoCompleteFieldsProperty.getValue());
         if (autoCompleteBothProperty.getValue()) {
-            autoCompletePreferences.setOnlyCompleteFirstLast(false);
-            autoCompletePreferences.setOnlyCompleteLastFirst(false);
+            initialAutoCompletePreferences.setOnlyCompleteFirstLast(false);
+            initialAutoCompletePreferences.setOnlyCompleteLastFirst(false);
         }
         else if (autoCompleteFirstLastProperty.getValue()) {
-            autoCompletePreferences.setOnlyCompleteFirstLast(true);
-            autoCompletePreferences.setOnlyCompleteLastFirst(false);
+            initialAutoCompletePreferences.setOnlyCompleteFirstLast(true);
+            initialAutoCompletePreferences.setOnlyCompleteLastFirst(false);
         }
         else {
-            autoCompletePreferences.setOnlyCompleteFirstLast(false);
-            autoCompletePreferences.setOnlyCompleteLastFirst(true);
+            initialAutoCompletePreferences.setOnlyCompleteFirstLast(false);
+            initialAutoCompletePreferences.setOnlyCompleteLastFirst(true);
         }
 
         if (firstNameModeAbbreviatedProperty.getValue()) {
-            autoCompletePreferences.setFirstNameMode(ONLY_ABBREVIATED);
+            initialAutoCompletePreferences.setFirstNameMode(ONLY_ABBREVIATED);
         } else if (firstNameModeFullProperty.getValue()) {
-            autoCompletePreferences.setFirstNameMode(ONLY_FULL);
+            initialAutoCompletePreferences.setFirstNameMode(ONLY_FULL);
         } else {
-            autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
+            initialAutoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
         }
 
-        preferences.storeAutoCompletePreferences(autoCompletePreferences);
+        preferencesService.storeAutoCompletePreferences(initialAutoCompletePreferences);
     }
 
     @Override

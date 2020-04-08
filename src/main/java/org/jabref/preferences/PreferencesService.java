@@ -6,8 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
@@ -45,6 +49,10 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
+    FieldWriterPreferences getFieldWriterPreferences();
+
+    FieldContentFormatterPreferences getFieldContentParserPreferences();
+
     XmpPreferences getXMPPreferences();
 
     AutoLinkPreferences getAutoLinkPreferences();
@@ -59,11 +67,11 @@ public interface PreferencesService {
 
     PreviewPreferences getPreviewPreferences();
 
-    void purgeSeries(String prefix, int number);
-
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
+
+    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
@@ -101,7 +109,9 @@ public interface PreferencesService {
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
 
-    // General
+    //*************************************************************************************************************
+    // GeneralPreferences
+    //*************************************************************************************************************
 
     Language getLanguage();
 
@@ -131,9 +141,15 @@ public interface PreferencesService {
 
     void storeTimestampPreferences(TimestampPreferences preferences);
 
+    //*************************************************************************************************************
+    // ToDo: GroupPreferences
+    //*************************************************************************************************************
+
     boolean getDisplayGroupCount();
 
-    // Entry Editor
+    //*************************************************************************************************************
+    // EntryEditorPreferences
+    //*************************************************************************************************************
 
     Map<String, Set<Field>> getEntryEditorTabList();
 
@@ -148,4 +164,12 @@ public interface PreferencesService {
     EntryEditorPreferences getEntryEditorPreferences();
 
     void storeEntryEditorPreferences(EntryEditorPreferences preferences);
+
+    //*************************************************************************************************************
+    // ToDo: Misc preferences
+    //*************************************************************************************************************
+
+    AutoCompletePreferences getAutoCompletePreferences();
+
+    void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
 }
