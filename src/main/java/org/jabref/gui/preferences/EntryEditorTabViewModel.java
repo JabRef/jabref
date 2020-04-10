@@ -12,10 +12,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
-
-import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
-import static org.jabref.gui.autocompleter.AutoCompleteFirstNameMode.ONLY_FULL;
 
 public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
@@ -61,9 +59,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
 
-        if (initialAutoCompletePreferences.getOnlyCompleteFirstLast()) {
+        if (initialAutoCompletePreferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST) {
             autoCompleteFirstLastProperty.setValue(true);
-        } else if (initialAutoCompletePreferences.getOnlyCompleteLastFirst()) {
+        } else if (initialAutoCompletePreferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
             autoCompleteBothProperty.setValue(true);
@@ -93,30 +91,28 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 defaultSourceProperty.getValue(),
                 enableValidationProperty.getValue()));
 
-        initialAutoCompletePreferences.setShouldAutoComplete(enableAutoCompleteProperty.getValue());
-        initialAutoCompletePreferences.setCompleteNames(autoCompleteFieldsProperty.getValue());
-        if (autoCompleteBothProperty.getValue()) {
-            initialAutoCompletePreferences.setOnlyCompleteFirstLast(false);
-            initialAutoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else if (autoCompleteFirstLastProperty.getValue()) {
-            initialAutoCompletePreferences.setOnlyCompleteFirstLast(true);
-            initialAutoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else {
-            initialAutoCompletePreferences.setOnlyCompleteFirstLast(false);
-            initialAutoCompletePreferences.setOnlyCompleteLastFirst(true);
+        // default
+        AutoCompletePreferences.onlyCompleteNameFormat nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.BOTH;
+        if (autoCompleteFirstLastProperty.getValue()) {
+            nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST;
+        } else if (autoCompleteLastFirstProperty.getValue()) {
+            nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST;
         }
 
+        // default: AutoCompleteFirstNameMode.BOTH
+        AutoCompleteFirstNameMode firstNameMode = AutoCompleteFirstNameMode.BOTH;
         if (firstNameModeAbbreviatedProperty.getValue()) {
-            initialAutoCompletePreferences.setFirstNameMode(ONLY_ABBREVIATED);
+            firstNameMode = AutoCompleteFirstNameMode.ONLY_ABBREVIATED;
         } else if (firstNameModeFullProperty.getValue()) {
-            initialAutoCompletePreferences.setFirstNameMode(ONLY_FULL);
-        } else {
-            initialAutoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
+            firstNameMode = AutoCompleteFirstNameMode.ONLY_FULL;
         }
 
-        preferencesService.storeAutoCompletePreferences(initialAutoCompletePreferences);
+        preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
+                enableAutoCompleteProperty.getValue(),
+                firstNameMode,
+                nameFormat,
+                FieldFactory.parseFieldList(autoCompleteFieldsProperty.getValue()),
+                preferencesService.getJournalAbbreviationPreferences()));
     }
 
     @Override

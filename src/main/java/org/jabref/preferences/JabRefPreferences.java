@@ -2117,21 +2117,36 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
+        AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.BOTH;
+        if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
+            onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST;
+        } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
+            onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST;
+        }
+
         return new AutoCompletePreferences(
                 getBoolean(AUTO_COMPLETE),
                 AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                getBoolean(AUTOCOMPLETER_LAST_FIRST),
-                getBoolean(AUTOCOMPLETER_FIRST_LAST),
+                onlyCompleteNameFormat,
                 getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
                 getJournalAbbreviationPreferences());
     }
 
     @Override
-    public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
-        putBoolean(AUTO_COMPLETE, autoCompletePreferences.shouldAutoComplete());
-        put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
-        putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
-        putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
+    public void storeAutoCompletePreferences(AutoCompletePreferences preferences) {
+        putBoolean(AUTO_COMPLETE, preferences.shouldAutoComplete());
+        put(AUTOCOMPLETER_FIRSTNAME_MODE, preferences.getFirstNameMode().name());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, preferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
+
+        if (preferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.BOTH) {
+            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+        } else if (preferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST) {
+            putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
+            putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
+        } else {
+            putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
+            putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
+        }
     }
 }

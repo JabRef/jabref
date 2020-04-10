@@ -8,24 +8,22 @@ import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
+    public enum onlyCompleteNameFormat {
+        LAST_FIRST, FIRST_LAST, BOTH
+    }
+
     private boolean shouldAutoComplete;
     private AutoCompleteFirstNameMode firstNameMode;
-    private boolean onlyCompleteLastFirst;
-    private boolean onlyCompleteFirstLast;
+    private AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat;
     private Set<Field> completeFields;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
+        this.onlyCompleteNameFormat = onlyCompleteNameFormat;
         this.completeFields = completeFields;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
-    }
-
-    public void setShouldAutoComplete(boolean shouldAutoComplete) {
-        this.shouldAutoComplete = shouldAutoComplete;
     }
 
     public boolean shouldAutoComplete() {
@@ -39,25 +37,7 @@ public class AutoCompletePreferences {
         return firstNameMode;
     }
 
-    public void setFirstNameMode(AutoCompleteFirstNameMode firstNameMode) {
-        this.firstNameMode = firstNameMode;
-    }
-
-    public boolean getOnlyCompleteLastFirst() {
-        return onlyCompleteLastFirst;
-    }
-
-    public void setOnlyCompleteLastFirst(boolean onlyCompleteLastFirst) {
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
-    }
-
-    public boolean getOnlyCompleteFirstLast() {
-        return onlyCompleteFirstLast;
-    }
-
-    public void setOnlyCompleteFirstLast(boolean onlyCompleteFirstLast) {
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-    }
+    public AutoCompletePreferences.onlyCompleteNameFormat getOnlyCompleteNameFormat() { return onlyCompleteNameFormat; }
 
     /**
      * Returns the list of fields for which autocomplete is enabled
@@ -65,14 +45,6 @@ public class AutoCompletePreferences {
      */
     public Set<Field> getCompleteFields() {
         return completeFields;
-    }
-
-    public void setCompleteFields(Set<Field> completeFields) {
-        this.completeFields = completeFields;
-    }
-
-    public void setCompleteNames(String input) {
-        setCompleteFields(FieldFactory.parseFieldList(input));
     }
 
     public String getCompleteNamesAsString() {
