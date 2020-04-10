@@ -6,16 +6,19 @@
     <id>http://www.zotero.org/styles/american-institute-of-aeronautics-and-astronautics</id>
     <link href="http://www.zotero.org/styles/american-institute-of-aeronautics-and-astronautics" rel="self"/>
     <link href="http://www.zotero.org/styles/ieee-with-url" rel="template"/>
-    <link href="https://www.aiaa.org/Secondary.aspx?id=4597" rel="documentation"/>
+    <link href="https://www.aiaa.org/publications/journals/reference-style-and-format" rel="documentation"/>
     <author>
       <name>Garrett Foster</name>
       <email>garrett.d.foster@gmail.com</email>
       <uri>http://sdoresearch.com</uri>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="engineering"/>
     <summary>A style for AIAA</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-03-09T13:38:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="issued">
@@ -123,26 +126,35 @@
         <else-if type="chapter">
           <group delimiter=". ">
             <text variable="title" text-case="title"/>
-            <group delimiter=" ">
-              <text term="in" text-case="capitalize-first"/>
-              <text variable="container-title" font-style="italic"/>
-              <text macro="editor" prefix="(" suffix=")"/>
+            <group delimiter=", ">
+              <group delimiter=" ">
+                <text term="in" text-case="capitalize-first"/>
+                <text variable="container-title" font-style="italic"/>
+                <text macro="editor" prefix="(" suffix=")"/>
+              </group>
+              <text macro="publisher"/>
+              <text macro="issued"/>
+              <text macro="page"/>
             </group>
           </group>
-          <text macro="publisher" prefix=", "/>
-          <text macro="page" prefix=", "/>
         </else-if>
         <else-if type="article-journal article-newspaper" match="any">
           <group delimiter=". ">
             <text macro="title" text-case="title" quotes="true"/>
             <group delimiter=", ">
               <text variable="container-title" font-style="italic" form="long"/>
-              <text variable="volume" prefix="Vol. "/>
-              <text variable="issue" prefix="No. "/>
+              <group delimiter=" ">
+                <label text-case="capitalize-first" variable="volume" form="short"/>
+                <text variable="volume"/>
+              </group>
+              <group delimiter=" ">
+                <label text-case="capitalize-first" variable="issue" form="short"/>
+                <text variable="issue"/>
+              </group>
               <text macro="issued"/>
               <text macro="page"/>
             </group>
-            <text variable="DOI" prefix="doi:"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </group>
         </else-if>
         <else-if type="report">

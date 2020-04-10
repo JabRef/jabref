@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -40,11 +39,6 @@ public class OSX implements NativeDesktop {
     @Override
     public void openConsole(String absolutePath) throws IOException {
         Runtime.getRuntime().exec("open -a Terminal " + absolutePath, null, new File(absolutePath));
-    }
-
-    @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-        //TODO implement
     }
 
     @Override

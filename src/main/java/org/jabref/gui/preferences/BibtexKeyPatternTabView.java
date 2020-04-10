@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternTableView;
+import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -31,12 +31,12 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @FXML public HBox keyPatternContainer;
     @FXML public Button keyPatternHelp;
 
-    private final BibtexKeyPatternTableView bibtexKeyPatternTable;
+    private final BibtexKeyPatternPanel bibtexKeyPatternTable;
 
     public BibtexKeyPatternTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
-        bibtexKeyPatternTable = new BibtexKeyPatternTableView(preferences,
+        bibtexKeyPatternTable = new BibtexKeyPatternPanel(preferences,
                 Globals.entryTypesManager.getAllTypes(preferences.getDefaultBibDatabaseMode()),
                 preferences.getKeyPattern());
 

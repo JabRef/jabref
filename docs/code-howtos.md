@@ -170,11 +170,10 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under (src/test/org.jabref.logic.l10n)
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-4. With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well \(you can use `gradlew localizationUpdateExtended` for extended output\). [Crowdin](http://translate.jabref.org) will add them as required.
-5. Tests are green again.
+4. Please do not add tranlsations for other languages direclty in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
 ## Cleanup and Formatters
 
@@ -227,13 +226,11 @@ Imagine you want to test the method `format(String value)` in the class `BracesF
   testFormat() {
    assertEqual("test", format("test"));
    assertEqual("{test", format("{test"));
-   assertEqual("test", format("{{test"));
    assertEqual("test", format("test}}"));
-   assertEqual("test", format("{{test}}"));
   }
   ```
 
-  we would have five tests containing a single `assert` statement and named accordingly \(`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, `formatRemovesDoubleBracesAtBeginning`, etc.\). See [JUnit AntiPattern](http://www.exubero.com/junit/antipatterns.html#Multiple_Assertions) for background.
+  we would have five tests containing a single `assert` statement and named accordingly \(`formatDoesNotChangeStringWithoutBraces`, `formatDoesNotRemoveSingleBrace`, , etc.\). See [JUnit AntiPattern](https://exubero.com/junit/anti-patterns/#Multiple_Assertions) for background.
 
 * Do _not just test happy paths_, but also wrong/weird input.
 * It is recommend to write tests _before_ you actually implement the functionality \(test driven development\).
@@ -326,6 +323,10 @@ You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor
   * Read test input from `@State` objects
   * Return result of calculations \(either explicitly or via a `BlackHole` object\)
 * [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
+
+## Measure performance
+
+Try out the [YourKit JAva Profiler](https://www.yourkit.com/).
 
 ## equals
 

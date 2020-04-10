@@ -6,22 +6,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.StreamGobbler;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
 
@@ -105,23 +99,6 @@ public class Linux implements NativeDesktop {
             } else {
                 runtime.exec(emulatorName, null, new File(absolutePath));
             }
-        }
-    }
-
-    @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-
-        String application;
-        if (JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))) {
-            application = "acroread";
-
-            StringJoiner sj = new StringJoiner(" ");
-            sj.add(application);
-            parameters.forEach((param) -> sj.add(param));
-
-            openFileWithApplication(filePath, sj.toString());
-        } else {
-            openFile(filePath, "PDF");
         }
     }
 

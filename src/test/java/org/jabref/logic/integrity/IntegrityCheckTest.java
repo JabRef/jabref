@@ -176,7 +176,7 @@ class IntegrityCheckTest {
         assertCorrect(withMode(createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext(StandardField.EDITION, "Edition 2000"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBLATEX));
-        assertWrong(createContext(StandardField.EDITION, "1"));
+        assertWrong(withMode(createContext(StandardField.EDITION, "1"), BibDatabaseMode.BIBTEX));
     }
 
     @Test
@@ -360,7 +360,7 @@ class IntegrityCheckTest {
         Files.createFile(pdfFile);
 
         BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
-        databaseContext.setDatabaseFile(bibFile);
+        databaseContext.setDatabasePath(bibFile);
 
         assertCorrect(databaseContext);
     }

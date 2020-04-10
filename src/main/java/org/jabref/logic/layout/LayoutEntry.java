@@ -1,7 +1,7 @@
 package org.jabref.logic.layout;
 
-import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -57,6 +57,7 @@ import org.jabref.logic.layout.format.Iso690NamesAuthors;
 import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NotFoundFormatter;
@@ -366,10 +367,8 @@ class LayoutEntry {
                 return encoding.displayName();
 
             case LayoutHelper.IS_FILENAME:
-                return databaseContext.getDatabaseFile().map(File::getName).orElse("");
-
             case LayoutHelper.IS_FILEPATH:
-                return databaseContext.getDatabaseFile().map(File::getPath).orElse("");
+                return databaseContext.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).orElse("");
 
             default:
                 break;
@@ -538,6 +537,8 @@ class LayoutEntry {
                 return new WrapContent();
             case "WrapFileLinks":
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
+            case "Markdown":
+                return new MarkdownFormatter();
             default:
                 return null;
         }

@@ -49,6 +49,7 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
+        upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
     /**
@@ -298,6 +299,12 @@ public class PreferencesMigrations {
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.getPreviewStyle();
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
+        prefs.setPreviewStyle(migratedStyle);
+    }
+
+    static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.getPreviewStyle();
+        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}");
         prefs.setPreviewStyle(migratedStyle);
     }
 

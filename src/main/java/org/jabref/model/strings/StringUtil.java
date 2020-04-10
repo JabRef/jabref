@@ -193,20 +193,19 @@ public class StringUtil {
     }
 
     /**
-     * Formats field contents for output. Must be "symmetric" with the parse method above,
-     * so stored and reloaded fields are not mangled.
+     * Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
+     * are not mangled.
      *
-     * @param in
-     * @param wrapAmount
-     * @param newline
-     * @return the wrapped String.
+     * @param in         the string to wrap
+     * @param wrapAmount the number of characters belonging to a line of text
+     * @param newline    the newline character(s)
+     * @return the wrapped string
      */
     public static String wrap(String in, int wrapAmount, String newline) {
-
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline); // See
+        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
@@ -225,12 +224,21 @@ public class StringUtil {
         return result.toString();
     }
 
-    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newline) {
+    /**
+     * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
+     * Wrapping is done using newline and tab character.
+     *
+     * @param line          the line of text to be wrapped and appended
+     * @param wrapAmount    the number of characters belonging to a line of text
+     * @param newlineString a string containing the newline character(s)
+     */
+    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
         // Add the line, unmodified:
         result.append(line);
 
+        // insert newlines and one tab character at each position, where wrapping is necessary
         while (length < result.length()) {
             int current = result.indexOf(" ", length + wrapAmount);
             if ((current < 0) || (current >= result.length())) {
@@ -238,9 +246,8 @@ public class StringUtil {
             }
 
             result.deleteCharAt(current);
-            result.insert(current, newline + "\t");
-            length = current + newline.length();
-
+            result.insert(current, newlineString + "\t");
+            length = current + newlineString.length();
         }
     }
 

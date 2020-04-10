@@ -28,7 +28,6 @@ import javafx.scene.layout.BorderPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
@@ -39,7 +38,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.TypedBibEntry;
@@ -102,13 +100,6 @@ public class EntryEditor extends BorderPane {
         this.entryEditorPreferences = preferencesService.getEntryEditorPreferences();
         this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
                 databaseContext);
-
-        if (GUIGlobals.currentFont != null) {
-            setStyle(String.format("text-area-background: %s;text-area-foreground: %s;text-area-highlight: %s;",
-                    ColorUtil.toHex(GUIGlobals.validFieldBackgroundColor),
-                    ColorUtil.toHex(GUIGlobals.editorTextColor),
-                    ColorUtil.toHex(GUIGlobals.activeBackgroundColor)));
-        }
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;

@@ -130,13 +130,13 @@ public class FieldComparator implements Comparator<BibEntry> {
                 // Ok, parsing was successful. Update f1 and f2:
                 return i1.get().compareTo(i2.get()) * multiplier;
             } else if (i1.isPresent()) {
-                // The first one was parseable, but not the second one.
+                // The first one was parsable, but not the second one.
                 // This means we consider one < two
                 return -1 * multiplier;
             } else if (i2.isPresent()) {
-                // The second one was parseable, but not the first one.
+                // The second one was parsable, but not the first one.
                 // This means we consider one > two
-                return 1 * multiplier;
+                return multiplier;
             }
             // Else none of them were parseable, and we can fall back on comparing strings.
         }

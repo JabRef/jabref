@@ -1,6 +1,5 @@
 package org.jabref.gui.importer.fetcher;
 
-import java.util.List;
 import java.util.SortedSet;
 
 import javafx.beans.property.ListProperty;
@@ -17,10 +16,10 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -92,8 +91,8 @@ public class WebSearchPaneViewModel {
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> activeFetcher.performSearch(getQuery().trim()))
-                                                            .withInitialMessage(Localization.lang("Processing %0", getQuery()));
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
+                                                          .withInitialMessage(Localization.lang("Processing %0", getQuery()));
 
         task.onFailure(dialogService::showErrorDialogAndWait);
 
