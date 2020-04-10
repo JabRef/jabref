@@ -20,7 +20,7 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
 
-    private final StringProperty apiKeyPatternProperty = new SimpleStringProperty();
+    private final StringProperty apiKeyProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -34,14 +34,14 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         fileNamePatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         fileDirPatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
-        apiKeyPatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_API_WORLDCAT));
+        apiKeyProperty.setValue(preferences.get(JabRefPreferences.IMPORT_API_WORLDCAT));
     }
 
     @Override
     public void storeSettings() {
         preferences.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePatternProperty.getValue());
         preferences.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, fileDirPatternProperty.getValue());
-        preferences.put(JabRefPreferences.IMPORT_API_WORLDCAT, apiKeyPatternProperty.getValue());
+        preferences.put(JabRefPreferences.IMPORT_API_WORLDCAT, apiKeyProperty.getValue());
     }
 
     @Override
@@ -60,5 +60,5 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fileDirPatternProperty() { return fileDirPatternProperty; }
     
-    public StringProperty apiKeyPatternProperty() { return apiKeyPatternProperty; }
+    public StringProperty apiKeyProperty() { return apiKeyProperty; }
 }

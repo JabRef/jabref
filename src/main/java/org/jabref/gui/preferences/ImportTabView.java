@@ -31,7 +31,7 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
         
-        worldcatKey.textProperty().bindBidirectional(viewModel.apiKeyPatternProperty());
+        worldcatKey.textProperty().bindBidirectional(viewModel.apiKeyProperty());
     }
 
     @Override
