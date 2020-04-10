@@ -44,7 +44,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.easybind.EasyBind;
 
-public class ImportEntriesDialog extends BaseDialog<Void> {
+public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
@@ -76,14 +76,14 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-        setResultConverter(button -> {
+       setResultConverter(button -> {
             if (button == importButton) {
                 viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems());
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
 
-            return null;
+            return false;
         });
     }
 

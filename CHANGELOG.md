@@ -30,6 +30,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with inconsistent capitalization of file extensions when downloading files [#6115](https://github.com/JabRef/jabref/issues/6115)
 - We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We fixed an issue where search full-text documents downloaded files with same name, overwriting existing files. [#6174](https://github.com/JabRef/jabref/pull/6174)
+- We fixed an issue where when importing into current library an erroneous message "import cancelled" is displayed even though import is successful. [#6266](https://github.com/JabRef/jabref/issues/6266)
 
 ### Removed
 
