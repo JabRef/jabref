@@ -41,8 +41,8 @@ import org.xml.sax.SAXException;
  */
 public class WorldcatFetcher implements EntryBasedFetcher {
 
-    private String WORLDCAT_OPEN_SEARCH_URL = "http://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
-    private String WORLDCAT_READ_URL = "http://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
+    private String WORLDCAT_OPEN_SEARCH_URL = "https://www.worldcat.org/webservices/catalog/search/opensearch?wskey=";
+    private String WORLDCAT_READ_URL = "https://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
    
     public WorldcatFetcher(String worldcatKey) {
         WORLDCAT_OPEN_SEARCH_URL += worldcatKey;

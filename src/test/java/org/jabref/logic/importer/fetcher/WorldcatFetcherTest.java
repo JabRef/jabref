@@ -27,7 +27,7 @@ public class WorldcatFetcherTest {
     public void testPerformSearchForBadTitle() throws FetcherException {
         BibEntry entry = new BibEntry();
         //Mashing keyboard. Verified on https://platform.worldcat.org/api-explorer/apis/wcapi/Bib/OpenSearch
-        entry.setField(StandardField.TITLE, "ASDhbsd fnm");
+        entry.setField(StandardField.TITLE, "ASDhbsdfnm");
         List<BibEntry> list = fetcher.performSearch(entry);
         assertTrue(list.isEmpty());
     }
