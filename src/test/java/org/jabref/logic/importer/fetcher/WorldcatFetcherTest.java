@@ -40,13 +40,4 @@ public class WorldcatFetcherTest {
         List<BibEntry> list = fetcher.performSearch(entry);
         assertFalse(list.isEmpty());
     }
-
-    @Test
-    public void testPerformSearchForNullTitle() throws FetcherException {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, null);
-        List<BibEntry> list = fetcher.performSearch(entry);
-        assertTrue(list.isEmpty());
-    }
-
 }
