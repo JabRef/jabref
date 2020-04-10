@@ -20,7 +20,7 @@ public class WorldcatFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new WorldcatFetcher("API_KEY");
+        fetcher = new WorldcatFetcher("aMHOf2rfzUt3fuKkb7DXX8pkBv1AmcBWwwoSfwpt8CMhdUdxXscB4ESOmBPs4NlmYJmFtcSZ3Q5kMxzb");
     }
 
     @Test

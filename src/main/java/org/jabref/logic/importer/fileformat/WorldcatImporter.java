@@ -33,26 +33,26 @@ public class WorldcatImporter extends Importer {
      * @return XML document representing the content of s
      * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
      */
-    private Document parse (BufferedReader s) {
+    private Document parse(BufferedReader s) {
         try { 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance ();
-            DocumentBuilder builder = factory.newDocumentBuilder ();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
 
-            return builder.parse (new InputSource (s));
+            return builder.parse(new InputSource(s));
         } catch (ParserConfigurationException e) {
-            throw new IllegalArgumentException ("Parser Config Exception: ", e);
+            throw new IllegalArgumentException("Parser Config Exception: ", e);
         } catch (SAXException e) {
-            throw new IllegalArgumentException ("SAX Exception: ", e);
+            throw new IllegalArgumentException("SAX Exception: ", e);
         } catch (IOException e) {
-            throw new IllegalArgumentException ("IO Exception: ", e);
+            throw new IllegalArgumentException("IO Exception: ", e);
         }
     }
 
     @Override
-    public boolean isRecognizedFormat (BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         try {
-            Document doc = parse (input);
-            return doc.getElementsByTagName ("feed") != null;
+            Document doc = parse(input);
+            return doc.getElementsByTagName("feed") != null;
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -66,9 +66,9 @@ public class WorldcatImporter extends Importer {
      * @return the tag element
      * @throws NullPointerException if there is no element by this tag
      */
-    private Element getElementByTag (Element xml, String tag) throws NullPointerException { 
-        NodeList nl = xml.getElementsByTagName (tag);
-        return (Element) nl.item (0);
+    private Element getElementByTag(Element xml, String tag) throws NullPointerException { 
+        NodeList nl = xml.getElementsByTagName(tag);
+        return (Element) nl.item(0);
     }
 
     /**
@@ -77,25 +77,25 @@ public class WorldcatImporter extends Importer {
      * @return the correspoinding bibentry
      * @throws IOException if we cannot search Worldcat with the OCLC of the entry
      */
-    private BibEntry xmlEntryToBibEntry (Element xmlEntry) throws IOException { 
-        String authors = getElementByTag (xmlEntry, "dc:creator").getTextContent ();
+    private BibEntry xmlEntryToBibEntry(Element xmlEntry) throws IOException { 
+        String authors = getElementByTag(xmlEntry, "dc:creator").getTextContent();
 
-        String title = getElementByTag (xmlEntry, "dc:title").getTextContent ();
+        String title = getElementByTag(xmlEntry, "dc:title").getTextContent();
 
-        String oclcNr = getElementByTag (xmlEntry, "oclcterms:recordIdentifie").getTextContent ();
+        String oclcNr = getElementByTag(xmlEntry, "oclcterms:recordIdentifie").getTextContent();
         String url = "http://worldcat.org/oclc/" + oclcNr;
         
-        String date = getElementByTag (xmlEntry, "dc:date").getTextContent ();
+        String date = getElementByTag(xmlEntry, "dc:date").getTextContent();
 
-        String publisher =  getElementByTag (xmlEntry, "dc:publisher").getTextContent ();
+        String publisher =  getElementByTag(xmlEntry, "dc:publisher").getTextContent();
 
-        BibEntry entry = new BibEntry ();
+        BibEntry entry = new BibEntry();
 
-        entry.setField (StandardField.AUTHOR, authors);
-        entry.setField (StandardField.TITLE, title);
-        entry.setField (StandardField.URL, url);
-        entry.setField (StandardField.YEAR, date);
-        entry.setField (StandardField.JOURNAL, publisher);
+        entry.setField(StandardField.AUTHOR, authors);
+        entry.setField(StandardField.TITLE, title);
+        entry.setField(StandardField.URL, url);
+        entry.setField(StandardField.YEAR, date);
+        entry.setField(StandardField.JOURNAL, publisher);
 
         return entry;
     }
@@ -107,38 +107,38 @@ public class WorldcatImporter extends Importer {
      * @return the ParserResult containing the BibEntries collection
      * @throws IOException if {@link xmlEntryToBibEntry} throws 
      */
-    private ParserResult docToParserRes (Document doc) throws IOException { 
-        Element feed = (Element) doc.getElementsByTagName ("entries").item (0);
-        NodeList entryXMLList = feed.getElementsByTagName ("entry");
+    private ParserResult docToParserRes(Document doc) throws IOException { 
+        Element feed = (Element) doc.getElementsByTagName("entries").item(0);
+        NodeList entryXMLList = feed.getElementsByTagName("entry");
 
-        List<BibEntry> bibList = new ArrayList<>(entryXMLList.getLength ());
-        for (int i = 0; i < entryXMLList.getLength (); i++) {
-            Element xmlEntry = (Element) entryXMLList.item (i);
-            BibEntry bibEntry = xmlEntryToBibEntry (xmlEntry);
-            bibList.add (bibEntry);		
+        List<BibEntry> bibList = new ArrayList<>(entryXMLList.getLength());
+        for (int i = 0; i < entryXMLList.getLength(); i++) {
+            Element xmlEntry = (Element) entryXMLList.item(i);
+            BibEntry bibEntry = xmlEntryToBibEntry(xmlEntry);
+            bibList.add(bibEntry);		
         }
 
-        return new ParserResult (bibList);
+        return new ParserResult(bibList);
     }
 
     @Override
-    public ParserResult importDatabase (BufferedReader input) throws IOException {
-        Document parsedDoc = parse (input);
-        return docToParserRes (parsedDoc);
+    public ParserResult importDatabase(BufferedReader input) throws IOException {
+        Document parsedDoc = parse(input);
+        return docToParserRes(parsedDoc);
     }
 
     @Override
-    public String getName () {
+    public String getName() {
         return NAME;
     }
 
     @Override
-    public FileType getFileType () {
+    public FileType getFileType() {
         return StandardFileType.XML;
     }
 
     @Override
-    public String getDescription () {
+    public String getDescription() {
         return DESCRIPTION;
     }
 
