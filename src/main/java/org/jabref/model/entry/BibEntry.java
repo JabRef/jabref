@@ -528,8 +528,8 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.put(field, value.intern());
         invalidateFieldCache(field);
+        fields.put(field, value.intern());
 
         FieldChange change = new FieldChange(this, field, oldValue, value);
         if (isNewField) {
@@ -574,8 +574,8 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.remove(field);
         invalidateFieldCache(field);
+        fields.remove(field);
 
         FieldChange change = new FieldChange(this, field, oldValue.get(), null);
         eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
