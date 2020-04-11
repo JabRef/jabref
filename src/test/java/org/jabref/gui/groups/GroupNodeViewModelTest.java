@@ -20,6 +20,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -160,7 +161,7 @@ public class GroupNodeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
         model.addEntriesToGroup(databaseContext.getEntries());
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
@@ -168,10 +169,10 @@ public class GroupNodeViewModelTest {
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
     }
 
     private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
     }
 }
