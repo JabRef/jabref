@@ -6,8 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
@@ -37,7 +35,6 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.base.Enums;
@@ -62,15 +59,15 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final DelayTaskThrottler throttler;
-    private boolean displayItemsCount;
+    private final PreferencesService preferencesService;
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
-        this.displayItemsCount = false;
+        this.preferencesService = preferencesService;
 
         displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
@@ -102,16 +99,16 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard) {
-        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard);
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
+        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferencesService);
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard);
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferencesService);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferencesService);
     }
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
@@ -258,7 +255,7 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        if (displayItemsCount) {
+        if (preferencesService.getDisplayGroupCount()) {
             BackgroundTask
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
@@ -365,13 +362,5 @@ public class GroupNodeViewModel {
 
     private int getPositionInParent() {
         return groupNode.getPositionInParent();
-    }
-
-    public void setDisplayItemsCount(boolean displayItemsCount) {
-        this.displayItemsCount = displayItemsCount;
-
-        if (displayItemsCount) {
-            calculateNumberOfMatches();
-        }
     }
 }

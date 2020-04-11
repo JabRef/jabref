@@ -135,7 +135,6 @@ public class GroupTreeView {
                     }
                     Text text = new Text();
                     if (preferencesService.getDisplayGroupCount()) {
-                        group.setDisplayItemsCount(preferencesService.getDisplayGroupCount());
                         text.textProperty().bind(group.getHits().asString());
                     }
                     text.getStyleClass().setAll("text");
