@@ -247,6 +247,14 @@ public class BibEntry implements Cloneable {
      * @return The resolved field value or null if not found.
      */
     public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, this::getField);
+    }
+
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, this::getLatexFreeField);
+    }
+
+    private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, GetFieldInterface getFieldInterface) {
         if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)) {
             return Optional.of(type.get().getDisplayName());
         }
@@ -255,7 +263,7 @@ public class BibEntry implements Cloneable {
             return getCiteKeyOptional();
         }
 
-        Optional<String> result = getFieldOrAlias(field);
+        Optional<String> result = genericGetFieldOrAlias(field, getFieldInterface);
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry, following the biblatex rules
         if (result.isEmpty() && (database != null)) {
@@ -266,7 +274,7 @@ public class BibEntry implements Cloneable {
                 Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
 
                 if (sourceField.isPresent()) {
-                    result = referred.get().getFieldOrAlias(sourceField.get());
+                    result = referred.get().genericGetFieldOrAlias(sourceField.get(), getFieldInterface);
                 }
             }
         }
@@ -870,9 +878,9 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
-                String latexFreeField = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
-                latexFreeFields.put(field, latexFreeField);
-                return Optional.of(latexFreeField);
+                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                latexFreeFields.put(field, latexFreeValue);
+                return Optional.of(latexFreeValue);
             } else {
                 return Optional.empty();
             }
