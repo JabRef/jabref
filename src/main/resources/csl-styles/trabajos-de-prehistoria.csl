@@ -15,7 +15,7 @@
     <category field="history"/>
     <issn>0082-5638</issn>
     <eissn>1988-3218</eissn>
-    <updated>2020-04-04T11:24:49+00:00</updated>
+    <updated>2020-04-09T10:37:35+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="es">
@@ -109,7 +109,7 @@
   <macro name="pages">
     <text variable="page" prefix=": "/>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
       <key macro="year-date"/>
       <key variable="author"/>
@@ -127,11 +127,11 @@
   <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" line-spacing="2" hanging-indent="true">
     <sort>
       <key macro="author"/>
-      <key variable="title"/>
+      <key macro="year-date"/>
     </sort>
     <layout suffix=".">
       <text macro="author" suffix=" "/>
-      <date variable="issued" suffix=":">
+      <date variable="issued" suffix=": ">
         <date-part name="year"/>
       </date>
       <choose>
