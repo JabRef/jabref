@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
@@ -23,7 +26,9 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     private final StringProperty apiKeyProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+	private final JabRefPreferences preferences;
+	
+	private final String WORLDCAT_REQUEST_URL = "https://platform.worldcat.org/wskey";
 
     public ImportTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -52,7 +57,7 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     @Override
     public List<String> getRestartWarnings() {
         return new ArrayList<>();
-    }
+	}
 
     public ListProperty<String> defaultFileNamePatternsProperty() { return defaultFileNamePatternsProperty; }
 
@@ -60,5 +65,17 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fileDirPatternProperty() { return fileDirPatternProperty; }
     
-    public StringProperty apiKeyProperty() { return apiKeyProperty; }
+	public StringProperty apiKeyProperty() { return apiKeyProperty; }
+	
+	public void openWorldcatKeyRequest() {
+		openWebsite(WORLDCAT_REQUEST_URL);
+	}
+
+	private void openWebsite(String url) {
+        try {
+            JabRefDesktop.openBrowser(url);
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
+        }
+    }
 }

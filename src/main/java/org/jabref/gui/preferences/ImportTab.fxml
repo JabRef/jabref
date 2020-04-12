@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -43,9 +45,13 @@
             <RowConstraints vgrow="SOMETIMES"/>
         </rowConstraints>
         <Label text="%Worldcat" GridPane.rowIndex="1"/>
-		<Label fx:id="worldcatDescription"
-           text="%You can request a link at this link: https://platform.worldcat.org/wskey"
-           textOverrun="CLIP" wrapText="true"/>
+		<HBox alignment="CENTER_LEFT">
+			<Label fx:id="worldcatDescription"
+			text="%You can request a key at"
+			styleClass="space-after"
+			textOverrun="CLIP" wrapText="true"/>
+			<Hyperlink onAction="#openWorldcatKeyRequest" text="%the worlcat platform" />
+		</HBox>
         <TextField fx:id="worldcatKey" GridPane.columnIndex="1" GridPane.rowIndex="1"
                    prefWidth="300" minWidth="300" maxWidth="300"/>
     </GridPane>

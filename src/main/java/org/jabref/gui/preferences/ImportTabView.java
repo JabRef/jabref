@@ -34,6 +34,11 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
         worldcatKey.textProperty().bindBidirectional(viewModel.apiKeyProperty());
     }
 
+	@FXML
+	public void openWorldcatKeyRequest() { 
+		viewModel.openWorldcatKeyRequest(); 
+	}
+
     @Override
     public String getTabName() { return Localization.lang("Import"); }
 }
