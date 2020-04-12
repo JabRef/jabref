@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
@@ -247,6 +248,14 @@ public class BibEntry implements Cloneable {
      * @return The resolved field value or null if not found.
      */
     public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);
+    }
+
+    public Optional<String> getResolvedFieldOrAliasLatexFree(Field field, BibDatabase database) {
+        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);
+    }
+
+    private Optional<String> genericGetResolvedFieldOrAlias(Field field, BibDatabase database, BiFunction<BibEntry, Field, Optional<String>> getFieldOrAlias) {
         if (InternalField.TYPE_HEADER.equals(field) || InternalField.OBSOLETE_TYPE_HEADER.equals(field)) {
             return Optional.of(type.get().getDisplayName());
         }
@@ -255,7 +264,7 @@ public class BibEntry implements Cloneable {
             return getCiteKeyOptional();
         }
 
-        Optional<String> result = getFieldOrAlias(field);
+        Optional<String> result = getFieldOrAlias.apply(this, field);
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry, following the biblatex rules
         if (result.isEmpty() && (database != null)) {
@@ -266,7 +275,7 @@ public class BibEntry implements Cloneable {
                 Optional<Field> sourceField = getSourceField(field, targetEntry, sourceEntry);
 
                 if (sourceField.isPresent()) {
-                    result = referred.get().getFieldOrAlias(sourceField.get());
+                    result = getFieldOrAlias.apply(referred.get(), sourceField.get());
                 }
             }
         }
@@ -281,7 +290,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField.KEY_FIELD}.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
      *
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
@@ -396,13 +405,12 @@ public class BibEntry implements Cloneable {
      *
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
-     * @param field the field
-     * @param getFieldInterface
-     *
+     * @param field         the field
+     * @param getFieldValue the method to get the value of a given field in a given entry
      * @return determined field value
      */
-    private Optional<String> genericGetFieldOrAlias(Field field, GetFieldInterface getFieldInterface) {
-        Optional<String> fieldValue = getFieldInterface.getValueForField(field);
+    private Optional<String> genericGetFieldOrAlias(Field field, BiFunction<BibEntry, Field, Optional<String>> getFieldValue) {
+        Optional<String> fieldValue = getFieldValue.apply(this, field);
 
         if (fieldValue.isPresent() && !fieldValue.get().isEmpty()) {
             return fieldValue;
@@ -412,22 +420,22 @@ public class BibEntry implements Cloneable {
         Field aliasForField = EntryConverter.FIELD_ALIASES.get(field);
 
         if (aliasForField != null) {
-            return getFieldInterface.getValueForField(aliasForField);
+            return getFieldValue.apply(this, aliasForField);
         }
 
         // Finally, handle dates
         if (StandardField.DATE.equals(field)) {
             Optional<Date> date = Date.parse(
-                    getFieldInterface.getValueForField(StandardField.YEAR),
-                    getFieldInterface.getValueForField(StandardField.MONTH),
-                    getFieldInterface.getValueForField(StandardField.DAY));
+                    getFieldValue.apply(this, StandardField.YEAR),
+                    getFieldValue.apply(this, StandardField.MONTH),
+                    getFieldValue.apply(this, StandardField.DAY));
 
             return date.map(Date::getNormalized);
         }
 
         if (StandardField.YEAR.equals(field) || StandardField.MONTH.equals(field) || StandardField.DAY.equals(field)) {
-            Optional<String> date = getFieldInterface.getValueForField(StandardField.DATE);
-            if (!date.isPresent()) {
+            Optional<String> date = getFieldValue.apply(this, StandardField.DATE);
+            if (date.isEmpty()) {
                 return Optional.empty();
             }
 
@@ -464,7 +472,7 @@ public class BibEntry implements Cloneable {
      * @return  the stored latex-free content of the field (or its alias)
      */
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
-        return genericGetFieldOrAlias(name, this::getLatexFreeField);
+        return genericGetFieldOrAlias(name, BibEntry::getLatexFreeField);
     }
 
     /**
@@ -492,7 +500,7 @@ public class BibEntry implements Cloneable {
      * </p>
      */
     public Optional<String> getFieldOrAlias(Field field) {
-        return genericGetFieldOrAlias(field, this::getField);
+        return genericGetFieldOrAlias(field, BibEntry::getField);
     }
 
     /**
@@ -870,9 +878,9 @@ public class BibEntry implements Cloneable {
         } else {
             Optional<String> fieldValue = getField(field);
             if (fieldValue.isPresent()) {
-                String latexFreeField = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
-                latexFreeFields.put(field, latexFreeField);
-                return Optional.of(latexFreeField);
+                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();
+                latexFreeFields.put(field, latexFreeValue);
+                return Optional.of(latexFreeValue);
             } else {
                 return Optional.empty();
             }
@@ -943,9 +951,4 @@ public class BibEntry implements Cloneable {
     public Observable[] getObservables() {
         return new Observable[] {fields, type};
     }
-
-    private interface GetFieldInterface {
-        Optional<String> getValueForField(Field field);
-    }
-
 }
