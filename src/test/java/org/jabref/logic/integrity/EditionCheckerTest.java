@@ -55,18 +55,13 @@ public class EditionCheckerTest {
     }
 
     @Test
-    void bibTexDoesNotAcceptIntegerInputInEdition() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX));
+    void bibTexAcceptsIntegerInputInEdition() {
+        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void bibTexNowAcceptsIntegerInputInEdition() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX), true);
-    }
-
-    @Test
-    void bibTexDoesNotAcceptOrdinalNumberInNumbers() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
+    void bibTexAcceptsOrdinalNumberInNumbers() {
+        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
     }
 
     @Test
