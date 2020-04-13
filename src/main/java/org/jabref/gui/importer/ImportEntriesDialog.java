@@ -48,6 +48,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
+    public Label totalItems;
+    public Label selectedItems;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -67,7 +69,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -90,7 +91,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML
     private void initialize() {
         viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
-
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
@@ -126,18 +126,21 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     }).executeWith(Globals.TASK_EXECUTOR);
 
                     /*
-                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    inserted the if-statement here, since a Platform.runLater() call did not work.
                     also tried to move it to the end of the initialize method, but it did not select the entry.
                     */
                     if (entriesListView.getItems().size() == 1) {
                         selectAllNewEntries();
-                      }
+                    }
 
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
+
+        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
+        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 
