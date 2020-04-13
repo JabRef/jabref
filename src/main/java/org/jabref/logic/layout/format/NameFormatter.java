@@ -14,9 +14,9 @@ import org.jabref.model.entry.AuthorList;
  *
  * The formatter needs a parameter to be passed in that follows the following format:
  *
- * <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
+ * <code>&lt;case1>@&lt;range11>@"&lt;format>"@&lt;range12>@"&lt;format>"@&lt;range13>...@@
  *
- * <case2>@<range21>@... and so on.
+ * &lt;case2>@&lt;range21>@...</code> and so on.
  *
  * Individual cases are separated by @@ and items in a case by @.
  *
