@@ -1,0 +1,18 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/stale@master
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'Closing this issue due to inactivity :zzz: Please reopen the issue with additional information if the problem persists.'
+        stale-issue-label: 's: stale'
+        days-before-stale: 30
+        only-labels: 's: waiting-for-customer-feedback'
