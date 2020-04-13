@@ -29,7 +29,7 @@ import org.jabref.model.entry.AuthorList;
  * case2 = 3
  * case3 = *
  *
- * Ranges are either &lt;integer>..&lt;<integer>, &lt;integer> or the character * using a 1 based index for indexing
+ * Ranges are either &lt;integer>..&lt;integer>, &lt;integer> or the character * using a 1 based index for indexing
  * authors from the given authorlist. Integer indexes can be negative to denote them to start from
  * the end of the list where -1 is the last author.
  *
