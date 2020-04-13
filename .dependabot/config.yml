@@ -6,7 +6,7 @@ update_configs:
     directory: "/"
     update_schedule: "weekly"
     default_labels:
-      - "dependencies"
+      - "t: dependencies"
     automerged_updates:
       - match:
          dependency_type: "all"

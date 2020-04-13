@@ -76,7 +76,7 @@ An explanation of donation possibilities and usage of donations is available at 
 [![Join the chat at https://gitter.im/JabRef/jabref](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JabRef/jabref?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![OpenHub](https://www.openhub.net/p/jabref/widgets/project_thin_badge.gif)](https://www.openhub.net/p/jabref)
 
-> Not a programmer? [Learn how to help.](http://contribute.jabref.org)
+> Not a programmer? [Learn how to help.](https://contribute.jabref.org)
 
 Want to be part of a free and open-source project that tens of thousands of scientists use every day? Check out the ways you can contribute, below:
 
