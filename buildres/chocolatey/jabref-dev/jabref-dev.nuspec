@@ -2,28 +2,27 @@
 
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
-    <!-- == PACKAGE SPECIFIC SECTION == -->
-    <id>jabref-dev</id>
+    <id>jabref-nightly</id>
     <!-- version should MATCH as closely as possible with the underlying software -->
     <!-- Is the version a prerelease of a version? https://docs.nuget.org/create/versioning#creating-prerelease-packages -->
     <!-- Note that unstable versions like 0.0.1 can be considered a released version, but it's possible that one can release a 0.0.1-beta before you release a 0.0.1 version. If the version number is final, that is considered a released version and not a prerelease. -->
-    <version>5.0.0</version>
+    <version>AssemblySemFileVer</version>
     <!-- <packageSourceUrl>Where is this Chocolatey package located (think GitHub)? packageSourceUrl is highly recommended for the community feed</packageSourceUrl>-->
     <owners>JabRef</owners>
 
     <!-- == SOFTWARE SPECIFIC SECTION == -->
     <title>JabRef (development version)</title>
-    <authors>https://github.com/JabRef/jabref/blob/master/AUTHORS</authors>
+    <authors>JabRef Developers</authors>
     <projectUrl>https://www.jabref.org/</projectUrl>
     <iconUrl>https://cdn.jsdelivr.net/gh/JabRef/jabref/src/main/resources/images/external/JabRef-icon-128.png</iconUrl>
     <copyright>JabRef</copyright>
     <licenseUrl>https://github.com/JabRef/jabref/blob/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <projectSourceUrl>https://github.com/JabRef/jabref/</projectSourceUrl>
-    <docsUrl>https://help.jabref.org/</docsUrl>
+    <docsUrl>https://docs.jabref.org/</docsUrl>
     <mailingListUrl>http://discourse.jabref.org/</mailingListUrl>
     <bugTrackerUrl>https://github.com/JabRef/jabref/issues</bugTrackerUrl>
-    <tags>jabref bibtex latex bibliography reference database admin</tags>
+    <tags>jabref bibtex biblatex latex bibliography reference database</tags>
     <summary>JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.</summary>
     <description><![CDATA[
       ** Please Note: This development version is a special build that allows you to test the latest features and bug fixes before they become available in the next [stable release of JabRef](https://chocolatey.org/packages/jabref)**

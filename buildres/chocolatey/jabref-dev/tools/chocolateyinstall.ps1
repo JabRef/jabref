@@ -1,7 +1,7 @@
 ﻿$ErrorActionPreference = 'Stop'; # stop on all errors
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
 
-$url        = 'https://builds.jabref.org/master/JabRef-5.0.0.msi'
+$url        = 'https://builds.jabref.org/nightly/JabRef-5.1.msi'
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
@@ -13,12 +13,12 @@ $packageArgs = @{
   softwareName  = 'JabRef*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
 
   # Checksums are now required as of 0.10.0.
-  # To determine checksums, you can get that from the original site if provided. 
-  # You can also use checksum.exe (choco install checksum) and use it 
+  # To determine checksums, you can get that from the original site if provided.
+  # You can also use checksum.exe (choco install checksum) and use it
   # e.g. checksum -t sha256 -f path\to\file
-  checksum      = ''
+  checksum      = 'CHECKSUM'
   checksumType  = 'sha256' #default is md5, can also be sha1, sha256 or sha512
-  checksum64    = ''
+  checksum64    = 'CHECKSUM'
   checksumType64= 'sha256' #default is checksumType
 
   # MSI

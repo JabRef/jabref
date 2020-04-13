@@ -1,4 +1,5 @@
-assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
+assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber ?? 0}'
+assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{WeightedPreReleaseNumber ?? 0}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
 mode: ContinuousDeployment
 

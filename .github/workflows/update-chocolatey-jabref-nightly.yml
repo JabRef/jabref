@@ -1,0 +1,61 @@
+name: Chocolatey Nightly
+
+on:
+  push:
+    branches:
+      - chocoDev
+  schedule:
+    # run on each day
+    - cron: '33 5 * * *'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    name: Create installer and portable version for chocolatey
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Make current master version the nightly build version
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        uses: appleboy/ssh-action@v0.0.6
+        with:
+          script: |
+            rm /var/www/builds.jabref.org/www/nightly/* || mkdir -p /var/www/builds.jabref.org/www/nightly || true
+            cp /var/www/builds.jabref.org/www/master/JabRef-5.1.msi /var/www/builds.jabref.org/www/nightly/
+            cp /var/www/builds.jabref.org/www/master/JabRef-5.1-portable_windows.zip /var/www/builds.jabref.org/www/nightly/
+          host: build-upload.jabref.org
+          port: 9922
+          username: jrrsync
+          key: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Determine sha256 sums
+        id: checksum
+        shell: bash
+        run: |
+          wget https://builds.jabref.org/master/JabRef-5.1.msi -o /tmp/jabref.msi
+          echo ::set-output checksum::`sha256sum < /tmp/jabref.msi | sed s/ .*//`
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.2
+        with:
+          versionSpec: '5.2.x'
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.2
+      - name: Put in version and checksum
+        shell: bash
+        run: |
+          sed -i "s/AssemblySemFileVer/${{ steps.gitversion.outputs.AssemblySemFileVer }}/" buildres/chocolatey/jabref-dev/tools/chocolateyinstall.ps1
+          sed -i "s/CHECKSUM/${{ steps.checksum.outputs.checksum }}/" buildres/chocolatey/jabref-dev/tools/chocolateyinstall.ps1
+          cat buildres/chocolatey/jabref-dev/tools/chocolateyinstall.ps1
