@@ -76,7 +76,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-       setResultConverter(button -> {
+        setResultConverter(button -> {
             if (button == importButton) {
                 viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems());
             } else {
