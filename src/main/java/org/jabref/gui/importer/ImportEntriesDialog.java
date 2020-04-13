@@ -44,7 +44,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.easybind.EasyBind;
 
-public class ImportEntriesDialog extends BaseDialog<Void> {
+public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
@@ -84,7 +84,7 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
 
-            return null;
+            return false;
         });
     }
 
