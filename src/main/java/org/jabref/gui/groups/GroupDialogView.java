@@ -3,7 +3,9 @@ package org.jabref.gui.groups;
 import java.util.EnumMap;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -59,8 +61,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML private TextField texGroupFilePath;
 
-    private final EnumMap<GroupHierarchyType,String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
-    private final EnumMap<GroupHierarchyType,String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
+    private final EnumMap<GroupHierarchyType, String> hierarchyText = new EnumMap<>(GroupHierarchyType.class);
+    private final EnumMap<GroupHierarchyType, String> hierarchyToolTip = new EnumMap<>(GroupHierarchyType.class);
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     private final GroupDialogViewModel viewModel;
@@ -80,6 +82,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         setResultConverter(viewModel::resultConverter);
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
+
+        final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        // handle validation before closing dialog and calling resultConverter
+        confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
     }
 
     @FXML
@@ -135,11 +141,12 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.searchSearchTermEmptyValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
+            validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
         });
 
         // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
-        viewModel.validationStatus().validProperty().addListener((obs, oldValue, newValue) -> {
-            if (newValue) {
+        viewModel.validationStatus().validProperty().addListener((obs, _oldValue, validationStatus) -> {
+            if (validationStatus) {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
             } else {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(true);

@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -89,7 +88,6 @@ import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.importer.ManageCustomImportsAction;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
-import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -306,8 +304,8 @@ public class JabRefFrame extends BorderPane {
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
             String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabaseFile()
-                                       .map(File::getPath)
+                                       .getDatabasePath()
+                                       .map(Path::toString)
                                        .orElse(Localization.lang("untitled"));
             //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
@@ -355,7 +353,7 @@ public class JabRefFrame extends BorderPane {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
+                Path focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabasePath().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
         }
@@ -380,7 +378,7 @@ public class JabRefFrame extends BorderPane {
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
-            BibDatabaseContext context = panel.getBibDatabaseContext();
+            final BibDatabaseContext context = panel.getBibDatabaseContext();
 
             if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
@@ -394,7 +392,7 @@ public class JabRefFrame extends BorderPane {
             }
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context);
-            context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
+            context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
@@ -679,7 +677,6 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.IMPORT,
-                        factory.createMenuItem(StandardActions.MERGE_DATABASE, new AppendDatabaseAction(this, dialogService, stateManager)), // TODO: merge with import
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(this, false, stateManager)),
                         factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(this, true, stateManager))),
 
@@ -728,7 +725,8 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager))
+                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),
+                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
@@ -753,11 +751,10 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
         );
 
         quality.getItems().addAll(
@@ -903,27 +900,26 @@ public class JabRefFrame extends BorderPane {
         return menu;
     }
 
-    public void addParserResult(ParserResult pr, boolean focusPanel) {
-        if (pr.toOpenTab()) {
+    public void addParserResult(ParserResult parserResult, boolean focusPanel) {
+        if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), focusPanel);
+                addTab(parserResult.getDatabaseContext(), focusPanel);
             } else {
-                List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
-                addImportedEntries(panel, entries);
+                addImportedEntries(panel, parserResult);
             }
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(pr.getFile()))
+                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(parserResult.getFile()))
                                                           .findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.getSelectionModel().select(getTab(panel.get()));
             } else {
-                addTab(pr.getDatabaseContext(), focusPanel);
+                addTab(parserResult.getDatabaseContext(), focusPanel);
             }
         }
     }
@@ -953,15 +949,11 @@ public class JabRefFrame extends BorderPane {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
         for (BasePanel basePanel : getBasePanelList()) {
-            try {
-                // db file exists
-                if (basePanel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().get().getCanonicalPath());
-                } else {
-                    dbPaths.add("");
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Invalid database file path: " + ex.getMessage());
+            // db file exists
+            if (basePanel.getBibDatabaseContext().getDatabasePath().isPresent()) {
+                dbPaths.add(basePanel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
+            } else {
+                dbPaths.add("");
             }
         }
         return dbPaths;
@@ -977,10 +969,10 @@ public class JabRefFrame extends BorderPane {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
+            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
             if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
+                if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
@@ -991,7 +983,7 @@ public class JabRefFrame extends BorderPane {
             } else {
                 tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
             }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(File::getAbsolutePath).orElse(null)));
+            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
         }
     }
 
@@ -1047,17 +1039,17 @@ public class JabRefFrame extends BorderPane {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
-                context.getDatabaseFile().isPresent();
+                context.getDatabasePath().isPresent();
     }
 
     /**
      * Opens the import inspection dialog to let the user decide which of the given entries to import.
      *
-     * @param panel   The BasePanel to add to.
-     * @param entries The entries to add.
+     * @param panel        The BasePanel to add to.
+     * @param parserResult The entries to add.
      */
-    private void addImportedEntries(final BasePanel panel, final List<BibEntry> entries) {
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> entries);
+    private void addImportedEntries(final BasePanel panel, final ParserResult parserResult) {
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();
@@ -1158,7 +1150,7 @@ public class JabRefFrame extends BorderPane {
             return;
         }
 
-        BibDatabaseContext context = panel.getBibDatabaseContext();
+        final BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {

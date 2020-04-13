@@ -56,7 +56,7 @@ public class TagBar<T> extends HBox {
     }
 
     public void setTags(Collection<T> newTags) {
-        this.tags.setAll(tags);
+        this.tags.setAll(newTags);
     }
 
     public ListProperty<T> tagsProperty() {

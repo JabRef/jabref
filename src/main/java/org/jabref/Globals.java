@@ -113,10 +113,10 @@ public class Globals {
 
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
-        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.getAzureInstrumentationKey());
+        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
-        telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.getVersion().toString());
+        telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());
         telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());
         telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());

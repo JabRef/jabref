@@ -15,10 +15,12 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -59,8 +61,6 @@ public interface PreferencesService {
 
     Map<String, Set<Field>> getEntryEditorTabList();
 
-    boolean getEnforceLegalKeys();
-
     Map<String, String> getCustomTabsNamesAndFields();
 
     void setCustomTabsNameAndFields(String name, String fields, int defNumber);
@@ -75,8 +75,6 @@ public interface PreferencesService {
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
-    UpdateFieldPreferences getUpdateFieldPreferences();
-
     ImportFormatPreferences getImportFormatPreferences();
 
     boolean isKeywordSyncEnabled();
@@ -88,8 +86,6 @@ public interface PreferencesService {
     void setExportWorkingDirectory(String layoutFileDirString);
 
     Charset getDefaultEncoding();
-
-    void setDefaultEncoding(Charset encoding);
 
     String getUser();
 
@@ -105,8 +101,6 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes();
 
-    boolean getAllowIntegerEdition();
-
     EntryEditorPreferences getEntryEditorPreferences();
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
@@ -116,4 +110,37 @@ public interface PreferencesService {
     CleanupPreset getCleanupPreset();
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
+
+    // General
+
+    Language getLanguage();
+
+    void setLanguage(Language language);
+
+    boolean shouldCollectTelemetry();
+
+    void setShouldCollectTelemetry(boolean value);
+
+    boolean shouldAskToCollectTelemetry();
+
+    void askedToCollectTelemetry();
+
+    boolean getEnforceLegalKeys();
+
+    boolean getAllowIntegerEdition();
+
+    GeneralPreferences getGeneralPreferences();
+
+    void storeGeneralPreferences(GeneralPreferences preferences);
+
+    OwnerPreferences getOwnerPreferences();
+
+    void storeOwnerPreferences(OwnerPreferences preferences);
+
+    TimestampPreferences getTimestampPreferences();
+
+    void storeTimestampPreferences(TimestampPreferences preferences);
+
+    boolean getDisplayGroupCount();
+
 }

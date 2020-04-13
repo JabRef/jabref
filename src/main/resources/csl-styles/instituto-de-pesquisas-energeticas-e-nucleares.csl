@@ -22,7 +22,7 @@
     <category citation-format="author-date"/>
     <category field="science"/>
     <summary>The Brazilian standard style</summary>
-    <updated>2020-03-11T08:37:01+00:00</updated>
+    <updated>2020-03-21T08:37:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="pt-BR">
@@ -561,8 +561,7 @@
           <group delimiter=". " suffix=". ">
             <text macro="publisher"/>
           </group>
-          <text variable="number" suffix=", "/>
-          <text macro="issued" suffix=". "/>
+          <text variable="number" suffix=". "/>
           <text macro="access"/>
         </else-if>
         <else-if type="report">

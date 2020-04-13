@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * GUI Dialog for the feature "Find unlinked files".
  */
-public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
+public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private final BibDatabaseContext databaseContext;
@@ -86,9 +86,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                 dialogService,
                 databaseContext,
                 ExternalFileTypes.getInstance(),
-                Globals.prefs.getFilePreferences(),
-                Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getUpdateFieldPreferences(),
+                preferences,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
                 Globals.stateManager);
@@ -198,7 +196,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                     findUnlinkedFilesTask.cancel();
                 }
             }
-            return null;
+            return false;
         });
 
         new ViewModelTreeCellFactory<FileNodeWrapper>()

@@ -25,6 +25,7 @@
     <RadioButton fx:id="groupViewModeUnion" text="%Display all entries belonging to one or more of the selected groups"
                  toggleGroup="$groupViewMode"/>
     <CheckBox fx:id="autoAssignGroup" text="%Automatically assign new entry to selected groups"/>
+    <CheckBox fx:id="displayGroupCount" text="%Display count of items in group"/>
 
     <Label styleClass="sectionHeader" text="%Dynamic groups"/>
     <GridPane hgap="10.0" vgap="4.0">
