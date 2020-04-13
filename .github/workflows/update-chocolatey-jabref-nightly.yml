@@ -9,9 +9,8 @@ on:
     - cron: '33 5 * * *'
 
 jobs:
-  build:
-    runs-on: windows-latest
-    name: Create installer and portable version for chocolatey
+  createnightly:
+    runs-on: ubuntu-latest
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -36,6 +35,11 @@ jobs:
           port: 9922
           username: jrrsync
           key: ${{ secrets.buildJabRefPrivateKey }}
+  createchoco:
+    needs: createnightly
+    runs-on: windows-latest
+    name: Create installer and portable version for chocolatey
+    steps:
       - name: Determine sha256 sums
         id: checksum
         shell: bash
