@@ -34,7 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We fixed an issue where search full-text documents downloaded files with same name, overwriting existing files. [#6174](https://github.com/JabRef/jabref/pull/6174)
 - We fixe an issue where custom jstyles for Open/LibreOffice where not saved correctly. [#6170](https://github.com/JabRef/jabref/issues/6170)
-
+- We fixed an issue where Autosave actions could lead to an exception. [#5658](https://github.com/JabRef/jabref/issues/5658)
 
 ### Removed
 

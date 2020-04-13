@@ -966,25 +966,27 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void updateAllTabTitles() {
-        List<String> paths = getUniquePathParts();
-        for (int i = 0; i < getBasePanelCount(); i++) {
-            String uniqPath = paths.get(i);
-            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            List<String> paths = getUniquePathParts();
+            for (int i = 0; i < getBasePanelCount(); i++) {
+                String uniqPath = paths.get(i);
+                Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
-            if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
-                    // remove filename
-                    uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                if (file.isPresent()) {
+                    if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
+                        // remove filename
+                        uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                    } else {
+                        // set original filename (again)
+                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                    }
                 } else {
-                    // set original filename (again)
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
                 }
-            } else {
-                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
             }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
-        }
+        });
     }
 
     public void addTab(BasePanel basePanel, boolean raisePanel) {
