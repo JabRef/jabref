@@ -1,16 +1,15 @@
 package org.jabref.preferences;
 
+/**
+ * An enum which contains the possible NewLineSeperators
+ * Possible are CR ("\n"), LF ("\r") and the windows standard CR/LF.
+ */
 public enum NewLineSeparator {
     CR,
     LF,
     CRLF;
 
-    /**
-     * An enum which contains the possible NewLineSeperators
-     * Possible are CR ("\n"), LF ("\r") and the windows standard CR/LF.
-     */
-
-    public String toString() {
+    public String getDisplayName() {
         switch (this) {
             case CR:
                 return "CR (\"\\r\")";
@@ -24,7 +23,7 @@ public enum NewLineSeparator {
     /**
      * @return the name of the current mode as String
      */
-    public String getEscapeChars() {
+    public String toString() {
         switch (this) {
             case CR:
                 return "\r";

@@ -12,8 +12,8 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
-import org.jabref.model.texparser.TexBibEntriesResolverResult;
-import org.jabref.model.texparser.TexParserResult;
+import org.jabref.model.texparser.LatexBibEntriesResolverResult;
+import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.util.FileUpdateMonitor;
 
 public class TexBibEntriesResolver {
@@ -31,17 +31,17 @@ public class TexBibEntriesResolver {
     /**
      * Resolve all BibTeX entries and check if they are in the given database.
      */
-    public TexBibEntriesResolverResult resolve(TexParserResult texParserResult) {
-        TexBibEntriesResolverResult resolverResult = new TexBibEntriesResolverResult(texParserResult);
+    public LatexBibEntriesResolverResult resolve(LatexParserResult latexParserResult) {
+        LatexBibEntriesResolverResult resolverResult = new LatexBibEntriesResolverResult(latexParserResult);
 
         // Preload databases from BIB files.
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
                 Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, fileMonitor).getDatabase()));
 
         // Get all pairs Entry<String entryKey, Citation>.
-        Stream<Map.Entry<String, Citation>> citationsStream = texParserResult.getCitations().entries().stream().distinct();
+        Stream<Map.Entry<String, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();
 
-        Set<BibEntry> newEntries = citationsStream.flatMap(mapEntry -> apply(mapEntry, texParserResult, bibDatabases)).collect(Collectors.toSet());
+        Set<BibEntry> newEntries = citationsStream.flatMap(mapEntry -> apply(mapEntry, latexParserResult, bibDatabases)).collect(Collectors.toSet());
 
         // Add all new entries to the newEntries set.
         resolverResult.getNewEntries().addAll(newEntries);
@@ -49,8 +49,8 @@ public class TexBibEntriesResolver {
         return resolverResult;
     }
 
-    private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, TexParserResult texParserResult, Map<Path, BibDatabase> bibDatabases) {
-        return texParserResult.getBibFiles().get(mapEntry.getValue().getPath()).stream().distinct().flatMap(bibFile ->
+    private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, LatexParserResult latexParserResult, Map<Path, BibDatabase> bibDatabases) {
+        return latexParserResult.getBibFiles().get(mapEntry.getValue().getPath()).stream().distinct().flatMap(bibFile ->
                 // Get a specific entry from an entryKey and a BIB file.
                 bibDatabases.get(bibFile).getEntriesByKey(mapEntry.getKey()).stream().distinct()
                             // Check if there is already an entry with the same key in the given database.

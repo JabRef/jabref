@@ -14,6 +14,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import de.undercouch.citeproc.CSL;
+import de.undercouch.citeproc.DefaultAbbreviationProvider;
 import de.undercouch.citeproc.ItemDataProvider;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;
 import de.undercouch.citeproc.csl.CSLItemData;
@@ -66,7 +67,8 @@ public class CSLAdapter {
     private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
         if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
-            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(), newStyle, "en-US", false);
+            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
+                  new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
             style = newStyle;
         }
 
@@ -82,7 +84,7 @@ public class CSLAdapter {
      */
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
-        private final ArrayList<BibEntry> data = new ArrayList<>();
+        private final List<BibEntry> data = new ArrayList<>();
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.

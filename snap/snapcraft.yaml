@@ -5,12 +5,34 @@ license: MIT
 summary: Bibliography manager
 description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
 
-grade: devel
+grade: stable
 confinement: strict
 base: core18
 license: MIT
 architectures:
   - build-on: amd64
+
+plugs:
+  desktop:
+  desktop-legacy:
+  wayland:
+  unity7:
+  home:
+  opengl:
+  network-bind:
+  removable-media:
+  hostfs-mozilla-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+  etc-opt-chrome-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+  etc-chromium-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
 
 apps:
   jabref:
@@ -22,34 +44,13 @@ apps:
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
-plugs:
-  desktop:
-  desktop-legacy:
-  wayland:
-  unity7:
-  home:
-  opengl:
-  network-bind:
-  removable-media:
-  plugs:
-    hostfs-mozilla-native-messaging-jabref:
-      interface: system-files
-      write:
-      - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
-    hostfs-chrome-native-messaging-jabref:
-      interface: system-files
-      write:
-      - /var/lib/snapd/hostfs/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
-    hostfs-chromium-native-messaging-jabref:
-      interface: system-files
-      write:
-      - /var/lib/snapd/hostfs/etc/chromium/native-messaging-hosts/org.jabref.jabref.json
+
 parts:
   jabref:
     plugin: dump
-    source: build/distribution/JabRef-portable_linux.tar.gz
+    # source: build/distribution/JabRef-5.0-portable_linux.tar.gz
     # Use this source for debug purposes:
-    # source: https://builds.jabref.org/master/JabRef-portable_linux.tar.gz
+    source: https://builds.jabref.org/master/JabRef-5.0-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |

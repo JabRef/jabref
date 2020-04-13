@@ -13,6 +13,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -24,7 +25,6 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
-    @FXML private CheckBox backupOldFile;
     @FXML private TextField noWrapFiles;
     @FXML private RadioButton resolveStringsBibTex;
     @FXML private RadioButton resolveStringsAll;
@@ -62,12 +62,14 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         this.viewModel = new FileTabViewModel(dialogService, preferences);
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
-        backupOldFile.selectedProperty().bindBidirectional(viewModel.backupOldFileProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
         resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
         resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolvStringsExceptProperty());
         resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
+        new ViewModelListCellFactory<NewLineSeparator>()
+                .withText(NewLineSeparator::getDisplayName)
+                .install(newLineSeparator);
         newLineSeparator.itemsProperty().bind(viewModel.newLineSeparatorListProperty());
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());

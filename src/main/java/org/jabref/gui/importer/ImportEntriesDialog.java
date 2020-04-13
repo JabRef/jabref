@@ -1,7 +1,6 @@
 package org.jabref.gui.importer;
 
 import java.util.EnumSet;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
@@ -31,6 +30,7 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -48,7 +48,9 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
-    private final BackgroundTask<List<BibEntry>> task;
+    public Label totalItems;
+    public Label selectedItems;
+    private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -58,10 +60,15 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     private BibDatabaseContext database;
 
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<List<BibEntry>> task) {
+    /**
+     * Imports the given entries into the given database. The entries are provided using the BackgroundTask
+     *
+     * @param database the database to import into
+     * @param task     the task executed for parsing the selected files(s).
+     */
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -84,7 +91,6 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
-
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
@@ -120,18 +126,21 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     }).executeWith(Globals.TASK_EXECUTOR);
 
                     /*
-                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    inserted the if-statement here, since a Platform.runLater() call did not work.
                     also tried to move it to the end of the initialize method, but it did not select the entry.
                     */
                     if (entriesListView.getItems().size() == 1) {
                         selectAllNewEntries();
-                      }
+                    }
 
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
+
+        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
+        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 

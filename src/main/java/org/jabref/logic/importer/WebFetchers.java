@@ -8,6 +8,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.jabref.logic.importer.fetcher.ACS;
+import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CiteSeer;
@@ -159,6 +160,7 @@ public class WebFetchers {
         fetchers.add(new ACS());
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new ApsFetcher());
         // Meta search
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());

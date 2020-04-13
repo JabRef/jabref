@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
+  <!-- Polyglot; journal publishes in English and Spanish -->
   <info>
     <title>Society for American Archaeology</title>
+    <title-short>SAA</title-short>
     <id>http://www.zotero.org/styles/society-for-american-archaeology</id>
     <link href="http://www.zotero.org/styles/society-for-american-archaeology" rel="self"/>
-    <link href="http://www.saa.org/AbouttheSociety/Publications/StyleGuide/tabid/984/Default.aspx" rel="documentation"/>
+    <link href="https://www.saa.org/publications" rel="documentation"/>
+    <link href="https://documents.saa.org/container/docs/default-source/doc-publications/style-guide/saa-style-guide_updated-july-2018c5062f7e55154959ab57564384bda7de.pdf?sfvrsn=8247640e_6" rel="documentation"/>
     <author>
       <name>Michael Barton</name>
       <email>michael.barton@asu.edu</email>
@@ -18,7 +21,7 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
-    <updated>2018-02-22T10:46:52+00:00</updated>
+    <updated>2020-04-09T13:02:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -123,17 +126,24 @@
         <if type="graphic report" match="any">
           <text macro="archive"/>
         </if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="article-journal" match="any">
           <group delimiter=", ">
-            <text variable="URL"/>
+            <text variable="DOI" prefix=" DOI:"/>
             <group delimiter=" ">
               <text term="accessed"/>
               <date form="text" variable="accessed"/>
             </group>
           </group>
         </else-if>
-        <else-if type="article-journal" match="any">
-          <text variable="DOI" prefix=" DOI:"/>
+        <else-if type="webpage post-weblog post" match="any">
+          <group delimiter=", ">
+            <text variable="genre"/>
+            <text variable="URL"/>
+            <group delimiter=" ">
+              <text term="accessed"/>
+              <date form="text" variable="accessed"/>
+            </group>
+          </group>
         </else-if>
         <else-if type="bill book graphic legal_case motion_picture report song article-journal article-magazine article-newspaper thesis chapter paper-conference" match="none">
           <text macro="archive"/>
@@ -267,10 +277,7 @@
     </date>
   </macro>
   <macro name="day-month">
-    <date variable="issued">
-      <date-part name="month"/>
-      <date-part name="day" prefix=" "/>
-    </date>
+    <date form="text" date-parts="year-month-day" variable="issued"/>
   </macro>
   <macro name="collection-title">
     <text variable="collection-title"/>
@@ -287,13 +294,6 @@
       <text macro="interviewer"/>
       <text variable="medium" text-case="capitalize-first"/>
     </group>
-    <choose>
-      <if variable="title" match="none"/>
-      <else-if type="thesis"/>
-      <else>
-        <text variable="genre" prefix="Unpublished "/>
-      </else>
-    </choose>
   </macro>
   <macro name="issue">
     <choose>
@@ -350,7 +350,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography subsequent-author-substitute="" entry-spacing="0">
+  <bibliography subsequent-author-substitute="" entry-spacing="0" line-spacing="2">
     <sort>
       <key macro="contributors"/>
       <key variable="issued"/>

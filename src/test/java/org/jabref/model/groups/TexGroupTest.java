@@ -49,7 +49,7 @@ public class TexGroupTest {
     public void getFilePathReturnsRelativePath() throws Exception {
         Path auxFile = Paths.get(TexGroupTest.class.getResource("paper.aux").toURI());
         String user = "Darwin";
-        metaData.setLaTexFileDirectory(user, auxFile.getParent());
+        metaData.setLatexFileDirectory(user, auxFile.getParent());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, user);
 
         assertEquals("paper.aux", group.getFilePath().toString());

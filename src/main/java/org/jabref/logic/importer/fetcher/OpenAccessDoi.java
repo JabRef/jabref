@@ -11,6 +11,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import org.slf4j.Logger;
@@ -22,10 +24,9 @@ import org.slf4j.LoggerFactory;
  * @implSpec API is documented at http://unpaywall.org/api/v2
  */
 public class OpenAccessDoi implements FulltextFetcher {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FulltextFetcher.class);
 
-    private static String API_URL = "https://api.oadoi.org/v2/";
+    private static final String API_URL = "https://api.oadoi.org/v2/";
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -33,14 +34,15 @@ public class OpenAccessDoi implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(StandardField.DOI)
                                  .flatMap(DOI::parse);
-        if (doi.isPresent()) {
-            try {
-                return findFullText(doi.get());
-            } catch (UnirestException e) {
-                throw new IOException(e);
-            }
-        } else {
+
+        if (!doi.isPresent()) {
             return Optional.empty();
+        }
+
+        try {
+            return findFullText(doi.get());
+        } catch (UnirestException e) {
+            throw new IOException(e);
         }
     }
 
@@ -50,15 +52,17 @@ public class OpenAccessDoi implements FulltextFetcher {
     }
 
     public Optional<URL> findFullText(DOI doi) throws UnirestException {
-        return Optional.of(Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
-                                  .header("accept", "application/json")
-                                  .asJson())
-                       .map(response -> response.getBody())
-                       .filter(body -> body != null)
-                       .map(body -> body.getObject())
-                       .filter(root -> root != null)
+        HttpResponse<JsonNode> request = Unirest.get(API_URL + doi.getDOI() + "?email=developers@jabref.org")
+                                                .header("accept", "application/json")
+                                                .asJson();
+
+        return Optional.of(request)
+                       .map(HttpResponse::getBody)
+                       .filter(Objects::nonNull)
+                       .map(JsonNode::getObject)
+                       .filter(Objects::nonNull)
                        .map(root -> root.optJSONObject("best_oa_location"))
-                       .filter(object -> object != null)
+                       .filter(Objects::nonNull)
                        .map(location -> location.optString("url"))
                        .flatMap(url -> {
                            try {

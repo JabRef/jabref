@@ -758,7 +758,6 @@
           </group>
           <text variable="references"/>
           <text macro="URL"/>
-          <text macro="title-short-flag" quotes="true" prefix="(" suffix=")"/>
         </group>
       </group>
     </layout>

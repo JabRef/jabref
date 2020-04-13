@@ -13,7 +13,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Style based on STN ISO 690:2012</summary>
-    <updated>2014-04-23T23:24:15+00:00</updated>
+    <updated>2020-04-02T22:05:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -139,7 +139,6 @@
   <macro name="container-author">
     <names variable="container-author">
       <name and="text" delimiter=", " delimiter-precedes-last="never">
-        <!--name and="text" name-as-sort-order="all" sort-separator=" " delimiter=", " delimiter-precedes-last="never"-->
         <name-part name="given"/>
         <name-part name="family" text-case="uppercase"/>
       </name>
@@ -286,7 +285,6 @@
         <date variable="issued">
           <date-part name="day" suffix="."/>
           <date-part name="month" form="numeric" suffix="."/>
-          <!--date-part name="year"/-->
         </date>
       </if>
     </choose>
@@ -300,8 +298,8 @@
   <macro name="edition">
     <choose>
       <if is-numeric="edition">
-        <number variable="edition" form="ordinal"/>
-        <label variable="edition" form="short" prefix=" "/>
+        <number suffix="." variable="edition"/>
+        <label plural="never" prefix=" " variable="edition" form="short"/>
       </if>
       <else>
         <text variable="edition" form="long"/>
@@ -323,7 +321,6 @@
             <text variable="publisher-place"/>
           </if>
           <else>
-            <!-- sine loco (s.l.)-->
             <text value="b.m." text-case="capitalize-first"/>
           </else>
         </choose>
@@ -362,7 +359,6 @@
             <text variable="publisher"/>
           </if>
           <else>
-            <!-- sine nomine (s.n.)-->
             <text value="b.n."/>
           </else>
         </choose>
@@ -383,11 +379,11 @@
     <choose>
       <if variable="URL DOI" match="any">
         <group prefix=" [" suffix="]">
-          <text term="accessed" form="short"/>
-          <date variable="accessed">
-            <date-part name="day" prefix=". "/>
-            <date-part name="month" prefix=". "/>
-            <date-part name="year" prefix=" "/>
+          <text term="accessed" form="short" suffix=". "/>
+          <date form="numeric" variable="accessed">
+            <date-part name="day"/>
+            <date-part name="month"/>
+            <date-part name="year"/>
           </date>
         </group>
       </if>
@@ -469,14 +465,10 @@
     </sort>
     <layout>
       <group delimiter=", " suffix=". ">
-        <!-- Author(s) -->
         <text macro="responsability"/>
-        <!-- Citation Year -->
         <text macro="year-date"/>
       </group>
-      <!-- Rest of Citation -->
       <choose>
-        <!-- Specific Formats -->
         <if type="book" match="any">
           <group delimiter=". " suffix=". ">
             <group delimiter=" ">
@@ -486,7 +478,6 @@
                 <text macro="edition"/>
                 <text macro="secondary-responsability"/>
                 <text macro="publisher-info"/>
-                <!--text macro="page"/-->
                 <text macro="collection"/>
               </group>
               <text macro="accessed"/>
@@ -503,7 +494,6 @@
             <text macro="edition"/>
             <text macro="secondary-responsability"/>
             <text macro="publisher-info"/>
-            <!--text macro="page"/-->
             <group delimiter=" ">
               <text macro="collection"/>
               <text macro="accessed"/>
@@ -545,10 +535,6 @@
             <group delimiter=" ">
               <group delimiter=", ">
                 <text macro="publisher-info"/>
-                <!--group delimiter=": ">
-                    <text macro="publisher-place"/>
-                    <text macro="publisher"/>
-                  </group-->
                 <text macro="collection"/>
                 <text macro="page"/>
               </group>
@@ -683,7 +669,6 @@
           <group delimiter=". " suffix=". ">
             <text macro="title"/>
             <text macro="interviewer"/>
-            <!--text macro="event"/-->
             <text macro="date-day-month"/>
           </group>
         </else-if>

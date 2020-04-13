@@ -12,7 +12,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
@@ -52,12 +51,12 @@ public class JabRefGUI {
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionDelayed();
     }
 
     private void openWindow(Stage mainStage) {
-        GUIGlobals.init();
+        IconTheme.loadFonts();
 
         LOGGER.debug("Initializing frame");
         mainFrame.init();
@@ -248,7 +247,7 @@ public class JabRefGUI {
                 continue;
             }
 
-            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 

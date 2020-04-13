@@ -49,7 +49,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         String oldValue = entry.getField(fieldKey).orElse(null);
 
@@ -57,7 +57,7 @@ public class FieldFormatterCleanup implements CleanupJob {
         String newValue = formatter.format(oldValue);
 
         if (oldValue.equals(newValue)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         } else {
             if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);
