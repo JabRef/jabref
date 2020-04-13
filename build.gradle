@@ -202,7 +202,7 @@ dependencies {
 
     testImplementation 'io.github.classgraph:classgraph:4.8.69'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
 
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.9'
