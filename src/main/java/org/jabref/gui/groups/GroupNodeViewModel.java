@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,7 +28,6 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -50,7 +49,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final SimpleIntegerProperty hits;
+    private final ObservableList<BibEntry> matchedEntries = FXCollections.observableArrayList();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -58,7 +57,6 @@ public class GroupNodeViewModel {
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
-    private final DelayTaskThrottler throttler;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -82,8 +80,7 @@ public class GroupNodeViewModel {
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        hits = new SimpleIntegerProperty(0);
-        calculateNumberOfMatches();
+        updateMatchedEntries();
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -91,7 +88,6 @@ public class GroupNodeViewModel {
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
-        throttler = taskExecutor.createThrottler(1000);
 
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
@@ -157,8 +153,8 @@ public class GroupNodeViewModel {
         return groupNode.getGroup().getDescription().orElse("");
     }
 
-    public SimpleIntegerProperty getHits() {
-        return hits;
+    public IntegerBinding getHits() {
+        return Bindings.size(matchedEntries);
     }
 
     @Override
@@ -184,7 +180,7 @@ public class GroupNodeViewModel {
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
-                ", hits=" + hits +
+                ", matchedEntries=" + matchedEntries +
                 '}';
     }
 
@@ -222,16 +218,44 @@ public class GroupNodeViewModel {
      * Gets invoked if an entry in the current database changes.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
-        throttler.schedule(this::calculateNumberOfMatches);
+        while (change.next()) {
+            if (change.wasPermutated()) {
+                // Nothing to do, as permutation doesn't change matched entries
+            } else if (change.wasUpdated()) {
+                for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
+                    if (groupNode.matches(changedEntry)) {
+                        if (!matchedEntries.contains(changedEntry)) {
+                            matchedEntries.add(changedEntry);
+                        }
+                    } else {
+                        matchedEntries.remove(changedEntry);
+                    }
+                }
+            } else {
+                for (BibEntry removedEntry : change.getRemoved()) {
+                    matchedEntries.remove(removedEntry);
+                }
+                for (BibEntry addedEntry : change.getAddedSubList()) {
+                    if (groupNode.matches(addedEntry)) {
+                        if (!matchedEntries.contains(addedEntry)) {
+                            matchedEntries.add(addedEntry);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void calculateNumberOfMatches() {
+    private void updateMatchedEntries() {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
         BackgroundTask
-                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                .onSuccess(hits::setValue)
+                .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
+                .onSuccess(entries -> {
+                    matchedEntries.clear();
+                    matchedEntries.addAll(entries);
+                })
                 .executeWith(taskExecutor);
     }
 
