@@ -29,8 +29,8 @@ jobs:
         with:
           script: |
             rm /var/www/builds.jabref.org/www/nightly/* || mkdir -p /var/www/builds.jabref.org/www/nightly || true
-            cp /var/www/builds.jabref.org/www/master/JabRef-5.1.msi /var/www/builds.jabref.org/www/nightly/
-            cp /var/www/builds.jabref.org/www/master/JabRef-5.1-portable_windows.zip /var/www/builds.jabref.org/www/nightly/
+            cp -a /var/www/builds.jabref.org/www/master/JabRef-5.1.msi /var/www/builds.jabref.org/www/nightly/
+            cp -a /var/www/builds.jabref.org/www/master/JabRef-5.1-portable_windows.zip /var/www/builds.jabref.org/www/nightly/
           host: build-upload.jabref.org
           port: 9922
           username: jrrsync
