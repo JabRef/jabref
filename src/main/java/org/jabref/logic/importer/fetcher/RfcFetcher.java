@@ -24,7 +24,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public RfcFetcher (ImportFormatPreferences importFormatPreferences) {
+    public RfcFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 

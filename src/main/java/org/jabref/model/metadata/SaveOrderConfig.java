@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.FieldFactory;
 /**
  * Stores the save order config from MetaData
  * <p>
- * Format: <choice>, pair of field + ascending (boolean)
+ * Format: &lt;choice>, pair of field + ascending (boolean)
  */
 public class SaveOrderConfig {
 

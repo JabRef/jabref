@@ -28,7 +28,7 @@ import org.jabref.model.util.FileHelper;
 public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
-    //We have to mark these properties as transient because they can't be serialized directly
+    // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
     private transient StringProperty link = new SimpleStringProperty();
     private transient StringProperty fileType = new SimpleStringProperty();

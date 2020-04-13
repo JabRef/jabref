@@ -12,7 +12,7 @@ public class CopyFilesResultListDependency {
     private List<CopyFilesResultItemViewModel> results = new ArrayList<>();
 
     public CopyFilesResultListDependency() {
-        //empty, workaround for injection into FXML controller
+        // empty, workaround for injection into FXML controller
     }
 
     public CopyFilesResultListDependency(List<CopyFilesResultItemViewModel> results) {

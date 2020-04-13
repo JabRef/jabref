@@ -60,7 +60,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);
         uriBuilder.addParameter("p", query); // Query
-        //uriBuilder.addParameter("jrec", "1"); // Start index (not needed at the moment)
+        // uriBuilder.addParameter("jrec", "1"); // Start index (not needed at the moment)
         uriBuilder.addParameter("rg", "100"); // Should return up to 100 items (instead of default 25)
         uriBuilder.addParameter("of", "hx"); // BibTeX format
         return uriBuilder.build().toURL();
@@ -79,7 +79,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
             Elements preElements = doc.getElementsByTag("pre");
 
             for (Element elem : preElements) {
-                //We have to use a new instance here, because otherwise only the first entry gets parsed
+                // We have to use a new instance here, because otherwise only the first entry gets parsed
                 BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
                 List<BibEntry> entry = bibtexParser.parseEntries(elem.text());
                 entries.addAll(entry);

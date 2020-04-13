@@ -67,7 +67,7 @@ public class Cleanups {
 
         List<FieldFormatterCleanup> actions = new ArrayList<>();
 
-        //read concrete actions
+        // read concrete actions
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
@@ -82,7 +82,7 @@ public class Cleanups {
                 int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
-                //read each formatter
+                // read each formatter
                 int tokenIndex = remainingString.indexOf(',');
                 do {
                     boolean doBreak = false;

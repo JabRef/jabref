@@ -136,7 +136,7 @@ public class JabRefExecutorService {
     public void shutdownEverything() {
         // those threads will be allowed to finish
         this.executorService.shutdown();
-        //those threads will be interrupted in their current task
+        // those threads will be interrupted in their current task
         this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();

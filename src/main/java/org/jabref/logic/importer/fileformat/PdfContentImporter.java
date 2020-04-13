@@ -232,7 +232,7 @@ public class PdfContentImporter extends Importer {
         return new ParserResult(result);
     }
 
-    //make this method package visible so we can test it
+    // make this method package visible so we can test it
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
 
         // idea: split[] contains the different lines
@@ -248,7 +248,7 @@ public class PdfContentImporter extends Importer {
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
 
-        lineIndex = 0; //to prevent array index out of bounds exception on second run we need to reset i to zero
+        lineIndex = 0; // to prevent array index out of bounds exception on second run we need to reset i to zero
 
         proceedToNextNonEmptyLine();
         if (lineIndex >= lines.length) {
@@ -300,7 +300,7 @@ public class PdfContentImporter extends Importer {
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
         curString = "";
-        //i points to the next non-empty line
+        // i points to the next non-empty line
 
         // after title: authors
         author = null;
@@ -391,9 +391,9 @@ public class PdfContentImporter extends Importer {
                 editor = streamlineNames(curString.substring(0, pos - 1));
 
                 int edslength = "(Eds.)".length();
-                int posWithEditor = pos + edslength + 2;//+2 because of ":" after (Eds.) and the subsequent space
+                int posWithEditor = pos + edslength + 2; //+2 because of ":" after (Eds.) and the subsequent space
                 if (posWithEditor > curString.length()) {
-                    curString = curString.substring(posWithEditor - 2); //we don't have any spaces after Eds so we substract the 2
+                    curString = curString.substring(posWithEditor - 2); // we don't have any spaces after Eds so we substract the 2
                 } else {
                     curString = curString.substring(posWithEditor);
                 }

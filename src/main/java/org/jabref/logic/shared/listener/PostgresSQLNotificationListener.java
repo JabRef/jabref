@@ -25,11 +25,12 @@ public class PostgresSQLNotificationListener implements Runnable {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
+
     @Override
     public void run() {
         stop = false;
         try {
-            //noinspection InfiniteLoopStatement
+            // noinspection InfiniteLoopStatement
             while (!stop) {
                 PGNotification notifications[] = pgConnection.getNotifications();
 

@@ -32,6 +32,7 @@ public class BibtexImporter extends Importer {
         this.importFormatPreferences = importFormatPreferences;
         this.fileMonitor = fileMonitor;
     }
+
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
      *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.

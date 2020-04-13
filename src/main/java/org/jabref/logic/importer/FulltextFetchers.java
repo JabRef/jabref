@@ -89,7 +89,7 @@ public class FulltextFetchers {
         try {
             return future.get();
         } catch (InterruptedException ignore) {
-
+            // ignore thread interruptions
         } catch (ExecutionException | CancellationException e) {
             LOGGER.debug("Fetcher execution failed or was cancelled");
         }

@@ -5,8 +5,7 @@ import java.util.List;
 public class NameFormatterPreferences {
 
     private final List<String> nameFormatterKey;
-    private final List<String> nameFormatterValue;
-
+    private final List<String> nameFormatterValue;check
 
     public NameFormatterPreferences(List<String> nameFormatterKey, List<String> nameFormatterValue) {
         this.nameFormatterKey = nameFormatterKey;

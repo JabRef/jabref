@@ -58,7 +58,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
             return action.getText();
         } else {
             String commandName = command.getClass().getSimpleName();
-            if ( commandName.contains("EditAction")
+            if (commandName.contains("EditAction")
                     || commandName.contains("CopyMoreAction")
                     || commandName.contains("CopyCitationAction")
                     || commandName.contains("PreviewSwitchAction")

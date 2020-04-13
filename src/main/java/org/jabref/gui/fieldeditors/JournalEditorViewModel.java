@@ -28,7 +28,7 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             if (nextAbbreviation.isPresent()) {
                 text.set(nextAbbreviation.get());
                 // TODO: Add undo
-                //panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
+                // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
             }
         }
     }

@@ -45,7 +45,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
     @Override
     public String getTabName() { return Localization.lang("XMP metadata"); }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());

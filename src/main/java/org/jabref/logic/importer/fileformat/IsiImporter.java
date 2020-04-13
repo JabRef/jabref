@@ -348,7 +348,7 @@ public class IsiImporter extends Importer {
         for (String part : parts) {
             try {
                 int number = Integer.parseInt(part);
-                Optional<Month>  month = Month.getMonthByNumber(number);
+                Optional<Month> month = Month.getMonthByNumber(number);
                 if (month.isPresent()) {
                     return month.get().getJabRefFormat();
                 }

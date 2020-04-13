@@ -33,14 +33,14 @@ public class EntryAnnotationImporterTest {
 
     @Test
     public void readEntryExampleThesis() {
-        //given
+        // given
         entry.setField(StandardField.FILE, ":thesis-example.pdf:PDF");
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
-        //when
+        // when
         Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FilePreferences.class));
 
-        //then
+        // then
         int fileCounter = 0;
         int annotationCounter = 0;
         for (List<FileAnnotation> annotationsOfFile : annotations.values()) {

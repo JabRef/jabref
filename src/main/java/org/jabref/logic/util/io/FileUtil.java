@@ -266,7 +266,7 @@ public class FileUtil {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
-        //Removes illegal characters from filename
+        // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
@@ -286,7 +286,7 @@ public class FileUtil {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
-        //Removes illegal characters from filename
+        // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
         return targetName;
     }

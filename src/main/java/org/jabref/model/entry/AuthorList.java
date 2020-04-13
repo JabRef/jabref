@@ -352,7 +352,7 @@ public class AuthorList {
     /**
      * Returns the a list of <CODE>Author</CODE> objects.
      *
-     * @return the <CODE>List<Author></CODE> object.
+     * @return the <CODE>List&lt;Author></CODE> object.
      */
     public List<Author> getAuthors() {
         return authors;
@@ -622,7 +622,7 @@ public class AuthorList {
      * Brown"</li>
      * <li>"John von Neumann and John Smith and Black Brown, Peter" ==> "John
      * von Neumann and John Smith and Peter Black Brown" </li>
-     * </li>
+     * </ul>
      *
      * @return formatted list of authors.
      */
@@ -644,9 +644,9 @@ public class AuthorList {
      * is treated similarly if abbreviated in one case and not in another. This
      * form is not intended to be suitable for presentation, only for sorting.
      * <p>
-     * <p>
      * <ul>
      * <li>"John Smith" ==> "Smith, J.";</li>
+     * </ul>
      *
      * @return formatted list of authors
      */

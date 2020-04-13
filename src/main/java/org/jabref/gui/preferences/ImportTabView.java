@@ -22,7 +22,7 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
                 .load();
     }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new ImportTabViewModel(dialogService, preferences);
 
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
