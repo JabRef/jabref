@@ -135,7 +135,7 @@ public class StyleLoaderTest {
         for (OOBibStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
-        //As the prefs are mocked away, the getExternalStyles still returns the initial one
+        // As the prefs are mocked away, the getExternalStyles still returns the initial one
         assertFalse(preferences.getExternalStyles().isEmpty());
     }
 

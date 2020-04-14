@@ -17,7 +17,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-//Do not make this class final, as it otherwise can't be mocked for tests
+// Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type

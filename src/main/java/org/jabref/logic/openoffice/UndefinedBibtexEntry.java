@@ -11,7 +11,6 @@ public class UndefinedBibtexEntry extends BibEntry {
 
     private final String key;
 
-
     public UndefinedBibtexEntry(String key) {
         this.key = key;
         setField(StandardField.AUTHOR, OOBibStyle.UNDEFINED_CITATION_MARKER);

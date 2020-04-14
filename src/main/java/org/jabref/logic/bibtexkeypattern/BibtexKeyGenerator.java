@@ -102,7 +102,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     public static String cleanKey(String key, boolean enforceLegalKey) {
-        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s","");
+        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s", "");
     }
 
     public String generateKey(BibEntry entry) {

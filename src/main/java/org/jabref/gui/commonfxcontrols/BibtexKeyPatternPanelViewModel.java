@@ -25,7 +25,7 @@ public class BibtexKeyPatternPanelViewModel {
 
         if (itemOneName.equals(itemTwoName)) {
             return 0;
-        } else if  (itemOneName.equals(ENTRY_TYPE_DEFAULT_NAME)) {
+        } else if (itemOneName.equals(ENTRY_TYPE_DEFAULT_NAME)) {
             return -1;
         } else if (itemTwoName.equals(ENTRY_TYPE_DEFAULT_NAME)) {
             return 1;
@@ -80,15 +80,23 @@ public class BibtexKeyPatternPanelViewModel {
         defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
     }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() { return patternListProperty; }
+    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+        return patternListProperty;
+    }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() { return defaultItemProperty; }
+    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+        return defaultItemProperty;
+    }
 
     public static class DefaultEntryType implements EntryType {
         @Override
-        public String getName() { return ENTRY_TYPE_DEFAULT_NAME; }
+        public String getName() {
+            return ENTRY_TYPE_DEFAULT_NAME;
+        }
 
         @Override
-        public String getDisplayName() { return Localization.lang("Default pattern"); }
+        public String getDisplayName() {
+            return Localization.lang("Default pattern");
+        }
     }
 }

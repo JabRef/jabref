@@ -27,8 +27,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect.
- *
- * @see 'https://dev.elsevier.com/'
+ * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);

@@ -108,10 +108,10 @@ public class GroupNodeViewModel {
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        //if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
-        //{
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+        // {
         //    return; // user aborted operation
-        //}
+        // }
 
         var changes = groupNode.addEntriesToGroup(entries);
 
@@ -298,13 +298,13 @@ public class GroupNodeViewModel {
 
     public void moveTo(GroupNodeViewModel target) {
         // TODO: Add undo and display message
-        //MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
         //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
 
         getGroupNode().moveTo(target.getGroupNode());
-        //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
-        //panel.markBaseChanged();
-        //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        // panel.markBaseChanged();
+        // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }
 
     public void moveTo(GroupTreeNode target, int targetIndex) {

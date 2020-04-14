@@ -101,7 +101,7 @@ public class GlobalSearchBar extends HBox {
 
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchDisplayMode = searchPreferences.getSearchMode();
-        
+
         this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
@@ -162,9 +162,6 @@ public class GlobalSearchBar extends HBox {
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
-
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
             if (isFocused) {
                 KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), expandedSize);
@@ -183,11 +180,13 @@ public class GlobalSearchBar extends HBox {
 
         this.setAlignment(Pos.CENTER_LEFT);
 
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
                 searchTerm -> {
-                    performSearch();
+                    // Async update
+                    searchTask.restart();
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
         );
@@ -317,7 +316,7 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             // TODO: switch Icon color
-            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
         setHintTooltip(description);
@@ -425,7 +424,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
-            //empty
+            // empty
         }
     }
 }

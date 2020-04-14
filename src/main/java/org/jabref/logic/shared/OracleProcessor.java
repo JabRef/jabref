@@ -29,7 +29,6 @@ public class OracleProcessor extends DBMSProcessor {
 
     private DatabaseChangeRegistration databaseChangeRegistration;
 
-
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
     }
@@ -169,7 +168,8 @@ public class OracleProcessor extends DBMSProcessor {
                         fieldsCompleted += 1;
                     }
                 }
-                preparedFieldStatement.executeUpdate();            }
+                preparedFieldStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }

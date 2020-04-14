@@ -169,7 +169,7 @@ public class BibTeXMLExporter extends Exporter {
             }
         }
 
-        //set the entryType to the entry
+        // set the entryType to the entry
         entry.setInbook(inbook);
     }
 
@@ -229,7 +229,7 @@ public class BibTeXMLExporter extends Exporter {
                 }
             }
 
-            //set the entryType to the entry
+            // set the entryType to the entry
             List<Method> entryMethods = getListOfSetMethods(entry);
             for (Method method : entryMethods) {
                 String methodWithoutSet = method.getName().replace("set", "");

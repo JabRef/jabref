@@ -81,7 +81,7 @@ public class HTMLChars implements LayoutFormatter {
                         incommand = false;
                         escaped = false;
                     } else {
-                        //	Are we already at the end of the string?
+                        // Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
                             String result = HTML_CHARS.get(command);

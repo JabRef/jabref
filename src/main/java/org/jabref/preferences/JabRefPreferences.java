@@ -293,10 +293,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
-    //KeyBindings - keys - public because needed for pref migration
+    // KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
-    //AutcompleteFields - public because needed for pref migration
+    // AutcompleteFields - public because needed for pref migration
     public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
     // Id Entry Generator Preferences
@@ -350,7 +350,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     private static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
-    //GroupViewMode
+    // GroupViewMode
     private static final String GROUP_INTERSECT_UNION_VIEW_MODE = "groupIntersectUnionViewModes";
 
     // Dialog states
@@ -626,7 +626,7 @@ public class JabRefPreferences implements PreferencesService {
 
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
-        //Default empty String to be backwards compatible
+        // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
 
         customImports = new CustomImportList(this);
@@ -648,7 +648,7 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(FILE_BROWSER_COMMAND, "");
         }
 
-        //versioncheck defaults
+        // versioncheck defaults
         defaults.put(VERSION_IGNORED_UPDATE, "");
 
         // preview

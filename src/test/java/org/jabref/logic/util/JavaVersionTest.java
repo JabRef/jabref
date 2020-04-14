@@ -20,12 +20,12 @@ public class JavaVersionTest {
         java.add("1.6.0_10"); // Oracle
         java.add("1.6.0_45"); // Oracle
         java.add("1.7.0_13"); // Oracle
-        java.add("1.8.0_76-release"); //openjdk
-        java.add("1.8.0_92"); //Oracle
-        java.add("1.8.0_111"); //Oracle
-        java.add("1.8.0_112-release"); //openjdk
-        java.add("1.8.0_152-release"); //openjdk
-        java.add("1.8.0_144"); //Oracle
+        java.add("1.8.0_76-release"); // openjdk
+        java.add("1.8.0_92"); // Oracle
+        java.add("1.8.0_111"); // Oracle
+        java.add("1.8.0_112-release"); // openjdk
+        java.add("1.8.0_152-release"); // openjdk
+        java.add("1.8.0_144"); // Oracle
 
         // Examples http://openjdk.java.net/jeps/223
         // Note that it might be possible that java 9 versions are either 9.1.4+8 or new style 1.9.0_31-b08
