@@ -30,13 +30,13 @@ public final class BibtexCaseChanger {
         // However, we decided against it and will probably do the other way round: https://github.com/JabRef/jabref/pull/215#issuecomment-146981624
 
         // Each word should start with a capital letter
-        //EACH_FIRST_UPPERS('f'),
+        // EACH_FIRST_UPPERS('f'),
 
         // Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
         // Capitalizes first and last word
         // Does not change words starting with "{"
         // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
-        //TITLE_UPPERS('T');
+        // TITLE_UPPERS('T');
 
         private final char asChar;
 

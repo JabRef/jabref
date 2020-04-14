@@ -15,9 +15,7 @@ import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Class for obtaining shortened DOI names.
- *
- * @see 'https://shortdoi.org'
+ * Class for obtaining shortened DOI names. See <a href="https://shortdoi.org">https://shortdoi.org</a>.
  */
 public class ShortDOIService {
 

@@ -155,7 +155,7 @@ public class DocumentViewerControl extends StackPane {
             // Set empty background and create proper rendering in background (for smoother loading)
             background = new Rectangle(getDesiredWidth(), getDesiredHeight());
             background.setStyle("-fx-fill: WHITE");
-            //imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
+            // imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
                     .wrap(() -> renderPage(initialPage))
                     .onSuccess(image -> {

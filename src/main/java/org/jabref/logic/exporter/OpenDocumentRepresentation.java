@@ -32,7 +32,6 @@ class OpenDocumentRepresentation {
 
     private final BibDatabase database;
 
-
     public OpenDocumentRepresentation(BibDatabase database, List<BibEntry> entries) {
         this.database = database;
         // Make a list of comparators for sorting the entries:
@@ -60,7 +59,7 @@ class OpenDocumentRepresentation {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             result = dbuild.newDocument();
             Element collection = result.createElement("office:document-content");
-            //collection.setAttribute("xmlns", "http://openoffice.org/2000/office");
+            // collection.setAttribute("xmlns", "http://openoffice.org/2000/office");
             collection.setAttribute("xmlns:office", "urn:oasis:names:tc:opendocument:xmlns:office:1.0");
             collection.setAttribute("xmlns:style", "urn:oasis:names:tc:opendocument:xmlns:style:1.0");
             collection.setAttribute("xmlns:text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0");
@@ -148,13 +147,13 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, StandardField.ADDRESS));
                 addTableCell(result, row, getField(e, StandardField.ASSIGNEE));
                 addTableCell(result, row, getField(e, StandardField.ANNOTE));
-                addTableCell(result, row, getField(e, StandardField.AUTHOR));//new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));
+                addTableCell(result, row, getField(e, StandardField.AUTHOR)); // new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));
                 addTableCell(result, row, getField(e, StandardField.BOOKTITLE));
                 addTableCell(result, row, getField(e, StandardField.CHAPTER));
                 addTableCell(result, row, getField(e, StandardField.DAY));
                 addTableCell(result, row, getField(e, StandardField.DAYFILED));
                 addTableCell(result, row, getField(e, StandardField.EDITION));
-                addTableCell(result, row, getField(e, StandardField.EDITOR));//new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
+                addTableCell(result, row, getField(e, StandardField.EDITOR)); // new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, StandardField.HOWPUBLISHED));
                 addTableCell(result, row, getField(e, StandardField.INSTITUTION));
                 addTableCell(result, row, getField(e, StandardField.JOURNAL));
@@ -205,7 +204,7 @@ class OpenDocumentRepresentation {
         Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);
-        //text.setTextContent(content);
+        // text.setTextContent(content);
         cell.appendChild(text);
         parent.appendChild(cell);
     }

@@ -155,11 +155,10 @@ public class Authors extends AbstractParamLayoutFormatter {
                 abbrDots = false;
                 lastFirstSeparator = ", ";
             }
-        }
+        } else if (Authors.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
+            // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
+            // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
 
-        // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
-        // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
-        else if (Authors.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
             if (comp(key, "Comma")) {
                 if (setSep) {
                     lastSeparator = Authors.COMMA;
@@ -275,8 +274,6 @@ public class Authors extends AbstractParamLayoutFormatter {
                     String abbr = firstNameResult;
                     firstNameResult = a.getFirst().get();
                     int index = firstNameResult.indexOf(' ');
-                    //System.out.println(firstNamePart);
-                    //System.out.println(index);
                     if (index >= 0) {
                         firstNameResult = firstNameResult.substring(0, index + 1);
                         if (abbr.length() > 3) {

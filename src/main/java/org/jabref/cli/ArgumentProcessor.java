@@ -241,8 +241,8 @@ public class ArgumentProcessor {
 
     private boolean exportMatches(List<ParserResult> loaded) {
         String[] data = cli.getExportMatches().split(",");
-        String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-        //$ stands for a blank
+        String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
+        // $ stands for a blank
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
@@ -252,17 +252,17 @@ public class ArgumentProcessor {
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
-        //export matches
+        // export matches
         if (!matches.isEmpty()) {
             String formatName;
 
-            //read in the export format, take default format if no format entered
+            // read in the export format, take default format if no format entered
             switch (data.length) {
                 case 3:
                     formatName = data[2];
                     break;
                 case 2:
-                    //default exporter: HTML table (with Abstract & BibTeX)
+                    // default exporter: HTML table (with Abstract & BibTeX)
                     formatName = "tablerefsabsbib";
                     break;
                 default:
@@ -272,7 +272,7 @@ public class ArgumentProcessor {
                     return false;
             }
 
-            //export new database
+            // export new database
             Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
             if (!exporter.isPresent()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + formatName);

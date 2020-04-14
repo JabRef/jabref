@@ -940,9 +940,9 @@ class BibtexParserTest {
     void parseRecognizesStringAndEntry() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("" + "@string{bourdieu = {Bourdieu, Pierre}}"
-                        + "@book{bourdieu-2002-questions-sociologie, " + "	Address = {Paris}," + "	Author = bourdieu,"
-                        + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
-                        + "	Year = 2002" + "}"));
+                        + "@book{bourdieu-2002-questions-sociologie, " + "    Address = {Paris}," + "    Author = bourdieu,"
+                        + "    Isbn = 2707318256," + "    Publisher = {Minuit}," + "    Title = {Questions de sociologie},"
+                        + "    Year = 2002" + "}"));
 
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
@@ -1720,7 +1720,7 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m1, author = kopp # et # kubovy }" );
+                        "@Misc{m1, author = kopp # et # kubovy }");
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
                 .withCiteKey("m1")
@@ -1736,7 +1736,7 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }");
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
                 .withCiteKey("m2")
@@ -1752,42 +1752,42 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }");
 
         assertEquals("#kopp# and #kubovy#", parsed.iterator().next().getField(StandardField.AUTHOR).get());
     }
 
     @Test
     void textAprilIsParsedAsMonthApril() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }");
 
         assertEquals(Month.APRIL, result.get().getMonth().get());
     }
 
     @Test
     void textAprilIsDisplayedAsConstant() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }");
 
         assertEquals("apr", result.get().getField(StandardField.MONTH).get());
     }
 
     @Test
     void bibTeXConstantAprilIsParsedAsMonthApril() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals(Month.APRIL, result.get().getMonth().get());
     }
 
     @Test
     void bibTeXConstantAprilIsDisplayedAsConstant() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals("#apr#", result.get().getField(StandardField.MONTH).get());
     }
 
     @Test
     void bibTeXConstantAprilIsParsedAsStringMonthAprilWhenReadingTheField() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
     }

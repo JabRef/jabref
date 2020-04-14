@@ -156,11 +156,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 parent.addSubgroup(group);
 
                 // TODO: Add undo
-                //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-                //panel.getUndoManager().addEdit(undo);
+                // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+                // panel.getUndoManager().addEdit(undo);
 
                 // TODO: Expand parent to make new group visible
-                //parent.expand();
+                // parent.expand();
 
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
@@ -205,16 +205,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 // if (undoAddPreviousEntries == null) {
                 //    panel.getUndoManager().addEdit(undo);
-                //} else {
+                // } else {
                 //    NamedCompound nc = new NamedCompound("Modify Group");
                 //    nc.addEdit(undo);
                 //    nc.addEdit(undoAddPreviousEntries);
                 //    nc.end();/
                 //      panel.getUndoManager().addEdit(nc);
-                //}
-                //if (!addChange.isEmpty()) {
+                // }
+                // if (!addChange.isEmpty()) {
                 //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
-                //}
+                // }
 
                 dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
                 writeGroupChangesToMetaData();
@@ -231,8 +231,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
         if (confirmation) {
             /// TODO: Add undo
-            //final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
-            //panel.getUndoManager().addEdit(undo);
+            // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
+            // panel.getUndoManager().addEdit(undo);
             group.getGroupNode().removeAllChildren();
             dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
@@ -246,8 +246,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         if (confirmation) {
             // TODO: Add undo
-            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            //panel.getUndoManager().addEdit(undo);
+            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+            // panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
             groupNode.getParent()
                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
@@ -268,8 +268,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 Localization.lang("Remove"));
         if (confirmed) {
             // TODO: Add undo
-            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-            //panel.getUndoManager().addEdit(undo);
+            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+            // panel.getUndoManager().addEdit(undo);
 
             removeGroupsAndSubGroupsFromEntries(group);
 
@@ -305,11 +305,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // panel.getUndoManager().addEdit(undoAll);
 
         // TODO Display massages
-        //if (undo == null) {
+        // if (undo == null) {
         //    frame.output(Localization.lang("The group \"%0\" already contains the selection.",
         //            node.getGroup().getName()));
         //    return;
-        //}
+        // }
         // panel.getUndoManager().addEdit(undo);
         // final String groupName = node.getGroup().getName();
         // if (assignedEntries == 1) {
@@ -317,7 +317,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // } else {
         //    frame.output(Localization.lang("Assigned %0 entries to group \"%1\".", String.valueOf(assignedEntries),
         //            groupName));
-        //}
+        // }
     }
 
     public void removeSelectedEntries(GroupNodeViewModel group) {

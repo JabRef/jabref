@@ -220,7 +220,7 @@ public class GroupTreeView {
                 if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
-                    //expand node and all children on drag over
+                    // expand node and all children on drag over
                     dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     if (localDragboard.hasBibEntries()) {
@@ -358,20 +358,20 @@ public class GroupTreeView {
         menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
-        //if (group.canBeEdited()) {
-        //editGroupPopupAction.setEnabled(false);
-        //addGroupPopupAction.setEnabled(false);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(false);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(false);
-        //} else {
-        //editGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setNode(node);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(true);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(true);
-        //}
-        //sortSubmenu.setEnabled(!node.isLeaf());
-        //removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
+        // if (group.canBeEdited()) {
+        // editGroupPopupAction.setEnabled(false);
+        // addGroupPopupAction.setEnabled(false);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(false);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(false);
+        // } else {
+        // editGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setNode(node);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(true);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(true);
+        // }
+        // sortSubmenu.setEnabled(!node.isLeaf());
+        // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
     }

@@ -35,7 +35,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
                 if (object == null) {
                     return null;
                 } else {
-                    return getItemMap().inverse().getOrDefault(object, object.toString()); //if the object is not found we simply return itself as string
+                    return getItemMap().inverse().getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
                 }
             }
 

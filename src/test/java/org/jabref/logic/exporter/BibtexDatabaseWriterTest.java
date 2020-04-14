@@ -642,8 +642,8 @@ class BibtexDatabaseWriterTest {
                         "  author = {A}," + OS.NEWLINE +
                         "  year   = {2000}," + OS.NEWLINE +
                         "}"
-                        + OS.NEWLINE
-                , stringWriter.toString());
+                        + OS.NEWLINE,
+                stringWriter.toString());
     }
 
     @Test
