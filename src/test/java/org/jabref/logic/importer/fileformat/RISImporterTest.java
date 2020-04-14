@@ -54,15 +54,4 @@ public class RISImporterTest {
         Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
-
-    @Test
-    public void testDuplicatesInAbstractField() throws URISyntaxException, IOException {
-        Path file = Paths.get(RISImporterTest.class.getResource("RisImporterTest9.ris").toURI());
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file.toAbsolutePath().toString()));
-        List<BibEntry> allEntries = importer.importDatabase(bufferedReader).getDatabase().getEntries();
-        BibEntry firstEntry = allEntries.get(0);
-        assertEquals(394, firstEntry.getField(StandardField.ABSTRACT).get().length());
-    }
-
-
 }

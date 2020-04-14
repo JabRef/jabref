@@ -1,7 +1,7 @@
 TY  - JOUR
 T1  - Grid Cells for Conceptual Spaces?
 AU  - Kriegeskorte, Nikolaus
-AU  - Storrs, Katherine R.
+AU  - Storrs, Katherine R.
 Y1  - 2016/10/19
 PY  - 2016
 N1  - doi: 10.1016/j.neuron.2016.10.006
@@ -13,8 +13,8 @@ EP  - 284
 VL  - 92
 IS  - 2
 PB  - Elsevier
-N2  - ?Grid cells? encode an animal?s location and direction of movement in 2D physical environments via regularly repeating receptive fields. Constantinescu et al. (2016) report the first evidence of grid cells for 2D conceptual spaces. The work has exciting implications for mental representation and shows how detailed neural-coding hypotheses can be tested with bulk population-activity measures.
-AB  - ?Grid cells? encode an animal?s location and direction of movement in 2D physical environments via regularly repeating receptive fields. Constantinescu et al. (2016) report the first evidence of grid cells for 2D conceptual spaces. The work has exciting implications for mental representation and shows how detailed neural-coding hypotheses can be tested with bulk population-activity measures.
+N2  - location and direction of movement in 2D physical environments via regularly repeating receptive fields.
+AB  - location and direction of movement in 2D physical environments via regularly repeating receptive fields.
 SN  - 0896-6273
 M3  - doi: 10.1016/j.neuron.2016.10.006
 UR  - https://doi.org/10.1016/j.neuron.2016.10.006
