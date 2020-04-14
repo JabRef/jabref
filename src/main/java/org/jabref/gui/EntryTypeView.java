@@ -188,7 +188,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     //Biblatex documentation is favored over the bibtex,
     //since bibtex is a subset of biblatex and biblatex is better documented.
     public static String getDescription(EntryType selectedType) {
-        if (selectedType instanceof StandardEntryType entry) {
+        if (selectedType instanceof StandardEntryType ) {
+        {
+        var entry = (StandardEntryType) selectedType;
             switch (entry) {
                 case Article -> {
                     return Localization.lang("An article in a journal, magazine, newspaper, or other periodical which forms a self-contained unit with its own title.");
