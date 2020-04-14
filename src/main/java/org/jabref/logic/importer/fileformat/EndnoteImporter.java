@@ -197,9 +197,8 @@ public class EndnoteImporter extends Importer {
                     } else {
                         hm.put(StandardField.PUBLISHER, val);
                     }
-                }
-                // replace single dash page ranges (23-45) with double dashes (23--45):
-                else if ("P".equals(prefix)) {
+                } else if ("P".equals(prefix)) {
+                    // replace single dash page ranges (23-45) with double dashes (23--45):
                     hm.put(StandardField.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
                 } else if ("V".equals(prefix)) {
                     hm.put(StandardField.VOLUME, val);
@@ -245,14 +244,14 @@ public class EndnoteImporter extends Importer {
                 author = "";
             }
 
-            //fixauthorscomma
+            // fixauthorscomma
             if (!"".equals(author)) {
                 hm.put(StandardField.AUTHOR, fixAuthor(author));
             }
             if (!"".equals(editor)) {
                 hm.put(StandardField.EDITOR, fixAuthor(editor));
             }
-            //if pages missing and article number given, use the article number
+            // if pages missing and article number given, use the article number
             if (((hm.get(StandardField.PAGES) == null) || "-".equals(hm.get(StandardField.PAGES))) && !"".equals(artnum)) {
                 hm.put(StandardField.PAGES, artnum);
             }

@@ -59,7 +59,9 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Advanced"); }
+    public String getTabName() {
+        return Localization.lang("Advanced");
+    }
 
     public void initialize() {
         this.viewModel = new AdvancedTabViewModel(dialogService, preferences);

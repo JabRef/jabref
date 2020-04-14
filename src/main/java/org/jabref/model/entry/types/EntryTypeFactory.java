@@ -48,8 +48,8 @@ public class EntryTypeFactory {
 
     public static EntryType parse(String typeName) {
 
-        List<EntryType> types = new ArrayList<>(Arrays.<EntryType> asList(StandardEntryType.values()));
-        types.addAll(Arrays.<EntryType> asList(IEEETranEntryType.values()));
+        List<EntryType> types = new ArrayList<>(Arrays.<EntryType>asList(StandardEntryType.values()));
+        types.addAll(Arrays.<EntryType>asList(IEEETranEntryType.values()));
 
         return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
     }

@@ -149,7 +149,6 @@ public class RepecNepImporter extends Importer {
     private String preLine = "";
     private boolean inOverviewSection;
 
-
     public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }

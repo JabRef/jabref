@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for working with Eprint identifiers
  *
- * @see https://arxiv.org/help/arxiv_identifier
- * @see https://arxiv.org/hypertex/bibstyles/
+ * See also <a href="https://arxiv.org/help/arxiv_identifier">https://arxiv.org/help/arxiv_identifier</a> and <a href="https://arxiv.org/hypertex/bibstyles/">https://arxiv.org/hypertex/bibstyles/</a>
  */
 public class Eprint implements Identifier {
     public static final URI RESOLVER = URI.create("https://arxiv.org");
@@ -80,7 +79,7 @@ public class Eprint implements Identifier {
     }
 
     /**
-     * Creates an Optional<Eprint> from various schemes including URL.
+     * Creates an Optional&lt;Eprint> from various schemes including URL.
      *
      * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor
      * and checking for Optional.isPresent() instead.

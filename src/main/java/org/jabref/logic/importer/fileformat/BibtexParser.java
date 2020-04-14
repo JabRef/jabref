@@ -38,6 +38,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
@@ -89,7 +90,7 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @param fileMonitor
-     * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
@@ -247,7 +248,9 @@ public class BibtexParser implements Parser {
 
             boolean duplicateKey = database.insertEntry(entry);
             if (duplicateKey) {
-                parserResult.addDuplicateKey(entry.getCiteKey());
+                entry.getField(InternalField.KEY_FIELD).ifPresent(
+                        key -> parserResult.addDuplicateKey(key)
+                );
             }
         } catch (IOException ex) {
             // Trying to make the parser more robust.
@@ -574,7 +577,7 @@ public class BibtexParser implements Parser {
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
-                    //multiple keywords fields should be combined to one
+                    // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {

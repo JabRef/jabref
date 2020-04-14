@@ -46,7 +46,7 @@ public class XmpExporterTest {
         entry.setField(StandardField.AUTHOR, "Alan Turing");
 
         exporter.export(databaseContext, file, encoding, Collections.singletonList(entry));
-        String actual = String.join("\n", Files.readAllLines(file)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
                 "      <dc:creator>\n" +
@@ -79,7 +79,7 @@ public class XmpExporterTest {
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
-        String actual = String.join("\n", Files.readAllLines(file)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expected = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -135,7 +135,7 @@ public class XmpExporterTest {
         assertEquals(Collections.emptyList(), lines);
 
         Path fileTuring = Paths.get(file.getParent().toString() + "/" + entryTuring.getId() + "_null.xmp");
-        String actualTuring = String.join("\n", Files.readAllLines(fileTuring)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualTuring = String.join("\n", Files.readAllLines(fileTuring)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedTuring = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +
@@ -156,7 +156,7 @@ public class XmpExporterTest {
         assertEquals(expectedTuring, actualTuring);
 
         Path fileArmbrust = Paths.get(file.getParent().toString() + "/" + entryArmbrust.getId() + "_Armbrust2010.xmp");
-        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust)); //we are using \n to join, so we need it in the expected string as well, \r\n would fail
+        String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedArmbrust = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
                 "    <rdf:Description xmlns:dc=\"http://purl.org/dc/elements/1.1/\" rdf:about=\"\">\n" +

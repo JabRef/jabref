@@ -128,9 +128,9 @@ public class TestVM {
 
     @Test
     public void testVMIfSkipPop() throws RecognitionException {
-        VM vm = new VM("FUNCTION {not}	{   { #0 }	    { #1 }  if$	}"
-                + "FUNCTION {and}	{   'skip$	    { pop$ #0 }	  if$	}"
-                + "FUNCTION {or}	{   { pop$ #1 }	    'skip$	  if$	}" + "FUNCTION {test} { "
+        VM vm = new VM("FUNCTION {not}    {   { #0 }        { #1 }  if$    }"
+                + "FUNCTION {and}    {   'skip$        { pop$ #0 }      if$    }"
+                + "FUNCTION {or}    {   { pop$ #1 }        'skip$      if$    }" + "FUNCTION {test} { "
                 + "#1 #1 and #0 #1 and #1 #0 and #0 #0 and " + "#0 not #1 not "
                 + "#1 #1 or #0 #1 or #1 #0 or #0 #0 or }" + "EXECUTE {test}");
 
@@ -385,7 +385,7 @@ public class TestVM {
     @Test
     public void testVariables() throws RecognitionException {
         VM vm = new VM(" STRINGS { t }                          "
-                + " FUNCTION {not}	{ { #0 } { #1 }  if$ } "
+                + " FUNCTION {not}    { { #0 } { #1 }  if$ } "
                 + " FUNCTION {n.dashify} { \"HELLO-WORLD\" 't := t empty$ not } "
                 + " EXECUTE {n.dashify}                    ");
 
@@ -398,33 +398,33 @@ public class TestVM {
     public void testWhile() throws RecognitionException {
         VM vm = new VM(
                 "STRINGS { t }            "
-                        + "FUNCTION {not}	{   "
+                        + "FUNCTION {not}    {   "
                         + " { #0 } { #1 }  if$ } "
                         + "FUNCTION {n.dashify}              "
                         + "{ \"HELLO-WORLD\"                 "
                         + "  't :=                           "
                         + " \"\"                                                 "
-                        + "	   { t empty$ not }                 "
-                        + "	   { t #1 #1 substring$ \"-\" =                      "
-                        + "	     { t #1 #2 substring$ \"--\" = not "
-                        + "	          { \"--\" *                                       "
-                        + "	            t #2 global.max$ substring$ 't :=                 "
-                        + "	          }                                                    "
-                        + "	          {   { t #1 #1 substring$ \"-\" = }                "
-                        + "	              { \"-\" *                                         "
-                        + "	                t #2 global.max$ substring$ 't :=               "
-                        + "	              }                                                  "
-                        + "	            while$                                                                  "
-                        + "	          }                                                                  "
-                        + "	        if$                                                                  "
-                        + "	      }                                                                  "
-                        + "	      { t #1 #1 substring$ *                                       "
-                        + "	        t #2 global.max$ substring$ 't :=                          "
-                        + "	      }                                                                  "
-                        + "	      if$                                                                  "
-                        + "	    }                                                                  "
-                        + "	  while$                                                                  "
-                        + "	}                                                                  "
+                        + "       { t empty$ not }                 "
+                        + "       { t #1 #1 substring$ \"-\" =                      "
+                        + "         { t #1 #2 substring$ \"--\" = not "
+                        + "              { \"--\" *                                       "
+                        + "                t #2 global.max$ substring$ 't :=                 "
+                        + "              }                                                    "
+                        + "              {   { t #1 #1 substring$ \"-\" = }                "
+                        + "                  { \"-\" *                                         "
+                        + "                    t #2 global.max$ substring$ 't :=               "
+                        + "                  }                                                  "
+                        + "                while$                                                                  "
+                        + "              }                                                                  "
+                        + "            if$                                                                  "
+                        + "          }                                                                  "
+                        + "          { t #1 #1 substring$ *                                       "
+                        + "            t #2 global.max$ substring$ 't :=                          "
+                        + "          }                                                                  "
+                        + "          if$                                                                  "
+                        + "        }                                                                  "
+                        + "      while$                                                                  "
+                        + "    }                                                                  "
                         + " EXECUTE {n.dashify} ");
 
         List<BibEntry> v = Collections.emptyList();
@@ -553,37 +553,37 @@ public class TestVM {
     @Test
     public void testWidth() throws RecognitionException, IOException {
         VM vm = new VM("ENTRY  { " + "  address " + "  author " + "  title " + "  type "
-                + "}  {}  { label } " + //
-                "STRINGS { longest.label } " + //
-                "INTEGERS { number.label longest.label.width } " + //
-                "FUNCTION {initialize.longest.label} " + //
-                "{ \"\" 'longest.label := " + //
-                "  #1 'number.label := " + //
-                "  #0 'longest.label.width := " + //
-                "} " + //
-                " " + //
-                "		FUNCTION {longest.label.pass} " + //
-                "		{ number.label int.to.str$ 'label := " + //
-                "		  number.label #1 + 'number.label := " + //
-                "		  label width$ longest.label.width > " + //
-                "		    { label 'longest.label := " + //
-                "		      label width$ 'longest.label.width := " + //
-                "		    } " + //
-                "		    'skip$ " + //
-                "		  if$ " + //
-                "		} " + //
-                " " + //
-                "		EXECUTE {initialize.longest.label} " + //
-                " " + //
-                "		ITERATE {longest.label.pass} " + //
-                "FUNCTION {begin.bib} " + //
-                "{ preamble$ empty$" + //
-                "    'skip$" + //
-                "    { preamble$ write$ newline$ }" + //
-                "  if$" + //
-                "  \"\\begin{thebibliography}{\"  longest.label  * \"}\" *" + //
-                "}" + //
-                "EXECUTE {begin.bib}");//
+                + "}  {}  { label } " +
+                "STRINGS { longest.label } " +
+                "INTEGERS { number.label longest.label.width } " +
+                "FUNCTION {initialize.longest.label} " +
+                "{ \"\" 'longest.label := " +
+                "  #1 'number.label := " +
+                "  #0 'longest.label.width := " +
+                "} " +
+                " " +
+                "        FUNCTION {longest.label.pass} " +
+                "        { number.label int.to.str$ 'label := " +
+                "          number.label #1 + 'number.label := " +
+                "          label width$ longest.label.width > " +
+                "            { label 'longest.label := " +
+                "              label width$ 'longest.label.width := " +
+                "            } " +
+                "            'skip$ " +
+                "          if$ " +
+                "        } " +
+                " " +
+                "        EXECUTE {initialize.longest.label} " +
+                " " +
+                "        ITERATE {longest.label.pass} " +
+                "FUNCTION {begin.bib} " +
+                "{ preamble$ empty$" +
+                "    'skip$" +
+                "    { preamble$ write$ newline$ }" +
+                "  if$" +
+                "  \"\\begin{thebibliography}{\"  longest.label  * \"}\" *" +
+                "}" +
+                "EXECUTE {begin.bib}");
 
         List<BibEntry> v = List.of(t1BibtexEntry());
 

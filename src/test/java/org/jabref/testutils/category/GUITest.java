@@ -13,5 +13,5 @@ import org.junit.jupiter.api.Tag;
 @Inherited
 @Tag("GUITest")
 public @interface GUITest {
-    //empty
+    // empty
 }

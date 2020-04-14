@@ -15,7 +15,6 @@ public class StringInt implements java.io.Serializable {
      */
     public final int i;
 
-
     /**
      *  Constructor for the StringInt object
      *
