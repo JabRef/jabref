@@ -78,7 +78,7 @@ class MSBibEntry {
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
     public MSBibEntry() {
-        //empty
+        // empty
     }
 
     /**
@@ -304,7 +304,7 @@ class MSBibEntry {
         parent.appendChild(elem);
     }
 
-    //Add authors for export
+    // Add authors for export
     private void addAuthor(Document document, Element allAuthors, String entryName, List<MsBibAuthor> authorsLst) {
         if (authorsLst == null) {
             return;

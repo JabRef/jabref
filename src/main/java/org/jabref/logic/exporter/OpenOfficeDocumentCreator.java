@@ -38,7 +38,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeDocumentCreator.class);
 
-
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */

@@ -40,7 +40,6 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
 
-
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
@@ -52,7 +51,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
 
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
 
-            //addResourceFile("mimetype", "/resource/ods/mimetype", out);
+            // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
             ze.setMethod(ZipEntry.STORED);
@@ -67,7 +66,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
             out.closeEntry();
 
             ZipEntry zipEntry = new ZipEntry("content.xml");
-            //zipEntry.setMethod(ZipEntry.DEFLATED);
+            // zipEntry.setMethod(ZipEntry.DEFLATED);
             out.putNextEntry(zipEntry);
             int c;
             while ((c = source.read()) >= 0) {

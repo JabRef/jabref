@@ -38,7 +38,6 @@ public class MSBibDatabase {
 
     private Set<MSBibEntry> entries;
 
-
     /**
      * Creates a {@link MSBibDatabase} for <b>import</b>
      */

@@ -316,7 +316,7 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             // TODO: switch Icon color
-            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
         setHintTooltip(description);
@@ -424,7 +424,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
-            //empty
+            // empty
         }
     }
 }

@@ -272,11 +272,11 @@ public class OpenOfficePanel {
         VBox row1 = new VBox();
         VBox row2 = new VBox();
         VBox row3 = new VBox();
-        row1.getChildren().addAll(setStyleFile,pushEntries, pushEntriesInt);
+        row1.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
         row2.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
         row3.getChildren().addAll(manageCitations, exportCitations, settingsB);
-        HBox hbox1 =  new HBox();
-        hbox1.getChildren().addAll(row1,row2,row3);
+        HBox hbox1 = new HBox();
+        hbox1.getChildren().addAll(row1, row2, row3);
         hbox1.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
 
         vbox.setFillWidth(true);

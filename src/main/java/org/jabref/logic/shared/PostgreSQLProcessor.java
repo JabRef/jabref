@@ -92,7 +92,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         // Disable cleanup output of ThreadedHousekeeper
-        //Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
+        // Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
         try {
             connection.createStatement().execute("LISTEN jabrefLiveUpdate");
             // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!

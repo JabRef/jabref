@@ -15,6 +15,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 
 /**
  * A custom exporter to write bib entries to a .xmp file for further processing
@@ -49,7 +50,7 @@ public class XmpExporter extends Exporter {
             for (BibEntry entry : entries) {
                 // Avoid situations, where two cite keys are null
                 Path entryFile;
-                String suffix = entry.getId() + "_" + entry.getCiteKey() + ".xmp";
+                String suffix = entry.getId() + "_" + entry.getField(InternalField.KEY_FIELD).orElse("") + ".xmp";
                 if (file.getParent() == null) {
                     entryFile = Paths.get(suffix);
                 } else {

@@ -79,19 +79,19 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         setResultConverter(button -> {
             if (button == dismissChanges) {
                 return false;
-
             } else {
                 // Perform all accepted changes
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 for (DatabaseChangeViewModel change : changes) {
                     if (change instanceof EntryChangeViewModel) {
-                        change.makeChange(database, ce); //We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        // We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        change.makeChange(database, ce);
                     } else if (change.isAccepted()) {
                         change.makeChange(database, ce);
                     }
                 }
                 ce.end();
-                //TODO: panel.getUndoManager().addEdit(ce);
+                // TODO: panel.getUndoManager().addEdit(ce);
 
                 return true;
             }
