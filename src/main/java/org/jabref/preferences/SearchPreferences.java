@@ -18,7 +18,6 @@ public class SearchPreferences {
 
     private final JabRefPreferences preferences;
 
-
     public SearchPreferences(JabRefPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }

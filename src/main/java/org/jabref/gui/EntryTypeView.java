@@ -73,7 +73,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
 
         setResultConverter(button -> {
-            //The buttonType will always be cancel, even if we pressed one of the entry type buttons
+            // The buttonType will always be cancel, even if we pressed one of the entry type buttons
             return type;
         });
 
@@ -127,8 +127,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         new ViewModelListCellFactory<IdBasedFetcher>().withText(item -> item.getName()).install(idBasedFetchers);
 
-        //we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
-        //avoids removing and adding from the scence graph
+        // we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
+        // avoids removing and adding from the scence graph
         bibTexTitlePane.managedProperty().bind(bibTexTitlePane.visibleProperty());
         ieeeTranTitlePane.managedProperty().bind(ieeeTranTitlePane.visibleProperty());
         biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());

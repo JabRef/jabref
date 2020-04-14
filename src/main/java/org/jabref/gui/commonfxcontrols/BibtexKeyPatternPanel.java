@@ -80,13 +80,21 @@ public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemMo
         this.itemsProperty().bindBidirectional(viewModel.patternListProperty());
     }
 
-    public void setValues() { viewModel.setValues(); }
+    public void setValues() {
+        viewModel.setValues();
+    }
 
-    public void resetAll() { viewModel.resetAll(); }
+    public void resetAll() {
+        viewModel.resetAll();
+    }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() { return viewModel.patternListProperty(); }
+    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+        return viewModel.patternListProperty();
+    }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() { return viewModel.defaultKeyPatternProperty(); }
+    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+        return viewModel.defaultKeyPatternProperty();
+    }
 
     private void jumpToSearchKey(KeyEvent keypressed) {
         if (keypressed.getCharacter() == null) {

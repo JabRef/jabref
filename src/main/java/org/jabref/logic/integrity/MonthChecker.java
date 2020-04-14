@@ -19,7 +19,6 @@ public class MonthChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextMonth;
 
-
     public MonthChecker(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContextMonth = Objects.requireNonNull(bibDatabaseContext);
     }
@@ -38,13 +37,13 @@ public class MonthChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        //biblatex
+        // biblatex
         if (bibDatabaseContextMonth.isBiblatexMode()
                 && !(ONLY_AN_INTEGER.test(value.trim()) || MONTH_NORMALIZED.test(value.trim()))) {
             return Optional.of(Localization.lang("should be an integer or normalized"));
         }
 
-        //BibTeX
+        // BibTeX
         if (!bibDatabaseContextMonth.isBiblatexMode() && !MONTH_NORMALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should be normalized"));
         }

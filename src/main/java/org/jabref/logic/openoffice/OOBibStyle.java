@@ -123,6 +123,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
     private boolean isDefaultLayoutPresent;
+
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
@@ -133,6 +134,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         fromResource = false;
         path = styleFile.getPath();
     }
+
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
@@ -842,7 +844,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @return True if an internal style
      */
-    public boolean isFromResource() {
+    public boolean isInternalStyle() {
         return fromResource;
     }
 

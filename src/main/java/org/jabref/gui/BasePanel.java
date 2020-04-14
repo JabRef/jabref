@@ -149,9 +149,10 @@ public class BasePanel extends StackPane {
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
             if (this.bibDatabaseContext.getDatabasePath().isPresent()) {
-                // check if file is modified
-                String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
-                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName()).append(changeFlag);
+                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName());
+                if (isModified() && !isAutosaveEnabled) {
+                    title.append("*");
+                }
             } else {
                 title.append(Localization.lang("untitled"));
 
@@ -302,9 +303,7 @@ public class BasePanel extends StackPane {
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
                                                          .stream()
                                                          .findFirst()
-                                                         .ifPresent(entry -> {
-                                                             entryEditor.setEntry(entry);
-                                                         }));
+                                                         .ifPresent(entryEditor::setEntry));
 
         // TODO: Register these actions globally
         /*

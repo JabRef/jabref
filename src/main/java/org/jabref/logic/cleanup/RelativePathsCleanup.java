@@ -37,8 +37,7 @@ public class RelativePathsCleanup implements CleanupJob {
             if (fileEntry.isOnlineLink()) {
                 // keep online link untouched
                 newFileName = oldFileName;
-            }
-            else {
+            } else {
                 // only try to transform local file path to relative one
                 newFileName = FileUtil
                         .relativize(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))

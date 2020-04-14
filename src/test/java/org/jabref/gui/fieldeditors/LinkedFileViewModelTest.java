@@ -157,7 +157,7 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); //use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 

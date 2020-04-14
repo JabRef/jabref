@@ -1,6 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
@@ -39,11 +40,7 @@ public class HTMLChars implements LayoutFormatter {
                     /* Close Command */
                     String command = currentCommand.toString();
                     String result = HTML_CHARS.get(command);
-                    if (result == null) {
-                        sb.append(command);
-                    } else {
-                        sb.append(result);
-                    }
+                    sb.append(Objects.requireNonNullElse(result, command));
                 }
                 escaped = true;
                 incommand = true;
@@ -79,16 +76,12 @@ public class HTMLChars implements LayoutFormatter {
                         }
                         String result = HTML_CHARS.get(command + commandBody);
 
-                        if (result == null) {
-                            sb.append(commandBody);
-                        } else {
-                            sb.append(result);
-                        }
+                        sb.append(Objects.requireNonNullElse(result, commandBody));
 
                         incommand = false;
                         escaped = false;
                     } else {
-                        //	Are we already at the end of the string?
+                        // Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
                             String result = HTML_CHARS.get(command);
@@ -96,11 +89,7 @@ public class HTMLChars implements LayoutFormatter {
                              * then keep
                              * the text of the parameter intact.
                              */
-                            if (result == null) {
-                                sb.append(command);
-                            } else {
-                                sb.append(result);
-                            }
+                            sb.append(Objects.requireNonNullElse(result, command));
 
                         }
                     }
@@ -143,19 +132,11 @@ public class HTMLChars implements LayoutFormatter {
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         String result = HTML_CHARS.get(command);
-                        if (result == null) {
-                            // If the command is unknown, just print it:
-                            sb.append(command);
-                        } else {
-                            sb.append(result);
-                        }
+                        // If the command is unknown, just print it:
+                        sb.append(Objects.requireNonNullElse(result, command));
                     } else {
                         String result = HTML_CHARS.get(command);
-                        if (result == null) {
-                            sb.append(command);
-                        } else {
-                            sb.append(result);
-                        }
+                        sb.append(Objects.requireNonNullElse(result, command));
                         sb.append(' ');
                     }
                 } else {

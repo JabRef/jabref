@@ -9,12 +9,10 @@ import org.jabref.logic.layout.LayoutFormatter;
 /**
  * A layout formatter that is the composite of the given Formatters executed in
  * order.
- *
  */
 public class CompositeFormat implements LayoutFormatter {
 
     private final List<LayoutFormatter> formatters;
-
 
     /**
      * If called with this constructor, this formatter does nothing.

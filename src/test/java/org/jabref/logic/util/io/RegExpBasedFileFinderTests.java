@@ -46,7 +46,7 @@ public class RegExpBasedFileFinderTests {
 
     @Test
     public void testFindFiles() throws Exception {
-        //given
+        // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInDatabase");
         localEntry.setField(StandardField.YEAR, "2001");
@@ -56,33 +56,33 @@ public class RegExpBasedFileFinderTests {
         List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
-        //when
+        // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
-        //then
+        // then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
                 result);
     }
 
     @Test
     public void testYearAuthFirspageFindFiles() throws Exception {
-        //given
+        // given
         List<String> extensions = Collections.singletonList("pdf");
 
         List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
-        //when
+        // when
         List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
-        //then
+        // then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
                 result);
     }
 
     @Test
     public void testAuthorWithDiacritics() throws Exception {
-        //given
+        // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("Grazulis2017");
         localEntry.setField(StandardField.YEAR, "2017");
@@ -94,17 +94,17 @@ public class RegExpBasedFileFinderTests {
         List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
 
-        //when
+        // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
-        //then
+        // then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
                 result);
     }
 
     @Test
     public void testFindFileInSubdirectory() throws Exception {
-        //given
+        // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField(StandardField.YEAR, "2017");
@@ -114,17 +114,17 @@ public class RegExpBasedFileFinderTests {
         List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
-        //when
+        // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
-        //then
+        // then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
                 result);
     }
 
     @Test
     public void testFindFileNonRecursive() throws Exception {
-        //given
+        // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCiteKey("pdfInSubdirectory");
         localEntry.setField(StandardField.YEAR, "2017");
@@ -134,10 +134,10 @@ public class RegExpBasedFileFinderTests {
         List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[bibtexkey].*\\\\.[extension]", ',');
 
-        //when
+        // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
-        //then
+        // then
         assertTrue(result.isEmpty());
     }
 

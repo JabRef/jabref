@@ -77,8 +77,8 @@ public class CustomizeGeneralFieldsDialogViewModel {
     public void resetFields() {
 
         StringBuilder sb = new StringBuilder();
-        Map<String,String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
-        for (Map.Entry<String,String>entry : customTabNamesFields.entrySet()) {
+        Map<String, String> customTabNamesFields = preferences.getCustomTabsNamesAndFields();
+        for (Map.Entry<String, String> entry : customTabNamesFields.entrySet()) {
             sb.append(entry.getKey());
             sb.append(':');
             sb.append(entry.getValue());

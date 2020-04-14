@@ -92,7 +92,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (selectedItem != null) {
             ClipboardContent content = new ClipboardContent();
             Dragboard dragboard = listView.startDragAndDrop(TransferMode.MOVE);
-            //We have to use the model class here, as the content of the dragboard must be serializable
+            // We have to use the model class here, as the content of the dragboard must be serializable
             content.put(DragAndDropDataFormats.LINKED_FILE, selectedItem);
             dragboard.setContent(content);
         }

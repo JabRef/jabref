@@ -120,7 +120,7 @@ public class GroupTreeView {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
-        // Number of hits
+        // Number of hits (only if user wants to see them)
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
@@ -134,7 +134,9 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    text.textProperty().bind(group.getHits().asString());
+                    if (preferencesService.getDisplayGroupCount()) {
+                        text.textProperty().bind(group.getHits().asString());
+                    }
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -218,7 +220,7 @@ public class GroupTreeView {
                 if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
-                    //expand node and all children on drag over
+                    // expand node and all children on drag over
                     dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     if (localDragboard.hasBibEntries()) {
@@ -356,20 +358,20 @@ public class GroupTreeView {
         menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
-        //if (group.canBeEdited()) {
-        //editGroupPopupAction.setEnabled(false);
-        //addGroupPopupAction.setEnabled(false);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(false);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(false);
-        //} else {
-        //editGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setNode(node);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(true);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(true);
-        //}
-        //sortSubmenu.setEnabled(!node.isLeaf());
-        //removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
+        // if (group.canBeEdited()) {
+        // editGroupPopupAction.setEnabled(false);
+        // addGroupPopupAction.setEnabled(false);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(false);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(false);
+        // } else {
+        // editGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setNode(node);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(true);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(true);
+        // }
+        // sortSubmenu.setEnabled(!node.isLeaf());
+        // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
     }
