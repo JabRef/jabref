@@ -17,8 +17,8 @@ public interface FileType {
                               .collect(Collectors.toList());
     }
 
-    default Set<String> getExtensionsLowerCase(){
-        return getExtensions().stream().map(ext->ext.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
+    default Set<String> getExtensionsLowerCase() {
+        return getExtensions().stream().map(ext -> ext.toLowerCase(Locale.ROOT)).collect(Collectors.toSet());
     }
 
     List<String> getExtensions();
