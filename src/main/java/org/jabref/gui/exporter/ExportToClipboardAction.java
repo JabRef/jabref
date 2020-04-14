@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.scene.input.ClipboardContent;
@@ -20,6 +20,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
@@ -34,21 +35,24 @@ public class ExportToClipboardAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     // Only text based exporters can be used
-    private static final List<String> SUPPORTED_FILETYPES = Arrays.asList("txt", "rtf", "rdf", "xml", "html", "htm", "csv", "ris");
+    private static final Set<String> SUPPORTED_FILETYPES = Set.of("txt", "rtf", "rdf", "xml", "html", "htm", "csv", "ris");
 
     private JabRefFrame frame;
     private final DialogService dialogService;
     private BasePanel panel;
     private final List<BibEntry> entries = new ArrayList<>();
+    private final ExporterFactory exporterFactory;
 
-    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService) {
+    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory) {
         this.frame = frame;
         this.dialogService = dialogService;
+        this.exporterFactory = exporterFactory;
     }
 
-    public ExportToClipboardAction(BasePanel panel, DialogService dialogService) {
+    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory) {
         this.panel = panel;
         this.dialogService = dialogService;
+        this.exporterFactory = exporterFactory;
     }
 
     @Override
@@ -62,10 +66,10 @@ public class ExportToClipboardAction extends SimpleCommand {
             return;
         }
 
-        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
-                                                        .sorted(Comparator.comparing(Exporter::getName))
-                                                        .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensions()))
-                                                        .collect(Collectors.toList());
+        List<Exporter> exporters = exporterFactory.getExporters().stream()
+                                                  .sorted(Comparator.comparing(Exporter::getName))
+                                                  .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensionsLowerCase()))
+                                                  .collect(Collectors.toList());
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
@@ -74,12 +78,13 @@ public class ExportToClipboardAction extends SimpleCommand {
                                           .orElse(null);
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                Localization.lang("Export"), defaultChoice, exporters);
+                                                                                    Localization.lang("Export"), defaultChoice, exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                                .onSuccess(this::setContentToClipboard)
-                                                                .onFailure(ex -> { /* swallow as already logged */ })
-                                                                .executeWith(Globals.TASK_EXECUTOR));
+                                                             .onSuccess(this::setContentToClipboard)
+                                                             .onFailure(ex -> {
+                                                                 /* swallow as already logged */ })
+                                                             .executeWith(Globals.TASK_EXECUTOR));
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
@@ -151,6 +156,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     }
 
     private static class ExportResult {
+
         final String content;
         final FileType fileType;
 
