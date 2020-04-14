@@ -1,12 +1,18 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,4 +54,15 @@ public class RISImporterTest {
         Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
+
+    @Test
+    public void testDuplicatesInAbstractField() throws URISyntaxException, IOException {
+        Path file = Paths.get(RISImporterTest.class.getResource("RisImporterTest9.ris").toURI());
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file.toAbsolutePath().toString()));
+        List<BibEntry> allEntries = importer.importDatabase(bufferedReader).getDatabase().getEntries();
+        BibEntry firstEntry = allEntries.get(0);
+        assertEquals(394, firstEntry.getField(StandardField.ABSTRACT).get().length());
+    }
+
+
 }
