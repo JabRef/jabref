@@ -1,6 +1,7 @@
 package org.jabref.gui.metadata;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,15 +46,6 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     }
 
     public void addNewString(BibtexStringEditorItemModel newString) {
-        /* if (!StringUtil.isNullOrEmpty(addLabelProperty.getValue())
-                && !labelAlreadyExists(addLabelProperty.getValue())) {
-            stringsListProperty.add(new BibtexStringEditorItemModel(addLabelProperty.getValue(), addContentProperty.getValue()));
-            addLabelProperty.setValue("");
-            addContentProperty.setValue("");
-            return true;
-        } else {
-            return false;
-        } */
         stringsListProperty.add(newString);
     }
 
@@ -76,8 +68,8 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         return new BibtexString(label, content);
     }
 
-    public boolean labelAlreadyExists(String label) {
-        return stringsListProperty.stream().anyMatch(item -> item.labelProperty().getValue().equals(label));
+    public Optional<BibtexStringEditorItemModel> labelAlreadyExists(String label) {
+        return stringsListProperty.stream().filter(item -> item.labelProperty().getValue().equals(label)).findFirst();
     }
 
     public void openHelpPage() {

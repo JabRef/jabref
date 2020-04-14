@@ -1,9 +1,10 @@
 package org.jabref.gui.metadata;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -67,19 +68,26 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
         labelColumn.setSortable(true);
         labelColumn.setReorderable(false);
-        labelColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
+
+        // The ErrorDialog has to be opened from the CellValueFactory, as it throws errors otherwise. The Implementation
+        // follows basically the SpinnerValueFactory.
+        // FixMe: Possible scenario: If the newLabel and the oldLabel are both in use the the listener jumps endlessly
+        //  between the same change back and forth
+        labelColumn.setCellValueFactory(cellData -> {
+            cellData.getValue().labelProperty().addListener(((observable, oldLabel, newLabel) -> {
+                Optional<BibtexStringEditorItemModel> item = viewModel.labelAlreadyExists(newLabel);
+                if (item.isPresent() && !item.get().equals(stringsList.getFocusModel().getFocusedItem())) {
+                    dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", newLabel));
+                    cellData.getValue().setLabel(oldLabel);
+                } else {
+                    cellData.getValue().setLabel(newLabel);
+                }
+            }));
+            return cellData.getValue().labelProperty();
+        });
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringEditorItemModel, String>()
                 .withValidation(BibtexStringEditorItemModel::labelValidation, visualizer)
                 .install(labelColumn, new DefaultStringConverter());
-        labelColumn.setOnEditCommit((CellEditEvent<BibtexStringEditorItemModel, String> cell) -> {
-            String newLabelValue = cell.getNewValue();
-            if (viewModel.labelAlreadyExists(newLabelValue)) {
-                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", newLabelValue));
-                cell.getRowValue().setLabel(cell.getOldValue());
-            } else {
-                cell.getRowValue().setLabel(newLabelValue);
-            }
-        });
 
         contentColumn.setSortable(true);
         contentColumn.setReorderable(false);
@@ -100,38 +108,28 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
                         viewModel.removeString(stringsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
-/*        addStringLabel.textProperty().bindBidirectional(viewModel.addLabelProperty());
-        addStringLabel.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                addStringContent.requestFocus();
-                addStringContent.selectAll();
-                event.consume();
-            }
-        });
-
-        addStringContent.textProperty().bindBidirectional(viewModel.addContentProperty());
-        addStringContent.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                viewModel.addNewString();
-                addStringLabel.requestFocus();
-                event.consume();
-            }
-        }); */
-
         stringsList.itemsProperty().bindBidirectional(viewModel.stringsListProperty());
         stringsList.setEditable(true);
+
+        // ToDo: Some keyPressed-Events should be added to navigate in the table, at least tab.
     }
 
+    /**
+     * Inserts a StringConstant into the stringsList and automatically starts the edit mode for it's label.
+     *
+     * ToDo / FixMe:
+     *   1. The second to the fifth line added does not automatically start edit mode and
+     *   2. the initial name of the StringConstant is not checked for uniquity.
+     *   Possible solution:
+     *   1. -- needs debugging --
+     *   2. Check at construction of a new label for uniquity.
+     */
     @FXML
     private void addString() {
         BibtexStringEditorItemModel newString = new BibtexStringEditorItemModel("New String","");
         viewModel.addNewString(newString);
+        stringsList.getFocusModel().focus(stringsList.getItems().size() - 1, labelColumn);
         stringsList.edit(stringsList.getItems().size() - 1, labelColumn);
-
-        // NPE - textfield does not yet exist.
-        Node textfield = stringsList.lookup(".text-field");
-        textfield.requestFocus();
-
     }
 
     @FXML
