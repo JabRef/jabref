@@ -56,7 +56,7 @@ public class ExportCommand extends SimpleCommand {
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
 
-        //Get list of exporters and sort before adding to file dialog
+        // Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());

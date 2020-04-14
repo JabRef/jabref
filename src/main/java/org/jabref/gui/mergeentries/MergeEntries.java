@@ -272,7 +272,7 @@ public class MergeEntries extends BorderPane {
                 mergePanel.add(button, 2 + k, rowIndex);
             }
             if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
-                typeRadioButtons.get(1).setSelected(true); //This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+                typeRadioButtons.get(1).setSelected(true); // This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
                 rightRadioButtons.add(typeRadioButtons.get(1));
             } else {
                 typeRadioButtons.get(0).setSelected(true);

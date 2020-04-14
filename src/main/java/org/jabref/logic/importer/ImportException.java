@@ -4,7 +4,6 @@ import org.jabref.JabRefException;
 
 public class ImportException extends JabRefException {
 
-
     public ImportException(String errorMessage, Exception cause) {
         super(errorMessage, cause);
     }

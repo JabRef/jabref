@@ -219,7 +219,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                              *
                              * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
                              */
-                            sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
+                            sb.append(replaceStrings(flEntry.getLink())); // f.toURI().toString();
 
                             break;
                         case FILE_EXTENSION:

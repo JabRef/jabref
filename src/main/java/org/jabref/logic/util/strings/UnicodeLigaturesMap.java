@@ -21,7 +21,7 @@ public class UnicodeLigaturesMap extends HashMap<String, String> {
         put("\uA737", "au");
         put("\uA738", "AV");
         put("\uA739", "av");
-        //AV, av with bar
+        // AV, av with bar
         put("\uA73A", "AV");
         put("\uA73B", "av");
         put("\uA73C", "AY");
