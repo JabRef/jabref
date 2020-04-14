@@ -199,7 +199,7 @@ public class RisImporter extends Importer {
                         String oldAb = fields.get(StandardField.ABSTRACT);
                         if (oldAb == null) {
                             fields.put(StandardField.ABSTRACT, value);
-                        } else {
+                        } else if (!oldAb.equals(value) && !value.isEmpty()) {
                             fields.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + value);
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
