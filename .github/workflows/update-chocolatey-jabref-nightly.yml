@@ -42,10 +42,17 @@ jobs:
     steps:
       - name: Determine sha256 sums
         id: checksum
-        shell: bash
+        shell: python
         run: |
-          wget https://builds.jabref.org/master/JabRef-5.1.msi -o /tmp/jabref.msi
-          echo ::set-output checksum::`sha256sum < /tmp/jabref.msi | sed s/ .*//`
+          from urllib.request import urlretrieve
+          import hashlib
+
+          tmpfile, headers = urlretrieve('https://builds.jabref.org/master/JabRef-5.1.msi')
+          hash = hashlib.sha256()
+          with open(tmpfile, "rb") as f:
+              for chunk in iter(lambda: f.read(4096), b""):
+                  hash.update(chunk)
+          print(f'::set-output name=secretspresent::{hash.hexdigest()}')
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Fetch all history for all tags and branches
