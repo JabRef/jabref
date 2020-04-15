@@ -135,10 +135,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile.findIn(directories);
     }
 
-    /**
-     * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
-     * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
-     */
     public JabRefIcon getTypeIcon() {
         return externalFileTypes.fromLinkedFile(linkedFile, false)
                                 .map(ExternalFileType::getIcon)
