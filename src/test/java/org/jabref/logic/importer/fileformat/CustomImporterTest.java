@@ -54,7 +54,7 @@ public class CustomImporterTest {
 
     @Test
     public void equalsIsBasedOnName() {
-        //noinspection AssertEqualsBetweenInconvertibleTypes
+        // noinspection AssertEqualsBetweenInconvertibleTypes
         assertEquals(new CopacImporter(), importer);
     }
 

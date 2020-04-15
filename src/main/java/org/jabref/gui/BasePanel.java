@@ -303,9 +303,7 @@ public class BasePanel extends StackPane {
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
                                                          .stream()
                                                          .findFirst()
-                                                         .ifPresent(entry -> {
-                                                             entryEditor.setEntry(entry);
-                                                         }));
+                                                         .ifPresent(entryEditor::setEntry));
 
         // TODO: Register these actions globally
         /*

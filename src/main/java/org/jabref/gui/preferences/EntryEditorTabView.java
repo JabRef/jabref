@@ -29,16 +29,17 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
 
     public EntryEditorTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
-
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Entry editor"); }
+    public String getTabName() {
+        return Localization.lang("Entry editor");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());

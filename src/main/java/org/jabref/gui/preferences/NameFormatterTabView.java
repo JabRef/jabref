@@ -42,7 +42,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
     @Override
     public String getTabName() { return Localization.lang("Name formatter"); }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new NameFormatterTabViewModel(dialogService, preferences);
 
         formatterNameColumn.setSortable(true);

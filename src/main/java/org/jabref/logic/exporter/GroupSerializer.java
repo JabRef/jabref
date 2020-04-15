@@ -117,13 +117,13 @@ public class GroupSerializer {
         if (group instanceof AllEntriesGroup) {
             return serializeAllEntriesGroup();
         } else if (group instanceof ExplicitGroup) {
-            return serializeExplicitGroup((ExplicitGroup)group);
+            return serializeExplicitGroup((ExplicitGroup) group);
         } else if (group instanceof KeywordGroup) {
-            return serializeKeywordGroup((KeywordGroup)group);
+            return serializeKeywordGroup((KeywordGroup) group);
         } else if (group instanceof SearchGroup) {
-            return serializeSearchGroup((SearchGroup)group);
+            return serializeSearchGroup((SearchGroup) group);
         } else if (group instanceof AutomaticKeywordGroup) {
-            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup)group);
+            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup) group);
         } else if (group instanceof AutomaticPersonsGroup) {
             return serializeAutomaticPersonsGroup((AutomaticPersonsGroup) group);
         } else if (group instanceof TexGroup) {

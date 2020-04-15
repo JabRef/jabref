@@ -119,7 +119,7 @@ public abstract class BibDatabaseWriter {
         Objects.requireNonNull(bibDatabaseContext);
         Objects.requireNonNull(entriesToSort);
 
-        //if no meta data are present, simply return in original order
+        // if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             return new LinkedList<>(entriesToSort);
         }
@@ -215,7 +215,7 @@ public abstract class BibDatabaseWriter {
             writeEntryTypeDefinitions(typesToWrite);
         }
 
-        //finally write whatever remains of the file, but at least a concluding newline
+        // finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
 
         writer.close();
