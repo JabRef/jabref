@@ -94,7 +94,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                                                   .getExternalFileTypeByExt(fileExtension)
                                                                   .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
-        return new LinkedFile("", relativePath.toString(), suggestedFileType.getExtension());
+        return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
 
     public LinkedFileViewModel fromFile(Path file) {
