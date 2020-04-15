@@ -140,7 +140,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
      */
     public JabRefIcon getTypeIcon() {
-        return IconTheme.JabRefIcons.PDF_FILE;
+        return externalFileTypes.fromLinkedFile(linkedFile, false)
+                                .map(ExternalFileType::getIcon)
+                                .orElse(IconTheme.JabRefIcons.FILE);
     }
 
     public void markAsAutomaticallyFound() {
