@@ -8,7 +8,6 @@ public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
     private final GlobalBibtexKeyPattern globalBibtexKeyPattern;
 
-
     public DatabaseBibtexKeyPattern(GlobalBibtexKeyPattern globalBibtexKeyPattern) {
         this.globalBibtexKeyPattern = globalBibtexKeyPattern;
     }

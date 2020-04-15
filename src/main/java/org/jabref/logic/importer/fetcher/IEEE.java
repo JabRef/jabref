@@ -80,7 +80,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         }
 
         entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
-        //entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
+        // entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
 
         final List<String> authors = new ArrayList<>();
         JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
@@ -91,7 +91,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
-        entry.setField(StandardField.YEAR,jsonEntry.optString("publication_year"));
+        entry.setField(StandardField.YEAR, jsonEntry.optString("publication_year"));
         entry.setField(StandardField.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
@@ -141,7 +141,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
                 stampString = STAMP_BASE_STRING_DOCUMENT + docId;
             }
 
-            //You get this url if you export bibtex from IEEE
+            // You get this url if you export bibtex from IEEE
             Matcher stampMatcher = STAMP_PATTERN.matcher(urlString.get());
             if (stampMatcher.find()) {
                 // Found it
@@ -156,7 +156,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
-                //We don't need to modify the cookies, but we need support for them
+                // We don't need to modify the cookies, but we need support for them
                 urlDownload.getCookieFromUrl();
 
                 String resolvedDOIPage = urlDownload.asString();
@@ -176,7 +176,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         // Download the HTML page containing a frame with the PDF
         URLDownload urlDownload = new URLDownload(BASE_URL + stampString);
-        //We don't need to modify the cookies, but we need support for them
+        // We don't need to modify the cookies, but we need support for them
         urlDownload.getCookieFromUrl();
 
         String framePage = urlDownload.asString();

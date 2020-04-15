@@ -39,7 +39,7 @@ public class BibEntryTableViewModel {
     }
 
     public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
-        return entry.getResolvedFieldOrAlias(field, database);
+        return entry.getResolvedFieldOrAliasLatexFree(field, database);
     }
 
     public ObjectBinding<String> getField(Field field) {

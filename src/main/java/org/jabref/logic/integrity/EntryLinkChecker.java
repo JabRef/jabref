@@ -18,7 +18,6 @@ public class EntryLinkChecker implements Checker {
 
     private final BibDatabase database;
 
-
     public EntryLinkChecker(BibDatabase database) {
         this.database = Objects.requireNonNull(database);
     }

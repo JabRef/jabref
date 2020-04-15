@@ -23,8 +23,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -79,15 +79,15 @@ public class PreviewPanel extends VBox {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
-                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+                    LOGGER.debug("Mode MOVE"); // shift on win or no modifier
                     fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); //alt on win
+                    LOGGER.debug("Node LINK"); // alt on win
                     fileLinker.addFilesToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
+                    LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
                     fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                 }
                 success = true;

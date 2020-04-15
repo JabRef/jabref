@@ -90,12 +90,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         if (autoCompleteBothProperty.getValue()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
             autoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else if (autoCompleteFirstLastProperty.getValue()) {
+        } else if (autoCompleteFirstLastProperty.getValue()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(true);
             autoCompletePreferences.setOnlyCompleteLastFirst(false);
-        }
-        else {
+        } else {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
             autoCompletePreferences.setOnlyCompleteLastFirst(true);
         }

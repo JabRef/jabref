@@ -300,7 +300,7 @@ public class Bootstrap {
             }
 
             // create call with arguments
-            //We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
+            // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
             cmdArray[0] = fOffice.getPath();
             cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");

@@ -93,7 +93,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         description.set(linkedFile.getDescription());
 
         if (linkedFile.isOnlineLink()) {
-            link.setValue(linkedFile.getLink()); //Might be an URL
+            link.setValue(linkedFile.getLink()); // Might be an URL
         } else {
             link.setValue(relativize(Paths.get(linkedFile.getLink())));
         }

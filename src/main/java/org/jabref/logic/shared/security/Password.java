@@ -23,7 +23,6 @@ public class Password {
     private final SecretKeySpec secretKey;
     private final IvParameterSpec ivSpec;
 
-
     /**
      * @param phrase Phrase which should be encrypted or decrypted
      * @param key Key which is used to improve symmetric encryption

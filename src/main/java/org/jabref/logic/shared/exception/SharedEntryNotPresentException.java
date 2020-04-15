@@ -9,7 +9,6 @@ public class SharedEntryNotPresentException extends Exception {
 
     private final BibEntry nonPresentBibEntry;
 
-
     public SharedEntryNotPresentException(BibEntry nonPresentbibEntry) {
         super("Required BibEntry is not present on shared database.");
         this.nonPresentBibEntry = nonPresentbibEntry;

@@ -49,6 +49,7 @@ public class PreferencesMigrations {
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
+        upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
     /**
@@ -188,7 +189,7 @@ public class PreferencesMigrations {
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
             }
-            //Pref node already exists do not migrate from previous version
+            // Pref node already exists do not migrate from previous version
             if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
                 return;
             }
@@ -246,7 +247,7 @@ public class PreferencesMigrations {
             String[] newStylePatterns = new String[] {"[bibtexkey]",
                                                       "[bibtexkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title",};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -275,7 +276,7 @@ public class PreferencesMigrations {
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefPreferences prefs) {
-        //LinkedHashSet because we want to retain the order and add new fields to the end
+        // LinkedHashSet because we want to retain the order and add new fields to the end
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
         keys.add("related");
@@ -298,6 +299,12 @@ public class PreferencesMigrations {
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.getPreviewStyle();
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
+        prefs.setPreviewStyle(migratedStyle);
+    }
+
+    static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.getPreviewStyle();
+        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}");
         prefs.setPreviewStyle(migratedStyle);
     }
 
