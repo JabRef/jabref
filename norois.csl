@@ -13,7 +13,7 @@
     <category field="geography"/>
     <issn>0029-182X</issn>
     <eissn>1760-8546</eissn>
-    <updated>2020-04-06T09:41:00+00:00</updated>
+    <updated>2020-04-14T10:19:50+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -32,7 +32,7 @@
     <choose>
       <if type="chapter paper-conference" match="any">
         <names variable="editor translator" delimiter=", " suffix=", ">
-          <name and="text" initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all" sort-separator=" "/>
           <et-al font-style="italic"/>
           <label form="short" prefix=" (" suffix=")"/>
         </names>
@@ -52,7 +52,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+      <name name-as-sort-order="all" and="text" sort-separator=" " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
       <et-al font-style="italic"/>
       <label form="short" prefix=" (" suffix=")"/>
       <substitute>
@@ -217,7 +217,7 @@
           <choose>
             <if type="article-journal article-magazine paper-conference" match="none">
               <group delimiter=", ">
-                <group delimiter=" : ">
+                <group delimiter=", ">
                   <text variable="publisher-place"/>
                   <text variable="publisher"/>
                 </group>
@@ -270,7 +270,7 @@
       <if type="bill legal_case legislation" match="none">
         <choose>
           <if variable="issued">
-            <group prefix=" (" suffix=")">
+            <group prefix=" ">
               <date variable="issued">
                 <date-part name="year"/>
               </date>
@@ -342,15 +342,11 @@
     <choose>
       <if type="article-journal article-magazine" match="any">
         <group delimiter=", " prefix=", ">
-          <group delimiter=" ">
-            <label variable="issue" form="symbol"/>
-            <text variable="issue"/>
-          </group>
           <group>
-            <label variable="volume" form="short"/>
             <text variable="volume" font-style="normal"/>
+            <text variable="issue" prefix="(" suffix=")"/>
           </group>
-          <group prefix=", " delimiter=", ">
+          <group delimiter=" ">
             <label variable="page" form="short"/>
             <text variable="page"/>
           </group>
@@ -486,7 +482,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort"/>
@@ -508,8 +504,10 @@
     <layout>
       <group suffix=".">
         <group delimiter=". ">
-          <text macro="author"/>
-          <text macro="issued"/>
+          <group delimiter=", ">
+            <text macro="author"/>
+            <text macro="issued"/>
+          </group>
           <text macro="title" prefix=" "/>
           <text macro="container"/>
         </group>
