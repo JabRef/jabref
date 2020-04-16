@@ -48,6 +48,10 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
+        // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
+        // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
+        // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
+        changeColumnVariableNamesFor51(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
@@ -308,6 +312,18 @@ public class PreferencesMigrations {
         prefs.setPreviewStyle(migratedStyle);
     }
 
+    static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
+        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
+        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        if (!oldColumnNames.isEmpty() && columnNames.isEmpty()) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, preferences.getStringList("columnNames"));
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, preferences.getStringList("columnWidths"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, preferences.getStringList("mainTableColumnSortTypes"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, preferences.getStringList("mainTableColumnSortOrder"));
+        }
+    }
+
     /**
      * The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0
      * the preferences store the type of the column too, so that the formerly hardwired columns like the graphic groups
@@ -316,8 +332,13 @@ public class PreferencesMigrations {
      *
      * Simple strings are by default parsed as a FieldColumn, so there is nothing to do there, but the formerly hard
      * wired columns need to be added.
+     *
+     * In 5.1 variable names in JabRefPreferences have changed to offer backward compatibility with pre 5.0 releases
+     * Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
+     * Since 5.1: mainTableColumnNames, mainTableColumnWidths, mainTableColumnSortTypes, mainTableColumnSortOrder
      */
     static void upgradeColumnPreferences(JabRefPreferences preferences) {
+        // Variable names have to be hardcoded here, since they are already changed in JabRefPreferences
         List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
         List<Double> columnWidths = preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS)
                                                .stream()
