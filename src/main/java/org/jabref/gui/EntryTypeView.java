@@ -188,6 +188,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     //Biblatex documentation is favored over the bibtex,
     //since bibtex is a subset of biblatex and biblatex is better documented.
     public static String getDescription(EntryType selectedType) {
+        //CHECKSTYLE:OFF
         if (selectedType instanceof StandardEntryType) {
             switch ((StandardEntryType) selectedType) {
                 case Article -> {
@@ -293,6 +294,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         } else {
             return "";
         }
+        //CHECKSTYLE:ON
+
     }
 
 }
