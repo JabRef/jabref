@@ -111,7 +111,6 @@ public class TemplateExporter extends Exporter {
         this.savePreferences = savePreferences;
     }
 
-
     /**
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.

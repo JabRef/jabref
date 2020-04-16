@@ -14,7 +14,6 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final String oldValue;
     private int delta = 0;
 
-
     /**
      * @param bibEntry  Affected BibEntry object
      * @param field Name of field which has been changed

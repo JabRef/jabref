@@ -116,7 +116,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new PersistenceVisualStateTable(this, Globals.prefs);
 
         // TODO: Float marked entries
-        //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
+        // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
 
@@ -242,8 +242,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        //The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
-        //It doesn't work without
+        // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
+        // It doesn't work without
         ClipboardContent content = new ClipboardContent();
         Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
         content.put(DragAndDropDataFormats.ENTRIES, "");
@@ -275,15 +275,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
                         case LINK:
-                            LOGGER.debug("Mode LINK"); //shift on win or no modifier
+                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
                             importHandler.getLinker().addFilesToEntry(entry, files);
                             break;
                         case MOVE:
-                            LOGGER.debug("Mode MOVE"); //alt on win
+                            LOGGER.debug("Mode MOVE"); // alt on win
                             importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
                             break;
                         case COPY:
-                            LOGGER.debug("Mode Copy"); //ctrl on win
+                            LOGGER.debug("Mode Copy"); // ctrl on win
                             importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
                             break;
                     }

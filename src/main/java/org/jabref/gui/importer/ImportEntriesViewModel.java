@@ -236,7 +236,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 // TODO: Remove old entry. Or... add it to a list of entries
                 // to be deleted. We only delete
                 // it after Ok is clicked.
-                //entriesToDelete.add(other.get());
+                // entriesToDelete.add(other.get());
 
                 // Replace entry by merged entry
                 entries.add(dialog.getMergedEntry());

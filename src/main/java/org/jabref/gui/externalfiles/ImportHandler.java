@@ -72,7 +72,7 @@ public class ImportHandler {
                 // First try xmp import, if empty try pdf import, otherwise create empty entry
                 if (!xmpEntriesInFile.isEmpty()) {
                     if (!pdfResult.isEmpty()) {
-                        //FIXME: Show merge dialog?
+                        // FIXME: Show merge dialog?
                         entriesToAdd = xmpEntriesInFile;
                     } else {
                         entriesToAdd = xmpEntriesInFile;
@@ -105,8 +105,8 @@ public class ImportHandler {
     }
 
     public void importEntries(List<BibEntry> entries) {
-        //TODO: Add undo/redo
-        //undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
+        // TODO: Add undo/redo
+        // undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
 
         database.getDatabase().insertEntries(entries);
 
@@ -128,10 +128,10 @@ public class ImportHandler {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) node.getGroup();
                 List<FieldChange> undo = entryChanger.add(entries);
                 // TODO: Add undo
-                //if (!undo.isEmpty()) {
+                // if (!undo.isEmpty()) {
                 //    ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
                 //            undo));
-                //}
+                // }
             }
         }
     }

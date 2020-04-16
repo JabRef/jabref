@@ -70,7 +70,7 @@ public class ImportAction {
             // TODO: show parserwarnings, if any (not here)
             // for (ImportFormatReader.UnknownFormatImport p : imports) {
             //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
-            //}
+            // }
             if (bibtexResult.isEmpty()) {
                 if (importError == null) {
                     // TODO: No control flow using exceptions

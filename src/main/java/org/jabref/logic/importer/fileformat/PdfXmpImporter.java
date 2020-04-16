@@ -21,7 +21,6 @@ public class PdfXmpImporter extends Importer {
 
     private final XmpPreferences xmpPreferences;
 
-
     public PdfXmpImporter(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
     }

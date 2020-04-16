@@ -8,7 +8,6 @@ public class UndefinedParagraphFormatException extends Exception {
 
     private final String formatName;
 
-
     public UndefinedParagraphFormatException(String formatName) {
         super();
         this.formatName = formatName;

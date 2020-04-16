@@ -149,9 +149,7 @@ public abstract class SuggestionProvider<T> implements Callback<ISuggestionReque
 
             // In case no stringConverter was provided, use the default strategy
             if (this.stringConverter == null) {
-                this.stringConverter = obj -> {
-                    return obj != null ? obj.toString() : ""; //$NON-NLS-1$
-                };
+                this.stringConverter = obj -> obj != null ? obj.toString() : "";
             }
         }
 

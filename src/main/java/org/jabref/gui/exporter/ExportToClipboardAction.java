@@ -67,7 +67,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                         .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensions()))
                                                         .collect(Collectors.toList());
 
-        //Find default choice, if any
+        // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
                                           .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
                                           .findAny()
@@ -88,7 +88,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
 
-        //Add chosen export type to last used pref, to become default
+        // Add chosen export type to last used pref, to become default
         Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());
 
         Path tmp = null;
