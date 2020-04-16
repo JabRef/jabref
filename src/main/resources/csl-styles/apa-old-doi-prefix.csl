@@ -85,6 +85,14 @@
       <term name="et-al">et al.</term>
     </terms>
   </locale>
+  <locale xml:lang="fr">
+    <terms>
+      <term name="editor" form="short">
+        <single>éd.</single>
+        <multiple>éds.</multiple>
+      </term>
+    </terms>
+  </locale>
   <macro name="container-contributors-booklike">
     <choose>
       <if variable="container-title">

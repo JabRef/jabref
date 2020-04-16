@@ -94,6 +94,9 @@
       <if type="book chapter" match="any">
         <text variable="ISBN" prefix=" ISBN "/>
       </if>
+      <else-if type="article-journal">
+        <text variable="DOI" prefix=", doi:"/>
+      </else-if>
     </choose>
   </macro>
   <citation collapse="citation-number">
