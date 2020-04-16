@@ -26,6 +26,8 @@ case "$1" in
 		        rm $NATIVE_MESSAGING_JSON
 		    fi
 		done
+		rm /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
+		rm /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
     ;;
 
     *)
