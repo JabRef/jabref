@@ -15,10 +15,12 @@ import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
@@ -42,17 +44,23 @@ public class ExportToClipboardAction extends SimpleCommand {
     private BasePanel panel;
     private final List<BibEntry> entries = new ArrayList<>();
     private final ExporterFactory exporterFactory;
+    private final ClipBoardManager clipBoardManager;
+    private final TaskExecutor taskExecutor;
 
-    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory) {
+    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
+        this.clipBoardManager = clipBoardManager;
+        this.taskExecutor = taskExecutor;
     }
 
-    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory) {
+    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
+        this.clipBoardManager = clipBoardManager;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -83,8 +91,10 @@ public class ExportToClipboardAction extends SimpleCommand {
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                                                              .onSuccess(this::setContentToClipboard)
                                                              .onFailure(ex -> {
-                                                                 /* swallow as already logged */ })
-                                                             .executeWith(Globals.TASK_EXECUTOR));
+                                                                 LOGGER.error("Error exporting to clipboard", ex);
+                                                                 dialogService.showErrorDialogAndWait("Error exporting to clipboard", ex);
+                                                             })
+                                                             .executeWith(taskExecutor));
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
@@ -114,9 +124,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(readFileToString(tmp), exporter.getFileType());
-        } catch (Exception e) {
-            LOGGER.error("Error exporting to clipboard", e);
-            throw new Exception("Rethrow ", e);
+
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -140,7 +148,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             clipboardContent.putRtf(result.content);
         }
         clipboardContent.putString(result.content);
-        Globals.clipboardManager.setContent(clipboardContent);
+        this.clipBoardManager.setContent(clipboardContent);
 
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
 
