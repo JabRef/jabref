@@ -79,7 +79,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty autoAssignGroupProperty() { return autoAssignGroupProperty; }
 
-    public BooleanProperty displayGroupCount() { return displayGroupCountProperty;}
+    public BooleanProperty displayGroupCount() { return displayGroupCountProperty; }
 
     public StringProperty defaultGroupingFieldProperty() { return defaultGroupingFieldProperty; }
 

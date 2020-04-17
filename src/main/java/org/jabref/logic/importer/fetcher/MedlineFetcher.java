@@ -64,7 +64,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     /**
-     * When using 'esearch.fcgi?db=<database>&term=<query>' we will get a list of IDs matching the query.
+     * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
      * Input: Any text query (&term)
      * Output: List of UIDs matching the query
      *
@@ -106,7 +106,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                     break;
 
                 case XMLStreamConstants.END_ELEMENT:
-                    //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+                    // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
                     if (streamReader.getName().toString().equals("IdList")) {
                         break fetchLoop;
                     }
@@ -166,7 +166,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } else {
             String searchTerm = replaceCommaWithAND(query);
 
-            //searching for pubmed ids matching the query
+            // searching for pubmed ids matching the query
             List<String> idList = getPubMedIdsFromQuery(searchTerm);
 
             if (idList.isEmpty()) {
@@ -178,7 +178,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                         numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
-            //pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
             entryList = fetchMedline(idList);
 
             return entryList;
@@ -204,7 +204,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
      */
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
-            //Separate the IDs with a comma to search multiple entries
+            // Separate the IDs with a comma to search multiple entries
             URL fetchURL = getURLForID(String.join(",", ids));
             URLConnection data = fetchURL.openConnection();
             ParserResult result = new MedlineImporter().importDatabase(

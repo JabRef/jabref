@@ -75,7 +75,7 @@ public class MedlinePlainImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
 
-        //use optional here, so that no exception will be thrown if the file is empty
+        // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
@@ -146,7 +146,7 @@ public class MedlinePlainImporter extends Importer {
                     }
                 }
 
-                //store the fields in a map
+                // store the fields in a map
                 Map<String, Field> hashMap = new HashMap<>();
                 hashMap.put("PG", StandardField.PAGES);
                 hashMap.put("PL", StandardField.ADDRESS);
@@ -172,7 +172,7 @@ public class MedlinePlainImporter extends Importer {
                 hashMap.put("OTO", new UnknownField("termowner"));
                 hashMap.put("OWN", InternalField.OWNER);
 
-                //add the fields to hm
+                // add the fields to hm
                 for (Map.Entry<String, Field> mapEntry : hashMap.entrySet()) {
                     String medlineKey = mapEntry.getKey();
                     Field bibtexKey = mapEntry.getValue();
@@ -256,9 +256,9 @@ public class MedlinePlainImporter extends Importer {
     private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
             Field key = StandardField.ISSN;
-            //it is possible to have two issn, one for electronic and for print
-            //if there are two then it comes at the end in brackets (electronic) or (print)
-            //so search for the brackets
+            // it is possible to have two issn, one for electronic and for print
+            // if there are two then it comes at the end in brackets (electronic) or (print)
+            // so search for the brackets
             if (value.indexOf('(') > 0) {
                 int keyStart = value.indexOf('(');
                 int keyEnd = value.indexOf(')');
@@ -342,10 +342,10 @@ public class MedlinePlainImporter extends Importer {
     private void addAbstract(Map<Field, String> hm, String lab, String value) {
         String abstractValue = "";
         if ("AB".equals(lab)) {
-            //adds copyright information that comes at the end of an abstract
+            // adds copyright information that comes at the end of an abstract
             if (value.contains("Copyright")) {
                 int copyrightIndex = value.lastIndexOf("Copyright");
-                //remove the copyright from the field since the name of the field is copyright
+                // remove the copyright from the field since the name of the field is copyright
                 String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
                 hm.put(new UnknownField("copyright"), copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);

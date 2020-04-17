@@ -10,7 +10,6 @@ public class NamedCompound extends CompoundEdit {
     private final String name;
     private boolean hasEdits;
 
-
     public NamedCompound(String name) {
         super();
         this.name = name;

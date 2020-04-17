@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 class CustomEntryTypePreferenceMigration {
 
-    //non-default preferences
+    // non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";

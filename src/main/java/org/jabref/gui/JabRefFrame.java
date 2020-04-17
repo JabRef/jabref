@@ -293,7 +293,7 @@ public class JabRefFrame extends BorderPane {
 
         // no database open
         if (panel == null) {
-            //setTitle(FRAME_TITLE);
+            // setTitle(FRAME_TITLE);
             return;
         }
 
@@ -307,9 +307,9 @@ public class JabRefFrame extends BorderPane {
                                        .getDatabasePath()
                                        .map(Path::toString)
                                        .orElse(Localization.lang("untitled"));
-            //setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
+            // setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            //setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
+            // setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
             //        + Localization.lang("shared") + "]" + modeInfo);
         }
     }
@@ -343,7 +343,7 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
+        // prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             // Here we store the names of all current files. If
@@ -554,10 +554,10 @@ public class JabRefFrame extends BorderPane {
 
         initDragAndDrop();
 
-        //setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        //WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        // setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
+        // WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
         //        JabRefPreferences.SIZE_Y);
-        //pw.displayWindowAtStoredLocation();
+        // pw.displayWindowAtStoredLocation();
 
         // Bind global state
         stateManager.activeDatabaseProperty().bind(
@@ -595,9 +595,9 @@ public class JabRefFrame extends BorderPane {
             stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
 
             // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            //previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            //generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            //openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+            // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+            // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
+            // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
 
             setWindowTitle();
             // Update search autocompleter with information for the correct database:
@@ -743,7 +743,7 @@ public class JabRefFrame extends BorderPane {
             );
         }
 
-        //@formatter:off
+        // @formatter:off
         library.getItems().addAll(
                 factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
                 factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
@@ -831,7 +831,7 @@ public class JabRefFrame extends BorderPane {
 
                     new SeparatorMenuItem(),
 
-                    factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction()),
+                    factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, prefs)),
                     factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(this, stateManager)),
                     factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
             );
@@ -883,7 +883,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
         );
 
-        //@formatter:on
+        // @formatter:on
         MenuBar menu = new MenuBar();
         menu.getStyleClass().add("mainMenu");
         menu.getMenus().addAll(

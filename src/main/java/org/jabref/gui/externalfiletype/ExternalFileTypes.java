@@ -17,7 +17,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-//Do not make this class final, as it otherwise can't be mocked for tests
+// Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type
@@ -56,7 +56,7 @@ public class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByName(String name) {
-        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getExtension().equals(name)).findFirst();
+        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getName().equals(name)).findFirst();
         if (externalFileType.isPresent()) {
             return externalFileType;
         }

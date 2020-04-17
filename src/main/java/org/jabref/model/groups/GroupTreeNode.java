@@ -116,7 +116,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot() && (originalContext
                 != GroupHierarchyType.INCLUDING)) {
-            //noinspection OptionalGetWithoutIsPresent
+            // noinspection OptionalGetWithoutIsPresent
             searchRule.addRule(getParent().get().getSearchMatcher(originalContext));
         }
         return searchRule;

@@ -21,7 +21,7 @@ public enum KeyBinding {
     COPY_BIBTEX_KEY_AND_LINK("Copy BibTeX key and link", Localization.lang("Copy BibTeX key and link"), "ctrl+alt+K", KeyBindingCategory.EDIT),
     COPY_PREVIEW("Copy preview", Localization.lang("Copy preview"), "ctrl+shift+C", KeyBindingCategory.VIEW),
     CUT("Cut", Localization.lang("Cut"), "ctrl+X", KeyBindingCategory.EDIT),
-    //We have to put Entry Editor Previous before, because otherwise the decrease font size is found first
+    // We have to put Entry Editor Previous before, because otherwise the decrease font size is found first
     ENTRY_EDITOR_PREVIOUS_PANEL_2("Entry editor, previous panel 2", Localization.lang("Entry editor, previous panel 2"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
     DEFAULT_DIALOG_ACTION("Execute default action in dialog", Localization.lang("Execute default action in dialog"), "ctrl+ENTER", KeyBindingCategory.VIEW),

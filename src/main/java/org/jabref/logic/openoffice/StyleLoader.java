@@ -83,7 +83,7 @@ public class StyleLoader {
         for (String filename : lists) {
             try {
                 OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
-                if (style.isValid()) { //Problem!
+                if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {
                     LOGGER.error(String.format("Style with filename %s is invalid", filename));

@@ -102,7 +102,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     public static String cleanKey(String key, boolean enforceLegalKey) {
-        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s","");
+        return removeUnwantedCharacters(key, enforceLegalKey).replaceAll("\\s", "");
     }
 
     public String generateKey(BibEntry entry) {
@@ -157,7 +157,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         }
 
         String oldKey = entry.getCiteKeyOptional().orElse(null);
-        int occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(key);
+        long occurrences = database.getNumberOfKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -178,7 +178,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
                 moddedKey = key + getAppendix(number);
                 number++;
 
-                occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
                 // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;

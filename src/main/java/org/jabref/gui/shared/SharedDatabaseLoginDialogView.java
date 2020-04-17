@@ -60,7 +60,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
         ControlHelper.setAction(connectButton, this.getDialogPane(), event -> openDatabase());
         Button btnConnect = (Button) this.getDialogPane().lookupButton(connectButton);
-        //must be set here, because in initialize the button is still null
+        // must be set here, because in initialize the button is still null
         btnConnect.disableProperty().bind(viewModel.formValidation().validProperty().not());
         btnConnect.textProperty().bind(EasyBind.map(viewModel.loadingProperty(), loading -> (loading) ? Localization.lang("Connecting...") : Localization.lang("Connect")));
     }
@@ -103,7 +103,7 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
         passwordKeystore.disableProperty().bind(viewModel.useSSLProperty().not());
         passwordKeystore.textProperty().bindBidirectional(viewModel.keyStorePasswordProperty());
 
-        //Must be executed after the initialization of the view, otherwise it doesn't work
+        // Must be executed after the initialization of the view, otherwise it doesn't work
         Platform.runLater(() -> {
             visualizer.initVisualization(viewModel.dbValidation(), database, true);
             visualizer.initVisualization(viewModel.hostValidation(), host, true);

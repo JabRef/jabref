@@ -42,9 +42,7 @@ public class RTFChars implements LayoutFormatter {
             if (escaped && (c == '\\')) {
                 sb.append('\\');
                 escaped = false;
-            }
-
-            else if (c == '\\') {
+            } else if (c == '\\') {
                 escaped = true;
                 incommand = true;
                 currentCommand = new StringBuilder();

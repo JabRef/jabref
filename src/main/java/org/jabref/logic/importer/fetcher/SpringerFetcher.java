@@ -160,7 +160,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         uriBuilder.addParameter("q", query); // Search query
         uriBuilder.addParameter("api_key", API_KEY); // API key
         uriBuilder.addParameter("p", "20"); // Number of results to return
-        //uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
+        // uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
         return uriBuilder.build().toURL();
     }
 
