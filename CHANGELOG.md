@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
 - We fixed an issue with incompatible characters at BibTeX-Key [#6257](https://github.com/JabRef/jabref/issues/6257)
+- We fixed an issue with incompatible characters at BibTeX key [#6257](https://github.com/JabRef/jabref/issues/6257)
 - We fixed an issue where dash (`-`) was reported as illegal BibTeX key [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We greatly improved the performance of the overall application and many operations. [#5071](https://github.com/JabRef/jabref/issues/5071)
 - We fixed an issue where sort by priority was broken. [#6222](https://github.com/JabRef/jabref/issues/6222)
