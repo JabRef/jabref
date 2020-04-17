@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
@@ -368,7 +367,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                new JournalAbbreviationRepository(), true, false)
                 .checkDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -408,7 +407,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                new JournalAbbreviationRepository(), true, false)
                 .checkDatabase();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -417,7 +416,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
+                new JournalAbbreviationRepository(), true, false
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
@@ -426,7 +425,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                new JournalAbbreviationRepository(), true,
                 allowIntegerEdition
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);

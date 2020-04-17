@@ -1,18 +1,17 @@
 package org.jabref.logic.journals;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.jabref.model.strings.StringUtil;
@@ -33,32 +32,20 @@ public class AbbreviationParser {
 
     public void readJournalListFromResource(String resourceFileName) {
         try {
-            URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
-            readJournalList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
+            InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
+            readJournalList(new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)));
         } catch (IOException e) {
-            LOGGER.info(String.format("Could not read journal list from file %s", resourceFileName), e);
+            LOGGER.error(String.format("Could not read journal list from file %s", resourceFileName), e);
         }
     }
 
-    public void readJournalListFromFile(File file) throws FileNotFoundException {
-        try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
-             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(StandardCharsets.UTF_8))) {
-            readJournalList(reader);
-        } catch (FileNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            LOGGER.warn(String.format("Could not read journal list from file %s", file.getAbsolutePath()), e);
-        }
+    public void readJournalListFromFile(Path file) throws IOException {
+        readJournalListFromFile(file, StandardCharsets.UTF_8);
     }
 
-    public void readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
-        try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
-             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
+    public void readJournalListFromFile(Path file, Charset encoding) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(file, encoding)) {
             readJournalList(reader);
-        } catch (FileNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            LOGGER.warn(String.format("Could not read journal list from file %s", file.getAbsolutePath()), e);
         }
     }
 
@@ -68,7 +55,7 @@ public class AbbreviationParser {
      *
      * @param reader a given file into a Reader object
      */
-    private void readJournalList(Reader reader) {
+    private void readJournalList(Reader reader) throws IOException {
         try (CSVParser csvParser = new CSVParser(reader, AbbreviationFormat.getCSVFormat())) {
             for (CSVRecord csvRecord : csvParser) {
                 String name = csvRecord.size() > 0 ? csvRecord.get(0) : StringUtil.EMPTY;
@@ -82,8 +69,6 @@ public class AbbreviationParser {
 
                 abbreviations.add(new Abbreviation(name, abbreviation, shortestUniqueAbbreviation));
             }
-        } catch (IOException ex) {
-            LOGGER.info("Could not read journal list from file ", ex);
         }
     }
 

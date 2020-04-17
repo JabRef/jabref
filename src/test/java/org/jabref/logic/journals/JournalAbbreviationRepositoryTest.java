@@ -6,20 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JournalAbbreviationRepositoryTest {
+class JournalAbbreviationRepositoryTest {
 
     @Test
-    public void empty() {
+    void empty() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        assertTrue(repository.getAbbreviations().isEmpty());
+        assertTrue(repository.getCustomAbbreviations().isEmpty());
     }
 
     @Test
-    public void oneElement() {
+    void oneElement() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N."));
-        assertEquals(1, repository.size());
-        assertFalse(repository.getAbbreviations().isEmpty());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
+        assertEquals(1, repository.getCustomAbbreviations().size());
 
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
@@ -42,11 +41,10 @@ public class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    public void oneElementWithShortestUniqueAbbreviation() {
+    void oneElementWithShortestUniqueAbbreviation() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N.", "LN"));
-        assertEquals(1, repository.size());
-        assertFalse(repository.getAbbreviations().isEmpty());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
+        assertEquals(1, repository.getCustomAbbreviations().size());
 
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("UNKNOWN", repository.getDefaultAbbreviation("?").orElse("UNKNOWN"));
@@ -71,59 +69,59 @@ public class JournalAbbreviationRepositoryTest {
     }
 
     @Test
-    public void testDuplicates() {
+    void testDuplicates() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N."));
-        repository.addEntry(new Abbreviation("Long Name", "L. N."));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
+        assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    public void testDuplicatesWithShortestUniqueAbbreviation() {
+    void testDuplicatesWithShortestUniqueAbbreviation() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N.", "LN"));
-        repository.addEntry(new Abbreviation("Long Name", "L. N.", "LN"));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
+        assertEquals(1, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    public void testDuplicatesIsoOnly() {
+    void testDuplicatesIsoOnly() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Old Long Name", "L. N."));
-        repository.addEntry(new Abbreviation("New Long Name", "L. N."));
-        assertEquals(2, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N."));
+        repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N."));
+        assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    public void testDuplicatesIsoOnlyWithShortestUniqueAbbreviation() {
+    void testDuplicatesIsoOnlyWithShortestUniqueAbbreviation() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Old Long Name", "L. N.", "LN"));
-        repository.addEntry(new Abbreviation("New Long Name", "L. N.", "LN"));
-        assertEquals(2, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N.", "LN"));
+        repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N.", "LN"));
+        assertEquals(2, repository.getCustomAbbreviations().size());
     }
 
     @Test
-    public void testDuplicateKeys() {
+    void testDuplicateKeys() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N."));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
+        assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
 
-        repository.addEntry(new Abbreviation("Long Name", "LA. N."));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "LA. N."));
+        assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("LA. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
     }
 
     @Test
-    public void testDuplicateKeysWithShortestUniqueAbbreviation() {
+    void testDuplicateKeysWithShortestUniqueAbbreviation() {
         JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-        repository.addEntry(new Abbreviation("Long Name", "L. N.", "LN"));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
+        assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("LN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
 
-        repository.addEntry(new Abbreviation("Long Name", "LA. N.", "LAN"));
-        assertEquals(1, repository.size());
+        repository.addCustomAbbreviation(new Abbreviation("Long Name", "LA. N.", "LAN"));
+        assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("LA. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("LAN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
     }

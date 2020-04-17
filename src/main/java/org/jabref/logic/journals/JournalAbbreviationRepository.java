@@ -1,24 +1,28 @@
 package org.jabref.logic.journals;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
+
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
 
-    // We have over 15.000 abbreviations in the built-in lists
-    private final Set<Abbreviation> abbreviations = new HashSet<>(16000);
+    private final MVMap<String, String> fullToAbbreviation;
+    private final MVMap<String, String> abbreviationToFull;
+    private final List<Abbreviation> customAbbreviations;
 
-    public JournalAbbreviationRepository(Abbreviation... abbreviations) {
-        for (Abbreviation abbreviation : abbreviations) {
-            addEntry(abbreviation);
-        }
+    public JournalAbbreviationRepository() {
+        MVStore store = new MVStore.Builder().readOnly().fileName("journalList.mv").open();
+        this.fullToAbbreviation = store.openMap("FullToAbbreviation");
+        this.abbreviationToFull = store.openMap("AbbreviationToFull");
+        this.customAbbreviations = new ArrayList<>();
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -36,16 +40,19 @@ public class JournalAbbreviationRepository {
         return isAbbreviated && !isExpanded;
     }
 
-    public int size() {
-        return abbreviations.size();
-    }
-
     /**
      * Returns true if the given journal name is contained in the list either in its full form (e.g Physical Review
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        return abbreviations.stream().anyMatch(abbreviation -> isMatched(journalName.trim(), abbreviation));
+        String journal = journalName.trim();
+
+        boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
+        if (isKnown) {
+            return true;
+        }
+
+        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal);
     }
 
     /**
@@ -53,7 +60,14 @@ public class JournalAbbreviationRepository {
      * i.e. journals whose abbreviation is the same as the full name are not considered
      */
     public boolean isAbbreviatedName(String journalName) {
-        return abbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journalName.trim(), abbreviation));
+        String journal = journalName.trim();
+
+        boolean isAbbreviated = customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation));
+        if (isAbbreviated) {
+            return true;
+        }
+
+        return abbreviationToFull.containsKey(journal);
     }
 
     /**
@@ -63,23 +77,33 @@ public class JournalAbbreviationRepository {
      * @return The abbreviated name
      */
     public Optional<Abbreviation> getAbbreviation(String journalName) {
-        return abbreviations.stream().filter(abbreviation -> isMatched(journalName.trim(), abbreviation)).findFirst();
+        String journal = journalName.trim();
+
+        Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
+                                                                       .filter(abbreviation -> isMatched(journal, abbreviation))
+                                                                       .findAny();
+        if (customAbbreviation.isPresent()) {
+            return customAbbreviation;
+        }
+
+        return Optional.ofNullable(fullToAbbreviation.get(journal))
+                       .map(abbreviation -> new Abbreviation(journal, abbreviation));
     }
 
-    public void addEntry(Abbreviation abbreviation) {
+    public void addCustomAbbreviation(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
 
-        // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
-        abbreviations.remove(abbreviation);
-        abbreviations.add(abbreviation);
+        // We do not want to keep duplicates, thus remove the old abbreviation
+        customAbbreviations.remove(abbreviation);
+        customAbbreviations.add(abbreviation);
     }
 
-    public void addEntries(Collection<Abbreviation> abbreviationsToAdd) {
-        abbreviationsToAdd.forEach(this::addEntry);
+    public List<Abbreviation> getCustomAbbreviations() {
+        return customAbbreviations;
     }
 
-    public Set<Abbreviation> getAbbreviations() {
-        return Collections.unmodifiableSet(abbreviations);
+    public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
+        abbreviationsToAdd.forEach(this::addCustomAbbreviation);
     }
 
     public Optional<String> getNextAbbreviation(String text) {

@@ -1,6 +1,5 @@
 package org.jabref.gui.journals;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -183,7 +182,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         if (abbreviationsFile.exists()) {
             try {
                 abbreviationsFile.readAbbreviations();
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 logger.debug(e.getLocalizedMessage());
             }
         }

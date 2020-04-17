@@ -9,7 +9,7 @@ public class ShippedJournalAbbreviationDuplicateTest {
     @Test
     public void noDuplicatesInShippedIEEEOfficialJournalAbbreviations() {
         JournalAbbreviationRepository repoBuiltIn = new JournalAbbreviationRepository();
-        repoBuiltIn.addEntries(JournalAbbreviationLoader.getBuiltInAbbreviations());
+        repoBuiltIn.addCustomAbbreviations(JournalAbbreviationLoader.getBuiltInAbbreviations());
 
         JournalAbbreviationLoader.getOfficialIEEEAbbreviations().parallelStream().forEach(abbreviation -> {
             assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
@@ -21,7 +21,7 @@ public class ShippedJournalAbbreviationDuplicateTest {
     @Test
     public void noDuplicatesInShippedIEEEStandardJournalAbbreviations() {
         JournalAbbreviationRepository repoBuiltIn = new JournalAbbreviationRepository();
-        repoBuiltIn.addEntries(JournalAbbreviationLoader.getBuiltInAbbreviations());
+        repoBuiltIn.addCustomAbbreviations(JournalAbbreviationLoader.getBuiltInAbbreviations());
 
         JournalAbbreviationLoader.getStandardIEEEAbbreviations().parallelStream().forEach(abbreviation -> {
             assertFalse(repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent(), "duplicate name " + abbreviation.toString());
