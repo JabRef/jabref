@@ -72,7 +72,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                    .withOnMouseClickedEvent(this::handleItemMouseClick)
                    .setOnDragDetected(this::handleOnDragDetected)
                    .setOnDragDropped(this::handleOnDragDropped)
-                   .setOnDragOver(this::handleOnDragOver);
+                   .setOnDragOver(this::handleOnDragOver)
+                   .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
 
