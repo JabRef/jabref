@@ -71,7 +71,6 @@ public class CustomizeGeneralFieldsDialogViewModel {
         }
 
         preferences.storeEntryEditorTabList(customTabsMap);
-        preferences.updateEntryEditorTabList();
     }
 
     public void resetFields() {

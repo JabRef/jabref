@@ -2038,6 +2038,8 @@ public class JabRefPreferences implements PreferencesService {
 
         purgeSeries(CUSTOM_TAB_NAME, customTabs.size());
         purgeSeries(CUSTOM_TAB_FIELDS, customTabs.size());
+
+        updateEntryEditorTabList();
     }
 
     /**
@@ -2117,17 +2119,17 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
-        AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.BOTH;
+        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
         if (getBoolean(AUTOCOMPLETER_LAST_FIRST)) {
-            onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST;
+            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
         } else if (getBoolean(AUTOCOMPLETER_FIRST_LAST)) {
-            onlyCompleteNameFormat = AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST;
+            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
         }
 
         return new AutoCompletePreferences(
                 getBoolean(AUTO_COMPLETE),
                 AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
-                onlyCompleteNameFormat,
+                nameFormat,
                 getStringList(AUTOCOMPLETER_COMPLETE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
                 getJournalAbbreviationPreferences());
     }
@@ -2138,10 +2140,10 @@ public class JabRefPreferences implements PreferencesService {
         put(AUTOCOMPLETER_FIRSTNAME_MODE, preferences.getFirstNameMode().name());
         putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, preferences.getCompleteFields().stream().map(Field::getName).collect(Collectors.toList()));
 
-        if (preferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.BOTH) {
+        if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.BOTH) {
             putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
             putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
-        } else if (preferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST) {
+        } else if (preferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
             putBoolean(AUTOCOMPLETER_LAST_FIRST, true);
             putBoolean(AUTOCOMPLETER_FIRST_LAST, false);
         } else {

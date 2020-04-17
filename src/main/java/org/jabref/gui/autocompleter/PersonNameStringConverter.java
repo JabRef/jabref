@@ -18,7 +18,7 @@ public class PersonNameStringConverter extends StringConverter<Author> {
     }
 
     public PersonNameStringConverter(AutoCompletePreferences preferences) {
-        switch (preferences.getOnlyCompleteNameFormat()) {
+        switch (preferences.getNameFormat()) {
             case FIRST_LAST:
                 autoCompFF = true;
                 autoCompLF = false;

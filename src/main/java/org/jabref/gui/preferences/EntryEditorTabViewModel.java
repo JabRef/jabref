@@ -46,8 +46,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        // ToDo: Include EntryEditorFieldsEditor in PreferencesDialog
-        // unused: initialEntryEditorPreferences.getEntryEditorTabList();
+        // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
+        // therefore yet unused: initialEntryEditorPreferences.getEntryEditorTabList();
 
         openOnNewEntryProperty.setValue(initialEntryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(initialEntryEditorPreferences.showSourceTabByDefault());
@@ -59,9 +59,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
 
-        if (initialAutoCompletePreferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST) {
+        if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.FIRST_LAST) {
             autoCompleteFirstLastProperty.setValue(true);
-        } else if (initialAutoCompletePreferences.getOnlyCompleteNameFormat() == AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST) {
+        } else if (initialAutoCompletePreferences.getNameFormat() == AutoCompletePreferences.NameFormat.LAST_FIRST) {
             autoCompleteLastFirstProperty.setValue(true);
         } else {
             autoCompleteBothProperty.setValue(true);
@@ -92,11 +92,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 enableValidationProperty.getValue()));
 
         // default
-        AutoCompletePreferences.onlyCompleteNameFormat nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.BOTH;
+        AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
         if (autoCompleteFirstLastProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.FIRST_LAST;
+            nameFormat = AutoCompletePreferences.NameFormat.FIRST_LAST;
         } else if (autoCompleteLastFirstProperty.getValue()) {
-            nameFormat = AutoCompletePreferences.onlyCompleteNameFormat.LAST_FIRST;
+            nameFormat = AutoCompletePreferences.NameFormat.LAST_FIRST;
         }
 
         // default: AutoCompleteFirstNameMode.BOTH

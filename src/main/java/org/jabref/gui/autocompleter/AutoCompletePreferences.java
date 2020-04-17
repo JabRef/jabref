@@ -8,20 +8,20 @@ import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
-    public enum onlyCompleteNameFormat {
+    public enum NameFormat {
         LAST_FIRST, FIRST_LAST, BOTH
     }
 
-    private boolean shouldAutoComplete;
-    private AutoCompleteFirstNameMode firstNameMode;
-    private AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat;
-    private Set<Field> completeFields;
+    private final boolean shouldAutoComplete;
+    private final AutoCompleteFirstNameMode firstNameMode;
+    private final NameFormat nameFormat;
+    private final Set<Field> completeFields;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, AutoCompletePreferences.onlyCompleteNameFormat onlyCompleteNameFormat, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, NameFormat nameFormat, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
-        this.onlyCompleteNameFormat = onlyCompleteNameFormat;
+        this.nameFormat = nameFormat;
         this.completeFields = completeFields;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
     }
@@ -37,7 +37,7 @@ public class AutoCompletePreferences {
         return firstNameMode;
     }
 
-    public AutoCompletePreferences.onlyCompleteNameFormat getOnlyCompleteNameFormat() { return onlyCompleteNameFormat; }
+    public NameFormat getNameFormat() { return nameFormat; }
 
     /**
      * Returns the list of fields for which autocomplete is enabled
