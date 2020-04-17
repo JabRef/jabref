@@ -1174,7 +1174,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
      *
-     * @param owPrefs
+     * @param owPrefs The custom preferences to overwrite the currently present
      */
     public void overwritePreferences(JabRefPreferences owPrefs) {
         singleton = owPrefs;

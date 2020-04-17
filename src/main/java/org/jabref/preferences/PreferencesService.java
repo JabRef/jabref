@@ -159,7 +159,7 @@ public interface PreferencesService {
 
     List<Field> getAllDefaultTabFieldNames();
 
-    void storeEntryEditorTabList(Map<String,Set<Field>> customTabsMap);
+    void storeEntryEditorTabList(Map<String, Set<Field>> customTabsMap);
 
     EntryEditorPreferences getEntryEditorPreferences();
 
