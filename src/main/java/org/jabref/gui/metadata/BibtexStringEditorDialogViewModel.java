@@ -23,7 +23,7 @@ import org.jabref.model.entry.BibtexString;
 import org.fxmisc.easybind.EasyBind;
 
 public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
-    private static final String NEW_STRING_LABEL = "New String";
+    private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces
 
     private final ListProperty<BibtexStringEditorItemModel> stringsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
