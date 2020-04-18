@@ -678,11 +678,13 @@ jlink {
         if (OperatingSystem.current().isMacOsX()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
-                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
+                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
         }
     }
