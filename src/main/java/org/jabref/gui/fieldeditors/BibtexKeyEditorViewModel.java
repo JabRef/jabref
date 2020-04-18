@@ -3,7 +3,7 @@ package org.jabref.gui.fieldeditors;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -18,7 +18,7 @@ public class BibtexKeyEditorViewModel extends AbstractEditorViewModel {
     private final UndoManager undoManager;
     private final DialogService dialogService;
 
-    public BibtexKeyEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, EntryEditorPreferences preferences, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
+    public BibtexKeyEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, EntryEditorPreferences preferences, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
         super(field, suggestionProvider, fieldCheckers);
         this.preferences = preferences;
         this.databaseContext = databaseContext;

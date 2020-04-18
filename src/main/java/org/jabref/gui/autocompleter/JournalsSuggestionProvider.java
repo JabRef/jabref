@@ -1,18 +1,17 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 
 public class JournalsSuggestionProvider extends FieldValueSuggestionProvider {
 
-    JournalsSuggestionProvider(Field field, AutoCompletePreferences preferences,
+    JournalsSuggestionProvider(Field field, BibDatabase database, AutoCompletePreferences preferences,
                                JournalAbbreviationLoader abbreviationLoader) {
-        super(field);
+        super(field, database);
+
+        /*
+        TODO: Reenable
 
         JournalAbbreviationPreferences journalAbbreviationPreferences = preferences.getJournalAbbreviationPreferences();
         List<String> journals = abbreviationLoader.getRepository(journalAbbreviationPreferences)
@@ -20,5 +19,6 @@ public class JournalsSuggestionProvider extends FieldValueSuggestionProvider {
                 .map(Abbreviation::getName)
                 .collect(Collectors.toList());
         addPossibleSuggestions(journals);
+         */
     }
 }
