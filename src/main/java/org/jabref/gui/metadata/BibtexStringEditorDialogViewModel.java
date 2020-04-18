@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibtexString;
 import org.fxmisc.easybind.EasyBind;
 
 public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
+    private static final String NEW_STRING_LABEL = "New String";
 
     private final ListProperty<BibtexStringEditorItemModel> stringsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -45,8 +46,19 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         stringsListProperty.addAll(strings);
     }
 
-    public void addNewString(BibtexStringEditorItemModel newString) {
-        stringsListProperty.add(newString);
+    public void addNewString() {
+        BibtexStringEditorItemModel newItem;
+        if (labelAlreadyExists(NEW_STRING_LABEL).isPresent()) {
+            int i = 1;
+            while (labelAlreadyExists(NEW_STRING_LABEL + i).isPresent()) {
+                i++;
+            }
+            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL + i, "");
+        } else {
+            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL, "");
+        }
+
+        stringsListProperty.add(newItem);
     }
 
     public void removeString(BibtexStringEditorItemModel item) {

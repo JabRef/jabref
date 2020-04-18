@@ -117,17 +117,11 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
     /**
      * Inserts a StringConstant into the stringsList and automatically starts the edit mode for it's label.
      *
-     * ToDo / FixMe:
-     *   1. The second to the fifth line added does not automatically start edit mode and
-     *   2. the initial name of the StringConstant is not checked for uniquity.
-     *   Possible solution:
-     *   1. -- needs debugging --
-     *   2. Check at construction of a new label for uniquity.
+     * ToDo: The second to the fifth line added does not automatically start edit mode, still needs debugging
      */
     @FXML
     private void addString() {
-        BibtexStringEditorItemModel newString = new BibtexStringEditorItemModel("New String","");
-        viewModel.addNewString(newString);
+        viewModel.addNewString();
         stringsList.getFocusModel().focus(stringsList.getItems().size() - 1, labelColumn);
         stringsList.edit(stringsList.getItems().size() - 1, labelColumn);
     }
