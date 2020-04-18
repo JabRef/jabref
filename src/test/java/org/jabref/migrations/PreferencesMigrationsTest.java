@@ -268,4 +268,20 @@ class PreferencesMigrationsTest {
         verify(prefs, never()).put("mainTableColumnSortTypes", "anyString");
         verify(prefs, never()).put("mainTableColumnSortOrder", "anyString");
     }
+
+    @Test
+    void testRestoreColumnVariablesForBackwardCompatibility() {
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
+
+        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(updatedNames);
+
+        PreferencesMigrations.restoreColumnVariablesForBackwardCompatibility(prefs);
+
+        verify(prefs).putStringList("columnNames", columnNames);
+        verify(prefs).putStringList("columnWidths", columnWidths);
+        verify(prefs).put("columnSortTypes", "");
+        verify(prefs).put("columnSortOrder", "");
+    }
 }

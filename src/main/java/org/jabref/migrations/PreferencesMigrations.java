@@ -1,6 +1,7 @@
 package org.jabref.migrations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ public class PreferencesMigrations {
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
+        restoreColumnVariablesForBackwardCompatibility(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
@@ -312,18 +314,6 @@ public class PreferencesMigrations {
         prefs.setPreviewStyle(migratedStyle);
     }
 
-    static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
-        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
-        List<String> oldColumnNames = preferences.getStringList("columnNames");
-        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
-        if (!oldColumnNames.isEmpty() && columnNames.isEmpty()) {
-            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, preferences.getStringList("columnNames"));
-            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, preferences.getStringList("columnWidths"));
-            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, preferences.getStringList("mainTableColumnSortTypes"));
-            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, preferences.getStringList("mainTableColumnSortOrder"));
-        }
-    }
-
     /**
      * The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0
      * the preferences store the type of the column too, so that the formerly hardwired columns like the graphic groups
@@ -390,6 +380,50 @@ public class PreferencesMigrations {
                     .map(MainTableColumnModel::getSortType)
                     .map(TableColumn.SortType::toString)
                     .collect(Collectors.toList()));
+        }
+    }
+
+    static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
+        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
+        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        if (!oldColumnNames.isEmpty() && columnNames.isEmpty()) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, preferences.getStringList("columnNames"));
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, preferences.getStringList("columnWidths"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, preferences.getStringList("columnSortTypes"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, preferences.getStringList("columnSortOrder"));
+        }
+    }
+
+    /**
+     * In 5.0 the format of column names have changed. That made newer versions of JabRef preferences incompatible with
+     * earlier versions of JabRef. As some complains came up, we decided to change the variable names and to clear the
+     * variable contents if they are unreadable, so former versions of JabRef would automatically create preferences
+     * they can deal with.
+     */
+    static void restoreColumnVariablesForBackwardCompatibility(JabRefPreferences preferences) {
+        List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> fieldColumnNames = oldColumnNames.stream()
+                                                      .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
+                                                      .map(columnName -> {
+                                                          if (columnName.startsWith("field:")) {
+                                                              return columnName.substring(6);
+                                                          } else { // special
+                                                              return columnName.substring(8);
+                                                          }
+                                                      }).collect(Collectors.toList());
+
+        if (!fieldColumnNames.isEmpty()) {
+            preferences.putStringList("columnNames", fieldColumnNames);
+
+            List<String> fieldColumnWidths = new ArrayList<>(Collections.emptyList());
+            for (int i = 0; i < fieldColumnNames.size(); i++) {
+                fieldColumnWidths.add("100");
+            }
+            preferences.putStringList("columnWidths", fieldColumnWidths);
+
+            preferences.put("columnSortTypes", "");
+            preferences.put("columnSortOrder", "");
         }
     }
 }
