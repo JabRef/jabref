@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added tooltips for most fields in the entry editor containing a short description. [#5847](https://github.com/JabRef/jabref/issues/5847)
 - We added support for basic markdown in custom formatted previews [#6194](https://github.com/JabRef/jabref/issues/6194)
 - We now show the number of items found and selected to import in the online search dialog. [#6248](https://github.com/JabRef/jabref/pull/6248)
+- We created a new install screen for macOS. [#5759](https://github.com/JabRef/jabref/issues/5759)
 
 ### Changed
 
