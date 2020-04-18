@@ -23,7 +23,7 @@ JabRef supports you in every step of your research work.
 - Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
-- [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
+- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabfox?src=external-github),  [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna) and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
 
 ### Organize
 
