@@ -648,6 +648,7 @@ jlink {
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
+                    '--verbose',
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
                     '--win-shortcut',
@@ -662,6 +663,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
             ]
             installerOptions = [
+                    '--verbose',
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     // '--temp', "$buildDir/installer",
@@ -678,11 +680,14 @@ jlink {
         if (OperatingSystem.current().isMacOsX()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
             installerOptions = [
+                    '--verbose',
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
-                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
+                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
         }
     }
