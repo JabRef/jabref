@@ -652,6 +652,7 @@ jlink {
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
                     '--win-shortcut',
+                    '--win-menu',
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
