@@ -571,7 +571,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
-        defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
+        defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn;");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
@@ -1538,12 +1538,14 @@ public class JabRefPreferences implements PreferencesService {
                                                   getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
     }
 
+    @Override
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
         return new CleanupPreferences(
                                       getLayoutFormatterPreferences(journalAbbreviationLoader),
                                       getFilePreferences());
     }
 
+    @Override
     public CleanupPreset getCleanupPreset() {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
@@ -1558,6 +1560,7 @@ public class JabRefPreferences implements PreferencesService {
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
+    @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));

@@ -139,13 +139,10 @@ public class FieldFactory {
         return defaultGeneralFields;
     }
 
-    // TODO: Move somewhere more appropriate and make user-configurable
-    public static boolean isSingleLineField(final Field field) {
-        if (field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT)) {
-            return false;
-        }
 
+    public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         // Treat unknown fields as multi-line fields
-        return !(field instanceof UnknownField);
+        // FieldContentFormatter provides us with the addtional field abstract, comment and review
+       return (field instanceof UnknownField) || nonWrappableFields.contains(field) || field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT) || field.equals(StandardField.REVIEW);
     }
 }
