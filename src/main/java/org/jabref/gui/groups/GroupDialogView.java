@@ -97,7 +97,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         hierarchyText.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent"));
         hierarchyToolTip.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent group: When selected, view only this group's entries"));
 
-         nameField.textProperty().bindBidirectional(viewModel.nameProperty());
+        nameField.textProperty().bindBidirectional(viewModel.nameProperty());
         descriptionField.textProperty().bindBidirectional(viewModel.descriptionProperty());
         iconField.textProperty().bindBidirectional(viewModel.iconProperty());
         colorField.valueProperty().bindBidirectional(viewModel.colorFieldProperty());
@@ -131,7 +131,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
-        
+
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
