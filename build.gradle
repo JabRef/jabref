@@ -129,7 +129,7 @@ dependencies {
     // Use the task bundleLibreOffice to update the bundled jar
     // DO NOT CHANGE THE libreoffice PREFIX
     libreoffice 'org.libreoffice:juh:6.3.2'
-    libreoffice 'org.libreoffice:jurt:6.3.2'
+    libreoffice 'org.libreoffice:jurt:6.4.3'
     libreoffice 'org.libreoffice:ridl:6.3.2'
     libreoffice 'org.libreoffice:unoil:6.3.2'
 
