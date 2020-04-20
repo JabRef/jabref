@@ -22,7 +22,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.5'
+    id 'org.beryx.jlink' version '2.17.7'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
