@@ -29,7 +29,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     // Basic Settings
-   @FXML private TextField nameField;
+    @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
     @FXML private ColorPicker colorField;
@@ -90,7 +90,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
-        System.out.println("Group Dialog View initiated");
         hierarchyText.put(GroupHierarchyType.INCLUDING, Localization.lang("Union"));
         hierarchyToolTip.put(GroupHierarchyType.INCLUDING, Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
         hierarchyText.put(GroupHierarchyType.REFINING, Localization.lang("Intersection"));
@@ -98,7 +97,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         hierarchyText.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent"));
         hierarchyToolTip.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent group: When selected, view only this group's entries"));
 
-      //  nameField.textProperty().bindBidirectional(viewModel.nameProperty());
+         nameField.textProperty().bindBidirectional(viewModel.nameProperty());
         descriptionField.textProperty().bindBidirectional(viewModel.descriptionProperty());
         iconField.textProperty().bindBidirectional(viewModel.iconProperty());
         colorField.valueProperty().bindBidirectional(viewModel.colorFieldProperty());
@@ -154,8 +153,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             }
         });
-
-      //  nameField.requestFocus();
     }
 
     @FXML
