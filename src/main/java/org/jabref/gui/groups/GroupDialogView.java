@@ -29,7 +29,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     // Basic Settings
-    @FXML private TextField nameField;
+   @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
     @FXML private ColorPicker colorField;
@@ -90,6 +90,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
     @FXML
     public void initialize() {
+        System.out.println("Group Dialog View initiated");
         hierarchyText.put(GroupHierarchyType.INCLUDING, Localization.lang("Union"));
         hierarchyToolTip.put(GroupHierarchyType.INCLUDING, Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
         hierarchyText.put(GroupHierarchyType.REFINING, Localization.lang("Intersection"));
@@ -97,7 +98,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         hierarchyText.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent"));
         hierarchyToolTip.put(GroupHierarchyType.INDEPENDENT, Localization.lang("Independent group: When selected, view only this group's entries"));
 
-        nameField.textProperty().bindBidirectional(viewModel.nameProperty());
+      //  nameField.textProperty().bindBidirectional(viewModel.nameProperty());
         descriptionField.textProperty().bindBidirectional(viewModel.descriptionProperty());
         iconField.textProperty().bindBidirectional(viewModel.iconProperty());
         colorField.valueProperty().bindBidirectional(viewModel.colorFieldProperty());
@@ -131,7 +132,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         autoGroupPersonsField.textProperty().bindBidirectional(viewModel.autoGroupPersonsFieldProperty());
 
         texGroupFilePath.textProperty().bindBidirectional(viewModel.texGroupFilePathProperty());
-
+        
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
@@ -142,6 +143,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
+            nameField.requestFocus();
         });
 
         // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
@@ -152,6 +154,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
             }
         });
+
+      //  nameField.requestFocus();
     }
 
     @FXML
