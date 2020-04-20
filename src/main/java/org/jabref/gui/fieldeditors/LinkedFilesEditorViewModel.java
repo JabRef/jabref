@@ -17,7 +17,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.externalfiletype.CustomExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -51,7 +51,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final PreferencesService preferences;
     private final ExternalFileTypes externalFileTypes = ExternalFileTypes.getInstance();
 
-    public LinkedFilesEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider,
+    public LinkedFilesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider,
                                       DialogService dialogService,
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,

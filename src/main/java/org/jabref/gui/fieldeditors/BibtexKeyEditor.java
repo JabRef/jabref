@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,7 +26,7 @@ public class BibtexKeyEditor extends HBox implements FieldEditorFX {
     @FXML private Button generateCiteKeyButton;
     @FXML private EditorTextField textField;
 
-    public BibtexKeyEditor(Field field, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
+    public BibtexKeyEditor(Field field, JabRefPreferences preferences, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
         this.preferences = preferences;
         this.viewModel = new BibtexKeyEditorViewModel(
                 field,

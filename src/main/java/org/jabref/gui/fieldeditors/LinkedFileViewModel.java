@@ -46,8 +46,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +74,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final LinkedFileHandler linkedFileHandler;
     private final ExternalFileTypes externalFileTypes;
 
+    private final Validator fileExistsValidator;
+
     public LinkedFileViewModel(LinkedFile linkedFile,
                                BibEntry entry,
                                BibDatabaseContext databaseContext,
@@ -87,6 +94,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.externalFileTypes = externalFileTypes;
         this.xmpPreferences = xmpPreferences;
+
+        fileExistsValidator = new FunctionBasedValidator<>(
+                linkedFile.linkProperty(),
+                link -> {
+                    if (linkedFile.isOnlineLink()) {
+                        return true;
+                    } else {
+                        Optional<Path> path = FileHelper.expandFilename(databaseContext, link, filePreferences);
+                        return path.isPresent() && Files.exists(path.get());
+                    }
+                },
+                ValidationMessage.warning(Localization.lang("Could not find file '%0'.", linkedFile.getLink())));
 
         downloadOngoing.bind(downloadProgress.greaterThanOrEqualTo(0).and(downloadProgress.lessThan(1)));
         canWriteXMPMetadata.setValue(!linkedFile.isOnlineLink() && linkedFile.getFileType().equalsIgnoreCase("pdf"));
@@ -136,12 +155,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile.findIn(directories);
     }
 
-    /**
-     * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
-     * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
-     */
     public JabRefIcon getTypeIcon() {
-        return IconTheme.JabRefIcons.PDF_FILE;
+        return externalFileTypes.fromLinkedFile(linkedFile, false)
+                                .map(ExternalFileType::getIcon)
+                                .orElse(IconTheme.JabRefIcons.FILE);
     }
 
     public void markAsAutomaticallyFound() {
@@ -174,24 +191,19 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void openFolder() {
         try {
-            Path path = null;
-            // absolute path
-            if (Paths.get(linkedFile.getLink()).isAbsolute()) {
-                path = Paths.get(linkedFile.getLink());
-            } else {
-                // relative to file folder
-                for (Path folder : databaseContext.getFileDirectoriesAsPaths(filePreferences)) {
-                    Path file = folder.resolve(linkedFile.getLink());
-                    if (Files.exists(file)) {
-                        path = file;
-                        break;
-                    }
+            if (!linkedFile.isOnlineLink()) {
+                Optional<Path> resolvedPath = FileHelper.expandFilename(
+                        databaseContext,
+                        linkedFile.getLink(),
+                        filePreferences);
+
+                if (resolvedPath.isPresent()) {
+                    JabRefDesktop.openFolderAndSelectFile(resolvedPath.get());
+                } else {
+                    dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
                 }
-            }
-            if (path != null) {
-                JabRefDesktop.openFolderAndSelectFile(path);
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
+                dialogService.showErrorDialogAndWait(Localization.lang("Cannot open folder as the file is an online link."));
             }
         } catch (IOException ex) {
             LOGGER.debug("Cannot open folder", ex);
@@ -253,7 +265,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
         // Get target folder
         Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(filePreferences);
-        if (!fileDir.isPresent()) {
+        if (fileDir.isEmpty()) {
             dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
             return;
         }
@@ -322,7 +334,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
 
-        if (!file.isPresent()) {
+        if (file.isEmpty()) {
             LOGGER.warn("Could not find file " + linkedFile.getLink());
             return true;
         }
@@ -367,7 +379,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         // Localization.lang("Writing XMP metadata...")
         BackgroundTask<Void> writeTask = BackgroundTask.wrap(() -> {
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
-            if (!file.isPresent()) {
+            if (file.isEmpty()) {
                 // TODO: Print error message
                 // Localization.lang("PDF does not exist");
             } else {
@@ -457,4 +469,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public LinkedFile getFile() {
         return linkedFile;
     }
+
+    public ValidationStatus fileExistsValidationStatus() { return fileExistsValidator.getValidationStatus(); }
 }

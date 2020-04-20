@@ -24,7 +24,7 @@ import org.jabref.model.entry.field.InternalField;
  */
 public class XmpExporter extends Exporter {
 
-    private static final String XMP_SPLIT_PATTERN = "split";
+    public static final String XMP_SPLIT_DIRECTORY_INDICATOR = "split";
 
     private final XmpPreferences xmpPreferences;
 
@@ -33,6 +33,12 @@ public class XmpExporter extends Exporter {
         this.xmpPreferences = xmpPreferences;
     }
 
+    /**
+     * @param databaseContext the database to export from
+     * @param file            the file to write to. If it contains "split", then the output is split into different files
+     * @param encoding        the encoding to use
+     * @param entries         a list containing all entries that should be exported
+     */
     @Override
     public void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
@@ -45,18 +51,16 @@ public class XmpExporter extends Exporter {
 
         // This is a distinction between writing all entries from the supplied list to a single .xmp file,
         // or write every entry to a separate file.
-        if (file.getFileName().toString().trim().equals(XMP_SPLIT_PATTERN)) {
-
+        if (file.getFileName().toString().trim().equals(XMP_SPLIT_DIRECTORY_INDICATOR)) {
             for (BibEntry entry : entries) {
                 // Avoid situations, where two cite keys are null
                 Path entryFile;
-                String suffix = entry.getId() + "_" + entry.getField(InternalField.KEY_FIELD).orElse("") + ".xmp";
+                String suffix = entry.getId() + "_" + entry.getField(InternalField.KEY_FIELD).orElse("null") + ".xmp";
                 if (file.getParent() == null) {
                     entryFile = Paths.get(suffix);
                 } else {
                     entryFile = Paths.get(file.getParent().toString() + "/" + suffix);
                 }
-
                 this.writeBibToXmp(entryFile, Collections.singletonList(entry), encoding);
             }
         } else {
@@ -66,7 +70,6 @@ public class XmpExporter extends Exporter {
 
     private void writeBibToXmp(Path file, List<BibEntry> entries, Charset encoding) throws IOException {
         String xmpContent = XmpUtilWriter.generateXmpStringWithoutXmpDeclaration(entries, this.xmpPreferences);
-
         try (BufferedWriter writer = Files.newBufferedWriter(file, encoding)) {
             writer.write(xmpContent);
             writer.flush();

@@ -918,7 +918,7 @@ public class BibEntry implements Cloneable {
     public List<LinkedFile> getFiles() {
         // Extract the path
         Optional<String> oldValue = getField(StandardField.FILE);
-        if (!oldValue.isPresent()) {
+        if (oldValue.isEmpty()) {
             return new ArrayList<>(); // Return new ArrayList because emptyList is immutable
         }
 
