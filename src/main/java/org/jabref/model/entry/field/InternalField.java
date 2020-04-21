@@ -12,7 +12,6 @@ import java.util.Set;
 public enum InternalField implements Field {
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
-    GROUPS("groups"),
     KEY_FIELD("bibtexkey"),
     /**
      * field which indicates the entrytype

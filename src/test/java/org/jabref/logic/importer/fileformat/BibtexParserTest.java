@@ -618,18 +618,6 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesDuplicateBibtexKeys() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{canh05," + "  author={Norton Bar}}"));
-
-        List<String> duplicateKeys = result.getDuplicateKeys();
-
-        assertEquals(1, duplicateKeys.size());
-        assertEquals("canh05", duplicateKeys.get(0));
-    }
-
-    @Test
     void parseNotWarnsAboutEntryWithoutBibtexKey() throws IOException {
         BibEntry expected = new BibEntry();
         expected.setField(StandardField.AUTHOR, "Ed von Test");

@@ -216,6 +216,8 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Citation keys of other entries which have a relationship to this entry.");
                 case XREF:
                     return Localization.lang("This field is an alternative cross-referencing mechanism. It differs from \"Crossref\" in that the child entry will not inherit any data from the parent entry specified in the \"Xref\" field.");
+                case GROUPS:
+                    return Localization.lang("Name(s) of the (manual) groups the entry belongs to.");
             }
         } else if (field instanceof InternalField) {
             InternalField internalField = (InternalField) field;
@@ -226,8 +228,6 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Timestamp of this entry, when it has been created or last modified.");
                 case KEY_FIELD:
                     return Localization.lang("Key by which the work may be cited.");
-                case GROUPS:
-                    return Localization.lang("Name(s) of the (manual) groups the entry belongs to.");
             }
         } else if (field instanceof SpecialField) {
             SpecialField specialField = (SpecialField) field;

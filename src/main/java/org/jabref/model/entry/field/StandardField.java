@@ -124,7 +124,10 @@ public enum StandardField implements Field {
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
-    XREF("xref", FieldProperty.SINGLE_ENTRY_LINK);
+    XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
+
+    // JabRef-specific fields
+    GROUPS("groups");
 
     private final String name;
     private final String displayName;
