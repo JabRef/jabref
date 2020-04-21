@@ -47,7 +47,7 @@ class XmpUtilWriterTest {
         olly2018.setField(StandardField.COMMENT, "COMMENT");
         olly2018.setField(StandardField.DOI, "10/3212.3123");
         olly2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
-        olly2018.setField(InternalField.GROUPS, "NO");
+        olly2018.setField(StandardField.GROUPS, "NO");
         olly2018.setField(StandardField.HOWPUBLISHED, "online");
         olly2018.setField(StandardField.KEYWORDS, "k1, k2");
         olly2018.setField(InternalField.OWNER, "me");
