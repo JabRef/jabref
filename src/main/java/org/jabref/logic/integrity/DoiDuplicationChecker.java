@@ -33,18 +33,18 @@ public class DoiDuplicationChecker implements Checker {
 
             ObservableList<BibEntry> bibEntries = database.getEntries();
             BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(bibEntries.size());
-            bibEntries.stream().filter(item -> item.hasField(StandardField.DOI)).forEach(item -> {
-                duplicateMap.computeIfAbsent(item.getDOI().get(), doi -> new ArrayList<>()).add(item);
-            });
+            for (BibEntry bibEntry : bibEntries) {
+                bibEntry.getDOI().ifPresent(doi ->
+                        duplicateMap.computeIfAbsent(doi, x -> new ArrayList<>()).add(bibEntry));
+            }
 
-            BiMap<List<BibEntry>, DOI> invertedMap = duplicateMap.inverse();
-            invertedMap.keySet().stream()
-                       .filter(list -> list.size() > 1)
-                       .flatMap(list -> list.stream())
-                       .forEach(item -> {
-                           IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI);
-                           errors.put(item, List.of(errorMessage));
-                       });
+            duplicateMap.inverse().keySet().stream()
+                        .filter(list -> list.size() > 1)
+                        .flatMap(list -> list.stream())
+                        .forEach(item -> {
+                            IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI);
+                            errors.put(item, List.of(errorMessage));
+                        });
         }
         return errors.getOrDefault(entry, Collections.emptyList());
     }
