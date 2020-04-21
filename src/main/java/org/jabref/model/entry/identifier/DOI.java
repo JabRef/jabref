@@ -2,6 +2,7 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -240,12 +241,12 @@ public class DOI implements Identifier {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        DOI doi1 = (DOI) o;
-        return doi.equalsIgnoreCase(doi1.doi);
+        DOI other = (DOI) o;
+        return doi.equalsIgnoreCase(other.doi);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(doi);
+        return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
 }
