@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.DialogService;
@@ -69,25 +70,21 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         labelColumn.setSortable(true);
         labelColumn.setReorderable(false);
 
-        // The ErrorDialog has to be opened from the CellValueFactory, as it throws errors otherwise. The Implementation
-        // follows basically the SpinnerValueFactory.
-        // FixMe: Possible scenario: If the newLabel and the oldLabel are both in use the the listener jumps endlessly
-        //  between the same change back and forth
-        labelColumn.setCellValueFactory(cellData -> {
-            cellData.getValue().labelProperty().addListener(((observable, oldLabel, newLabel) -> {
-                Optional<BibtexStringEditorItemModel> item = viewModel.labelAlreadyExists(newLabel);
-                if (item.isPresent() && !item.get().equals(stringsList.getFocusModel().getFocusedItem())) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", newLabel));
-                    cellData.getValue().setLabel(oldLabel);
-                } else {
-                    cellData.getValue().setLabel(newLabel);
-                }
-            }));
-            return cellData.getValue().labelProperty();
-        });
+        labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringEditorItemModel, String>()
                 .withValidation(BibtexStringEditorItemModel::labelValidation, visualizer)
                 .install(labelColumn, new DefaultStringConverter());
+        labelColumn.setOnEditCommit((CellEditEvent<BibtexStringEditorItemModel, String> cellEvent) -> {
+            BibtexStringEditorItemModel cellItem = cellEvent.getTableView().getItems().get(cellEvent.getTablePosition().getRow());
+            Optional<BibtexStringEditorItemModel> existingItem = viewModel.labelAlreadyExists(cellEvent.getNewValue());
+            if (existingItem.isPresent() && !existingItem.get().equals(cellItem)) {
+                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", cellEvent.getNewValue()));
+                cellItem.setLabel(cellEvent.getOldValue());
+            } else {
+                cellItem.setLabel(cellEvent.getNewValue());
+            }
+            cellEvent.getTableView().refresh();
+        });
 
         contentColumn.setSortable(true);
         contentColumn.setReorderable(false);
@@ -114,15 +111,9 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         // ToDo: Some keyPressed-Events should be added to navigate in the table, at least tab.
     }
 
-    /**
-     * Inserts a StringConstant into the stringsList and automatically starts the edit mode for it's label.
-     *
-     * ToDo: The second to the fifth line added does not automatically start edit mode, still needs debugging
-     */
     @FXML
     private void addString() {
         viewModel.addNewString();
-        stringsList.getFocusModel().focus(stringsList.getItems().size() - 1, labelColumn);
         stringsList.edit(stringsList.getItems().size() - 1, labelColumn);
     }
 
