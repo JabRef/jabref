@@ -34,7 +34,7 @@ public class IntegrityCheck {
         this.allowIntegerEdition = allowIntegerEdition;
     }
 
-    public List<IntegrityMessage> checkDatabase() {
+    List<IntegrityMessage> checkDatabase() {
         List<IntegrityMessage> result = new ArrayList<>();
 
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
