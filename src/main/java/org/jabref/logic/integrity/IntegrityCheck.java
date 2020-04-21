@@ -31,6 +31,7 @@ public class IntegrityCheck {
     private BibtexKeyDuplicationChecker bibtexKeyDuplicationChecker;
     private JournalInAbbreviationListChecker journalInAbbreviationListChecker;
     private FieldCheckers fieldCheckers;
+    private DoiDuplicationChecker doiDuplicationChecker;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
@@ -58,6 +59,7 @@ public class IntegrityCheck {
         entryLinkChecker = new EntryLinkChecker(bibDatabaseContext.getDatabase());
         bibtexkeyDeviationChecker = new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences);
         bibtexKeyDuplicationChecker = new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase());
+        doiDuplicationChecker = new DoiDuplicationChecker(bibDatabaseContext.getDatabase());
 
         if (bibDatabaseContext.isBiblatexMode()) {
             journalInAbbreviationListChecker = new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository);
@@ -108,7 +110,7 @@ public class IntegrityCheck {
         result.addAll(entryLinkChecker.check(entry));
         result.addAll(bibtexkeyDeviationChecker.check(entry));
         result.addAll(bibtexKeyDuplicationChecker.check(entry));
-        // TODO
+        result.addAll(doiDuplicationChecker.check(entry));
 
         return result;
     }

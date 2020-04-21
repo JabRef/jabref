@@ -14,7 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
+ * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers
+ * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
@@ -117,7 +118,7 @@ public class DOI implements Identifier {
 
     /**
      * Creates an Optional&lt;DOI> from various schemes including URL, URN, and plain DOIs.
-     *
+     * <p>
      * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor and checking for
      * Optional.isPresent() instead.
      *
@@ -226,5 +227,25 @@ public class DOI implements Identifier {
     @Override
     public String getNormalized() {
         return doi;
+    }
+
+    /**
+     * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DOI doi1 = (DOI) o;
+        return doi.equalsIgnoreCase(doi1.doi);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(doi);
     }
 }
