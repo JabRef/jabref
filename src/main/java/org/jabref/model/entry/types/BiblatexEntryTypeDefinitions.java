@@ -427,7 +427,7 @@ public class BiblatexEntryTypeDefinitions {
             .build();
 
     private static final BibEntryType DATASET = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.DATESET)
+            .withType(StandardEntryType.Dataset)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)

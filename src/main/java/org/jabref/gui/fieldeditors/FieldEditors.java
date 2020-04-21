@@ -8,8 +8,8 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -43,7 +43,7 @@ public class FieldEditors {
                                             final UndoManager undoManager) {
         final Set<FieldProperty> fieldProperties = field.getProperties();
 
-        final AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());
+        final SuggestionProvider<?> suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());
 
         final FieldCheckers fieldCheckers = new FieldCheckers(
                 databaseContext,
@@ -101,14 +101,14 @@ public class FieldEditors {
     }
 
     @SuppressWarnings("unchecked")
-    private static AutoCompleteSuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
-        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(field);
+    private static SuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
+        SuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(field);
 
         List<String> contentSelectorValues = metaData.getContentSelectorValuesForField(field);
         if (!contentSelectorValues.isEmpty()) {
             // Enrich auto completion by content selector values
             try {
-                return new ContentSelectorSuggestionProvider((AutoCompleteSuggestionProvider<String>) suggestionProvider, contentSelectorValues);
+                return new ContentSelectorSuggestionProvider((SuggestionProvider<String>) suggestionProvider, contentSelectorValues);
             } catch (ClassCastException exception) {
                 LOGGER.error("Content selectors are only supported for normal fields with string-based auto completion.");
                 return suggestionProvider;
