@@ -38,11 +38,13 @@ public class DoiDuplicationChecker implements Checker {
             });
 
             BiMap<List<BibEntry>, DOI> invertedMap = duplicateMap.inverse();
-            invertedMap.keySet().stream().filter(list -> list.size() > 1).forEach(itemList -> itemList.forEach(item -> {
-                // TODO add entries that have the same DOI, better error message, oder flatMap
-                IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Duplicate DOI"), item, StandardField.DOI);
-                errors.put(item, List.of(errorMessage));
-            }));
+            invertedMap.keySet().stream()
+                       .filter(list -> list.size() > 1)
+                       .flatMap(list -> list.stream())
+                       .forEach(item -> {
+                           IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI);
+                           errors.put(item, List.of(errorMessage));
+                       });
         }
         return errors.getOrDefault(entry, Collections.emptyList());
     }
