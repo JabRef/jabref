@@ -1,15 +1,15 @@
 package org.jabref.logic.integrity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class IntegrityCheck {
 

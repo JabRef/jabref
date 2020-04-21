@@ -1,8 +1,8 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.BibEntry;
-
 import java.util.List;
+
+import org.jabref.model.entry.BibEntry;
 
 @FunctionalInterface
 public interface Checker {
