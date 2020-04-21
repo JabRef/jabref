@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for basic markdown in custom formatted previews [#6194](https://github.com/JabRef/jabref/issues/6194)
 - We now show the number of items found and selected to import in the online search dialog. [#6248](https://github.com/JabRef/jabref/pull/6248)
 - We created a new install screen for macOS. [#5759](https://github.com/JabRef/jabref/issues/5759)
+- We added a new integrity check for duplicate DOIs. [koppor#339](https://github.com/koppor/jabref/issues/339)
 
 ### Changed
 
