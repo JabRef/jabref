@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -16,7 +15,6 @@ public class BibStringChecker implements Checker {
 
     // Detect # if it doesn't have a \ in front of it or if it starts the string
     private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
-
 
     /**
      * Checks, if there is an even number of unescaped #

@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -21,7 +20,7 @@ public class BibtexKeyChecker implements Checker {
         Optional<String> author = entry.getField(StandardField.AUTHOR);
         Optional<String> title = entry.getField(StandardField.TITLE);
         Optional<String> year = entry.getField(StandardField.YEAR);
-        if (!author.isPresent() || !title.isPresent() || !year.isPresent()) {
+        if (author.isEmpty() || title.isEmpty() || year.isEmpty()) {
             return Collections.emptyList();
         }
 
