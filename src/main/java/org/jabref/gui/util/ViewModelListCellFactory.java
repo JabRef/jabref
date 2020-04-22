@@ -212,7 +212,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     if (validationStatusProperty != null) {
                         validationStatusProperty.call(viewModel).getHighestMessage().ifPresent(message -> {
                             setTooltip(new Tooltip(message.getMessage()));
-                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS, validationStatusProperty.call(viewModel).validProperty().not()));
+                            subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                    this,
+                                    INVALID_PSEUDO_CLASS,
+                                    validationStatusProperty.call(viewModel).validProperty().not()));
                         });
                     }
                 }

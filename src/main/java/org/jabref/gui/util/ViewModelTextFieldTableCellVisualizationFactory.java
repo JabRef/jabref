@@ -1,29 +1,33 @@
 package org.jabref.gui.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 import javafx.application.Platform;
+import javafx.css.PseudoClass;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import org.fxmisc.easybind.Subscription;
 
 public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Callback<TableColumn<S, T>, TableCell<S, T>> {
 
-    private ControlsFxVisualizer visualizer;
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
+
     private Function<S, ValidationStatus> validationStatusProperty;
     private StringConverter<T> stringConverter;
 
-    public ViewModelTextFieldTableCellVisualizationFactory<S, T> withValidation(Function<S, ValidationStatus> validationStatusProperty, ControlsFxVisualizer visualizer) {
+    public ViewModelTextFieldTableCellVisualizationFactory<S, T> withValidation(Function<S, ValidationStatus> validationStatusProperty) {
         this.validationStatusProperty = validationStatusProperty;
-        this.visualizer = visualizer;
         return this;
     }
 
@@ -36,18 +40,24 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
     public TextFieldTableCell<S, T> call(TableColumn<S, T> param) {
         return new TextFieldTableCell<>(stringConverter) {
 
+            List<Subscription> subscriptions = new ArrayList<>();
+
             @Override
             public void startEdit() {
                 super.startEdit();
 
                 // The textfield is lazily created and not already present when a TableCell is created.
-                // As 'textfield' is a private member of TextFieldTableCell we need need to adress it by the backdoor.
                 lookupTextField().ifPresent(textField -> Platform.runLater(() -> {
                     textField.requestFocus();
                     textField.selectAll();
                 }));
             }
 
+            /**
+             * As 'textfield' is a private member of TextFieldTableCell we need need to get to it through the backdoor.
+             *
+             * @return The TextField containing the editable content of the TableCell
+             */
             private Optional<TextField> lookupTextField() {
                 if (getGraphic() instanceof TextField) {
                     return Optional.of((TextField) getGraphic());
@@ -67,13 +77,23 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
             public void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (!empty && (getTableRow() != null)) {
-                    S viewModel = getTableRow().getItem();
+                subscriptions.forEach(Subscription::unsubscribe);
+                subscriptions.clear();
 
-                    if (viewModel != null && visualizer != null && validationStatusProperty != null) {
-                        // FixMe: Visualization icon is buggy for tablecells, we should use a pseudoclass instead and
-                        //  a tooltip instead.
-                        visualizer.initVisualization(validationStatusProperty.apply(viewModel), this);
+                S viewModel = getTableRow().getItem();
+                if (empty || (viewModel == null)) {
+                    setText(null);
+                    setGraphic(null);
+                    setOnMouseClicked(null);
+                    setTooltip(null);
+                    setStyle("");
+                } else {
+                    if (validationStatusProperty != null) {
+                        validationStatusProperty.apply(viewModel).getHighestMessage().ifPresent(message -> {
+                            setTooltip(new Tooltip(message.getMessage()));
+                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS,
+                                    validationStatusProperty.apply(viewModel).validProperty().not()));
+                        });
                     }
                 }
             }

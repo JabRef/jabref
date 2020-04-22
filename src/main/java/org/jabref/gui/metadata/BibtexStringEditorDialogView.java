@@ -17,14 +17,12 @@ import javafx.util.converter.DefaultStringConverter;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTextFieldTableCellVisualizationFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
@@ -35,7 +33,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
     @FXML private Button addStringButton;
     @FXML private ButtonType saveButton;
 
-    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
     private final BibtexStringEditorDialogViewModel viewModel;
 
     @Inject private DialogService dialogService;
@@ -63,8 +60,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        visualizer.setDecoration(new IconValidationDecorator());
-
         addStringButton.setTooltip(new Tooltip(Localization.lang("New string")));
 
         labelColumn.setSortable(true);
@@ -72,7 +67,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
         labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringEditorItemModel, String>()
-                .withValidation(BibtexStringEditorItemModel::labelValidation, visualizer)
+                .withValidation(BibtexStringEditorItemModel::labelValidation)
                 .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit((CellEditEvent<BibtexStringEditorItemModel, String> cellEvent) -> {
             BibtexStringEditorItemModel cellItem = cellEvent.getTableView().getItems().get(cellEvent.getTablePosition().getRow());
@@ -90,7 +85,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         contentColumn.setReorderable(false);
         contentColumn.setCellValueFactory(cellData -> cellData.getValue().contentProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringEditorItemModel, String>()
-                .withValidation(BibtexStringEditorItemModel::contentValidation, visualizer)
+                .withValidation(BibtexStringEditorItemModel::contentValidation)
                 .install(contentColumn, new DefaultStringConverter());
         contentColumn.setOnEditCommit((CellEditEvent<BibtexStringEditorItemModel, String> cell) ->
                 cell.getRowValue().setContent(cell.getNewValue()));
@@ -107,8 +102,6 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
 
         stringsList.itemsProperty().bindBidirectional(viewModel.stringsListProperty());
         stringsList.setEditable(true);
-
-        // ToDo: Some keyPressed-Events should be added to navigate in the table, at least tab.
     }
 
     @FXML
