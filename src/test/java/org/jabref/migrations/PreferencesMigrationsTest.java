@@ -277,11 +277,15 @@ class PreferencesMigrationsTest {
 
         when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(updatedNames);
 
-        PreferencesMigrations.restoreColumnVariablesForBackwardCompatibility(prefs);
+        when(prefs.get(JabRefPreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
+
+        PreferencesMigrations.restoreVariablesForBackwardCompatibility(prefs);
 
         verify(prefs).putStringList("columnNames", columnNames);
         verify(prefs).putStringList("columnWidths", columnWidths);
         verify(prefs).put("columnSortTypes", "");
         verify(prefs).put("columnSortOrder", "");
+
+        verify(prefs).putInt(JabRefPreferences.MAIN_FONT_SIZE, 11);
     }
 }

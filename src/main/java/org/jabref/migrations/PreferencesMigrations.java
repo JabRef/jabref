@@ -54,7 +54,7 @@ public class PreferencesMigrations {
         // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
         changeColumnVariableNamesFor51(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
-        restoreColumnVariablesForBackwardCompatibility(Globals.prefs);
+        restoreVariablesForBackwardCompatibility(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
@@ -401,7 +401,7 @@ public class PreferencesMigrations {
      * variable contents if they are unreadable, so former versions of JabRef would automatically create preferences
      * they can deal with.
      */
-    static void restoreColumnVariablesForBackwardCompatibility(JabRefPreferences preferences) {
+    static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
         List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
         List<String> fieldColumnNames = oldColumnNames.stream()
                                                       .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
@@ -425,5 +425,9 @@ public class PreferencesMigrations {
             preferences.put("columnSortTypes", "");
             preferences.put("columnSortOrder", "");
         }
+
+        // Ensure font size is a parsable int variable
+        preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE,
+                (int) Math.round(Double.parseDouble(preferences.get(JabRefPreferences.MAIN_FONT_SIZE))));
     }
 }
