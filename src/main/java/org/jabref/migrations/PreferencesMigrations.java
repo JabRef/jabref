@@ -427,7 +427,14 @@ public class PreferencesMigrations {
         }
 
         // Ensure font size is a parsable int variable
-        preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE,
-                (int) Math.round(Double.parseDouble(preferences.get(JabRefPreferences.MAIN_FONT_SIZE))));
+        try {
+            // some versions stored the font size as double to the **same** key
+            // since the preference store is type-safe, we need to add this workaround
+            String fontSizeAsString = preferences.get(JabRefPreferences.MAIN_FONT_SIZE);
+            int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
+            preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+        } catch (ClassCastException e) {
+            // already an integer
+        }
     }
 }
