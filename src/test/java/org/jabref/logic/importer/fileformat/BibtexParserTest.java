@@ -485,8 +485,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 
@@ -513,8 +513,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 

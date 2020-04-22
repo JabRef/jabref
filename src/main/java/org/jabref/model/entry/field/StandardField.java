@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Standard BibTeX and BibLaTeX fields
+ * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
  */
 public enum StandardField implements Field {
 
@@ -127,7 +127,9 @@ public enum StandardField implements Field {
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
     // JabRef-specific fields
-    GROUPS("groups");
+    GROUPS("groups"),
+    OWNER("owner"),
+    TIMESTAMP("timestamp", FieldProperty.DATE);
 
     private final String name;
     private final String displayName;

@@ -218,14 +218,14 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("This field is an alternative cross-referencing mechanism. It differs from \"Crossref\" in that the child entry will not inherit any data from the parent entry specified in the \"Xref\" field.");
                 case GROUPS:
                     return Localization.lang("Name(s) of the (manual) groups the entry belongs to.");
-            }
-        } else if (field instanceof InternalField) {
-            InternalField internalField = (InternalField) field;
-            switch (internalField) {
                 case OWNER:
                     return Localization.lang("Owner/creator of this entry.");
                 case TIMESTAMP:
                     return Localization.lang("Timestamp of this entry, when it has been created or last modified.");
+            }
+        } else if (field instanceof InternalField) {
+            InternalField internalField = (InternalField) field;
+            switch (internalField) {
                 case KEY_FIELD:
                     return Localization.lang("Key by which the work may be cited.");
             }

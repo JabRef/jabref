@@ -10,7 +10,6 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -50,7 +49,7 @@ class XmpUtilWriterTest {
         olly2018.setField(StandardField.GROUPS, "NO");
         olly2018.setField(StandardField.HOWPUBLISHED, "online");
         olly2018.setField(StandardField.KEYWORDS, "k1, k2");
-        olly2018.setField(InternalField.OWNER, "me");
+        olly2018.setField(StandardField.OWNER, "me");
         olly2018.setField(StandardField.REVIEW, "review");
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
@@ -60,7 +59,7 @@ class XmpUtilWriterTest {
         toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
         toral2006.setField(StandardField.PAGES, "56--61");
         toral2006.setField(StandardField.EPRINTTYPE, "asdf");
-        toral2006.setField(InternalField.OWNER, "Ich");
+        toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
         vapnik2000 = new BibEntry(StandardEntryType.Book);
@@ -69,7 +68,7 @@ class XmpUtilWriterTest {
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
         vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
-        vapnik2000.setField(InternalField.OWNER, "Ich");
+        vapnik2000.setField(StandardField.OWNER, "Ich");
     }
 
     /**
