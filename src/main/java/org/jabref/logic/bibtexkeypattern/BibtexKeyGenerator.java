@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 public class BibtexKeyGenerator extends BracketedPattern {
     /*
      * All single characters that we can use for extending a key to make it unique.
-     * KEY_CHARACTERS_CAUSING_PARSING_ERRORS is a subset of KEY_ILLEGAL_CHARACTERS
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
-    private static final String KEY_ILLEGAL_CHARACTERS = "{}(),=\\\"#%~'`ʹ";
-    private static final String KEY_CHARACTERS_CAUSING_PARSING_ERRORS = "{}(),\\\"-";
+    // Source of DISALLOWED characters: https://tex.stackexchange.com/a/408548/9075
+    private static final String KEY_DISALLOWED_CHARACTERS = "{}(),=\\\"#%~'";
+    private static String KEY_UNWANTED_CHARACTERS = "-`ʹ:!;?^+";
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -82,7 +82,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
             StringBuilder newKey = new StringBuilder();
             for (int i = 0; i < key.length(); i++) {
                 char c = key.charAt(i);
-                if (KEY_CHARACTERS_CAUSING_PARSING_ERRORS.indexOf(c) == -1) {
+                if (KEY_UNWANTED_CHARACTERS.indexOf(c) == -1) {
                     newKey.append(c);
                 }
             }
@@ -92,7 +92,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (KEY_ILLEGAL_CHARACTERS.indexOf(c) == -1) {
+            if (KEY_DISALLOWED_CHARACTERS.indexOf(c) == -1) {
                 newKey.append(c);
             }
         }
