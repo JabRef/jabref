@@ -42,7 +42,7 @@ public class DoiDuplicationChecker implements Checker {
         BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(bibEntries.size());
         for (BibEntry bibEntry : bibEntries) {
             bibEntry.getDOI().ifPresent(doi ->
-                    duplicateMap.computeIfAbsent(doi, x -> new ArrayList<>()).add(bibEntry));
+                    duplicateMap.computeIfAbsent(doi, absentDoi -> new ArrayList<>()).add(bibEntry));
         }
 
         duplicateMap.inverse().keySet().stream()
