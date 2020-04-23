@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,16 +32,15 @@ public class IntegrityCheck {
                 enforceLegalKey,
                 allowIntegerEdition);
 
-        entryCheckers = Arrays.asList(
+        entryCheckers = new ArrayList<>(List.of(
                 new BibtexKeyChecker(),
                 new TypeChecker(),
                 new BibStringChecker(),
                 new HTMLCharacterChecker(),
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
                 new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences),
-                new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase()),
-                new DoiDuplicationChecker(bibDatabaseContext.getDatabase())
-        );
+                new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase())
+        ));
 
         if (!bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.add(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository));
@@ -54,12 +54,16 @@ public class IntegrityCheck {
         }
     }
 
-    List<IntegrityMessage> checkDatabase() {
+    List<IntegrityMessage> executeAllCheckers() {
         List<IntegrityMessage> result = new ArrayList<>();
 
-        for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
+        BibDatabase database = bibDatabaseContext.getDatabase();
+
+        for (BibEntry entry : database.getEntries()) {
             result.addAll(checkEntry(entry));
         }
+
+        result.addAll(checkDatabase(database));
 
         return result;
     }
@@ -79,5 +83,9 @@ public class IntegrityCheck {
         }
 
         return result;
+    }
+
+    public List<IntegrityMessage> checkDatabase(BibDatabase database) {
+        return new DoiDuplicationChecker().check(database);
     }
 }

@@ -369,7 +369,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                            new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
-                .checkDatabase();
+                .executeAllCheckers();
 
         assertEquals(clonedEntry, entry);
     }
@@ -409,7 +409,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
-                .checkDatabase();
+                .executeAllCheckers();
         assertNotEquals(Collections.emptyList(), messages);
     }
 
@@ -418,7 +418,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
-        ).checkDatabase();
+        ).executeAllCheckers();
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -428,7 +428,7 @@ class IntegrityCheckTest {
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
                 allowIntegerEdition
-        ).checkDatabase();
+        ).executeAllCheckers();
         assertEquals(Collections.emptyList(), messages);
     }
 
