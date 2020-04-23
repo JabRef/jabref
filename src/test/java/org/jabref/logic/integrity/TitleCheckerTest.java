@@ -4,8 +4,6 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,12 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TitleCheckerTest {
 
     private TitleChecker checker;
+    private TitleChecker checkerBiblatex;
 
     @BeforeEach
     public void setUp() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new TitleChecker(databaseContext);
+        databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
+        checkerBiblatex = new TitleChecker(databaseBiblatex);
     }
 
     @Test
@@ -80,142 +82,142 @@ public class TitleCheckerTest {
 
     @Test
     void bibTexAcceptsTitleWithOnlyFirstCapitalLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a title"));
     }
 
     @Test
     void bibTexDoesNotAcceptCapitalLettersInsideTitle() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("This is a Title"));
     }
 
     @Test
     void bibTexRemovesCapitalLetterInsideTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a {T}itle"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a {T}itle"));
     }
 
     @Test
     void bibTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "{This is a Title}"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("{This is a Title}"));
     }
 
     @Test
     void bibTexRemovesEverythingInBrackets() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a {Title}"));
     }
 
     @Test
     void bibTexAcceptsTitleWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("{C}urrent {C}hronicle"));
     }
 
     @Test
     void bibTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is a sub title 2"));
     }
 
     @Test
     void bibTexAcceptsSubTitleWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is a sub title 2"));
     }
 
     @Test
     void bibTexDoesNotAcceptCapitalLettersInsideSubTitle() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("This is a sub title 1: This is A sub title 2"));
     }
 
     @Test
     void bibTexRemovesCapitalLetterInsideSubTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1: this is {A} sub title 2"));
     }
 
     @Test
     void bibTexSplitsSubTitlesBasedOnDots() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is a sub title 1...This is a sub title 2"));
     }
 
     @Test
     void bibTexSplitsSubTitleBasedOnSpecialCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This is; A sub title 1.... This is a sub title 2"));
     }
 
     @Test
     void bibTexAcceptsCapitalLetterAfterSpecialCharacter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("This!is!!A!Title??"));
     }
 
     @Test
     void bibTexAcceptsCapitalLetterOnlyAfterSpecialCharacter() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("This!is!!A!TitlE??"));
     }
 
     @Test
     void bibLaTexAcceptsTitleWithOnlyFirstCapitalLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a title"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a title"));
     }
 
     @Test
     void bibLaTexAcceptsCapitalLettersInsideTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a Title"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a Title"));
     }
 
     @Test
     void bibLaTexRemovesCapitalLetterInsideTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a {T}itle"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {T}itle"));
     }
 
     @Test
     void bibLaTexRemovesEverythingInBracketsAndAcceptsNoTitleInput() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "{This is a Title}"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("{This is a Title}"));
     }
 
     @Test
     void bibLaTexRemovesEverythingInBrackets() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a {Title}"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a {Title}"));
     }
 
     @Test
     void bibLaTexAcceptsTitleWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("{C}urrent {C}hronicle"));
     }
 
     @Test
     void bibLaTexAcceptsSubTitlesWithOnlyFirstCapitalLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is a sub title 2"));
     }
 
     @Test
     void bibLaTexAcceptsSubTitleWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: this is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is a sub title 2"));
     }
 
     @Test
     void bibLaTexAcceptsCapitalLettersInsideSubTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: This is A sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: This is A sub title 2"));
     }
 
     @Test
     void bibLaTexRemovesCapitalLetterInsideSubTitle() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1: this is {A} sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1: this is {A} sub title 2"));
     }
 
     @Test
     void bibLaTexSplitsSubTitlesBasedOnDots() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is a sub title 1...This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is a sub title 1...This is a sub title 2"));
     }
 
     @Test
     void bibLaTexSplitsSubTitleBasedOnSpecialCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This is; A sub title 1.... This is a sub title 2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This is; A sub title 1.... This is a sub title 2"));
     }
 
     @Test
     void bibLaTexAcceptsCapitalLetterAfterSpecialCharacter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This!is!!A!Title??"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!Title??"));
     }
 
     @Test
     void bibLaTexAcceptsCapitalLetterNotOnlyAfterSpecialCharacter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.TITLE, "This!is!!A!TitlE??"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("This!is!!A!TitlE??"));
     }
 
 }

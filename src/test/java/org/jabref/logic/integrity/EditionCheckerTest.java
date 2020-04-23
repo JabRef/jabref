@@ -4,15 +4,33 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
-
+import org.jabref.model.entry.BibEntry;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EditionCheckerTest {
+
+    private EditionChecker checker;
+    private EditionChecker checkerb;
+    private BibEntry entry;
+    private BibDatabaseContext bibtex;
+    private BibDatabaseContext biblatex;
+
+    @BeforeEach
+    void setUp() {
+        bibtex = new BibDatabaseContext();
+        bibtex.setMode(BibDatabaseMode.BIBTEX);
+        biblatex = new BibDatabaseContext();
+        biblatex.setMode(BibDatabaseMode.BIBLATEX);
+        checker = new EditionChecker(bibtex, true);
+        checkerb = new EditionChecker(biblatex, true);
+        entry = new BibEntry();
+    }
 
     public BibDatabaseContext bibDatabaseContextEdition = new BibDatabaseContext();
 
@@ -46,42 +64,42 @@ public class EditionCheckerTest {
 
     @Test
     void bibTexAcceptsOrdinalNumberInWordsWithCapitalFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "Second"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("Second"));
     }
 
     @Test
     void bibTexDoesNotAcceptOrdinalNumberInWordsWithNonCapitalFirstLetter() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "second"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("second"));
     }
 
     @Test
     void bibTexAcceptsIntegerInputInEdition() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("2"));
     }
 
     @Test
     void bibTexAcceptsOrdinalNumberInNumbers() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("2nd"));
     }
 
     @Test
     void bibLaTexAcceptsEditionWithCapitalFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "Edition 2000"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerb.checkValue("Edition 2000"));
     }
 
     @Test
     void bibLaTexAcceptsIntegerInputInEdition() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerb.checkValue("2"));
     }
 
     @Test
     void bibLaTexAcceptsEditionAsLiteralString() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerb.checkValue("Third, revised and expanded edition"));
     }
 
     @Test
     void bibLaTexDoesNotAcceptOrdinalNumberInNumbers() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.EDITION, "2nd"), BibDatabaseMode.BIBLATEX));
+        assertNotEquals(Optional.empty(), checkerb.checkValue("2nd"));
     }
 
 }

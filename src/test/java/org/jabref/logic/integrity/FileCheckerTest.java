@@ -1,48 +1,58 @@
 package org.jabref.logic.integrity;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 public class FileCheckerTest {
 
-    @Test
-    void testFileChecks() {
-        MetaData metaData = mock(MetaData.class);
+    private FileChecker checker;
+    private BibEntry entry;
+    private BibDatabaseContext bibDatabaseContext;
+    private List<IntegrityMessage> messages;
+    MetaData metaData = mock(MetaData.class);
+    //private FilePreferences f;
+    //Map<Field, String> hash;
+
+    @BeforeEach
+    void setUp() {
+        //hash.put(StandardField.ABSTRACT, "");
+        //f = new FilePreferences("", hash, true, "", "");
+        bibDatabaseContext = new BibDatabaseContext();
+        checker = new FileChecker(bibDatabaseContext, mock(FilePreferences.class));
+        entry = new BibEntry();
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        //Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.empty());
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
-
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.FILE, ":build.gradle:gradle", metaData));
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.FILE, "description:build.gradle:gradle", metaData));
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData));
     }
 
     @Test
-    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
-        Path bibFile = testFolder.resolve("lit.bib");
-        Files.createFile(bibFile);
-        Path pdfFile = testFolder.resolve("file.pdf");
-        Files.createFile(pdfFile);
+    void fileAcceptsRelativePath() {
+        assertEquals(Optional.empty(), checker.checkValue(":build.gradle:gradle"));
+    }
 
-        BibDatabaseContext databaseContext = IntegrityCheckTest.createContext(StandardField.FILE, ":file.pdf:PDF");
-        databaseContext.setDatabasePath(bibFile);
-
-        IntegrityCheckTest.assertCorrect(databaseContext);
+    @Test
+    void fileAcceptsFullPath() {
+        assertEquals(Optional.empty(), checker.checkValue("description:build.gradle:gradle"));
+    }
+    @Test
+    void fileDoesNotAcceptWrongPath() {
+        assertNotEquals(Optional.empty(), checker.checkValue(":asflakjfwofja:PDF"));
     }
 
 }

@@ -1,20 +1,30 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.StandardEntryType;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class BooktitleCheckerTest {
 
+    private BooktitleChecker checker;
+
+    @BeforeEach
+    public void setUp() {
+        checker = new BooktitleChecker();
+    }
+
     @Test
     void booktitleAcceptsIfItDoesNotEndWithConferenceOn() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.BOOKTITLE, "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", StandardEntryType.Proceedings));
+        assertEquals(Optional.empty(), checker.checkValue("2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)"));
     }
 
     @Test
     void booktitleDoesNotAcceptsIfItEndsWithConferenceOn() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.BOOKTITLE, "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", StandardEntryType.Proceedings));
+        assertNotEquals(Optional.empty(), checker.checkValue("Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on"));
     }
 
 }

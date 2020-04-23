@@ -1,83 +1,94 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class YearCheckerTest {
 
+    private YearChecker checker;
+
+    @BeforeEach
+    void setUp() {
+        checker = new YearChecker();
+    }
+
     @Test
     void yearFieldAccepts21stCenturyDate() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "2014"));
+        assertEquals(Optional.empty(), checker.checkValue("2014"));
     }
 
     @Test
     void yearFieldAccepts20thCenturyDate() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "1986"));
+        assertEquals(Optional.empty(), checker.checkValue("1986"));
     }
 
     @Test
     void yearFieldAcceptsApproximateDate() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "around 1986"));
+        assertEquals(Optional.empty(), checker.checkValue("around 1986"));
     }
 
     @Test
     void yearFieldAcceptsApproximateDateWithParenthesis() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "(around 1986)"));
+        assertEquals(Optional.empty(), checker.checkValue("(around 1986)"));
     }
 
     @Test
     void yearFieldRemovesCommaFromYear() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "1986,"));
+        assertEquals(Optional.empty(), checker.checkValue("1986,"));
     }
 
     @Test
     void yearFieldRemovesBraceAndPercentageFromYear() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "1986}%"));
+        assertEquals(Optional.empty(), checker.checkValue("1986}%"));
     }
 
     @Test
     void yearFieldRemovesSpecialCharactersFromYear() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.YEAR, "1986(){},.;!?<>%&$"));
+        assertEquals(Optional.empty(), checker.checkValue("1986(){},.;!?<>%&$"));
     }
 
     @Test
     void yearFieldDoesNotAcceptStringAsInput() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "abc"));
+        assertNotEquals(Optional.empty(), checker.checkValue("abc"));
     }
 
     @Test
     void yearFieldDoesNotAcceptDoubleDigitNumber() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "86"));
+        assertNotEquals(Optional.empty(), checker.checkValue("86"));
     }
 
     @Test
     void yearFieldDoesNotAcceptTripleDigitNumber() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "204"));
+        assertNotEquals(Optional.empty(), checker.checkValue("204"));
     }
 
     @Test
     void yearFieldDoesNotRemoveStringInYear() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "1986a"));
+        assertNotEquals(Optional.empty(), checker.checkValue("1986a"));
     }
 
     @Test
     void yearFieldDoesNotRemoveStringInParenthesis() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "(1986a)"));
+        assertNotEquals(Optional.empty(), checker.checkValue("(1986a)"));
     }
 
     @Test
     void yearFieldDoesNotRemoveStringBeforeComma() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "1986a,"));
+        assertNotEquals(Optional.empty(), checker.checkValue("1986a,"));
     }
 
     @Test
     void yearFieldDoesNotRemoveStringInsideBraceAndPercentage() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "1986}a%"));
+        assertNotEquals(Optional.empty(), checker.checkValue("1986}a%"));
     }
 
     @Test
     void yearFieldDoesNotRemoveStringBeforeSpecialCharacters() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.YEAR, "1986a(){},.;!?<>%&$"));
+        assertNotEquals(Optional.empty(), checker.checkValue("1986a(){},.;!?<>%&$"));
     }
 }

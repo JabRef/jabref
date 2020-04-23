@@ -1,29 +1,55 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.database.BibDatabaseMode;
+import java.util.Collections;
+import java.util.List;
+
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JournalInAbbreviationListCheckerTest {
 
+    private JournalInAbbreviationListChecker checker;
+    private JournalInAbbreviationListChecker checkerb;
+    private JournalAbbreviationRepository abbreviationRepository;
+    private Abbreviation a;
+    private BibEntry entry;
+
+    @BeforeEach
+    void setUp() {
+        abbreviationRepository = new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"));
+        checker = new JournalInAbbreviationListChecker(StandardField.JOURNAL, abbreviationRepository);
+        checkerb = new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, abbreviationRepository);
+        entry = new BibEntry();
+    }
+
     @Test
     void journalAcceptsNameInTheList() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.JOURNAL, "IEEE Software"));
+        entry.setField(StandardField.JOURNAL, "IEEE Software");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void journalDoesNotAcceptNameNotInList() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.JOURNAL, "IEEE Whocares"));
+        entry.setField(StandardField.JOURNAL, "IEEE Whocares");
+        assertEquals(List.of(new IntegrityMessage("journal not found in abbreviation list", entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
     @Test
-    void bibLaTexDoesNotAcceptRandomInputInTitle() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.JOURNALTITLE, "A journal"), BibDatabaseMode.BIBLATEX));
+    void journalTitleDoesNotAcceptRandomInputInTitle() {
+        entry.setField(StandardField.JOURNALTITLE, "A journal");
+        assertEquals(List.of(new IntegrityMessage("journal not found in abbreviation list", entry, StandardField.JOURNALTITLE)), checkerb.check(entry));
     }
 
     @Test
-    void bibTexDoesNotAcceptRandomInputInTitle() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.JOURNAL, "A journal"), BibDatabaseMode.BIBTEX));
+    void journalDoesNotAcceptRandomInputInTitle() {
+        entry.setField(StandardField.JOURNAL, "A journal");
+        assertEquals(List.of(new IntegrityMessage("journal not found in abbreviation list", entry, StandardField.JOURNAL)), checker.check(entry));
     }
 }

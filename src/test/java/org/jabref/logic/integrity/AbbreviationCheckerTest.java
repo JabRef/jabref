@@ -1,13 +1,9 @@
 package org.jabref.logic.integrity;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,23 +33,13 @@ class AbbreviationCheckerTest {
     }
 
     @Test
-    void journalNameAcceptsFullForm() {
-        for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
-            IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(field, "IEEE Software"));
-        }
+    void checkValueDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
+        assertEquals(Optional.empty(), checker.checkValue("IEEE Software"));
     }
 
     @Test
-    void journalNameAcceptsEmptyInput() {
-        for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
-            IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(field, ""));
-        }
+    void checkValueDoesNotComplainAboutJournalNameThatHasΝοInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
     }
 
-    @Test
-    void journalNameDoesNotAcceptNonAbbreviatedForm() {
-        for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(field, "IEEE SW"));
-        }
-    }
 }

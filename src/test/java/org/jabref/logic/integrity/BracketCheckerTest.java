@@ -1,39 +1,50 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class BracketCheckerTest {
 
+    private BracketChecker checker;
+
+    @BeforeEach
+    void setUp() {
+        checker = new BracketChecker();
+    }
+
     @Test
     void fieldAcceptsNoBrackets() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.TITLE, "x"));
+        assertEquals(Optional.empty(), checker.checkValue("x"));
     }
 
     @Test
     void fieldAcceptsEvenNumberOfBrackets() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.TITLE, "{x}"));
+        assertEquals(Optional.empty(), checker.checkValue("{x}"));
     }
 
     @Test
     void fieldAcceptsExpectedBracket() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.TITLE, "{x}x{}x{{}}"));
+        assertEquals(Optional.empty(), checker.checkValue("{x}x{}x{{}}"));
     }
 
     @Test
     void fieldDoesNotAcceptOddNumberOfBrackets() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.TITLE, "{x}x{}}x{{}}"));
+        assertNotEquals(Optional.empty(), checker.checkValue("{x}x{}}x{{}}"));
     }
 
     @Test
     void fieldDoesNotAcceptUnexpectedClosingBracket() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.TITLE, "}"));
+        assertNotEquals(Optional.empty(), checker.checkValue("}"));
     }
 
     @Test
     void fieldDoesNotAcceptUnexpectedOpeningBracket() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.TITLE, "{"));
+        assertNotEquals(Optional.empty(), checker.checkValue("{"));
     }
 
 }

@@ -1,65 +1,82 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
 
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class MonthCheckerTest {
 
+    private MonthChecker checker;
+    private MonthChecker checkerBiblatex;
+
+    @BeforeEach
+    public void setUp() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        checker = new MonthChecker(databaseContext);
+        databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
+        checkerBiblatex = new MonthChecker(databaseBiblatex);
+    }
+
     @Test
     void bibTexAcceptsThreeLetterAbbreviationsWithHashMarks() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "#mar#"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("#mar#"));
     }
 
     @Test
     void bibTexDoesNotAcceptWhateverThreeLetterAbbreviations() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "#bla#"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("#bla#"));
     }
 
     @Test
     void bibTexDoesNotAcceptThreeLetterAbbreviationsWithNoHashMarks() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "Dec"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("Dec"));
     }
 
     @Test
     void bibTexDoesNotAcceptFullInput() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "December"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("December"));
     }
 
     @Test
     void bibTexDoesNotAcceptRandomString() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "Lorem"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("Lorem"));
     }
 
     @Test
     void bibTexDoesNotAcceptInteger() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "10"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("10"));
     }
 
     @Test
     void bibLaTexAcceptsThreeLetterAbbreviationsWithHashMarks() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "#jan#"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("#jan#"));
     }
 
     @Test
     void bibLaTexDoesNotAcceptThreeLetterAbbreviationsWithNoHashMarks() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "jan"), BibDatabaseMode.BIBLATEX));
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("jan"));
     }
 
     @Test
     void bibLaTexDoesNotAcceptFullInput() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "January"), BibDatabaseMode.BIBLATEX));
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("January"));
     }
 
     @Test
     void bibLaTexDoesNotAcceptRandomString() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "Lorem"), BibDatabaseMode.BIBLATEX));
+        assertNotEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem"));
     }
 
     @Test
     void bibLaTexAcceptsInteger() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.MONTH, "10"), BibDatabaseMode.BIBLATEX));
-
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("10"));
     }
 }

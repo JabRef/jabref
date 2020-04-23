@@ -4,13 +4,11 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class PersonNamesCheckerTest {
 
@@ -67,67 +65,48 @@ public class PersonNamesCheckerTest {
 
     @Test
     void authorAcceptsVoidInput() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            // getPersonNameFields returns fields that are available in biblatex only
-            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
-            IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, ""), BibDatabaseMode.BIBLATEX));
-        }
+        assertEquals(Optional.empty(), checker.checkValue(""));
     }
 
     @Test
     void authorAcceptsLastNameOnly() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
-        }
+        assertEquals(Optional.empty(), checker.checkValue("Knuth"));
     }
 
     @Test
     void authorDoesNotAcceptSpacesBeforeFormat() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue("   Knuth, Donald E. "));
     }
 
     @Test
     void authorDoesNotAcceptDifferentFormats() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue("Knuth, Donald E. and Kurt Cobain and A. Einstein"));
     }
 
     @Test
     void authorAcceptsMultipleAuthors() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-        }
+        assertEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and A. Einstein"));
     }
 
     @Test
     void authorCanNotStartWithComma() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue(", and Kurt Cobain and A. Einstein"));
     }
 
     @Test
     void authorDoesNotAcceptCommaAsAuthor() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and ,"));
+
     }
 
     @Test
     void authorCanNotStartWithAnd() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue("and Kurt Cobain and A. Einstein"));
     }
 
     @Test
     void authorDoesNotAcceptUnfinishedSentence() {
-        for (Field field : FieldFactory.getPersonNameFields()) {
-            IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(field, "Donald E. Knuth and Kurt Cobain and"), BibDatabaseMode.BIBLATEX));
-        }
+        assertNotEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and"));
     }
 
 }

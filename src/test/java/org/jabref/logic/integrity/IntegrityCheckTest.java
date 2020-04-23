@@ -118,11 +118,10 @@ class IntegrityCheckTest {
 
     protected static void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
-                createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
-                allowIntegerEdition
-        ).checkDatabase();
+                                                             mock(FilePreferences.class),
+                                                             createBibtexKeyPatternPreferences(),
+                                                             new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                                                             allowIntegerEdition).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

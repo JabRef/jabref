@@ -1,39 +1,61 @@
 package org.jabref.logic.integrity;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLCharacterCheckerTest {
 
+    private HTMLCharacterChecker checker;
+    private BibEntry entry;
+
+    @BeforeEach
+    void setUp() {
+        checker = new HTMLCharacterChecker();
+        entry = new BibEntry();
+    }
+
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.TITLE, "Not a single {HTML} character"));
+        entry.setField(StandardField.TITLE, "Not a single {HTML} character");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void monthAcceptsNonHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.MONTH, "#jan#"));
+        entry.setField(StandardField.MONTH, "#jan#");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void authorAcceptsNonHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.AUTHOR, "A. Einstein and I. Newton"));
+        entry.setField(StandardField.AUTHOR, "A. Einstein and I. Newton");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void urlAcceptsNonHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.URL, "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
+        entry.setField(StandardField.URL, "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
     void authorDoesNotAcceptHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.AUTHOR, "Lenhard, J&#227;rg"));
+        entry.setField(StandardField.AUTHOR, "Lenhard, J&#227;rg");
+        assertEquals(List.of(new IntegrityMessage("HTML encoded character found", entry, StandardField.AUTHOR)), checker.check(entry));
     }
 
     @Test
     void journalDoesNotAcceptHTMLEncodedCharacters() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
+        entry.setField(StandardField.JOURNAL, "&Auml;rling Str&ouml;m for &#8211; &#x2031;");
+        assertEquals(List.of(new IntegrityMessage("HTML encoded character found", entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
 

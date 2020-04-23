@@ -1,37 +1,49 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class UrlCheckerTest {
 
+    private UrlChecker checker;
+
+    @BeforeEach
+    void setUp() {
+        checker = new UrlChecker();
+    }
+
     @Test
     void urlFieldAcceptsHttpAddress() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.URL, "http://www.google.com"));
+        assertEquals(Optional.empty(), checker.checkValue("http://www.google.com"));
     }
 
     @Test
     void urlFieldAcceptsFullLocalPath() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.URL, "file://c:/asdf/asdf"));
+        assertEquals(Optional.empty(), checker.checkValue("file://c:/asdf/asdf"));
     }
 
     @Test
     void urlFieldAcceptsFullPathHttpAddress() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.URL, "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
+        assertEquals(Optional.empty(), checker.checkValue("http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
     }
 
     @Test
     void urlFieldDoesNotAcceptHttpAddressWithoutTheHttp() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.URL, "www.google.com"));
+        assertNotEquals(Optional.empty(), checker.checkValue("www.google.com"));
     }
 
     @Test
     void urlFieldDoesNotAcceptPartialHttpAddress() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.URL, "google.com"));
+        assertNotEquals(Optional.empty(), checker.checkValue("google.com"));
     }
 
     @Test
     void urlFieldDoesNotAcceptPartialLocalPath() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.URL, "c:/asdf/asdf"));
+        assertNotEquals(Optional.empty(), checker.checkValue("c:/asdf/asdf"));
     }
 }

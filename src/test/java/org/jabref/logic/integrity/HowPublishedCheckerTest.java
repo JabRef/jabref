@@ -1,40 +1,58 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
 
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class HowPublishedCheckerTest {
 
+    private HowPublishedChecker checker;
+    private HowPublishedChecker checkerBiblatex;
+
+    @BeforeEach
+    public void setUp() {
+        BibDatabaseContext databaseContext = new BibDatabaseContext();
+        BibDatabaseContext databaseBiblatex = new BibDatabaseContext();
+        databaseContext.setMode(BibDatabaseMode.BIBTEX);
+        checker = new HowPublishedChecker(databaseContext);
+        databaseBiblatex.setMode(BibDatabaseMode.BIBLATEX);
+        checkerBiblatex = new HowPublishedChecker(databaseBiblatex);
+    }
+
     @Test
     void bibTexAcceptsStringWithCapitalFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("Lorem ipsum"));
     }
 
     @Test
     void bibTexDoesNotCareAboutSpecialChracters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("Lorem ipsum? 10"));
     }
 
     @Test
     void bibTexDoesNotAcceptStringWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertNotEquals(Optional.empty(), checker.checkValue("lorem ipsum"));
     }
 
     @Test
     void bibTexAcceptsUrl() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "\\url{someurl}"), BibDatabaseMode.BIBTEX));
+        assertEquals(Optional.empty(), checker.checkValue("\\url{someurl}"));
     }
 
     @Test
     void bibLaTexAcceptsStringWithCapitalFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("Lorem ipsum"));
     }
 
     @Test
     void bibLaTexAcceptsStringWithLowercaseFirstLetter() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.withMode(IntegrityCheckTest.createContext(StandardField.HOWPUBLISHED, "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertEquals(Optional.empty(), checkerBiblatex.checkValue("lorem ipsum"));
     }
 
 }

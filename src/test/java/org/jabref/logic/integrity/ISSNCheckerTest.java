@@ -1,29 +1,40 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.entry.field.StandardField;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class ISSNCheckerTest {
 
+    private ISSNChecker checker;
+
+    @BeforeEach
+    void setUp() {
+        checker = new ISSNChecker();
+    }
+
     @Test
     void issnAcceptsValidInput() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.ISSN, "0020-7217"));
+        assertEquals(Optional.empty(), checker.checkValue("0020-7217"));
     }
 
     @Test
     void issnAcceptsNumbersAndCharacters() {
-        IntegrityCheckTest.assertCorrect(IntegrityCheckTest.createContext(StandardField.ISSN, "2434-561x"));
+        assertEquals(Optional.empty(), checker.checkValue("2434-561x"));
     }
 
     @Test
     void issnDoesNotAcceptRandomInput() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.ISSN, "Some other stuff"));
+        assertNotEquals(Optional.empty(), checker.checkValue("Some other stuff"));
     }
 
     @Test
     void issnDoesNotAcceptInvalidInput() {
-        IntegrityCheckTest.assertWrong(IntegrityCheckTest.createContext(StandardField.ISSN, "0020-7218"));
+        assertNotEquals(Optional.empty(), checker.checkValue("0020-7218"));
     }
 
 }
