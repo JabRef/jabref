@@ -24,28 +24,33 @@ public class DoiDuplicationChecker implements Checker {
 
     public DoiDuplicationChecker(BibDatabase database) {
         this.database = Objects.requireNonNull(database);
+        // There is no interface for the check of the complete database.
+        // A duplication check needs the knowledge of the **other** entries.
+        // The method "check" is called for each **entry**, thus walk through all entries only once
+        fillErrorMap();
     }
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        if (errors == null) {
-            errors = new HashMap<>();
-
-            ObservableList<BibEntry> bibEntries = database.getEntries();
-            BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(bibEntries.size());
-            for (BibEntry bibEntry : bibEntries) {
-                bibEntry.getDOI().ifPresent(doi ->
-                        duplicateMap.computeIfAbsent(doi, x -> new ArrayList<>()).add(bibEntry));
-            }
-
-            duplicateMap.inverse().keySet().stream()
-                        .filter(list -> list.size() > 1)
-                        .flatMap(list -> list.stream())
-                        .forEach(item -> {
-                            IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI);
-                            errors.put(item, List.of(errorMessage));
-                        });
-        }
         return errors.getOrDefault(entry, Collections.emptyList());
+    }
+
+    private void fillErrorMap() {
+        errors = new HashMap<>();
+
+        ObservableList<BibEntry> bibEntries = database.getEntries();
+        BiMap<DOI, List<BibEntry>> duplicateMap = HashBiMap.create(bibEntries.size());
+        for (BibEntry bibEntry : bibEntries) {
+            bibEntry.getDOI().ifPresent(doi ->
+                    duplicateMap.computeIfAbsent(doi, x -> new ArrayList<>()).add(bibEntry));
+        }
+
+        duplicateMap.inverse().keySet().stream()
+                    .filter(list -> list.size() > 1)
+                    .flatMap(list -> list.stream())
+                    .forEach(item -> {
+                        IntegrityMessage errorMessage = new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI);
+                        errors.put(item, List.of(errorMessage));
+                    });
     }
 }
