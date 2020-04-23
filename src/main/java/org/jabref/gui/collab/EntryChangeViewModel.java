@@ -1,146 +1,67 @@
 package org.jabref.gui.collab;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.mergeentries.MergeEntries.DefaultRadioButtonSelectionMode;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class EntryChangeViewModel extends DatabaseChangeViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EntryChangeViewModel.class);
+    private final BibEntry oldEntry;
+    private final BibEntry newEntry;
+    private MergeEntries mergePanel;
 
-    private final List<FieldChangeViewModel> fieldChanges = new ArrayList<>();
-
-    public EntryChangeViewModel(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
+    public EntryChangeViewModel(BibEntry entry, BibEntry newEntry) {
         super();
-        name = tmpEntry.getCiteKeyOptional()
-                       .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
-                       .orElse(Localization.lang("Modified entry"));
 
-        // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
-        // locally as well, since last tempfile was saved.
-        boolean isModifiedLocally = (DuplicateCheck.compareEntriesStrictly(memEntry, tmpEntry) <= 1);
+        this.oldEntry = entry;
+        this.newEntry = newEntry;
 
-        // Another (unlikely?) possibility is that both disk and mem version has been modified
-        // in the same way. Check for this, too.
-        boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
+        name = entry.getCiteKeyOptional()
+                    .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
+                    .orElse(Localization.lang("Modified entry"));
+    }
 
-        LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
-                + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
-
-        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        allFields.addAll(memEntry.getFields());
-        allFields.addAll(tmpEntry.getFields());
-        allFields.addAll(diskEntry.getFields());
-
-        for (Field field : allFields) {
-            Optional<String> mem = memEntry.getField(field);
-            Optional<String> tmp = tmpEntry.getField(field);
-            Optional<String> disk = diskEntry.getField(field);
-
-            if ((tmp.isPresent()) && (disk.isPresent())) {
-                if (!tmp.equals(disk)) {
-                    // Modified externally.
-                    fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
-                }
-            } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
-                    || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
-                            && (mem.isPresent()) && !mem.get().isEmpty())) {
-                // Added externally.
-                fieldChanges.add(new FieldChangeViewModel(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null), disk.orElse(null)));
-            }
+    /**
+     *   We override this here to select the radio buttons accordingly
+     */
+    @Override
+    public void setAccepted(boolean accepted) {
+        super.setAccepted(accepted);
+        if (accepted) {
+            mergePanel.selectAllRightRadioButtons();
+        } else {
+            mergePanel.selectAllLeftRadioButtons();
         }
     }
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        for (DatabaseChangeViewModel c : fieldChanges) {
-            if (c.isAccepted()) {
-                c.makeChange(database, undoEdit);
-            }
-        }
+        database.getDatabase().removeEntry(oldEntry);
+        BibEntry mergedEntry = mergePanel.getMergeEntry();
+        mergedEntry.setId(oldEntry.getId()); // Keep ID
+        database.getDatabase().insertEntry(mergedEntry);
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), oldEntry));
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), mergedEntry));
     }
 
     @Override
     public Node description() {
-        VBox container = new VBox();
+        mergePanel = new MergeEntries(oldEntry, newEntry, Localization.lang("In JabRef"), Localization.lang("On disk"), DefaultRadioButtonSelectionMode.LEFT);
+        VBox container = new VBox(10);
         Label header = new Label(name);
         header.getStyleClass().add("sectionHeader");
         container.getChildren().add(header);
-
-        for (FieldChangeViewModel change : fieldChanges) {
-            container.getChildren().add(change.description());
-        }
-
+        container.getChildren().add(mergePanel);
+        VBox.setMargin(mergePanel, new Insets(5, 5, 5, 5));
         return container;
-    }
-
-    static class FieldChangeViewModel extends DatabaseChangeViewModel {
-
-        private final BibEntry entry;
-        private final BibEntry tmpEntry;
-        private final Field field;
-        private final String inMem;
-        private final String onTmp;
-        private final String onDisk;
-
-        public FieldChangeViewModel(Field field, BibEntry memEntry, BibEntry tmpEntry, String inMem, String onTmp, String onDisk) {
-            super(field.getName());
-            entry = memEntry;
-            this.tmpEntry = tmpEntry;
-            this.field = field;
-            this.inMem = inMem;
-            this.onTmp = onTmp;
-            this.onDisk = onDisk;
-        }
-
-        @Override
-        public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-            if (onDisk == null) {
-                entry.clearField(field);
-            } else {
-                entry.setField(field, onDisk);
-            }
-            undoEdit.addEdit(new UndoableFieldChange(entry, field, inMem, onDisk));
-        }
-
-        @Override
-        public Node description() {
-            VBox container = new VBox();
-            container.getChildren().add(new Label(Localization.lang("Modification of field") + " " + field));
-
-            if ((onDisk != null) && !onDisk.isEmpty()) {
-                container.getChildren().add(new Label(Localization.lang("Value set externally") + ": " + onDisk));
-            } else {
-                container.getChildren().add(new Label(Localization.lang("Value cleared externally")));
-            }
-
-            if ((inMem != null) && !inMem.isEmpty()) {
-                container.getChildren().add(new Label(Localization.lang("Current value") + ": " + inMem));
-            }
-            if ((onTmp != null) && !onTmp.isEmpty()) {
-                container.getChildren().add(new Label(Localization.lang("Current tmp value") + ": " + onTmp));
-            }
-
-            return container;
-        }
-
     }
 }

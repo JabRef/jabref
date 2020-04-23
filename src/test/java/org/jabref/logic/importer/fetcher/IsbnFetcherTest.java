@@ -38,7 +38,7 @@ class IsbnFetcherTest {
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
         bibEntry.setField(StandardField.YEAR, "2018");
         bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
-        bibEntry.setField(StandardField.DATE, "2018-01-11");
+        bibEntry.setField(StandardField.DATE, "2018-01-01");
         bibEntry.setField(new UnknownField("ean"), "9780134685991");
         bibEntry.setField(StandardField.ISBN, "0134685997");
         bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
@@ -51,7 +51,7 @@ class IsbnFetcherTest {
 
     @Test
     void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
@@ -97,10 +97,10 @@ class IsbnFetcherTest {
 
     /**
      * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
-     * not available on ebook.de. The fetcher should something as it falls back to Chimbori
+     * not available on ebook.de. The fetcher should something as it falls back to OttoBib
      */
     @Test
-    void searchForIsbnAvailableAtChimboriButNonOnEbookDe() throws FetcherException {
+    void searchForIsbnAvailableAtOttoBibButNonOnEbookDe() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
         assertNotEquals(Optional.empty(), fetchedEntry);
     }

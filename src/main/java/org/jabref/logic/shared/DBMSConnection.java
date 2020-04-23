@@ -22,7 +22,6 @@ public class DBMSConnection implements DatabaseConnection {
     private final DBMSConnectionProperties properties;
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
-
         if (!connectionProperties.isValid()) {
             throw new InvalidDBMSConnectionPropertiesException();
         }
@@ -34,7 +33,6 @@ public class DBMSConnection implements DatabaseConnection {
             // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
             DBMSConnection.getAvailableDBMSTypes();
             this.connection = DriverManager.getConnection(connectionProperties.getUrl(), connectionProperties.asProperties());
-
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.

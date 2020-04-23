@@ -28,7 +28,6 @@ import javafx.scene.layout.BorderPane;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
@@ -39,7 +38,6 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.TypedBibEntry;
@@ -103,13 +101,6 @@ public class EntryEditor extends BorderPane {
         this.fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferencesService.getFilePreferences(),
                 databaseContext);
 
-        if (GUIGlobals.currentFont != null) {
-            setStyle(String.format("text-area-background: %s;text-area-foreground: %s;text-area-highlight: %s;",
-                    ColorUtil.toHex(GUIGlobals.validFieldBackgroundColor),
-                    ColorUtil.toHex(GUIGlobals.editorTextColor),
-                    ColorUtil.toHex(GUIGlobals.activeBackgroundColor)));
-        }
-
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
@@ -134,25 +125,21 @@ public class EntryEditor extends BorderPane {
 
             if (event.getDragboard().hasContent(DataFormat.FILES)) {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
-                FileDragDropPreferenceType dragDropPreferencesType = preferencesService.getEntryEditorFileLinkPreference();
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.MOVE) {
-                    LOGGER.debug("Mode MOVE");
-                    fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
+                switch (event.getTransferMode()) {
+                    case COPY:
+                        LOGGER.debug("Mode COPY");
+                        fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
+                        break;
+                    case MOVE:
+                        LOGGER.debug("Mode MOVE");
+                        fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
+                        break;
+                    case LINK:
+                        LOGGER.debug("Mode LINK");
+                        fileLinker.addFilesToEntry(entry, files);
+                        break;
                 }
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.COPY) {
-                    LOGGER.debug("Mode COPY");
-                    fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
-                    success = true;
-                }
-
-                if (dragDropPreferencesType == FileDragDropPreferenceType.LINK) {
-                    LOGGER.debug("Mode LINK");
-                    fileLinker.addFilesToEntry(entry, files);
-                    success = true;
-                }
+                success = true;
             }
 
             event.setDropCompleted(success);
@@ -256,8 +243,8 @@ public class EntryEditor extends BorderPane {
 
         // Source tab
         sourceTab = new SourceTab(databaseContext, undoManager,
-                entryEditorPreferences.getLatexFieldFormatterPreferences(),
-                entryEditorPreferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager);
+                entryEditorPreferences.getFieldWriterPreferences(),
+                entryEditorPreferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager, Globals.getKeyPrefs());
         entryEditorTabs.add(sourceTab);
 
         // LaTeX citations tab

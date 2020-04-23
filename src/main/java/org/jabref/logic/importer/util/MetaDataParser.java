@@ -69,7 +69,7 @@ public class MetaDataParser {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 6);
                 Path path = Paths.get(getSingleItem(value)).normalize();
-                metaData.setLaTexFileDirectory(user, path);
+                metaData.setLatexFileDirectory(user, path);
                 continue;
             }
 
@@ -102,7 +102,7 @@ public class MetaDataParser {
                     break;
                 default:
                     // Keep meta data items that we do not know in the file
-                    metaData.putUnkownMetaDataItem(entry.getKey(), value);
+                    metaData.putUnknownMetaDataItem(entry.getKey(), value);
             }
         }
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {

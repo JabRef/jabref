@@ -1,0 +1,10 @@
+{
+  "name": "org.jabref.jabref",
+  "description": "JabRef",
+  "path": "/opt/jabref/lib/jabrefHost.py",
+  "type": "stdio",
+  "allowed_extensions": [
+    "browserextension@jabref.org",
+    "@jabfox"
+  ]
+}

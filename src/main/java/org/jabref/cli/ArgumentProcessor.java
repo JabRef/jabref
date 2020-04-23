@@ -44,7 +44,6 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -242,8 +241,8 @@ public class ArgumentProcessor {
 
     private boolean exportMatches(List<ParserResult> loaded) {
         String[] data = cli.getExportMatches().split(",");
-        String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-        //$ stands for a blank
+        String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
+        // $ stands for a blank
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
@@ -253,17 +252,17 @@ public class ArgumentProcessor {
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
-        //export matches
+        // export matches
         if (!matches.isEmpty()) {
             String formatName;
 
-            //read in the export format, take default format if no format entered
+            // read in the export format, take default format if no format entered
             switch (data.length) {
                 case 3:
                     formatName = data[2];
                     break;
                 case 2:
-                    //default exporter: HTML table (with Abstract & BibTeX)
+                    // default exporter: HTML table (with Abstract & BibTeX)
                     formatName = "tablerefsabsbib";
                     break;
                 default:
@@ -273,7 +272,7 @@ public class ArgumentProcessor {
                     return false;
             }
 
-            //export new database
+            // export new database
             Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
             if (!exporter.isPresent()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
@@ -392,8 +391,7 @@ public class ArgumentProcessor {
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
             AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
-            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-            databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults));
+            databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
             // Show just a warning message if encoding did not work for all characters:
             if (fileWriter.hasEncodingProblems()) {
@@ -433,7 +431,7 @@ public class ArgumentProcessor {
                 theFile = theFile.getAbsoluteFile();
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
-            databaseContext.setDatabaseFile(theFile);
+            databaseContext.setDatabasePath(theFile.toPath());
             Globals.prefs.fileDirForDatabase = databaseContext
                     .getFileDirectories(Globals.prefs.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
@@ -524,7 +522,7 @@ public class ArgumentProcessor {
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
-        if ((fetchCommand == null) || !fetchCommand.contains(":") || (fetchCommand.split(":").length != 2)) {
+        if ((fetchCommand == null) || !fetchCommand.contains(":")) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
             return Optional.empty();

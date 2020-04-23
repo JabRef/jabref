@@ -7,6 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ThemeLoader;
@@ -16,8 +17,12 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AppearanceTabViewModel implements PreferenceTabViewModel {
+
+    public static SpinnerValueFactory<Integer> fontSizeValueFactory =
+            new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
@@ -27,7 +32,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    private FunctionBasedValidator fontSizeValidator;
+    private Validator fontSizeValidator;
 
     private List<String> restartWarnings = new ArrayList<>();
 
@@ -81,37 +86,46 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         }
 
         if (themeLightProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
-            restartWarnings.add(Localization.lang("Theme changed:") + " " + ThemeLoader.MAIN_CSS);
+            restartWarnings.add(Localization.lang("Theme changed to light theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
         } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
-            restartWarnings.add(Localization.lang("Theme changed:") + " " + ThemeLoader.DARK_CSS);
+            restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
         }
     }
 
-    public ValidationStatus fontSizeValidationStatus() { return fontSizeValidator.getValidationStatus(); }
+    public ValidationStatus fontSizeValidationStatus() {
+        return fontSizeValidator.getValidationStatus();
+    }
 
     @Override
     public boolean validateSettings() {
-        if (fontOverrideProperty.getValue()) {
-            if (!fontSizeValidator.getValidationStatus().isValid()) {
-                fontSizeValidator.getValidationStatus().getHighestMessage().ifPresent(message ->
-                        dialogService.showErrorDialogAndWait(message.getMessage()));
-                return false;
-            }
+        if (fontOverrideProperty.getValue() && !fontSizeValidator.getValidationStatus().isValid()) {
+            fontSizeValidator.getValidationStatus().getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
+            return false;
         }
         return true;
     }
 
     @Override
-    public List<String> getRestartWarnings() { return restartWarnings; }
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
+    }
 
-    public BooleanProperty fontOverrideProperty() { return fontOverrideProperty; }
+    public BooleanProperty fontOverrideProperty() {
+        return fontOverrideProperty;
+    }
 
-    public StringProperty fontSizeProperty() { return fontSizeProperty; }
+    public StringProperty fontSizeProperty() {
+        return fontSizeProperty;
+    }
 
-    public BooleanProperty themeLightProperty() { return themeLightProperty; }
+    public BooleanProperty themeLightProperty() {
+        return themeLightProperty;
+    }
 
-    public BooleanProperty themeDarkProperty() { return themeDarkProperty; }
-
+    public BooleanProperty themeDarkProperty() {
+        return themeDarkProperty;
+    }
 }

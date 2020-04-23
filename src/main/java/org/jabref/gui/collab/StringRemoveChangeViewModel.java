@@ -17,18 +17,15 @@ class StringRemoveChangeViewModel extends DatabaseChangeViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringRemoveChangeViewModel.class);
     private final BibtexString string;
 
-    private final BibtexString inMem;
-
-    public StringRemoveChangeViewModel(BibtexString string, BibtexString inMem) {
+    public StringRemoveChangeViewModel(BibtexString string) {
         super(Localization.lang("Removed string") + ": '" + string.getName() + '\'');
         this.string = string;
-        this.inMem = inMem; // Holds the version in memory. Check if it has been modified...?
     }
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         try {
-            database.getDatabase().removeString(inMem.getId());
+            database.getDatabase().removeString(string.getId());
             undoEdit.addEdit(new UndoableRemoveString(database.getDatabase(), string));
         } catch (Exception ex) {
             LOGGER.warn("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);

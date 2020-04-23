@@ -11,7 +11,6 @@ public class DiffHighlightingTextPane extends TextFlow {
 
     private static final String CONTENT_TYPE = "text/html";
 
-
     public DiffHighlightingTextPane() {
         super();
 //        setContentType(CONTENT_TYPE);

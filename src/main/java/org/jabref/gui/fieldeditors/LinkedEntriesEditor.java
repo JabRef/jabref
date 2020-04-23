@@ -5,8 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.component.TagBar;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,16 +18,19 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedEntriesEditorViewModel viewModel;
-    @FXML private TagBar<ParsedEntryLink> linkedEntriesBar;
+    @FXML
+    private final LinkedEntriesEditorViewModel viewModel;
+    @FXML
+    private TagBar<ParsedEntryLink> linkedEntriesBar;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
+        linkedEntriesBar.setFieldProperties(field.getProperties());
         linkedEntriesBar.setStringConverter(viewModel.getStringConverter());
         linkedEntriesBar.setOnTagClicked((parsedEntryLink, mouseEvent) -> viewModel.jumpToEntry(parsedEntryLink));
 

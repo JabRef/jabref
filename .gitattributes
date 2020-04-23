@@ -1,13 +1,19 @@
 # unix  line endings at unix files
 gradlew text eol=lf
 *.sh text eol=lf
+
+# windows line endings at windows files
 *.bat text eol=crlf
 
+# required for proper releasing
 AUTHORS text eol=lf
 
-# ensure that line endings of *.java and *.properties are normalized
-*.properties text
+# ensure that line endings of *.java, and *.properties are normalized
 *.java text
+*.properties text
+
+# .bib files have to be written using OS specific line endings to enable our tests working
+*.bib text !eol
 
 # disable after a release
-# CHANGELOG.md merge=union
+CHANGELOG.md merge=union

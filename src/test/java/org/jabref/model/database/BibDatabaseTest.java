@@ -26,17 +26,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BibDatabaseTest {
+class BibDatabaseTest {
 
     private BibDatabase database;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         database = new BibDatabase();
     }
 
     @Test
-    public void insertEntryAddsEntryToEntriesList() {
+    void insertEntryAddsEntryToEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
         assertEquals(1, database.getEntries().size());
@@ -45,7 +45,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void containsEntryIdFindsEntry() {
+    void containsEntryIdFindsEntry() {
         BibEntry entry = new BibEntry();
         assertFalse(database.containsEntryWithId(entry.getId()));
         database.insertEntry(entry);
@@ -53,17 +53,17 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void insertEntryWithSameIdThrowsException() {
+    void insertEntryWithSameIdDoesNotThrowException() {
         BibEntry entry0 = new BibEntry();
         database.insertEntry(entry0);
 
         BibEntry entry1 = new BibEntry();
         entry1.setId(entry0.getId());
-        assertThrows(KeyCollisionException.class, () -> database.insertEntry(entry1));
+        database.insertEntry(entry1);
     }
 
     @Test
-    public void removeEntryRemovesEntryFromEntriesList() {
+    void removeEntryRemovesEntryFromEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
@@ -73,23 +73,55 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void insertNullEntryThrowsException() {
+    void removeSomeEntriesRemovesThoseEntriesFromEntriesList() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        List<BibEntry> allEntries = Arrays.asList(entry1, entry2, entry3);
+        database.insertEntries(allEntries);
+        List<BibEntry> entriesToDelete = Arrays.asList(entry1, entry3);
+        database.removeEntries(entriesToDelete);
+        assertEquals(Collections.singletonList(entry2), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertTrue(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    void removeAllEntriesRemovesAllEntriesFromEntriesList() {
+        List<BibEntry> allEntries = new ArrayList<>();
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        BibEntry entry3 = new BibEntry();
+        allEntries.add(entry1);
+        allEntries.add(entry2);
+        allEntries.add(entry3);
+
+        database.removeEntries(allEntries);
+        assertEquals(Collections.emptyList(), database.getEntries());
+        assertFalse(database.containsEntryWithId(entry1.getId()));
+        assertFalse(database.containsEntryWithId(entry2.getId()));
+        assertFalse(database.containsEntryWithId(entry3.getId()));
+    }
+
+    @Test
+    void insertNullEntryThrowsException() {
         assertThrows(NullPointerException.class, () -> database.insertEntry(null));
     }
 
     @Test
-    public void removeNullEntryThrowsException() {
+    void removeNullEntryThrowsException() {
         assertThrows(NullPointerException.class, () -> database.removeEntry(null));
     }
 
     @Test
-    public void emptyDatabaseHasNoStrings() {
+    void emptyDatabaseHasNoStrings() {
         assertEquals(Collections.emptySet(), database.getStringKeySet());
         assertTrue(database.hasNoStrings());
     }
 
     @Test
-    public void insertStringUpdatesStringList() {
+    void insertStringUpdatesStringList() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
@@ -101,7 +133,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void removeStringUpdatesStringList() {
+    void removeStringUpdatesStringList() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         database.removeString(string.getId());
@@ -114,15 +146,15 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void hasStringLabelFindsString() {
+    void hasStringLabelFindsString() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
-        assertTrue(database.hasStringLabel("DSP"));
-        assertFalse(database.hasStringLabel("VLSI"));
+        assertTrue(database.hasStringByName("DSP"));
+        assertFalse(database.hasStringByName("VLSI"));
     }
 
     @Test
-    public void setSingleStringAsCollection() {
+    void setSingleStringAsCollection() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         List<BibtexString> strings = Arrays.asList(string);
         database.setStrings(strings);
@@ -130,16 +162,15 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void setStringAsCollectionWithUpdatedContentOverridesString() {
+    void setStringAsCollectionWithUpdatedContentThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString newContent = new BibtexString("DSP", "ABCD");
         List<BibtexString> strings = Arrays.asList(string, newContent);
-        database.setStrings(strings);
-        assertEquals(Optional.of(newContent), database.getStringByName("DSP"));
+        assertThrows(KeyCollisionException.class, () -> database.setStrings(strings));
     }
 
     @Test
-    public void setStringAsCollectionWithNewContent() {
+    void setStringAsCollectionWithNewContent() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         BibtexString vlsi = new BibtexString("VLSI", "Very Large Scale Integration");
         List<BibtexString> strings = Arrays.asList(string, vlsi);
@@ -149,7 +180,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void addSameStringLabelTwiceThrowsKeyCollisionException() {
+    void addSameStringLabelTwiceThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         final BibtexString finalString = new BibtexString("DSP", "Digital Signal Processor");
@@ -158,7 +189,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void addSameStringIdTwiceThrowsKeyCollisionException() {
+    void addSameStringIdTwiceThrowsKeyCollisionException() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         string.setId("duplicateid");
         database.addString(string);
@@ -169,39 +200,41 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void insertEntryPostsAddedEntryEvent() {
+    void insertEntryPostsAddedEntryEvent() {
         BibEntry expectedEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
         database.registerListener(tel);
         database.insertEntry(expectedEntry);
-        assertEquals(expectedEntry, tel.getAddedEntry());
+        assertEquals(Collections.singletonList(expectedEntry), tel.getAddedEntries());
         assertEquals(expectedEntry, tel.getFirstInsertedEntry());
     }
 
     @Test
-    public void insertMultipleEntriesPostsAddedEntryEvent() {
+    void insertMultipleEntriesPostsAddedEntryEvent() {
         BibEntry firstEntry = new BibEntry();
         BibEntry secondEntry = new BibEntry();
         TestEventListener tel = new TestEventListener();
         database.registerListener(tel);
         database.insertEntries(firstEntry, secondEntry);
         assertEquals(firstEntry, tel.getFirstInsertedEntry());
-        assertEquals(secondEntry, tel.getAddedEntry());
+        assertEquals(Arrays.asList(firstEntry, secondEntry), tel.getAddedEntries());
     }
 
     @Test
-    public void removeEntryPostsRemovedEntryEvent() {
-        BibEntry expectedEntry = new BibEntry();
+    void removeEntriesPostsRemovedEntriesEvent() {
+        BibEntry entry1 = new BibEntry();
+        BibEntry entry2 = new BibEntry();
+        List<BibEntry> expectedEntries = Arrays.asList(entry1, entry2);
         TestEventListener tel = new TestEventListener();
-        database.insertEntry(expectedEntry);
+        database.insertEntries(expectedEntries);
         database.registerListener(tel);
-        database.removeEntry(expectedEntry);
-        BibEntry actualEntry = tel.getRemovedEntry();
-        assertEquals(expectedEntry, actualEntry);
+        database.removeEntries(expectedEntries);
+        List<BibEntry> actualEntry = tel.getRemovedEntries();
+        assertEquals(expectedEntries, actualEntry);
     }
 
     @Test
-    public void changingEntryPostsChangeEntryEvent() {
+    void changingEntryPostsChangeEntryEvent() {
         BibEntry entry = new BibEntry();
         TestEventListener tel = new TestEventListener();
         database.insertEntry(entry);
@@ -213,26 +246,26 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void correctKeyCountOne() {
+    void correctKeyCountOne() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
-    public void correctKeyCountTwo() {
+    void correctKeyCountTwo() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
         entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(2, database.getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
-    public void correctKeyCountAfterRemoving() {
+    void correctKeyCountAfterRemoving() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
@@ -240,11 +273,11 @@ public class BibDatabaseTest {
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
         database.removeEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
-    public void circularStringResolving() {
+    void circularStringResolving() {
         BibtexString string = new BibtexString("AAA", "#BBB#");
         database.addString(string);
         string = new BibtexString("BBB", "#AAA#");
@@ -254,7 +287,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void circularStringResolvingLongerCycle() {
+    void circularStringResolvingLongerCycle() {
         BibtexString string = new BibtexString("AAA", "#BBB#");
         database.addString(string);
         string = new BibtexString("BBB", "#CCC#");
@@ -270,26 +303,26 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void resolveForStringsMonth() {
+    void resolveForStringsMonth() {
         assertEquals("January", database.resolveForStrings("#jan#"));
     }
 
     @Test
-    public void resolveForStringsSurroundingContent() {
+    void resolveForStringsSurroundingContent() {
         BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
         assertEquals("aaaaaAAA", database.resolveForStrings("aa#AAA#AAA"));
     }
 
     @Test
-    public void resolveForStringsOddHashMarkAtTheEnd() {
+    void resolveForStringsOddHashMarkAtTheEnd() {
         BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
         assertEquals("AAAaaaAAA#", database.resolveForStrings("AAA#AAA#AAA#"));
     }
 
     @Test
-    public void getUsedStrings() {
+    void getUsedStrings() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other #BBB#");
@@ -309,7 +342,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void getUsedStringsSingleString() {
+    void getUsedStringsSingleString() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "#AAA#");
         BibtexString tripleA = new BibtexString("AAA", "Some other text");
@@ -326,7 +359,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void getUsedStringsNoString() {
+    void getUsedStringsNoString() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Oscar Gustafsson");
         BibtexString string = new BibtexString("AAA", "Some other text");
@@ -337,7 +370,7 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void getEntriesSortedWithTwoEntries() {
+    void getEntriesSortedWithTwoEntries() {
         BibEntry entryB = new BibEntry(StandardEntryType.Article);
         entryB.setId("2");
         BibEntry entryA = new BibEntry(StandardEntryType.Article);
@@ -347,12 +380,12 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void preambleIsEmptyIfNotSet() {
+    void preambleIsEmptyIfNotSet() {
         assertEquals(Optional.empty(), database.getPreamble());
     }
 
     @Test
-    public void setPreambleWorks() {
+    void setPreambleWorks() {
         database.setPreamble("Oh yeah!");
         assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
     }

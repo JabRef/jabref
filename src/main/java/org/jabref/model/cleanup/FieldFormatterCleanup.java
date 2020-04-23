@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -49,7 +49,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         String oldValue = entry.getField(fieldKey).orElse(null);
 
@@ -57,13 +57,13 @@ public class FieldFormatterCleanup implements CleanupJob {
         String newValue = formatter.format(oldValue);
 
         if (oldValue.equals(newValue)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         } else {
             if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);
                 newValue = null;
             } else {
-                entry.setField(fieldKey, newValue, EntryEventSource.SAVE_ACTION);
+                entry.setField(fieldKey, newValue, EntriesEventSource.SAVE_ACTION);
             }
             FieldChange change = new FieldChange(entry, fieldKey, oldValue, newValue);
             return Collections.singletonList(change);

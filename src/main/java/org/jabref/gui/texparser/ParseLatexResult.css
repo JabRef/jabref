@@ -1,0 +1,25 @@
+#referenceListView {
+    -fx-background-color: -jr-sidepane-background;
+}
+
+#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 4 4 4 4;
+    -fx-background: transparent;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+#referenceListView > .virtual-flow > .clipped-container > .sheet > .list-cell * {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-padding: 0 4 0 4;
+    -fx-background-color: transparent;
+}
+
+.button-bar > .container {
+    -fx-border-width: 1 0 0 0;
+    -fx-border-color: -jr-sidepane-background;
+}
+
+

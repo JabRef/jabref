@@ -46,6 +46,9 @@
     -jr-menu-item-foreground: -fx-light-text-color;
     -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
 
+    -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
+    -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
+
     -fx-focused-text-base-color: -fx-dark-text-color;
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
@@ -56,6 +59,15 @@
     color : #7d8591; /* -fx-mid-text-color*/
 }
 
+.table-view .groupColumnBackground {
+    -fx-stroke: -jr-gray-3;
+}
+
+.code-area .lineno {
+    -fx-background-color: -jr-background-alt;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
 .text-unchanged {
     -fx-fill: -fx-light-text-color;
 }
@@ -64,3 +76,14 @@
     -fx-background-color: -fx-light-text-color, -fx-control-inner-background;
 }
 
+.numberColumn > .hits:any-selected {
+    -fx-background-color: derive(-jr-gray-3, 70%);
+}
+
+.numberColumn > .hits:all-selected {
+    -fx-background-color: -jr-gray-3;
+}
+
+#preferencesContainer .tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: -jr-background;
+}

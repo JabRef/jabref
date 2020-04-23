@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
@@ -27,6 +28,7 @@ import org.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -176,6 +178,9 @@ public class BibTeXMLImporter extends Importer {
                 } else if (method.getName().equals("getNumber")) {
                     putNumber(fields, (BigInteger) method.invoke(entryType));
                     continue;
+                } else if (method.getName().equals("getMonth")) {
+                    putMonth(fields, Month.parse((String) method.invoke(entryType)));
+                    continue;
                 } else if (isMethodToIgnore(method.getName())) {
                     continue;
                 } else if (method.getName().startsWith("get")) {
@@ -208,7 +213,11 @@ public class BibTeXMLImporter extends Importer {
             Object elementValue = element.getValue();
             if (elementValue instanceof String) {
                 String value = (String) elementValue;
-                putIfValueNotNull(fields, field, value);
+                if (StandardField.MONTH.equals(field)) {
+                    putMonth(fields, Month.parse(value));
+                } else {
+                    putIfValueNotNull(fields, field, value);
+                }
             } else if (elementValue instanceof BigInteger) {
                 BigInteger value = (BigInteger) elementValue;
                 if (StandardField.NUMBER.equals(field)) {
@@ -238,6 +247,12 @@ public class BibTeXMLImporter extends Importer {
     private void putNumber(Map<Field, String> fields, BigInteger number) {
         if (number != null) {
             fields.put(StandardField.NUMBER, String.valueOf(number));
+        }
+    }
+
+    private void putMonth(Map<Field, String> fields, Optional<Month> month) {
+        if (month.isPresent()) {
+            fields.put(StandardField.MONTH, month.get().getJabRefFormat());
         }
     }
 

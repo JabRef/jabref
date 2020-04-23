@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import org.jabref.logic.importer.util.ShortDOIService;
 import org.jabref.logic.importer.util.ShortDOIServiceException;
@@ -29,22 +28,15 @@ public class ShortenDOIFormatter extends Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-
-        ShortDOIService shortDOIService = new ShortDOIService();
-
-        Optional<DOI> doi = Optional.empty();
-
-        try {
-            doi = DOI.parse(value);
-
-            if (doi.isPresent()) {
-                return shortDOIService.getShortDOI(doi.get()).getDOI();
-            }
-        } catch (ShortDOIServiceException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        return value;
+        return DOI.parse(value)
+                  .map(doi -> {
+                      try {
+                          return new ShortDOIService().getShortDOI(doi).getDOI();
+                      } catch (ShortDOIServiceException e) {
+                          LOGGER.error(e.getMessage(), e);
+                          return value;
+                      }
+                  }).orElse(value);
     }
 
     @Override

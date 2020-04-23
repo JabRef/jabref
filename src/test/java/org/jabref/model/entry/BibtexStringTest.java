@@ -97,28 +97,28 @@ public class BibtexStringTest {
 
     @Test
     public void authorTypeCorrectlyDetermined() {
-        // Source of the example: https://help.jabref.org/en/Strings
+        // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("aKopp", "KoppOliver");
         assertEquals(BibtexString.Type.AUTHOR, bibtexString.getType());
     }
 
     @Test
     public void institutionTypeCorrectlyDetermined() {
-        // Source of the example: https://help.jabref.org/en/Strings
+        // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("iMIT", "{Massachusetts Institute of Technology ({MIT})}");
         assertEquals(BibtexString.Type.INSTITUTION, bibtexString.getType());
     }
 
     @Test
     public void otherTypeCorrectlyDeterminedForLowerCase() {
-        // Source of the example: https://help.jabref.org/en/Strings
+        // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("anct", "Anecdote");
         assertEquals(BibtexString.Type.OTHER, bibtexString.getType());
     }
 
     @Test
     public void otherTypeCorrectlyDeterminedForUpperCase() {
-        // Source of the example: https://help.jabref.org/en/Strings
+        // Source of the example: https://docs.jabref.org/fields/strings
         BibtexString bibtexString = new BibtexString("lTOSCA", "Topology and Orchestration Specification for Cloud Applications");
         assertEquals(BibtexString.Type.OTHER, bibtexString.getType());
     }

@@ -7,19 +7,24 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.entryeditor.FileDragDropPreferenceType;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -56,8 +61,6 @@ public interface PreferencesService {
 
     Map<String, Set<Field>> getEntryEditorTabList();
 
-    boolean getEnforceLegalKeys();
-
     Map<String, String> getCustomTabsNamesAndFields();
 
     void setCustomTabsNameAndFields(String name, String fields, int defNumber);
@@ -72,8 +75,6 @@ public interface PreferencesService {
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
 
-    UpdateFieldPreferences getUpdateFieldPreferences();
-
     ImportFormatPreferences getImportFormatPreferences();
 
     boolean isKeywordSyncEnabled();
@@ -86,9 +87,9 @@ public interface PreferencesService {
 
     Charset getDefaultEncoding();
 
-    void setDefaultEncoding(Charset encoding);
-
     String getUser();
+
+    String getTheme();
 
     SaveOrderConfig loadExportSaveOrder();
 
@@ -100,9 +101,46 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes();
 
+    EntryEditorPreferences getEntryEditorPreferences();
+
+    List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
+
+    CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader);
+
+    CleanupPreset getCleanupPreset();
+
+    void setCleanupPreset(CleanupPreset cleanupPreset);
+
+    // General
+
+    Language getLanguage();
+
+    void setLanguage(Language language);
+
+    boolean shouldCollectTelemetry();
+
+    void setShouldCollectTelemetry(boolean value);
+
+    boolean shouldAskToCollectTelemetry();
+
+    void askedToCollectTelemetry();
+
+    boolean getEnforceLegalKeys();
+
     boolean getAllowIntegerEdition();
 
-    FileDragDropPreferenceType getEntryEditorFileLinkPreference();
+    GeneralPreferences getGeneralPreferences();
 
-    EntryEditorPreferences getEntryEditorPreferences();
+    void storeGeneralPreferences(GeneralPreferences preferences);
+
+    OwnerPreferences getOwnerPreferences();
+
+    void storeOwnerPreferences(OwnerPreferences preferences);
+
+    TimestampPreferences getTimestampPreferences();
+
+    void storeTimestampPreferences(TimestampPreferences preferences);
+
+    boolean getDisplayGroupCount();
+
 }

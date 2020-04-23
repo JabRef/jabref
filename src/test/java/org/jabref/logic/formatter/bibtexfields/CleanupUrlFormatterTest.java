@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class CleanupUrlFormatterTest {
 
-    private CleanupURLFormatter formatter;
+    private CleanupUrlFormatter formatter;
 
     @BeforeEach
     void setUp() {
-        formatter = new CleanupURLFormatter();
+        formatter = new CleanupUrlFormatter();
     }
 
     @Test
@@ -27,6 +27,17 @@ class CleanupUrlFormatterTest {
     void extractURLFormLink() {
         assertEquals("http://wikipedia.org",
                 formatter.format("away.php?to=http%3A%2F%2Fwikipedia.org&a=snippet"));
+    }
+
+    @Test
+    void latexCommandsNotRemoved() {
+        assertEquals("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
+    }
+
+    @Test
+    void urlencodedSlashesAreAlsoConverted() {
+        // the caller has to pay attention that this does not happen
+        assertEquals("jabref.org/test/test", formatter.format("jabref.org/test%2Ftest"));
     }
 
     @Test

@@ -7,16 +7,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
@@ -24,8 +25,11 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNewlinesFormatter;
+import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -63,6 +67,17 @@ public abstract class BibDatabaseWriter {
                 changes.addAll(actions.applySaveActions(entry));
             }
         });
+
+        // Run a couple of standard cleanups
+        List<FieldFormatterCleanup> preSaveCleanups =
+                Stream.of(new TrimWhitespaceFormatter(), new NormalizeNewlinesFormatter())
+                      .map(formatter -> new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, formatter))
+                      .collect(Collectors.toList());
+        for (FieldFormatterCleanup formatter : preSaveCleanups) {
+            for (BibEntry entry : toChange) {
+                changes.addAll(formatter.cleanup(entry));
+            }
+        }
 
         return changes;
     }
@@ -104,7 +119,7 @@ public abstract class BibDatabaseWriter {
         Objects.requireNonNull(bibDatabaseContext);
         Objects.requireNonNull(entriesToSort);
 
-        //if no meta data are present, simply return in original order
+        // if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             return new LinkedList<>(entriesToSort);
         }
@@ -151,13 +166,13 @@ public abstract class BibDatabaseWriter {
      */
     public void savePartOfDatabase(BibDatabaseContext bibDatabaseContext, List<BibEntry> entries) throws IOException {
         Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
-
         if (sharedDatabaseIDOptional.isPresent()) {
+            // may throw an IOException. Thus, we do not use "ifPresent", but the "old" isPresent way
             writeDatabaseID(sharedDatabaseIDOptional.get());
         }
 
         // Map to collect entry type definitions that we must save along with entries using them.
-        Set<BibEntryType> typesToWrite = new HashSet<>();
+        Set<BibEntryType> typesToWrite = new TreeSet<>();
 
         // Some file formats write something at the start of the file (like the encoding)
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
@@ -200,7 +215,7 @@ public abstract class BibDatabaseWriter {
             writeEntryTypeDefinitions(typesToWrite);
         }
 
-        //finally write whatever remains of the file, but at least a concluding newline
+        // finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
 
         writer.close();

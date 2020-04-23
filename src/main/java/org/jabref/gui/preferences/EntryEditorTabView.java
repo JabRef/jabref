@@ -26,22 +26,20 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
     @FXML private RadioButton firstNameModeAbbreviated;
     @FXML private RadioButton firstNameModeFull;
     @FXML private RadioButton firstNameModeBoth;
-    @FXML private RadioButton dndCopyFile;
-    @FXML private RadioButton dndLinkFile;
-    @FXML private RadioButton dndCopyRenameLinkFile;
 
     public EntryEditorTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
-
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Entry editor"); }
+    public String getTabName() {
+        return Localization.lang("Entry editor");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
@@ -58,8 +56,5 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
         firstNameModeAbbreviated.selectedProperty().bindBidirectional(viewModel.firstNameModeAbbreviatedProperty());
         firstNameModeFull.selectedProperty().bindBidirectional(viewModel.firstNameModeFullProperty());
         firstNameModeBoth.selectedProperty().bindBidirectional(viewModel.firstNameModeBothProperty());
-        dndCopyFile.selectedProperty().bindBidirectional(viewModel.dndCopyFileProperty());
-        dndLinkFile.selectedProperty().bindBidirectional(viewModel.dndLinkFileProperty());
-        dndCopyRenameLinkFile.selectedProperty().bindBidirectional(viewModel.dndCopyRenameLinkFileProperty());
     }
 }

@@ -6,6 +6,9 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
+/**
+ * Stores the credentials for the test systems
+ */
 @DatabaseTest
 public class TestConnector {
 
@@ -15,19 +18,15 @@ public class TestConnector {
     }
 
     public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
-
-        if (dbmsType == DBMSType.MYSQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "", false, "");
+        switch (dbmsType) {
+            case MYSQL:
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("127.0.0.1").setPort(3800).setDatabase("jabref").setUser("root").setPassword("root").setUseSSL(false).setAllowPublicKeyRetrieval(true).createDBMSConnectionProperties();
+            case POSTGRESQL:
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("postgres").setUser("postgres").setPassword("postgres").setUseSSL(false).createDBMSConnectionProperties();
+            case ORACLE:
+                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(32118).setDatabase("jabref").setUser("jabref").setPassword("jabref").setUseSSL(false).createDBMSConnectionProperties();
+            default:
+                return new DBMSConnectionPropertiesBuilder().createDBMSConnectionProperties();
         }
-
-        if (dbmsType == DBMSType.POSTGRESQL) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "postgres", "", false, "");
-        }
-
-        if (dbmsType == DBMSType.ORACLE) {
-            return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "xe", "travis", "travis", false, "");
-        }
-
-        return new DBMSConnectionProperties();
     }
 }

@@ -153,7 +153,7 @@ class OOBibBase {
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
-        //this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
+        // this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
         Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
         return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }
@@ -227,7 +227,7 @@ class OOBibBase {
             if (document != null) {
                 result.add(document);
             }
-        }   
+        }
         return result;
     }
 
@@ -237,12 +237,12 @@ class OOBibBase {
         URL[] urls = jarUrls.toArray(new URL[1]);
         URLClassLoader loader = new URLClassLoader(urls, null);
 
-        //Get the office component context:
+        // Get the office component context:
         XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loader);
-        //Get the office service manager:
+        // Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
-        //Create the desktop, which is the root frame of the
-        //hierarchy of frames that contain viewable components:
+        // Create the desktop, which is the root frame of the
+        // hierarchy of frames that contain viewable components:
         Object desktop;
         try {
             desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
@@ -1273,6 +1273,7 @@ class OOBibBase {
         throws NoSuchElementException, WrappedTargetException {
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys();
+        List<BibEntry> entriesToInsert = new ArrayList<BibEntry>();
 
         // For each cited key
         for (String key : cited) {
@@ -1283,13 +1284,13 @@ class OOBibBase {
                 if (entry.isPresent()) {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     // Insert a copy of the entry
-                    resultDatabase.insertEntry(clonedEntry);
+                    entriesToInsert.add(clonedEntry);
                     // Check if the cloned entry has a crossref field
                     clonedEntry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current library
-                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
+                            loopDatabase.getEntryByKey(crossref).ifPresent(entriesToInsert::add);
                         }
                     });
 
@@ -1298,7 +1299,7 @@ class OOBibBase {
                 }
             }
         }
-
+        resultDatabase.insertEntries(entriesToInsert);
         return resultDatabase;
     }
 

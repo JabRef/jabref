@@ -16,21 +16,19 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
-import org.jabref.logic.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
@@ -103,7 +101,7 @@ public class SharedDatabaseUIManager {
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(AlertType.CONFIRMATION, Localization.lang("Update refused"), message.toString(), ButtonType.CANCEL, merge);
 
         if (response.isPresent() && response.get().equals(merge)) {
-            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry, updateRefusedEvent.getBibDatabaseContext().getMode());
+            MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
             Optional<BibEntry> mergedEntry = dialog.showAndWait();
 
             mergedEntry.ifPresent(mergedBibEntry -> {
@@ -119,13 +117,13 @@ public class SharedDatabaseUIManager {
     }
 
     @Subscribe
-    public void listen(SharedEntryNotPresentEvent event) {
+    public void listen(SharedEntriesNotPresentEvent event) {
         BasePanel panel = jabRefFrame.getCurrentBasePanel();
         EntryEditor entryEditor = panel.getEntryEditor();
 
-        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry()));
+        panel.getUndoManager().addEdit(new UndoableRemoveEntries(panel.getDatabase(), event.getBibEntries()));
 
-        if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
+        if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                                                        Localization.lang("The entry you currently work on has been deleted on the shared side.")
@@ -144,8 +142,8 @@ public class SharedDatabaseUIManager {
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
         throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
-        BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
@@ -169,13 +167,13 @@ public class SharedDatabaseUIManager {
         String sharedDatabaseID = sharedDatabaseIDOptional.get();
         DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
-        BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
         DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
-        bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
+        bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));

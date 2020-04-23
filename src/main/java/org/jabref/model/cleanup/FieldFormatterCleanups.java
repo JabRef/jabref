@@ -62,7 +62,7 @@ public class FieldFormatterCleanups {
         if (enabled) {
             return applyAllActions(entry);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -91,7 +91,7 @@ public class FieldFormatterCleanups {
     }
 
     private static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newline) {
-        //first, group all formatters by the field for which they apply
+        // first, group all formatters by the field for which they apply
         Map<Field, List<String>> groupedByField = new TreeMap<>(Comparator.comparing(Field::getName));
         for (FieldFormatterCleanup cleanup : actionList) {
             Field key = cleanup.getField();
@@ -101,7 +101,7 @@ public class FieldFormatterCleanups {
                 groupedByField.put(key, new ArrayList<>());
             }
 
-            //add the formatter to the map if it is not already there
+            // add the formatter to the map if it is not already there
             List<String> formattersForKey = groupedByField.get(key);
             if (!formattersForKey.contains(cleanup.getFormatter().getKey())) {
                 formattersForKey.add(cleanup.getFormatter().getKey());

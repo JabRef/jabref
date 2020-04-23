@@ -19,12 +19,17 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
@@ -50,17 +55,23 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty markTimeStampFieldNameProperty = new SimpleStringProperty("");
     private final BooleanProperty updateTimeStampProperty = new SimpleBooleanProperty();
 
-    private FunctionBasedValidator markTimeStampFormatValidator;
+    private Validator markTimeStampFormatValidator;
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferencesService;
+    private final GeneralPreferences initialGeneralPreferences;
+    private final OwnerPreferences initialOwnerPreferences;
+    private final TimestampPreferences initialTimestampPreferences;
 
     private List<String> restartWarning = new ArrayList<>();
 
     @SuppressWarnings("ReturnValueIgnored")
-    public GeneralTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public GeneralTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-        this.preferences = preferences;
+        this.preferencesService = preferencesService;
+        this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
+        this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
+        this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
 
         markTimeStampFormatValidator = new FunctionBasedValidator<>(
                 markTimeStampFormatProperty,
@@ -84,70 +95,69 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public void setValues() {
         languagesListProperty.setValue(FXCollections.observableArrayList(Language.values()));
-        selectedLanguageProperty.setValue(preferences.getLanguage());
+        selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
-        selectedEncodingProperty.setValue(preferences.getDefaultEncoding());
+        selectedEncodingProperty.setValue(initialGeneralPreferences.getDefaultEncoding());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
-        if (preferences.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
-            selectedBiblatexModeProperty.setValue(BibDatabaseMode.BIBLATEX);
-        } else {
-            selectedBiblatexModeProperty.setValue(BibDatabaseMode.BIBTEX);
-        }
+        selectedBiblatexModeProperty.setValue(initialGeneralPreferences.getDefaultBibDatabaseMode());
 
-        inspectionWarningDuplicateProperty.setValue(preferences.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
-        confirmDeleteProperty.setValue(preferences.getBoolean(JabRefPreferences.CONFIRM_DELETE));
-        enforceLegalKeysProperty.setValue(preferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-        allowIntegerEditionProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
-        memoryStickModeProperty.setValue(preferences.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
-        collectTelemetryProperty.setValue(preferences.shouldCollectTelemetry());
-        showAdvancedHintsProperty.setValue(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
+        inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
+        confirmDeleteProperty.setValue(initialGeneralPreferences.isConfirmDelete());
+        enforceLegalKeysProperty.setValue(initialGeneralPreferences.isEnforceLegalBibtexKey());
+        allowIntegerEditionProperty.setValue(initialGeneralPreferences.isAllowIntegerEditionBibtex());
+        memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
+        collectTelemetryProperty.setValue(preferencesService.shouldCollectTelemetry());
+        showAdvancedHintsProperty.setValue(initialGeneralPreferences.isShowAdvancedHints());
 
-        markOwnerProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_OWNER));
-        markOwnerNameProperty.setValue(preferences.get(JabRefPreferences.DEFAULT_OWNER));
-        markOwnerOverwriteProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
+        markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
+        markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
+        markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
 
-        markTimestampProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_TIME_STAMP));
-        markTimeStampFormatProperty.setValue(preferences.get(JabRefPreferences.TIME_STAMP_FORMAT));
-        markTimeStampOverwriteProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
-        markTimeStampFieldNameProperty.setValue(preferences.get(JabRefPreferences.TIME_STAMP_FIELD));
-        updateTimeStampProperty.setValue(preferences.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
+        markTimestampProperty.setValue(initialTimestampPreferences.isUseTimestamps());
+        markTimeStampFormatProperty.setValue(initialTimestampPreferences.getTimestampFormat());
+        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.isOverwriteTimestamp());
+        markTimeStampFieldNameProperty.setValue(initialTimestampPreferences.getTimestampField().getName());
+        updateTimeStampProperty.setValue(initialTimestampPreferences.isUpdateTimestamp());
     }
 
     public void storeSettings() {
         Language newLanguage = selectedLanguageProperty.getValue();
-        if (newLanguage != preferences.getLanguage()) {
-            preferences.setLanguage(newLanguage);
+        if (newLanguage != preferencesService.getLanguage()) {
+            preferencesService.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
             restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
         }
 
-        preferences.setDefaultEncoding(selectedEncodingProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE, selectedBiblatexModeProperty.getValue() == BibDatabaseMode.BIBLATEX);
-
-        preferences.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarningDuplicateProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDeleteProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeysProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX, allowIntegerEditionProperty.getValue());
-        if (preferences.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStickModeProperty.getValue()) {
+        if (initialGeneralPreferences.isMemoryStickMode() && !memoryStickModeProperty.getValue()) {
             dialogService.showInformationDialogAndWait(Localization.lang("Memory stick mode"),
                     Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."));
         }
-        preferences.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStickModeProperty.getValue());
-        preferences.setShouldCollectTelemetry(collectTelemetryProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS, showAdvancedHintsProperty.getValue());
 
-        preferences.putBoolean(JabRefPreferences.USE_OWNER, markOwnerProperty.getValue());
-        preferences.put(JabRefPreferences.DEFAULT_OWNER, markOwnerNameProperty.getValue().trim());
-        preferences.putBoolean(JabRefPreferences.OVERWRITE_OWNER, markOwnerOverwriteProperty.getValue());
+        preferencesService.storeGeneralPreferences(new GeneralPreferences(
+                selectedEncodingProperty.getValue(),
+                selectedBiblatexModeProperty.getValue(),
+                inspectionWarningDuplicateProperty.getValue(),
+                confirmDeleteProperty.getValue(),
+                enforceLegalKeysProperty.getValue(),
+                allowIntegerEditionProperty.getValue(),
+                memoryStickModeProperty.getValue(),
+                collectTelemetryProperty.getValue(),
+                showAdvancedHintsProperty.getValue()));
 
-        preferences.putBoolean(JabRefPreferences.USE_TIME_STAMP, markTimestampProperty.getValue());
-        preferences.put(JabRefPreferences.TIME_STAMP_FORMAT, markTimeStampFormatProperty.getValue().trim());
-        preferences.put(JabRefPreferences.TIME_STAMP_FIELD, markTimeStampFieldNameProperty.getValue().trim());
-        preferences.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, markTimeStampOverwriteProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStampProperty.getValue());
+        preferencesService.storeOwnerPreferences(new OwnerPreferences(
+                markOwnerProperty.getValue(),
+                markOwnerNameProperty.getValue().trim(),
+                markOwnerOverwriteProperty.getValue()));
+
+        preferencesService.storeTimestampPreferences(new TimestampPreferences(
+                markTimestampProperty.getValue(),
+                updateTimeStampProperty.getValue(),
+                FieldFactory.parseField(markTimeStampFieldNameProperty.getValue().trim()),
+                markTimeStampFormatProperty.getValue().trim(),
+                markTimeStampOverwriteProperty.getValue()));
     }
 
     public ValidationStatus markTimeStampFormatValidationStatus() {

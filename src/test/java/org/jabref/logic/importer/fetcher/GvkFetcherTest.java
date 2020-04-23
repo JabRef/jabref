@@ -65,7 +65,7 @@ public class GvkFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("GVK", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-online-bibliographic-database/gvk", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

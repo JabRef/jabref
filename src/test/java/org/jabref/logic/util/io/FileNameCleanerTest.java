@@ -25,4 +25,9 @@ public class FileNameCleanerTest {
         assertEquals("subdir\\legalFilename.txt", FileNameCleaner.cleanDirectoryName("subdir\\legalFilename.txt"));
         assertEquals("illegalFilename\\_____.txt", FileNameCleaner.cleanDirectoryName("illegalFilename\\?*<>|.txt"));
     }
+
+    @Test
+    public void testCleanCurlyBracesAsWell() {
+        assertEquals("The Evolution of Sentiment_ Analysis_A Review of Research Topics, Venues, and Top Cited Papers.PDF", FileNameCleaner.cleanFileName("The Evolution of Sentiment} Analysis}A Review of Research Topics, Venues, and Top Cited Papers.PDF"));
+    }
 }

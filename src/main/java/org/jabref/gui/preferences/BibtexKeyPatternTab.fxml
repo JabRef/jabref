@@ -56,6 +56,6 @@
     </HBox>
     <AnchorPane>
         <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="220.0"/>
-        <Button text="Reset All" onAction="#resetAllKeyPatterns" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+        <Button text="%Reset All" onAction="#resetAllKeyPatterns" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
     </AnchorPane>
 </fx:root>

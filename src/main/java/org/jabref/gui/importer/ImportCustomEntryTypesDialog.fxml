@@ -13,7 +13,6 @@
          <children>
             <Label text="%Custom entry types found in file" />
             <Label text="%Select all customized types to be stored in local preferences:" />
-            <Label text="%Currently unknown:" />
             <CheckListView fx:id="unknownEntryTypesCheckList" />
             <VBox fx:id="boxDifferentCustomization">
                <children>

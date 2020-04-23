@@ -1,7 +1,9 @@
 package org.jabref.logic.importer;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class OpenDatabase {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenDatabase.class);
 
     private OpenDatabase() {
     }
@@ -29,31 +31,26 @@ public class OpenDatabase {
      *
      * @param name Name of the BIB-file to open
      * @return ParserResult which never is null
+     * @deprecated use {@link #loadDatabase(Path, ImportFormatPreferences, FileUpdateMonitor)} instead
      */
+    @Deprecated
     public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
-        File file = new File(name);
-        LOGGER.info("Opening: " + name);
+        LOGGER.debug("Opening: " + name);
+        Path file = Paths.get(name);
 
-        if (!file.exists()) {
+        if (!Files.exists(file)) {
             ParserResult pr = ParserResult.fromErrorMessage(Localization.lang("File not found"));
-            pr.setFile(file);
+            pr.setFile(file.toFile());
 
             LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
         }
 
         try {
-            ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
-            pr.setFile(file);
-            if (pr.hasWarnings()) {
-                for (String aWarn : pr.warnings()) {
-                    LOGGER.warn(aWarn);
-                }
-            }
-            return pr;
+            return OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
         } catch (IOException ex) {
             ParserResult pr = ParserResult.fromError(ex);
-            pr.setFile(file);
+            pr.setFile(file.toFile());
             LOGGER.error("Problem opening .bib-file", ex);
             return pr;
         }
@@ -62,9 +59,9 @@ public class OpenDatabase {
     /**
      * Opens a new database.
      */
-    public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
+    public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
         throws IOException {
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen.toPath(),
+        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
 
         if (importFormatPreferences.isKeywordSyncEnabled()) {

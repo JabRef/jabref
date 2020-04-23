@@ -1,0 +1,20 @@
+language: ruby
+cache: bundler
+rvm:
+  - 2.6.3
+install:
+  - bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
+  - bundle update sheldon
+notifications:
+  email:
+    recipients:
+      - rintze.zelle@gmail.com
+      - karcher@u.northwestern.edu
+    on_success: change
+    on_failure: always
+  webhooks:
+    urls:
+      - https://shelbot.herokuapp.com/build
+    on_success: always
+    on_failure: always
+    on_start: never

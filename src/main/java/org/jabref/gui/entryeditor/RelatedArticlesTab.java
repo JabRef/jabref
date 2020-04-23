@@ -3,6 +3,8 @@ package org.jabref.gui.entryeditor;
 import java.io.IOException;
 import java.util.List;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Hyperlink;
@@ -54,12 +56,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
      */
     private StackPane getRelatedArticlesPane(BibEntry entry) {
         StackPane root = new StackPane();
-        root.getStyleClass().add("related-articles-tab");
+        root.setId("related-articles-tab");
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
         MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
-                                                  Globals.BUILD_INFO.getVersion());
+                Globals.BUILD_INFO.version);
         BackgroundTask
                       .wrap(() -> fetcher.performSearch(entry))
                       .onRunning(() -> progress.setVisible(true))
@@ -92,10 +94,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
         String heading = fetcher.getHeading();
         Text headingText = new Text(heading);
-        headingText.getStyleClass().add("recommendation-heading");
+        headingText.getStyleClass().add("heading");
         String description = fetcher.getDescription();
         Text descriptionText = new Text(description);
-        descriptionText.getStyleClass().add("recommendation-description");
+        descriptionText.getStyleClass().add("description");
         vBox.getChildren().add(headingText);
         vBox.getChildren().add(descriptionText);
 
@@ -143,7 +145,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vBox.setSpacing(20.0);
 
         Text descriptionText = new Text(Localization.lang("No recommendations received from Mr. DLib for this entry."));
-        descriptionText.getStyleClass().add("recommendation-description");
+        descriptionText.getStyleClass().add("description");
         vBox.getChildren().add(descriptionText);
         scrollPane.setContent(vBox);
 
@@ -157,20 +159,26 @@ public class RelatedArticlesTab extends EntryEditorTab {
      */
     private ScrollPane getPrivacyDialog(BibEntry entry) {
         ScrollPane root = new ScrollPane();
-        root.getStyleClass().add("related-articles-tab");
+        root.setId("related-articles-tab");
         VBox vbox = new VBox();
-        vbox.getStyleClass().add("gdpr-dialog");
+        vbox.setId("gdpr-dialog");
         vbox.setSpacing(20.0);
+
+        Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
+        title.getStyleClass().add("heading");
 
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
 
+        DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
+
         Text line1 = new Text(Localization.lang("JabRef requests recommendations from Mr. DLib, which is an external service. To enable Mr. DLib to calculate recommendations, some of your data must be shared with Mr. DLib. Generally, the more data is shared the better recommendations can be calculated. However, we understand that some of your data in JabRef is sensitive, and you may not want to share it. Therefore, Mr. DLib offers a choice of which data you would like to share."));
-        line1.setWrappingWidth(1300.0);
+        line1.wrappingWidthProperty().bind(rootWidth);
         Text line2 = new Text(Localization.lang("Whatever option you choose, Mr. DLib may share its data with research partners to further improve recommendation quality as part of a 'living lab'. Mr. DLib may also release public datasets that may contain anonymized information about you and the recommendations (sensitive information such as metadata of your articles will be anonymised through e.g. hashing). Research partners are obliged to adhere to the same strict data protection policy as Mr. DLib."));
-        line2.setWrappingWidth(1300.0);
+        line2.wrappingWidthProperty().bind(rootWidth);
         Text line3 = new Text(Localization.lang("This setting may be changed in preferences at any time."));
-        Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr DLib. for JabRef users."));
+        line3.wrappingWidthProperty().bind(rootWidth);
+        Hyperlink mdlLink = new Hyperlink(Localization.lang("Further information about Mr. DLib for JabRef users."));
         mdlLink.setOnAction(event -> {
             try {
                 JabRefDesktop.openBrowser("http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/");
@@ -202,7 +210,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        vbox.getChildren().addAll(line1, line2, mdlLink, line3, vb, button);
+        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, button);
         root.setContent(vbox);
 
         return root;

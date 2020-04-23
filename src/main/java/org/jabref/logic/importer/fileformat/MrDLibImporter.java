@@ -91,7 +91,7 @@ public class MrDLibImporter extends Importer {
     /**
      * Small pair-class to ensure the right order of the recommendations.
      */
-    private class RankedBibEntry {
+    private static class RankedBibEntry {
 
         public BibEntry entry;
         public Integer rank;
@@ -130,9 +130,7 @@ public class MrDLibImporter extends Importer {
                                RankedBibEntry rankedBibEntry2) -> rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank));
         List<BibEntry> bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
 
-        for (BibEntry bibentry : bibEntries) {
-            bibDatabase.insertEntry(bibentry);
-        }
+        bibDatabase.insertEntries(bibEntries);
         parserResult = new ParserResult(bibDatabase);
 
         JSONObject label = recommendationSetJson.getJSONObject("label");

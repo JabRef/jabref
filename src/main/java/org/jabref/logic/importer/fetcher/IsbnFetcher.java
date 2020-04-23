@@ -47,17 +47,10 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
-        
-        // nothing found at ebook.de, try chimbori.com
-        if (!bibEntry.isPresent()) {
-            LOGGER.debug("No entry found at ebook.de try chimbori.com");
-            IsbnViaChimboriFetcher isbnViaChimboriFetcher = new IsbnViaChimboriFetcher(importFormatPreferences);
-            bibEntry = isbnViaChimboriFetcher.performSearchById(identifier);
-        }
 
-        //nothing found at ebook.de and chimbori.com, try ottobib
+        // nothing found at ebook.de: try ottobib
         if (!bibEntry.isPresent()) {
-            LOGGER.debug("No entry found at ebook.de and chimbori.com try ottobib");
+            LOGGER.debug("No entry found at ebook.de; trying ottobib");
             IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
             bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
         }

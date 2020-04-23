@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -27,14 +27,14 @@ class ZbMATHTest {
     @BeforeEach
     void setUp() throws Exception {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                mock(FieldContentFormatterPreferences.class));
         fetcher = new ZbMATH(importFormatPreferences);
 
         donaldsonEntry = new BibEntry();
         donaldsonEntry.setType(StandardEntryType.Article);
         donaldsonEntry.setCiteKey("zbMATH03800580");
-        donaldsonEntry.setField(StandardField.AUTHOR, "S.K. {Donaldson}");
+        donaldsonEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
         donaldsonEntry.setField(StandardField.JOURNAL, "Journal of Differential Geometry");
         donaldsonEntry.setField(StandardField.ISSN, "0022-040X; 1945-743X/e");
         donaldsonEntry.setField(StandardField.LANGUAGE, "English");

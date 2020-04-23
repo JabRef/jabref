@@ -23,7 +23,7 @@ public class MetaDataSerializer {
     }
 
     /**
-     * Writes all data in the format <key, serialized data>.
+     * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
             GlobalBibtexKeyPattern globalCiteKeyPattern) {
@@ -44,7 +44,7 @@ public class MetaDataSerializer {
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
-        metaData.getLaTexFileDirectories().forEach((user, path) -> stringyMetaData
+        metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
 
         for (ContentSelector selector: metaData.getContentSelectorList()) {
@@ -80,7 +80,7 @@ public class MetaDataSerializer {
             for (String dataItem : metaItem.getValue()) {
                 stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
 
-                //in case of save actions, add an additional newline after the enabled flag
+                // in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)
                                 || FieldFormatterCleanups.DISABLED.equals(dataItem))) {

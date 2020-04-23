@@ -6,14 +6,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
+import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.cleanup.CleanupPreset;
-import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;
@@ -34,8 +36,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
-    @FXML private VBox formatterContainer;
-    private FieldFormatterCleanupsPanel cleanUpFormatters;
+    @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -64,9 +65,6 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
-        cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"), Cleanups.DEFAULT_SAVE_ACTIONS);
-        formatterContainer.getChildren().setAll(cleanUpFormatters);
-
         String currentPattern = Localization.lang("Filename format pattern")
                                             .concat(": ")
                                             .concat(filePreferences.getFileNamePattern());
@@ -88,7 +86,8 @@ public class CleanupPresetPanel extends VBox {
         cleanUpBiblatex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
-        cleanUpFormatters.setValues(preset.getFormatterCleanups());
+        formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFormatterCleanups().isEnabled());
+        formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFormatterCleanups().getConfiguredActions()));
     }
 
     public CleanupPreset getCleanupPreset() {
@@ -128,6 +127,8 @@ public class CleanupPresetPanel extends VBox {
 
         activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
 
-        return new CleanupPreset(activeJobs, cleanUpFormatters.getFormatterCleanups());
+        return new CleanupPreset(activeJobs, new FieldFormatterCleanups(
+                !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
+                formatterCleanupsPanel.cleanupsProperty()));
     }
 }

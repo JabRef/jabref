@@ -31,7 +31,6 @@ class OOCalcDatabase {
 
     private final List<BibEntry> entries;
 
-
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
@@ -61,7 +60,7 @@ class OOCalcDatabase {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             result = dbuild.newDocument();
             Element collection = result.createElement("office:document-content");
-            //collection.setAttribute("xmlns", "http://openoffice.org/2000/office");
+            // collection.setAttribute("xmlns", "http://openoffice.org/2000/office");
             collection.setAttribute("xmlns:office", "http://openoffice.org/2000/office");
             collection.setAttribute("xmlns:style", "http://openoffice.org/2000/style");
             collection.setAttribute("xmlns:text", "http://openoffice.org/2000/text");
@@ -145,7 +144,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, StandardField.ISBN));
                 addTableCell(result, row, getField(e, InternalField.KEY_FIELD));
-                addTableCell(result, row, getField(e, StandardField.AUTHOR));//new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));
+                addTableCell(result, row, getField(e, StandardField.AUTHOR)); // new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, StandardField.TITLE))));
                 addTableCell(result, row, getField(e, StandardField.JOURNAL));
                 addTableCell(result, row, getField(e, StandardField.VOLUME));
@@ -160,7 +159,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, StandardField.CHAPTER));
                 addTableCell(result, row, getField(e, StandardField.EDITION));
                 addTableCell(result, row, getField(e, StandardField.SERIES));
-                addTableCell(result, row, getField(e, StandardField.EDITOR));//new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
+                addTableCell(result, row, getField(e, StandardField.EDITOR)); // new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, StandardField.PUBLISHER));
                 addTableCell(result, row, getField(e, new UnknownField("reporttype")));
                 addTableCell(result, row, getField(e, StandardField.HOWPUBLISHED));
@@ -199,7 +198,7 @@ class OOCalcDatabase {
         Element text = doc.createElement("text:p");
         Text textNode = doc.createTextNode(content);
         text.appendChild(textNode);
-        //text.setTextContent(content);
+        // text.setTextContent(content);
         cell.appendChild(text);
         parent.appendChild(cell);
     }

@@ -47,7 +47,12 @@ class MainArchitectureTestsWithArchUnit {
         noClasses().that().resideOutsideOfPackage("org.jabref.gui.icon").should().accessClassesThat().resideInAnyPackage("de.jensd.fx.glyphs", "de.jensd.fx.glyphs.materialdesignicons").check(classes);
     }
 
-    //"Currently disabled as there is no alternative for the rest of classes who need awt"
+    @ArchTest
+    public static void doNotUseAssertJ(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("org.assertj..").check(classes);
+    }
+
+    // "Currently disabled as there is no alternative for the rest of classes who need awt"
     @ArchIgnore
     @ArchTest
     public static void doNotUseJavaAWT(JavaClasses classes) {

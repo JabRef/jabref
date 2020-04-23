@@ -168,8 +168,9 @@ public enum Month {
      * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#'.
      * Example: #jan#, #feb#, etc.
      *
-     * See https://github.com/JabRef/jabref/issues/263#issuecomment-151246595 for a discussion on that thing.
-     * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef
+     * See <a href="https://github.com/JabRef/jabref/issues/263#issuecomment-151246595">Issue 263</a> for a discussion on that thing.
+     * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef.
+     * The documentation is available at the <a href="https://docs.jabref.org/fields/strings">Strings help</a> of JabRef.
      *
      * @return Month in JabRef format
      */

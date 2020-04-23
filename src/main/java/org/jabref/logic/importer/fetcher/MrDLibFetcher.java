@@ -39,7 +39,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String description;
     private String recommendationSetId;
 
-
     public MrDLibFetcher(String language, Version version) {
         LANGUAGE = language;
         VERSION = version;
@@ -100,7 +99,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             URLDownload.bypassSSLVerification();
             String response = urlDownload.asString();
 
-            //Conversion of < and >
+            // Conversion of < and >
             response = response.replaceAll("&gt;", ">");
             response = response.replaceAll("&lt;", "<");
             return response;

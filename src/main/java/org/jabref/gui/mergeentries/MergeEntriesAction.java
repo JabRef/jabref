@@ -1,45 +1,50 @@
 package org.jabref.gui.mergeentries;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class MergeEntriesAction extends SimpleCommand {
 
-    private final JabRefFrame jabRefFrame;
+    private final JabRefFrame frame;
     private final DialogService dialogService;
+    private final StateManager stateManager;
 
-    public MergeEntriesAction(JabRefFrame jabRefFrame, StateManager stateManager) {
-        this.jabRefFrame = jabRefFrame;
-        this.dialogService = jabRefFrame.getDialogService();
+    public MergeEntriesAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+        this.frame = frame;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
 
-        this.executable.bind(needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsEntriesSelected(2, stateManager));
     }
 
     @Override
     public void execute() {
-        BasePanel basePanel = jabRefFrame.getCurrentBasePanel();
+        if (stateManager.getActiveDatabase().isEmpty()) {
+            return;
+        }
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
 
         // Check if there are two entries selected
-        List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
+        List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
         if (selectedEntries.size() != 2) {
             // Inform the user to select entries first.
             dialogService.showInformationDialogAndWait(
                     Localization.lang("Merge entries"),
                     Localization.lang("You have to choose exactly two entries to merge."));
-
             return;
         }
 
@@ -47,22 +52,24 @@ public class MergeEntriesAction extends SimpleCommand {
         BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two, basePanel.getBibDatabaseContext().getMode());
+        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two);
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dlg.showAndWait();
         if (mergedEntry.isPresent()) {
-            basePanel.insertEntry(mergedEntry.get());
+            // ToDo: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
+            //  entries with a timestamp, only BasePanel::insertEntry does. Workaround for the moment is to get the
+            //  BasePanel from the constructor injected JabRefFrame. Should be refactored and extracted!
+            frame.getCurrentBasePanel().insertEntry(mergedEntry.get());
 
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)
             NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableInsertEntry(basePanel.getDatabase(), mergedEntry.get()));
-            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), one));
-            basePanel.getDatabase().removeEntry(one);
-            ce.addEdit(new UndoableRemoveEntry(basePanel.getDatabase(), two));
-            basePanel.getDatabase().removeEntry(two);
+            ce.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), mergedEntry.get()));
+            List<BibEntry> entriesToRemove = Arrays.asList(one, two);
+            ce.addEdit(new UndoableRemoveEntries(databaseContext.getDatabase(), entriesToRemove));
+            databaseContext.getDatabase().removeEntries(entriesToRemove);
             ce.end();
-            basePanel.getUndoManager().addEdit(ce);
+            Globals.undoManager.addEdit(ce); // ToDo: Rework UndoManager and extract Globals
 
             dialogService.notify(Localization.lang("Merged entries"));
         } else {

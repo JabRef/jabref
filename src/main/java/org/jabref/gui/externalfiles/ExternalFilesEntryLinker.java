@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class ExternalFilesEntryLinker {
         if (firstExistingFileDir.isPresent()) {
             Path targetFile = firstExistingFileDir.get().resolve(file.getFileName());
             if (FileUtil.copyFile(file, targetFile, false)) {
-                return Optional.ofNullable(targetFile);
+                return Optional.of(targetFile);
             }
         }
         return Optional.empty();
@@ -71,7 +72,7 @@ public class ExternalFilesEntryLinker {
     public void copyFilesToFileDirAndAddToEntry(BibEntry entry, List<Path> files) {
         for (Path file : files) {
             copyFileToFileDir(file)
-                    .ifPresent(copiedFile -> addFilesToEntry(entry, files));
+                    .ifPresent(copiedFile -> addFilesToEntry(entry, Collections.singletonList(copiedFile)));
         }
         renameLinkedFilesToPattern(entry);
     }

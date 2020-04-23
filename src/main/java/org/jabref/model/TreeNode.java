@@ -15,11 +15,11 @@ import javafx.collections.ObservableList;
  * Represents a node in a tree.
  * <p>
  * Usually, tree nodes have a value property which allows access to the value stored in the node.
- * In contrast to this approach, the TreeNode<T> class is designed to be used as a base class which provides the
+ * In contrast to this approach, the TreeNode&lt;T> class is designed to be used as a base class which provides the
  * tree traversing functionality via inheritance.
  * <p>
  * Example usage:
- * private class BasicTreeNode extends TreeNode<BasicTreeNode> {
+ * private class BasicTreeNode extends TreeNode&lt;BasicTreeNode> {
  * public BasicTreeNode() {
  * super(BasicTreeNode.class);
  * }
@@ -50,7 +50,7 @@ import javafx.collections.ObservableList;
     /**
      * Constructs a tree node without parent and no children.
      *
-     * @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
+     * @param derivingClass class deriving from TreeNode&lt,T>. It should always be "T.class".
      *                      We need this parameter since it is hard to get this information by other means.
      */
     public TreeNode(Class<T> derivingClass) {
@@ -424,7 +424,7 @@ import javafx.collections.ObservableList;
         children.remove(child);
         child.setParent(null);
 
-        notifyAboutDescendantChange((T)this);
+        notifyAboutDescendantChange((T) this);
     }
 
     /**
@@ -441,7 +441,7 @@ import javafx.collections.ObservableList;
             child.get().setParent(null);
         }
 
-        notifyAboutDescendantChange((T)this);
+        notifyAboutDescendantChange((T) this);
     }
 
     /**
@@ -473,7 +473,7 @@ import javafx.collections.ObservableList;
         child.setParent((T) this);
         children.add(index, child);
 
-        notifyAboutDescendantChange((T)this);
+        notifyAboutDescendantChange((T) this);
 
         return child;
     }

@@ -63,14 +63,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Keep right"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
-                me = new MergeEntries(one, two, database.getMode());
+                me = new MergeEntries(one, two);
                 break;
             case INSPECTION:
                 first = new ButtonType(Localization.lang("Remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Remove entry from import"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Keep both"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), database.getMode());
+                        Localization.lang("From import"));
                 break;
             case DUPLICATE_SEARCH_WITH_EXACT:
                 first = new ButtonType(Localization.lang("Keep left"), ButtonData.APPLY);
@@ -79,14 +79,14 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
                 removeExactVisible = true;
 
-                me = new MergeEntries(one, two, database.getMode());
+                me = new MergeEntries(one, two);
                 break;
             default:
                 first = new ButtonType(Localization.lang("Import and remove old entry"), ButtonData.APPLY);
                 second = new ButtonType(Localization.lang("Do not import entry"), ButtonData.APPLY);
                 both = new ButtonType(Localization.lang("Import and keep old entry"), ButtonData.APPLY);
                 me = new MergeEntries(one, two, Localization.lang("Old entry"),
-                        Localization.lang("From import"), database.getMode());
+                        Localization.lang("From import"));
                 break;
         }
         if (removeExactVisible) {

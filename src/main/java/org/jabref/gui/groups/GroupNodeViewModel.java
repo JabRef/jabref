@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -38,6 +38,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -48,7 +49,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final SimpleIntegerProperty hits;
+    private final ObservableList<BibEntry> matchedEntries = FXCollections.observableArrayList();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -79,8 +80,7 @@ public class GroupNodeViewModel {
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        hits = new SimpleIntegerProperty(0);
-        calculateNumberOfMatches();
+        updateMatchedEntries();
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -108,10 +108,10 @@ public class GroupNodeViewModel {
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        //if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
-        //{
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+        // {
         //    return; // user aborted operation
-        //}
+        // }
 
         var changes = groupNode.addEntriesToGroup(entries);
 
@@ -153,8 +153,8 @@ public class GroupNodeViewModel {
         return groupNode.getGroup().getDescription().orElse("");
     }
 
-    public SimpleIntegerProperty getHits() {
-        return hits;
+    public IntegerBinding getHits() {
+        return Bindings.size(matchedEntries);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class GroupNodeViewModel {
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
-                ", hits=" + hits +
+                ", matchedEntries=" + matchedEntries +
                 '}';
     }
 
@@ -201,7 +201,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(IconTheme.JabRefIcons.class, iconCode.toUpperCase(Locale.ENGLISH))
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
                     .toJavaUtil()
                     .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
@@ -218,16 +218,44 @@ public class GroupNodeViewModel {
      * Gets invoked if an entry in the current database changes.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
-        calculateNumberOfMatches();
+        while (change.next()) {
+            if (change.wasPermutated()) {
+                // Nothing to do, as permutation doesn't change matched entries
+            } else if (change.wasUpdated()) {
+                for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
+                    if (groupNode.matches(changedEntry)) {
+                        if (!matchedEntries.contains(changedEntry)) {
+                            matchedEntries.add(changedEntry);
+                        }
+                    } else {
+                        matchedEntries.remove(changedEntry);
+                    }
+                }
+            } else {
+                for (BibEntry removedEntry : change.getRemoved()) {
+                    matchedEntries.remove(removedEntry);
+                }
+                for (BibEntry addedEntry : change.getAddedSubList()) {
+                    if (groupNode.matches(addedEntry)) {
+                        if (!matchedEntries.contains(addedEntry)) {
+                            matchedEntries.add(addedEntry);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void calculateNumberOfMatches() {
+    private void updateMatchedEntries() {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
         BackgroundTask
-                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                .onSuccess(hits::setValue)
+                .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
+                .onSuccess(entries -> {
+                    matchedEntries.clear();
+                    matchedEntries.addAll(entries);
+                })
                 .executeWith(taskExecutor);
     }
 
@@ -270,13 +298,13 @@ public class GroupNodeViewModel {
 
     public void moveTo(GroupNodeViewModel target) {
         // TODO: Add undo and display message
-        //MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
         //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
 
         getGroupNode().moveTo(target.getGroupNode());
-        //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
-        //panel.markBaseChanged();
-        //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        // panel.markBaseChanged();
+        // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }
 
     public void moveTo(GroupTreeNode target, int targetIndex) {
@@ -288,10 +316,14 @@ public class GroupNodeViewModel {
     }
 
     public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+        // No action, if the target is the same as the source
+        if (this.equals(target)) {
+            return;
+        }
+
         Optional<GroupTreeNode> targetParent = target.getParent();
         if (targetParent.isPresent()) {
             int targetIndex = target.getPositionInParent();
-
             // In case we want to move an item in the same parent
             // and the item is moved down, we need to adjust the target index
             if (targetParent.equals(getParent())) {

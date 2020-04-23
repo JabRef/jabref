@@ -12,10 +12,8 @@ import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
-import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
-import org.jabref.logic.importer.fileformat.FreeCiteImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -58,7 +56,6 @@ public class ImportFormatReader {
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new EndnoteXmlImporter(importFormatPreferences));
-        formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
@@ -73,9 +70,7 @@ public class ImportFormatReader {
         formats.add(new SilverPlatterImporter());
 
         // Get custom import formats
-        for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
-            formats.add(importer);
-        }
+        formats.addAll(importFormatPreferences.getCustomImportList());
     }
 
     /**
@@ -172,7 +167,7 @@ public class ImportFormatReader {
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult parserResult = OpenDatabase.loadDatabase(filePath.toFile(), importFormatPreferences, fileMonitor);
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 parserResult.setFile(filePath.toFile());
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);

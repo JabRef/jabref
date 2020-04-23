@@ -16,10 +16,22 @@ public class RemoveBracketsTest {
     }
 
     @Test
-    public void testFormat() throws Exception {
+    public void bracePairCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("{some text}"));
+    }
+
+    @Test
+    public void singleOpeningBraceCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("{some text"));
+    }
+
+    @Test
+    public void singleClosingBraceCorrectlyRemoved() throws Exception {
         assertEquals("some text", formatter.format("some text}"));
+    }
+
+    @Test
+    public void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
         assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
 }

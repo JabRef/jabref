@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.formatter.bibtexfields.CleanupURLFormatter;
+import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
@@ -58,7 +59,7 @@ public class Formatters {
     public static List<Formatter> getOthers() {
         return Arrays.asList(
                 new ClearFormatter(),
-                new CleanupURLFormatter(),
+                new CleanupUrlFormatter(),
                 new LatexCleanupFormatter(),
                 new MinifyNameListFormatter(),
                 new NormalizeDateFormatter(),
@@ -69,6 +70,7 @@ public class Formatters {
                 new RemoveBracesFormatter(),
                 new UnitsToLatexFormatter(),
                 new EscapeUnderscoresFormatter(),
+                new EscapeAmpersandsFormatter(),
                 new ShortenDOIFormatter()
         );
     }

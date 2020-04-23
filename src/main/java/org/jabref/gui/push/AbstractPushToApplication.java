@@ -81,13 +81,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                 ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
                 processBuilder.start();
             }
-        }
-
-        // In case it did not work
-        catch (IOException excep) {
+        } catch (IOException excep) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
-
-            LOGGER.warn("Error: Could not call executable '" + commandPath + "'.", excep);
         }
     }
 

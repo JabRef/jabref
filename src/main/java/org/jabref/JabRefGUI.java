@@ -3,15 +3,15 @@ package org.jabref;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
@@ -40,21 +40,23 @@ public class JabRefGUI {
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
+    private boolean correctedWindowPos;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
     public JabRefGUI(Stage mainStage, List<ParserResult> databases, boolean isBlank) {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
+        this.correctedWindowPos = false;
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionDelayed();
     }
 
     private void openWindow(Stage mainStage) {
-        GUIGlobals.init();
+        IconTheme.loadFonts();
 
         LOGGER.debug("Initializing frame");
         mainFrame.init();
@@ -62,12 +64,21 @@ public class JabRefGUI {
         // Restore window location and/or maximised state
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
+        } else if (Screen.getScreens().size() == 1 && isWindowPositionOutOfBounds()) {
+            // corrects the Window, if its outside of the mainscreen
+            LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
+            mainStage.setX(0);
+            mainStage.setY(0);
+            mainStage.setWidth(1024);
+            mainStage.setHeight(768);
+            correctedWindowPos = true;
         } else {
             mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
             mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
             mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
             mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
         }
+        debugLogWindowState(mainStage);
 
         // We create a decoration pane ourselves for performance reasons
         // (otherwise it has to be injected later, leading to a complete redraw/relayout of the complete scene)
@@ -82,7 +93,11 @@ public class JabRefGUI {
         mainStage.show();
 
         mainStage.setOnCloseRequest(event -> {
-            saveWindowState(mainStage);
+            if (!correctedWindowPos) {
+                // saves the window position only if its not  corrected -> the window will rest at the old Position,
+                // if the external Screen is connected again.
+                saveWindowState(mainStage);
+            }
             boolean reallyQuit = mainFrame.quit();
             if (!reallyQuit) {
                 event.consume();
@@ -97,6 +112,13 @@ public class JabRefGUI {
             openLastEditedDatabases();
         }
 
+        // Remove invalid databases
+        List<ParserResult> invalidDatabases = bibDatabases.stream()
+                                                          .filter(ParserResult::isInvalid)
+                                                          .collect(Collectors.toList());
+        failed.addAll(invalidDatabases);
+        bibDatabases.removeAll(invalidDatabases);
+
         // passed file (we take the first one) should be focused
         String focusedFile = bibDatabases.stream()
                                          .findFirst()
@@ -106,40 +128,34 @@ public class JabRefGUI {
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
-        if (!bibDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
-                ParserResult pr = parserResultIterator.next();
-                // Define focused tab
-                if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
-                    first = true;
-                }
+        for (ParserResult pr : bibDatabases) {
+            // Define focused tab
+            if (pr.getFile().filter(path -> path.getAbsolutePath().equals(focusedFile)).isPresent()) {
+                first = true;
+            }
 
-                if (pr.isInvalid()) {
-                    failed.add(pr);
-                    parserResultIterator.remove();
-                } else if (pr.getDatabase().isShared()) {
-                    try {
-                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
-                            NotASharedDatabaseException e) {
-                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
-                        pr.getDatabase().clearSharedDatabaseID();
+            if (pr.getDatabase().isShared()) {
+                try {
+                    new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                        NotASharedDatabaseException e) {
+                    pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                    pr.getDatabase().clearSharedDatabaseID();
 
-                        LOGGER.error("Connection error", e);
-                        mainFrame.getDialogService().showErrorDialogAndWait(
-                                Localization.lang("Connection error"),
-                                Localization.lang("A local copy will be opened."),
-                                e);
-                    }
-                    toOpenTab.add(pr);
-                } else if (pr.toOpenTab()) {
-                    // things to be appended to an opened tab should be done after opening all tabs
-                    // add them to the list
-                    toOpenTab.add(pr);
-                } else {
-                    mainFrame.addParserResult(pr, first);
-                    first = false;
+                    LOGGER.error("Connection error", e);
+                    mainFrame.getDialogService().showErrorDialogAndWait(
+                            Localization.lang("Connection error"),
+                            Localization.lang("A local copy will be opened."),
+                            e);
                 }
+                toOpenTab.add(pr);
+            } else if (pr.toOpenTab()) {
+                // things to be appended to an opened tab should be done after opening all tabs
+                // add them to the list
+                toOpenTab.add(pr);
+            } else {
+                mainFrame.addParserResult(pr, first);
+                first = false;
             }
         }
 
@@ -187,6 +203,34 @@ public class JabRefGUI {
         Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
         Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
+        debugLogWindowState(mainStage);
+    }
+
+    /**
+     * outprints the Data from the Screen (only in debug mode)
+     *
+     * @param mainStage
+     */
+    private void debugLogWindowState(Stage mainStage) {
+        if (LOGGER.isDebugEnabled()) {
+            StringBuilder debugLogString = new StringBuilder();
+            debugLogString.append("SCREEN DATA:");
+            debugLogString.append("mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n");
+            debugLogString.append("mainStage.POS_X: " + mainStage.getX() + "\n");
+            debugLogString.append("mainStage.POS_Y: " + mainStage.getY() + "\n");
+            debugLogString.append("mainStage.SIZE_X: " + mainStage.getWidth() + "\n");
+            debugLogString.append("mainStages.SIZE_Y: " + mainStage.getHeight() + "\n");
+            LOGGER.debug(debugLogString.toString());
+        }
+    }
+
+    /**
+     * Tests if the window coordinates are out of the mainscreen
+     *
+     * @return outbounds
+     */
+    private boolean isWindowPositionOutOfBounds() {
+        return !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X), Globals.prefs.getDouble(JabRefPreferences.POS_Y));
     }
 
     private void openLastEditedDatabases() {
@@ -203,7 +247,7 @@ public class JabRefGUI {
                 continue;
             }
 
-            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 

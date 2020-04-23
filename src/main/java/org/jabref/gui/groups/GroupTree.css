@@ -29,15 +29,7 @@
     -fx-fill: -jr-group-hits-fg;
 }
 
-.numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-green, 70%);
-}
-
-.numberColumn > .hits:all-selected {
-    -fx-background-color: -jr-green;
-}
-
-.disclosureNodeColumn {
+.expansionNodeColumn {
     -fx-alignment: top-right;
 }
 
@@ -81,7 +73,7 @@
     -fx-padding: 0.40em 0.2em 0.40em 0em;
 }
 
-.tree-table-row-cell:root > .disclosureNodeColumn {
+.tree-table-row-cell:root > .expansionNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
 
@@ -110,13 +102,17 @@
     -fx-translate-x: -0.4em;
 }
 
-#barBottom {
+#newGroupButton {
+    -fx-padding: 0.1em 1.5em 0.1em 1.5em;
+}
+
+#groupFilterBar {
     -fx-background-color: -jr-sidepane-header-background;
     -fx-border-color: -jr-separator;
     -fx-border-width: 1 0 0 0;
     -fx-padding: 0em 1em 0em 1em;
 }
 
-#barBottom .glyph-icon {
+#groupFilterBar .glyph-icon {
     -fx-font-size: 2em;
 }

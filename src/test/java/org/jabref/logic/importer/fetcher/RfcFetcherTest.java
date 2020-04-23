@@ -49,7 +49,7 @@ public class RfcFetcherTest {
 
     @Test
     public void getHelpPageReturnsEqualHelpPage() {
-        assertEquals("RFCtoBibTeX", fetcher.getHelpPage().get().getPageName());
+        assertEquals("import-using-publication-identifiers/rfctobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

@@ -21,14 +21,13 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -41,33 +40,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A bibliography database.
+ * A bibliography database. This is the "bib" file (or the library stored in a shared SQL database)
  */
 public class BibDatabase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
     /**
      * State attributes
      */
     private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
     private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
-    /**
-     * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
-     */
-    private final DuplicationChecker duplicationChecker = new DuplicationChecker();
-    /**
-     * contains all entry.getID() of the current database
-     */
-    private final Set<String> internalIDs = new HashSet<>();
+
     private final EventBus eventBus = new EventBus();
+
     private String preamble;
+
     // All file contents below the last entry in the file
     private String epilog = "";
     private String sharedDatabaseID;
 
     public BibDatabase() {
-        this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
     }
 
@@ -120,7 +114,7 @@ public class BibDatabase {
      * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
     public boolean containsEntryWithId(String id) {
-        return internalIDs.contains(id);
+        return entries.stream().anyMatch(entry -> entry.getId().equals(id));
     }
 
     public ObservableList<BibEntry> getEntries() {
@@ -175,96 +169,80 @@ public class BibDatabase {
     }
 
     /**
-     * Finds the entry with a specified ID.
+     * Inserts the entry.
      *
-     * @param id
-     * @return The entry that has the given id
+     * @param entry entry to insert
      */
-    public synchronized Optional<BibEntry> getEntryById(String id) {
-        return entries.stream().filter(entry -> entry.getId().equals(id)).findFirst();
+    public synchronized void insertEntry(BibEntry entry) {
+        insertEntry(entry, EntriesEventSource.LOCAL);
     }
 
     /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
+     * Inserts the entry.
      *
-     * @param entry BibEntry to insert into the database
-     * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
+     * @param entry       entry to insert
+     * @param eventSource source the event is sent from
      */
-    public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntryEventSource.LOCAL);
-    }
-
-    /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
-     *
-     * @param entry BibEntry to insert
-     * @param eventSource Source the event is sent from
-     * @return false if the insert was done without a duplicate warning
-     */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
         insertEntries(Collections.singletonList(entry), eventSource);
-        return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
-    public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
-        insertEntries(Arrays.asList(entries), EntryEventSource.LOCAL);
+    public synchronized void insertEntries(BibEntry... entries) {
+        insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
-        insertEntries(entries, EntryEventSource.LOCAL);
+    public synchronized void insertEntries(List<BibEntry> entries) {
+        insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) {
         Objects.requireNonNull(newEntries);
-
-        BibEntry firstEntry = null;
         for (BibEntry entry : newEntries) {
-            String id = entry.getId();
-            if (containsEntryWithId(id)) {
-                throw new KeyCollisionException("ID is already in use, please choose another");
-            }
-
-            internalIDs.add(id);
             entry.registerListener(this);
-
-            eventBus.post(new EntryAddedEvent(entry, eventSource));
-
-            if (firstEntry == null) {
-                firstEntry = entry;
-            }
+        }
+        if (newEntries.isEmpty()) {
+            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
+        } else {
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
-        if (firstEntry != null) {
-            eventBus.post(new AllInsertsFinishedEvent(firstEntry, eventSource));
-        }
+    }
+
+    public synchronized void removeEntry(BibEntry bibEntry) {
+        removeEntries(Collections.singletonList(bibEntry));
+    }
+
+    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
+        removeEntries(Collections.singletonList(bibEntry), eventSource);
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
-     * @param toBeDeleted Entry to delete
+     * Removes the given entries.
+     * The entries removed based on the id {@link BibEntry#getId()}
+     *
+     * @param toBeDeleted Entries to delete
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted) {
-        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
+        removeEntries(toBeDeleted, EntriesEventSource.LOCAL);
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
+     * Removes the given entries.
+     * The entries are removed based on the id {@link BibEntry#getId()}
      *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        List<String> ids = new ArrayList<>();
+        for (BibEntry entry : toBeDeleted) {
+            ids.add(entry.getId());
+        }
+        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
-            internalIDs.remove(toBeDeleted.getId());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
+            eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
 
@@ -291,25 +269,27 @@ public class BibDatabase {
      * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
-        if (hasStringLabel(string.getName())) {
-            throw new KeyCollisionException("A string with that label already exists");
+        String id = string.getId();
+
+        if (hasStringByName(string.getName())) {
+            throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibTeX string id.");
+        if (bibtexStrings.containsKey(id)) {
+            throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(string.getId(), string);
+        bibtexStrings.put(id, string);
     }
 
     /**
      * Replaces the existing lists of BibTexString with the given one
-     * No Duplicate checks are performed
+     * Duplicates throw KeyCollisionException
      * @param stringsToAdd The collection of strings to set
      */
-    public void setStrings(Collection<BibtexString> stringsToAdd) {
-        Map<String, BibtexString> strs = stringsToAdd.stream().collect(Collectors.toConcurrentMap(BibtexString::getId, (bibtexStr) -> bibtexStr));
-        bibtexStrings = strs;
+    public void setStrings(List<BibtexString> stringsToAdd) {
+        bibtexStrings = new ConcurrentHashMap<>();
+        stringsToAdd.forEach(this::addString);
     }
 
     /**
@@ -375,7 +355,7 @@ public class BibDatabase {
     /**
      * Returns true if a string with the given label already exists.
      */
-    public synchronized boolean hasStringLabel(String label) {
+    public synchronized boolean hasStringByName(String label) {
         return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
@@ -571,8 +551,7 @@ public class BibDatabase {
      *
      *   - {@link EntryAddedEvent}
      *   - {@link EntryChangedEvent}
-     *   - {@link EntryRemovedEvent}
-     *   - {@link AllInsertsFinishedEvent}
+     *   - {@link EntriesRemovedEvent}
      *
      * @param listener listener (subscriber) to add
      */
@@ -628,7 +607,20 @@ public class BibDatabase {
         return this.sharedDatabaseID;
     }
 
-    public DuplicationChecker getDuplicationChecker() {
-        return duplicationChecker;
+    /**
+     * Returns the number of occurrences of the given key in this database.
+     */
+    public long getNumberOfKeyOccurrences(String citeKey) {
+        return entries.stream()
+                      .flatMap(entry -> entry.getCiteKeyOptional().stream())
+                      .filter(key -> key.equals(citeKey))
+                      .count();
+    }
+
+    /**
+     * Checks if there is more than one occurrence of the cite key
+     */
+    public boolean isDuplicateCiteKeyExisting(String citeKey) {
+        return getNumberOfKeyOccurrences(citeKey) > 1;
     }
 }

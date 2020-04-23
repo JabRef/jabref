@@ -23,9 +23,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -85,7 +85,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private boolean registered;
 
     private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
-        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getPatternForWords);
+        searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
 
@@ -131,7 +131,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void highlightSearchPattern() {
         if (searchHighlightPattern.isPresent()) {
-            String pattern = searchHighlightPattern.get().pattern().replace("\\Q", "").replace("\\E", "");
+            String pattern = searchHighlightPattern.get().pattern();
 
             previewView.getEngine().executeScript(
                     "var markInstance = new Mark(document.getElementById(\"content\"));" +
@@ -173,7 +173,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
-        if (!entry.isPresent() || layout == null) {
+        if (entry.isEmpty() || layout == null) {
             // Nothing to do
             return;
         }

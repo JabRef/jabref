@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.BaseDialog;
@@ -50,10 +51,16 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ImportCustomEntryTypesDialogViewModel(mode, customEntryTypes, preferencesService);
-
         boxDifferentCustomization.visibleProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         boxDifferentCustomization.managedProperty().bind(Bindings.isNotEmpty(viewModel.differentCustomizations()));
         unknownEntryTypesCheckList.setItems(viewModel.newTypes());
+        unknownEntryTypesCheckList.setCellFactory(listView -> new CheckBoxListCell<>(unknownEntryTypesCheckList::getItemBooleanProperty) {
+            @Override
+            public void updateItem(BibEntryType bibEntryType, boolean empty) {
+                super.updateItem(bibEntryType, empty);
+                setText(bibEntryType == null ? "" : bibEntryType.getType().getDisplayName());
+            }
+        });
         differentCustomizationCheckList.setItems(viewModel.differentCustomizations());
     }
 

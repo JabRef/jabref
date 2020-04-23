@@ -42,9 +42,9 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -71,6 +71,8 @@ import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class GlobalSearchBar extends HBox {
 
@@ -99,6 +101,8 @@ public class GlobalSearchBar extends HBox {
 
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchDisplayMode = searchPreferences.getSearchMode();
+
+        this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
@@ -158,9 +162,6 @@ public class GlobalSearchBar extends HBox {
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
         Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
 
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
-
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
             if (isFocused) {
                 KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), expandedSize);
@@ -179,11 +180,13 @@ public class GlobalSearchBar extends HBox {
 
         this.setAlignment(Pos.CENTER_LEFT);
 
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
                 searchTerm -> {
-                    performSearch();
+                    // Async update
+                    searchTask.restart();
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
         );
@@ -273,12 +276,12 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
+    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                                                                                                              searchCompleter,
-                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                                                                                                              new AppendPersonNamesStrategy());
+                    searchCompleter::provideSuggestions,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
@@ -313,7 +316,7 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             // TODO: switch Icon color
-            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
         setHintTooltip(description);
@@ -421,7 +424,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
-            //empty
+            // empty
         }
     }
 }

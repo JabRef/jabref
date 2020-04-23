@@ -9,10 +9,16 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+
+import javafx.scene.control.TableColumn;
 
 import org.jabref.Globals;
 import org.jabref.JabRefMain;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.preferences.JabRefPreferences;
@@ -31,7 +37,6 @@ public class PreferencesMigrations {
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
     public static void runMigrations() {
-
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
@@ -43,6 +48,8 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
+        upgradeColumnPreferences(Globals.prefs);
+        upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
     /**
@@ -182,7 +189,7 @@ public class PreferencesMigrations {
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
             }
-            //Pref node already exists do not migrate from previous version
+            // Pref node already exists do not migrate from previous version
             if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
                 return;
             }
@@ -240,7 +247,7 @@ public class PreferencesMigrations {
             String[] newStylePatterns = new String[] {"[bibtexkey]",
                                                       "[bibtexkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title",};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -269,7 +276,7 @@ public class PreferencesMigrations {
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefPreferences prefs) {
-        //LinkedHashSet because we want to retain the order and add new fields to the end
+        // LinkedHashSet because we want to retain the order and add new fields to the end
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
         keys.add("related");
@@ -293,5 +300,75 @@ public class PreferencesMigrations {
         String currentPreviewStyle = prefs.getPreviewStyle();
         String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
         prefs.setPreviewStyle(migratedStyle);
+    }
+
+    static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
+        String currentPreviewStyle = prefs.getPreviewStyle();
+        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}");
+        prefs.setPreviewStyle(migratedStyle);
+    }
+
+    /**
+     * The former preferences default of columns was a simple list of strings ("author;title;year;..."). Since 5.0
+     * the preferences store the type of the column too, so that the formerly hardwired columns like the graphic groups
+     * column or the other icon columns can be reordered in the main table and behave like any other field column
+     * ("groups;linked_id;field:author;special:readstatus;extrafile:pdf;...").
+     *
+     * Simple strings are by default parsed as a FieldColumn, so there is nothing to do there, but the formerly hard
+     * wired columns need to be added.
+     */
+    static void upgradeColumnPreferences(JabRefPreferences preferences) {
+        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<Double> columnWidths = preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS)
+                                               .stream()
+                                               .map(string -> {
+                                                   try {
+                                                       return Double.parseDouble(string);
+                                                   } catch (NumberFormatException e) {
+                                                       return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                                                   }
+                                               })
+                                               .collect(Collectors.toList());
+
+        // "field:"
+        String normalFieldTypeString = MainTableColumnModel.Type.NORMALFIELD.getName() + MainTableColumnModel.COLUMNS_QUALIFIER_DELIMITER;
+
+        if (!columnNames.isEmpty() && columnNames.stream().noneMatch(name -> name.contains(normalFieldTypeString))) {
+            List<MainTableColumnModel> columns = new ArrayList<>();
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.GROUPS));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.FILES));
+            columns.add(new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER));
+
+            for (int i = 0; i < columnNames.size(); i++) {
+                String name = columnNames.get(i);
+                double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+
+                MainTableColumnModel.Type type = SpecialField.fromName(name)
+                                                             .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
+                                                             .orElse(MainTableColumnModel.Type.NORMALFIELD);
+
+                if (i < columnWidths.size()) {
+                    columnWidth = columnWidths.get(i);
+                }
+
+                columns.add(new MainTableColumnModel(type, name, columnWidth));
+            }
+
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, columns.stream()
+                    .map(MainTableColumnModel::getName)
+                    .collect(Collectors.toList()));
+
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, columns.stream()
+                    .map(MainTableColumnModel::getWidth)
+                    .map(Double::intValue)
+                    .map(Object::toString)
+                    .collect(Collectors.toList()));
+
+            // ASCENDING by default
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, columns.stream()
+                    .map(MainTableColumnModel::getSortType)
+                    .map(TableColumn.SortType::toString)
+                    .collect(Collectors.toList()));
+        }
     }
 }

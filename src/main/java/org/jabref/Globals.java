@@ -27,41 +27,56 @@ import org.jabref.preferences.JabRefPreferences;
 import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
-import com.microsoft.applicationinsights.internal.shutdown.SDKShutdownActivity;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 import kong.unirest.Unirest;
 
+/**
+ * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
+ */
+@Deprecated
 public class Globals {
 
-    // JabRef version info
+    /**
+     * JabRef version info
+     */
     public static final BuildInfo BUILD_INFO = new BuildInfo();
+
     // Remote listener
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
+
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
     public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
-    // In the main program, this field is initialized in JabRefMain.java
-    // Each test case initializes this field if required
+
+    /**
+     * Each test case initializes this field if required
+     */
     public static JabRefPreferences prefs;
+
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static JournalAbbreviationLoader journalAbbreviationLoader;
+
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;
+
     /**
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
+
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
     public static ClipBoardManager clipboardManager = new ClipBoardManager();
+
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
+
     private static DefaultFileUpdateMonitor fileUpdateMonitor;
     private static ThemeLoader themeLoader;
     private static TelemetryClient telemetryClient;
@@ -93,18 +108,15 @@ public class Globals {
         getTelemetryClient().ifPresent(client -> {
             client.trackSessionState(SessionState.End);
             client.flush();
-
-            //FIXME: Workaround for bug https://github.com/Microsoft/ApplicationInsights-Java/issues/662
-            SDKShutdownActivity.INSTANCE.stopAll();
         });
     }
 
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
-        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.getAzureInstrumentationKey());
+        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
-        telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.getVersion().toString());
+        telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());
         telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());
         telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());

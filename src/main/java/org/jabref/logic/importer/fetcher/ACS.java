@@ -26,7 +26,7 @@ public class ACS implements FulltextFetcher {
 
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
-     *
+     * <p>
      * Currently only uses the DOI if found.
      *
      * @param entry The Bibtex entry
@@ -37,23 +37,24 @@ public class ACS implements FulltextFetcher {
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfLink = Optional.empty();
 
         // DOI search
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (doi.isPresent()) {
-            String source = String.format(SOURCE, doi.get().getDOI());
-            // Retrieve PDF link
-            Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
-            Element link = html.select(".pdf-high-res a").first();
-
-            if (link != null) {
-                LOGGER.info("Fulltext PDF found @ ACS.");
-                pdfLink = Optional.of(new URL(source.replaceFirst("/abs/", "/pdf/")));
-            }
+        if (!doi.isPresent()) {
+            return Optional.empty();
         }
-        return pdfLink;
+
+        String source = String.format(SOURCE, doi.get().getDOI());
+        // Retrieve PDF link
+        Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
+        Element link = html.select("a.button_primary").first();
+
+        if (link != null) {
+            LOGGER.info("Fulltext PDF found @ ACS.");
+            return Optional.of(new URL(source.replaceFirst("/abs/", "/pdf/")));
+        }
+        return Optional.empty();
     }
 
     @Override

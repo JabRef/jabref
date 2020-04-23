@@ -49,9 +49,6 @@ public class BracketedPattern {
         this.pattern = null;
     }
 
-    /**
-     * @param bibentry
-     */
     public BracketedPattern(String pattern) {
         this.pattern = pattern;
     }
@@ -111,7 +108,7 @@ public class BracketedPattern {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
+        StringTokenizer st = new StringTokenizer(pattern, "\\[]", true);
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
@@ -206,9 +203,8 @@ public class BracketedPattern {
                     return allAuthors(authString);
                 } else if ("authorsAlpha".equals(val)) {
                     return authorsAlpha(authString);
-                }
-                // Last author's last name
-                else if ("authorLast".equals(val)) {
+                } else if ("authorLast".equals(val)) {
+                    // Last author's last name
                     return lastAuthor(authString);
                 } else if ("authorLastForeIni".equals(val)) {
                     return lastAuthorForenameInitials(authString);
@@ -230,6 +226,7 @@ public class BracketedPattern {
                     return authNofMth(authString, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
                 } else if (val.matches("auth\\d+")) {
+                    // authN. First N chars of the first author's last name.
                     int num = Integer.parseInt(val.substring(4));
                     return authN(authString, num, isEnforceLegalKey);
                 } else if (val.matches("authors\\d+")) {
@@ -267,10 +264,7 @@ public class BracketedPattern {
                     return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if ("edtrshort".equals(val)) {
                     return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                }
-                // authN. First N chars of the first author's last
-                // name.
-                else if (val.matches("edtr\\d+")) {
+                } else if (val.matches("edtr\\d+")) {
                     String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
@@ -354,8 +348,7 @@ public class BracketedPattern {
                 // we haven't seen any special demands
                 return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
             }
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
         }

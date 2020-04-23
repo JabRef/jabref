@@ -1,5 +1,7 @@
 package org.jabref.migrations;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import org.jabref.preferences.JabRefPreferences;
@@ -20,7 +22,7 @@ class PreferencesMigrationsTest {
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
     private final String[] newStylePatterns = new String[]{"[bibtexkey]",
-                                                            "[bibtexkey] - [title]"};
+            "[bibtexkey] - [title]"};
 
     @BeforeEach
     void setUp() {
@@ -114,5 +116,107 @@ class PreferencesMigrationsTest {
         PreferencesMigrations.upgradePreviewStyleFromReviewToComment(prefs);
 
         verify(prefs).setPreviewStyle(newPreviewStyle);
+    }
+
+    @Test
+    void upgradePreviewStyleAllowMarkupDefault() {
+        String oldPreviewStyle = "<font face=\"sans-serif\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        String newPreviewStyle = "<font face=\"sans-serif\">"
+                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                // Include the booktitle field for @inproceedings, @proceedings, etc.
+                + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        prefs.setPreviewStyle(oldPreviewStyle);
+        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyleAllowMarkdown(prefs);
+
+        verify(prefs).setPreviewStyle(newPreviewStyle);
+    }
+
+    @Test
+    void upgradePreviewStyleAllowMarkupCustomized() {
+        String oldPreviewStyle = "<font face=\"sans-serif\">"
+                + "My highly customized format only using comments:<br>"
+                + "\\begin{comment} Something: \\format[HTMLChars]{\\comment} special \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        String newPreviewStyle = "<font face=\"sans-serif\">"
+                + "My highly customized format only using comments:<br>"
+                + "\\begin{comment} Something: \\format[Markdown,HTMLChars]{\\comment} special \\end{comment}"
+                + "</dd>__NEWLINE__<p></p></font>";
+
+        prefs.setPreviewStyle(oldPreviewStyle);
+        when(prefs.getPreviewStyle()).thenReturn(oldPreviewStyle);
+
+        PreferencesMigrations.upgradePreviewStyleAllowMarkdown(prefs);
+
+        verify(prefs).setPreviewStyle(newPreviewStyle);
+    }
+
+    @Test
+    void testUpgradeColumnPreferencesAlreadyMigrated() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+
+        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(prefs);
+
+        verify(prefs, never()).put(JabRefPreferences.COLUMN_NAMES, "anyString");
+        verify(prefs, never()).put(JabRefPreferences.COLUMN_WIDTHS, "anyString");
+    }
+
+    @Test
+    void testUpgradeColumnPreferencesFromWithoutTypes() {
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
+        List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
+        List<String> newSortTypes = Arrays.asList("ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING");
+
+        when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
+        when(prefs.getStringList(JabRefPreferences.COLUMN_WIDTHS)).thenReturn(columnWidths);
+
+        PreferencesMigrations.upgradeColumnPreferences(prefs);
+
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_NAMES, updatedNames);
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_WIDTHS, updatedWidths);
+        verify(prefs).putStringList(JabRefPreferences.COLUMN_SORT_TYPES, newSortTypes);
     }
 }

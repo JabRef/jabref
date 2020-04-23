@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -299,7 +300,7 @@ public class Bootstrap {
             }
 
             // create call with arguments
-            //We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
+            // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
             cmdArray[0] = fOffice.getPath();
             cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");
@@ -360,7 +361,7 @@ public class Bootstrap {
             @Override
             public void run() {
                 try {
-                    BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                    BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
                     for (;;) {
                         String s = r.readLine();

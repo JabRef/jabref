@@ -2,7 +2,6 @@ package org.jabref.gui.duplicationFinder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +21,8 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
-import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -162,18 +161,14 @@ public class DuplicateSearch extends SimpleCommand {
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            for (BibEntry entry : result.getToRemove()) {
-                panel.getDatabase().removeEntry(entry);
-                compoundEdit.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry));
-            }
+            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove()));
+            panel.getDatabase().removeEntries(result.getToRemove());
             panel.markBaseChanged();
         }
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
-            for (BibEntry entry : result.getToAdd()) {
-                panel.getDatabase().insertEntry(entry);
-                compoundEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry));
-            }
+            compoundEdit.addEdit(new UndoableInsertEntries(panel.getDatabase(), result.getToAdd()));
+            panel.getDatabase().insertEntries(result.getToAdd());
             panel.markBaseChanged();
         }
 
@@ -189,15 +184,15 @@ public class DuplicateSearch extends SimpleCommand {
      * Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
      * {@link BibEntry BibEntries} are equal to each other.
      */
-    class DuplicateSearchResult {
+    static class DuplicateSearchResult {
 
         private final Map<Integer, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();
 
         private int duplicates = 0;
 
-        public synchronized Collection<BibEntry> getToRemove() {
-            return toRemove.values();
+        public synchronized List<BibEntry> getToRemove() {
+            return new ArrayList<>(toRemove.values());
         }
 
         public synchronized List<BibEntry> getToAdd() {

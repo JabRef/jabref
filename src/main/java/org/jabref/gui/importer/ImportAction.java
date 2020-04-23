@@ -1,10 +1,10 @@
 package org.jabref.gui.importer;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,12 +24,19 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.metadata.ContentSelector;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImportAction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
     private final JabRefFrame frame;
     private final boolean openInNew;
@@ -47,11 +54,12 @@ public class ImportAction {
 
     /**
      * Automatically imports the files given as arguments.
+     *
      * @param filenames List of files to import
      */
     public void automatedImport(List<String> filenames) {
         List<Path> files = filenames.stream().map(Paths::get).collect(Collectors.toList());
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> {
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> {
             List<ImportFormatReader.UnknownFormatImport> imports = doImport(files);
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
@@ -62,22 +70,23 @@ public class ImportAction {
             // TODO: show parserwarnings, if any (not here)
             // for (ImportFormatReader.UnknownFormatImport p : imports) {
             //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
-            //}
-            if (bibtexResult == null) {
+            // }
+            if (bibtexResult.isEmpty()) {
                 if (importError == null) {
+                    // TODO: No control flow using exceptions
                     throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                 } else {
                     throw importError;
                 }
             }
 
-            return bibtexResult.getDatabase().getEntries();
+            return bibtexResult;
         });
 
         if (openInNew) {
-            task.onSuccess(entries -> {
-                frame.addTab(new BibDatabaseContext(new BibDatabase(entries)), true);
-                dialogService.notify(Localization.lang("Imported entries") + ": " + entries.size());
+            task.onSuccess(parserResult -> {
+                frame.addTab(parserResult.getDatabaseContext(), true);
+                dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
             })
                 .executeWith(taskExecutor);
         } else {
@@ -115,66 +124,76 @@ public class ImportAction {
         return imports;
     }
 
+    /**
+     * TODO: Move this to logic package. Blocked by undo functionality.
+     */
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibDatabase database = new BibDatabase();
-        ParserResult directParserResult = null;
-        boolean anythingUseful = false;
+        BibDatabase resultDatabase = new BibDatabase();
+        ParserResult result = new ParserResult(resultDatabase);
 
         for (ImportFormatReader.UnknownFormatImport importResult : imports) {
             if (importResult == null) {
                 continue;
             }
+            ParserResult parserResult = importResult.parserResult;
+            List<BibEntry> entries = parserResult.getDatabase().getEntries();
+            resultDatabase.insertEntries(entries);
+
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
-                // Bibtex result. We must merge it into our main base.
-                ParserResult pr = importResult.parserResult;
+                // additional treatment of BibTeX
+                // merge into existing database
 
-                anythingUseful = anythingUseful || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
-
-                // Record the parserResult, as long as this is the first bibtex result:
-                if (directParserResult == null) {
-                    directParserResult = pr;
-                }
-                // Merge entries:
-                for (BibEntry entry : pr.getDatabase().getEntries()) {
-                    database.insertEntry(entry);
-                }
-
-                // Merge strings:
-                for (BibtexString bs : pr.getDatabase().getStringValues()) {
-                    try {
-                        database.addString((BibtexString) bs.clone());
-                    } catch (KeyCollisionException e) {
-                        // TODO: This means a duplicate string name exists, so it's not
-                        // a very exceptional situation. We should maybe give a warning...?
+                // Merge strings
+                for (BibtexString bibtexString : parserResult.getDatabase().getStringValues()) {
+                    String bibtexStringName = bibtexString.getName();
+                    if (resultDatabase.hasStringByName(bibtexStringName)) {
+                        String importedContent = bibtexString.getContent();
+                        String existingContent = resultDatabase.getStringByName(bibtexStringName).get().getContent();
+                        if (!importedContent.equals(existingContent)) {
+                            LOGGER.warn("String contents differ for {}: {} != {}", bibtexStringName, importedContent, existingContent);
+                            // TODO: decide what to do here (in case the same string exits)
+                        }
+                    } else {
+                        resultDatabase.addString(bibtexString);
                     }
                 }
-            } else {
 
-                ParserResult pr = importResult.parserResult;
-                Collection<BibEntry> entries = pr.getDatabase().getEntries();
+                // Merge groups
+                // Adds the specified node as a child of the current root. The group contained in <b>newGroups </b> must not be of
+                // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups </b> are
+                // inserted directly, i.e. they are not deepCopy()'d.
+                parserResult.getMetaData().getGroups().ifPresent(newGroups -> {
+                    // ensure that there is always only one AllEntriesGroup in the resulting database
+                    // "Rename" the AllEntriesGroup of the imported database to "Imported"
+                    if (newGroups.getGroup() instanceof AllEntriesGroup) {
+                        // create a dummy group
+                        try {
+                            // This will cause a bug if the group already exists
+                            // There will be group where the two groups are merged
+                            String newGroupName = importResult.parserResult.getFile().map(File::getName).orElse("unknown");
+                            ExplicitGroup group = new ExplicitGroup("Imported " + newGroupName, GroupHierarchyType.INDEPENDENT,
+                                    Globals.prefs.getKeywordDelimiter());
+                            newGroups.setGroup(group);
+                            group.add(parserResult.getDatabase().getEntries());
+                        } catch (IllegalArgumentException e) {
+                            LOGGER.error("Problem appending entries to group", e);
+                        }
+                    }
+                    result.getMetaData().getGroups().ifPresent(newGroups::moveTo);
+                });
 
-                anythingUseful = anythingUseful | !entries.isEmpty();
-
-                // set timestamp and owner
-                UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
-
-                for (BibEntry entry : entries) {
-                    database.insertEntry(entry);
+                for (ContentSelector selector : parserResult.getMetaData().getContentSelectorList()) {
+                    result.getMetaData().addContentSelector(selector);
                 }
+
             }
+            // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }
 
-        if (!anythingUseful) {
-            return null;
-        }
+        // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), Globals.prefs.getOwnerPreferences(), Globals.prefs.getTimestampPreferences()); // set timestamp and owner
 
-        if ((imports.size() == 1) && (directParserResult != null)) {
-            return directParserResult;
-        } else {
-
-            return new ParserResult(database);
-
-        }
+        return result;
     }
 
 }

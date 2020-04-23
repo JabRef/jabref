@@ -37,7 +37,6 @@ public class LayoutHelper {
     private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
-
     public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.prefs = Objects.requireNonNull(prefs);
@@ -67,27 +66,24 @@ public class LayoutHelper {
 
     private void doBracketedField(final int field) throws IOException {
         StringBuilder buffer = null;
-        int c;
+        int currentCharacter;
         boolean start = false;
 
         while (!endOfFile) {
-            c = read();
+            currentCharacter = read();
 
-            if (c == -1) {
+            if (currentCharacter == -1) {
                 endOfFile = true;
-
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), field));
                 }
-
                 return;
             }
 
-            if ((c == '{') || (c == '}')) {
-                if (c == '}') {
+            if ((currentCharacter == '{') || (currentCharacter == '}')) {
+                if (currentCharacter == '}') {
                     if (buffer != null) {
                         parsedEntries.add(new StringInt(buffer.toString(), field));
-
                         return;
                     }
                 } else {
@@ -98,16 +94,13 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if (start && (c != '}')) {
-                    buffer.append((char) c);
+                if (start && (currentCharacter != '}')) {
+                    buffer.append((char) currentCharacter);
                 }
             }
         }
     }
 
-    /**
-     *
-     */
     private void doBracketedOptionField() throws IOException {
         StringBuilder buffer = null;
         int c;
@@ -184,10 +177,9 @@ public class LayoutHelper {
 
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
-                    //if (c != '\\')
-                    //{
+                    // if (c != '\\') {
                     buffer.append((char) c);
-                    //}
+                    // }
                     // changed section end - arudert
 
                 }

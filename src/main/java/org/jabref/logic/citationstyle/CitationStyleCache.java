@@ -2,8 +2,9 @@ package org.jabref.logic.citationstyle;
 
 import java.util.Objects;
 
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
@@ -62,11 +63,13 @@ public class CitationStyleCache {
         }
 
         /**
-         * removes the citation of the removed entry as it's not needed anymore
+         * removes the citation of the removed entries as they are not needed anymore
          */
         @Subscribe
-        public void listen(EntryRemovedEvent entryRemovedEvent) {
-            citationStyleCache.invalidate(entryRemovedEvent.getBibEntry());
+        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
+            for (BibEntry entry : entriesRemovedEvent.getBibEntries()) {
+                citationStyleCache.invalidate(entry);
+            }
         }
     }
 }

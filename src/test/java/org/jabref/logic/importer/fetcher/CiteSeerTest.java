@@ -25,11 +25,10 @@ class CiteSeerTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Misc);
-        expected.setField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei");
-        expected.setField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory");
-        expected.setField(StandardField.DOI, "10.1.1.744.5780");
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Wang Wei and Zhang Pingwen and Zhang Zhifei")
+                .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory")
+                .withField(StandardField.DOI, "10.1.1.744.5780");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
@@ -37,15 +36,14 @@ class CiteSeerTest {
 
     @Test
     void searchByQueryFindsEntry2() throws Exception {
-        BibEntry expected = new BibEntry();
-        expected.setType(StandardEntryType.Misc);
-        expected.setField(StandardField.AUTHOR, "Lazarus Richard S.");
-        expected.setField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future");
-        expected.setField(StandardField.DOI, "10.1.1.115.9665");
-        expected.setField(StandardField.YEAR, "1993");
-        expected.setField(StandardField.JOURNALTITLE, "PSYCHOSOMATIC MEDICINE");
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Lazarus Richard S.")
+                .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
+                .withField(StandardField.DOI, "10.1.1.115.9665")
+                .withField(StandardField.YEAR, "1993")
+                .withField(StandardField.JOURNALTITLE, "PSYCHOSOMATIC MEDICINE");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef");
-        assertEquals(expected, fetchedEntries.get(4));
+        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665");
+        assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

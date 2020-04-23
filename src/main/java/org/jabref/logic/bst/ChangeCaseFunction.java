@@ -35,7 +35,6 @@ public class ChangeCaseFunction implements BstFunction {
 
     private final VM vm;
 
-
     public ChangeCaseFunction(VM vm) {
         this.vm = vm;
     }

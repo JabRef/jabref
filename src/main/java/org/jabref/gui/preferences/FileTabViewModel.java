@@ -27,11 +27,11 @@ import org.jabref.preferences.NewLineSeparator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
-    private final BooleanProperty backupOldFileProperty = new SimpleBooleanProperty();
     private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
     private final BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
     private final BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
@@ -51,7 +51,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final FunctionBasedValidator mainFileDirValidator;
+    private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -79,7 +79,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         openLastStartupProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
-        backupOldFileProperty.setValue(preferences.getBoolean(JabRefPreferences.BACKUP));
         noWrapFilesProperty.setValue(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
         resolveStringsAllProperty.setValue(preferences.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS)); // Flipped around
         resolveStringsBibTexProperty.setValue(!resolveStringsAllProperty.getValue());
@@ -107,7 +106,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     @Override
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.BACKUP, backupOldFileProperty.getValue());
         if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
         }
@@ -136,9 +134,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus status = mainFileDirValidationStatus();
-        if (!status.isValid()) {
-            dialogService.showErrorDialogAndWait(status.getHighestMessage().get().getMessage());
+        ValidationStatus validationStatus = mainFileDirValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
         return true;
@@ -157,8 +156,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     // General
 
     public BooleanProperty openLastStartupProperty() { return openLastStartupProperty; }
-
-    public BooleanProperty backupOldFileProperty() { return backupOldFileProperty; }
 
     public StringProperty noWrapFilesProperty() { return noWrapFilesProperty; }
 

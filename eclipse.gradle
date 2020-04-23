@@ -28,6 +28,11 @@ eclipse {
                 javafxcontrols.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
                 javafxcontrols.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
 
+                def javafxgraphics = entries.find { isJavafxGraphics(it) };
+                javafxgraphics.entryAttributes['add-opens'] = 'javafx.graphics/javafx.scene=org.controlsfx.controls';
+
+                def graaltruffle = entries.find{ isTruffleGraal(it) } ;
+                graaltruffle.entryAttributes['add-exports'] = 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle';
 
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
@@ -54,6 +59,9 @@ boolean isControlsfx(entry) { return entry.properties.path.contains('controlsfx'
 
 boolean isJavafxControls(entry) { return entry.properties.path.contains('javafx-controls'); }
 
+boolean isJavafxGraphics(entry) { return entry.properties.path.contains('javafx-graphics'); }
+
+boolean isTruffleGraal(entry)  {return entry.properties.path.contains('org.graalvm.regex'); }
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282

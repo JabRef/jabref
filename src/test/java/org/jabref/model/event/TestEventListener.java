@@ -1,8 +1,9 @@
 package org.jabref.model.event;
 
-import org.jabref.model.database.event.AllInsertsFinishedEvent;
-import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
+import java.util.List;
+
+import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
@@ -10,24 +11,20 @@ import com.google.common.eventbus.Subscribe;
 
 public class TestEventListener {
 
-    private BibEntry addedEntry;
+    private List<BibEntry> addedEntries;
     private BibEntry firstInsertedEntry;
-    private BibEntry removedEntry;
+    private List<BibEntry> removedEntries;
     private BibEntry changedEntry;
 
     @Subscribe
-    public void listen(EntryAddedEvent event) {
-        this.addedEntry = event.getBibEntry();
+    public void listen(EntriesAddedEvent event) {
+        this.addedEntries = event.getBibEntries();
+        this.firstInsertedEntry = event.getFirstEntry();
     }
 
     @Subscribe
-    public void listen(AllInsertsFinishedEvent event) {
-        this.firstInsertedEntry = event.getBibEntry();
-    }
-
-    @Subscribe
-    public void listen(EntryRemovedEvent event) {
-        this.removedEntry = event.getBibEntry();
+    public void listen(EntriesRemovedEvent event) {
+        this.removedEntries = event.getBibEntries();
     }
 
     @Subscribe
@@ -35,16 +32,16 @@ public class TestEventListener {
         this.changedEntry = event.getBibEntry();
     }
 
-    public BibEntry getAddedEntry() {
-        return addedEntry;
+    public List<BibEntry> getAddedEntries() {
+        return addedEntries;
     }
 
     public BibEntry getFirstInsertedEntry() {
         return firstInsertedEntry;
     }
 
-    public BibEntry getRemovedEntry() {
-        return removedEntry;
+    public List<BibEntry> getRemovedEntries() {
+        return removedEntries;
     }
 
     public BibEntry getChangedEntry() {

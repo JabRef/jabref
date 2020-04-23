@@ -1,5 +1,7 @@
 package org.jabref.model.database;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
@@ -84,8 +86,8 @@ public class KeyChangeListenerTest {
 
     @Test
     public void testRelatedAllEntriesRemoved() {
-        db.removeEntry(entry1);
-        db.removeEntry(entry3);
+        List<BibEntry> entries = Arrays.asList(entry1, entry3);
+        db.removeEntries(entries);
         assertEquals(Optional.empty(), entry2.getField(StandardField.RELATED));
     }
 }

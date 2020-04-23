@@ -6,9 +6,9 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionStrategy;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.field.Field;
@@ -19,7 +19,7 @@ public class PersonsEditorViewModel extends AbstractEditorViewModel {
 
     private final AutoCompletePreferences preferences;
 
-    public PersonsEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers) {
+    public PersonsEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, AutoCompletePreferences preferences, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
         this.preferences = preferences;
     }

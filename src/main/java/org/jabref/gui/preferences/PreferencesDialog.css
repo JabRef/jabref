@@ -26,7 +26,7 @@
     -fx-background-color: transparent;
 }
 
-#container {
+#preferencesContainer {
     -fx-padding: 0.5em;
 }
 
@@ -38,7 +38,10 @@
     -fx-padding: 0;
     -fx-border-width: 1;
     -fx-background-color: transparent;
-    -fx-border-color: -fx-outer-border;
+}
+
+.code-area .text {
+    -fx-fill: -fx-text-background-color;
 }
 
 .code-area .tagmark {
@@ -59,7 +62,7 @@
 }
 
 .code-area .avalue {
-    -fx-fill: black;
+    -fx-fill: green;
 }
 
 .code-area .comment {
@@ -68,10 +71,6 @@
 
 .code-area .highlight-keyword {
     -fx-text-fill: -jr-purple;
-}
-
-.code-area .context-menu {
-    -fx-font-family: sans-serif;
 }
 
 .code-area .context-menu .menu-item .label {

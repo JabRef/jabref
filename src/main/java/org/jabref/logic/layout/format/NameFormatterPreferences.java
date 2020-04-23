@@ -7,7 +7,6 @@ public class NameFormatterPreferences {
     private final List<String> nameFormatterKey;
     private final List<String> nameFormatterValue;
 
-
     public NameFormatterPreferences(List<String> nameFormatterKey, List<String> nameFormatterValue) {
         this.nameFormatterKey = nameFormatterKey;
         this.nameFormatterValue = nameFormatterValue;

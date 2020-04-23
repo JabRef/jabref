@@ -25,6 +25,7 @@ import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
@@ -39,11 +40,11 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
 
-    private FunctionBasedValidator remotePortValidator;
-    private FunctionBasedValidator proxyHostnameValidator;
-    private FunctionBasedValidator proxyPortValidator;
-    private FunctionBasedValidator proxyUsernameValidator;
-    private FunctionBasedValidator proxyPasswordValidator;
+    private Validator remotePortValidator;
+    private Validator proxyHostnameValidator;
+    private Validator proxyPortValidator;
+    private Validator proxyUsernameValidator;
+    private Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -188,15 +189,25 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public ValidationStatus remotePortValidationStatus() { return remotePortValidator.getValidationStatus(); }
+    public ValidationStatus remotePortValidationStatus() {
+        return remotePortValidator.getValidationStatus();
+    }
 
-    public ValidationStatus proxyHostnameValidationStatus() { return proxyHostnameValidator.getValidationStatus(); }
+    public ValidationStatus proxyHostnameValidationStatus() {
+        return proxyHostnameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus proxyPortValidationStatus() { return proxyPortValidator.getValidationStatus(); }
+    public ValidationStatus proxyPortValidationStatus() {
+        return proxyPortValidator.getValidationStatus();
+    }
 
-    public ValidationStatus proxyUsernameValidationStatus() { return proxyUsernameValidator.getValidationStatus(); }
+    public ValidationStatus proxyUsernameValidationStatus() {
+        return proxyUsernameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus proxyPasswordValidationStatus() { return proxyPasswordValidator.getValidationStatus(); }
+    public ValidationStatus proxyPasswordValidationStatus() {
+        return proxyPasswordValidator.getValidationStatus();
+    }
 
     public boolean validateSettings() {
         CompositeValidator validator = new CompositeValidator();
@@ -225,27 +236,51 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return restartWarning; }
+    public List<String> getRestartWarnings() {
+        return restartWarning;
+    }
 
-    public BooleanProperty remoteServerProperty() { return remoteServerProperty; }
+    public BooleanProperty remoteServerProperty() {
+        return remoteServerProperty;
+    }
 
-    public StringProperty remotePortProperty() { return remotePortProperty; }
+    public StringProperty remotePortProperty() {
+        return remotePortProperty;
+    }
 
-    public BooleanProperty useIEEELatexAbbreviationsProperty() { return useIEEELatexAbbreviationsProperty; }
+    public BooleanProperty useIEEELatexAbbreviationsProperty() {
+        return useIEEELatexAbbreviationsProperty;
+    }
 
-    public BooleanProperty useCaseKeeperProperty() { return useCaseKeeperProperty; }
+    public BooleanProperty useCaseKeeperProperty() {
+        return useCaseKeeperProperty;
+    }
 
-    public BooleanProperty useUnitFormatterProperty() { return useUnitFormatterProperty; }
+    public BooleanProperty useUnitFormatterProperty() {
+        return useUnitFormatterProperty;
+    }
 
-    public BooleanProperty proxyUseProperty() { return proxyUseProperty; }
+    public BooleanProperty proxyUseProperty() {
+        return proxyUseProperty;
+    }
 
-    public StringProperty proxyHostnameProperty() { return proxyHostnameProperty; }
+    public StringProperty proxyHostnameProperty() {
+        return proxyHostnameProperty;
+    }
 
-    public StringProperty proxyPortProperty() { return proxyPortProperty; }
+    public StringProperty proxyPortProperty() {
+        return proxyPortProperty;
+    }
 
-    public BooleanProperty proxyUseAuthenticationProperty() { return proxyUseAuthenticationProperty; }
+    public BooleanProperty proxyUseAuthenticationProperty() {
+        return proxyUseAuthenticationProperty;
+    }
 
-    public StringProperty proxyUsernameProperty() { return proxyUsernameProperty; }
+    public StringProperty proxyUsernameProperty() {
+        return proxyUsernameProperty;
+    }
 
-    public StringProperty proxyPasswordProperty() { return proxyPasswordProperty; }
+    public StringProperty proxyPasswordProperty() {
+        return proxyPasswordProperty;
+    }
 }

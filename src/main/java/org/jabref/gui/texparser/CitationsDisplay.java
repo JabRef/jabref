@@ -30,6 +30,8 @@ public class CitationsDisplay extends ListView<Citation> {
         new ViewModelListCellFactory<Citation>().withGraphic(this::getDisplayGraphic)
                                                 .withTooltip(this::getDisplayTooltip)
                                                 .install(this);
+
+        this.getStyleClass().add("citationsList");
     }
 
     public ObjectProperty<Path> basePathProperty() {
@@ -45,13 +47,11 @@ public class CitationsDisplay extends ListView<Citation> {
         Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));
         contextText.wrappingWidthProperty().bind(this.widthProperty().subtract(85));
         HBox contextBox = new HBox(8, citationIcon, contextText);
-        contextBox.setStyle("-fx-border-color: grey;-fx-border-insets: 5;-fx-border-style: dashed;-fx-border-width: 2;-fx-padding: 12;");
+        contextBox.getStyleClass().add("contextBox");
 
         Label fileNameLabel = new Label(String.format("%s", basePath.get().relativize(item.getPath())));
-        fileNameLabel.setStyle("-fx-font-family: 'Courier New', Courier, monospace;-fx-font-weight: bold;-fx-label-padding: 5 0 10 10;");
         fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());
         Label positionLabel = new Label(String.format("(%s:%s-%s)", item.getLine(), item.getColStart(), item.getColEnd()));
-        positionLabel.setStyle("-fx-font-family: 'Courier New', Courier, monospace;-fx-font-weight: bold;-fx-label-padding: 5 0 10 10;");
         positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());
         HBox dataBox = new HBox(5, fileNameLabel, positionLabel);
 

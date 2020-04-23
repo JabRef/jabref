@@ -4,8 +4,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
-import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
@@ -40,10 +40,14 @@ class WebFetchersTest {
 
             expected.remove(AbstractIsbnFetcher.class);
             expected.remove(IdBasedParserFetcher.class);
+
             // Remove special ISBN fetcher since we don't want to expose them to the user
-            expected.remove(IsbnViaChimboriFetcher.class);
             expected.remove(IsbnViaEbookDeFetcher.class);
             expected.remove(IsbnViaOttoBibFetcher.class);
+
+            // Remove ACM, because it doesn't work currently
+            expected.remove(ACMPortalFetcher.class);
+
             assertEquals(expected, getClasses(idFetchers));
         }
     }
@@ -70,8 +74,13 @@ class WebFetchersTest {
             Set<Class<?>> expected = controlClasses.loadClasses().stream().collect(Collectors.toSet());
 
             expected.remove(SearchBasedParserFetcher.class);
+
+            // Remove ACM, because it doesn't work currently
+            expected.remove(ACMPortalFetcher.class);
+
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
+
             assertEquals(expected, getClasses(searchBasedFetchers));
         }
     }

@@ -3,13 +3,29 @@ package org.jabref.gui.maintable;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 
-abstract class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
+import org.jabref.gui.util.BindingsHelper;
 
-    MainTableColumn(String text) {
-        super(text);
+public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
 
-        setCellValueFactory(param -> getColumnValue(param.getValue()));
+    private MainTableColumnModel model;
+
+    public MainTableColumn(MainTableColumnModel model) {
+        this.model = model;
+
+        BindingsHelper.bindBidirectional(
+                this.widthProperty(),
+                model.widthProperty(),
+                value -> this.setPrefWidth(model.widthProperty().getValue()),
+                value -> model.widthProperty().setValue(this.getWidth()));
+
+        BindingsHelper.bindBidirectional(
+                this.sortTypeProperty(),
+                (ObservableValue<SortType>) model.sortTypeProperty(),
+                value -> this.setSortType(model.sortTypeProperty().getValue()),
+                value -> model.sortTypeProperty().setValue(this.getSortType()));
     }
 
-    abstract ObservableValue<T> getColumnValue(BibEntryTableViewModel entry);
+    public MainTableColumnModel getModel() { return model; }
+
+    public String getDisplayName() { return model.getDisplayName(); }
 }
