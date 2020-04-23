@@ -11,13 +11,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 
+/**
+ * Checks, if there are any HTML encoded characters in nonverbatim fields.
+ */
 public class HTMLCharacterChecker implements Checker {
-    // Detect any HTML encoded character,
+    // Detect any HTML encoded character
     private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
 
-    /**
-     * Checks, if there are any HTML encoded characters in nonverbatim fields.
-     */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
