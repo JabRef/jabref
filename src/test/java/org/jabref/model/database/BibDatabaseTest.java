@@ -53,13 +53,13 @@ class BibDatabaseTest {
     }
 
     @Test
-    void insertEntryWithSameIdThrowsException() {
+    void insertEntryWithSameIdDoesNotThrowException() {
         BibEntry entry0 = new BibEntry();
         database.insertEntry(entry0);
 
         BibEntry entry1 = new BibEntry();
         entry1.setId(entry0.getId());
-        assertThrows(KeyCollisionException.class, () -> database.insertEntry(entry1));
+        database.insertEntry(entry1);
     }
 
     @Test

@@ -16,7 +16,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
@@ -170,7 +169,7 @@ public class MedlinePlainImporter extends Importer {
                 hashMap.put("STAT", new UnknownField("status"));
                 hashMap.put("SB", new UnknownField("subset"));
                 hashMap.put("OTO", new UnknownField("termowner"));
-                hashMap.put("OWN", InternalField.OWNER);
+                hashMap.put("OWN", StandardField.OWNER);
 
                 // add the fields to hm
                 for (Map.Entry<String, Field> mapEntry : hashMap.entrySet()) {

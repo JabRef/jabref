@@ -4,8 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -20,7 +20,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private JournalEditorViewModel viewModel;
     @FXML private EditorTextField textField;
 
-    public JournalEditor(Field field, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public JournalEditor(Field field, JournalAbbreviationRepository journalAbbreviationRepository, JabRefPreferences preferences, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new JournalEditorViewModel(field, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
 
         ViewLoader.view(this)
