@@ -103,8 +103,8 @@ configurations {
 }
 
 javafx {
-    version = "14"
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
+    version = "14.0.1"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing']
 }
 
 dependencies {
@@ -146,12 +146,12 @@ dependencies {
 
     implementation 'org.postgresql:postgresql:42.2.12'
 
-    implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
+    implementation('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:29.0-jre') {
+    implementation('com.google.guava:guava:29.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -183,24 +183,24 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
-    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.2'
+    implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
 
-    implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
+    implementation('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
     }
 
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
-    implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
+    implementation(group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.61.16'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.6'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.16'
+    implementation 'com.vladsch.flexmark:flexmark:0.61.18'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.18'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.18'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.71'
+    testImplementation 'io.github.classgraph:classgraph:4.8.75'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
@@ -226,7 +226,7 @@ dependencyUpdates {
 }
 
 // We have some dependencies which cannot be updated due to various reasons.
-dependencyUpdates.resolutionStrategy = {
+dependencyUpdates.resolutionStrategy {
     componentSelection { rules ->
         rules.all { ComponentSelection selection ->
             boolean rejected = ['alpha', 'snapshot', 'beta', 'rc', 'cr', 'm', 'preview', 'b', 'ea'].any { qualifier ->
@@ -247,12 +247,16 @@ dependencyUpdates.resolutionStrategy = {
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-core") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ ||
+                    selection.candidate.version ==~ /2.5.1/ ||
+                    selection.candidate.version ==~ /2.6.0/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }
         rules.withModule("com.microsoft.azure:applicationinsights-logging-log4j2") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.5.0/ || selection.candidate.version ==~ /2.5.1/) {
+            if (selection.candidate.version ==~ /2.5.0/ ||
+                    selection.candidate.version ==~ /2.5.1/ ||
+                    selection.candidate.version ==~ /2.6.0/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5596")
             }
         }
@@ -370,8 +374,8 @@ compileJava {
     moduleOptions {
         // TODO: Remove access to internal api
         addExports = [
-                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'javafx.controls/com.sun.javafx.scene.control'    : 'org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin': 'org.jabref'
         ]
     }
 }
@@ -409,14 +413,14 @@ run {
     // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
-                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                'javafx.controls/com.sun.javafx.scene.control'     : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
-                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
+                'com.oracle.truffle.regex/com.oracle.truffle.regex': 'org.graalvm.truffle'
         ]
 
         addOpens = [
-                'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref'
+                'javafx.controls/javafx.scene.control'                    : 'org.jabref',
+                'org.controlsfx.controls/org.controlsfx.control.textfield': 'org.jabref'
         ]
     }
 }
@@ -539,7 +543,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    options = ['--strip-debug','--compress', '2', '--no-header-files', '--no-man-pages']
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'JabRef'
     }
