@@ -22,6 +22,7 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
 
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.easybind.Subscription;
 
 /**
@@ -30,6 +31,8 @@ import org.fxmisc.easybind.Subscription;
  * @param <T> cell value
  */
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
+
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
@@ -43,6 +46,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
     private Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
+    private Callback<T, ValidationStatus> validationStatusProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -66,10 +70,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     }
 
     public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon, Callback<T, Color> toColor) {
-        this.toGraphic = viewModel -> {
-
-            return toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
-        };
+        this.toGraphic = viewModel -> toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
         return this;
     }
 
@@ -134,6 +135,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> withValidation(Callback<T, ValidationStatus> validationStatusProperty) {
+        this.validationStatusProperty = validationStatusProperty;
+        return this;
+    }
+
     public void install(ComboBox<T> comboBox) {
         comboBox.setButtonCell(this.call(null));
         comboBox.setCellFactory(this);
@@ -146,7 +152,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     @Override
     public ListCell<T> call(ListView<T> param) {
 
-        return new ListCell<T>() {
+        return new ListCell<>() {
 
             List<Subscription> subscriptions = new ArrayList<>();
 
@@ -202,6 +208,12 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
                         Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
                         subscriptions.add(subscription);
+                    }
+                    if (validationStatusProperty != null) {
+                        validationStatusProperty.call(viewModel).getHighestMessage().ifPresent(message -> {
+                            setTooltip(new Tooltip(message.getMessage()));
+                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS, validationStatusProperty.call(viewModel).validProperty().not()));
+                        });
                     }
                 }
             }

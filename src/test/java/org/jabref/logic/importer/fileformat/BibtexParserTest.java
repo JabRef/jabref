@@ -485,8 +485,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 
@@ -513,8 +513,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 
@@ -615,18 +615,6 @@ class BibtexParserTest {
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
 
         assertEquals(0, parsed.size());
-    }
-
-    @Test
-    void parseRecognizesDuplicateBibtexKeys() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{canh05," + "  author={Norton Bar}}"));
-
-        List<String> duplicateKeys = result.getDuplicateKeys();
-
-        assertEquals(1, duplicateKeys.size());
-        assertEquals("canh05", duplicateKeys.get(0));
     }
 
     @Test

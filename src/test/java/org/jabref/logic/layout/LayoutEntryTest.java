@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -49,13 +48,13 @@ public class LayoutEntryTest {
         mBTE.setField(new UnknownField("citeulike-linkout-1"), "http://dx.doi.org/10.1145/1554339.1554341");
         mBTE.setField(StandardField.URL, "http://dx.doi.org/10.1145/1554339.1554341");
         mBTE.setField(StandardField.PUBLISHER, "ACM");
-        mBTE.setField(InternalField.TIMESTAMP, "2010.11.11");
+        mBTE.setField(StandardField.TIMESTAMP, "2010.11.11");
         mBTE.setField(StandardField.AUTHOR, "Chaudhuri, Avik");
         mBTE.setField(StandardField.TITLE, "Language-based security on Android");
         mBTE.setField(StandardField.ADDRESS, "New York, NY, USA");
         mBTE.setField(SpecialField.PRIORITY, "2");
         mBTE.setField(StandardField.ISBN, "978-1-60558-645-8");
-        mBTE.setField(InternalField.OWNER, "Arne");
+        mBTE.setField(StandardField.OWNER, "Arne");
         mBTE.setField(StandardField.YEAR, "2009");
         mBTE.setField(new UnknownField("citeulike-linkout-0"), "http://portal.acm.org/citation.cfm?id=1554339.1554341");
         mBTE.setField(StandardField.DOI, "10.1145/1554339.1554341");

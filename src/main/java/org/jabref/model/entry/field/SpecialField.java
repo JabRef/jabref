@@ -37,19 +37,19 @@ public enum SpecialField implements Field {
     ),
 
     READ_STATUS("readstatus",
-        SpecialFieldValue.CLEAR_READ_STATUS,
-        SpecialFieldValue.READ,
-        SpecialFieldValue.SKIMMED
+            SpecialFieldValue.CLEAR_READ_STATUS,
+            SpecialFieldValue.READ,
+            SpecialFieldValue.SKIMMED
     ),
 
     RELEVANCE("relevance",
-        SpecialFieldValue.RELEVANT
+            SpecialFieldValue.RELEVANT
     );
 
-    private List<SpecialFieldValue> values;
-    private KeywordList keywords;
-    private HashMap<String, SpecialFieldValue> map;
-    private String fieldName;
+    private final List<SpecialFieldValue> values;
+    private final KeywordList keywords;
+    private final HashMap<String, SpecialFieldValue> map;
+    private final String fieldName;
 
     SpecialField(String fieldName, SpecialFieldValue... values) {
         this.fieldName = fieldName;
