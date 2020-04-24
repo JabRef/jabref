@@ -333,8 +333,6 @@ public class JabRefPreferences implements PreferencesService {
     // User
     private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
-    private static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
@@ -587,7 +585,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(REMOTE_SERVER_PORT, 6050);
 
-        defaults.put(PERSONAL_JOURNAL_LIST, "");
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
 
@@ -634,7 +631,6 @@ public class JabRefPreferences implements PreferencesService {
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
@@ -1534,8 +1530,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST),
-                                                  getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
     }
 
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
@@ -1637,7 +1632,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-        putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
     }
 
     @Override

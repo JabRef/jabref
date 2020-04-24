@@ -45,8 +45,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
     private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
-    private final SimpleBooleanProperty isLoadingBuiltIn = new SimpleBooleanProperty(false);
-    private final SimpleBooleanProperty isLoadingIeee = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final PreferencesService preferences;
@@ -101,7 +99,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 }
             }
         });
-        isLoading.bind(isLoadingBuiltIn.or(isLoadingIeee));
     }
 
     public SimpleBooleanProperty isLoadingProperty() {
@@ -109,29 +106,16 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     /**
-     * This will wrap the built in and ieee abbreviations in pseudo abbreviation files and add them to the list of
-     * journal abbreviation files.
+     * This will load the built in abbreviation files and add it to the list of journal abbreviation files.
      */
-    void addBuiltInLists() {
+    void addBuiltInList() {
         BackgroundTask
                 .wrap(JournalAbbreviationLoader::getBuiltInAbbreviations)
-                .onRunning(() -> isLoadingBuiltIn.setValue(true))
+                .onRunning(() -> isLoading.setValue(true))
                 .onSuccess(result -> {
-                    isLoadingBuiltIn.setValue(false);
+                    isLoading.setValue(false);
                     addList(Localization.lang("JabRef built in list"), result);
                     selectLastJournalFile();
-                })
-                .onFailure(dialogService::showErrorDialogAndWait)
-                .executeWith(taskExecutor);
-
-        BackgroundTask
-                .wrap(() -> abbreviationsPreferences.useIEEEAbbreviations()
-                        ? JournalAbbreviationLoader.getOfficialIEEEAbbreviations()
-                        : JournalAbbreviationLoader.getStandardIEEEAbbreviations())
-                .onRunning(() -> isLoadingIeee.setValue(true))
-                .onSuccess(result -> {
-                    isLoadingIeee.setValue(false);
-                    addList(Localization.lang("IEEE built in list"), result);
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
                 .executeWith(taskExecutor);
@@ -411,6 +395,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     public void init() {
         createFileObjects();
         selectLastJournalFile();
-        addBuiltInLists();
+        addBuiltInList();
     }
 }

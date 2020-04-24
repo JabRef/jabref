@@ -18,18 +18,8 @@ public class JournalAbbreviationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
     private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.csv";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.csv";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.csv";
 
     private JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
-
-    public static List<Abbreviation> getOfficialIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
-    }
-
-    public static List<Abbreviation> getStandardIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
-    }
 
     public static List<Abbreviation> getBuiltInAbbreviations() {
         return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
@@ -58,41 +48,23 @@ public class JournalAbbreviationLoader {
     public static void writeDefaultDatabase(Path targetDirectory) {
         try (MVStore store = MVStore.open(targetDirectory.resolve("journalList.mv").getParent().toString())) {
             MVMap<String, String> fullToAbbreviation = store.openMap("FullToAbbreviation");
-
-            // Add all standard abbreviations
             fullToAbbreviation.putAll(
                     getBuiltInAbbreviations()
-                            .stream()
-                            .collect(Collectors.toMap(Abbreviation::getName, Abbreviation::getAbbreviation))
-            );
-
-            // Add all IEEE abbreviations
-            fullToAbbreviation.putAll(
-                    getStandardIEEEAbbreviations()
                             .stream()
                             .collect(Collectors.toMap(Abbreviation::getName, Abbreviation::getAbbreviation))
             );
 
             MVMap<String, String> abbreviationToFull = store.openMap("AbbreviationToFull");
-
-            // Add all standard abbreviations
             abbreviationToFull.putAll(
                     getBuiltInAbbreviations()
                             .stream()
                             .collect(Collectors.toMap(Abbreviation::getAbbreviation, Abbreviation::getName))
             );
-
-            // Add all IEEE abbreviations
-            abbreviationToFull.putAll(
-                    getStandardIEEEAbbreviations()
-                            .stream()
-                            .collect(Collectors.toMap(Abbreviation::getAbbreviation, Abbreviation::getName))
-            );
-            //store.commit();
         }
     }
 
     public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        // Initialize with built-in list
         repository = new JournalAbbreviationRepository();
 
         // Read external lists
@@ -105,18 +77,6 @@ public class JournalAbbreviationLoader {
                 } catch (IOException e) {
                     LOGGER.error(String.format("Cannot read external journal list file %s", filename), e);
                 }
-            }
-        }
-
-        // Read personal list
-        String personalJournalList = journalAbbreviationPreferences.getPersonalJournalLists();
-        if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
-            try {
-                repository.addCustomAbbreviations(
-                        readJournalListFromFile(Path.of(personalJournalList),
-                                journalAbbreviationPreferences.getDefaultEncoding()));
-            } catch (IOException e) {
-                LOGGER.error(String.format("Personal journal list file '%s' could not be read.", personalJournalList), e);
             }
         }
     }

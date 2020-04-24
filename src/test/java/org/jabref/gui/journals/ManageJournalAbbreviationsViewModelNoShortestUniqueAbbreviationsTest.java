@@ -195,27 +195,11 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(false);
-        viewModel.addBuiltInLists();
+        viewModel.addBuiltInList();
         assertEquals(2, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
-        ObservableList<Abbreviation> actualAbbreviations = FXCollections
-                .observableArrayList(viewModel.abbreviationsProperty().stream()
-                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
-
-        assertEquals(expected, actualAbbreviations);
-    }
-
-    @Test
-    void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(true);
-        viewModel.addBuiltInLists();
-        viewModel.selectLastJournalFile();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
-        ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getOfficialIEEEAbbreviations());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
                                               .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
