@@ -11,24 +11,18 @@ class AbbreviationsTest {
 
     @BeforeEach
     void setUp() {
-        repository = new JournalAbbreviationRepository();
+        repository = JournalAbbreviationLoader.loadBuiltInRepository();
     }
 
     @Test
     void getNextAbbreviationAbbreviatesJournalTitle() {
-        assertEquals("Proc. IEEE",
-                repository.getNextAbbreviation("Proceedings of the IEEE").get());
-    }
-
-    @Test
-    void getNextAbbreviationRemovesPoint() {
-        assertEquals("Proc IEEE",
-                repository.getNextAbbreviation("Proc. IEEE").get());
+        assertEquals("2D Mater.",
+                repository.getNextAbbreviation("2D Materials").get());
     }
 
     @Test
     void getNextAbbreviationExpandsAbbreviation() {
-        assertEquals("Proceedings of the IEEE",
-                repository.getNextAbbreviation("Proc IEEE").get());
+        assertEquals("2D Materials",
+                repository.getNextAbbreviation("2D Mater.").get());
     }
 }

@@ -1,10 +1,12 @@
 package org.jabref.logic.journals;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -18,8 +20,8 @@ public class JournalAbbreviationRepository {
     private final MVMap<String, String> abbreviationToFull;
     private final List<Abbreviation> customAbbreviations;
 
-    public JournalAbbreviationRepository() {
-        MVStore store = new MVStore.Builder().readOnly().fileName("journalList.mv").open();
+    public JournalAbbreviationRepository(Path journalList) {
+        MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
         this.fullToAbbreviation = store.openMap("FullToAbbreviation");
         this.abbreviationToFull = store.openMap("AbbreviationToFull");
         this.customAbbreviations = new ArrayList<>();
@@ -71,13 +73,12 @@ public class JournalAbbreviationRepository {
     }
 
     /**
-     * Attempts to get the abbreviated name of the journal given. May contain dots.
+     * Attempts to get the abbreviation of the journal given.
      *
-     * @param journalName The journal name to abbreviate.
-     * @return The abbreviated name
+     * @param input The journal name (either abbreviated or full name).
      */
-    public Optional<Abbreviation> getAbbreviation(String journalName) {
-        String journal = journalName.trim();
+    public Optional<Abbreviation> get(String input) {
+        String journal = input.trim();
 
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                                                                        .filter(abbreviation -> isMatched(journal, abbreviation))
@@ -87,6 +88,7 @@ public class JournalAbbreviationRepository {
         }
 
         return Optional.ofNullable(fullToAbbreviation.get(journal))
+                       .or(() -> Optional.ofNullable(abbreviationToFull.get(journal)))
                        .map(abbreviation -> new Abbreviation(journal, abbreviation));
     }
 
@@ -107,18 +109,22 @@ public class JournalAbbreviationRepository {
     }
 
     public Optional<String> getNextAbbreviation(String text) {
-        return getAbbreviation(text).map(abbreviation -> abbreviation.getNext(text));
+        return get(text).map(abbreviation -> abbreviation.getNext(text));
     }
 
     public Optional<String> getDefaultAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getAbbreviation);
+        return get(text).map(Abbreviation::getAbbreviation);
     }
 
     public Optional<String> getMedlineAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getMedlineAbbreviation);
+        return get(text).map(Abbreviation::getMedlineAbbreviation);
     }
 
     public Optional<String> getShortestUniqueAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getShortestUniqueAbbreviation);
+        return get(text).map(Abbreviation::getShortestUniqueAbbreviation);
+    }
+
+    public Set<String> getFullNames() {
+        return fullToAbbreviation.keySet();
     }
 }

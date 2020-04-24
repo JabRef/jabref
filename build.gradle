@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.antlr.JabRefAntlrPlugin
 import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
@@ -7,13 +8,6 @@ import org.jabref.build.xjc.XjcTask
 
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
-
-buildscript {
-    repositories {
-        mavenLocal()
-        jcenter()
-    }
-}
 
 plugins {
     id 'application'
@@ -298,9 +292,10 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "generateJournalAbbreviationList"]) {
     group = 'JabRef'
-    description 'Generates all Java source files.'
+    description 'Generates all necessary (Java) source files.'
 }
 
 task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
@@ -358,6 +353,14 @@ task generateModsSource(type: XjcTask) {
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.mods"
     arguments = '-npa'
+}
+
+task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
+    group = 'JabRef'
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
+
+    inputDir = file("src/main/resources/journals")
+    outputDir = file("src/main/resources/journals")
 }
 
 tasks.withType(JavaCompile) {

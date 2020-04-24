@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -367,7 +367,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
                 .checkDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -407,7 +407,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
                 .checkDatabase();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -416,7 +416,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(), true, false
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
@@ -425,7 +425,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(), true,
+                JournalAbbreviationLoader.loadBuiltInRepository(), true,
                 allowIntegerEdition
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);

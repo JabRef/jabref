@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
+import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
@@ -23,9 +24,9 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -51,15 +52,15 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationPreferences abbreviationsPreferences;
-    private final JournalAbbreviationLoader journalAbbreviationLoader;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
     public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService,
-                                               TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
+                                               TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.journalAbbreviationLoader = Objects.requireNonNull(journalAbbreviationLoader);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.abbreviationsPreferences = preferences.getJournalAbbreviationPreferences();
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
@@ -218,7 +219,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     public void addAbbreviation(String name, String abbreviation) {
-        addAbbreviation(name, abbreviation, StringUtil.EMPTY);
+        addAbbreviation(name, abbreviation, "");
     }
 
     /**
@@ -246,7 +247,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     public void editAbbreviation(String name, String abbreviation) {
-        editAbbreviation(name, abbreviation, StringUtil.EMPTY);
+        editAbbreviation(name, abbreviation, "");
     }
 
     /**
@@ -273,7 +274,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
-        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, StringUtil.EMPTY);
+        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, "");
     }
 
     /**
@@ -349,7 +350,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
             }
 
             // Update journal abbreviation loader
-            journalAbbreviationLoader.update(abbreviationsPreferences);
+            Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(abbreviationsPreferences);
 
             preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
         }).executeWith(taskExecutor);

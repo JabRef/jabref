@@ -2,14 +2,13 @@ package org.jabref.logic.journals;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.h2.mvstore.MVMap;
-import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +17,6 @@ public class JournalAbbreviationLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
     private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.csv";
-
-    private JournalAbbreviationRepository repository = new JournalAbbreviationRepository();
 
     public static List<Abbreviation> getBuiltInAbbreviations() {
         return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
@@ -45,27 +42,17 @@ public class JournalAbbreviationLoader {
         return parser.getAbbreviations();
     }
 
-    public static void writeDefaultDatabase(Path targetDirectory) {
-        try (MVStore store = MVStore.open(targetDirectory.resolve("journalList.mv").getParent().toString())) {
-            MVMap<String, String> fullToAbbreviation = store.openMap("FullToAbbreviation");
-            fullToAbbreviation.putAll(
-                    getBuiltInAbbreviations()
-                            .stream()
-                            .collect(Collectors.toMap(Abbreviation::getName, Abbreviation::getAbbreviation))
-            );
-
-            MVMap<String, String> abbreviationToFull = store.openMap("AbbreviationToFull");
-            abbreviationToFull.putAll(
-                    getBuiltInAbbreviations()
-                            .stream()
-                            .collect(Collectors.toMap(Abbreviation::getAbbreviation, Abbreviation::getName))
-            );
-        }
-    }
-
-    public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        JournalAbbreviationRepository repository;
         // Initialize with built-in list
-        repository = new JournalAbbreviationRepository();
+        try {
+            Path tempJournalList = Files.createTempDirectory("journal").resolve("journalList.mv");
+            Files.copy(JournalAbbreviationRepository.class.getResourceAsStream("/journals/journalList.mv"), tempJournalList);
+            repository = new JournalAbbreviationRepository(tempJournalList);
+        } catch (IOException e) {
+            LOGGER.error("Error while copying journal list", e);
+            return null;
+        }
 
         // Read external lists
         List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
@@ -79,12 +66,10 @@ public class JournalAbbreviationLoader {
                 }
             }
         }
+        return repository;
     }
 
-    public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
-        if (repository == null) {
-            update(journalAbbreviationPreferences);
-        }
-        return repository;
+    public static JournalAbbreviationRepository loadBuiltInRepository() {
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), StandardCharsets.UTF_8));
     }
 }

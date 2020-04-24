@@ -25,9 +25,9 @@ public class AbbreviationViewModel {
         this.abbreviationObject = abbreviation;
         this.pseudoAbbreviation.set(this.abbreviationObject == null);
         if (this.abbreviationObject != null) {
-            this.name.bindBidirectional(this.abbreviationObject.nameProperty());
-            this.abbreviation.bindBidirectional(this.abbreviationObject.abbreviationProperty());
-            this.shortestUniqueAbbreviation.bindBidirectional(this.abbreviationObject.shortestUniqueAbbreviationProperty());
+            this.name.setValue(this.abbreviationObject.getName());
+            this.abbreviation.setValue(this.abbreviationObject.getAbbreviation());
+            this.shortestUniqueAbbreviation.setValue(this.abbreviationObject.getShortestUniqueAbbreviation());
         }
     }
 

@@ -13,8 +13,8 @@ import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -69,11 +69,11 @@ public interface PreferencesService {
 
     void updateEntryEditorTabList();
 
-    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
+    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
 
@@ -105,7 +105,7 @@ public interface PreferencesService {
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
-    CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader);
+    CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository repository);
 
     CleanupPreset getCleanupPreset();
 

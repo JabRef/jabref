@@ -3,6 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ class AbbreviationCheckerTest {
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository = new JournalAbbreviationRepository();
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
         checker = new AbbreviationChecker(abbreviationRepository);
     }
