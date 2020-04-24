@@ -195,7 +195,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
         viewModel.addBuiltInList();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
+        assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
@@ -401,16 +401,16 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
                 "Abbreviations;Abb;A",
                 "Test Entry;TE;T",
                 "MoreEntries;ME;M",
-                "JabRefTestEntry;JTE");
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
+                "EntryEntry;EE;EE",
                 "Abbreviations;Abb;A",
                 "Test Entry;TE;T",
-                "SomeOtherEntry;SOE");
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
@@ -447,7 +447,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
     }
 
     /**

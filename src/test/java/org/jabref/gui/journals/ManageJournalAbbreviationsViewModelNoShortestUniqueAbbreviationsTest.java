@@ -195,7 +195,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
         viewModel.addBuiltInList();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
+        assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
@@ -398,19 +398,19 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb",
-                "Test Entry;TE",
-                "MoreEntries;ME",
-                "JabRefTestEntry;JTE");
+                "Abbreviations;Abb;Abb",
+                "Test Entry;TE;TE",
+                "MoreEntries;ME;ME",
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
-                "Abbreviations;Abb",
-                "Test Entry;TE",
-                "SomeOtherEntry;SOE");
+                "EntryEntry;EE;EE",
+                "Abbreviations;Abb;Abb",
+                "Test Entry;TE;TE",
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
@@ -447,7 +447,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
     }
 
     /**

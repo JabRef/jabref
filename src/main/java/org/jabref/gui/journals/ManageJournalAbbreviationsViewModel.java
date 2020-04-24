@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
@@ -340,7 +339,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * finally updates the abbreviations auto complete. It basically calls {@link #saveExternalFilesList()}, {@link
      * #saveJournalAbbreviationFiles() } and finally {@link JournalAbbreviationLoader#update(JournalAbbreviationPreferences)}.
      */
-    public void saveEverythingAndUpdateAutoCompleter() {
+    public void save() {
         BackgroundTask.wrap(() -> {
             saveExternalFilesList();
 
@@ -348,9 +347,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 saveJournalAbbreviationFiles();
                 shouldWriteLists = false;
             }
-
-            // Update journal abbreviation loader
-            Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(abbreviationsPreferences);
 
             preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
         }).executeWith(taskExecutor);

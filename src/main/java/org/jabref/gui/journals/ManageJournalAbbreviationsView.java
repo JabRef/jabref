@@ -12,11 +12,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -145,7 +147,11 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void saveAbbreviationsAndCloseDialog() {
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
+
+        // Update journal abbreviation loader
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+
         close();
     }
 

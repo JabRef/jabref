@@ -219,16 +219,16 @@ class IntegrityCheckTest {
     @Test
     void testAbbreviationChecks() {
         for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
-            assertCorrect(createContext(field, "IEEE Software"));
+            assertCorrect(createContext(field, "2D Materials"));
             assertCorrect(createContext(field, ""));
-            assertWrong(createContext(field, "IEEE SW"));
+            assertWrong(createContext(field, "2D Mater."));
         }
     }
 
     @Test
     void testJournalIsKnownInAbbreviationList() {
-        assertCorrect(createContext(StandardField.JOURNAL, "IEEE Software"));
-        assertWrong(createContext(StandardField.JOURNAL, "IEEE Whocares"));
+        assertCorrect(createContext(StandardField.JOURNAL, "2D Materials"));
+        assertWrong(createContext(StandardField.JOURNAL, "Some unknown journal"));
     }
 
     @Test
