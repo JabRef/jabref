@@ -13,7 +13,7 @@
     <category field="geography"/>
     <issn>0029-182X</issn>
     <eissn>1760-8546</eissn>
-    <updated>2020-04-14T10:19:50+00:00</updated>
+    <updated>2020-04-15T09:55:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -116,7 +116,7 @@
       <else>
         <choose>
           <if variable="DOI">
-            <text variable="DOI" prefix="DOI: "/>
+            <text variable="DOI" prefix="DOI : "/>
           </if>
           <else>
             <group delimiter=" ">
@@ -503,7 +503,7 @@
     </sort>
     <layout>
       <group suffix=".">
-        <group delimiter=". ">
+        <group delimiter=", ">
           <group delimiter=", ">
             <text macro="author"/>
             <text macro="issued"/>

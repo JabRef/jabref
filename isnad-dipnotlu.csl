@@ -21,7 +21,7 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <!--
-	ISNAD AUTHOR-DATE v.1.0
+	ISNAD FULL NOTES v.1.1
 
 	Document Type Mappings
 	ISNAD				CSL
@@ -395,6 +395,13 @@
       <else-if type="motion_picture" variable="genre" match="all">
         <text variable="title" text-case="title" font-style="italic"/>
       </else-if>
+      <else-if type="entry-dictionary">
+        <choose>
+          <if variable="author editor" match="none">
+            <text variable="title" text-case="title" quotes="true"/>
+          </if>
+        </choose>
+      </else-if>
       <else>
         <text variable="title" text-case="title" quotes="true"/>
       </else>
@@ -556,6 +563,13 @@
       </else-if>
       <else-if type="motion_picture" variable="genre" match="all">
         <text variable="title" font-style="italic" form="short"/>
+      </else-if>
+      <else-if type="entry-dictionary">
+        <choose>
+          <if variable="author editor" match="none">
+            <text variable="title" text-case="title" quotes="true"/>
+          </if>
+        </choose>
       </else-if>
       <else>
         <text variable="title" text-case="title" form="short" quotes="true"/>
@@ -904,6 +918,24 @@
       </if>
     </choose>
   </macro>
+  <macro name="locators-dictionary">
+    <choose>
+      <if type="entry-dictionary">
+        <choose>
+          <if variable="author editor" match="none"/>
+          <else-if variable="title" match="all">
+            <group delimiter=", ">
+              <text variable="title" text-case="title" quotes="true"/>
+              <text macro="point-locators"/>
+            </group>
+          </else-if>
+          <else>
+            <text variable="locator"/>
+          </else>
+        </choose>
+      </if>
+    </choose>
+  </macro>
   <macro name="event-note">
     <text variable="event"/>
   </macro>
@@ -1078,6 +1110,9 @@
           </else>
         </choose>
       </if>
+      <else-if type="entry-dictionary">
+        <text macro="locators-dictionary"/>
+      </else-if>
       <else-if variable="locator">
         <choose>
           <if locator="page verse book" match="none">
@@ -1106,7 +1141,7 @@
               <text variable="locator"/>
             </group>
           </if>
-          <else-if type="book graphic motion_picture report song chapter entry-encyclopedia entry-dictionary paper-conference" match="any">
+          <else-if type="book graphic motion_picture report song chapter entry-encyclopedia paper-conference" match="any">
             <group delimiter="/">
               <number variable="volume" form="numeric"/>
               <text variable="locator"/>
@@ -1139,9 +1174,12 @@
   </macro>
   <macro name="point-locators-join-with-comma">
     <choose>
-      <if type="article-journal article-magazine article-newspaper" match="none">
+      <if type="article-journal article-magazine article-newspaper entry-dictionary" match="none">
         <text macro="point-locators"/>
       </if>
+      <else-if type="entry-dictionary">
+        <text macro="locators-dictionary"/>
+      </else-if>
       <else-if variable="volume issue" match="none">
         <text macro="point-locators"/>
       </else-if>
@@ -1187,7 +1225,7 @@
   </macro>
   <macro name="locators-chapter">
     <choose>
-      <if type="chapter entry-dictionary entry-encyclopedia paper-conference" match="any">
+      <if type="chapter entry-encyclopedia paper-conference" match="any">
         <choose>
           <if variable="author container-author" match="all"/>
           <else>
