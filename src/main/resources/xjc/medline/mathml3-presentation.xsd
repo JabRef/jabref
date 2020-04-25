@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:m="http://www.w3.org/1998/Math/MathML"
+           xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+           jxb:extensionBindingPrefixes="xjc"
+           jxb:version="2.1"
            elementFormDefault="qualified"
            targetNamespace="http://www.w3.org/1998/Math/MathML">
-   <xs:complexType name="ImpliedMrow">
+  <xs:complexType name="ImpliedMrow">
       <xs:group minOccurs="0" maxOccurs="unbounded" ref="m:MathExpression"/>
    </xs:complexType>
    <xs:element name="TableRowExpression" abstract="true"/>
@@ -32,7 +36,7 @@
       </xs:choice>
    </xs:group>
    <xs:group name="MultiScriptExpression">
-      <xs:sequence>
+     <xs:sequence>
          <xs:choice>
             <xs:group ref="m:MathExpression"/>
             <xs:element ref="m:none"/>
@@ -1693,9 +1697,9 @@
          <xs:attributeGroup ref="m:mmultiscripts.attributes"/>
       </xs:complexType>
    </xs:element>
-   <xs:attributeGroup name="mmultiscripts.attributes">
-      <xs:attributeGroup ref="m:msubsup.attributes"/>
-   </xs:attributeGroup>
+  <xs:attributeGroup name="mmultiscripts.attributes">
+    <xs:attributeGroup ref="m:msubsup.attributes"/>
+  </xs:attributeGroup>
    <xs:element name="mtable" substitutionGroup="m:PresentationExpression">
       <xs:complexType>
          <xs:sequence>

@@ -19,7 +19,7 @@ class XjcTask extends DefaultTask {
     @TaskAction
     def generateClasses() {
         project.mkdir(outputDirectory)
-        project.ant.xjc(destdir: outputDirectory, package: javaPackage, encoding: getEncoding()) {
+        project.ant.xjc(destdir: outputDirectory, package: javaPackage, encoding: getEncoding(), extension: true) {
             schema(dir: schemaFile.getParent(), includes: schemaFile.getName())
             if (bindingFile != null) {
                 binding(dir: bindingFile.getParent(), includes: bindingFile.getName())
