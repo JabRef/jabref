@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="PubmedArticleSet">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="PubmedArticle">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MedlineCitation">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="PMID">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base="xs:unsignedInt">
+                            <xs:attribute name="Version" type="xs:unsignedByte" use="required" />
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="DateCompleted">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Year" type="xs:unsignedShort" />
+                          <xs:element name="Month" type="xs:unsignedByte" />
+                          <xs:element name="Day" type="xs:unsignedByte" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="DateRevised">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Year" type="xs:unsignedShort" />
+                          <xs:element name="Month" type="xs:unsignedByte" />
+                          <xs:element name="Day" type="xs:unsignedByte" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Article">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Journal">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element minOccurs="0" name="ISSN">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute name="IssnType" type="xs:string" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="JournalIssue">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="Volume" type="xs:unsignedShort" />
+                                      <xs:element minOccurs="0" name="Issue" type="xs:string" />
+                                      <xs:element name="PubDate">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="Year" type="xs:unsignedShort" />
+                                            <xs:element minOccurs="0" name="Season" type="xs:string" />
+                                            <xs:element minOccurs="0" name="Month" type="xs:string" />
+                                            <xs:element minOccurs="0" name="Day" type="xs:unsignedByte" />
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="CitedMedium" type="xs:string" use="required" />
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="Title" type="xs:string" />
+                                <xs:element name="ISOAbbreviation" type="xs:string" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="ArticleTitle">
+                            <xs:complexType mixed="true">
+                              <xs:sequence minOccurs="0">
+                                <xs:element name="i" type="xs:string" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="Pagination">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="MedlinePgn" type="xs:string" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="ELocationID">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="EIdType" type="xs:string" use="required" />
+                                  <xs:attribute name="ValidYN" type="xs:string" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="Abstract">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="AbstractText">
+                                  <xs:complexType mixed="true">
+                                    <xs:sequence minOccurs="0">
+                                      <xs:choice maxOccurs="unbounded">
+                                        <xs:element maxOccurs="unbounded" name="b">
+                                          <xs:complexType>
+                                            <xs:sequence>
+                                              <xs:element name="i" type="xs:string" />
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="sub" type="xs:unsignedByte" />
+                                        <xs:element maxOccurs="unbounded" name="i" type="xs:string" />
+                                        <xs:element name="sup">
+                                          <xs:complexType mixed="true">
+                                            <xs:sequence minOccurs="0">
+                                              <xs:element name="i" type="xs:unsignedByte" />
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                      </xs:choice>
+                                    </xs:sequence>
+                                    <xs:attribute name="Label" type="xs:string" use="optional" />
+                                    <xs:attribute name="NlmCategory" type="xs:string" use="optional" />
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" name="CopyrightInformation" type="xs:string" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="AuthorList">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="Author">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="LastName" type="xs:string" />
+                                      <xs:element name="ForeName" type="xs:string" />
+                                      <xs:element name="Initials" type="xs:string" />
+                                      <xs:element minOccurs="0" maxOccurs="unbounded" name="AffiliationInfo">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="Affiliation" type="xs:string" />
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="ValidYN" type="xs:string" use="required" />
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="CompleteYN" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="Language" type="xs:string" />
+                          <xs:element minOccurs="0" name="GrantList">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="Grant">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="GrantID" type="xs:string" />
+                                      <xs:element name="Acronym" type="xs:string" />
+                                      <xs:element name="Agency" type="xs:string" />
+                                      <xs:element name="Country" type="xs:string" />
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="CompleteYN" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="PublicationTypeList">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element maxOccurs="unbounded" name="PublicationType">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute name="UI" type="xs:string" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" name="ArticleDate">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Year" type="xs:unsignedShort" />
+                                <xs:element name="Month" type="xs:unsignedByte" />
+                                <xs:element name="Day" type="xs:unsignedByte" />
+                              </xs:sequence>
+                              <xs:attribute name="DateType" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="PubModel" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="MedlineJournalInfo">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Country" type="xs:string" />
+                          <xs:element name="MedlineTA" type="xs:string" />
+                          <xs:element name="NlmUniqueID" type="xs:string" />
+                          <xs:element minOccurs="0" name="ISSNLinking" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="ChemicalList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="Chemical">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="RegistryNumber" type="xs:string" />
+                                <xs:element name="NameOfSubstance">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute name="UI" type="xs:string" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="CitationSubset" type="xs:string" />
+                    <xs:element minOccurs="0" name="CommentsCorrectionsList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="CommentsCorrections">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="RefSource" type="xs:string" />
+                                <xs:element name="PMID">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:unsignedInt">
+                                        <xs:attribute name="Version" type="xs:unsignedByte" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="RefType" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="OtherAbstract">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="AbstractText" type="xs:string" />
+                        </xs:sequence>
+                        <xs:attribute name="Type" type="xs:string" use="required" />
+                        <xs:attribute name="Language" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="MeshHeadingList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="MeshHeading">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="DescriptorName">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute name="UI" type="xs:string" use="required" />
+                                        <xs:attribute name="MajorTopicYN" type="xs:string" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element minOccurs="0" maxOccurs="unbounded" name="QualifierName">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="xs:string">
+                                        <xs:attribute name="UI" type="xs:string" use="required" />
+                                        <xs:attribute name="MajorTopicYN" type="xs:string" use="required" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="KeywordList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="Keyword">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="MajorTopicYN" type="xs:string" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="Owner" type="xs:string" use="required" />
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="CoiStatement" type="xs:string" />
+                  </xs:sequence>
+                  <xs:attribute name="Status" type="xs:string" use="required" />
+                  <xs:attribute name="Owner" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="PubmedData">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="History">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="PubMedPubDate">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Year" type="xs:unsignedShort" />
+                                <xs:element name="Month" type="xs:unsignedByte" />
+                                <xs:element name="Day" type="xs:unsignedByte" />
+                                <xs:element minOccurs="0" name="Hour" type="xs:unsignedByte" />
+                                <xs:element minOccurs="0" name="Minute" type="xs:unsignedByte" />
+                              </xs:sequence>
+                              <xs:attribute name="PubStatus" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="PublicationStatus" type="xs:string" />
+                    <xs:element name="ArticleIdList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="ArticleId">
+                            <xs:complexType>
+                              <xs:simpleContent>
+                                <xs:extension base="xs:string">
+                                  <xs:attribute name="IdType" type="xs:string" use="required" />
+                                </xs:extension>
+                              </xs:simpleContent>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="ReferenceList">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element maxOccurs="unbounded" name="Reference">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Citation" type="xs:string" />
+                                <xs:element name="ArticleIdList">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="ArticleId">
+                                        <xs:complexType>
+                                          <xs:simpleContent>
+                                            <xs:extension base="xs:unsignedInt">
+                                              <xs:attribute name="IdType" type="xs:string" use="required" />
+                                            </xs:extension>
+                                          </xs:simpleContent>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
