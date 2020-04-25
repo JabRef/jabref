@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:mml="http://www.w3.org/1998/Math/MathML" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import namespace="http://www.w3.org/1998/Math/MathML" />
+  <xs:import namespace="http://www.w3.org/1998/Math/MathML" schemaLocation="mathml3.xsd"/>
   <xs:element name="PubmedArticleSet">
     <xs:complexType>
       <xs:sequence>
