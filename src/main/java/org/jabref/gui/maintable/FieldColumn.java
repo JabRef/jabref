@@ -1,15 +1,7 @@
 package org.jabref.gui.maintable;
 
-import java.util.Optional;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
 
-import org.jabref.Globals;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 
 /**
@@ -17,20 +9,14 @@ import org.jabref.model.entry.field.OrFields;
  */
 public class FieldColumn extends MainTableColumn<String> {
 
-    private final OrFields bibtexFields;
+    private final OrFields fields;
 
-    private final Optional<BibDatabase> database;
-
-    private final MainTableNameFormatter nameFormatter;
-
-    public FieldColumn(MainTableColumnModel model, OrFields bibtexFields, BibDatabase database) {
+    public FieldColumn(MainTableColumnModel model, OrFields fields) {
         super(model);
-        this.bibtexFields = bibtexFields;
-        this.database = Optional.of(database);
-        this.nameFormatter = new MainTableNameFormatter(Globals.prefs);
+        this.fields = fields;
 
         setText(getDisplayName());
-        setCellValueFactory(param -> getColumnValue(param.getValue()));
+        setCellValueFactory(param -> getFieldValue(param.getValue()));
     }
 
     /**
@@ -39,35 +25,15 @@ public class FieldColumn extends MainTableColumn<String> {
      * @return name to be displayed. null if field is empty.
      */
     @Override
-    public String getDisplayName() { return bibtexFields.getDisplayName(); }
-
-    private ObservableValue<String> getColumnValue(BibEntryTableViewModel entry) {
-        if (bibtexFields.isEmpty()) {
-            return null;
-        }
-
-        ObjectBinding[] dependencies = bibtexFields.stream().map(entry::getField).toArray(ObjectBinding[]::new);
-        return Bindings.createStringBinding(() -> computeText(entry), dependencies);
+    public String getDisplayName() {
+        return fields.getDisplayName();
     }
 
-    private String computeText(BibEntryTableViewModel entry) {
-        boolean isNameColumn = false;
-
-        Optional<String> content = Optional.empty();
-        for (Field field : bibtexFields) {
-            content = entry.getResolvedFieldOrAlias(field, database.orElse(null));
-            if (content.isPresent()) {
-                isNameColumn = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                break;
-            }
-        }
-
-        String result = content.orElse(null);
-
-        if (isNameColumn) {
-            return nameFormatter.formatName(result);
+    private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {
+        if (fields.isEmpty()) {
+            return null;
         } else {
-            return result;
+            return entry.getFields(fields);
         }
     }
 }

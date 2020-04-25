@@ -14,7 +14,7 @@
     <issn>1742-464X</issn>
     <eissn>1742-4658</eissn>
     <summary>Style for FEBS Journal</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-04-21T19:53:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -108,7 +108,7 @@
         <else>
           <group prefix=" " suffix=".">
             <text macro="title" suffix=". "/>
-            <text variable="container-title" form="short" font-style="italic"/>
+            <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
             <group prefix=" ">
               <text variable="volume" font-weight="bold"/>
             </group>

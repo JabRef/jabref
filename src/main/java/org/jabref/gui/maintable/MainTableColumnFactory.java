@@ -160,7 +160,7 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
-        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
@@ -207,8 +207,8 @@ class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
         FieldColumn column = new FieldColumn(columnModel,
-                FieldFactory.parseOrFields(columnModel.getQualifier()),
-                database.getDatabase());
+                FieldFactory.parseOrFields(columnModel.getQualifier())
+        );
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);

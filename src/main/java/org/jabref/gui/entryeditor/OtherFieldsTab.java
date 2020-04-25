@@ -34,10 +34,27 @@ public class OtherFieldsTab extends FieldsEditorTab {
     private final List<Field> customTabFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<Field> customTabFieldNames, DialogService dialogService, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, externalFileTypes, taskExecutor, journalAbbreviationLoader);
+    public OtherFieldsTab(BibDatabaseContext databaseContext,
+                          SuggestionProviders suggestionProviders,
+                          UndoManager undoManager,
+                          DialogService dialogService,
+                          JabRefPreferences preferences,
+                          BibEntryTypesManager entryTypesManager,
+                          ExternalFileTypes externalFileTypes,
+                          TaskExecutor taskExecutor,
+                          JournalAbbreviationLoader journalAbbreviationLoader) {
+        super(false,
+                databaseContext,
+                suggestionProviders,
+                undoManager,
+                dialogService,
+                preferences, // ToDo: Still uses JabRefPreferences instead of PreferencesService
+                externalFileTypes,
+                taskExecutor,
+                journalAbbreviationLoader);
+
         this.entryTypesManager = entryTypesManager;
-        this.customTabFieldNames = customTabFieldNames;
+        this.customTabFieldNames = preferences.getAllDefaultTabFieldNames();
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));
