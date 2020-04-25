@@ -7,6 +7,9 @@ on:
   pull_request:
     # always run on pull requests
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+
 jobs:
   checkstyle:
     name: Checkstyle
@@ -17,7 +20,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13.0.2
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
@@ -43,7 +46,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -87,7 +90,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -133,7 +136,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -167,12 +170,23 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "CODECOV_TOKEN" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -188,9 +202,10 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Update test coverage metrics
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
-          CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
+          CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation

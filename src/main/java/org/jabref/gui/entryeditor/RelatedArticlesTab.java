@@ -61,7 +61,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         progress.setMaxSize(100, 100);
 
         MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
-                                                  Globals.BUILD_INFO.getVersion());
+                Globals.BUILD_INFO.version);
         BackgroundTask
                       .wrap(() -> fetcher.performSearch(entry))
                       .onRunning(() -> progress.setVisible(true))
@@ -170,7 +170,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
 
-        DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(),88d);
+        DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
         Text line1 = new Text(Localization.lang("JabRef requests recommendations from Mr. DLib, which is an external service. To enable Mr. DLib to calculate recommendations, some of your data must be shared with Mr. DLib. Generally, the more data is shared the better recommendations can be calculated. However, we understand that some of your data in JabRef is sensitive, and you may not want to share it. Therefore, Mr. DLib offers a choice of which data you would like to share."));
         line1.wrappingWidthProperty().bind(rootWidth);

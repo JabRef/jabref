@@ -22,7 +22,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.2'
+    id 'org.beryx.jlink' version '2.17.7'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -46,8 +46,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
-    targetCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
 }
 
 application {
@@ -87,7 +87,6 @@ sourceSets {
 }
 
 repositories {
-    mavenLocal()
     jcenter()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
@@ -104,7 +103,7 @@ configurations {
 }
 
 javafx {
-    version = "13.0.2"
+    version = "14"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -112,26 +111,27 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.18'
-    implementation 'org.apache.pdfbox:fontbox:2.0.18'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.18'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.19'
+    implementation 'org.apache.pdfbox:fontbox:2.0.19'
+    implementation 'org.apache.pdfbox:xmpbox:2.0.19'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.23'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.64'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
 
     implementation 'commons-cli:commons-cli:1.4'
 
     // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
     // See https://bugs.documentfoundation.org/show_bug.cgi?id=117331#c8 for background information
     // Use the task bundleLibreOffice to update the bundled jar
-    //implementation "org.libreoffice:juh:6.2.3"
-    //implementation "org.libreoffice:jurt:6.2.3"
-    //implementation "org.libreoffice:ridl:6.2.3"
-    //implementation "org.libreoffice:unoil:6.2.3"
+    // DO NOT CHANGE THE libreoffice PREFIX
+    libreoffice 'org.libreoffice:juh:6.4.3'
+    libreoffice 'org.libreoffice:jurt:6.4.3'
+    libreoffice 'org.libreoffice:ridl:6.4.3'
+    libreoffice 'org.libreoffice:unoil:6.4.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.5'
     implementation 'info.debatty:java-string-similarity:1.2.1'
@@ -142,16 +142,16 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.5.4'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.0'
 
-    implementation 'org.postgresql:postgresql:42.2.10'
+    implementation 'org.postgresql:postgresql:42.2.12'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:28.2-jre') {
+    implementation ('com.google.guava:guava:29.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -165,13 +165,13 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'org.fxmisc.easybind:easybind:1.0.3'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.9'
     implementation 'org.controlsfx:controlsfx:11.0.1'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.6.01'
+    implementation 'com.konghq:unirest-java:3.7.02'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -196,16 +196,19 @@ dependencies {
         exclude module: "log4j-core"
     }
 
+    implementation 'com.vladsch.flexmark:flexmark:0.61.16'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.6'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.16'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.65'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.6.0'
+    testImplementation 'io.github.classgraph:classgraph:4.8.71'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.8'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.9'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.3.1'
+    testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'org.xmlunit:xmlunit-core:2.6.4'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.6.4'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.13.1'
@@ -213,13 +216,9 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.30'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.31'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
-    jython 'org.python:jython-standalone:2.7.1'
-}
-
-jacoco {
-    toolVersion = '0.8.3'
+    jython 'org.python:jython-standalone:2.7.2'
 }
 
 dependencyUpdates {
@@ -234,11 +233,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.candidate.version ==~ /(?i).*[.-]$qualifier[.\d-+]*/
             }
             if (rejected) {
-                selection.reject('Release candidate')
-            }
-        }
-        rules.withModule("org.python:jython-standalone") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.7.2b\d/) {
                 selection.reject('Release candidate')
             }
         }
@@ -285,6 +279,7 @@ processResources {
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 
@@ -653,9 +648,11 @@ jlink {
             installerOptions = [
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
+                    '--verbose',
                     '--win-upgrade-uuid', 'd636b4ee-6f10-451e-bf57-c89656780e36',
                     '--win-dir-chooser',
                     '--win-shortcut',
+                    '--win-menu',
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
@@ -667,6 +664,7 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
             ]
             installerOptions = [
+                    '--verbose',
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     // '--temp', "$buildDir/installer",
@@ -683,11 +681,14 @@ jlink {
         if (OperatingSystem.current().isMacOsX()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
             installerOptions = [
+                    '--verbose',
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
-                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties"
+                    '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
+                    '--resource-dir', "${projectDir}/buildres/mac"
             ]
         }
     }

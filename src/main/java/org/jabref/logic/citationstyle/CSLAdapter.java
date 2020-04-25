@@ -84,7 +84,7 @@ public class CSLAdapter {
      */
     private static class JabRefItemDataProvider implements ItemDataProvider {
 
-        private final ArrayList<BibEntry> data = new ArrayList<>();
+        private final List<BibEntry> data = new ArrayList<>();
 
         /**
          * Converts the {@link BibEntry} into {@link CSLItemData}.

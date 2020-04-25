@@ -49,7 +49,7 @@ class MoveFilesCleanupTest {
         metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
-        databaseContext.setDatabaseFile(bibFolder.resolve("test.bib"));
+        databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -59,7 +59,7 @@ class MoveFilesCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.isBibLocationAsPrimary()).thenReturn(false); //Biblocation as Primary overwrites all other dirs, therefore we set it to false here
+        when(filePreferences.isBibLocationAsPrimary()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
         cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
     }
 

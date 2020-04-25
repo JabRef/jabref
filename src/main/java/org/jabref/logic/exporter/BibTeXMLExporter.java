@@ -169,7 +169,7 @@ public class BibTeXMLExporter extends Exporter {
             }
         }
 
-        //set the entryType to the entry
+        // set the entryType to the entry
         entry.setInbook(inbook);
     }
 
@@ -211,7 +211,7 @@ public class BibTeXMLExporter extends Exporter {
                         try {
                             method.invoke(entryType, new BigInteger(value));
                         } catch (NumberFormatException exception) {
-                            LOGGER.warn("The value %s of the 'number' field is not an integer and thus is ignored for the export", value);
+                            LOGGER.warn("The value {} of the 'number' field is not an integer and thus is ignored for the export", value);
                         }
                         break;
                     } else if (StandardField.MONTH.equals(key)) {
@@ -229,7 +229,7 @@ public class BibTeXMLExporter extends Exporter {
                 }
             }
 
-            //set the entryType to the entry
+            // set the entryType to the entry
             List<Method> entryMethods = getListOfSetMethods(entry);
             for (Method method : entryMethods) {
                 String methodWithoutSet = method.getName().replace("set", "");

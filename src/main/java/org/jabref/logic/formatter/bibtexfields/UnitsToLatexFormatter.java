@@ -41,7 +41,7 @@ public class UnitsToLatexFormatter extends Formatter {
             "cd", // candela
             "dB", // decibel
             "dBm", // decibel
-            "dBc", //decibel
+            "dBc", // decibel
             "eV", // electron volts
             "inch", // inch
             "kat", // katal

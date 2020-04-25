@@ -29,7 +29,7 @@ public class ReplaceStringView extends BaseDialog<Void>
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public ReplaceStringView(BasePanel basePanel)  {
+    public ReplaceStringView(BasePanel basePanel) {
         this.setTitle(Localization.lang("Replace String"));
 
         viewModel = new ReplaceStringViewModel(basePanel);

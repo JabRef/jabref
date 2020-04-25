@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" default-locale="fr-FR">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Transversalités (French)</title>
     <id>http://www.zotero.org/styles/transversalites</id>
@@ -19,7 +19,7 @@
     <category field="social_science"/>
     <issn>1286-9449</issn>
     <eissn>2259-3799</eissn>
-    <updated>2019-10-17T04:06:19+00:00</updated>
+    <updated>2020-03-11T13:45:39+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -34,6 +34,7 @@
         <single>éd.</single>
         <multiple>éds.</multiple>
       </term>
+      <term name="translator" form="short">trad. de</term>
       <term name="online">[en ligne]</term>
     </terms>
   </locale>
@@ -52,7 +53,7 @@
           <name font-style="normal" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
-          <label form="short" prefix="&#160;(" suffix=".)"/>
+          <label form="short" prefix=" (" suffix=".)"/>
         </names>
       </else-if>
     </choose>
@@ -72,7 +73,7 @@
           <name font-style="normal" delimiter-precedes-last="never" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1" name-as-sort-order="all" sort-separator=" ">
             <name-part name="family" font-variant="small-caps" suffix=", "/>
           </name>
-          <label form="short" prefix="&#160;(" suffix=".)"/>
+          <label form="short" prefix=" (" suffix=".)"/>
         </names>
       </else-if>
     </choose>
@@ -82,7 +83,7 @@
       <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
         <name-part name="family" font-variant="small-caps"/>
       </name>
-      <label form="short" prefix="&#160;(" suffix=".)"/>
+      <label form="short" prefix=" (" suffix=".)"/>
     </names>
   </macro>
   <macro name="title">
@@ -156,7 +157,7 @@
             <text variable="title" text-case="capitalize-first" quotes="true"/>
             <text macro="online"/>
           </group>
-          <text value="in" prefix=" " suffix=" "/>
+          <text value="dans" prefix=" " suffix=" "/>
           <text macro="editor" suffix=", "/>
           <text variable="container-title" text-case="capitalize-first" font-style="italic"/>
         </group>
@@ -167,7 +168,7 @@
             <text variable="title" text-case="capitalize-first" quotes="true" prefix="article "/>
             <text macro="online"/>
           </group>
-          <text value="in" font-style="normal" prefix=" " suffix=" "/>
+          <text value="dans" font-style="normal" prefix=" " suffix=" "/>
           <text macro="editor" suffix=", "/>
           <text variable="container-title" text-case="capitalize-first" font-style="italic"/>
         </group>
@@ -200,17 +201,19 @@
       </else>
     </choose>
   </macro>
-  <macro name="translator-bib">
+  <macro name="translator">
     <names variable="translator">
-      <name prefix=", trad. " name-as-sort-order="all" sort-separator=" ">
-        <name-part name="family" text-case="sentence" font-variant="small-caps" suffix=", "/>
+      <label form="short" prefix=", " suffix=""/>
+      <name font-style="normal" prefix=" " delimiter-precedes-last="never" sort-separator=" ">
+        <name-part name="family" text-case="sentence" font-variant="small-caps"/>
       </name>
     </names>
   </macro>
-  <macro name="translator">
+  <macro name="translator-bib">
     <names variable="translator">
-      <name font-style="normal" prefix=", trad. " delimiter-precedes-last="never" sort-separator=" ">
-        <name-part name="family" text-case="sentence" font-variant="small-caps"/>
+      <label form="short" prefix=", " suffix=""/>
+      <name prefix=" " name-as-sort-order="all" sort-separator=" ">
+        <name-part name="family" text-case="sentence" font-variant="small-caps" suffix=", "/>
       </name>
     </names>
   </macro>
@@ -233,9 +236,8 @@
         <group font-style="normal">
           <choose>
             <if variable="issued">
-              <group prefix=" (" suffix=")">
-                <date date-parts="year" form="text" variable="issued"/>
-                <text macro="issue" text-decoration="none" prefix="/"/>
+              <group prefix="" suffix="">
+                <text macro="issue" text-decoration="none" prefix=", "/>
               </group>
             </if>
             <else>
@@ -339,10 +341,10 @@
   <macro name="collection">
     <choose>
       <if type="motion_picture map entry-dictionary entry-encyclopedia book speech paper-conference chapter" match="any">
-        <group prefix=", ">
+        <group prefix=", coll. ">
           <group delimiter="">
-            <text variable="collection-title"/>
-            <text variable="collection-number" prefix="&#160;n°&#160;"/>
+            <text variable="collection-title" prefix="« " suffix=" »"/>
+            <text variable="collection-number" prefix=" "/>
           </group>
         </group>
       </if>
@@ -374,13 +376,13 @@
       <else-if type="map manuscript thesis motion_picture broadcast" match="any">
         <group>
           <text macro="date" suffix="."/>
-          <text variable="number-of-pages" prefix=", " suffix="&#160;p"/>
+          <text variable="number-of-pages" prefix=", " suffix=" p"/>
         </group>
       </else-if>
       <else-if type="report entry-dictionary entry-encyclopedia chapter" match="any">
         <group>
           <text macro="date"/>
-          <group delimiter="&#160;" prefix=", ">
+          <group delimiter=" " prefix=", ">
             <label variable="page" form="short"/>
             <text variable="page"/>
           </group>
@@ -388,8 +390,9 @@
       </else-if>
       <else-if type="graphic personal_communication interview" match="any"/>
       <else-if type="article-journal article-magazine" match="any">
-        <group delimiter=" " font-style="normal" prefix=", ">
-          <group delimiter="&#160;" suffix=".">
+        <group delimiter="" font-style="normal">
+          <text macro="date"/>
+          <group delimiter=" " prefix=", " suffix=".">
             <label variable="page" form="short"/>
             <text variable="page"/>
           </group>
@@ -399,7 +402,7 @@
         <group delimiter="" font-style="normal">
           <text macro="newspaper-edition"/>
           <text macro="date"/>
-          <group delimiter="&#160;" prefix=", ">
+          <group delimiter=" " prefix=", ">
             <label variable="page" form="short"/>
             <text variable="page"/>
           </group>
@@ -418,7 +421,7 @@
       <else>
         <group>
           <text macro="date"/>
-          <text variable="number-of-pages" prefix=", " suffix="&#160;p."/>
+          <text variable="number-of-pages" prefix=", " suffix=" p."/>
         </group>
       </else>
     </choose>
@@ -437,7 +440,7 @@
       <if type="article-journal article-newspaper" match="any">
         <choose>
           <if is-numeric="volume">
-            <text variable="volume" prefix=" "/>
+            <text variable="volume" prefix=", vol. "/>
           </if>
           <else>
             <text variable="number-of-volumes" suffix="vol.,"/>
@@ -459,7 +462,7 @@
   <macro name="number">
     <choose>
       <if is-numeric="number">
-        <text variable="number" prefix="n°&#160;"/>
+        <text variable="number" prefix="n° "/>
       </if>
       <else>
         <text variable="number"/>
@@ -469,7 +472,7 @@
   <macro name="issue">
     <choose>
       <if is-numeric="issue">
-        <text variable="issue"/>
+        <text variable="issue" prefix="n° "/>
       </if>
       <else>
         <text variable="issue"/>
@@ -507,11 +510,11 @@
     </choose>
   </macro>
   <macro name="pages-citation">
-    <label plural="never" suffix=" " variable="page" form="short"/>
+    <label plural="never" suffix=" " variable="locator" form="short"/>
     <text variable="locator" form="short"/>
   </macro>
   <citation et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1">
-    <layout suffix="." delimiter="&#160;; ">
+    <layout suffix="." delimiter=" ; ">
       <choose>
         <if position="ibid-with-locator">
           <group delimiter=", ">
@@ -534,7 +537,7 @@
               </else>
             </choose>
             <text term="cited" font-style="italic" suffix="."/>
-            <group delimiter="&#160;">
+            <group delimiter=" ">
               <text macro="pages-citation"/>
             </group>
           </group>
@@ -542,16 +545,16 @@
         <else>
           <text macro="author"/>
           <text macro="title"/>
-          <text macro="translator"/>
-          <text macro="collection"/>
           <text macro="volume"/>
           <text macro="edition"/>
           <text macro="event"/>
-          <text macro="publisher"/>
           <text macro="place"/>
-          <text macro="yearpage-bib"/>
-          <text macro="accessed"/>
+          <text macro="publisher"/>
+          <text macro="collection"/>
+          <text macro="date"/>
+          <text macro="translator"/>
           <text macro="pages-citation" prefix=", "/>
+          <text macro="accessed"/>
         </else>
       </choose>
     </layout>
@@ -564,17 +567,17 @@
     <layout suffix=".">
       <text macro="author-bib"/>
       <text macro="title"/>
-      <text macro="translator-bib"/>
-      <text macro="collection"/>
       <text macro="volume"/>
+      <text macro="place"/>
       <text macro="edition"/>
       <text macro="event"/>
       <text macro="publisher"/>
-      <text macro="place"/>
+      <text macro="collection"/>
       <text macro="yearpage-bib"/>
+      <text macro="translator-bib"/>
       <text macro="archive"/>
+      <text variable="number-of-pages" prefix=", " suffix=" p."/>
       <text macro="accessed"/>
-      <text variable="number-of-pages" prefix=",&#160;" suffix="&#160;p."/>
     </layout>
   </bibliography>
 </style>

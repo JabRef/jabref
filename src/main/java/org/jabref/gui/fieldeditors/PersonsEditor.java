@@ -4,8 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.uithreadaware.UiThreadStringProperty;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -20,7 +20,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     private final UiThreadStringProperty decoratedStringProperty;
 
     public PersonsEditor(final Field field,
-                         final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                         final SuggestionProvider<?> suggestionProvider,
                          final JabRefPreferences preferences,
                          final FieldCheckers fieldCheckers,
                          final boolean isSingleLine) {
