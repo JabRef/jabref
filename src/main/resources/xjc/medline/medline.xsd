@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:mml="http://www.w3.org/1998/Math/MathML" attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://www.w3.org/1998/Math/MathML" />
   <xs:element name="PubmedArticleSet">
     <xs:complexType>
       <xs:sequence>
@@ -78,13 +79,20 @@
                           <xs:element name="ArticleTitle">
                             <xs:complexType mixed="true">
                               <xs:sequence minOccurs="0">
-                                <xs:element name="i" type="xs:string" />
+                                <xs:choice maxOccurs="unbounded">
+                                  <xs:element name="sup" type="xs:string" />
+                                  <xs:element maxOccurs="unbounded" name="i" type="xs:string" />
+                                  <xs:element maxOccurs="unbounded" name="sub" type="xs:string" />
+                                  <xs:element ref="mml:math" />
+                                </xs:choice>
                               </xs:sequence>
                             </xs:complexType>
                           </xs:element>
                           <xs:element name="Pagination">
                             <xs:complexType>
                               <xs:sequence>
+                                <xs:element minOccurs="0" name="StartPage" type="xs:string" />
+                                <xs:element minOccurs="0" name="EndPage" type="xs:unsignedByte" />
                                 <xs:element name="MedlinePgn" type="xs:string" />
                               </xs:sequence>
                             </xs:complexType>
@@ -106,19 +114,32 @@
                                   <xs:complexType mixed="true">
                                     <xs:sequence minOccurs="0">
                                       <xs:choice maxOccurs="unbounded">
-                                        <xs:element maxOccurs="unbounded" name="b">
-                                          <xs:complexType>
-                                            <xs:sequence>
+                                        <xs:element name="i">
+                                          <xs:complexType mixed="true">
+                                            <xs:sequence minOccurs="0">
+                                              <xs:element name="sub" type="xs:string" />
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                        <xs:element ref="mml:math" />
+                                        <xs:element name="sub">
+                                          <xs:complexType mixed="true">
+                                            <xs:sequence minOccurs="0">
                                               <xs:element name="i" type="xs:string" />
                                             </xs:sequence>
                                           </xs:complexType>
                                         </xs:element>
-                                        <xs:element name="sub" type="xs:unsignedByte" />
-                                        <xs:element maxOccurs="unbounded" name="i" type="xs:string" />
                                         <xs:element name="sup">
                                           <xs:complexType mixed="true">
                                             <xs:sequence minOccurs="0">
                                               <xs:element name="i" type="xs:unsignedByte" />
+                                            </xs:sequence>
+                                          </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="b">
+                                          <xs:complexType mixed="true">
+                                            <xs:sequence minOccurs="0">
+                                              <xs:element name="i" type="xs:string" />
                                             </xs:sequence>
                                           </xs:complexType>
                                         </xs:element>
@@ -141,10 +162,28 @@
                                       <xs:element name="LastName" type="xs:string" />
                                       <xs:element name="ForeName" type="xs:string" />
                                       <xs:element name="Initials" type="xs:string" />
+                                      <xs:element minOccurs="0" name="Identifier">
+                                        <xs:complexType>
+                                          <xs:simpleContent>
+                                            <xs:extension base="xs:string">
+                                              <xs:attribute name="Source" type="xs:string" use="required" />
+                                            </xs:extension>
+                                          </xs:simpleContent>
+                                        </xs:complexType>
+                                      </xs:element>
                                       <xs:element minOccurs="0" maxOccurs="unbounded" name="AffiliationInfo">
                                         <xs:complexType>
                                           <xs:sequence>
                                             <xs:element name="Affiliation" type="xs:string" />
+                                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Identifier">
+                                              <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                    <xs:attribute name="Source" type="xs:string" use="required" />
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                              </xs:complexType>
+                                            </xs:element>
                                           </xs:sequence>
                                         </xs:complexType>
                                       </xs:element>
@@ -157,6 +196,27 @@
                             </xs:complexType>
                           </xs:element>
                           <xs:element name="Language" type="xs:string" />
+                          <xs:element minOccurs="0" name="DataBankList">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="DataBank">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="DataBankName" type="xs:string" />
+                                      <xs:element name="AccessionNumberList">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="AccessionNumber" type="xs:string" />
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="CompleteYN" type="xs:string" use="required" />
+                            </xs:complexType>
+                          </xs:element>
                           <xs:element minOccurs="0" name="GrantList">
                             <xs:complexType>
                               <xs:sequence>
@@ -206,7 +266,7 @@
                     <xs:element name="MedlineJournalInfo">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="Country" type="xs:string" />
+                          <xs:element minOccurs="0" name="Country" type="xs:string" />
                           <xs:element name="MedlineTA" type="xs:string" />
                           <xs:element name="NlmUniqueID" type="xs:string" />
                           <xs:element minOccurs="0" name="ISSNLinking" type="xs:string" />
@@ -304,12 +364,11 @@
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element maxOccurs="unbounded" name="Keyword">
-                            <xs:complexType>
-                              <xs:simpleContent>
-                                <xs:extension base="xs:string">
-                                  <xs:attribute name="MajorTopicYN" type="xs:string" use="required" />
-                                </xs:extension>
-                              </xs:simpleContent>
+                            <xs:complexType mixed="true">
+                              <xs:sequence minOccurs="0">
+                                <xs:element ref="mml:math" />
+                              </xs:sequence>
+                              <xs:attribute name="MajorTopicYN" type="xs:string" use="required" />
                             </xs:complexType>
                           </xs:element>
                         </xs:sequence>
@@ -359,20 +418,50 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element minOccurs="0" name="ReferenceList">
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ReferenceList">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element maxOccurs="unbounded" name="Reference">
+                          <xs:element minOccurs="0" name="Title" type="xs:string" />
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="ReferenceList">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="Title" type="xs:string" />
+                                <xs:element maxOccurs="unbounded" name="Reference">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="Citation" type="xs:string" />
+                                      <xs:element minOccurs="0" name="ArticleIdList">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element maxOccurs="unbounded" name="ArticleId">
+                                              <xs:complexType>
+                                                <xs:simpleContent>
+                                                  <xs:extension base="xs:string">
+                                                    <xs:attribute name="IdType" type="xs:string" use="required" />
+                                                  </xs:extension>
+                                                </xs:simpleContent>
+                                              </xs:complexType>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element minOccurs="0" maxOccurs="unbounded" name="Reference">
                             <xs:complexType>
                               <xs:sequence>
                                 <xs:element name="Citation" type="xs:string" />
-                                <xs:element name="ArticleIdList">
+                                <xs:element minOccurs="0" name="ArticleIdList">
                                   <xs:complexType>
                                     <xs:sequence>
-                                      <xs:element name="ArticleId">
+                                      <xs:element maxOccurs="unbounded" name="ArticleId">
                                         <xs:complexType>
                                           <xs:simpleContent>
-                                            <xs:extension base="xs:unsignedInt">
+                                            <xs:extension base="xs:string">
                                               <xs:attribute name="IdType" type="xs:string" use="required" />
                                             </xs:extension>
                                           </xs:simpleContent>
