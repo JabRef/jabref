@@ -3,9 +3,12 @@ package org.jabref.gui.protectedterms;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.ButtonBar.ButtonData;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -45,7 +48,7 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         setResultConverter(button -> {
-            if (button.getButtonData() == ButtonData.OK_DONE) {
+            if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 viewModel.save();
             }
             return null;
