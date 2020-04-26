@@ -21,17 +21,27 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
     protected JabRefPreferences preferences;
 
     @Override
-    public Node getBuilder() { return this; }
+    public Node getBuilder() {
+        return this;
+    }
 
     @Override
-    public void setValues() { viewModel.setValues(); }
+    public void setValues() {
+        viewModel.setValues();
+    }
 
     @Override
-    public void storeSettings() { viewModel.storeSettings(); }
+    public void storeSettings() {
+        viewModel.storeSettings();
+    }
 
     @Override
-    public boolean validateSettings() { return viewModel.validateSettings(); }
+    public boolean validateSettings() {
+        return viewModel.validateSettings();
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return viewModel.getRestartWarnings(); }
+    public List<String> getRestartWarnings() {
+        return viewModel.getRestartWarnings();
+    }
 }

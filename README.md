@@ -23,7 +23,7 @@ JabRef supports you in every step of your research work.
 - Easily retrieve and link full-text articles
 - Fetch complete bibliographic information based on ISBN, DOI, PubMed-ID and arXiv-ID
 - Extract metadata from PDFs
-- [JabFox Firefox Add-on](https://addons.mozilla.org/en-US/firefox/addon/jabfox/) lets you import new references directly from the browser with one click
+- Import new references directly from the browser with one click using the [official browser extension](https://github.com/JabRef/JabRef-Browser-Extension) for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/jabref/?src=external-github),  [Chrome](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh), [Edge](https://microsoftedge.microsoft.com/addons/detail/pgkajmkfgbehiomipedjhoddkejohfna) and [Vivaldi](https://chrome.google.com/webstore/detail/jabref-browser-extension/bifehkofibaamoeaopjglfkddgkijdlh)
 
 ### Organize
 
@@ -88,7 +88,7 @@ We view pull requests as a collaborative process.
 Submit a pull request early to get feedback from the team on work in progress.
 We will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS) approve.
 
-If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/guidelines-for-setting-up-a-local-workspace/).
+If you want a step-by-step walk-through on how to set-up your workspace, please check [this guideline](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
 To compile JabRef from source, you need a Java Development Kit 14 and `JAVA_HOME` pointing to this JDK.
 To run it, just execute `gradlew run`.

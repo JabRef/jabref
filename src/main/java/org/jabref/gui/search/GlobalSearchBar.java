@@ -42,9 +42,9 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -276,12 +276,12 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
+    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
         if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                                                                                                              searchCompleter,
-                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                                                                                                              new AppendPersonNamesStrategy());
+                    searchCompleter::provideSuggestions,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
@@ -316,7 +316,7 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             // TODO: switch Icon color
-            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
         setHintTooltip(description);
@@ -424,7 +424,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
-            //empty
+            // empty
         }
     }
 }

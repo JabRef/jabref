@@ -67,7 +67,7 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); //default command
+        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); // default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);

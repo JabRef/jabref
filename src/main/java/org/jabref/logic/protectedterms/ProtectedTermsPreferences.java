@@ -9,7 +9,6 @@ public class ProtectedTermsPreferences {
     private final List<String> disabledInternalTermLists;
     private final List<String> disabledExternalTermLists;
 
-
     public ProtectedTermsPreferences(List<String> enabledInternalTermLists, List<String> enabledExternalTermLists,
             List<String> disabledInternalTermLists, List<String> disabledExternalTermLists) {
         this.enabledInternalTermLists = enabledInternalTermLists;

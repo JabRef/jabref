@@ -3,6 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
@@ -20,7 +21,12 @@ public class BibtexKeyDuplicationChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        boolean isDuplicate = database.getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
+        Optional<String> citeKey = entry.getCiteKeyOptional();
+        if (citeKey.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        boolean isDuplicate = database.isDuplicateCiteKeyExisting(citeKey.get());
         if (isDuplicate) {
             return Collections.singletonList(
                     new IntegrityMessage(Localization.lang("Duplicate BibTeX key"), entry, StandardField.KEY));

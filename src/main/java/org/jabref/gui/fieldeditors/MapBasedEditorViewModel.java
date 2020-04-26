@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
 
@@ -20,7 +20,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
-    public MapBasedEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
     }
 
@@ -35,7 +35,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
                 if (object == null) {
                     return null;
                 } else {
-                    return getItemMap().inverse().getOrDefault(object, object.toString()); //if the object is not found we simply return itself as string
+                    return getItemMap().inverse().getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
                 }
             }
 

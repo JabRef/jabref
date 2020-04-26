@@ -177,14 +177,13 @@ public class BiblioscapeImporter extends Importer {
                     } else if ("TH".equals(entry.getKey())) {
                         comments.add("Short Title: "
                                 + entry.getValue());
-                    } else if ("SE".equals(entry.getKey()))
-                    {
+                    } else if ("SE".equals(entry.getKey())) {
                         hm.put(StandardField.CHAPTER, entry
                                 .getValue().toString());
-                        //else if (entry.getKey().equals("AC"))
-                        // hm.put("",entry.getValue().toString());
-                        //else if (entry.getKey().equals("LP"))
-                        // hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("AC"))
+                        //   hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("LP"))
+                        //   hm.put("",entry.getValue().toString());
                     }
                 }
 

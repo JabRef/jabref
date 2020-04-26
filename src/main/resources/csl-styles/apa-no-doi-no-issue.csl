@@ -336,7 +336,7 @@
         <text macro="patent-number"/>
       </if>
       <else-if type="treaty">
-        <text variable="title" form="short"/>
+        <text variable="title" form="short" text-case="title"/>
       </else-if>
       <else-if type="personal_communication">
         <choose>
@@ -345,7 +345,7 @@
               <names variable="author">
                 <name and="symbol" delimiter=", " initialize-with=". "/>
                 <substitute>
-                  <text variable="title" form="short" quotes="true"/>
+                  <text variable="title" form="short" text-case="title" quotes="true"/>
                 </substitute>
               </names>
               <!-- This should be localized -->
@@ -360,10 +360,10 @@
                 <names variable="translator"/>
                 <choose>
                   <if variable="container-title">
-                    <text variable="title" form="short" quotes="true"/>
+                    <text variable="title" form="short" text-case="title" quotes="true"/>
                   </if>
                   <else>
-                    <text variable="title" form="short" font-style="italic"/>
+                    <text variable="title" form="short" text-case="title" font-style="italic"/>
                   </else>
                 </choose>
                 <text macro="format-short" prefix="[" suffix="]"/>
@@ -381,10 +381,10 @@
             <names variable="translator"/>
             <choose>
               <if variable="container-title">
-                <text variable="title" form="short" quotes="true"/>
+                <text variable="title" form="short" text-case="title" quotes="true"/>
               </if>
               <else>
-                <text variable="title" form="short" font-style="italic"/>
+                <text variable="title" form="short" text-case="title" font-style="italic"/>
               </else>
             </choose>
             <text macro="format-short" prefix="[" suffix="]"/>
@@ -402,7 +402,7 @@
               <if variable="container-title">
                 <choose>
                   <if type="book entry entry-dictionary entry-encyclopedia">
-                    <text variable="title" form="short" quotes="true"/>
+                    <text variable="title" form="short" text-case="title" quotes="true"/>
                   </if>
                   <else>
                     <names variable="translator"/>
@@ -421,16 +421,16 @@
                 <text variable="title" font-style="italic"/>
               </else-if>
               <else-if type="bill legislation" match="any">
-                <text variable="title" form="short"/>
+                <text variable="title" form="short" text-case="title"/>
               </else-if>
               <else-if variable="reviewed-author" type="review review-book" match="any">
                 <text macro="format-short" prefix="[" suffix="]"/>
               </else-if>
               <else-if type="post post-weblog webpage" variable="container-title" match="any">
-                <text variable="title" form="short" quotes="true"/>
+                <text variable="title" form="short" text-case="title" quotes="true"/>
               </else-if>
               <else>
-                <text variable="title" form="short" font-style="italic"/>
+                <text variable="title" form="short" text-case="title" font-style="italic"/>
               </else>
             </choose>
             <text macro="format-short" prefix="[" suffix="]"/>
@@ -706,20 +706,20 @@
                 <!-- Delimiting by , rather than "of" to avoid incorrect grammar -->
                 <group delimiter=", ">
                   <text variable="genre" text-case="capitalize-first"/>
-                  <text variable="title" form="short" font-style="italic"/>
+                  <text variable="title" form="short" text-case="title" font-style="italic"/>
                 </group>
               </if>
               <else>
                 <!-- This should be localized -->
                 <group delimiter=" ">
                   <text value="Review of"/>
-                  <text variable="title" form="short" font-style="italic"/>
+                  <text variable="title" form="short" text-case="title" font-style="italic"/>
                 </group>
               </else>
             </choose>
           </if>
           <else>
-            <text variable="title" form="short" quotes="true"/>
+            <text variable="title" form="short" text-case="title" quotes="true"/>
           </else>
         </choose>
       </if>

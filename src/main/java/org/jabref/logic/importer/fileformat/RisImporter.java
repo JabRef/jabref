@@ -58,13 +58,13 @@ public class RisImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
 
-        //use optional here, so that no exception will be thrown if the file is empty
+        // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                                         .split("ER  -.*\\n");
 
-        //stores all the date tags from highest to lowest priority
+        // stores all the date tags from highest to lowest priority
         List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
 
         for (String entry1 : entries) {
@@ -141,10 +141,10 @@ public class RisImporter extends Importer {
                     } else if ("BT".equals(tag)) {
                         fields.put(StandardField.BOOKTITLE, value);
                     } else if (("T2".equals(tag) || "J2".equals(tag) || "JA".equals(tag)) && ((fields.get(StandardField.JOURNAL) == null) || "".equals(fields.get(StandardField.JOURNAL)))) {
-                        //if there is no journal title, then put second title as journal title
+                        // if there is no journal title, then put second title as journal title
                         fields.put(StandardField.JOURNAL, value);
                     } else if ("JO".equals(tag) || "J1".equals(tag) || "JF".equals(tag)) {
-                        //if this field appears then this should be the journal title
+                        // if this field appears then this should be the journal title
                         fields.put(StandardField.JOURNAL, value);
                     } else if ("T3".equals(tag)) {
                         fields.put(StandardField.SERIES, value);
@@ -199,7 +199,7 @@ public class RisImporter extends Importer {
                         String oldAb = fields.get(StandardField.ABSTRACT);
                         if (oldAb == null) {
                             fields.put(StandardField.ABSTRACT, value);
-                        } else {
+                        } else if (!oldAb.equals(value) && !value.isEmpty()) {
                             fields.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + value);
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
@@ -211,12 +211,12 @@ public class RisImporter extends Importer {
 
                             try {
                                     Year.parse(year, formatter);
-                                    //if the year is parsebale we have found a higher priority date
+                                    // if the year is parsebale we have found a higher priority date
                                     dateTag = tag;
                                     dateValue = value;
                                     datePriority = tagPriority;
                             } catch (DateTimeParseException ex) {
-                                //We can't parse the year, we ignore it
+                                // We can't parse the year, we ignore it
                             }
                         }
                     } else if ("KW".equals(tag)) {
@@ -244,9 +244,9 @@ public class RisImporter extends Importer {
                         fields.put(StandardField.EPRINTTYPE, "pubmed");
                     } else if ("TA".equals(tag)) {
                         fields.put(StandardField.TRANSLATOR, value);
-                    }
+
                     // fields for which there is no direct mapping in the bibtext standard
-                    else if ("AV".equals(tag)) {
+                    } else if ("AV".equals(tag)) {
                         fields.put(new UnknownField("archive_location"), value);
                     } else if ("CN".equals(tag) || "VO".equals(tag)) {
                         fields.put(new UnknownField("call-number"), value);

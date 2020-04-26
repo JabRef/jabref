@@ -10,7 +10,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 public class UpdateField {
 
@@ -95,7 +95,7 @@ public class UpdateField {
         String defaultOwner = ownerPreferences.getDefaultOwner();
         String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
         Field timeStampField = timestampPreferences.getTimestampField();
-        boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(InternalField.OWNER)));
+        boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(StandardField.OWNER)));
         boolean setTimeStamp = timestampPreferences.isUseTimestamps() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
@@ -116,7 +116,7 @@ public class UpdateField {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(InternalField.OWNER, owner);
+            entry.setField(StandardField.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -147,7 +147,7 @@ public class UpdateField {
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalField.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }

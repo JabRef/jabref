@@ -110,7 +110,7 @@ public class BibDatabaseDiff {
                 differences.add(new BibEntryDiff(originalEntry, null));
             }
         }
-        
+
         // Finally, look if there are still untouched entries in the new database. These may have been added.
         for (int i = 0; i < newEntries.size(); i++) {
             if (!used.contains(i)) {

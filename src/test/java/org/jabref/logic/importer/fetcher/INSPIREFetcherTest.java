@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -32,24 +32,6 @@ class INSPIREFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry phd = new BibEntry(StandardEntryType.PhdThesis);
-        phd.setCiteKey("Diez:2019pkg");
-        phd.setField(StandardField.AUTHOR, "Diez, Tobias");
-        phd.setField(StandardField.TITLE, "Normal Form of Equivariant Maps and Singular Symplectic Reduction in Infinite Dimensions with Applications to Gauge Field Theory");
-        phd.setField(StandardField.YEAR, "2019");
-        phd.setField(StandardField.EPRINT, "1909.00744");
-        phd.setField(new UnknownField("reportnumber"), "urn:nbn:de:bsz:15-qucosa2-352179");
-        phd.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        phd.setField(StandardField.PRIMARYCLASS, "math.SG");
-
-        BibEntry article = new BibEntry(StandardEntryType.Article);
-        article.setCiteKey("Diez:2018gjz");
-        article.setField(StandardField.AUTHOR, "Diez, Tobias and Rudolph, Gerd");
-        article.setField(StandardField.TITLE, "Singular symplectic cotangent bundle reduction of gauge field theory");
-        article.setField(StandardField.YEAR, "2018");
-        article.setField(StandardField.EPRINT, "1812.04707");
-        article.setField(StandardField.ARCHIVEPREFIX, "arXiv");
-        article.setField(StandardField.PRIMARYCLASS, "math-ph");
 
         BibEntry master = new BibEntry(StandardEntryType.MastersThesis);
         master.setCiteKey("Diez:2014ppa");
@@ -63,6 +45,27 @@ class INSPIREFetcherTest {
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field");
 
-        assertEquals(Arrays.asList(phd, article, master), fetchedEntries);
+        assertEquals(Collections.singletonList(master), fetchedEntries);
+    }
+
+    @Test
+    public void searchByIdentifierFindsEntry() throws Exception {
+        BibEntry article = new BibEntry(StandardEntryType.Article);
+        article.setCiteKey("Melnikov:1998pr");
+        article.setField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander");
+        article.setField(StandardField.TITLE, "Top quark production at threshold with O(alpha-s**2) accuracy");
+        article.setField(StandardField.DOI, "10.1016/S0550-3213(98)00348-4");
+        article.setField(StandardField.JOURNAL, "Nucl.\\ Phys.\\ B");
+        article.setField(StandardField.PAGES, "59--72");
+        article.setField(StandardField.VOLUME, "528");
+        article.setField(StandardField.YEAR, "1998");
+        article.setField(StandardField.EPRINT, "hep-ph/9802379");
+        article.setField(StandardField.ARCHIVEPREFIX, "arXiv");
+        article.setField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch("hep-ph/9802379");
+
+        assertEquals(Collections.singletonList(article), fetchedEntries);
+
     }
 }

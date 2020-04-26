@@ -16,7 +16,6 @@ public class ISBN implements Identifier {
 
     private final String isbnString;
 
-
     public ISBN(String isbnString) {
         this.isbnString = Objects.requireNonNull(isbnString).trim().replace("-", "");
     }
