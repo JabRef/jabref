@@ -147,10 +147,14 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EXPORT_TERTIARY_SORT_FIELD = "exportTerSort";
     public static final String EXPORT_TERTIARY_SORT_DESCENDING = "exportTerDescending";
     public static final String NEWLINE = "newline";
-    public static final String COLUMN_NAMES = "columnNames";
-    public static final String COLUMN_WIDTHS = "columnWidths";
-    public static final String COLUMN_SORT_TYPES = "columnSortTypes";
-    public static final String COLUMN_SORT_ORDER = "columnSortOrder";
+
+    // Variable names have changed to ensure backward compatibility with pre 5.0 releases of JabRef
+    // Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
+    public static final String COLUMN_NAMES = "mainTableColumnNames";
+    public static final String COLUMN_WIDTHS = "mainTableColumnWidths";
+    public static final String COLUMN_SORT_TYPES = "mainTableColumnSortTypes";
+    public static final String COLUMN_SORT_ORDER = "mainTableColumnSortOrder";
+
     public static final String SIDE_PANE_COMPONENT_PREFERRED_POSITIONS = "sidePaneComponentPreferredPositions";
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
