@@ -3,10 +3,10 @@
 }
 
 .text-added {
-    -fx-fill: blue;
+    -fx-fill: #4281be;
 }
 
 .text-removed {
-    -fx-fill: red;
+    -fx-fill: #fa4251;
 }
 
