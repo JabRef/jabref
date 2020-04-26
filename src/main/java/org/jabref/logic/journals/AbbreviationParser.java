@@ -29,9 +29,9 @@ public class AbbreviationParser {
     private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 
     public void readJournalListFromResource(String resourceFileName) {
-        try {
-            InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
-            readJournalList(new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8)));
+        try (InputStream stream = JournalAbbreviationRepository.class.getResourceAsStream(resourceFileName);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            readJournalList(reader);
         } catch (IOException e) {
             LOGGER.error(String.format("Could not read journal list from file %s", resourceFileName), e);
         }

@@ -86,7 +86,7 @@ public class AbbreviationViewModel {
             return false;
         }
         AbbreviationViewModel that = (AbbreviationViewModel) o;
-        return getName().equals(that.getName()) &&
+        return Objects.equals(getName(), that.getName()) &&
                 isPseudoAbbreviation() == that.isPseudoAbbreviation();
     }
 

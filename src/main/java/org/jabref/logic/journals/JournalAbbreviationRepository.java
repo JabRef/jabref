@@ -64,12 +64,9 @@ public class JournalAbbreviationRepository {
     public boolean isAbbreviatedName(String journalName) {
         String journal = journalName.trim();
 
-        boolean isAbbreviated = customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation));
-        if (isAbbreviated) {
-            return true;
-        }
-
-        return abbreviationToFull.containsKey(journal);
+        return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
+                ||
+                abbreviationToFull.containsKey(journal);
     }
 
     /**

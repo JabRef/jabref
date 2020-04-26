@@ -1,13 +1,12 @@
 apply plugin: 'java'
 
 repositories {
-    mavenLocal()
     jcenter()
 }
 
 dependencies {
     compile 'com.h2database:h2-mvstore:1.4.200'
-    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+    compile 'org.apache.commons:commons-csv:1.8'
     compile 'org.slf4j:slf4j-api:2.0.0-alpha1'
 }
 

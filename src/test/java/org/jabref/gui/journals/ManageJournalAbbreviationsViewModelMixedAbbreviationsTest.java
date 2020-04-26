@@ -398,19 +398,19 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb",
+                "Abbreviations;Abb;Abb",
                 "Test Entry;TE;T",
                 "MoreEntries;ME;M",
-                "JabRefTestEntry;JTE");
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
-                "Abbreviations;Abb",
-                "Test Entry;TE;T",
-                "SomeOtherEntry;SOE");
+                "EntryEntry;EE;EE",
+                "Abbreviations;Abb;Abb",
+                "Test Entry;TE;TE",
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);

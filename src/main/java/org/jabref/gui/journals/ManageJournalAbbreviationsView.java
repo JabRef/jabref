@@ -149,7 +149,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     private void saveAbbreviationsAndCloseDialog() {
         viewModel.save();
 
-        // Update journal abbreviation loader
+        // Update journal abbreviation repository
         Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         close();
