@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
 - We greatly improved the performance of the overall application and many operations. [#5071](https://github.com/JabRef/jabref/issues/5071)
 - We fixed an issue where sort by priority was broken. [#6222](https://github.com/JabRef/jabref/issues/6222)
 - We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
