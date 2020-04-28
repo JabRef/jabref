@@ -790,7 +790,11 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager))
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager)),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcherAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR))
         );
 
         // PushToApplication
@@ -806,10 +810,6 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.WRITE_XMP, new WriteXMPAction(stateManager, dialogService)),
                 factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(stateManager, this.getDialogService())),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcherAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
 
                 new SeparatorMenuItem(),
 
