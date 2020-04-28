@@ -58,7 +58,6 @@ public class GroupNodeViewModel {
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
-    private final DelayTaskThrottler throttler;
     private final PreferencesService preferencesService;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
