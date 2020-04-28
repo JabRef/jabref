@@ -46,7 +46,7 @@
     -jr-menu-item-foreground: -fx-light-text-color;
     -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
 
-    -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
+    -jr-scrollbar-thumb: -fx-light-text-color;
     -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
 
     -fx-focused-text-base-color: -fx-dark-text-color;
