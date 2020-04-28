@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -27,6 +28,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,7 @@ public class EntryTypeViewModel {
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final BasePanel basePanel;
     private final DialogService dialogService;
+    private final Validator idFieldValidator;
 
     public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
@@ -51,6 +57,9 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
+
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+        idFieldValidator = new FunctionBasedValidator<>(idText, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
 
     }
 
@@ -65,6 +74,8 @@ public class EntryTypeViewModel {
     public ObjectProperty<IdBasedFetcher> selectedItemProperty() {
         return selectedItemProperty;
     }
+
+    public ValidationStatus idFieldValidationStatus() { return idFieldValidator.getValidationStatus(); }
 
     public StringProperty idTextProperty() {
         return idText;
