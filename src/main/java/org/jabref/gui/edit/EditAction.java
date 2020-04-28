@@ -62,7 +62,7 @@ public class EditAction extends SimpleCommand {
                             frame.getCurrentBasePanel().cut();
                             break;
                         case PASTE:
-                            // handled by FX in TextInputControl#paste
+                            frame.getCurrentBasePanel().paste();
                             break;
                         case DELETE_ENTRY:
                             frame.getCurrentBasePanel().delete(false);

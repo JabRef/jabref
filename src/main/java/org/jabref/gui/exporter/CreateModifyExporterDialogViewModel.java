@@ -46,7 +46,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         this.preferences = preferences;
         this.loader = loader;
 
-        //Set text of each of the boxes
+        // Set text of each of the boxes
         if (exporter != null) {
             name.setValue(exporter.name().get());
             layoutFile.setValue(exporter.layoutFileName().get());

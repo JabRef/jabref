@@ -22,7 +22,6 @@ public class CustomImportList extends TreeSet<CustomImporter> {
 
     private final JabRefPreferences prefs;
 
-
     public CustomImportList(JabRefPreferences prefs) {
         super();
         this.prefs = prefs;

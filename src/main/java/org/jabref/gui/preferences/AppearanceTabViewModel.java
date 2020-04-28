@@ -94,7 +94,9 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public ValidationStatus fontSizeValidationStatus() { return fontSizeValidator.getValidationStatus(); }
+    public ValidationStatus fontSizeValidationStatus() {
+        return fontSizeValidator.getValidationStatus();
+    }
 
     @Override
     public boolean validateSettings() {
@@ -107,14 +109,23 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return restartWarnings; }
+    public List<String> getRestartWarnings() {
+        return restartWarnings;
+    }
 
-    public BooleanProperty fontOverrideProperty() { return fontOverrideProperty; }
+    public BooleanProperty fontOverrideProperty() {
+        return fontOverrideProperty;
+    }
 
-    public StringProperty fontSizeProperty() { return fontSizeProperty; }
+    public StringProperty fontSizeProperty() {
+        return fontSizeProperty;
+    }
 
-    public BooleanProperty themeLightProperty() { return themeLightProperty; }
+    public BooleanProperty themeLightProperty() {
+        return themeLightProperty;
+    }
 
-    public BooleanProperty themeDarkProperty() { return themeDarkProperty; }
-
+    public BooleanProperty themeDarkProperty() {
+        return themeDarkProperty;
+    }
 }

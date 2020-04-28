@@ -8,9 +8,6 @@ import org.jabref.logic.layout.LayoutFormatter;
  */
 public class AuthorAndsCommaReplacer implements LayoutFormatter {
 
-    /* (non-Javadoc)
-     * @see org.jabref.export.layout.LayoutFormatter#format(java.lang.String)
-     */
     @Override
     public String format(String fieldText) {
 
@@ -19,7 +16,7 @@ public class AuthorAndsCommaReplacer implements LayoutFormatter {
 
         switch (authors.length) {
         case 1:
-            //Does nothing;
+            // Does nothing
             s = authors[0];
             break;
         case 2:

@@ -11,7 +11,6 @@ public class RemotePreferences {
     private int port;
     private boolean useRemoteServer;
 
-
     public RemotePreferences(int port, boolean useRemoteServer) {
         this.port = port;
         this.useRemoteServer = useRemoteServer;

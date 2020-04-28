@@ -83,4 +83,9 @@ open module org.jabref {
     requires flowless;
     requires org.apache.tika.core;
     requires Java.WebSocket;
+    requires flexmark;
+    requires flexmark.ext.gfm.strikethrough;
+    requires flexmark.ext.gfm.tasklist;
+    requires flexmark.util.ast;
+    requires flexmark.util.data;
 }

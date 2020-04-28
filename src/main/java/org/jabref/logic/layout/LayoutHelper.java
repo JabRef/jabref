@@ -37,7 +37,6 @@ public class LayoutHelper {
     private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
-
     public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.prefs = Objects.requireNonNull(prefs);
@@ -178,10 +177,9 @@ public class LayoutHelper {
 
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
-                    //if (c != '\\')
-                    //{
+                    // if (c != '\\') {
                     buffer.append((char) c);
-                    //}
+                    // }
                     // changed section end - arudert
 
                 }

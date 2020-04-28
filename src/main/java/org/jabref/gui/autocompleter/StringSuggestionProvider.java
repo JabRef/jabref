@@ -1,26 +1,30 @@
 package org.jabref.gui.autocompleter;
 
 import java.util.Comparator;
+import java.util.stream.Stream;
 
+import org.jabref.model.strings.StringUtil;
+
+import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
-class StringSuggestionProvider extends SuggestionProvider<String> {
+abstract class StringSuggestionProvider extends SuggestionProvider<String> {
 
-    private final Comparator<String> stringComparator = Comparator.naturalOrder();
-
-    public StringSuggestionProvider() {
-
+    @Override
+    protected Equivalence<String> getEquivalence() {
+        return Equivalence.equals().onResultOf(value -> value);
     }
 
     @Override
     protected Comparator<String> getComparator() {
-        return stringComparator;
+        return Comparator.naturalOrder();
     }
 
     @Override
-    protected boolean isMatch(String suggestion, AutoCompletionBinding.ISuggestionRequest request) {
-        String userTextLower = request.getUserText().toLowerCase();
-        String suggestionStr = suggestion.toLowerCase();
-        return suggestionStr.contains(userTextLower);
+    protected boolean isMatch(String candidate, AutoCompletionBinding.ISuggestionRequest request) {
+        return StringUtil.containsIgnoreCase(candidate, request.getUserText());
     }
+
+    @Override
+    public abstract Stream<String> getSource();
 }

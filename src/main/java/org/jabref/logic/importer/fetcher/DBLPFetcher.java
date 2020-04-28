@@ -20,7 +20,6 @@ import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -66,7 +65,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
         FieldFormatterCleanups cleanups = new FieldFormatterCleanups(true,
                 List.of(
-                        new FieldFormatterCleanup(InternalField.TIMESTAMP, new ClearFormatter()),
+                        new FieldFormatterCleanup(StandardField.TIMESTAMP, new ClearFormatter()),
                         // unescape the the contents of the URL field, e.g., some\_url\_part becomes some_url_part
                         new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
                 ));

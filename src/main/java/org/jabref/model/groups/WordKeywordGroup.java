@@ -13,7 +13,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.ListUtil;
 
 /**
  * Matches entries if a given field contains a specified word.
@@ -21,7 +24,7 @@ import org.jabref.model.strings.StringUtil;
 public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
-    private final Set<String> searchWords;
+    private final SearchStrategy searchStrategy;
     private final boolean onlySplitWordsAtSeparator;
 
     public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
@@ -31,7 +34,16 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
         this.keywordSeparator = keywordSeparator;
         this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
-        this.searchWords = getSearchWords(searchExpression);
+
+        if (onlySplitWordsAtSeparator) {
+            if (InternalField.TYPE_HEADER.equals(searchField)) {
+                searchStrategy = new TypeSearchStrategy();
+            } else {
+                searchStrategy = new KeywordListSearchStrategy();
+            }
+        } else {
+            searchStrategy = new StringSearchStrategy();
+        }
     }
 
     private static boolean containsCaseInsensitive(Set<String> searchIn, Collection<String> searchFor) {
@@ -105,31 +117,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
 
     @Override
     public boolean contains(BibEntry entry) {
-        Set<String> content = getFieldContentAsWords(entry);
-        if (caseSensitive) {
-            return content.containsAll(searchWords);
-        } else {
-            return containsCaseInsensitive(content, searchWords);
-        }
-    }
-
-    private Set<String> getFieldContentAsWords(BibEntry entry) {
-        if (onlySplitWordsAtSeparator) {
-            if (InternalField.TYPE_HEADER.equals(searchField)) {
-                return searchWords.stream().filter(word -> entry.getType().getName().equalsIgnoreCase(word)).collect(Collectors.toSet());
-            }
-            return entry.getFieldAsKeywords(searchField, keywordSeparator).toStringList();
-        } else {
-            return entry.getFieldAsWords(searchField);
-        }
-    }
-
-    private Set<String> getSearchWords(String searchExpression) {
-        if (onlySplitWordsAtSeparator) {
-            return KeywordList.parse(searchExpression, keywordSeparator).toStringList();
-        } else {
-            return new HashSet<>(StringUtil.getStringAsWords(searchExpression));
-        }
+        return searchStrategy.contains(entry);
     }
 
     @Override
@@ -147,5 +135,60 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
                 caseSensitive,
                 keywordSeparator,
                 onlySplitWordsAtSeparator);
+    }
+
+    interface SearchStrategy {
+        boolean contains(BibEntry entry);
+    }
+
+    class StringSearchStrategy implements SearchStrategy {
+        Set<String> searchWords;
+
+        StringSearchStrategy() {
+            searchWords = new HashSet<>(StringUtil.getStringAsWords(searchExpression));
+        }
+
+        @Override
+        public boolean contains(BibEntry entry) {
+            Set<String> content = entry.getFieldAsWords(searchField);
+            if (caseSensitive) {
+                return content.containsAll(searchWords);
+            } else {
+                return containsCaseInsensitive(content, searchWords);
+            }
+        }
+    }
+
+    class TypeSearchStrategy implements SearchStrategy {
+
+        Set<EntryType> searchWords;
+
+        TypeSearchStrategy() {
+            searchWords = KeywordList.parse(searchExpression, keywordSeparator)
+                                     .stream()
+                                     .map(word -> EntryTypeFactory.parse(word.get()))
+                                     .collect(Collectors.toSet());
+        }
+
+        @Override
+        public boolean contains(BibEntry entry) {
+            return searchWords.stream()
+                              .anyMatch(word -> entry.getType().equals(word));
+        }
+    }
+
+    class KeywordListSearchStrategy implements SearchStrategy {
+
+        private final KeywordList searchWords;
+
+        KeywordListSearchStrategy() {
+            searchWords = KeywordList.parse(searchExpression, keywordSeparator);
+        }
+
+        @Override
+        public boolean contains(BibEntry entry) {
+            KeywordList fieldValue = entry.getFieldAsKeywords(searchField, keywordSeparator);
+            return ListUtil.allMatch(searchWords, fieldValue::contains);
+        }
     }
 }
