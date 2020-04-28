@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -126,6 +127,7 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setHeaderText(title);
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
+        Globals.getThemeLoader().installCss(choiceDialog.getDialogPane().getScene(), Globals.prefs);
         return choiceDialog.showAndWait();
     }
 
@@ -148,12 +150,14 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void showInformationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.INFORMATION, title, content);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         alert.showAndWait();
     }
 
     @Override
     public void showWarningDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.WARNING, title, content);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         alert.showAndWait();
     }
 
@@ -188,6 +192,7 @@ public class JabRefDialogService implements DialogService {
     @Override
     public boolean showConfirmationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.OK).isPresent();
     }
 
@@ -196,6 +201,7 @@ public class JabRefDialogService implements DialogService {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         alert.getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
@@ -206,6 +212,7 @@ public class JabRefDialogService implements DialogService {
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
@@ -214,6 +221,7 @@ public class JabRefDialogService implements DialogService {
                                                            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = createDialogWithOptOut(AlertType.CONFIRMATION, title, content, optOutMessage, optOutAction);
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.YES).isPresent();
     }
 
@@ -225,6 +233,7 @@ public class JabRefDialogService implements DialogService {
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.YES);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
@@ -244,6 +253,7 @@ public class JabRefDialogService implements DialogService {
         alert.getButtonTypes().setAll(buttonTypes);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
+        Globals.getThemeLoader().installCss(alert.getDialogPane().getScene(), Globals.prefs);
         return alert.showAndWait();
     }
 
@@ -268,6 +278,7 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
+        Globals.getThemeLoader().installCss(progressDialog.getDialogPane().getScene(), Globals.prefs);
         progressDialog.show();
     }
 

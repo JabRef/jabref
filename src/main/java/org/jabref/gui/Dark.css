@@ -52,6 +52,9 @@
     -fx-focused-text-base-color: -fx-dark-text-color;
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
+
+    -jr-drag-target: -jr-accent;
+    -jr-drag-target-hover: -jr-accent;
 }
 
 #previewBody{
