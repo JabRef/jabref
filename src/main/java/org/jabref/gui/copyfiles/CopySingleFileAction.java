@@ -48,12 +48,10 @@ public class CopySingleFileAction {
             boolean success = FileUtil.copyFile(fileToExport.get(), newFile, false);
             if (success) {
                 dialogService.showInformationDialogAndWait(Localization.lang("Copy linked file"), Localization.lang("Sucessfully copied file to %0", newPath.map(Path::getParent).map(Path::toString).orElse("")));
-            }
-            else {
+            } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Copy linked file"), Localization.lang("Could not copy file to %0, maybe the file is already existing?", newPath.map(Path::getParent).map(Path::toString).orElse("")));
             }
-        }
-        else {
+        } else {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not resolve the file %0", fileToExport.map(Path::getParent).map(Path::toString).orElse("")));
         }
 

@@ -45,7 +45,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 incommand = true;
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
-                //Swallow braces, necessary for replacing encoded characters
+                // Swallow braces, necessary for replacing encoded characters
 
             } else if (Character.isLetter(c) || (c == '%')
                     || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
@@ -83,7 +83,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         incommand = false;
                         escaped = false;
                     } else {
-                        //	Are we already at the end of the string?
+                        // Are we already at the end of the string?
                         if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
                             String result = OOPreFormatter.CHARS.get(command);
@@ -134,11 +134,10 @@ public class OOPreFormatter implements LayoutFormatter {
                         sb.append(Objects.requireNonNullElse(result, command));
                         sb.append(' ');
                     }
-                } /* else if (c == '}') {
-                    System.out.printf("com term by }: '%s'\n", currentCommand.toString());
-
-                    argument = "";
-                 }*/ else {
+                } else if (c == '}') {
+                    // System.out.printf("com term by }: '%s'\n", currentCommand.toString());
+                    // argument = "";
+                 } else {
                     /*
                      * TODO: this point is reached, apparently, if a command is
                      * terminated in a strange way, such as with "$\omega$".

@@ -12,7 +12,6 @@ public class QuotedStringTokenizer {
     private final char quoteChar;
     private int index;
 
-
     /**
      * @param content
      *            The String to be tokenized.

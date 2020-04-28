@@ -441,7 +441,8 @@ class IntegrityCheckTest {
                 false,
                 false,
                 keyPattern,
-                ',');
+                ',',
+                false);
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

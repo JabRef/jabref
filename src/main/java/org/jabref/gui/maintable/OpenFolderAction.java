@@ -7,7 +7,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 public class OpenFolderAction extends SimpleCommand {
@@ -21,7 +20,7 @@ public class OpenFolderAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.isFieldSetForSelectedEntry(StandardField.FILE, stateManager));
+        this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService));
     }
 
     @Override

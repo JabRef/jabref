@@ -27,14 +27,16 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Appearance"); }
+    public String getTabName() {
+        return Localization.lang("Appearance");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new AppearanceTabViewModel(dialogService, preferences);
 
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());

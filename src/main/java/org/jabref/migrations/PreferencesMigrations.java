@@ -1,6 +1,7 @@
 package org.jabref.migrations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,7 +49,12 @@ public class PreferencesMigrations {
         upgradeKeyBindingsToJavaFX(Globals.prefs);
         addCrossRefRelatedFieldsForAutoComplete(Globals.prefs);
         upgradePreviewStyleFromReviewToComment(Globals.prefs);
+        // changeColumnVariableNamesFor51 needs to be run before upgradeColumnPre50Preferences to ensure
+        // backwardcompatibility, as it copies the old values to new variable names and keeps th old sored with the old
+        // variable names. However, the variables from 5.0 need to be copied to the new variable name too.
+        changeColumnVariableNamesFor51(Globals.prefs);
         upgradeColumnPreferences(Globals.prefs);
+        restoreVariablesForBackwardCompatibility(Globals.prefs);
         upgradePreviewStyleAllowMarkdown(Globals.prefs);
     }
 
@@ -189,7 +195,7 @@ public class PreferencesMigrations {
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
             }
-            //Pref node already exists do not migrate from previous version
+            // Pref node already exists do not migrate from previous version
             if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
                 return;
             }
@@ -247,7 +253,7 @@ public class PreferencesMigrations {
             String[] newStylePatterns = new String[] {"[bibtexkey]",
                                                       "[bibtexkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title",};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -276,7 +282,7 @@ public class PreferencesMigrations {
     }
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefPreferences prefs) {
-        //LinkedHashSet because we want to retain the order and add new fields to the end
+        // LinkedHashSet because we want to retain the order and add new fields to the end
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
         keys.add("related");
@@ -316,8 +322,13 @@ public class PreferencesMigrations {
      *
      * Simple strings are by default parsed as a FieldColumn, so there is nothing to do there, but the formerly hard
      * wired columns need to be added.
+     *
+     * In 5.1 variable names in JabRefPreferences have changed to offer backward compatibility with pre 5.0 releases
+     * Pre 5.1: columnNames, columnWidths, columnSortTypes, columnSortOrder
+     * Since 5.1: mainTableColumnNames, mainTableColumnWidths, mainTableColumnSortTypes, mainTableColumnSortOrder
      */
     static void upgradeColumnPreferences(JabRefPreferences preferences) {
+        // Variable names have to be hardcoded here, since they are already changed in JabRefPreferences
         List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
         List<Double> columnWidths = preferences.getStringList(JabRefPreferences.COLUMN_WIDTHS)
                                                .stream()
@@ -369,6 +380,61 @@ public class PreferencesMigrations {
                     .map(MainTableColumnModel::getSortType)
                     .map(TableColumn.SortType::toString)
                     .collect(Collectors.toList()));
+        }
+    }
+
+    static void changeColumnVariableNamesFor51(JabRefPreferences preferences) {
+        // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
+        List<String> oldColumnNames = preferences.getStringList("columnNames");
+        List<String> columnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        if (!oldColumnNames.isEmpty() && columnNames.isEmpty()) {
+            preferences.putStringList(JabRefPreferences.COLUMN_NAMES, preferences.getStringList("columnNames"));
+            preferences.putStringList(JabRefPreferences.COLUMN_WIDTHS, preferences.getStringList("columnWidths"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_TYPES, preferences.getStringList("columnSortTypes"));
+            preferences.putStringList(JabRefPreferences.COLUMN_SORT_ORDER, preferences.getStringList("columnSortOrder"));
+        }
+    }
+
+    /**
+     * In 5.0 the format of column names have changed. That made newer versions of JabRef preferences incompatible with
+     * earlier versions of JabRef. As some complains came up, we decided to change the variable names and to clear the
+     * variable contents if they are unreadable, so former versions of JabRef would automatically create preferences
+     * they can deal with.
+     */
+    static void restoreVariablesForBackwardCompatibility(JabRefPreferences preferences) {
+        List<String> oldColumnNames = preferences.getStringList(JabRefPreferences.COLUMN_NAMES);
+        List<String> fieldColumnNames = oldColumnNames.stream()
+                                                      .filter(columnName -> columnName.startsWith("field:") || columnName.startsWith("special:"))
+                                                      .map(columnName -> {
+                                                          if (columnName.startsWith("field:")) {
+                                                              return columnName.substring(6);
+                                                          } else { // special
+                                                              return columnName.substring(8);
+                                                          }
+                                                      }).collect(Collectors.toList());
+
+        if (!fieldColumnNames.isEmpty()) {
+            preferences.putStringList("columnNames", fieldColumnNames);
+
+            List<String> fieldColumnWidths = new ArrayList<>(Collections.emptyList());
+            for (int i = 0; i < fieldColumnNames.size(); i++) {
+                fieldColumnWidths.add("100");
+            }
+            preferences.putStringList("columnWidths", fieldColumnWidths);
+
+            preferences.put("columnSortTypes", "");
+            preferences.put("columnSortOrder", "");
+        }
+
+        // Ensure font size is a parsable int variable
+        try {
+            // some versions stored the font size as double to the **same** key
+            // since the preference store is type-safe, we need to add this workaround
+            String fontSizeAsString = preferences.get(JabRefPreferences.MAIN_FONT_SIZE);
+            int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
+            preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+        } catch (ClassCastException e) {
+            // already an integer
         }
     }
 }

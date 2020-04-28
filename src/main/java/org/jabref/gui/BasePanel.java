@@ -14,9 +14,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
@@ -40,9 +38,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -93,12 +89,10 @@ public class BasePanel extends StackPane {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
-    private JabRefExecutorService executorService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
-        this.executorService = JabRefExecutorService.INSTANCE;
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
@@ -114,6 +108,7 @@ public class BasePanel extends StackPane {
         annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
 
         setupMainPanel();
+        setupAutoCompletion();
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
@@ -257,7 +252,6 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-            try {
                 bibDatabaseContext.getDatabase().insertEntries(entries);
 
                 // Set owner and timestamp
@@ -276,9 +270,6 @@ public class BasePanel extends StackPane {
                     showAndEdit(entries.get(0));
                 }
                 clearAndSelect(entries.get(0));
-            } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
-            }
         }
     }
 
@@ -303,9 +294,7 @@ public class BasePanel extends StackPane {
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
                                                          .stream()
                                                          .findFirst()
-                                                         .ifPresent(entry -> {
-                                                             entryEditor.setEntry(entry);
-                                                         }));
+                                                         .ifPresent(entryEditor::setEntry));
 
         // TODO: Register these actions globally
         /*
@@ -381,11 +370,6 @@ public class BasePanel extends StackPane {
 
         splitPane.getItems().add(mainTable);
 
-        // Set up name autocompleter for search:
-        setupAutoCompletion();
-        executorService.execute(this::instantiateSearchAutoCompleter);
-        this.getDatabase().registerListener(new SearchAutoCompleteListener());
-
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
@@ -415,26 +399,16 @@ public class BasePanel extends StackPane {
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
-            suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
-            suggestionProviders.indexDatabase(getDatabase());
-            // Ensure that the suggestion providers are in sync with entries
-            CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
-            changeFilter.registerListener(new AutoCompleteUpdater(suggestionProviders));
+            suggestionProviders = new SuggestionProviders(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
+        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 
     public void updateSearchManager() {
         frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
-    }
-
-    private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields());
-        for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-            searchAutoCompleter.indexEntry(entry);
-        }
     }
 
     private void adjustSplitter() {
@@ -729,23 +703,6 @@ public class BasePanel extends StackPane {
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
             ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
-        }
-    }
-
-    /**
-     * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
-     * harvest words from the entry Actual methods for autocomplete indexing  must run in javafx thread
-     */
-    private class SearchAutoCompleteListener {
-
-        @Subscribe
-        public void listen(EntriesAddedEvent addedEntriesEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> addedEntriesEvent.getBibEntries().forEach(entry -> searchAutoCompleter.indexEntry(entry)));
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry()));
         }
     }
 

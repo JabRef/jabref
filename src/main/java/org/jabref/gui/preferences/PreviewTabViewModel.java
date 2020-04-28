@@ -205,7 +205,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
             // TODO: Find a better way to update preview
             basePanel.closeBottomPane();
-            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+            // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 

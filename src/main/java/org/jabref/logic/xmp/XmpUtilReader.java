@@ -26,8 +26,8 @@ public class XmpUtilReader {
     private static final String END_TAG = "</rdf:Description>";
 
     private XmpUtilReader() {
-        //See: https://pdfbox.apache.org/2.0/getting-started.html
-        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); //To get higher rendering speed on java 8 oder 9 for images
+        // See: https://pdfbox.apache.org/2.0/getting-started.html
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); // To get higher rendering speed on java 8 oder 9 for images
     }
 
     /**
@@ -142,8 +142,7 @@ public class XmpUtilReader {
      * Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
      *
      * @param path The path to load.
-     * @return
-     * @throws IOException from the underlying {@link PDDocument#load(File)}
+     * @throws IOException from the underlying @link PDDocument#load(File)
      */
     public static PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document

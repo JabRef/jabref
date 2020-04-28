@@ -107,7 +107,7 @@ public class StyleLoaderTest {
         List<OOBibStyle> toremove = new ArrayList<>();
         int beforeRemoving = loader.getStyles().size();
         for (OOBibStyle style : loader.getStyles()) {
-            if (!style.isFromResource()) {
+            if (!style.isInternalStyle()) {
                 toremove.add(style);
             }
         }
@@ -127,7 +127,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {
-            if (!style.isFromResource()) {
+            if (!style.isInternalStyle()) {
                 toremove.add(style);
             }
         }
@@ -135,7 +135,7 @@ public class StyleLoaderTest {
         for (OOBibStyle style : toremove) {
             assertTrue(loader.removeStyle(style));
         }
-        //As the prefs are mocked away, the getExternalStyles still returns the initial one
+        // As the prefs are mocked away, the getExternalStyles still returns the initial one
         assertFalse(preferences.getExternalStyles().isEmpty());
     }
 
@@ -194,7 +194,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {
-            if (style.isFromResource()) {
+            if (style.isInternalStyle()) {
                 toremove.add(style);
             }
         }

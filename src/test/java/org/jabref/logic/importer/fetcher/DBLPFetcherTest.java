@@ -58,7 +58,7 @@ public class DBLPFetcherTest {
 
     @Test
     public void findSingleEntryUsingComplexOperators() throws FetcherException {
-        String query = "geiger harrer betsy$ softw.trends"; //-wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
+        String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
         assertEquals(Collections.singletonList(entry), result);

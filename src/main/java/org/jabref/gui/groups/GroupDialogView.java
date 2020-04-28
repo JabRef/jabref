@@ -142,6 +142,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordSearchTermEmptyValidationStatus(), keywordGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordFieldEmptyValidationStatus(), keywordGroupSearchField);
+            nameField.requestFocus();
         });
 
         // Binding to the button throws a NPE, since it doesn't exist yet. Working around.
