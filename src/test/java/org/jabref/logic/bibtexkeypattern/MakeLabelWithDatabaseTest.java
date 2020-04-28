@@ -211,7 +211,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[author:(Problem:No Author Provided)]");
         entry.clearField(StandardField.AUTHOR);
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Problem:NoAuthorProvided"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("ProblemNoAuthorProvided"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -398,7 +398,7 @@ class MakeLabelWithDatabaseTest {
         bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
         entry.setField(StandardField.TITLE, "Please replace the spaces");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
-        assertEquals(Optional.of("Please-Replace-the-Spaces"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("PleaseReplacetheSpaces"), entry.getCiteKeyOptional());
     }
 
     @Test

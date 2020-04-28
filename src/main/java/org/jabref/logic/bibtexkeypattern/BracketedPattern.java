@@ -837,7 +837,7 @@ public class BracketedPattern {
      */
     public static String authN(String authString, int num, boolean isEnforceLegalKey) {
         String fa = firstAuthor(authString);
-        fa = BibtexKeyGenerator.removeUnwantedCharacters(fa, isEnforceLegalKey);
+        fa = BibtexKeyGenerator.removeUnwantedCharacters(fa);
         if (num > fa.length()) {
             num = fa.length();
         }

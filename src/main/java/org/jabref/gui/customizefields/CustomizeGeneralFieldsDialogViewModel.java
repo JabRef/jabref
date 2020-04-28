@@ -57,12 +57,13 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getEnforceLegalKeys());
+            String testString = BibtexKeyGenerator.cleanKey(parts[1]);
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Field names are not allowed to contain white space or the following "
                                                    + "characters")
-                                 + ": # { } ( ) ~ , ^ & - \" ' ` ʹ \\";
+                                 + "{ } ( ) , = \\ \" # % ~ '";
+
                 dialogService.showInformationDialogAndWait(title, content);
                 return;
             }
