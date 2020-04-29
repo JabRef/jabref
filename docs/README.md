@@ -26,7 +26,8 @@ Without jlink, it is not possible to generate a fat jar any more. During develop
 
 ## Groups
 
-UML diagram showing aspects of groups: [Groups.uml](https://github.com/JabRef/jabref/tree/ec47f2138b0550a4622872d455902443cd56d9cc/docs/Gropus.uml).
+
+diagram showing aspects of groups: [Groups.uml](https://github.com/JabRef/jabref/tree/ec47f2138b0550a4622872d455902443cd56d9cc/docs/Groups.uml).
 
 ## Decision Records
 
