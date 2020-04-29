@@ -1,7 +1,6 @@
 package org.jabref.gui;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -57,10 +56,7 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
-
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
-        idFieldValidator = new FunctionBasedValidator<>(idText, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
-
+        idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
 
     public BooleanProperty searchSuccesfulProperty() {
