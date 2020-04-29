@@ -85,8 +85,8 @@ public class JournalAbbreviationRepository {
         }
 
         return Optional.ofNullable(fullToAbbreviation.get(journal))
-                       .or(() -> Optional.ofNullable(abbreviationToFull.get(journal)))
-                       .map(abbreviation -> new Abbreviation(journal, abbreviation));
+                       .map(abbreviation -> new Abbreviation(journal, abbreviation))
+                       .or(() -> Optional.ofNullable(abbreviationToFull.get(journal)).map(fullName -> new Abbreviation(fullName, journal)));
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {

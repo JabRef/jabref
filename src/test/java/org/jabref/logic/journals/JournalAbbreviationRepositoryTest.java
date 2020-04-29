@@ -1,5 +1,6 @@
 package org.jabref.logic.journals;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,15 +9,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JournalAbbreviationRepositoryTest {
 
+    private JournalAbbreviationRepository repository;
+
+    @BeforeEach
+    void setUp() {
+        repository = JournalAbbreviationLoader.loadBuiltInRepository();
+    }
+
     @Test
     void empty() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         assertTrue(repository.getCustomAbbreviations().isEmpty());
     }
 
     @Test
     void oneElement() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
 
@@ -42,7 +48,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void oneElementWithShortestUniqueAbbreviation() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
 
@@ -70,7 +75,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicates() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
@@ -78,7 +82,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicatesWithShortestUniqueAbbreviation() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
@@ -86,7 +89,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicatesIsoOnly() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N."));
         repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N."));
         assertEquals(2, repository.getCustomAbbreviations().size());
@@ -94,7 +96,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicatesIsoOnlyWithShortestUniqueAbbreviation() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Old Long Name", "L. N.", "LN"));
         repository.addCustomAbbreviation(new Abbreviation("New Long Name", "L. N.", "LN"));
         assertEquals(2, repository.getCustomAbbreviations().size());
@@ -102,7 +103,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicateKeys() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N."));
         assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
@@ -114,7 +114,6 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void testDuplicateKeysWithShortestUniqueAbbreviation() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
         repository.addCustomAbbreviation(new Abbreviation("Long Name", "L. N.", "LN"));
         assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("L. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
@@ -124,5 +123,15 @@ class JournalAbbreviationRepositoryTest {
         assertEquals(1, repository.getCustomAbbreviations().size());
         assertEquals("LA. N.", repository.getDefaultAbbreviation("Long Name").orElse("WRONG"));
         assertEquals("LAN", repository.getShortestUniqueAbbreviation("Long Name").orElse("WRONG"));
+    }
+
+    @Test
+    void getFromFullName() {
+        assertEquals(new Abbreviation("American Journal of Public Health", "Am. J. Public Health"), repository.get("American Journal of Public Health").get());
+    }
+
+    @Test
+    void getFromAbbreviatedName() {
+        assertEquals(new Abbreviation("American Journal of Public Health", "Am. J. Public Health"), repository.get("Am. J. Public Health").get());
     }
 }
