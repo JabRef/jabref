@@ -152,7 +152,7 @@ public class EntryEditor extends BorderPane {
      */
     private void setupKeyBindings() {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            Optional<KeyBinding> keyBinding = entryEditorPreferences.getKeyBindings().mapToKeyBinding(event);
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case ENTRY_EDITOR_NEXT_PANEL:
@@ -202,7 +202,7 @@ public class EntryEditor extends BorderPane {
     @FXML
     void generateCiteKeyButton() {
         GenerateBibtexKeySingleAction action = new GenerateBibtexKeySingleAction(getEntry(), databaseContext,
-                dialogService, entryEditorPreferences, undoManager);
+                dialogService, preferencesService, undoManager);
         action.execute();
     }
 
@@ -229,7 +229,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // Other fields
-        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, entryEditorPreferences.getCustomTabFieldNames(), dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
+        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // General fields from preferences
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
@@ -242,9 +242,15 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, dialogService));
 
         // Source tab
-        sourceTab = new SourceTab(databaseContext, undoManager,
-                entryEditorPreferences.getFieldWriterPreferences(),
-                entryEditorPreferences.getImportFormatPreferences(), fileMonitor, dialogService, stateManager, Globals.getKeyPrefs());
+        sourceTab = new SourceTab(
+                databaseContext,
+                undoManager,
+                preferencesService.getFieldWriterPreferences(),
+                preferencesService.getImportFormatPreferences(),
+                fileMonitor,
+                dialogService,
+                stateManager,
+                Globals.getKeyPrefs());
         entryEditorTabs.add(sourceTab);
 
         // LaTeX citations tab
@@ -335,7 +341,7 @@ public class EntryEditor extends BorderPane {
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(entryEditorPreferences.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportFormatPreferences())) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);
