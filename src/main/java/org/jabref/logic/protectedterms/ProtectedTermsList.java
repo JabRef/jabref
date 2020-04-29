@@ -25,7 +25,6 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
     private final boolean internalList;
     private boolean enabled;
 
-
     public ProtectedTermsList(String description, List<String> termList, String location, boolean internalList) {
         this.description = Objects.requireNonNull(description);
         this.termsList = Objects.requireNonNull(termList);

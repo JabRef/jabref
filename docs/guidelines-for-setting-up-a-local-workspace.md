@@ -29,9 +29,9 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 Proposals for account names:
 
-- Login similar to your university account. Example: `koppor`
-- Use your last name prefixed by the first letter of your first name. Example: `okopp`
-- Use `firstname.lastname`. Example: `oliver.kopp`
+* Login similar to your university account. Example: `koppor`
+* Use your last name prefixed by the first letter of your first name. Example: `okopp`
+* Use `firstname.lastname`. Example: `oliver.kopp`
 
 You can hide your email adress by following the recommendations at <https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/>.
 
@@ -41,9 +41,9 @@ That account then be used for develoment mailing lists, mail exchange with other
 
 Examples:
 
-- Same login as in GitHub (see above). Example: `koppor@gmail.com`
-- "`it`" in the name. Example:  `kopp.it@gmail.com`
-- Use the university login. Example: `st342435@stud.uni-stuttgart.de`
+* Same login as in GitHub (see above). Example: `koppor@gmail.com`
+* "`it`" in the name. Example:  `kopp.it@gmail.com`
+* Use the university login. Example: `st342435@stud.uni-stuttgart.de`
 
 ### git
 
@@ -161,47 +161,6 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   "Test using" is set to "IntelliJ IDEA".
 
-To use the "JabRef Main" run configuration, open **Run \| Edit Configurations... \| Application \| JabRef Main** and
-
-* Verify, that your JDK 14 is used
-* Set "VM Options" to the following:
-
-  ```text
-    --patch-module org.jabref=build/resources/main
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-    --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-    --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-    --add-opens javafx.controls/javafx.scene.control=org.jabref
-    --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
-    --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls
-    --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-    --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-opens javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.binding=com.jfoenix
-    --add-opens javafx.graphics/com.sun.javafx.stage=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.event=com.jfoenix
-  ```
-
-  Optionally the following entries can also be added \(but they currently only produce warnings and they are not needed\):
-
-  ```text
-    --patch-module test=fastparse_2.12-1.0.0.jar
-    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-    --patch-module test3=sourcecode_2.12-0.1.4.jar
-  ```
-
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
 #### Using JabRef's code-style
@@ -213,14 +172,18 @@ Contributions to JabRef's source code need to have a code formatting that is con
   2. Close the settings afterwards and restart IntelliJ
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
-* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
-* Go to **File \| Settings \| Other Settings \| Checkstyle \| Configuration File**
+* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
+* Go to **File \| Settings \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide e.g. "CheckStyle"
+  2. For the description provide "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Click "Next" and "Finish"
-  5. Activate the CheckStyle configuration file by ticking it in the list
-  6. Save settings by clicking "OK"
+  4. Check "Store relative to project location"
+  5. Click "Next" and "Finish"
+  6. Activate the CheckStyle configuration file by ticking it in the list
+  7. Ensure that CheckStyle version 8.31 (or higher) is selected
+  8. Save settings by clicking "OK"
+
+![checkstyle settings](images/intellij-checkstyle-settings.png)
 
 #### Troubleshooting when using both IDEA and Eclipse
 
@@ -240,7 +203,7 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
-2. Run `./gradlew eclipse` 
+2. Run `./gradlew eclipse`
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
@@ -250,29 +213,28 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
-     * Set "VM Arguments" to:
+        ```text
+        --patch-module test=fastparse_2.12-1.0.0.jar
+        --patch-module test2=fastparse-utils_2.12-1.0.0.jar
+        --patch-module test3=sourcecode_2.12-0.1.4.jar
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
+        --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+        --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
+        --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
+        --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
+        --patch-module org.jabref=build\resources\main
+        ```
 
-     ```text
-     --patch-module test=fastparse_2.12-1.0.0.jar
-     --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-     --patch-module test3=sourcecode_2.12-0.1.4.jar
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-     --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-     --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-     --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-     --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-     --patch-module org.jabref=build\resources\main
-     ```
 6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
 7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 

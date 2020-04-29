@@ -5,9 +5,9 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
@@ -20,7 +20,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     private final TextInputControl textInput;
 
     public SimpleEditor(final Field field,
-                        final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                        final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences,
                         final boolean isSingleLine) {
@@ -45,7 +45,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     }
 
     public SimpleEditor(final Field field,
-                        final AutoCompleteSuggestionProvider<?> suggestionProvider,
+                        final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences) {
         this(field, suggestionProvider, fieldCheckers, preferences, false);

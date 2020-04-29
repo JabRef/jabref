@@ -34,9 +34,9 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -206,7 +206,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
             // TODO: Find a better way to update preview
             basePanel.closeBottomPane();
-            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+            // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 

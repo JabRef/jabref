@@ -230,7 +230,7 @@ public class OvidImporter extends Importer {
      */
     private static String fixNames(String content) {
         String names;
-        if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
+        if (content.indexOf(';') > 0) { // LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replace(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");

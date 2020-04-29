@@ -92,7 +92,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         if (StringUtil.isNotBlank(useFileBrowserSpecialCommandProperty.getValue())) {
             preferences.put(JabRefPreferences.FILE_BROWSER_COMMAND, useFileBrowserSpecialCommandProperty.getValue());
         } else {
-            preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, true); //default if no command specified
+            preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, true); // default if no command specified
         }
     }
 

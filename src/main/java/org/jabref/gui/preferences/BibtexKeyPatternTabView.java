@@ -46,9 +46,11 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     }
 
     @Override
-    public String getTabName() { return Localization.lang("BibTeX key generator"); }
+    public String getTabName() {
+        return Localization.lang("BibTeX key generator");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new BibtexKeyPatternTabViewModel(dialogService, preferences);
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());

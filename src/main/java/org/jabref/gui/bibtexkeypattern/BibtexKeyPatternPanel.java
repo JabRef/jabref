@@ -68,7 +68,7 @@ public class BibtexKeyPatternPanel extends Pane {
             Label keyPattern = new Label(Localization.lang("Key pattern"));
             gridPane.add(label, ++columnIndex, rowIndex);
             gridPane.add(keyPattern, ++columnIndex, rowIndex);
-            ++columnIndex; //3
+            columnIndex++;
         }
 
         rowIndex++;

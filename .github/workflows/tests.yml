@@ -205,7 +205,7 @@ jobs:
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
-          CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
+          CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
