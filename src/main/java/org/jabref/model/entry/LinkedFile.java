@@ -188,7 +188,7 @@ public class LinkedFile implements Serializable {
                     return Optional.empty();
                 }
             } else {
-                return FileHelper.expandFilenameAsPath(link.get(), directories);
+                return FileHelper.find(link.get(), directories);
             }
         } catch (InvalidPathException ex) {
             return Optional.empty();

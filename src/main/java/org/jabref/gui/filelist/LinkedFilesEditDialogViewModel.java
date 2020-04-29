@@ -70,7 +70,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
+        Optional<Path> file = FileHelper.find(database, fileText, preferences.getFilePreferences());
 
         Path workingDir = file.orElse(preferences.getWorkingDir());
         String fileName = Paths.get(fileText).getFileName().toString();

@@ -101,7 +101,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileHelper.expandFilename(databaseContext, link, filePreferences);
+                        Optional<Path> path = FileHelper.find(databaseContext, link, filePreferences);
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
@@ -192,7 +192,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void openFolder() {
         try {
             if (!linkedFile.isOnlineLink()) {
-                Optional<Path> resolvedPath = FileHelper.expandFilename(
+                Optional<Path> resolvedPath = FileHelper.find(
                         databaseContext,
                         linkedFile.getLink(),
                         filePreferences);

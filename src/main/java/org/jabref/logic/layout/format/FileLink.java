@@ -1,6 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,7 +56,7 @@ public class FileLink implements ParamLayoutFormatter {
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
         if (prefs.getFileDirForDatabase() == null) {
-            dirs = prefs.getGeneratedDirForDatabase();
+            dirs = Collections.singletonList(prefs.getMainFileDirectory());
         } else {
             dirs = prefs.getFileDirForDatabase();
         }
