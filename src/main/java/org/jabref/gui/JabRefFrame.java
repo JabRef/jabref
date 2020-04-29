@@ -114,6 +114,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -152,6 +153,7 @@ public class JabRefFrame extends BorderPane {
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
+    private final ThemeLoader themeLoader = Globals.getThemeLoader();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
     private final ProgressBar progressBar = new ProgressBar();
@@ -169,7 +171,7 @@ public class JabRefFrame extends BorderPane {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new JabRefDialogService(mainStage, this);
+        this.dialogService = new JabRefDialogService(mainStage, this, prefs, themeLoader);
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
