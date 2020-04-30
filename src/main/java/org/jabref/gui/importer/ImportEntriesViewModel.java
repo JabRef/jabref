@@ -130,7 +130,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             buildImportHandlerThenImportEntries(entriesToImport);
         }
 
-        if(downloadFiles) {
+        if (downloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
                 for (LinkedFile linkedFile : bibEntry.getFiles()) {
                     LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, bibEntry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), ExternalFileTypes.getInstance());
