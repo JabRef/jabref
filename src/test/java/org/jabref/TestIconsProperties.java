@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class TestIconsProperties {
 
         // load properties
         Properties properties = new Properties();
-        try (Reader reader = Files.newBufferedReader(Paths.get(iconsPropertiesPath))) {
+        try (Reader reader = Files.newBufferedReader(Path.of(iconsPropertiesPath))) {
             properties.load(reader);
         }
         assertFalse(properties.entrySet().isEmpty(), "There must be loaded properties after loading " + iconsPropertiesPath);
@@ -38,7 +37,7 @@ public class TestIconsProperties {
             String name = entry.getKey().toString();
             String value = entry.getValue().toString();
 
-            assertTrue(Files.exists(Paths.get(folder, value)), "Referenced image (" + name + " --> " + value + " does not exist in folder " + folder);
+            assertTrue(Files.exists(Path.of(folder, value)), "Referenced image (" + name + " --> " + value + " does not exist in folder " + folder);
         }
 
         // check that each image in the folder is referenced by a key
@@ -47,7 +46,7 @@ public class TestIconsProperties {
             imagesReferencedFromProperties.add(entry.getValue().toString());
         }
 
-        try (Stream<Path> pathStream = Files.list(Paths.get(folder))) {
+        try (Stream<Path> pathStream = Files.list(Path.of(folder))) {
             List<String> fileNamesInFolder = pathStream.map(p -> p.getFileName().toString()).collect(Collectors.toList());
             fileNamesInFolder.removeAll(imagesReferencedFromProperties);
             assertEquals("[red.png]", fileNamesInFolder.toString(), "Images are in the folder that are unused");

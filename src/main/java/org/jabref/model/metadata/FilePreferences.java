@@ -1,7 +1,6 @@
 package org.jabref.model.metadata;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
@@ -34,7 +33,7 @@ public class FilePreferences {
         if (StringUtil.isBlank(mainFileDirectory)) {
             return Optional.empty();
         } else {
-            return Optional.of(Paths.get(mainFileDirectory));
+            return Optional.of(Path.of(mainFileDirectory));
         }
     }
 

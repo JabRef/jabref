@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -326,7 +325,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWithArticleMonths() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/articleWithMonths.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -340,7 +339,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWithComplexBib() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -354,7 +353,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWithUserComment() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -368,7 +367,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWithUserCommentAndEntryChange() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -380,12 +379,12 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries());
-        assertEquals(Files.readString(Paths.get("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
+        assertEquals(Files.readString(Path.of("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"), encoding), stringWriter.toString());
     }
 
     @Test
     void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -405,7 +404,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWithUnknownMetaData() throws Exception {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/unknownMetaData.bib");
+        Path testBibtexFile = Path.of("src/test/resources/testbib/unknownMetaData.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
@@ -547,7 +546,7 @@ class BibtexDatabaseWriterTest {
     void writeFileDirectories() throws Exception {
         metaData.setDefaultFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
-        metaData.setLatexFileDirectory("defaultOwner-user", Paths.get("D:\\Latex"));
+        metaData.setLatexFileDirectory("defaultOwner-user", Path.of("D:\\Latex"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
 

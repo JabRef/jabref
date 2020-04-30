@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -216,7 +215,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
-        Path oldFilePath = Paths.get(oldFile);
+        Path oldFilePath = Path.of(oldFile);
         Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
@@ -293,7 +292,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if the suggested filename is same as current filename.
      */
     public boolean isGeneratedNameSameAsOriginal() {
-        Path file = Paths.get(this.linkedFile.getLink());
+        Path file = Path.of(this.linkedFile.getLink());
         String currentFileName = file.getFileName().toString();
         String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
 

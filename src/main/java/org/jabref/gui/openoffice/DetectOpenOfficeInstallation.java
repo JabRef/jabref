@@ -2,7 +2,6 @@ package org.jabref.gui.openoffice;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,7 +75,7 @@ public class DetectOpenOfficeInstallation {
      */
     private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
         String executablePath = openOfficePreferences.getExecutablePath();
-        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Paths.get(executablePath));
+        return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Path.of(executablePath));
     }
 
     private boolean setOpenOfficePreferences(Path installDir) {

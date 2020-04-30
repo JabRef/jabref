@@ -2,7 +2,6 @@ package org.jabref.gui.preferences;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +60,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirProperty,
                 input -> {
-                    Path path = Paths.get(mainFileDirProperty.getValue());
+                    Path path = Path.of(mainFileDirProperty.getValue());
                     return (Files.exists(path) && Files.isDirectory(path));
                 },
                 ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
@@ -146,7 +145,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
-                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Paths.get(mainFileDirProperty.getValue())).build();
+                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(mainFileDirProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
                 .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
     }

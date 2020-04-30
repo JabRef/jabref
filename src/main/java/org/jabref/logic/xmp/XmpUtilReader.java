@@ -1,10 +1,8 @@
 package org.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +48,7 @@ public class XmpUtilReader {
      * @return BibtexEntryies found in the PDF or an empty list
      */
     public static List<BibEntry> readXmp(String filename, XmpPreferences xmpPreferences) throws IOException {
-        return XmpUtilReader.readXmp(Paths.get(filename), xmpPreferences);
+        return XmpUtilReader.readXmp(Path.of(filename), xmpPreferences);
     }
 
     /**

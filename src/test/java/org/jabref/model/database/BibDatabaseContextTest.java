@@ -1,7 +1,6 @@
 package org.jabref.model.database;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -26,21 +25,21 @@ class BibDatabaseContextTest {
     @BeforeEach
     void setUp() {
         fileDirPrefs = mock(FilePreferences.class);
-        currentWorkingDir = Paths.get(System.getProperty("user.dir"));
+        currentWorkingDir = Path.of(System.getProperty("user.dir"));
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
     }
 
     @Test
     void getFileDirectoriesWithEmptyDbParent() {
         BibDatabaseContext database = new BibDatabaseContext();
-        database.setDatabasePath(Paths.get("biblio.bib"));
+        database.setDatabasePath(Path.of("biblio.bib"));
         assertEquals(Collections.singletonList(currentWorkingDir),
                 database.getFileDirectoriesAsPaths(fileDirPrefs));
     }
 
     @Test
     void getFileDirectoriesWithRelativeDbParent() {
-        Path file = Paths.get("relative/subdir").resolve("biblio.bib");
+        Path file = Path.of("relative/subdir").resolve("biblio.bib");
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
@@ -50,7 +49,7 @@ class BibDatabaseContextTest {
 
     @Test
     void getFileDirectoriesWithRelativeDottedDbParent() {
-        Path file = Paths.get("./relative/subdir").resolve("biblio.bib");
+        Path file = Path.of("./relative/subdir").resolve("biblio.bib");
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
@@ -60,7 +59,7 @@ class BibDatabaseContextTest {
 
     @Test
     void getFileDirectoriesWithAbsoluteDbParent() {
-        Path file = Paths.get("/absolute/subdir").resolve("biblio.bib");
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
@@ -70,23 +69,23 @@ class BibDatabaseContextTest {
 
     @Test
     void getFileDirectoriesWithRelativeMetadata() {
-        Path file = Paths.get("/absolute/subdir").resolve("biblio.bib");
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("../Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Paths.get("/absolute/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/Literature").toAbsolutePath()),
                 database.getFileDirectoriesAsPaths(fileDirPrefs));
     }
 
     @Test
     void getFileDirectoriesWithMetadata() {
-        Path file = Paths.get("/absolute/subdir").resolve("biblio.bib");
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Paths.get("/absolute/subdir/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/subdir/Literature").toAbsolutePath()),
                 database.getFileDirectoriesAsPaths(fileDirPrefs));
     }
 

@@ -1,6 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,7 +61,7 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = prefs.getFileDirForDatabase();
         }
 
-        return link.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
+        return link.findIn(dirs.stream().map(Path::of).collect(Collectors.toList()))
                 .map(path -> path.normalize().toString())
                 .orElse(link.getLink());
 

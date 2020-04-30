@@ -3,7 +3,7 @@ package org.jabref.logic.openoffice;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 public class StyleLoaderTest {
 
-    private static int numberOfInternalStyles = 2;
+    private static final int numberOfInternalStyles = 2;
     private StyleLoader loader;
 
     private OpenOfficePreferences preferences;
@@ -65,8 +65,8 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
 
-        String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                               .toFile().getPath();
+        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                              .toFile().getPath();
         loader.addStyleIfValid(filename);
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
@@ -82,7 +82,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
-        String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                                .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
@@ -99,7 +99,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
-        String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                                .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
@@ -120,7 +120,7 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
-        String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                                .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
 
@@ -144,7 +144,7 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         int beforeAdding = loader.getStyles().size();
-        String filename = Paths.get(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                                .toFile().getPath();
         loader.addStyleIfValid(filename);
         loader.addStyleIfValid(filename);

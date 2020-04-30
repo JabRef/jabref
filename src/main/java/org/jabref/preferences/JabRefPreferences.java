@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1142,7 +1141,7 @@ public class JabRefPreferences implements PreferencesService {
      * @param filename String File to export to
      */
     public void exportPreferences(String filename) throws JabRefException {
-        exportPreferences(Paths.get(filename));
+        exportPreferences(Path.of(filename));
     }
 
     public void exportPreferences(Path file) throws JabRefException {
@@ -1162,7 +1161,7 @@ public class JabRefPreferences implements PreferencesService {
      *                         or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
-        importPreferences(Paths.get(filename));
+        importPreferences(Path.of(filename));
     }
 
     public void importPreferences(Path file) throws JabRefException {
@@ -1190,7 +1189,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
+        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
     }
 
     public void storeFileHistory(FileHistory history) {
@@ -1695,7 +1694,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public Path getWorkingDir() {
-        return Paths.get(get(WORKING_DIRECTORY));
+        return Path.of(get(WORKING_DIRECTORY));
     }
 
     @Override

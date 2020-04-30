@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -304,9 +303,9 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
     }
 
     private Path getSearchDirectory() {
-        Path directory = Paths.get(textfieldDirectoryPath.getText());
+        Path directory = Path.of(textfieldDirectoryPath.getText());
         if (Files.notExists(directory)) {
-            directory = Paths.get(System.getProperty("user.dir"));
+            directory = Path.of(System.getProperty("user.dir"));
             textfieldDirectoryPath.setText(directory.toAbsolutePath().toString());
         }
         if (!Files.isDirectory(directory)) {

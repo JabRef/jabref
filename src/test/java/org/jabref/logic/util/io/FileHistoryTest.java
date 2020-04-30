@@ -1,6 +1,6 @@
 package org.jabref.logic.util.io;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,27 +19,27 @@ class FileHistoryTest {
 
     @Test
     void newItemsAreAddedInRightOrder() {
-        history.newFile(Paths.get("aa"));
-        history.newFile(Paths.get("bb"));
-        assertEquals(Arrays.asList(Paths.get("bb"), Paths.get("aa")), history.getHistory());
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        assertEquals(Arrays.asList(Path.of("bb"), Path.of("aa")), history.getHistory());
     }
 
     @Test
     void itemsAlreadyInListIsMovedToTop() {
-        history.newFile(Paths.get("aa"));
-        history.newFile(Paths.get("bb"));
-        history.newFile(Paths.get("aa"));
-        assertEquals(Arrays.asList(Paths.get("aa"), Paths.get("bb")), history.getHistory());
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        history.newFile(Path.of("aa"));
+        assertEquals(Arrays.asList(Path.of("aa"), Path.of("bb")), history.getHistory());
     }
 
     @Test
     void removeItemsLeavesOtherItemsInRightOrder() {
-        history.newFile(Paths.get("aa"));
-        history.newFile(Paths.get("bb"));
-        history.newFile(Paths.get("cc"));
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        history.newFile(Path.of("cc"));
 
-        history.removeItem(Paths.get("bb"));
+        history.removeItem(Path.of("bb"));
 
-        assertEquals(Arrays.asList(Paths.get("cc"), Paths.get("aa")), history.getHistory());
+        assertEquals(Arrays.asList(Path.of("cc"), Path.of("aa")), history.getHistory());
     }
 }

@@ -2,7 +2,6 @@ package org.jabref.model.database;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -138,7 +137,7 @@ public class BibDatabaseContext {
             Objects.requireNonNull(dbPath, "dbPath is null");
             Path parentPath = dbPath.getParent();
             if (parentPath == null) {
-                parentPath = Paths.get(System.getProperty("user.dir"));
+                parentPath = Path.of(System.getProperty("user.dir"));
             }
             Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
 
