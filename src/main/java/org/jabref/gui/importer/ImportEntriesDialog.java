@@ -15,6 +15,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -50,6 +51,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ButtonType importButton;
     public Label totalItems;
     public Label selectedItems;
+    public CheckBox downloadLinkedOnlineFiles;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -79,7 +81,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == importButton) {
-                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems());
+                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems(), downloadLinkedOnlineFiles.isSelected());
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
