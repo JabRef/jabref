@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -320,7 +319,7 @@ public class JabRefFrame extends BorderPane {
      * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
      */
     public void openAction(String filePath) {
-        Path file = Paths.get(filePath);
+        Path file = Path.of(filePath);
         // all the logic is done in openIt. Even raising an existing panel
         getOpenDatabaseAction().openFile(file, true);
     }

@@ -55,12 +55,12 @@ public class JabRefDesktop {
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectories(field, Globals.prefs.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
 
-            Optional<Path> file = FileHelper.expandFilename(link, dir);
+            Optional<Path> file = FileHelper.find(link, directories);
 
             // Check that the file exists:
-            if (!file.isPresent() || !Files.exists(file.get())) {
+            if (file.isEmpty() || !Files.exists(file.get())) {
                 throw new IOException("File not found (" + field + "): '" + link + "'.");
             }
             link = file.get().toAbsolutePath().toString();
@@ -126,21 +126,16 @@ public class JabRefDesktop {
             return true;
         }
 
-        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFilePreferences());
+        Optional<Path> file = FileHelper.find(databaseContext, link, Globals.prefs.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
-            return true;
         } else {
             // No file matched the name, try to open it directly using the given app
             openExternalFilePlatformIndependent(type, link);
-            return true;
         }
-    }
-
-    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext, final Optional<ExternalFileType> type) throws IOException {
-        return openExternalFileAnyFormat(databaseContext, file.toString(), type);
+        return true;
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)

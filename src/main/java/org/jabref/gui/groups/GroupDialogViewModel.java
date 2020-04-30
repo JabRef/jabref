@@ -2,7 +2,6 @@ package org.jabref.gui.groups;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +98,7 @@ public class GroupDialogViewModel {
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
-    private CompositeValidator validator = new CompositeValidator();
+    private final CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -142,10 +141,8 @@ public class GroupDialogViewModel {
                             return false;
                         }
 
-                        if ((editedGroup != null) && !editedGroup.getName().equals(name) && (groupsWithSameName > 0)) {
-                            // Edit group, changed name to something that is already present
-                            return false;
-                        }
+                        // Edit group, changed name to something that is already present
+                        return (editedGroup == null) || editedGroup.getName().equals(name) || (groupsWithSameName <= 0);
                     }
                     return true;
                 },
@@ -302,7 +299,7 @@ public class GroupDialogViewModel {
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        Paths.get(texGroupFilePathProperty.getValue().trim()),
+                        Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         Globals.getFileUpdateMonitor(),
                         currentDatabase.getMetaData());

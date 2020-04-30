@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -55,7 +54,7 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     }
 
     public ExporterViewModel saveExporter() {
-        Path layoutFileDir = Paths.get(layoutFile.get()).getParent();
+        Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
             preferences.setExportWorkingDirectory(layoutFileDirString);

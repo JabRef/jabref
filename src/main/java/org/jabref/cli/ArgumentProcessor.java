@@ -3,7 +3,6 @@ package org.jabref.cli;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,9 +110,9 @@ public class ArgumentProcessor {
             }
         } else {
             if (OS.WINDOWS) {
-                file = Paths.get(address);
+                file = Path.of(address);
             } else {
-                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+                file = Path.of(address.replace("~", System.getProperty("user.home")));
             }
         }
 
@@ -280,7 +279,7 @@ public class ArgumentProcessor {
                 // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Paths.get(data[1]),
+                    exporter.get().export(databaseContext, Path.of(data[1]),
                             databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
                             matches);
                 } catch (Exception ex) {
@@ -389,7 +388,7 @@ public class ArgumentProcessor {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
-            AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
+            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), prefs.getEncoding());
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
@@ -441,7 +440,7 @@ public class ArgumentProcessor {
             } else {
                 // We have an exporter:
                 try {
-                    exporter.get().export(pr.getDatabaseContext(), Paths.get(data[0]),
+                    exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
                                     .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
