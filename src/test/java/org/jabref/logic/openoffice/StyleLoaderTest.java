@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 public class StyleLoaderTest {
 
-    private static final int numberOfInternalStyles = 2;
+    private static final int NUMBER_OF_INTERNAL_STYLES = 2;
     private StyleLoader loader;
 
     private OpenOfficePreferences preferences;
@@ -68,7 +68,7 @@ public class StyleLoaderTest {
         String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                               .toFile().getPath();
         loader.addStyleIfValid(filename);
-        assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
+        assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class StyleLoaderTest {
                                .toFile().getPath();
         when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
-        assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
+        assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
-        assertEquals(numberOfInternalStyles, loader.getStyles().size());
+        assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
     }
 
     @Test
@@ -200,6 +200,6 @@ public class StyleLoaderTest {
         }
 
         assertFalse(loader.removeStyle(toremove.get(0)));
-        assertEquals(numberOfInternalStyles, loader.getStyles().size());
+        assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
     }
 }

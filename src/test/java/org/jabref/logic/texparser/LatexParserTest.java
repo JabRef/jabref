@@ -31,10 +31,10 @@ public class LatexParserTest {
     private final static String EINSTEIN_B = "Einstein1920b";
     private final static String EINSTEIN_C = "Einstein1920c";
 
-    private static final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private static ImportFormatPreferences importFormatPreferences;
-    private static BibDatabase database;
-    private static BibDatabase database2;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private ImportFormatPreferences importFormatPreferences;
+    private BibDatabase database;
+    private BibDatabase database2;
 
     @BeforeEach
     private void setUp() {
