@@ -26,6 +26,7 @@ import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -37,7 +38,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     // Only text based exporters can be used
-    private static final Set<String> SUPPORTED_FILETYPES = Set.of("txt", "rtf", "rdf", "xml", "html", "htm", "csv", "ris");
+    private static final Set<FileType> SUPPORTED_FILETYPES = Set.of(StandardFileType.TXT, StandardFileType.RTF, StandardFileType.RDF, StandardFileType.XML, StandardFileType.HTML, StandardFileType.CSV, StandardFileType.RIS);
 
     private JabRefFrame frame;
     private final DialogService dialogService;
@@ -76,7 +77,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         List<Exporter> exporters = exporterFactory.getExporters().stream()
                                                   .sorted(Comparator.comparing(Exporter::getName))
-                                                  .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensionsLowerCase()))
+                                                  .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))
                                                   .collect(Collectors.toList());
 
         // Find default choice, if any
