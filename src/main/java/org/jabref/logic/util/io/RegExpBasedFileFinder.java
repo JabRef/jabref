@@ -6,7 +6,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,7 +121,7 @@ class RegExpBasedFileFinder implements FileFinder {
         String fileName = file;
         Path actualDirectory;
         if (fileName.startsWith("/")) {
-            actualDirectory = Paths.get(".");
+            actualDirectory = Path.of(".");
             fileName = fileName.substring(1);
         } else {
             actualDirectory = directory;
@@ -148,7 +147,7 @@ class RegExpBasedFileFinder implements FileFinder {
             dirToProcess = expandBrackets(dirToProcess, entry, null, keywordDelimiter);
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                actualDirectory = Paths.get(dirToProcess + '/');
+                actualDirectory = Path.of(dirToProcess + '/');
                 continue;
             }
             if (".".equals(dirToProcess)) { // Stay in current directory

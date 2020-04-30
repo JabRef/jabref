@@ -2,7 +2,6 @@ package org.jabref.logic.importer;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -31,7 +30,7 @@ class ImportFormatReaderTestParameterless {
 
     @Test
     void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
-        Path file = Paths.get(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
+        Path file = Path.of(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
         assertThrows(ImportException.class, () -> reader.importUnknownFormat(file, fileMonitor));
     }
 
@@ -47,6 +46,6 @@ class ImportFormatReaderTestParameterless {
 
     @Test
     void importFromFileWithUnknownFormatThrowsException() throws Exception {
-        assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Paths.get("somepath")));
+        assertThrows(ImportException.class, () -> reader.importFromFile("someunknownformat", Path.of("somepath")));
     }
 }

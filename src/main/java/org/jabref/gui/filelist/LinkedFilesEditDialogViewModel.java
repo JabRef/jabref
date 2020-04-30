@@ -1,7 +1,6 @@
 package org.jabref.gui.filelist;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -70,10 +69,10 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     public void openBrowseDialog() {
         String fileText = link.get();
 
-        Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.getFilePreferences());
+        Optional<Path> file = FileHelper.find(database, fileText, preferences.getFilePreferences());
 
         Path workingDir = file.orElse(preferences.getWorkingDir());
-        String fileName = Paths.get(fileText).getFileName().toString();
+        String fileName = Path.of(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .withInitialDirectory(workingDir)
@@ -95,7 +94,7 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         if (linkedFile.isOnlineLink()) {
             link.setValue(linkedFile.getLink()); // Might be an URL
         } else {
-            link.setValue(relativize(Paths.get(linkedFile.getLink())));
+            link.setValue(relativize(Path.of(linkedFile.getLink())));
         }
 
         selectedExternalFileType.setValue(null);

@@ -47,7 +47,7 @@ public class ActionHelper {
         return Bindings.createBooleanBinding(() -> {
                     List<LinkedFile> files = stateManager.getSelectedEntries().get(0).getFiles();
                     if ((files.size() > 0) && stateManager.getActiveDatabase().isPresent()) {
-                        Optional<Path> filename = FileHelper.expandFilename(
+                        Optional<Path> filename = FileHelper.find(
                                 stateManager.getActiveDatabase().get(),
                                 files.get(0).getLink(),
                                 preferencesService.getFilePreferences());
