@@ -25,6 +25,9 @@
       <name>Andrew Dunning</name>
       <email>andrew.dunning@utoronto.ca</email>
     </contributor>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+    </contributor>
     <category citation-format="note"/>
     <category field="generic-base"/>
     <summary>Chicago format with full notes and bibliography</summary>
@@ -665,7 +668,14 @@
     <choose>
       <if variable="title">
         <group delimiter=" ">
-          <text term="presented at"/>
+          <choose>
+            <if variable="genre">
+              <text term="presented at"/>
+            </if>
+            <else>
+              <text term="presented at" text-case="capitalize-first"/>
+            </else>
+          </choose>
           <text variable="event"/>
         </group>
       </if>
