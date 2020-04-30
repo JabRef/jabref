@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +57,7 @@ public class XmpUtilWriter {
      */
     public static void writeXmp(String fileName, BibEntry entry,
             BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
-        XmpUtilWriter.writeXmp(Paths.get(fileName), entry, database, xmpPreferences);
+        XmpUtilWriter.writeXmp(Path.of(fileName), entry, database, xmpPreferences);
     }
 
     /**

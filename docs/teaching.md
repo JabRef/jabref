@@ -120,6 +120,15 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 - Summary: Students are requested to contribute to an Open Source project to learn about the maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
 - Course offered from 2013 to 2016 with different names
 
+## Interesting Read for Students and Advisors
+
+- [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) by [@ayaankazerouni](https://github.com/ayaankazerouni?tab=overview&from=2015-12-01&to=2015-12-31)  
+  > When students worked earlier and more often, they produced projects that:
+  >
+  > - were more correct,
+  > - were completed earlier,
+  > - took no more or less time to complete
+
 ## References
 
 <a id="LientzSwanson" href="#a1">1</a>: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.

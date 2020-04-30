@@ -3,7 +3,6 @@ package org.jabref.logic.texparser;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -32,11 +31,11 @@ public class TexBibEntriesResolverTest {
     private final static String EINSTEIN_B = "Einstein1920b";
     private final static String EINSTEIN_C = "Einstein1920c";
 
-    private static FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private static ImportFormatPreferences importFormatPreferences;
-    private static BibDatabase database;
-    private static BibDatabase database2;
-    private static BibEntry bibEntry;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private ImportFormatPreferences importFormatPreferences;
+    private BibDatabase database;
+    private BibDatabase database2;
+    private BibEntry bibEntry;
 
     @BeforeEach
     private void setUp() {
@@ -100,7 +99,7 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testSingleFile() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
@@ -111,8 +110,8 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testTwoFiles() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
-        Path texFile2 = Paths.get(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Path.of(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
@@ -123,7 +122,7 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testDuplicateFiles() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
@@ -134,7 +133,7 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testUnknownKey() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
@@ -145,7 +144,7 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testNestedFiles() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
@@ -156,7 +155,7 @@ public class TexBibEntriesResolverTest {
 
     @Test
     public void testCrossRef() throws URISyntaxException {
-        Path texFile = Paths.get(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
+        Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
         LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);

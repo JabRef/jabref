@@ -38,7 +38,6 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -253,7 +252,6 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-            try {
                 bibDatabaseContext.getDatabase().insertEntries(entries);
 
                 // Set owner and timestamp
@@ -272,9 +270,6 @@ public class BasePanel extends StackPane {
                     showAndEdit(entries.get(0));
                 }
                 clearAndSelect(entries.get(0));
-            } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
-            }
         }
     }
 

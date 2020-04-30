@@ -27,7 +27,8 @@ public class MainTableDataModel {
     public MainTableDataModel(BibDatabaseContext context) {
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
 
-        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context));
+        MainTableNameFormatter nameFormatter = new MainTableNameFormatter(Globals.prefs);
+        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(

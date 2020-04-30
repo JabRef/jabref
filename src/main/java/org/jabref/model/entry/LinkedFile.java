@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -180,7 +179,7 @@ public class LinkedFile implements Serializable {
                 return Optional.empty();
             }
 
-            Path file = Paths.get(link.get());
+            Path file = Path.of(link.get());
             if (file.isAbsolute() || directories.isEmpty()) {
                 if (Files.exists(file)) {
                     return Optional.of(file);
@@ -188,7 +187,7 @@ public class LinkedFile implements Serializable {
                     return Optional.empty();
                 }
             } else {
-                return FileHelper.expandFilenameAsPath(link.get(), directories);
+                return FileHelper.find(link.get(), directories);
             }
         } catch (InvalidPathException ex) {
             return Optional.empty();

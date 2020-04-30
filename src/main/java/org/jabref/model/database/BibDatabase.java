@@ -169,46 +169,35 @@ public class BibDatabase {
     }
 
     /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
+     * Inserts the entry.
      *
-     * @param entry BibEntry to insert into the database
-     * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
+     * @param entry entry to insert
      */
-    public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntriesEventSource.LOCAL);
+    public synchronized void insertEntry(BibEntry entry) {
+        insertEntry(entry, EntriesEventSource.LOCAL);
     }
 
     /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
+     * Inserts the entry.
      *
-     * @param entry BibEntry to insert
-     * @param eventSource Source the event is sent from
-     * @return false if the insert was done without a duplicate warning
+     * @param entry       entry to insert
+     * @param eventSource source the event is sent from
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntriesEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
         insertEntries(Collections.singletonList(entry), eventSource);
-        return entry.getCiteKeyOptional().map(this::isDuplicateCiteKeyExisting).orElse(false);
     }
 
-    public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
+    public synchronized void insertEntries(BibEntry... entries) {
         insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> entries) {
         insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) {
         Objects.requireNonNull(newEntries);
         for (BibEntry entry : newEntries) {
-            String id = entry.getId();
-            if (containsEntryWithId(id)) {
-                throw new KeyCollisionException("ID is already in use, please choose another", id);
-            }
-
             entry.registerListener(this);
         }
         if (newEntries.isEmpty()) {

@@ -64,7 +64,7 @@ public class FieldEditors {
             return new JournalEditor(field, journalAbbreviationRepository, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.DOI) || fieldProperties.contains(FieldProperty.EPRINT) || fieldProperties.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(field, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
-        } else if (field == InternalField.OWNER) {
+        } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
