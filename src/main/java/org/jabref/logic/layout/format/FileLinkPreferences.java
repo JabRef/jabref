@@ -4,15 +4,16 @@ import java.util.List;
 
 public class FileLinkPreferences {
 
-    private final List<String> generatedDirForDatabase;
+    private final String mainFileDirectory;
     private final List<String> fileDirForDatabase;
-    public FileLinkPreferences(List<String> generatedDirForDatabase, List<String> fileDirForDatabase) {
-        this.generatedDirForDatabase = generatedDirForDatabase;
+
+    public FileLinkPreferences(String mainFileDirectory, List<String> fileDirForDatabase) {
+        this.mainFileDirectory = mainFileDirectory;
         this.fileDirForDatabase = fileDirForDatabase;
     }
 
-    public List<String> getGeneratedDirForDatabase() {
-        return generatedDirForDatabase;
+    public String getMainFileDirectory() {
+        return mainFileDirectory;
     }
 
     public List<String> getFileDirForDatabase() {

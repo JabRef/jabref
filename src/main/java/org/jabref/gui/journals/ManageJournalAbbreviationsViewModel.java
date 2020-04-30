@@ -3,7 +3,6 @@ package org.jabref.gui.journals;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -151,7 +150,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
-        externalFiles.forEach(name -> openFile(Paths.get(name)));
+        externalFiles.forEach(name -> openFile(Path.of(name)));
     }
 
     /**

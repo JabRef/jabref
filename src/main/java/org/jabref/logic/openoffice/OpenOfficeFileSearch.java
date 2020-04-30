@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,26 +54,26 @@ public class OpenOfficeFileSearch {
         // 64-bit program directory
         String progFiles = System.getenv("ProgramFiles");
         if (progFiles != null) {
-            sourceList.add(Paths.get(progFiles));
+            sourceList.add(Path.of(progFiles));
         }
 
         // 32-bit program directory
         progFiles = System.getenv("ProgramFiles(x86)");
         if (progFiles != null) {
-            sourceList.add(Paths.get(progFiles));
+            sourceList.add(Path.of(progFiles));
         }
 
         return findOpenOfficeDirectories(sourceList);
     }
 
     private static List<Path> findOSXOpenOfficeDirs() {
-        List<Path> sourceList = Collections.singletonList(Paths.get("/Applications"));
+        List<Path> sourceList = Collections.singletonList(Path.of("/Applications"));
 
         return findOpenOfficeDirectories(sourceList);
     }
 
     private static List<Path> findLinuxOpenOfficeDirs() {
-        List<Path> sourceList = Arrays.asList(Paths.get("/usr/lib"), Paths.get("/usr/lib64"), Paths.get("/opt"));
+        List<Path> sourceList = Arrays.asList(Path.of("/usr/lib"), Path.of("/usr/lib64"), Path.of("/opt"));
 
         return findOpenOfficeDirectories(sourceList);
     }

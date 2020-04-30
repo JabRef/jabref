@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -24,10 +23,10 @@ public class CustomImporter extends Importer {
     private final String className;
     private final Path basePath;
 
-    private Importer importer;
+    private final Importer importer;
 
     public CustomImporter(String basePath, String className) throws ClassNotFoundException {
-        this.basePath = Paths.get(basePath);
+        this.basePath = Path.of(basePath);
         this.className = className;
         try {
             importer = load(this.basePath.toUri().toURL(), this.className);

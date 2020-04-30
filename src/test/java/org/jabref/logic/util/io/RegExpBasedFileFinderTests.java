@@ -1,7 +1,6 @@
 package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,14 +52,14 @@ public class RegExpBasedFileFinderTests {
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
+        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         // then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
                 result);
     }
 
@@ -69,14 +68,14 @@ public class RegExpBasedFileFinderTests {
         // given
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
+        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         // then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
                 result);
     }
 
@@ -91,14 +90,14 @@ public class RegExpBasedFileFinderTests {
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
+        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage]\\\\.[extension]", ',');
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         // then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
                 result);
     }
 
@@ -111,14 +110,14 @@ public class RegExpBasedFileFinderTests {
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
+        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         // then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
                 result);
     }
 
@@ -131,7 +130,7 @@ public class RegExpBasedFileFinderTests {
 
         List<String> extensions = Collections.singletonList("pdf");
 
-        List<Path> dirs = Collections.singletonList(Paths.get(FILES_DIRECTORY));
+        List<Path> dirs = Collections.singletonList(Path.of(FILES_DIRECTORY));
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[bibtexkey].*\\\\.[extension]", ',');
 
         // when

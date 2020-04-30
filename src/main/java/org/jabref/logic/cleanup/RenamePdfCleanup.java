@@ -1,7 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
         boolean changed = false;
         for (LinkedFile file : files) {
-            if (onlyRelativePaths && Paths.get(file.getLink()).isAbsolute()) {
+            if (onlyRelativePaths && Path.of(file.getLink()).isAbsolute()) {
                 continue;
             }
 

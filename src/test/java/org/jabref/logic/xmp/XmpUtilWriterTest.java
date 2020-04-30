@@ -2,7 +2,6 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -118,9 +117,9 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
 
-        XmpUtilWriter.writeXmp(Paths.get(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
 
-        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(Path.of(pdfFile.toAbsolutePath().toString()), xmpPreferences);
         assertEquals(3, entryList.size());
     }
 

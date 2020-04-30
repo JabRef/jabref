@@ -3,7 +3,6 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -128,7 +127,7 @@ public class GroupsParser {
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         try {
-            Path path = Paths.get(tok.nextToken());
+            Path path = Path.of(tok.nextToken());
             try {
                 TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
                 addGroupDetails(tok, newGroup);
