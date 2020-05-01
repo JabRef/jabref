@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 
@@ -20,21 +19,17 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
 
     @Inject private JournalAbbreviationRepository repository;
     private final ExporterViewModel exporter;
-    @FXML private Button browseButton;
     @FXML private TextField name;
     @FXML private TextField fileName;
     @FXML private TextField extension;
     @FXML private ButtonType saveExporter;
-    @Inject private final DialogService dialogService;
-    @Inject private final PreferencesService preferences;
+    @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
     private CreateModifyExporterDialogViewModel viewModel;
 
-    public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
-                                          PreferencesService preferences) {
+    public CreateModifyExporterDialogView(ExporterViewModel exporter) {
         this.setTitle(Localization.lang("Customize Export Formats"));
         this.exporter = exporter;
-        this.dialogService = dialogService;
-        this.preferences = preferences;
 
         ViewLoader.view(this)
                   .load()

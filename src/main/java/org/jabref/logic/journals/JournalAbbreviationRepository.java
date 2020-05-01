@@ -93,6 +93,7 @@ public class JournalAbbreviationRepository {
         Objects.requireNonNull(abbreviation);
 
         // We do not want to keep duplicates, thus remove the old abbreviation
+        // (abbreviation equality is tested on name only, so we cannot use a Set instead)
         customAbbreviations.remove(abbreviation);
         customAbbreviations.add(abbreviation);
     }

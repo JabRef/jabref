@@ -207,7 +207,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
     }
 
     @Test
-    void testcurrentFilePropertyChangeActiveFile() throws Exception {
+    void testCurrentFilePropertyChangeActiveFile() throws Exception {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile1Entries));
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile3Entries));
@@ -409,7 +409,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
         expected = Arrays.asList(
                 "EntryEntry;EE;EE",
                 "Abbreviations;Abb;Abb",
-                "Test Entry;TE;TE",
+                "Test Entry;TE;T",
                 "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 

@@ -38,8 +38,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void addExporter() {
-        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null, dialogService, preferences
-        );
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.add(exporter.get());
@@ -53,7 +52,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
             return;
         }
         exporterToModify = selectedExporters.get(0);
-        dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences);
+        dialog = new CreateModifyExporterDialogView(exporterToModify);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.remove(exporterToModify);
