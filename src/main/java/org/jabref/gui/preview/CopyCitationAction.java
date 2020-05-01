@@ -58,6 +58,7 @@ public class CopyCitationAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
+    @Override
     public void execute() {
         BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
