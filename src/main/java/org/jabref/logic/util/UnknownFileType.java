@@ -3,6 +3,7 @@ package org.jabref.logic.util;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class UnknownFileType implements FileType {
@@ -14,6 +15,7 @@ public class UnknownFileType implements FileType {
             if (extensions[i].contains(".")) {
                 extensions[i] = extensions[i].substring(extensions[i].indexOf('.') + 1);
             }
+            extensions[i] = extensions[i].toLowerCase(Locale.ROOT);
         }
         this.extensions = Arrays.asList(extensions);
     }
