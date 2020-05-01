@@ -21,8 +21,8 @@ class AbbreviationsTest {
     }
 
     @Test
-    void getNextAbbreviationExpandsAbbreviation() {
-        assertEquals("2D Materials",
+    void getNextAbbreviationConvertsAbbreviationToDotLessAbbreviation() {
+        assertEquals("2D Mater",
                 repository.getNextAbbreviation("2D Mater.").get());
     }
 }
