@@ -39,6 +39,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -78,6 +79,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
+
+        downloadLinkedOnlineFiles.setSelected(JabRefPreferences.getInstance().getFilePreferences().getDownloadLinkedFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {
