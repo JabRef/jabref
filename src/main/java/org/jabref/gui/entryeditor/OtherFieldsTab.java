@@ -18,7 +18,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +42,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           BibEntryTypesManager entryTypesManager,
                           ExternalFileTypes externalFileTypes,
                           TaskExecutor taskExecutor,
-                          JournalAbbreviationLoader journalAbbreviationLoader) {
+                          JournalAbbreviationRepository journalAbbreviationRepository) {
         super(false,
                 databaseContext,
                 suggestionProviders,
@@ -51,7 +51,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 preferences, // ToDo: Still uses JabRefPreferences instead of PreferencesService
                 externalFileTypes,
                 taskExecutor,
-                journalAbbreviationLoader);
+                journalAbbreviationRepository);
 
         this.entryTypesManager = entryTypesManager;
         this.customTabFieldNames = preferences.getAllDefaultTabFieldNames();

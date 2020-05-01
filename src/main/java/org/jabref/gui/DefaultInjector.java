@@ -8,7 +8,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -36,8 +36,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.prefs;
         } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
-        } else if (clazz == JournalAbbreviationLoader.class) {
-            return Globals.journalAbbreviationLoader;
+        } else if (clazz == JournalAbbreviationRepository.class) {
+            return Globals.journalAbbreviationRepository;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
         } else if (clazz == FileUpdateMonitor.class) {

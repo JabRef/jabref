@@ -1,9 +1,8 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
@@ -13,13 +12,11 @@ public class SuggestionProviders {
 
     private final boolean isEmpty;
     private BibDatabase database;
-    private AutoCompletePreferences preferences;
-    private JournalAbbreviationLoader abbreviationLoader;
+    private JournalAbbreviationRepository abbreviationRepository;
 
-    public SuggestionProviders(BibDatabase database, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
+    public SuggestionProviders(BibDatabase database, JournalAbbreviationRepository abbreviationRepository) {
         this.database = database;
-        this.preferences = Objects.requireNonNull(preferences);
-        this.abbreviationLoader = abbreviationLoader;
+        this.abbreviationRepository = abbreviationRepository;
         this.isEmpty = false;
     }
 
@@ -39,7 +36,7 @@ public class SuggestionProviders {
             return new BibEntrySuggestionProvider(database);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)
                 || StandardField.PUBLISHER.equals(field)) {
-            return new JournalsSuggestionProvider(field, database, preferences, abbreviationLoader);
+            return new JournalsSuggestionProvider(field, database, abbreviationRepository);
         } else {
             return new WordSuggestionProvider(field, database);
         }
