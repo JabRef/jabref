@@ -6,6 +6,7 @@ import java.util.Set;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
@@ -57,7 +58,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = BibtexKeyGenerator.cleanKey(parts[1]);
+            String testString = BibtexKeyGenerator.cleanKey(parts[1], Globals.prefs.get(JabRefPreferences.DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 String title = Localization.lang("Error");
                 String content = Localization.lang("Field names are not allowed to contain white space or the following "

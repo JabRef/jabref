@@ -10,7 +10,6 @@ public class GeneralPreferences {
 
         private final boolean warnAboutDuplicatesInInspection;
         private final boolean confirmDelete;
-        private final boolean enforceLegalBibtexKey;
         private final boolean allowIntegerEditionBibtex;
         private final boolean memoryStickMode;
         private final boolean collectTelemetry;
@@ -20,7 +19,6 @@ public class GeneralPreferences {
                               BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
-                              boolean enforceLegalBibtexKey,
                               boolean allowIntegerEditionBibtex,
                               boolean memoryStickMode,
                               boolean collectTelemetry,
@@ -29,7 +27,6 @@ public class GeneralPreferences {
         this.defaultBibDatabaseMode = defaultBibDatabaseMode;
         this.warnAboutDuplicatesInInspection = warnAboutDuplicatesInInspection;
         this.confirmDelete = confirmDelete;
-        this.enforceLegalBibtexKey = enforceLegalBibtexKey;
         this.allowIntegerEditionBibtex = allowIntegerEditionBibtex;
         this.memoryStickMode = memoryStickMode;
         this.collectTelemetry = collectTelemetry;
@@ -50,10 +47,6 @@ public class GeneralPreferences {
 
     public boolean isConfirmDelete() {
         return confirmDelete;
-    }
-
-    public boolean isEnforceLegalBibtexKey() {
-        return enforceLegalBibtexKey;
     }
 
     public boolean isAllowIntegerEditionBibtex() {

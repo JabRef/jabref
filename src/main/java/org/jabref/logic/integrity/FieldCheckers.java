@@ -20,12 +20,11 @@ public class FieldCheckers {
     private final Multimap<Field, ValueChecker> fieldChecker;
 
     public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences,
-                         JournalAbbreviationRepository abbreviationRepository,
-                         boolean enforceLegalKey, boolean allowIntegerEdition) {
-        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey, allowIntegerEdition);
+                         JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
+        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, allowIntegerEdition);
     }
 
-    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey, boolean allowIntegerEdition) {
+    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (Field field : FieldFactory.getJournalNameFields()) {
