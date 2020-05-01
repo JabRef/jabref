@@ -29,8 +29,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
-    private static List<Character> disallowedCharacters = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
-    private static List<Character> unwantedCharacters = Arrays.asList('-', '`', 'ʹ', ':', '!', ';', '?', '^', '+');
+    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
     private final AbstractBibtexKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -54,7 +53,8 @@ public class BibtexKeyGenerator extends BracketedPattern {
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, true, keyPattern, ',', false))
+        String unwantedCharacters = "-`ʹ:!;?^+";
+        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, unwantedCharacters))
                 .generateKey(entry);
     }
 
@@ -75,11 +75,16 @@ public class BibtexKeyGenerator extends BracketedPattern {
         }
     }
 
-    public static String removeUnwantedCharacters(String key) {
+    public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
+        List<Character> unwantedChars = new ArrayList<>();
+        for (char ch : unwantedCharacters.toCharArray()) {
+            unwantedChars.add(ch);
+        }
+
         StringBuilder newKey = new StringBuilder();
         for (int i = 0; i < key.length(); i++) {
             char c = key.charAt(i);
-            if (!disallowedCharacters.contains(c) && !unwantedCharacters.contains(c)) {
+            if (!DISALLOWED_CHARACTERS.contains(c) && !unwantedChars.contains(c)) {
                 newKey.append(c);
             }
         }
@@ -88,8 +93,8 @@ public class BibtexKeyGenerator extends BracketedPattern {
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
-    public static String cleanKey(String key) {
-        return removeUnwantedCharacters(key).replaceAll("\\s", "");
+    public static String cleanKey(String key, String unwantedCharacters) {
+        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
 
     public String generateKey(BibEntry entry) {
@@ -115,15 +120,14 @@ public class BibtexKeyGenerator extends BracketedPattern {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
-                    String label = expandBrackets(pattern, delimiter, entry, database, bibtexKeyPatternPreferences.isEnforceLegalKey());
+                    String label = expandBrackets(pattern, delimiter, entry, database);
                     // apply modifier if present
                     if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
                     }
 
                     // Remove all illegal characters from the label.
-                    label = cleanKey(label);
-
+                    label = cleanKey(label, bibtexKeyPatternPreferences.getUnwantedCharacters());
                     stringBuilder.append(label);
 
                 } else {

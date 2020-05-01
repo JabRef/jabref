@@ -7,11 +7,13 @@ import java.util.Set;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CustomizeGeneralFieldsDialogViewModel {
@@ -58,7 +60,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getEnforceLegalKeys());
+            String testString = BibtexKeyGenerator.cleanKey(parts[1], Globals.prefs.get(JabRefPreferences.DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Error"),

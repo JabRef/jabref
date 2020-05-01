@@ -2,6 +2,7 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
+import org.jabref.Globals;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
@@ -17,7 +18,7 @@ public class ValidBibtexKeyChecker implements ValueChecker {
             return Optional.of(Localization.lang("empty BibTeX key"));
         }
 
-        String cleaned = BibtexKeyGenerator.cleanKey(value);
+        String cleaned = BibtexKeyGenerator.cleanKey(value, Globals.prefs.getUnwantedCharacters());
 
         if (cleaned.equals(value)) {
             return Optional.empty();

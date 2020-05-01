@@ -49,6 +49,11 @@
         </padding>
     </HBox>
 
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Remove the following characters:"/>
+        <TextField fx:id="unwantedCharacters" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
     <HBox prefWidth="650.0">
         <Label styleClass="sectionHeader" text="%Key patterns"/>
         <HBox HBox.hgrow="ALWAYS"/>
