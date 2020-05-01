@@ -28,8 +28,6 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
-
-    @FXML private CheckBox useIEEELatexAbbreviations;
     @FXML private CheckBox useCaseKeeper;
     @FXML private CheckBox useUnitFormatter;
 
@@ -70,8 +68,6 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
-
-        useIEEELatexAbbreviations.selectedProperty().bindBidirectional(viewModel.useIEEELatexAbbreviationsProperty());
 
         useCaseKeeper.selectedProperty().bindBidirectional(viewModel.useCaseKeeperProperty());
         useUnitFormatter.selectedProperty().bindBidirectional(viewModel.useUnitFormatterProperty());

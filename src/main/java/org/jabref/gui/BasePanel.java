@@ -399,7 +399,7 @@ public class BasePanel extends StackPane {
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
-            suggestionProviders = new SuggestionProviders(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
+            suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository);
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
