@@ -53,6 +53,11 @@ public class FileHistoryMenu extends Menu {
     private void addItem(Path file, int num) {
         String number = Integer.toString(num);
         MenuItem item = new MenuItem(number + ". " + file);
+        // By default mnemonic parsing is set to true for anything that is Labeled, if an underscore character
+        // is present, it would create a key combination ALT+the succeeding character (at least for Windows OS)
+        // and the underscore character will be parsed (deleted).
+        // i.e if the file name was called "bib_test.bib", a key combination "ALT+t" will be created
+        // so to avoid this, mnemonic parsing should be set to false to print normally the underscore character.
         item.setMnemonicParsing(false);
         item.setOnAction(event -> openFile(file));
         getItems().add(item);
