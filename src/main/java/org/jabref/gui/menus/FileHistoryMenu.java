@@ -53,6 +53,7 @@ public class FileHistoryMenu extends Menu {
     private void addItem(Path file, int num) {
         String number = Integer.toString(num);
         MenuItem item = new MenuItem(number + ". " + file);
+        item.setMnemonicParsing(false);
         item.setOnAction(event -> openFile(file));
         getItems().add(item);
     }
