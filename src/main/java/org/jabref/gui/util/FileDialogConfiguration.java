@@ -2,7 +2,6 @@ package org.jabref.gui.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -84,7 +83,7 @@ public class FileDialogConfiguration {
 
         public Builder withInitialDirectory(String directory) {
             if (directory != null) {
-                withInitialDirectory(Paths.get(directory));
+                withInitialDirectory(Path.of(directory));
             } else {
                 initialDirectory = null;
             }

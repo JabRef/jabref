@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +40,7 @@ class LocalizationConsistencyTest {
         // e.g., "<bundle>_en.properties", where <bundle> is [JabRef, Menu]
         Pattern propertiesFile = Pattern.compile(String.format("%s_.{2,}.properties", bundle));
         Set<String> localizationFiles = new HashSet<>();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get("src/main/resources/l10n"))) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of("src/main/resources/l10n"))) {
             for (Path fullPath : directoryStream) {
                 String fileName = fullPath.getFileName().toString();
                 if (propertiesFile.matcher(fileName).matches()) {
@@ -156,7 +155,7 @@ class LocalizationConsistencyTest {
     @ParameterizedTest
     @MethodSource("installedLanguages")
     void resourceBundleExists(Language language) {
-        Path messagesPropertyFile = Paths.get("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + language.getId() + ".properties");
+        Path messagesPropertyFile = Path.of("src/main/resources").resolve(Localization.RESOURCE_PREFIX + "_" + language.getId() + ".properties");
         assertTrue(Files.exists(messagesPropertyFile));
     }
 

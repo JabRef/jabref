@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -135,7 +134,7 @@ public class XmpExporterTest {
         List<String> lines = Files.readAllLines(file);
         assertEquals(Collections.emptyList(), lines);
 
-        Path fileTuring = Paths.get(file.getParent().toString(), entryTuring.getId() + "_null.xmp");
+        Path fileTuring = Path.of(file.getParent().toString(), entryTuring.getId() + "_null.xmp");
         String actualTuring = String.join("\n", Files.readAllLines(fileTuring)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedTuring = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +
@@ -156,7 +155,7 @@ public class XmpExporterTest {
 
         assertEquals(expectedTuring, actualTuring);
 
-        Path fileArmbrust = Paths.get(file.getParent().toString(), entryArmbrust.getId() + "_Armbrust2010.xmp");
+        Path fileArmbrust = Path.of(file.getParent().toString(), entryArmbrust.getId() + "_Armbrust2010.xmp");
         String actualArmbrust = String.join("\n", Files.readAllLines(fileArmbrust)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
 
         String expectedArmbrust = "  <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" +

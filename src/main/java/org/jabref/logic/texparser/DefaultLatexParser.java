@@ -10,7 +10,6 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +62,7 @@ public class DefaultLatexParser implements LatexParser {
 
     @Override
     public LatexParserResult parse(String citeString) {
-        matchCitation(Paths.get(""), 1, citeString);
+        matchCitation(Path.of(""), 1, citeString);
         return latexParserResult;
     }
 

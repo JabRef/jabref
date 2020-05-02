@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +88,7 @@ public class MainArchitectureTests {
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main/"))) {
+        try (Stream<Path> pathStream = Files.walk(Path.of("src/main/"))) {
             List<Path> files = pathStream
                     .filter(p -> p.toString().endsWith(".java"))
                     .filter(p -> {

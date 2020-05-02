@@ -161,14 +161,14 @@ public class JabRefMain extends Application {
 
     private static void applyPreferences(JabRefPreferences preferences) {
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(Globals.prefs.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                                                         Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationLoader);
+        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationRepository);
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,8 +66,8 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -214,6 +213,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
     public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
+    public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -337,8 +337,6 @@ public class JabRefPreferences implements PreferencesService {
     // User
     private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
-    private static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
@@ -591,7 +589,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(REMOTE_SERVER_PORT, 6050);
 
-        defaults.put(PERSONAL_JOURNAL_LIST, "");
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(CITE_COMMAND, "\\cite"); // obsoleted by the app-specific ones (not any more?)
 
@@ -638,7 +635,6 @@ public class JabRefPreferences implements PreferencesService {
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
@@ -1141,7 +1137,7 @@ public class JabRefPreferences implements PreferencesService {
      * @param filename String File to export to
      */
     public void exportPreferences(String filename) throws JabRefException {
-        exportPreferences(Paths.get(filename));
+        exportPreferences(Path.of(filename));
     }
 
     public void exportPreferences(Path file) throws JabRefException {
@@ -1161,7 +1157,7 @@ public class JabRefPreferences implements PreferencesService {
      *                         or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
-        importPreferences(Paths.get(filename));
+        importPreferences(Path.of(filename));
     }
 
     public void importPreferences(Path file) throws JabRefException {
@@ -1189,7 +1185,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Paths::get).collect(Collectors.toList()));
+        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
     }
 
     public void storeFileHistory(FileHistory history) {
@@ -1200,12 +1196,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public FilePreferences getFilePreferences() {
-        Map<Field, String> fieldDirectories = Stream.of(StandardField.FILE, StandardField.PDF, StandardField.PS)
-                                                    .collect(Collectors.toMap(field -> field, field -> get(field.getName() + FilePreferences.DIR_SUFFIX, "")));
         return new FilePreferences(
                 getUser(),
-                fieldDirectories,
-                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR),
+                get(MAIN_FILE_DIRECTORY),
+                getBoolean(BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN));
     }
@@ -1278,9 +1272,9 @@ public class JabRefPreferences implements PreferencesService {
                 getBibtexKeyPatternPreferences());
     }
 
-    public ExporterFactory getExporterFactory(JournalAbbreviationLoader abbreviationLoader) {
-        List<TemplateExporter> customFormats = getCustomExportFormats(abbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationLoader);
+    public ExporterFactory getExporterFactory(JournalAbbreviationRepository abbreviationRepository) {
+        List<TemplateExporter> customFormats = getCustomExportFormats(abbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationRepository);
         SavePreferences savePreferences = this.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = this.getXMPPreferences();
         return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
@@ -1300,16 +1294,19 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
-        Objects.requireNonNull(journalAbbreviationLoader);
-        return new LayoutFormatterPreferences(getNameFormatterPreferences(), getJournalAbbreviationPreferences(),
-                                              getFileLinkPreferences(), journalAbbreviationLoader);
+    public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository) {
+        return new LayoutFormatterPreferences(
+                getNameFormatterPreferences(),
+                getFileLinkPreferences(),
+                repository);
     }
 
     @Override
     public XmpPreferences getXMPPreferences() {
-        return new XmpPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                                  getKeywordDelimiter());
+        return new XmpPreferences(
+                getBoolean(USE_XMP_PRIVACY_FILTER),
+                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
+                getKeywordDelimiter());
     }
 
     @Override
@@ -1341,10 +1338,10 @@ public class JabRefPreferences implements PreferencesService {
         return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
     }
 
-    public FileLinkPreferences getFileLinkPreferences() {
+    private FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
-                                       Collections.singletonList(get(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX)),
-                                       fileDirForDatabase);
+                get(MAIN_FILE_DIRECTORY),
+                fileDirForDatabase);
     }
 
     public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
@@ -1392,7 +1389,7 @@ public class JabRefPreferences implements PreferencesService {
                                                                        .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file))
                                                                        .orElse(null);
                                                } else {
-                                                   return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                                                   return new TextBasedPreviewLayout(style, getLayoutFormatterPreferences(Globals.journalAbbreviationRepository));
                                                }
                                            })
                                            .filter(Objects::nonNull)
@@ -1465,14 +1462,13 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST),
-                                                  getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
     }
 
     @Override
-    public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
+    public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
         return new CleanupPreferences(
-                                      getLayoutFormatterPreferences(journalAbbreviationLoader),
+                                      getLayoutFormatterPreferences(abbreviationRepository),
                                       getFilePreferences());
     }
 
@@ -1571,7 +1567,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-        putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
     }
 
     @Override
@@ -1699,7 +1694,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public Path getWorkingDir() {
-        return Paths.get(get(WORKING_DIRECTORY));
+        return Path.of(get(WORKING_DIRECTORY));
     }
 
     @Override
@@ -1749,13 +1744,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader) {
+    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
         int i = 0;
         List<TemplateExporter> formats = new ArrayList<>();
         String exporterName;
         String filename;
         String extension;
-        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(loader);
+        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
         SavePreferences savePreferences = loadForExportFromPreferences();
         List<String> formatData;
         while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {

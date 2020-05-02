@@ -101,7 +101,7 @@ class LayoutTest {
     }
 
     @Test
-    public void beginConditionals() throws IOException {
+    void beginConditionals() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.AUTHOR, "Author");
 
@@ -135,7 +135,7 @@ class LayoutTest {
     @Test
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
-                new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));
+                new FileLinkPreferences("", Collections.singletonList("src/test/resources/pdfs/")));
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.addFile(new LinkedFile("Test file", "encrypted.pdf", "PDF"));
 
