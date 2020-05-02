@@ -13,12 +13,13 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.util.LinkedHashSetEqualsUtil;
 
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
-    private final Set<OrFields> requiredFields;
-    private final Set<BibField> fields;
+    private final LinkedHashSet<OrFields> requiredFields;
+    private final LinkedHashSet<BibField> fields;
 
     public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
@@ -112,13 +113,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
-                requiredFields.equals(that.requiredFields) &&
-                fields.equals(that.fields);
+               LinkedHashSetEqualsUtil.linkedEquals(requiredFields, that.requiredFields)
+               && LinkedHashSetEqualsUtil.linkedEquals(fields, that.fields);
+
     }
 
     @Override
@@ -129,10 +131,10 @@ public class BibEntryType implements Comparable<BibEntryType> {
     @Override
     public String toString() {
         return "BibEntryType{" +
-                "type=" + type +
-                ", requiredFields=" + requiredFields +
-                ", fields=" + fields +
-                '}';
+               "type=" + type +
+               ", requiredFields=" + requiredFields +
+               ", fields=" + fields +
+               '}';
     }
 
     @Override
