@@ -47,15 +47,16 @@ public class BibtexKeyGenerator extends BracketedPattern {
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
+    @Deprecated
     static String generateKey(BibEntry entry, String pattern) {
         return generateKey(entry, pattern, new BibDatabase());
     }
 
+    @Deprecated
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        String unwantedCharacters = "-`ʹ:!;?^+";
-        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, unwantedCharacters))
+        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, "-`ʹ:!;?^+"))
                 .generateKey(entry);
     }
 

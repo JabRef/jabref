@@ -214,7 +214,7 @@ public class JabRefPreferences implements PreferencesService {
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
-    public static final String DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
+    public static final String UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -569,7 +569,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
-        defaults.put(DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
+        defaults.put(UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -1366,7 +1366,7 @@ public class JabRefPreferences implements PreferencesService {
                                                getKeyPattern(),
                                                getKeywordDelimiter(),
                                                getBoolean(AVOID_OVERWRITING_KEY),
-                                               get(DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS));
+                                               get(UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -1987,7 +1987,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUnwantedCharacters() {
-        return get(DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS);
+        return get(UNWANTED_BIBTEX_KEY_CHARACTERS);
     }
 
     @Override

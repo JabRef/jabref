@@ -232,7 +232,7 @@ public class EndnoteImporter extends Importer {
                         type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val, "-`ʹ:!;?^+"));
+                    hm.put(InternalField.KEY_FIELD, preferences.getBibtexKeyPatternPreferences().getUnwantedCharacters());
                 }
             }
 
