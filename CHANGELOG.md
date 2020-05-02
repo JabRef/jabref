@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the windows installer did not create an entry in the start menu [bug report in the forum](https://discourse.jabref.org/t/error-while-fetching-from-doi/2018/3)
 - We fixed an issue where JabRef switched to discrete graphics under macOS [#5935](https://github.com/JabRef/jabref/issues/5935)
 - We fixed an issue where the Preferences entry preview will be unexpected modified leads to Value too long exception [#6198](https://github.com/JabRef/jabref/issues/6198)
+- We fixed an issue, when slash in Author's name caused wrong data display in main table [#6388](https://github.com/JabRef/jabref/issues/6388)
 
 ### Removed
 
