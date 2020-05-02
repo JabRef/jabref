@@ -11,6 +11,11 @@ import org.jabref.build.xjc.XjcTask
 buildscript {
     repositories {
         mavenLocal()
+        maven {url 'https://maven.aliyun.com/repository/central/'}
+        maven {url 'https://maven.aliyun.com/repository/public/'}
+        maven {url 'https://maven.aliyun.com/repository/google/'}
+        maven {url 'https://maven.aliyun.com/repository/gradle-plugin/'}
+        maven {url 'https://maven.aliyun.com/repository/jcenter/'}
         jcenter()
     }
 }
