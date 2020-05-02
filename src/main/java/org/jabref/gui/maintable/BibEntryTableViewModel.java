@@ -112,6 +112,7 @@ public class BibEntryTableViewModel {
 
     public ObservableValue<String> getFields(OrFields fields) {
         ObservableValue<String> value = fieldValues.get(fields);
+        String checking = fields.getDisplayName();
         if (value != null) {
             return value;
         } else {
