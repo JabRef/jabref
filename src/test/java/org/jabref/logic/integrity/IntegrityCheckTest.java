@@ -10,8 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -220,16 +219,16 @@ class IntegrityCheckTest {
     @Test
     void testAbbreviationChecks() {
         for (Field field : Arrays.asList(StandardField.BOOKTITLE, StandardField.JOURNAL)) {
-            assertCorrect(createContext(field, "IEEE Software"));
+            assertCorrect(createContext(field, "2D Materials"));
             assertCorrect(createContext(field, ""));
-            assertWrong(createContext(field, "IEEE SW"));
+            assertWrong(createContext(field, "2D Mater."));
         }
     }
 
     @Test
     void testJournalIsKnownInAbbreviationList() {
-        assertCorrect(createContext(StandardField.JOURNAL, "IEEE Software"));
-        assertWrong(createContext(StandardField.JOURNAL, "IEEE Whocares"));
+        assertCorrect(createContext(StandardField.JOURNAL, "2D Materials"));
+        assertWrong(createContext(StandardField.JOURNAL, "Some unknown journal"));
     }
 
     @Test
@@ -368,7 +367,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                           new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
                 .checkDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -408,7 +407,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
                 .checkDatabase();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -417,7 +416,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true, false
+                JournalAbbreviationLoader.loadBuiltInRepository(), true, false
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
@@ -426,7 +425,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                JournalAbbreviationLoader.loadBuiltInRepository(), true,
                 allowIntegerEdition
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
