@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded">
   <info>
-    <title>ISNAD</title>
-    <title-short>IAS</title-short>
+    <title>İSNAD Atıf Sistemi 1. Edisyon (dipnotlu)</title>
+    <title-short>İSNAD</title-short>
     <id>http://www.zotero.org/styles/isnad</id>
     <link href="http://www.zotero.org/styles/isnad" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
     <link href="http://www.isnadsistemi.org/" rel="documentation"/>
-    <link href="http://www.isnadsistemi.org/dosyalar/Isnad_Atif_Sistemi_12-3-2018.pdf" rel="documentation"/>
+    <link href="http://www.isnadsistemi.org/guide" rel="documentation"/>
     <author>
       <name>Muhammet Tarakçı</name>
       <email>muhammettarakci@gmail.com</email>

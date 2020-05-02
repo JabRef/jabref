@@ -42,7 +42,7 @@ public class AutoSetFileLinksUtilTest {
 
     @Test
     public void test() throws Exception {
-        //Due to mocking the externalFileType class, the file extension will not be found
+        // Due to mocking the externalFileType class, the file extension will not be found
 
         List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
 

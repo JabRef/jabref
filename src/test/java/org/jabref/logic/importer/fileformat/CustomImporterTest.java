@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.jabref.logic.importer.Importer;
@@ -37,7 +37,7 @@ public class CustomImporterTest {
 
     @Test
     public void testGetBasePath() {
-        assertEquals(Paths.get("src/main/java/org/jabref/logic/importer/fileformat/CopacImporter.java"),
+        assertEquals(Path.of("src/main/java/org/jabref/logic/importer/fileformat/CopacImporter.java"),
                 importer.getBasePath());
     }
 
@@ -54,7 +54,7 @@ public class CustomImporterTest {
 
     @Test
     public void equalsIsBasedOnName() {
-        //noinspection AssertEqualsBetweenInconvertibleTypes
+        // noinspection AssertEqualsBetweenInconvertibleTypes
         assertEquals(new CopacImporter(), importer);
     }
 

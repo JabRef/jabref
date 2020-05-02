@@ -6,7 +6,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -40,7 +40,7 @@ class UpdateTimestampListenerTest {
 
     @Test
     void updateTimestampEnabled() {
-        final Field timestampField = InternalField.TIMESTAMP;
+        final Field timestampField = StandardField.TIMESTAMP;
         final String baseDate = "2000-1-1";
         final String newDate = "2000-1-2";
 
@@ -63,7 +63,7 @@ class UpdateTimestampListenerTest {
 
     @Test
     void updateTimestampDisabled() {
-        final Field timestampField = InternalField.TIMESTAMP;
+        final Field timestampField = StandardField.TIMESTAMP;
         final String baseDate = "2000-1-1";
         final String newDate = "2000-1-2";
 

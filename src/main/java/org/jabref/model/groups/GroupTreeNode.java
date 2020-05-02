@@ -116,7 +116,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot() && (originalContext
                 != GroupHierarchyType.INCLUDING)) {
-            //noinspection OptionalGetWithoutIsPresent
+            // noinspection OptionalGetWithoutIsPresent
             searchRule.addRule(getParent().get().getSearchMatcher(originalContext));
         }
         return searchRule;
@@ -218,24 +218,26 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Determines the number of entries in the specified list which are matched by this group.
+     * Determines the entries in the specified list which are matched by this group.
+     *
      * @param entries list of entries to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public long calculateNumberOfMatches(List<BibEntry> entries) {
+    public List<BibEntry> findMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
         return entries.stream()
                       .filter(matcher::isMatch)
-                      .count();
+                      .collect(Collectors.toList());
     }
 
     /**
-     * Determines the number of entries in the specified database which are matched by this group.
+     * Determines the entries in the specified database which are matched by this group.
+     *
      * @param database database to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public long calculateNumberOfMatches(BibDatabase database) {
-        return calculateNumberOfMatches(database.getEntries());
+    public List<BibEntry> findMatches(BibDatabase database) {
+        return findMatches(database.getEntries());
     }
 
     /**

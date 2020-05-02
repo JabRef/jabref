@@ -3,7 +3,6 @@ package org.jabref.cli;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,9 +110,9 @@ public class ArgumentProcessor {
             }
         } else {
             if (OS.WINDOWS) {
-                file = Paths.get(address);
+                file = Path.of(address);
             } else {
-                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+                file = Path.of(address.replace("~", System.getProperty("user.home")));
             }
         }
 
@@ -241,8 +240,8 @@ public class ArgumentProcessor {
 
     private boolean exportMatches(List<ParserResult> loaded) {
         String[] data = cli.getExportMatches().split(",");
-        String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-        //$ stands for a blank
+        String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
+        // $ stands for a blank
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
@@ -252,17 +251,17 @@ public class ArgumentProcessor {
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
-        //export matches
+        // export matches
         if (!matches.isEmpty()) {
             String formatName;
 
-            //read in the export format, take default format if no format entered
+            // read in the export format, take default format if no format entered
             switch (data.length) {
                 case 3:
                     formatName = data[2];
                     break;
                 case 2:
-                    //default exporter: HTML table (with Abstract & BibTeX)
+                    // default exporter: HTML table (with Abstract & BibTeX)
                     formatName = "tablerefsabsbib";
                     break;
                 default:
@@ -272,7 +271,7 @@ public class ArgumentProcessor {
                     return false;
             }
 
-            //export new database
+            // export new database
             Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
             if (!exporter.isPresent()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
@@ -280,7 +279,7 @@ public class ArgumentProcessor {
                 // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Paths.get(data[1]),
+                    exporter.get().export(databaseContext, Path.of(data[1]),
                             databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
                             matches);
                 } catch (Exception ex) {
@@ -389,7 +388,7 @@ public class ArgumentProcessor {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.loadForSaveFromPreferences();
-            AtomicFileWriter fileWriter = new AtomicFileWriter(Paths.get(subName), prefs.getEncoding());
+            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), prefs.getEncoding());
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
@@ -441,7 +440,7 @@ public class ArgumentProcessor {
             } else {
                 // We have an exporter:
                 try {
-                    exporter.get().export(pr.getDatabaseContext(), Paths.get(data[0]),
+                    exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
                                     .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
@@ -458,9 +457,9 @@ public class ArgumentProcessor {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             Globals.entryTypesManager.addCustomOrModifiedTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                     Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
-            List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationLoader);
+            List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                    .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+                    .getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
             SavePreferences savePreferences = Globals.prefs.loadForExportFromPreferences();
             XmpPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
             Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
