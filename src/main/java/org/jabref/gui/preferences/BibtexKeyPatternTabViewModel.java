@@ -67,7 +67,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
         keyPatternRegexProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REGEX));
         keyPatternReplacementProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
-        unwantedCharactersProperty.setValue(preferences.get(JabRefPreferences.DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS));
+        unwantedCharactersProperty.setValue(preferences.get(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
         preferences.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegexProperty.getValue());
         preferences.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, keyPatternReplacementProperty.getValue());
-        preferences.put(JabRefPreferences.DEFAULT_UNWANTED_BIBTEX_KEY_CHARACTERS, unwantedCharactersProperty.getValue());
+        preferences.put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, unwantedCharactersProperty.getValue());
 
         GlobalBibtexKeyPattern newKeyPattern = GlobalBibtexKeyPattern.fromPattern(preferences.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         patternListProperty.forEach(item -> {
