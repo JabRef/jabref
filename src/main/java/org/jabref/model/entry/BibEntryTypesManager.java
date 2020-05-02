@@ -1,7 +1,6 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -11,7 +10,6 @@ import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -177,7 +175,7 @@ public class BibEntryTypesManager {
             customOrModifiedType.remove(type);
             customOrModifiedType.add(type);
         }
-        
+
         private void removeCustomOrModifiedEntryType(BibEntryType type) {
             customOrModifiedType.remove(type);
         }
@@ -190,7 +188,7 @@ public class BibEntryTypesManager {
 
         public boolean isCustomOrModifiedType(BibEntryType entryType) {
             return customOrModifiedType.stream()
-                                       .anyMatch(customizedType -> customizedType.getType().equals(entryType.getType()));
+                                       .anyMatch(customizedType -> customizedType.equals(entryType));
         }
     }
 }

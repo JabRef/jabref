@@ -1091,28 +1091,35 @@ public class JabRefPreferences implements PreferencesService {
 
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
+
         try {
-            for (String key : this.prefs.keys()) {
-                Object value = getObject(key);
-                result.put(key, value);
-            }
+            dump(this.prefs, result);
+
         } catch (BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
     }
 
-    private Object getObject(String key) {
+    private void dump(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
+        for(String key : prefs.keys()) {
+            result.put(key, getObject(prefs, key));
+        }
+        for(String child : prefs.childrenNames()) {
+            dump(prefs.node(child), result);
+        }
+    }
+    private Object getObject(Preferences prefs, String key) {
         try {
-            return this.get(key);
+            return  prefs.get(key, (String) defaults.get(key));
         } catch (ClassCastException e) {
             try {
-                return this.getBoolean(key);
+                return prefs.getBoolean(key, getBooleanDefault(key));
             } catch (ClassCastException e2) {
                 try {
-                    return this.getInt(key);
+                    return prefs.getInt(key, getIntDefault(key));
                 } catch (ClassCastException e3) {
-                    return this.getDouble(key);
+                    return prefs.getDouble(key, getDoubleDefault(key));
                 }
             }
         }
@@ -1212,6 +1219,7 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
+    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
@@ -1465,12 +1473,14 @@ public class JabRefPreferences implements PreferencesService {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
     }
 
+    @Override
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
         return new CleanupPreferences(
                                       getLayoutFormatterPreferences(abbreviationRepository),
                                       getFilePreferences());
     }
 
+    @Override
     public CleanupPreset getCleanupPreset() {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
@@ -1485,6 +1495,7 @@ public class JabRefPreferences implements PreferencesService {
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
+    @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));
