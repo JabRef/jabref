@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
@@ -51,6 +52,10 @@ public class ActionHelper {
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
         return Bindings.createBooleanBinding(() -> {
+
+                    if (stateManager.getSelectedEntries().isEmpty()) {
+                        return false;
+                    }
                     List<LinkedFile> files = stateManager.getSelectedEntries().get(0).getFiles();
                     if ((files.size() > 0) && stateManager.getActiveDatabase().isPresent()) {
                         Optional<Path> filename = FileHelper.find(
@@ -62,6 +67,6 @@ public class ActionHelper {
                         return false;
                     }
                 }, stateManager.getSelectedEntries(),
-                stateManager.getSelectedEntries().get(0).getFieldBinding(StandardField.FILE));
+                stateManager.getSelectedEntries().isEmpty() ? new SimpleStringProperty("") : stateManager.getSelectedEntries().get(0).getFieldBinding(StandardField.FILE));
     }
 }
