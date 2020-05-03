@@ -490,7 +490,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
+    void testEmptyStringPropertyAndOxfordComma() throws Exception {
         OOBibStyle style = new OOBibStyle("test.jstyle", layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -506,5 +506,12 @@ class OOBibStyleTest {
         entryDBMap.put(entry, database);
         assertEquals("von Beta, Epsilon, & Tau, 2016",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
+    }
+
+    @Test
+    void testIsValidWithDefaultSectionAtTheStart() throws Exception
+    {
+        OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences);
+        assertTrue(style.isValid());
     }
 }
