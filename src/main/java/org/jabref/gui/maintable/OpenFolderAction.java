@@ -26,17 +26,22 @@ public class OpenFolderAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(databaseContext ->
-            stateManager.getSelectedEntries().forEach(entry -> {
-                LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                        entry.getFiles().get(0),
-                        entry,
-                        databaseContext,
-                        Globals.TASK_EXECUTOR,
-                        dialogService,
-                        preferencesService.getXMPPreferences(),
-                        preferencesService.getFilePreferences(),
-                        ExternalFileTypes.getInstance());
-                linkedFileViewModel.openFolder();
-            }));
+                stateManager.getSelectedEntries().forEach(entry -> {
+                    if (entry.getFiles().isEmpty()) {
+                        return;
+                    }
+
+                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
+                            entry.getFiles().get(0),
+                            entry,
+                            databaseContext,
+                            Globals.TASK_EXECUTOR,
+                            dialogService,
+                            preferencesService.getXMPPreferences(),
+                            preferencesService.getFilePreferences(),
+                            ExternalFileTypes.getInstance()
+                    );
+                    linkedFileViewModel.openFolder();
+                }));
     }
 }
