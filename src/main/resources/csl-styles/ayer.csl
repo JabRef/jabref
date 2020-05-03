@@ -15,7 +15,7 @@
     <issn>1134-2277</issn>
     <eissn>2255-5838</eissn>
     <summary>Journal of the Association for Contemporary History (AHC), co-edited by the AHC and Marcial Pons-Ediciones de Historia.</summary>
-    <updated>2020-02-14T11:54:59+00:00</updated>
+    <updated>2020-03-31T14:42:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -65,16 +65,6 @@
       </choose>
       <text macro="locators-specific-note"/>
     </group>
-  </macro>
-  <macro name="title-sort-substitute">
-    <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text variable="title" font-style="italic" text-case="title" form="short"/>
-      </if>
-      <else>
-        <text variable="title" quotes="true" text-case="title" form="short"/>
-      </else>
-    </choose>
   </macro>
   <macro name="editor-translator">
     <text term="in" suffix=" "/>
@@ -181,23 +171,6 @@
       <name and="text" delimiter=", "/>
     </names>
   </macro>
-  <macro name="recipient-short">
-    <names variable="recipient">
-      <label form="verb" prefix=" " suffix=" "/>
-      <name form="short" and="text" delimiter=", "/>
-    </names>
-  </macro>
-  <macro name="contributors-short">
-    <names variable="author">
-      <name form="short" and="text" sort-separator=", " delimiter=", " delimiter-precedes-last="never"/>
-      <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
-        <text macro="title-sort-substitute"/>
-      </substitute>
-    </names>
-    <text macro="recipient-short"/>
-  </macro>
   <macro name="locators-newspaper">
     <choose>
       <if type="article-newspaper">
@@ -260,7 +233,7 @@
         </group>
       </if>
       <else>
-        <group delimiter=" " prefix=", ">
+        <group delimiter=" ">
           <label variable="locator" form="short"/>
           <text variable="locator" form="long"/>
         </group>
@@ -307,7 +280,7 @@
     </choose>
   </macro>
   <macro name="locators-subsequent">
-    <group>
+    <group delimiter=" ">
       <label variable="locator" form="short"/>
       <text variable="locator"/>
     </group>
@@ -325,7 +298,7 @@
           <text term="ibid" form="short"/>
         </else-if>
         <else-if position="subsequent">
-          <text macro="contributors-short"/>
+          <text macro="contributors-note"/>
           <text macro="title-short" prefix=", "/>
           <text macro="locators-subsequent" prefix=", "/>
         </else-if>

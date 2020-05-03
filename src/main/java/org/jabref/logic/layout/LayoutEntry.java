@@ -57,6 +57,7 @@ import org.jabref.logic.layout.format.Iso690NamesAuthors;
 import org.jabref.logic.layout.format.JournalAbbreviator;
 import org.jabref.logic.layout.format.LastPage;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.format.MarkdownFormatter;
 import org.jabref.logic.layout.format.NameFormatter;
 import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
 import org.jabref.logic.layout.format.NotFoundFormatter;
@@ -261,7 +262,7 @@ class LayoutEntry {
             for (String part : parts) {
                 negated = part.startsWith("!");
                 field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
-                if (!(field.isPresent() ^ negated)) {
+                if (field.isPresent() == negated) {
                     break;
                 }
             }
@@ -278,7 +279,7 @@ class LayoutEntry {
             }
         }
 
-        if ((!(field.isPresent() ^ negated)) || ((type == LayoutHelper.IS_GROUP_START)
+        if ((field.isPresent() == negated) || ((type == LayoutHelper.IS_GROUP_START)
                 && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
         } else {
@@ -484,7 +485,7 @@ class LayoutEntry {
             case "Iso690NamesAuthors":
                 return new Iso690NamesAuthors();
             case "JournalAbbreviator":
-                return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(), prefs.getJournalAbbreviationPreferences());
+                return new JournalAbbreviator(prefs.getJournalAbbreviationRepository());
             case "LastPage":
                 return new LastPage();
             case "FormatChars": // For backward compatibility
@@ -536,6 +537,8 @@ class LayoutEntry {
                 return new WrapContent();
             case "WrapFileLinks":
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
+            case "Markdown":
+                return new MarkdownFormatter();
             default:
                 return null;
         }

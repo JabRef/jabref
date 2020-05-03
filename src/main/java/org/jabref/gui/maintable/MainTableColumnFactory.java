@@ -38,6 +38,7 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
@@ -159,7 +160,7 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
-        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
@@ -206,8 +207,8 @@ class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
         FieldColumn column = new FieldColumn(columnModel,
-                FieldFactory.parseOrFields(columnModel.getQualifier()),
-                database.getDatabase());
+                FieldFactory.parseOrFields(columnModel.getQualifier())
+        );
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);
@@ -314,6 +315,10 @@ class MainTableColumnFactory {
         // Added comparator for Read Status
         if (specialField == SpecialField.READ_STATUS) {
             column.setComparator(new ReadStatusFieldComparator());
+        }
+
+        if (specialField == SpecialField.PRIORITY) {
+            column.setComparator(new PriorityFieldComparator());
         }
 
         column.setSortable(true);

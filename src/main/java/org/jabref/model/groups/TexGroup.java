@@ -23,12 +23,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
-    private Path filePath;
+    private final Path filePath;
     private Set<String> keysUsedInAux = null;
     private final FileUpdateMonitor fileMonitor;
-    private AuxParser auxParser;
+    private final AuxParser auxParser;
     private final MetaData metaData;
-    private String user;
+    private final String user;
 
     TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
         super(name, context);
@@ -126,7 +126,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileHelper.expandFilenameAsPath(path.toString(), fileDirectories).orElse(path);
+        return FileHelper.find(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {

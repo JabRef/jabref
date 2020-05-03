@@ -63,7 +63,7 @@ Any listening method has to be annotated with `@Subscribe` keyword and must have
 
 ### Posting an object
 
-`post(object)` posts an object trough the `EventBus` which has been used to register the listening/subscribing methods.
+`post(object)` posts an object through the `EventBus` which has been used to register the listening/subscribing methods.
 
 ### Short example
 
@@ -111,7 +111,7 @@ public class Main {
 
 The `event` package contains some specific events which occure in JabRef.
 
-For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent trough the `eventBus` which is located in `BibDatabase`.
+For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent through the `eventBus` which is located in `BibDatabase`.
 
 If you want to catch the event you'll have to register your listener class with the `registerListener(Object listener)` method in `BibDatabase`. `EntryAddedEvent` provides also methods to get the inserted `BibEntry`.
 
@@ -170,11 +170,10 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under (src/test/org.jabref.logic.l10n)
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-4. With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well \(you can use `gradlew localizationUpdateExtended` for extended output\). [Crowdin](http://translate.jabref.org) will add them as required.
-5. Tests are green again.
+4. Please do not add tranlsations for other languages direclty in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
 ## Cleanup and Formatters
 

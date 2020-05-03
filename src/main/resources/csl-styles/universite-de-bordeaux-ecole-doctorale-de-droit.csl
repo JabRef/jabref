@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0" page-range-format="expanded" demote-non-dropping-particle="never">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="fr-FR">
   <info>
     <title>Université de Bordeaux - École doctorale de droit (French)</title>
     <id>http://www.zotero.org/styles/universite-de-bordeaux-ecole-doctorale-de-droit</id>
@@ -16,7 +16,7 @@
     </author>
     <category citation-format="note"/>
     <category field="law"/>
-    <updated>2019-04-03T15:47:26+00:00</updated>
+    <updated>2019-11-07T04:39:48+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -660,11 +660,29 @@
           <text term="ibid" text-case="capitalize-first" font-style="italic"/>
         </else-if>
         <else-if position="near-note" match="any">
-          <group delimiter=", ">
-            <text macro="author"/>
-            <text term="cited" font-style="italic"/>
-            <text macro="locator"/>
-          </group>
+          <choose>
+            <if variable="author editor" match="none">
+              <group delimiter=", ">
+                <text macro="authority"/>
+                <text macro="case-patent-ref"/>
+                <text macro="author"/>
+                <text macro="title-short"/>
+                <text macro="container-title-short"/>
+                <text macro="thesis-genre"/>
+                <text macro="publisher"/>
+                <text macro="issued-short"/>
+                <text macro="locator"/>
+                <text macro="access-date"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text macro="author"/>
+                <text term="cited" font-style="italic"/>
+                <text macro="locator"/>
+              </group>
+            </else>
+          </choose>
         </else-if>
         <else>
           <group delimiter=", ">

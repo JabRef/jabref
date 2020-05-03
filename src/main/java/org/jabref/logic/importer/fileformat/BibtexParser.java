@@ -89,7 +89,7 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @param fileMonitor
-     * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
@@ -140,11 +140,7 @@ public class BibtexParser implements Parser {
 
         skipWhitespace();
 
-        try {
-            return parseFileContent();
-        } catch (KeyCollisionException kce) {
-            throw new IOException("Duplicate ID in bibtex file: " + kce);
-        }
+        return parseFileContent();
     }
 
     private void initializeParserResult() {
@@ -245,10 +241,7 @@ public class BibtexParser implements Parser {
             // store complete parsed serialization (comments, type definition + type contents)
             entry.setParsedSerialization(commentsAndEntryTypeDefinition + dumpTextReadSoFarToString());
 
-            boolean duplicateKey = database.insertEntry(entry);
-            if (duplicateKey) {
-                parserResult.addDuplicateKey(entry.getCiteKey());
-            }
+            database.insertEntry(entry);
         } catch (IOException ex) {
             // Trying to make the parser more robust.
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
@@ -275,7 +268,7 @@ public class BibtexParser implements Parser {
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
 
-            if (comment.substring(0, MetaData.META_FLAG.length()).equals(MetaData.META_FLAG)) {
+            if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
                 int pos = rest.indexOf(':');
@@ -574,7 +567,7 @@ public class BibtexParser implements Parser {
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
-                    //multiple keywords fields should be combined to one
+                    // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {

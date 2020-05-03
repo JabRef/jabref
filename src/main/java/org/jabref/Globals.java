@@ -16,7 +16,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
@@ -56,7 +56,7 @@ public class Globals {
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
-    public static JournalAbbreviationLoader journalAbbreviationLoader;
+    public static JournalAbbreviationRepository journalAbbreviationRepository;
 
     /**
      * This field is initialized upon startup.

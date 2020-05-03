@@ -108,8 +108,8 @@ class IEEETest {
         expected.setField(StandardField.TITLE, "Optimal operation of PV-DG-battery based microgrid with power quality conditioner");
         expected.setField(StandardField.VOLUME, "13");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("8636659"); //article number
-        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright);
+        List<BibEntry> fetchedEntries = fetcher.performSearch("8636659"); // article number
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(Collections.singletonList(expected), fetchedEntries);
 
     }

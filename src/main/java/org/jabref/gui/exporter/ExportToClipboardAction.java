@@ -5,24 +5,28 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -34,21 +38,30 @@ public class ExportToClipboardAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportToClipboardAction.class);
 
     // Only text based exporters can be used
-    private static final List<String> SUPPORTED_FILETYPES = Arrays.asList("txt", "rtf", "rdf", "xml", "html", "htm", "csv", "ris");
+    private static final Set<FileType> SUPPORTED_FILETYPES = Set.of(StandardFileType.TXT, StandardFileType.RTF, StandardFileType.RDF, StandardFileType.XML, StandardFileType.HTML, StandardFileType.CSV, StandardFileType.RIS);
 
     private JabRefFrame frame;
     private final DialogService dialogService;
     private BasePanel panel;
     private final List<BibEntry> entries = new ArrayList<>();
+    private final ExporterFactory exporterFactory;
+    private final ClipBoardManager clipBoardManager;
+    private final TaskExecutor taskExecutor;
 
-    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService) {
+    public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
+        this.exporterFactory = exporterFactory;
+        this.clipBoardManager = clipBoardManager;
+        this.taskExecutor = taskExecutor;
     }
 
-    public ExportToClipboardAction(BasePanel panel, DialogService dialogService) {
+    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.dialogService = dialogService;
+        this.exporterFactory = exporterFactory;
+        this.clipBoardManager = clipBoardManager;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
@@ -62,24 +75,27 @@ public class ExportToClipboardAction extends SimpleCommand {
             return;
         }
 
-        List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
-                                                        .sorted(Comparator.comparing(Exporter::getName))
-                                                        .filter(exporter -> SUPPORTED_FILETYPES.containsAll(exporter.getFileType().getExtensions()))
-                                                        .collect(Collectors.toList());
+        List<Exporter> exporters = exporterFactory.getExporters().stream()
+                                                  .sorted(Comparator.comparing(Exporter::getName))
+                                                  .filter(exporter -> SUPPORTED_FILETYPES.contains(exporter.getFileType()))
+                                                  .collect(Collectors.toList());
 
-        //Find default choice, if any
+        // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
                                           .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
                                           .findAny()
                                           .orElse(null);
 
         Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                Localization.lang("Export"), defaultChoice, exporters);
+                                                                                    Localization.lang("Export"), defaultChoice, exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
-                                                                .onSuccess(this::setContentToClipboard)
-                                                                .onFailure(ex -> { /* swallow as already logged */ })
-                                                                .executeWith(Globals.TASK_EXECUTOR));
+                                                             .onSuccess(this::setContentToClipboard)
+                                                             .onFailure(ex -> {
+                                                                 LOGGER.error("Error exporting to clipboard", ex);
+                                                                 dialogService.showErrorDialogAndWait("Error exporting to clipboard", ex);
+                                                             })
+                                                             .executeWith(taskExecutor));
     }
 
     private ExportResult exportToClipboard(Exporter exporter) throws Exception {
@@ -88,7 +104,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
 
-        //Add chosen export type to last used pref, to become default
+        // Add chosen export type to last used pref, to become default
         Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());
 
         Path tmp = null;
@@ -109,9 +125,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(readFileToString(tmp), exporter.getFileType());
-        } catch (Exception e) {
-            LOGGER.error("Error exporting to clipboard", e);
-            throw new Exception("Rethrow ", e);
+
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -135,7 +149,7 @@ public class ExportToClipboardAction extends SimpleCommand {
             clipboardContent.putRtf(result.content);
         }
         clipboardContent.putString(result.content);
-        Globals.clipboardManager.setContent(clipboardContent);
+        this.clipBoardManager.setContent(clipboardContent);
 
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
 
@@ -150,7 +164,8 @@ public class ExportToClipboardAction extends SimpleCommand {
         }
     }
 
-    private class ExportResult {
+    private static class ExportResult {
+
         final String content;
         final FileType fileType;
 

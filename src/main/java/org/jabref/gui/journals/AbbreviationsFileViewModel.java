@@ -50,9 +50,9 @@ public class AbbreviationsFileViewModel {
         this.isBuiltInList = new SimpleBooleanProperty(true);
     }
 
-    public void readAbbreviations() throws FileNotFoundException {
+    public void readAbbreviations() throws IOException {
         if (path.isPresent()) {
-            List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get().toFile());
+            List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.get());
             abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
         } else {
             throw new FileNotFoundException();

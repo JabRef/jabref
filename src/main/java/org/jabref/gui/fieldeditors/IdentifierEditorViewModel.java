@@ -10,7 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
@@ -33,7 +33,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
-    public IdentifierEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
+    public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
 
         this.taskExecutor = taskExecutor;

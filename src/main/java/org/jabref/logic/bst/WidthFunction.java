@@ -19,7 +19,6 @@ public class WidthFunction implements BstFunction {
 
     private final VM vm;
 
-
     public WidthFunction(VM vm) {
         this.vm = vm;
     }
