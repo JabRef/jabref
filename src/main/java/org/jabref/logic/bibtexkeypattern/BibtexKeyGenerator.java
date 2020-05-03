@@ -15,6 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +47,12 @@ public class BibtexKeyGenerator extends BracketedPattern {
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
+    @Deprecated
     static String generateKey(BibEntry entry, String pattern) {
         return generateKey(entry, pattern, new BibDatabase());
     }
 
+    @Deprecated
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
@@ -124,11 +127,9 @@ public class BibtexKeyGenerator extends BracketedPattern {
                     if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
                     }
-
                     // Remove all illegal characters from the label.
                     label = cleanKey(label, bibtexKeyPatternPreferences.getUnwantedCharacters());
                     stringBuilder.append(label);
-
                 } else {
                     stringBuilder.append(typeListEntry);
                 }
