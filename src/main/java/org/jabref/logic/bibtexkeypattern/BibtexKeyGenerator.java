@@ -46,12 +46,10 @@ public class BibtexKeyGenerator extends BracketedPattern {
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
-    @Deprecated
     static String generateKey(BibEntry entry, String pattern) {
         return generateKey(entry, pattern, new BibDatabase());
     }
 
-    @Deprecated
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
