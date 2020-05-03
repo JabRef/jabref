@@ -5,12 +5,14 @@ import java.util.List;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
-import javafx.beans.binding.ObjectBinding;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
 
 public class ActionHelper {
     public static BooleanExpression needsDatabase(StateManager stateManager) {
@@ -33,14 +35,11 @@ public class ActionHelper {
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-
-        ObjectBinding<BibEntry> entry = Bindings.valueAt(selectedEntries, 0);
-        return Bindings.createBooleanBinding(() -> {
-            if (entry.get() == null) {
-                return false;
-            } else {
-                return entry.get().getFields().stream().anyMatch(fields::contains);
-            }
-        }, selectedEntries);
+        MonadicBinding<Boolean> fieldsAreSet = EasyBind.monadic(Bindings.valueAt(selectedEntries, 0))
+                                                       .flatMap(entry -> Bindings.createBooleanBinding(() -> {
+                                                           return entry.getFields().stream().anyMatch(fields::contains);
+                                                       }, entry.getFieldsObservable()))
+                                                       .orElse(false);
+        return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 }
