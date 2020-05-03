@@ -1148,6 +1148,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void exportPreferences(Path file) throws JabRefException {
+        LOGGER.debug(file.toAbsolutePath().toString());
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
