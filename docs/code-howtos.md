@@ -63,7 +63,7 @@ Any listening method has to be annotated with `@Subscribe` keyword and must have
 
 ### Posting an object
 
-`post(object)` posts an object trough the `EventBus` which has been used to register the listening/subscribing methods.
+`post(object)` posts an object through the `EventBus` which has been used to register the listening/subscribing methods.
 
 ### Short example
 
@@ -111,7 +111,7 @@ public class Main {
 
 The `event` package contains some specific events which occure in JabRef.
 
-For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent trough the `eventBus` which is located in `BibDatabase`.
+For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent through the `eventBus` which is located in `BibDatabase`.
 
 If you want to catch the event you'll have to register your listener class with the `registerListener(Object listener)` method in `BibDatabase`. `EntryAddedEvent` provides also methods to get the inserted `BibEntry`.
 
