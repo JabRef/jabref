@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +16,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
+
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
 
 public class ActionHelper {
     public static BooleanExpression needsDatabase(StateManager stateManager) {
@@ -36,11 +40,13 @@ public class ActionHelper {
     }
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
-        BibEntry entry = stateManager.getSelectedEntries().get(0);
-        return Bindings.createBooleanBinding(
-                () -> entry.getFields().stream().anyMatch(fields::contains),
-                entry.getFieldsObservable(),
-                stateManager.getSelectedEntries());
+        ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+        MonadicBinding<Boolean> fieldsAreSet = EasyBind.monadic(Bindings.valueAt(selectedEntries, 0))
+                                                       .flatMap(entry -> Bindings.createBooleanBinding(() -> {
+                                                           return entry.getFields().stream().anyMatch(fields::contains);
+                                                       }, entry.getFieldsObservable()))
+                                                       .orElse(false);
+        return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {

@@ -127,7 +127,7 @@ public class OpenOfficePanel {
         update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(ooPrefs,
-                                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
+                                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                                  Globals.prefs.getDefaultEncoding());
 
         initPanel();
