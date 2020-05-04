@@ -37,6 +37,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with inconsistent capitalization of file extensions when downloading files. [#6115](https://github.com/JabRef/jabref/issues/6115)
 - We fixed the display of language and encoding in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We fixed the display of icon both in the main table and linked file editor. [#6169](https://github.com/JabRef/jabref/issues/6169)
+- We fixed an error that sometimes occurred when using the context menu. [#6085](https://github.com/JabRef/jabref/issues/6085)
 - We fixed an issue where search full-text documents downloaded files with same name, overwriting existing files. [#6174](https://github.com/JabRef/jabref/pull/6174)
 - We fixed an issue when importing into current library an erroneous message "import cancelled" is displayed even though import is successful. [#6266](https://github.com/JabRef/jabref/issues/6266)
 - We fixed an issue where custom jstyles for Open/LibreOffice where not saved correctly. [#6170](https://github.com/JabRef/jabref/issues/6170)
@@ -102,7 +103,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where adding the addition of a new entry was not completely validated [#6370](https://github.com/JabRef/jabref/issues/6370)
 - We fixed an issue where the blue and red text colors in the Merge entries dialog were not quite visible [#6334](https://github.com/JabRef/jabref/issues/6334)
 - We fixed an issue where underscore character was removed from the file name in the Recent Libraries list in File menu [#6383](https://github.com/JabRef/jabref/issues/6383)
-
+- We fixed an issue where few keyboard shortcuts regarding new entries were missing [#6403](https://github.com/JabRef/jabref/issues/6403)
 ### Removed
 
 - Ampersands are no longer escaped by default in the `bib` file. If you want to keep the current behaviour, you can use the new "Escape Ampersands" formatter as a save action. [#5869](https://github.com/JabRef/jabref/issues/5869)
