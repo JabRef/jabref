@@ -39,7 +39,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
