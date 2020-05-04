@@ -11,7 +11,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.converter.DefaultStringConverter;
 
 import org.jabref.gui.DialogService;
@@ -65,7 +64,7 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         labelColumn.setSortable(true);
         labelColumn.setReorderable(false);
 
-        labelColumn.setCellValueFactory(new PropertyValueFactory<>("label"));
+        labelColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
         new ViewModelTextFieldTableCellVisualizationFactory<BibtexStringEditorItemModel, String>()
                 .withValidation(BibtexStringEditorItemModel::labelValidation)
                 .install(labelColumn, new DefaultStringConverter());

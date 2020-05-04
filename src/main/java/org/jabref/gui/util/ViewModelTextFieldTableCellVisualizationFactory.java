@@ -40,7 +40,7 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
     public TextFieldTableCell<S, T> call(TableColumn<S, T> param) {
         return new TextFieldTableCell<>(stringConverter) {
 
-            List<Subscription> subscriptions = new ArrayList<>();
+            final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override
             public void startEdit() {
@@ -89,8 +89,13 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
                     pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
                     if (validationStatusProperty != null) {
-                        validationStatusProperty.apply(viewModel).getHighestMessage().ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
-                        subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS,
+                        validationStatusProperty.apply(viewModel)
+                                                .getHighestMessage()
+                                                .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                INVALID_PSEUDO_CLASS,
                                 validationStatusProperty.apply(viewModel).validProperty().not()));
                     }
                 }
