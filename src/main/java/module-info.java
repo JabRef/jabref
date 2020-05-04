@@ -82,4 +82,11 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires flowless;
     requires org.apache.tika.core;
+
+    requires flexmark;
+    requires flexmark.ext.gfm.strikethrough;
+    requires flexmark.ext.gfm.tasklist;
+    requires flexmark.util.ast;
+    requires flexmark.util.data;
+    requires com.h2database.mvstore;
 }

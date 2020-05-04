@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,7 +43,7 @@ class OOBibStyleTest {
     void testAuthorYear() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
         assertTrue(style.isValid());
-        assertTrue(style.isFromResource());
+        assertTrue(style.isInternalStyle());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
@@ -54,11 +54,11 @@ class OOBibStyleTest {
 
     @Test
     void testAuthorYearAsFile() throws URISyntaxException, IOException {
-        File defFile = Paths.get(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                            .toFile();
+        File defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+                           .toFile();
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
-        assertFalse(style.isFromResource());
+        assertFalse(style.isInternalStyle());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());

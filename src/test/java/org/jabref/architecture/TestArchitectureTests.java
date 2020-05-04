@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +56,7 @@ public class TestArchitectureTests {
         Predicate<String> isForbiddenPackage = (s) -> s.startsWith("import " + forbiddenPackage);
         Predicate<String> isExceptionClass = (s) -> exceptions.stream().anyMatch(exception -> s.startsWith("class " + exception));
 
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/test/"))) {
+        try (Stream<Path> pathStream = Files.walk(Path.of("src/test/"))) {
             List<Path> files = pathStream
                     .filter(p -> p.toString().endsWith(".java"))
                     .filter(p -> {

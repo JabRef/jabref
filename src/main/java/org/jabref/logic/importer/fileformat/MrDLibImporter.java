@@ -91,7 +91,7 @@ public class MrDLibImporter extends Importer {
     /**
      * Small pair-class to ensure the right order of the recommendations.
      */
-    private class RankedBibEntry {
+    private static class RankedBibEntry {
 
         public BibEntry entry;
         public Integer rank;

@@ -78,7 +78,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -151,7 +150,7 @@ public class MedlineImporter extends Importer implements Parser {
         try {
             Object unmarshalledObject = unmarshallRoot(reader);
 
-            //check whether we have an article set, an article, a book article or a book article set
+            // check whether we have an article set, an article, a book article or a book article set
             if (unmarshalledObject instanceof PubmedArticleSet) {
                 PubmedArticleSet articleSet = (PubmedArticleSet) unmarshalledObject;
                 for (Object article : articleSet.getPubmedArticleOrPubmedBookArticle()) {
@@ -189,7 +188,7 @@ public class MedlineImporter extends Importer implements Parser {
         XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
         XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
-        //go to the root element
+        // go to the root element
         while (!xmlStreamReader.isStartElement()) {
             xmlStreamReader.next();
         }
@@ -290,7 +289,7 @@ public class MedlineImporter extends Importer implements Parser {
         }
         if (book.getAuthorList() != null) {
             List<AuthorList> authorLists = book.getAuthorList();
-            //authorLists size should be one
+            // authorLists size should be one
             if (authorLists.size() == 1) {
                 for (AuthorList authorList : authorLists) {
                     handleAuthors(fields, authorList);
@@ -372,7 +371,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
 
             fields.put(StandardField.PMID, medlineCitation.getPMID().getContent());
-            fields.put(InternalField.OWNER, medlineCitation.getOwner());
+            fields.put(StandardField.OWNER, medlineCitation.getOwner());
 
             addArticleInformation(fields, medlineCitation.getArticle().getContent());
 
@@ -458,7 +457,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
                 investigatorNames.add(name);
 
-                //now add the affiliation info
+                // now add the affiliation info
                 if (investigator.getAffiliationInfo() != null) {
                     for (AffiliationInfo info : investigator.getAffiliationInfo()) {
                         for (Serializable affiliation : info.getAffiliation().getContent()) {
@@ -476,7 +475,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     private void addKeyWords(Map<Field, String> fields, List<KeywordList> allKeywordLists) {
         List<String> keywordStrings = new ArrayList<>();
-        //add keywords to the list
+        // add keywords to the list
         for (KeywordList keywordList : allKeywordLists) {
             for (Keyword keyword : keywordList.getKeyword()) {
                 for (Serializable content : keyword.getContent()) {
@@ -486,12 +485,12 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
         }
-        //Check whether MeshHeadingList exist or not
+        // Check whether MeshHeadingList exist or not
         if (fields.get(StandardField.KEYWORDS) == null) {
             fields.put(StandardField.KEYWORDS, join(keywordStrings, KEYWORD_SEPARATOR));
         } else {
             if (keywordStrings.size() > 0) {
-                //if it exists, combine the MeshHeading with the keywords
+                // if it exists, combine the MeshHeading with the keywords
                 String result = join(keywordStrings, "; ");
                 result = fields.get(StandardField.KEYWORDS) + KEYWORD_SEPARATOR + result;
                 fields.put(StandardField.KEYWORDS, result);
@@ -509,7 +508,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     private void addPersonalNames(Map<Field, String> fields, PersonalNameSubjectList personalNameSubjectList) {
         if (fields.get(StandardField.AUTHOR) == null) {
-            //if no authors appear, then add the personal names as authors
+            // if no authors appear, then add the personal names as authors
             List<String> personalNames = new ArrayList<>();
             if (personalNameSubjectList.getPersonalNameSubject() != null) {
                 List<PersonalNameSubject> personalNameSubject = personalNameSubjectList.getPersonalNameSubject();
@@ -600,7 +599,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     private void addPubDate(Map<Field, String> fields, PubDate pubDate) {
         if (pubDate.getYear() == null) {
-            //if year of the pubdate is null, the medlineDate shouldn't be null
+            // if year of the pubdate is null, the medlineDate shouldn't be null
             fields.put(StandardField.YEAR, extractYear(pubDate.getMedlineDate()));
         } else {
             fields.put(StandardField.YEAR, pubDate.getYear());
@@ -635,19 +634,19 @@ public class MedlineImporter extends Importer implements Parser {
             if ("MedlinePgn".equals(element.getName().getLocalPart())) {
                 putIfValueNotNull(fields, StandardField.PAGES, fixPageRange(element.getValue()));
             } else if ("StartPage".equals(element.getName().getLocalPart())) {
-                //it could happen, that the article has only a start page
+                // it could happen, that the article has only a start page
                 startPage = element.getValue() + endPage;
                 putIfValueNotNull(fields, StandardField.PAGES, startPage);
             } else if ("EndPage".equals(element.getName().getLocalPart())) {
                 endPage = element.getValue();
-                //but it should not happen, that a endpage appears without startpage
+                // but it should not happen, that a endpage appears without startpage
                 fields.put(StandardField.PAGES, fixPageRange(startPage + "-" + endPage));
             }
         }
     }
 
     private String extractYear(String medlineDate) {
-        //The year of the medlineDate should be the first 4 digits
+        // The year of the medlineDate should be the first 4 digits
         return medlineDate.substring(0, 4);
     }
 

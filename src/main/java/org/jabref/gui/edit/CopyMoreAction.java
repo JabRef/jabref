@@ -164,7 +164,7 @@ public class CopyMoreAction extends SimpleCommand {
         StringReader layoutString = new StringReader("\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
         Layout layout;
         try {
-            layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader)).getLayoutFromText();
+            layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository)).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Could not get layout.", e);
             return;

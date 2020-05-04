@@ -83,7 +83,7 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
                             SavePreferences savePreferences) {
-        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), layoutPreferences, savePreferences);
+        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, savePreferences);
     }
 
     /**
@@ -110,7 +110,6 @@ public class TemplateExporter extends Exporter {
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
     }
-
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -247,7 +246,7 @@ public class TemplateExporter extends Exporter {
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn("Missing formatters found ", missingFormatters);
+                    LOGGER.warn("Missing formatters found: {}", missingFormatters);
                 }
             }
             Map<EntryType, Layout> layouts = new HashMap<>();
@@ -310,10 +309,10 @@ public class TemplateExporter extends Exporter {
             // Clear custom name formatters:
             layoutPreferences.clearCustomExportNameFormatters();
 
-            if (!missingFormatters.isEmpty()) {
+            if (!missingFormatters.isEmpty() && LOGGER.isWarnEnabled()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
                 sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn("Formatters not found", sb);
+                LOGGER.warn("Formatters {} not found", sb.toString());
             }
         }
     }

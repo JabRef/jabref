@@ -153,7 +153,7 @@ class OOBibBase {
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
-        //this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
+        // this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
         Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
         return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }
@@ -237,12 +237,12 @@ class OOBibBase {
         URL[] urls = jarUrls.toArray(new URL[1]);
         URLClassLoader loader = new URLClassLoader(urls, null);
 
-        //Get the office component context:
+        // Get the office component context:
         XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loader);
-        //Get the office service manager:
+        // Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
-        //Create the desktop, which is the root frame of the
-        //hierarchy of frames that contain viewable components:
+        // Create the desktop, which is the root frame of the
+        // hierarchy of frames that contain viewable components:
         Object desktop;
         try {
             desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);

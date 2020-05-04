@@ -22,7 +22,6 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
     // Field name and file type name (from ExternalFileTypes)
     private final Map<Field, String> fields = new HashMap<>();
 
-
     public UpgradePdfPsToFileCleanup() {
         fields.put(StandardField.PDF, "PDF");
         fields.put(StandardField.PS, "PostScript");

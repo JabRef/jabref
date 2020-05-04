@@ -606,7 +606,7 @@ public class AuthorListTest {
 
     @Test
     public void parseNameWithBracesAroundFirstName() throws Exception {
-        //TODO: Be more intelligent and abbreviate the first name correctly
+        // TODO: Be more intelligent and abbreviate the first name correctly
         Author expected = new Author("Tse-tung", "{Tse-tung}.", null, "Mao", null);
         assertEquals(new AuthorList(expected), AuthorList.parse("{Tse-tung} Mao"));
     }

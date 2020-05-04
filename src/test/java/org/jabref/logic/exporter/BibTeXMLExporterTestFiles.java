@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,7 +40,7 @@ public class BibTeXMLExporterTestFiles {
     public BibtexImporter testImporter;
 
     public static Stream<String> fileNames() throws IOException, URISyntaxException {
-        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
+        resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("BibTeXMLExporterTestArticle.bib").toURI()).getParent();
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
@@ -72,7 +71,7 @@ public class BibTeXMLExporterTestFiles {
         bibtexmlExportFormat.export(databaseContext, tempFile, charset, entries);
 
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilePath)));
+        Builder test = Input.from(Files.newInputStream(Path.of(tempFilePath)));
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                                        .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());

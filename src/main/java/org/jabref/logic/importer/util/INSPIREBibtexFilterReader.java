@@ -25,7 +25,6 @@ public class INSPIREBibtexFilterReader extends FilterReader {
 
     private boolean pre;
 
-
     public INSPIREBibtexFilterReader(final Reader initialReader) {
         super(initialReader);
         inReader = new BufferedReader(initialReader);

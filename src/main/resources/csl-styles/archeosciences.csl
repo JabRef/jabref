@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" delimiter-precedes-last="never" page-range-format="expanded" demote-non-dropping-particle="never" default-locale="fr-FR">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>ArchéoSciences (French)</title>
     <id>http://www.zotero.org/styles/archeosciences</id>
@@ -17,13 +17,13 @@
     <issn>1960-1360</issn>
     <eissn>2104-3728</eissn>
     <summary>Style pour ArchéoSciences, revue d'Archéométrie.</summary>
-    <updated>2019-03-22T12:49:09+00:00</updated>
+    <updated>2020-04-09T17:01:16+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
     <terms>
       <term name="editor" form="short">dir.</term>
-      <term name="in">dans</term>
+      <term name="in">in</term>
       <term name="anonymous">anonyme</term>
       <term name="anonymous" form="short">anon.</term>
       <term name="accessed">consulté le</term>
@@ -32,26 +32,23 @@
     </terms>
   </locale>
   <macro name="author">
-    <names variable="author" delimiter=" ">
+    <names variable="author">
       <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
       <substitute>
-        <text macro="editor"/>
-        <text term="anonymous" text-case="capitalize-first"/>
+        <choose>
+          <if match="any" variable="editor">
+            <text macro="editor"/>
+          </if>
+          <else>
+            <text term="anonymous" text-case="capitalize-first"/>
+          </else>
+        </choose>
       </substitute>
     </names>
   </macro>
-  <macro name="editor">
-    <names variable="editor">
-      <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
-      <label form="short" text-case="lowercase" prefix=" (" suffix=")"/>
-    </names>
-  </macro>
-  <macro name="pages">
-    <text variable="page"/>
-  </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter-precedes-last="never"/>
+      <name form="short" and="symbol" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1"/>
       <et-al font-style="italic"/>
       <substitute>
         <choose>
@@ -65,32 +62,36 @@
       </substitute>
     </names>
   </macro>
+  <macro name="editor">
+    <names variable="editor">
+      <name delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <label form="short" plural="never" text-case="lowercase" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="pages">
+    <text variable="page"/>
+  </macro>
   <macro name="editor-short">
     <names variable="editor">
-      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <name form="short" and="symbol" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" initialize-with=". " name-as-sort-order="all"/>
       <et-al font-style="italic"/>
     </names>
   </macro>
-  <macro name="URLaccess">
-    <group delimiter=" " suffix=".">
-      <text term="available at" text-case="capitalize-first" suffix=":"/>
-      <text variable="URL"/>
-      <text macro="access"/>
+  <macro name="URL">
+    <group delimiter=", ">
+      <group delimiter=" ">
+        <text term="available at" text-case="capitalize-first"/>
+        <text variable="URL"/>
+      </group>
+      <group>
+        <text term="accessed" form="short" text-case="lowercase" suffix=" "/>
+        <date form="numeric" variable="accessed"/>
+      </group>
     </group>
-  </macro>
-  <macro name="access">
-    <group prefix="(" suffix=")">
-      <text term="accessed" form="short" suffix=" "/>
-      <date form="numeric" variable="accessed"/>
-    </group>
-  </macro>
-  <macro name="editor-text">
-    <text macro="editor"/>
-    <text macro="publisher" suffix=", "/>
   </macro>
   <macro name="title">
     <choose>
-      <if type="book dataset map report webpage" match="any">
+      <if type="book" match="any">
         <text variable="title" font-style="italic"/>
       </if>
       <else>
@@ -115,26 +116,25 @@
         <text term="no date" form="short"/>
       </else>
     </choose>
-    <choose>
-      <if is-numeric="edition">
-        <number variable="edition" prefix=" (" suffix=")"/>
-      </if>
-      <else>
-        <text variable="edition" prefix=" (" suffix=")"/>
-      </else>
-    </choose>
   </macro>
   <macro name="DOI">
-    <text variable="DOI" prefix="DOI: "/>
+    <text variable="DOI" prefix="DOI : "/>
   </macro>
   <macro name="collection">
-    <group delimiter=", " suffix=".">
+    <group delimiter=" " suffix=".">
       <text variable="collection-title"/>
       <text variable="collection-number"/>
     </group>
   </macro>
+  <macro name="editor-text">
+    <group delimiter=" ">
+      <text term="in" text-case="capitalize-first" font-style="italic"/>
+      <text macro="editor"/>
+    </group>
+  </macro>
   <citation et-al-min="3" et-al-use-first="1" delimiter-precedes-et-al="never" disambiguate-add-year-suffix="true">
     <sort>
+      <key variable="issued"/>
       <key variable="author"/>
     </sort>
     <layout delimiter="&#160;; " prefix="(" suffix=")">
@@ -158,49 +158,49 @@
         </group>
         <text macro="title"/>
         <choose>
-          <if type="thesis">
-            <text macro="publisher"/>
-          </if>
-          <else-if type="article-journal article-magazine article-newspaper broadcast personal_communication entry-dictionary entry-encyclopedia" match="any">
-            <group delimiter=", " suffix=".">
-              <text variable="container-title" font-style="italic"/>
-              <text variable="volume"/>
-              <text variable="issue"/>
-              <text macro="pages"/>
+          <if type="article-journal article-magazine article-newspaper" match="any">
+            <group>
+              <text variable="container-title" font-style="italic" suffix=", "/>
+              <text variable="volume" suffix=", "/>
+              <text variable="issue" suffix=" "/>
+              <text macro="pages" prefix=": "/>
             </group>
-          </else-if>
+          </if>
           <else-if type="book" match="any">
-            <choose>
-              <if match="all" variable="editor author">
-                <text macro="editor-text"/>
-              </if>
-              <else>
-                <text macro="publisher"/>
-              </else>
-            </choose>
+            <text macro="collection"/>
+            <text macro="publisher"/>
           </else-if>
           <else-if type="chapter paper-conference" match="any">
-            <group delimiter=" " suffix=".">
-              <text term="in" text-case="capitalize-first"/>
-              <text macro="editor"/>
-            </group>
-            <text variable="container-title" font-style="italic"/>
+            <text macro="editor-text"/>
+            <choose>
+              <if type="chapter" match="any">
+                <text variable="container-title" font-style="italic"/>
+              </if>
+              <else>
+                <text variable="container-title"/>
+              </else>
+            </choose>
+            <text variable="event"/>
+            <text macro="collection"/>
+            <text macro="publisher"/>
+          </else-if>
+          <else-if type="thesis" match="any">
             <group delimiter=", ">
+              <text variable="genre"/>
               <text macro="publisher"/>
-              <text macro="pages"/>
             </group>
           </else-if>
-          <else-if type="dataset report" match="any">
+          <else-if type="report dataset" match="any">
+            <text variable="genre"/>
+            <text variable="version" prefix="Version "/>
             <text macro="collection"/>
-            <text variable="note" suffix="."/>
             <text macro="publisher"/>
-            <text macro="URLaccess"/>
+            <text variable="URL" prefix="URL : "/>
           </else-if>
           <else-if type="webpage">
-            <text macro="URLaccess"/>
+            <text macro="URL"/>
           </else-if>
           <else>
-            <text variable="title" font-style="italic" suffix=". "/>
             <text macro="publisher"/>
           </else>
         </choose>

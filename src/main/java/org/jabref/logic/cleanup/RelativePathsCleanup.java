@@ -1,6 +1,6 @@
 package org.jabref.logic.cleanup;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,11 +37,10 @@ public class RelativePathsCleanup implements CleanupJob {
             if (fileEntry.isOnlineLink()) {
                 // keep online link untouched
                 newFileName = oldFileName;
-            }
-            else {
+            } else {
                 // only try to transform local file path to relative one
                 newFileName = FileUtil
-                        .relativize(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
+                        .relativize(Path.of(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
                         .toString();
             }
             LinkedFile newFileEntry = fileEntry;

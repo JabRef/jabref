@@ -15,7 +15,7 @@
     <category field="biology"/>
     <issn>2463-2872</issn>
     <eissn>2463-2880</eissn>
-    <updated>2020-03-13T14:38:52+00:00</updated>
+    <updated>2020-03-23T13:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -55,6 +55,11 @@
     <choose>
       <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
         <text variable="title" font-style="italic"/>
+        <choose>
+          <if type="report" match="any">
+            <text variable="number" prefix=" [Report " suffix="]"/>
+          </if>
+        </choose>
       </if>
       <else>
         <text variable="title"/>
@@ -71,19 +76,6 @@
       <else>
         <text term="no date" form="short"/>
       </else>
-    </choose>
-  </macro>
-  <macro name="journal-info">
-    <choose>
-      <if type="article-journal article-magazine paper-conference" match="any">
-        <group delimiter=": ">
-          <group delimiter=" ">
-            <text variable="container-title" font-style="italic"/>
-            <text variable="volume" font-style="italic"/>
-          </group>
-          <text variable="page"/>
-        </group>
-      </if>
     </choose>
   </macro>
   <macro name="publisher">
@@ -141,16 +133,29 @@
         <text macro="author"/>
         <text macro="year-date"/>
         <text macro="title"/>
-        <text macro="journal-info"/>
         <choose>
           <if type="chapter paper-conference" match="any">
-            <group delimiter=": ">
-              <text term="in" text-case="capitalize-first"/>
-              <text macro="editor-translator"/>
+            <group delimiter=". ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor-translator"/>
+              </group>
+              <text variable="container-title" font-style="italic"/>
             </group>
           </if>
+          <else-if type="paper-conference chapter" match="any">
+            <text variable="container-title" font-style="italic"/>
+          </else-if>
+          <else-if type="article-journal article" match="any">
+            <group delimiter=": ">
+              <group delimiter=" ">
+                <text variable="container-title" font-style="italic"/>
+                <text variable="volume" font-style="italic"/>
+              </group>
+              <text variable="page"/>
+            </group>
+          </else-if>
         </choose>
-        <text variable="container-title" font-style="italic"/>
         <group delimiter=", ">
           <text macro="publisher"/>
           <text macro="page"/>

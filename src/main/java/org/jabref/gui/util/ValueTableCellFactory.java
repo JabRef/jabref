@@ -8,7 +8,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -78,8 +77,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
     @Override
     public TableCell<S, T> call(TableColumn<S, T> param) {
-
-        return new TableCell<S, T>() {
+        return new TableCell<>() {
 
             @Override
             protected void updateItem(T item, boolean empty) {
@@ -91,7 +89,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     setOnMouseClicked(null);
                     setTooltip(null);
                 } else {
-                    S rowItem = ((TableRow<S>) getTableRow()).getItem();
+                    S rowItem = getTableRow().getItem();
 
                     if (toText != null) {
                         setText(toText.apply(item));
