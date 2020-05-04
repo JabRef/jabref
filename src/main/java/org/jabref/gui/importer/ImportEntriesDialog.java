@@ -80,7 +80,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-        downloadLinkedOnlineFiles.setSelected(JabRefPreferences.getInstance().getFilePreferences().getDownloadLinkedFiles());
+        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().getDownloadLinkedFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {
