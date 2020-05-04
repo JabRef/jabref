@@ -88,4 +88,5 @@ open module org.jabref {
     requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
+    requires com.h2database.mvstore;
 }

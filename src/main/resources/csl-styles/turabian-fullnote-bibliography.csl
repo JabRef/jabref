@@ -12,6 +12,9 @@
     <contributor>
       <name>Sebastian Karcher</name>
     </contributor>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+    </contributor>
     <category citation-format="note"/>
     <category field="history"/>
     <summary>Turabian note style, a variant of Chicago for students</summary>
@@ -455,8 +458,15 @@
     </choose>
   </macro>
   <macro name="event">
-    <group>
-      <text term="presented at" suffix=" "/>
+    <group delimiter=" ">
+      <choose>
+        <if variable="genre">
+          <text term="presented at"/>
+        </if>
+        <else>
+          <text term="presented at" text-case="capitalize-first"/>
+        </else>
+      </choose>
       <text variable="event"/>
     </group>
   </macro>

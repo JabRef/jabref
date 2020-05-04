@@ -40,7 +40,7 @@
                             </GridPane.margin>
                         </Label>
                         <Label text="%File extension:" GridPane.rowIndex="5"/>
-                        <Button fx:id="browseButton" text="%Browse" onAction="#browse" GridPane.rowIndex="4"/>
+                        <Button text="%Browse" onAction="#browse" GridPane.rowIndex="4"/>
                     </children>
                     <padding>
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>

@@ -83,7 +83,7 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
                             SavePreferences savePreferences) {
-        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), layoutPreferences, savePreferences);
+        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, savePreferences);
     }
 
     /**

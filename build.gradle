@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.antlr.JabRefAntlrPlugin
 import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
@@ -8,13 +9,6 @@ import org.jabref.build.xjc.XjcTask
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
-buildscript {
-    repositories {
-        mavenLocal()
-        jcenter()
-    }
-}
-
 plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '1.8.0-1'
@@ -22,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.17.8'
+    id 'org.beryx.jlink' version '2.18.0'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -116,8 +110,9 @@ dependencies {
     implementation 'org.apache.pdfbox:xmpbox:2.0.19'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+    implementation 'com.h2database:h2-mvstore:1.4.200'
 
-    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
@@ -196,16 +191,16 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.61.20'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.20'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.20'
+    implementation 'com.vladsch.flexmark:flexmark:0.61.24'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.24'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.24'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.77'
+    testImplementation 'io.github.classgraph:classgraph:4.8.78'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.9'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.10'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.3.3'
@@ -217,7 +212,7 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.32'
-    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.2'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
     jython 'org.python:jython-standalone:2.7.2'
 }
 
@@ -297,9 +292,10 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource"]) {
+                                "generateModsSource",
+                                "generateJournalAbbreviationList"]) {
     group = 'JabRef'
-    description 'Generates all Java source files.'
+    description 'Generates all necessary (Java) source files.'
 }
 
 task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
@@ -357,6 +353,14 @@ task generateModsSource(type: XjcTask) {
     outputDirectory = "src/main/gen/"
     javaPackage = "org.jabref.logic.importer.fileformat.mods"
     arguments = '-npa'
+}
+
+task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
+    group = 'JabRef'
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
+
+    inputDir = file("src/main/resources/journals")
+    outputDir = file("src/main/resources/journals")
 }
 
 tasks.withType(JavaCompile) {
