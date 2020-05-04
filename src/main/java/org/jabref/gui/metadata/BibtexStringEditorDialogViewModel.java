@@ -1,8 +1,6 @@
 package org.jabref.gui.metadata;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -25,7 +23,8 @@ import org.fxmisc.easybind.EasyBind;
 public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces
 
-    private final ListProperty<BibtexStringEditorItemModel> stringsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<BibtexStringEditorItemModel> stringsListProperty =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BibDatabase bibDatabase;
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
@@ -34,16 +33,16 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         this.bibDatabase = bibDatabase;
         addAllStringsFromDB();
 
-        ObservableList<ObservableValue<Boolean>> allValidProperty = EasyBind.map(stringsListProperty(), BibtexStringEditorItemModel::combinedValidationValidProperty);
+        ObservableList<ObservableValue<Boolean>> allValidProperty =
+                EasyBind.map(stringsListProperty(), BibtexStringEditorItemModel::combinedValidationValidProperty);
         validProperty.bind(EasyBind.combine(allValidProperty, stream -> stream.allMatch(valid -> valid)));
     }
 
     private void addAllStringsFromDB() {
-        Set<BibtexStringEditorItemModel> strings = bibDatabase.getStringValues().stream()
-                .sorted(new BibtexStringComparator(false))
-                .map(this::convertFromBibTexString)
-                .collect(Collectors.toSet());
-        stringsListProperty.addAll(strings);
+        stringsListProperty.addAll(bibDatabase.getStringValues().stream()
+                                              .sorted(new BibtexStringComparator(false))
+                                              .map(this::convertFromBibTexString)
+                                              .collect(Collectors.toSet()));
     }
 
     public void addNewString() {
@@ -70,8 +69,9 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     }
 
     public void save() {
-        List<BibtexString> stringsToAdd = stringsListProperty.stream().map(this::fromBibtexStringViewModel).collect(Collectors.toList());
-        bibDatabase.setStrings(stringsToAdd);
+        bibDatabase.setStrings(stringsListProperty.stream()
+                                                  .map(this::fromBibtexStringViewModel)
+                                                  .collect(Collectors.toList()));
     }
 
     private BibtexString fromBibtexStringViewModel(BibtexStringEditorItemModel viewModel) {
@@ -81,7 +81,9 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     }
 
     public Optional<BibtexStringEditorItemModel> labelAlreadyExists(String label) {
-        return stringsListProperty.stream().filter(item -> item.labelProperty().getValue().equals(label)).findFirst();
+        return stringsListProperty.stream()
+                                  .filter(item -> item.labelProperty().getValue().equals(label))
+                                  .findFirst();
     }
 
     public void openHelpPage() {

@@ -40,8 +40,8 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
         this.viewModel = new BibtexStringEditorDialogViewModel(database);
 
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
 
@@ -69,14 +69,23 @@ public class BibtexStringEditorDialogView extends BaseDialog<Void> {
                 .withValidation(BibtexStringEditorItemModel::labelValidation)
                 .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit((CellEditEvent<BibtexStringEditorItemModel, String> cellEvent) -> {
-            BibtexStringEditorItemModel cellItem = cellEvent.getTableView().getItems().get(cellEvent.getTablePosition().getRow());
+
+            BibtexStringEditorItemModel cellItem = cellEvent.getTableView()
+                                                            .getItems()
+                                                            .get(cellEvent.getTablePosition().getRow());
+
             Optional<BibtexStringEditorItemModel> existingItem = viewModel.labelAlreadyExists(cellEvent.getNewValue());
+
             if (existingItem.isPresent() && !existingItem.get().equals(cellItem)) {
-                dialogService.showErrorDialogAndWait(Localization.lang("A string with the label '%0' already exists.", cellEvent.getNewValue()));
+                dialogService.showErrorDialogAndWait(Localization.lang(
+                        "A string with the label '%0' already exists.",
+                        cellEvent.getNewValue()));
+
                 cellItem.setLabel(cellEvent.getOldValue());
             } else {
                 cellItem.setLabel(cellEvent.getNewValue());
             }
+
             cellEvent.getTableView().refresh();
         });
 
