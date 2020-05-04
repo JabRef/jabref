@@ -86,6 +86,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         final Button confirmDialogButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         // handle validation before closing dialog and calling resultConverter
         confirmDialogButton.addEventFilter(ActionEvent.ACTION, viewModel::validationHandler);
+        getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
     }
 
     @FXML
@@ -134,7 +135,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {
-            validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
+            validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField, true);
             validationVisualizer.initVisualization(viewModel.nameContainsDelimiterValidationStatus(), nameField, false);
             validationVisualizer.initVisualization(viewModel.sameNameValidationStatus(), nameField);
             validationVisualizer.initVisualization(viewModel.searchRegexValidationStatus(), searchGroupSearchTerm);
