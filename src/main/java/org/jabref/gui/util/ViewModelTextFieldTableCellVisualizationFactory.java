@@ -80,14 +80,14 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
                 subscriptions.forEach(Subscription::unsubscribe);
                 subscriptions.clear();
 
-                S viewModel = getTableRow().getItem();
-                if (empty || (viewModel == null)) {
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
                     setTooltip(null);
                     pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
+                    S viewModel = getTableRow().getItem();
                     if (validationStatusProperty != null) {
                         validationStatusProperty.apply(viewModel)
                                                 .getHighestMessage()
