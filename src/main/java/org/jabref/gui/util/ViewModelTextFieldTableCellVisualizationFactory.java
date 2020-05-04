@@ -86,14 +86,12 @@ public class ViewModelTextFieldTableCellVisualizationFactory<S, T> implements Ca
                     setGraphic(null);
                     setOnMouseClicked(null);
                     setTooltip(null);
-                    setStyle("");
+                    pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
                     if (validationStatusProperty != null) {
-                        validationStatusProperty.apply(viewModel).getHighestMessage().ifPresent(message -> {
-                            setTooltip(new Tooltip(message.getMessage()));
-                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS,
-                                    validationStatusProperty.apply(viewModel).validProperty().not()));
-                        });
+                        validationStatusProperty.apply(viewModel).getHighestMessage().ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS,
+                                validationStatusProperty.apply(viewModel).validProperty().not()));
                     }
                 }
             }
