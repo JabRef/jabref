@@ -24,9 +24,6 @@
         <Button fx:id="remoteHelp" prefWidth="20.0"/>
     </HBox>
 
-    <Label styleClass="sectionHeader" text="%Search IEEEXplore"/>
-    <CheckBox fx:id="useIEEELatexAbbreviations" text="%Use IEEE LaTeX abbreviations"/>
-
     <Label styleClass="sectionHeader" text="%Import conversions"/>
     <CheckBox fx:id="useCaseKeeper" text="%Add {} to specified title words on search to keep the correct case"/>
     <CheckBox fx:id="useUnitFormatter"

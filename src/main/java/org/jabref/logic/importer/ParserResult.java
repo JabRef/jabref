@@ -22,7 +22,6 @@ import org.jabref.model.metadata.MetaData;
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
-    private final List<String> duplicateKeys = new ArrayList<>();
     private BibDatabase database;
     private MetaData metaData;
     private Path file;
@@ -35,7 +34,7 @@ public class ParserResult {
     }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+        this(new BibDatabase(BibDatabases.purgeEmptyEntries(entries)));
     }
 
     public ParserResult(BibDatabase database) {
@@ -124,35 +123,6 @@ public class ParserResult {
 
     public List<String> warnings() {
         return new ArrayList<>(warnings);
-    }
-
-    /**
-     * Add a key to the list of duplicated BibTeX keys found in the database.
-     *
-     * @param key The duplicated key
-     */
-    public void addDuplicateKey(String key) {
-        if (!duplicateKeys.contains(key)) {
-            duplicateKeys.add(key);
-        }
-    }
-
-    /**
-     * Query whether any duplicated BibTeX keys have been found in the database.
-     *
-     * @return true if there is at least one duplicate key.
-     */
-    public boolean hasDuplicateKeys() {
-        return !duplicateKeys.isEmpty();
-    }
-
-    /**
-     * Get all duplicated keys found in the database.
-     *
-     * @return A list containing the duplicated keys.
-     */
-    public List<String> getDuplicateKeys() {
-        return duplicateKeys;
     }
 
     public boolean isInvalid() {

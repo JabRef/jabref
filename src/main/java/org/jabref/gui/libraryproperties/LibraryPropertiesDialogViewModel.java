@@ -2,7 +2,6 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
@@ -155,7 +154,7 @@ public class LibraryPropertiesDialogViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getUser());
         } else {
-            newMetaData.setLatexFileDirectory(preferences.getUser(), Paths.get(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getUser(), Path.of(latexFileDirectory));
         }
 
         if (libraryProtectedProperty.getValue()) {

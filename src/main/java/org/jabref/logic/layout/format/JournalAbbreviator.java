@@ -2,8 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.Objects;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -16,18 +15,14 @@ import org.jabref.logic.layout.LayoutFormatter;
  */
 public class JournalAbbreviator implements LayoutFormatter {
 
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private final JournalAbbreviationRepository repository;
 
-    public JournalAbbreviator(JournalAbbreviationLoader repositoryLoader,
-                              JournalAbbreviationPreferences journalAbbreviationPreferences) {
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
-        this.journalAbbreviationPreferences = Objects.requireNonNull(journalAbbreviationPreferences);
+    public JournalAbbreviator(JournalAbbreviationRepository repository) {
+        this.repository = Objects.requireNonNull(repository);
     }
 
     @Override
     public String format(String fieldText) {
-        return repositoryLoader.getRepository(journalAbbreviationPreferences)
-                               .getDefaultAbbreviation(fieldText).orElse(fieldText);
+        return repository.getDefaultAbbreviation(fieldText).orElse(fieldText);
     }
 }

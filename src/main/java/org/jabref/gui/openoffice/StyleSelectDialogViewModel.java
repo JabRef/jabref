@@ -71,7 +71,7 @@ public class StyleSelectDialogViewModel {
                 styles.setAll(loadStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file."));
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
             }
         });
     }

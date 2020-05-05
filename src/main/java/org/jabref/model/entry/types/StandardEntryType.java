@@ -36,7 +36,7 @@ public enum StandardEntryType implements EntryType {
     Thesis("Thesis"),
     WWW("WWW"),
     Software("Software"),
-    DATESET("DataSet");
+    Dataset("Dataset");
 
 
 

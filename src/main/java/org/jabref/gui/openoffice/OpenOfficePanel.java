@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -128,7 +127,7 @@ public class OpenOfficePanel {
         update.setMaxWidth(Double.MAX_VALUE);
 
         loader = new StyleLoader(ooPrefs,
-                                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
+                                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                                  Globals.prefs.getDefaultEncoding());
 
         initPanel();
@@ -375,7 +374,7 @@ public class OpenOfficePanel {
             @Override
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
-                List<URL> jarUrls = findOpenOfficeJars(Paths.get(ooPrefs.getInstallationPath()));
+                List<URL> jarUrls = findOpenOfficeJars(Path.of(ooPrefs.getInstallationPath()));
 
                 return createBibBase(jarUrls);
             }

@@ -2,7 +2,6 @@ package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public interface NativeDesktop {
     void openFile(String filePath, String fileType) throws IOException;
@@ -35,6 +34,6 @@ public interface NativeDesktop {
      * @return the path to the user directory.
      */
     default Path getUserDirectory() {
-        return Paths.get(System.getProperty("user.home"));
+        return Path.of(System.getProperty("user.home"));
     }
 }
