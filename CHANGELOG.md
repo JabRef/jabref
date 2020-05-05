@@ -73,6 +73,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where citation styles except the default "Preview" could not be used. [#56220](https://github.com/JabRef/jabref/issues/5622)
 - We fixed an issue where a warning was displayed when the title content is made up of two sentences. [#5832](https://github.com/JabRef/jabref/issues/5832)
 - We fixed an issue where an exception was thrown when adding a save action without a selected formatter in the library properties [#6069](https://github.com/JabRef/jabref/issues/6069)
+- We fixed an issue where JabRef's icon was missing in the Export to clipboard Dialog. [#6286](https://github.com/JabRef/jabref/issues/6286)
+- We fixed an issue when an "Abstract field" was duplicating text, when importing from RIS file (Neurons) [#6065](https://github.com/JabRef/jabref/issues/6065)
+- We fixed an issue where adding the addition of a new entry was not completely validated [#6370](https://github.com/JabRef/jabref/issues/6370)
+- We fixed an issue where the blue and red text colors in the Merge entries dialog were not quite visible [#6334](https://github.com/JabRef/jabref/issues/6334)
+- We fixed an issue where underscore character was removed from the file name in the Recent Libraries list in File menu [#6383](https://github.com/JabRef/jabref/issues/6383)
+- We fixed an issue where few keyboard shortcuts regarding new entries were missing [#6403](https://github.com/JabRef/jabref/issues/6403)
 - We fixed an issue that merging idnetical colors. [#6175](https://github.com/JabRef/jabref/issues/6175)
 
 ### Removed
