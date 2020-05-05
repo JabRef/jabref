@@ -2,10 +2,12 @@ package org.jabref.gui.maintable;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -180,15 +182,40 @@ class MainTableColumnFactory {
             container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));
 
-            for (Color groupColor : groupColors) {
+            /*for (Color groupColor : groupColors) {
+                    Rectangle groupRectangle = new Rectangle();
+                    groupRectangle.getStyleClass().add("groupColumnBackground");
+                    groupRectangle.setWidth(3);
+                    groupRectangle.setHeight(18);
+                    groupRectangle.setFill(groupColor);
+                    groupRectangle.setStrokeWidth(1);
+
+                    container.getChildren().add(groupRectangle);
+            }*/
+            if (groupColors.size() == 1) {
                 Rectangle groupRectangle = new Rectangle();
                 groupRectangle.getStyleClass().add("groupColumnBackground");
                 groupRectangle.setWidth(3);
                 groupRectangle.setHeight(18);
-                groupRectangle.setFill(groupColor);
+                groupRectangle.setFill(groupColors.get(0));
                 groupRectangle.setStrokeWidth(1);
 
                 container.getChildren().add(groupRectangle);
+            } else {
+                Set < Color > colorSet = new HashSet<>();
+                for (Color groupColor : groupColors) {
+                    if (!colorSet.contains(groupColor)) {
+                        Rectangle groupRectangle = new Rectangle();
+                        groupRectangle.getStyleClass().add("groupColumnBackground");
+                        groupRectangle.setWidth(3);
+                        groupRectangle.setHeight(18);
+                        groupRectangle.setFill(groupColor);
+                        groupRectangle.setStrokeWidth(1);
+
+                        container.getChildren().add(groupRectangle);
+                        colorSet.add(groupColor);
+                    }
+                }
             }
 
             String matchedGroupsString = matchedGroups.stream()
