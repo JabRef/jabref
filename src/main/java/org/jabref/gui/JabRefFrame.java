@@ -415,6 +415,7 @@ public class JabRefFrame extends BorderPane {
         setTop(head);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
+        splitPane.setResizableWithParent(sidePane, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
