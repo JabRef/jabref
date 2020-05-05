@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -441,7 +442,7 @@ class IntegrityCheckTest {
                 keyPattern,
                 ',',
                 false,
-                "-`ʹ:!;?^+");
+                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

@@ -27,6 +27,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+    public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^+";
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
@@ -55,7 +56,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, "-`ʹ:!;?^+"))
+        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, DEFAULT_UNWANTED_CHARACTERS))
                 .generateKey(entry);
     }
 
