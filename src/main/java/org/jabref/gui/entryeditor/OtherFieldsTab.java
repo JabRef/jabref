@@ -18,7 +18,7 @@ import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,10 +34,27 @@ public class OtherFieldsTab extends FieldsEditorTab {
     private final List<Field> customTabFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, List<Field> customTabFieldNames, DialogService dialogService, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, externalFileTypes, taskExecutor, journalAbbreviationLoader);
+    public OtherFieldsTab(BibDatabaseContext databaseContext,
+                          SuggestionProviders suggestionProviders,
+                          UndoManager undoManager,
+                          DialogService dialogService,
+                          JabRefPreferences preferences,
+                          BibEntryTypesManager entryTypesManager,
+                          ExternalFileTypes externalFileTypes,
+                          TaskExecutor taskExecutor,
+                          JournalAbbreviationRepository journalAbbreviationRepository) {
+        super(false,
+                databaseContext,
+                suggestionProviders,
+                undoManager,
+                dialogService,
+                preferences, // ToDo: Still uses JabRefPreferences instead of PreferencesService
+                externalFileTypes,
+                taskExecutor,
+                journalAbbreviationRepository);
+
         this.entryTypesManager = entryTypesManager;
-        this.customTabFieldNames = customTabFieldNames;
+        this.customTabFieldNames = preferences.getAllDefaultTabFieldNames();
 
         setText(Localization.lang("Other fields"));
         setTooltip(new Tooltip(Localization.lang("Show remaining fields")));

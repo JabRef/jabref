@@ -1,6 +1,6 @@
 package org.jabref.gui.auximport;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -36,7 +36,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
     private final DialogService dialogService;
     private final BasePanel basePanel;
     @FXML private ButtonType generateButtonType;
-    private Button generateButton;
+    private final Button generateButton;
     @FXML private TextField auxFileField;
     @FXML private ListView<String> notFoundList;
 
@@ -74,7 +74,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {
             AuxParser auxParser = new DefaultAuxParser(refBase);
-            auxParserResult = auxParser.parse(Paths.get(auxName));
+            auxParserResult = auxParser.parse(Path.of(auxName));
             notFoundList.getItems().setAll(auxParserResult.getUnresolvedKeys());
             statusInfos.setText(new AuxParserResultViewModel(auxParserResult).getInformation(false));
 

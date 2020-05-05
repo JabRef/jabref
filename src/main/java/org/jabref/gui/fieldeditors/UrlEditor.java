@@ -10,7 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
@@ -26,7 +26,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @FXML private final UrlEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public UrlEditor(Field field, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+    public UrlEditor(Field field, DialogService dialogService, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
         this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, fieldCheckers);
 
         ViewLoader.view(this)

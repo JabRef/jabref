@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.util;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -121,7 +121,7 @@ class GroupsParserTest {
 
     @Test
     void fromStringParsesTexGroup() throws Exception {
-        TexGroup expected = TexGroup.createWithoutFileMonitoring("myTexGroup", GroupHierarchyType.INDEPENDENT, Paths.get("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
+        TexGroup expected = TexGroup.createWithoutFileMonitoring("myTexGroup", GroupHierarchyType.INDEPENDENT, Path.of("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
         AbstractGroup parsed = GroupsParser.fromString("TexGroup:myTexGroup;0;path/To/File;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }

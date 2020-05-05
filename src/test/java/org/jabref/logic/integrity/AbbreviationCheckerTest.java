@@ -3,6 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ class AbbreviationCheckerTest {
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository = new JournalAbbreviationRepository(new Abbreviation("Test Journal", "T. J."));
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Test Journal", "T. J."));
         checker = new AbbreviationChecker(abbreviationRepository);
     }
 
@@ -28,7 +30,7 @@ class AbbreviationCheckerTest {
 
     @Test
     void checkValueDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
-        abbreviationRepository.addEntry(new Abbreviation("Journal", "Journal"));
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
         assertEquals(Optional.empty(), checker.checkValue("Journal"));
     }
 

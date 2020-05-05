@@ -6,7 +6,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -19,7 +19,7 @@ public class UrlEditorViewModel extends AbstractEditorViewModel {
     private DialogService dialogService;
     private BooleanProperty validUrlIsNotPresent = new SimpleBooleanProperty(true);
 
-    public UrlEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, FieldCheckers fieldCheckers) {
+    public UrlEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DialogService dialogService, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
         this.dialogService = dialogService;
 

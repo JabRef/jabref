@@ -58,6 +58,7 @@ public class CopyCitationAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
+    @Override
     public void execute() {
         BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
@@ -80,7 +81,7 @@ public class CopyCitationAction extends SimpleCommand {
             }
 
             StringReader sr = new StringReader(previewStyle.replace("__NEWLINE__", "\n"));
-            LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
             Layout layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
 
             List<String> citations = new ArrayList<>(selectedEntries.size());

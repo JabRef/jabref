@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class OpenDatabase {
     @Deprecated
     public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         LOGGER.debug("Opening: " + name);
-        Path file = Paths.get(name);
+        Path file = Path.of(name);
 
         if (!Files.exists(file)) {
             ParserResult pr = ParserResult.fromErrorMessage(Localization.lang("File not found"));

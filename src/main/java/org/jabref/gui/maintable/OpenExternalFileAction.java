@@ -11,7 +11,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 public class OpenExternalFileAction extends SimpleCommand {
@@ -25,7 +24,7 @@ public class OpenExternalFileAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.isFieldSetForSelectedEntry(StandardField.FILE, stateManager)
+        this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService)
                 .and(ActionHelper.needsEntriesSelected(1, stateManager)));
     }
 

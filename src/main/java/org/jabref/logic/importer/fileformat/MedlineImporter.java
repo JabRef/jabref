@@ -78,7 +78,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -372,7 +371,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
 
             fields.put(StandardField.PMID, medlineCitation.getPMID().getContent());
-            fields.put(InternalField.OWNER, medlineCitation.getOwner());
+            fields.put(StandardField.OWNER, medlineCitation.getOwner());
 
             addArticleInformation(fields, medlineCitation.getArticle().getContent());
 
