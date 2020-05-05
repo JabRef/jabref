@@ -12,7 +12,6 @@ import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -136,8 +135,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private void updateAfterPreferenceChanges() {
         setValues();
 
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
@@ -181,7 +180,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                             + Localization.lang("You must restart JabRef for this to come into effect."));
         }
 
-        GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));

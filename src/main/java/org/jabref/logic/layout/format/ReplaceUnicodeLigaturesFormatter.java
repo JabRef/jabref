@@ -11,7 +11,7 @@ import org.jabref.model.cleanup.Formatter;
 
 public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
 
-    private Map<Pattern, String> ligaturesMap;
+    private final Map<Pattern, String> ligaturesMap;
 
     public ReplaceUnicodeLigaturesFormatter() {
         ligaturesMap = new HashMap<>();

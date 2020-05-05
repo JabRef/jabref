@@ -101,7 +101,7 @@ public class ModsImporter extends Importer implements Parser {
             }
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            //The unmarshalled object is a jaxbElement.
+            // The unmarshalled object is a jaxbElement.
             JAXBElement<?> unmarshalledObject = (JAXBElement<?>) unmarshaller.unmarshal(input);
 
             Optional<ModsCollectionDefinition> collection = getElement(unmarshalledObject.getValue(),
@@ -150,7 +150,7 @@ public class ModsImporter extends Importer implements Parser {
 
         for (Object groupElement : modsGroup) {
 
-            //Get the element. Only one of the elements should be not an empty optional.
+            // Get the element. Only one of the elements should be not an empty optional.
             Optional<AbstractDefinition> abstractDefinition = getElement(groupElement, AbstractDefinition.class);
             Optional<GenreDefinition> genreDefinition = getElement(groupElement, GenreDefinition.class);
             Optional<LanguageDefinition> languageDefinition = getElement(groupElement, LanguageDefinition.class);
@@ -165,7 +165,7 @@ public class ModsImporter extends Importer implements Parser {
             Optional<IdentifierDefinition> identifierDefinition = getElement(groupElement, IdentifierDefinition.class);
             Optional<TitleInfoDefinition> titleInfoDefinition = getElement(groupElement, TitleInfoDefinition.class);
 
-            //Now parse the information if the element is present
+            // Now parse the information if the element is present
             abstractDefinition
                     .ifPresent(abstractDef -> putIfValueNotNull(fields, StandardField.ABSTRACT, abstractDef.getValue()));
 
@@ -198,9 +198,9 @@ public class ModsImporter extends Importer implements Parser {
 
         }
 
-        //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
+        // The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
         putIfListIsNotEmpty(fields, keywords, StandardField.KEYWORDS, this.keywordSeparator);
-        //same goes for authors and notes
+        // same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, StandardField.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, StandardField.NOTE, ", ");
 
@@ -224,7 +224,7 @@ public class ModsImporter extends Importer implements Parser {
         if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
             entry.setCiteKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
-            //put all identifiers (doi, issn, isbn,...) except of local and citekey
+            // put all identifiers (doi, issn, isbn,...) except of local and citekey
             putIfValueNotNull(fields, FieldFactory.parseField(identifier.getType()), identifier.getValue());
         }
     }
@@ -319,10 +319,10 @@ public class ModsImporter extends Importer implements Parser {
                         List<JAXBElement<StringPlusLanguage>> numberOrCaptionOrTitle = detail
                                 .getNumberOrCaptionOrTitle();
 
-                        //In the for loop should only be the value of the element that belongs to the detail not be null
+                        // In the for loop should only be the value of the element that belongs to the detail not be null
                         for (JAXBElement<StringPlusLanguage> jaxbElement : numberOrCaptionOrTitle) {
                             StringPlusLanguage value = jaxbElement.getValue();
-                            //put details like volume, issue,...
+                            // put details like volume, issue,...
                             putIfValueNotNull(fields, FieldFactory.parseField(detail.getType()), value.getValue());
                         }
                     } else if (object instanceof ExtentDefinition) {
@@ -354,8 +354,8 @@ public class ModsImporter extends Importer implements Parser {
             putIfValueNotNull(fields, StandardField.PAGES, extentDefinition.getStart().getValue());
             if (extentDefinition.getEnd() != null) {
                 String endPage = extentDefinition.getEnd().getValue();
-                //if end appears, then there has to be a start page appeared, so get it and put it together with
-                //the end page
+                // if end appears, then there has to be a start page appeared, so get it and put it together with
+                // the end page
                 String startPage = fields.get(StandardField.PAGES);
                 fields.put(StandardField.PAGES, startPage + "-" + endPage);
             }
@@ -396,11 +396,11 @@ public class ModsImporter extends Importer implements Parser {
             switch (elementName) {
 
                 case "dateIssued":
-                    //The first 4 digits of dateIssued should be the year
+                    // The first 4 digits of dateIssued should be the year
                     fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
                     break;
                 case "dateCreated":
-                    //If there was no year in date issued, then take the year from date created
+                    // If there was no year in date issued, then take the year from date created
                     fields.computeIfAbsent(StandardField.YEAR, k -> date.getValue().substring(0, 4));
                     fields.put(new UnknownField("created"), date.getValue());
                     break;
@@ -436,13 +436,13 @@ public class ModsImporter extends Importer implements Parser {
                 if ((type == null) && (namePart.getValue() != null)) {
                     authors.add(namePart.getValue());
                 } else if ("family".equals(type) && (namePart.getValue() != null)) {
-                    //family should come first, so if family appears we can set the author then comes before
-                    //we have to check if forename and family name are not empty in case it's the first author
+                    // family should come first, so if family appears we can set the author then comes before
+                    // we have to check if forename and family name are not empty in case it's the first author
                     if (!foreName.isEmpty() && !familyName.isEmpty()) {
-                        //now set and add the old author
+                        // now set and add the old author
                         author = familyName + ", " + Joiner.on(" ").join(foreName);
                         authors.add(author);
-                        //remove old forenames
+                        // remove old forenames
                         foreName.clear();
                     } else if (foreName.isEmpty() && !familyName.isEmpty()) {
                         authors.add(familyName);
@@ -457,7 +457,7 @@ public class ModsImporter extends Importer implements Parser {
             }
         }
 
-        //last author is not added, so do it here
+        // last author is not added, so do it here
         if (!foreName.isEmpty() && !familyName.isEmpty()) {
             author = familyName + ", " + Joiner.on(" ").join(foreName);
             authors.add(author.trim());

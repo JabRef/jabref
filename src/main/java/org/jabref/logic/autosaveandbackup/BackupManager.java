@@ -30,14 +30,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
  * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while making backups and
- * rejects all redundant backup tasks.
- * This class does not manage the .bak file which is created when opening a database.
+ * rejects all redundant backup tasks. This class does not manage the .bak file which is created when opening a
+ * database.
  */
 public class BackupManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackupManager.class);
 
-    private static final String BACKUP_EXTENSION = ".sav";
+    // This differs from org.jabref.logic.exporter.AtomicFileOutputStream.BACKUP_EXTENSION, which is used for copying the .bib away before overwriting on save.
+    private static final String AUTOSAVE_FILE_EXTENSION = ".sav";
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
@@ -58,12 +59,12 @@ public class BackupManager {
     }
 
     static Path getBackupPath(Path originalPath) {
-        return FileUtil.addExtension(originalPath, BACKUP_EXTENSION);
+        return FileUtil.addExtension(originalPath, AUTOSAVE_FILE_EXTENSION);
     }
 
     /**
-     * Starts the BackupManager which is associated with the given {@link BibDatabaseContext}.
-     * As long as no database file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
+     * Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
+     * file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
@@ -86,13 +87,27 @@ public class BackupManager {
     }
 
     /**
-     * Checks whether a backup file exists for the given database file.
+     * Checks whether a backup file exists for the given database file. If it exists, it is checked whether it is
+     * different from the original.
      *
-     * @param originalPath Path to the file a backup should be checked for.
+     * @param originalPath Path to the file a backup should be checked for. Example: jabref.bib.
+     * @return <code>true</code> if backup file exists AND differs from originalPath. <code>false</code> is the
+     * "default" return value in the good case. In the case of an exception <code>true</code> is returned to ensure that
+     * the user checks the output.
      */
-    public static boolean checkForBackupFile(Path originalPath) {
+    public static boolean backupFileDiffers(Path originalPath) {
         Path backupPath = getBackupPath(originalPath);
-        return Files.exists(backupPath) && !Files.isDirectory(backupPath);
+        if (!Files.exists(backupPath) || Files.isDirectory(backupPath)) {
+            return false;
+        }
+
+        try {
+            return Files.mismatch(originalPath, backupPath) != -1L;
+        } catch (IOException e) {
+            LOGGER.debug("Could not compare original file and backup file.", e);
+            // User has to investigate in this case
+            return true;
+        }
     }
 
     /**
@@ -116,8 +131,10 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = preferences.loadForSaveFromPreferences().withEncoding
-                    (charset).withMakeBackup(false);
+            SavePreferences savePreferences = preferences
+                    .loadForSaveFromPreferences()
+                    .withEncoding(charset)
+                    .withMakeBackup(false);
             new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
@@ -148,8 +165,8 @@ public class BackupManager {
     }
 
     /**
-     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext} and deletes the backup file.
-     * This method should only be used when closing a database/JabRef legally.
+     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext} and deletes the backup file. This
+     * method should only be used when closing a database/JabRef legally.
      */
     private void shutdown() {
         changeFilter.unregisterListener(this);

@@ -210,7 +210,7 @@ public class OOUtil {
         if (formatting.contains(Formatting.SMALLCAPS)) {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
-        }        else {
+        } else {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.NONE);
         }

@@ -35,13 +35,13 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
-        context.setDatabaseFile(path);
+        context.setDatabasePath(path);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
+        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         cleanup = new RenamePdfCleanup(false, context, filePreferences);
     }
 

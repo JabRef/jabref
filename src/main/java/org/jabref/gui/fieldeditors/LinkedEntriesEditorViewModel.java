@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
@@ -24,7 +24,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
 
         this.databaseContext = databaseContext;
@@ -39,7 +39,7 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     @Override
     @SuppressWarnings("unchecked")
     public Collection<ParsedEntryLink> complete(AutoCompletionBinding.ISuggestionRequest request) {
-        //We have to cast the BibEntries from the BibEntrySuggestionProvider to ParsedEntryLink
+        // We have to cast the BibEntries from the BibEntrySuggestionProvider to ParsedEntryLink
         Collection<BibEntry> bibEntries = (Collection<BibEntry>) super.complete(request);
         return bibEntries.stream().map(ParsedEntryLink::new).collect(Collectors.toList());
     }
@@ -72,9 +72,9 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
         // This feature was removed while converting the linked entries editor to JavaFX
         // Right now there is no nice way to re-implement it as we have no good interface to control the focus of the main table
         // (except directly using the JabRefFrame class as below)
-        //parsedEntryLink.getLinkedEntry().ifPresent(
+        // parsedEntryLink.getLinkedEntry().ifPresent(
         //        e -> frame.getCurrentBasePanel().highlightEntry(e)
-        //);
+        // );
     }
 
 }

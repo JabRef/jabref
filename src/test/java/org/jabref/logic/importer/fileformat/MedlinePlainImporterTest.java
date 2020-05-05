@@ -146,7 +146,7 @@ class MedlinePlainImporterTest {
 
     private void assertImportOfMedlineFileEqualsBibtexFile(String medlineFile, String bibtexFile)
             throws IOException, URISyntaxException {
-        Path file = Paths.get(MedlinePlainImporter.class.getResource(medlineFile).toURI());
+        Path file = Path.of(MedlinePlainImporter.class.getResource(medlineFile).toURI());
 
         try (InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
             List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
@@ -189,7 +189,7 @@ class MedlinePlainImporterTest {
 
     @Test
     void testWithNbibFile() throws IOException, URISyntaxException {
-        Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
+        Path file = Path.of(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 

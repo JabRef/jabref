@@ -1,6 +1,6 @@
 package org.jabref.preferences;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,7 +27,7 @@ public class LastFocusedTabPreferencesTest {
     @Test
     public void testLastFocusedTab() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
-        File whatever = new File("whatever");
+        Path whatever = Path.of("whatever");
         prefs.setLastFocusedTab(whatever);
         assertTrue(prefs.hadLastFocus(whatever));
     }
@@ -35,7 +35,7 @@ public class LastFocusedTabPreferencesTest {
     @Test
     public void testLastFocusedTabNull() {
         LastFocusedTabPreferences prefs = new LastFocusedTabPreferences(JabRefPreferences.getInstance());
-        File whatever = new File("whatever");
+        Path whatever = Path.of("whatever");
         prefs.setLastFocusedTab(whatever);
         assertTrue(prefs.hadLastFocus(whatever));
 

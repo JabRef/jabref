@@ -19,49 +19,44 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
+    private final BibDatabase database;
+    private final MainTableNameFormatter nameFormatter;
+    private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
+    private final Map<SpecialField, ObservableValue<Optional<SpecialFieldValueViewModel>>> specialFieldValues = new HashMap<>();
+    private final MonadicBinding<List<LinkedFile>> linkedFiles;
+    private final ObjectBinding<Map<Field, String>> linkedIdentifiers;
+    private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
-    public BibEntryTableViewModel(BibEntry entry) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, MainTableNameFormatter nameFormatter) {
         this.entry = entry;
+        this.database = database.getDatabase();
+        this.nameFormatter = nameFormatter;
+
+        this.linkedFiles = EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
+        this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
+        this.matchedGroups = createMatchedGroupsBinding(database);
     }
 
-    public BibEntry getEntry() {
-        return entry;
-    }
-
-    public Optional<String> getResolvedFieldOrAlias(Field field, BibDatabase database) {
-        return entry.getResolvedFieldOrAlias(field, database);
-    }
-
-    public ObjectBinding<String> getField(Field field) {
-        return entry.getFieldBinding(field);
-    }
-
-    public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
-        return EasyBind.map(getField(field), value -> field.parseValue(value).map(SpecialFieldValueViewModel::new));
-    }
-
-    public ObservableValue<List<LinkedFile>> getLinkedFiles() {
-        return EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
-    }
-
-    public ObservableValue<Map<Field, String>> getLinkedIdentifiers() {
+    private ObjectBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
         return Bindings.createObjectBinding(() -> {
-                    Map<Field, String> linkedIdentifiers = new HashMap<>();
-                    entry.getField(StandardField.URL).ifPresent(value -> linkedIdentifiers.put(StandardField.URL, value));
-                    entry.getField(StandardField.DOI).ifPresent(value -> linkedIdentifiers.put(StandardField.DOI, value));
-                    entry.getField(StandardField.URI).ifPresent(value -> linkedIdentifiers.put(StandardField.URI, value));
-                    entry.getField(StandardField.EPRINT).ifPresent(value -> linkedIdentifiers.put(StandardField.EPRINT, value));
-                    return linkedIdentifiers;
+                    Map<Field, String> identifiers = new HashMap<>();
+                    entry.getField(StandardField.URL).ifPresent(value -> identifiers.put(StandardField.URL, value));
+                    entry.getField(StandardField.DOI).ifPresent(value -> identifiers.put(StandardField.DOI, value));
+                    entry.getField(StandardField.URI).ifPresent(value -> identifiers.put(StandardField.URI, value));
+                    entry.getField(StandardField.EPRINT).ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
+                    return identifiers;
                 },
                 getEntry().getFieldBinding(StandardField.URL),
                 getEntry().getFieldBinding(StandardField.DOI),
@@ -69,10 +64,41 @@ public class BibEntryTableViewModel {
                 getEntry().getFieldBinding(StandardField.EPRINT));
     }
 
-    public ObservableValue<List<AbstractGroup>> getMatchedGroups(BibDatabaseContext database) {
+    public BibEntry getEntry() {
+        return entry;
+    }
+
+    public ObjectBinding<String> getField(Field field) {
+        return entry.getFieldBinding(field);
+    }
+
+    public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
+        ObservableValue<Optional<SpecialFieldValueViewModel>> value = specialFieldValues.get(field);
+        if (value != null) {
+            return value;
+        } else {
+            value = EasyBind.map(getField(field), fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+            specialFieldValues.put(field, value);
+            return value;
+        }
+    }
+
+    public ObservableValue<List<LinkedFile>> getLinkedFiles() {
+        return linkedFiles;
+    }
+
+    public ObservableValue<Map<Field, String>> getLinkedIdentifiers() {
+        return linkedIdentifiers;
+    }
+
+    public ObservableValue<List<AbstractGroup>> getMatchedGroups() {
+        return matchedGroups;
+    }
+
+    private ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database) {
         Optional<GroupTreeNode> root = database.getMetaData().getGroups();
         if (root.isPresent()) {
-            return EasyBind.map(entry.getFieldBinding(InternalField.GROUPS), field -> {
+            return EasyBind.map(entry.getFieldBinding(StandardField.GROUPS), field -> {
                 List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
                                                  .stream()
                                                  .map(GroupTreeNode::getGroup)
@@ -82,5 +108,34 @@ public class BibEntryTableViewModel {
             });
         }
         return new SimpleObjectProperty<>(Collections.emptyList());
+    }
+
+    public ObservableValue<String> getFields(OrFields fields) {
+        ObservableValue<String> value = fieldValues.get(fields);
+        if (value != null) {
+            return value;
+        } else {
+            value = Bindings.createStringBinding(() -> {
+                boolean isName = false;
+
+                Optional<String> content = Optional.empty();
+                for (Field field : fields) {
+                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+                    if (content.isPresent()) {
+                        isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
+                        break;
+                    }
+                }
+
+                String result = content.orElse(null);
+                if (isName) {
+                    return nameFormatter.formatName(result);
+                } else {
+                    return result;
+                }
+            }, entry.getObservables());
+            fieldValues.put(fields, value);
+            return value;
+        }
     }
 }

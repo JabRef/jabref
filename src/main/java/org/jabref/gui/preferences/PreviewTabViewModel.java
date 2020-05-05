@@ -27,16 +27,16 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
@@ -65,14 +65,16 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final JabRefPreferences preferences;
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
-    private final CustomLocalDragboard localDragboard = GUIGlobals.localDragboard;
+    private final CustomLocalDragboard localDragboard;
     private Validator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
+    private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
-    public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor) {
+    public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
+        this.localDragboard = stateManager.getLocalDragboard();
         previewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
@@ -204,7 +206,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
             // TODO: Find a better way to update preview
             basePanel.closeBottomPane();
-            //basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+            // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 
@@ -230,12 +232,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void addToChosen() {
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
+        availableSelectionModelProperty.getValue().clearSelection();
         availableListProperty.removeAll(selected);
         chosenListProperty.addAll(selected);
     }
 
     public void removeFromChosen() {
         List<PreviewLayout> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedItems());
+        chosenSelectionModelProperty.getValue().clearSelection();
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
         availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
@@ -248,6 +252,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         List<Integer> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedIndices());
         List<Integer> newIndices = new ArrayList<>();
+        chosenSelectionModelProperty.getValue().clearSelection();
 
         for (int oldIndex : selected) {
             boolean alreadyTaken = newIndices.contains(oldIndex - 1);
@@ -256,7 +261,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             newIndices.add(newIndex);
         }
 
-        chosenSelectionModelProperty.getValue().clearSelection();
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
         chosenSelectionModelProperty.getValue().select(newIndices.get(0));
         refreshPreview();
@@ -269,6 +273,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         List<Integer> selected = new ArrayList<>(chosenSelectionModelProperty.getValue().getSelectedIndices());
         List<Integer> newIndices = new ArrayList<>();
+        chosenSelectionModelProperty.getValue().clearSelection();
 
         for (int i = selected.size() - 1; i >= 0; i--) {
             int oldIndex = selected.get(i);
@@ -278,7 +283,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             newIndices.add(newIndex);
         }
 
-        chosenSelectionModelProperty.getValue().clearSelection();
         newIndices.forEach(index -> chosenSelectionModelProperty.getValue().select(index));
         chosenSelectionModelProperty.getValue().select(newIndices.get(0));
         refreshPreview();
@@ -364,12 +368,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public void dragDetected(ListProperty<PreviewLayout> sourceList, List<PreviewLayout> selectedLayouts, Dragboard dragboard) {
+    public void dragDetected(ListProperty<PreviewLayout> sourceList, ObjectProperty<MultipleSelectionModel<PreviewLayout>> sourceSelectionModel, List<PreviewLayout> selectedLayouts, Dragboard dragboard) {
         ClipboardContent content = new ClipboardContent();
         content.put(DragAndDropDataFormats.PREVIEWLAYOUTS, "");
         dragboard.setContent(content);
         localDragboard.putPreviewLayouts(selectedLayouts);
         dragSourceList = sourceList;
+        dragSourceSelectionModel = sourceSelectionModel;
     }
 
     /**
@@ -385,6 +390,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
             List<PreviewLayout> draggedLayouts = localDragboard.getPreviewLayouts();
             if (!draggedLayouts.isEmpty()) {
+                dragSourceSelectionModel.getValue().clearSelection();
                 dragSourceList.getValue().removeAll(draggedLayouts);
                 targetList.getValue().addAll(draggedLayouts);
                 success = true;
@@ -411,7 +417,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         if (dragboard.hasContent(DragAndDropDataFormats.PREVIEWLAYOUTS)) {
             List<PreviewLayout> draggedSelectedLayouts = new ArrayList<>(localDragboard.getPreviewLayouts());
             if (!draggedSelectedLayouts.isEmpty()) {
-
+                chosenSelectionModelProperty.getValue().clearSelection();
                 int targetId = chosenListProperty.getValue().indexOf(targetLayout);
 
                 // see https://stackoverflow.com/questions/28603224/sort-tableview-with-drag-and-drop-rows
@@ -426,7 +432,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                     }
                     targetLayout = chosenListProperty.getValue().get(targetId);
                 }
-
+                dragSourceSelectionModel.getValue().clearSelection();
                 dragSourceList.getValue().removeAll(draggedSelectedLayouts);
 
                 if (targetLayout != null) {
@@ -437,7 +443,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
                 chosenListProperty.getValue().addAll(targetId, draggedSelectedLayouts);
 
-                chosenSelectionModelProperty.getValue().clearSelection();
                 draggedSelectedLayouts.forEach(layout -> chosenSelectionModelProperty.getValue().select(layout));
 
                 success = true;

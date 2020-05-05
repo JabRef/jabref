@@ -110,7 +110,7 @@ public class ManageKeywordsViewModel {
         }
 
         NamedCompound ce = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        //TODO: bp.getUndoManager().addEdit(ce);
+        // TODO: bp.getUndoManager().addEdit(ce);
     }
 
     private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,

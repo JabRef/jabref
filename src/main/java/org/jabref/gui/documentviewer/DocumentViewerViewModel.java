@@ -38,7 +38,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
-
     public DocumentViewerViewModel(StateManager stateManager) {
         this.stateManager = Objects.requireNonNull(stateManager);
 

@@ -4,8 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -43,17 +41,12 @@ public class OSX implements NativeDesktop {
     }
 
     @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-        //TODO implement
-    }
-
-    @Override
     public String detectProgramPath(String programName, String directoryName) {
         return programName;
     }
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/Applications");
+        return Path.of("/Applications");
     }
 }

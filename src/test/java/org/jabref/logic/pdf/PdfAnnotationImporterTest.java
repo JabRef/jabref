@@ -1,6 +1,6 @@
 package org.jabref.logic.pdf;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
@@ -18,37 +18,37 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void invalidPath() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("/asdf/does/not/exist.pdf")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("/asdf/does/not/exist.pdf")));
     }
 
     @Test
     public void invalidDirectory() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("src/test/resources/pdfs")));
     }
 
     @Test
     public void invalidDocumentType() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.docx")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("src/test/resources/pdfs/write-protected.docx")));
     }
 
     @Test
     public void noAnnotationsWriteProtected() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.pdf")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("src/test/resources/pdfs/write-protected.pdf")));
     }
 
     @Test
     public void noAnnotationsEncrypted() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/encrypted.pdf")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("src/test/resources/pdfs/encrypted.pdf")));
     }
 
     @Test
     public void twoAnnotationsThesisExample() {
-        assertEquals(2, importer.importAnnotations(Paths.get("src/test/resources/pdfs/thesis-example.pdf")).size());
+        assertEquals(2, importer.importAnnotations(Path.of("src/test/resources/pdfs/thesis-example.pdf")).size());
     }
 
     @Test
     public void noAnnotationsMinimal() {
-        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal.pdf")));
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal.pdf")));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class PdfAnnotationImporterTest {
                 "inline note annotation", FileAnnotationType.FREETEXT, Optional.empty());
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-inlinenote.pdf")));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class PdfAnnotationImporterTest {
                 "A simple pop-up note", FileAnnotationType.TEXT, Optional.empty());
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-popup.pdf")));
     }
 
     @Test
@@ -76,7 +76,7 @@ public class PdfAnnotationImporterTest {
         final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16, 1), 1,
                 "Hello", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-foxithighlight.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-foxithighlight.pdf")));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class PdfAnnotationImporterTest {
                 "World", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-highlight-no-note.pdf")));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class PdfAnnotationImporterTest {
                 "ello", FileAnnotationType.SQUIGGLY, Optional.of(expectedLinkedAnnotation));
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-squiggly.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-squiggly.pdf")));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class PdfAnnotationImporterTest {
                 "World", FileAnnotationType.STRIKEOUT, Optional.of(expectedLinkedAnnotation));
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-strikeout.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-strikeout.pdf")));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class PdfAnnotationImporterTest {
                 "World", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-with-note.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-highlight-with-note.pdf")));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class PdfAnnotationImporterTest {
                 "Hello", FileAnnotationType.UNDERLINE, Optional.of(expectedLinkedAnnotation));
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-underline.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-underline.pdf")));
     }
 
     @Test
@@ -140,7 +140,7 @@ public class PdfAnnotationImporterTest {
                 "polygon annotation", FileAnnotationType.POLYGON, Optional.empty());
 
         assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-polygon.pdf")));
+                importer.importAnnotations(Path.of("src/test/resources/pdfs/minimal-polygon.pdf")));
     }
 }
 

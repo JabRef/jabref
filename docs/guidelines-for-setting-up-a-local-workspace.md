@@ -2,32 +2,72 @@
 
 This guide explains how to set up your environment for development of JabRef. It includes information about prerequisites, configuring your IDE, and running JabRef locally to verify your setup.
 
+```text
+The most important step is to configure your IDE.
+In case you know how to install JDK14 and to fork JabRef's code,
+        please scroll down to the IDE setup.
+```
+
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
  [![](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
 ## Prerequisites
 
-### Java Development Kit 13
+This section list the prerequisites you need to get started to develop JabRef.
+After this section, you are ready to get the code.
 
-A working Java 13 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 13 \(e.g `javac 13.0.1`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your JAVA\_HOME environment variable or install the most recent JDK.
+### Java Development Kit 14
 
-### git
+A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-It is strongly recommend that you have git installed: [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+Download the JDK from <https://jdk.java.net/>. On Windows, you can execute `choco install openjdk` (requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)).
 
-* In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. For more advanced tooling, you may use [Git Extensions](http://gitextensions.github.io/) or [SourceTree](https://www.sourcetreeapp.com/). - See also our [tool recommendations](tools.md) for installation hints including [chocolatey](https://chocolatey.org/).
+### GitHub Account
 
 If you do not yet have a GitHub account, please [create one](https://github.com/join).
 
+Proposals for account names:
+
+* Login similar to your university account. Example: `koppor`
+* Use your last name prefixed by the first letter of your first name. Example: `okopp`
+* Use `firstname.lastname`. Example: `oliver.kopp`
+
+You can hide your email adress by following the recommendations at <https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/>.
+
+Most developers, though, do not hide their email adress. They use one mich may get public.
+Mostly, they create a new email account for development only.
+That account then be used for develoment mailing lists, mail exchange with other developers, etc.
+
+Examples:
+
+* Same login as in GitHub (see above). Example: `koppor@gmail.com`
+* "`it`" in the name. Example:  `kopp.it@gmail.com`
+* Use the university login. Example: `st342435@stud.uni-stuttgart.de`
+
+### git
+
+It is strongly recommend that you have git installed.
+
+* In Debian-based distros: `sudo apt-get install git`
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
+  Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a) install git and b) have linux commands such as `grep` available in your `PATH`.
+  For more advanced tooling, you may use [Fork - a fast and friendly git client for Mac and Windows](https://git-fork.com/): `choco install git-fork`.
+* [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse](https://eclipse.org/) \(`2019-12` or newer\).
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for advanced users)](https://eclipse.org/) \(`2020-03` or newer\).
 
 Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
+### Other Tooling
+
+See our [tool recommendations](tools.md).
+
 ## Get the code
+
+This section explains how you get the JabRef code onto your machine in a form allowing you to make contributions.
 
 ### Fork JabRef into your GitHub account
 
@@ -47,6 +87,10 @@ Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community]
 
 ## Configure your IDE
 
+These steps are very important.
+They allow you to focus on the content and ensure that the code formatting always goes well.
+Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
+
 ### Setup for IntelliJ IDEA
 
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
@@ -57,16 +101,16 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
   the _Gradle_ and _Gradle Extension_ enabled.
 
-After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 13 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
+After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-* Ensure you have a Java 13 SDK configured by navigating to
+* Ensure you have a Java 14 SDK configured by navigating to
 
   **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
 
-  location of a JDK 13.
+  location of a JDK 14.
 
-* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 13
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 13 SDK as
+* Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
 
   the Gradle JVM at the bottom.
 
@@ -117,47 +161,6 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   "Test using" is set to "IntelliJ IDEA".
 
-To use the "JabRef Main" run configuration, open **Run \| Edit Configurations... \| Application \| JabRef Main** and
-
-* Verify, that your JDK 13 is used
-* Set "VM Options" to the following:
-
-  ```text
-    --patch-module org.jabref=build/resources/main
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-    --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-    --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-    --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-    --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-    --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-    --add-opens javafx.controls/javafx.scene.control=org.jabref
-    --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref
-    --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls
-    --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-    --add-opens javafx.controls/com.sun.javafx.scene.control=org.jabref
-    --add-opens javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.binding=com.jfoenix
-    --add-opens javafx.graphics/com.sun.javafx.stage=com.jfoenix
-    --add-opens javafx.base/com.sun.javafx.event=com.jfoenix
-  ```
-
-  Optionally the following entries can also be added \(but they currently only produce warnings and they are not needed\):
-
-  ```text
-    --patch-module test=fastparse_2.12-1.0.0.jar
-    --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-    --patch-module test3=sourcecode_2.12-0.1.4.jar
-  ```
-
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
 #### Using JabRef's code-style
@@ -169,14 +172,18 @@ Contributions to JabRef's source code need to have a code formatting that is con
   2. Close the settings afterwards and restart IntelliJ
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
-* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
-* Go to **File \| Settings \| Other Settings \| Checkstyle \| Configuration File**
+* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
+* Go to **File \| Settings \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide e.g. "CheckStyle"
+  2. For the description provide "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Click "Next" and "Finish"
-  5. Activate the CheckStyle configuration file by ticking it in the list
-  6. Save settings by clicking "OK"
+  4. Check "Store relative to project location"
+  5. Click "Next" and "Finish"
+  6. Activate the CheckStyle configuration file by ticking it in the list
+  7. Ensure that CheckStyle version 8.31 (or higher) is selected
+  8. Save settings by clicking "OK"
+
+![checkstyle settings](images/intellij-checkstyle-settings.png)
 
 #### Troubleshooting when using both IDEA and Eclipse
 
@@ -190,7 +197,8 @@ If you have configured Eclipse for the same project \(the required steps are des
 
 ### Setup for Eclipse
 
-Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is required.
+Make sure your Eclipse installation us up to date, Eclipse 2020-03 or newer is required.
+For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
 
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
@@ -205,29 +213,28 @@ Make sure your Eclipse installation us up to date, Eclipse 2019-12 or newer is r
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
-     * Set "VM Arguments" to:
+        ```text
+        --patch-module test=fastparse_2.12-1.0.0.jar
+        --patch-module test2=fastparse-utils_2.12-1.0.0.jar
+        --patch-module test3=sourcecode_2.12-0.1.4.jar
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
+        --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+        --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
+        --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
+        --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
+        --patch-module org.jabref=build\resources\main
+        ```
 
-     ```text
-     --patch-module test=fastparse_2.12-1.0.0.jar
-     --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-     --patch-module test3=sourcecode_2.12-0.1.4.jar
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-     --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-     --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-     --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-     --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-     --patch-module org.jabref=build\resources\main
-     ```
 6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
 7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
@@ -239,7 +246,7 @@ Got it running? GREAT! You are ready to lurk the code and contribute to JabRef. 
 
 ### Java installation
 
-An indication that `JAVA_HOME` is not correctly set or no JDK 13 is installed is following error message:
+An indication that `JAVA_HOME` is not correctly set or no JDK 14 is installed is following error message:
 
 ```text
 compileJava FAILED
