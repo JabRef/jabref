@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -13,6 +14,7 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirPattern;
+    @FXML private CheckBox downloadLinkedFiles;
 
     public ImportTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -28,6 +30,7 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
+        downloadLinkedFiles.selectedProperty().bindBidirectional(viewModel.downloadLinkedFilesProperty());
     }
 
     @Override
