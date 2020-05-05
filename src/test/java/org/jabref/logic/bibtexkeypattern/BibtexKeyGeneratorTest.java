@@ -1027,6 +1027,48 @@ class BibtexKeyGeneratorTest {
     }
 
     @Test
+    void generateKeyWithTruncate4Modifier() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("TheI", BibtexKeyGenerator.generateKey(entry, "title:truncate4"));
+    }
+
+    @Test
+    void generateKeyWithTruncate5Modifier() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("TheIn", BibtexKeyGenerator.generateKey(entry, "title:truncate5"));
+    }
+
+    @Test
+    void generateKeyWithTruncate6Modifier() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("TheInt", BibtexKeyGenerator.generateKey(entry, "title:truncate6"));
+    }
+
+    @Test
+    void generateKeyWithShortTruncateModifier() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("", BibtexKeyGenerator.generateKey(entry, "title:truncate0"));
+    }
+
+    @Test
+    void generateKeyWithLongTruncateModifier() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("TheInterestingTitle", BibtexKeyGenerator.generateKey(entry, "title:truncate99"));
+    }
+
+    @Test
+    void generateKeyWithTwoTruncateModifiers() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "The Interesting Title");
+        assertEquals("The", BibtexKeyGenerator.generateKey(entry, "title:truncate5:truncate3"));
+    }
+
+    @Test
     void generateKeyWithTitleCapitalizeModifier() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
