@@ -252,6 +252,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+    public static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -629,6 +630,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
+        // Don't download files by default
+        defaults.put(DOWNLOAD_LINKED_FILES, false);
 
         customImports = new CustomImportList(this);
 
@@ -1201,7 +1204,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(MAIN_FILE_DIRECTORY),
                 getBoolean(BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
-                get(IMPORT_FILEDIRPATTERN));
+                get(IMPORT_FILEDIRPATTERN),
+                getBoolean(DOWNLOAD_LINKED_FILES));
     }
 
     @Override

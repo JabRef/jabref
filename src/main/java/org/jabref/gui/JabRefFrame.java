@@ -245,6 +245,30 @@ public class JabRefFrame extends BorderPane {
                     case SEARCH:
                         getGlobalSearchBar().focus();
                         break;
+                    case NEW_ARTICLE:
+                        new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_BOOK:
+                        new NewEntryAction(this, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_INBOOK:
+                        new NewEntryAction(this, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_MASTERSTHESIS:
+                        new NewEntryAction(this, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PHDTHESIS:
+                        new NewEntryAction(this, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PROCEEDINGS:
+                        new NewEntryAction(this, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_TECHREPORT:
+                        new NewEntryAction(this, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_UNPUBLISHED:
+                        new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
+                        break;
                     default:
                 }
             }
