@@ -78,16 +78,13 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
-        List<Character> unwantedChars = new ArrayList<>();
-        for (char ch : unwantedCharacters.toCharArray()) {
-            unwantedChars.add(ch);
-        }
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
                            .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
                            .collect(StringBuilder::new,
                                    StringBuilder::appendCodePoint, StringBuilder::append)
                            .toString();
+
         // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
         return StringUtil.replaceSpecialCharacters(newKey);
