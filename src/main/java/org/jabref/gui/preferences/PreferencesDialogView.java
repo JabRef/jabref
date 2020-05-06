@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
@@ -57,6 +58,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     public PreferencesDialogViewModel getViewModel() {
         return viewModel;
     }
+
+    public ListView<PreferencesTab> getPreferenceTabList() { return preferenceTabList; }
 
     @FXML
     private void initialize() {
