@@ -4,16 +4,13 @@ import java.util.Comparator;
 
 /**
  * Comparator for numeric cases.
+ * The purpose of this class is to add the numeric comparison, because values are sorted
+ * as if they were strings.
  */
 public class NumericFieldComparator implements Comparator<String> {
 
     @Override
     public int compare(String val1, String val2) {
-        /*
-         * The purpose of this class is to add the numeric comparison, because values are sorted
-         * as if they were strings.
-         * */
-
         // We start by implementing the comparison in the edge cases (if one of the values is null)
         if (val1 == null && val2 == null) { return 0; }
         if (val1 == null) { return -1; } // (we assume that "null" is "less than" any other value)
@@ -36,7 +33,4 @@ public class NumericFieldComparator implements Comparator<String> {
         // If we arrive at this stage then both values are actually numeric !
         return valInt1 - valInt2;
     }
-
-
-
 }
