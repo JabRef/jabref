@@ -232,8 +232,7 @@ public class EndnoteImporter extends Importer {
                         type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
-                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
+                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val, ""));
                 }
             }
 
