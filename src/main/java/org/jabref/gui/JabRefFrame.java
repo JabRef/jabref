@@ -863,7 +863,7 @@ public class JabRefFrame extends BorderPane {
         });
 
         options.getItems().addAll(
-                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR, themeLoader, prefs)),
+                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(this, Globals.TASK_EXECUTOR)),
 
                 new SeparatorMenuItem(),
 
