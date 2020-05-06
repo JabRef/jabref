@@ -40,7 +40,7 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                 entry.clearField(StandardField.MONTH).ifPresent(changes::add);
             });
         } else {
-            // If field date is filled it should be removed the year and date fields
+            // If field date is filled it should be removed the year and month fields
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(newDate -> {
                 entry.clearField(StandardField.YEAR).ifPresent(changes::add);
                 entry.clearField(StandardField.MONTH).ifPresent(changes::add);
