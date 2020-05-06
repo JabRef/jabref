@@ -1,9 +1,5 @@
 package org.jabref.logic.bibtexkeypattern;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
