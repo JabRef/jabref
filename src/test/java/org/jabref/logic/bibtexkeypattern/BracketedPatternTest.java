@@ -245,45 +245,42 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[year]-[journal:regex(\"Organization\",\"JabRef\")]", ';', dbentry, database));
     }
 
-
-    private static final String TITLE_STRING_THE_INTERESTING_TITLE = "The Interesting Title";
-
     /**
      * Test the [:truncate] modifier
      */
     @Test
-    void applyTruncate4Modifier() {
-        assertEquals("The",
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Collections.singletonList("truncate4"), 0));
+    void truncateModifierRemovesTrailingWhitespace() {
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[fulltitle:truncate5]", ';', dbentry, database));
     }
 
     @Test
-    void applyTruncate5Modifier() {
-        assertEquals("The I",
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Collections.singletonList("truncate5"), 0));
+    void truncateModifierKeepsIntenalWhitespace() {
+        assertEquals("Open S",
+                BracketedPattern.expandBrackets("[fulltitle:truncate6]", ';', dbentry, database));
     }
 
     @Test
-    void applyShortTruncateModifier() {
+    void truncateModifierWorksWith0Length() {
         assertEquals("",
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Collections.singletonList("truncate0"), 0));
+                BracketedPattern.expandBrackets("[fulltitle:truncate0]", ';', dbentry, database));
     }
 
     @Test
-    void applyLongTruncateModifier() {
-        assertEquals(TITLE_STRING_THE_INTERESTING_TITLE,
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Collections.singletonList("truncate99"), 0));
+    void truncateModifierWorksWith9999Length() {
+        assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
+                BracketedPattern.expandBrackets("[fulltitle:truncate9999]", ';', dbentry, database));
     }
 
     @Test
-    void applyTwoTruncateModifiers() {
-        assertEquals("The",
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Arrays.asList("truncate5", "truncate4"), 0));
+    void truncateModifiersWorksAppliedTwice() {
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[fulltitle:truncate6:truncate5]", ';', dbentry, database));
     }
 
     @Test
-    void applyEmptyTruncateModifiers() {
-        assertEquals(TITLE_STRING_THE_INTERESTING_TITLE,
-                BracketedPattern.applyModifiers(TITLE_STRING_THE_INTERESTING_TITLE, Collections.singletonList("truncate"), 0));
+    void truncateModifierIsIgnoredWithoutAnArgument() {
+        assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
+                BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
 }
