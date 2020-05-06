@@ -379,9 +379,9 @@ public class BracketedPattern {
                 resultingLabel = abbreviateSB.toString();
             } else if (modifier.matches("truncate[\\d]+")) {
                 // Truncate by keeping the first N characters and remove trailing white spaces.
-                int N = Integer.parseInt(modifier.substring(8));
-                N = Math.min(N, resultingLabel.length());
-                resultingLabel = resultingLabel.substring(0, N).stripTrailing();
+                int truncateAfter = Integer.parseInt(modifier.substring(8));
+                truncateAfter = Math.min(truncateAfter, resultingLabel.length());
+                resultingLabel = resultingLabel.substring(0, truncateAfter).stripTrailing();
             } else {
                 Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                 if (formatter.isPresent()) {
