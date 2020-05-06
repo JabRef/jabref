@@ -58,7 +58,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getEnforceLegalKeys());
+            String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getUnwantedCharacters());
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Error"),
