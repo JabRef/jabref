@@ -32,6 +32,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed the wrong behavior that font size increase does not increase preferences dialog window font size. [#6039](https://github.com/JabRef/jabref/issues/6039)
 - We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
 - We greatly improved the performance of the overall application and many operations. [#5071](https://github.com/JabRef/jabref/issues/5071)
 - We fixed an issue where sort by priority was broken. [#6222](https://github.com/JabRef/jabref/issues/6222)
