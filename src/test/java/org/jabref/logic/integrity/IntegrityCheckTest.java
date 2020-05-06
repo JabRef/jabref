@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -68,7 +69,7 @@ class IntegrityCheckTest {
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .checkDatabase();
 
         assertEquals(clonedEntry, entry);
@@ -101,7 +102,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), true, false)
+                JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .checkDatabase();
         assertNotEquals(Collections.emptyList(), messages);
     }
@@ -110,7 +111,7 @@ class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
-                JournalAbbreviationLoader.loadBuiltInRepository(), true, false
+                JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
@@ -131,10 +132,10 @@ class IntegrityCheckTest {
                 "",
                 false,
                 false,
-                false,
                 keyPattern,
                 ',',
-                false);
+                false,
+                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
     }
 
     protected static BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
