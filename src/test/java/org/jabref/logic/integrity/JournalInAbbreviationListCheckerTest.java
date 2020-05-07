@@ -1,9 +1,11 @@
 package org.jabref.logic.integrity;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -18,12 +20,13 @@ public class JournalInAbbreviationListCheckerTest {
     private JournalInAbbreviationListChecker checker;
     private JournalInAbbreviationListChecker checkerb;
     private JournalAbbreviationRepository abbreviationRepository;
-    private Abbreviation a;
     private BibEntry entry;
+    Path file;
 
     @BeforeEach
     void setUp() {
-        abbreviationRepository = new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"));
+        abbreviationRepository = JournalAbbreviationLoader.loadBuiltInRepository();
+        abbreviationRepository.addCustomAbbreviation(new Abbreviation("IEEE Software", "IEEE SW"));
         checker = new JournalInAbbreviationListChecker(StandardField.JOURNAL, abbreviationRepository);
         checkerb = new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, abbreviationRepository);
         entry = new BibEntry();
