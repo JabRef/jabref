@@ -29,6 +29,7 @@ import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
+import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.cleanup.Formatter;
 
@@ -102,6 +103,9 @@ public class Formatters {
         if (modifier.startsWith(RegexFormatter.KEY)) {
             String regex = modifier.substring(RegexFormatter.KEY.length());
             return Optional.of(new RegexFormatter(regex));
+        } else if (modifier.matches(TruncateFormatter.KEY + "\\d+")) {
+            int truncateAfter = Integer.parseInt(modifier.substring(TruncateFormatter.KEY.length()));
+            return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
             return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
