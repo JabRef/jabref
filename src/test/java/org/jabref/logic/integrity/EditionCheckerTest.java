@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,6 @@ public class EditionCheckerTest {
 
     private EditionChecker checker;
     private EditionChecker checkerb;
-    private BibEntry entry;
     private BibDatabaseContext bibtex;
     private BibDatabaseContext biblatex;
 
@@ -29,7 +27,6 @@ public class EditionCheckerTest {
         biblatex.setMode(BibDatabaseMode.BIBLATEX);
         checker = new EditionChecker(bibtex, true);
         checkerb = new EditionChecker(biblatex, true);
-        entry = new BibEntry();
     }
 
     public BibDatabaseContext bibDatabaseContextEdition = new BibDatabaseContext();
