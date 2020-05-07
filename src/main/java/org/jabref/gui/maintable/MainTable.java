@@ -12,6 +12,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -61,6 +62,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
+
+        this.setOnKeyTyped(key -> {
+            if (this.getSortOrder().size() == 0) {
+                return;
+            }
+            final char keyChar = key.getCharacter().charAt(0);
+            final TableColumn<BibEntryTableViewModel, ?> sortedColumn = getSortOrder().get(0);
+            final int target_row_index = this.getEntryIndexByInput(sortedColumn, keyChar);
+            if (Character.isLetterOrDigit(keyChar) && target_row_index != -1) {
+                this.scrollTo(target_row_index);
+                this.getSelectionModel().clearAndSelect(target_row_index);
+            }
+        });
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
@@ -121,6 +135,19 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         setupKeyBindings(keyBindingRepository);
 
         database.getDatabase().registerListener(this);
+    }
+
+    private int getEntryIndexByInput(TableColumn<BibEntryTableViewModel, ?> column, char target_char) {
+        for (int i = 0; i < this.getItems().size(); ++i) {
+            Object temp = column.getCellObservableValue(i).getValue();
+            if (temp == null) {
+                continue;
+            }
+            if (temp.toString().toLowerCase().charAt(0) == target_char) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Subscribe
