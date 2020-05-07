@@ -50,6 +50,7 @@ public class EditAction extends SimpleCommand {
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
                         textInput.deleteNextChar();
+                        break;
                     default:
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
