@@ -34,6 +34,7 @@ public abstract class BackgroundTask<V> {
     private BooleanProperty isCanceled = new SimpleBooleanProperty(false);
     private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
     private StringProperty message = new SimpleStringProperty("");
+    private StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
     private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
 
     public BackgroundTask() {
@@ -88,6 +89,10 @@ public abstract class BackgroundTask<V> {
 
     public StringProperty messageProperty() {
         return message;
+    }
+
+    public StringProperty titleProperty() {
+        return title;
     }
 
     public double getWorkDonePercentage() {

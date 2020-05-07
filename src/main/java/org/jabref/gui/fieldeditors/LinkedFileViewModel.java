@@ -417,6 +417,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 entry.addFile(0, newLinkedFile);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            downloadTask.titleProperty().set("Downloading");
+            downloadTask.messageProperty().set(linkedFile.getLink());
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

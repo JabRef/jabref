@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -41,6 +42,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
+    private final ObservableList<Task> backgroundTasks = FXCollections.observableArrayList();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -112,4 +114,12 @@ public class StateManager {
     public OptionalObjectProperty<Node> focusOwnerProperty() { return focusOwner; }
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
+
+    public ObservableList<Task> getBackgroundTasks() {
+        return backgroundTasks;
+    }
+
+    public void addBackgroundTask(Task backgroundTask) {
+        this.backgroundTasks.add(backgroundTask);
+    }
 }

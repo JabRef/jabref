@@ -1,0 +1,15 @@
+.addEntryButton {
+    -fx-font-size: 2em;
+}
+
+.entry-container {
+    /*-fx-padding: 0.5em 0em 0.5em 0em;*/
+}
+
+.list-cell {
+    -fx-padding: 0.5em 0 1em 0.5em;
+}
+
+.list-cell:entry-selected {
+    -fx-background-color: derive(-jr-selected, 60%);
+}

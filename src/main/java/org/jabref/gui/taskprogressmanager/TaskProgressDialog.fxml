@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.TaskProgressView?>
+<DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.taskprogressmanager.TaskProgressDialog">
+    <content>
+        <VBox spacing="10.0">
+            <TaskProgressView fx:id="taskProgressView" VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </content>
+</DialogPane>

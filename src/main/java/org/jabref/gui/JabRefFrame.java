@@ -40,6 +40,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javafx.stage.Window;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
@@ -107,6 +108,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+import org.jabref.gui.taskprogressmanager.TaskProgressDialog;
 import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
@@ -1074,6 +1076,12 @@ public class JabRefFrame extends BorderPane {
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();
+
+        TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
+        taskProgressDialog.setTitle("Task progress");
+        Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
+        dialogWindow.setOnCloseRequest(event -> dialogWindow.hide());
+        taskProgressDialog.showAndWait();
     }
 
     public FileHistoryMenu getFileHistory() {
