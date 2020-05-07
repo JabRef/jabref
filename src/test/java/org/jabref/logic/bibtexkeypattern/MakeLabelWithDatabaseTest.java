@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MakeLabelWithDatabaseTest {
@@ -32,7 +33,7 @@ class MakeLabelWithDatabaseTest {
         database.insertEntry(entry);
         pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("", "", false, true, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
     }
 
     @Test
@@ -54,14 +55,14 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyAlwaysLetter() {
-        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("", "", true, true, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016a"), entry.getCiteKeyOptional());
     }
 
     @Test
     void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("", "", true, true, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
 
         BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibtexKeyPattern, database, preferences);
         keyGenerator.generateAndSetKey(entry);
@@ -74,14 +75,14 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateDefaultKeyStartDuplicatesAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("", "", false, false, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);
         assertEquals(Optional.of("Doe2016"), entry.getCiteKeyOptional());
     }
 
     @Test
     void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("", "", false, false, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
 
         BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(bibtexKeyPattern, database, preferences);
         keyGenerator.generateAndSetKey(entry);
@@ -370,7 +371,7 @@ class MakeLabelWithDatabaseTest {
 
     @Test
     void generateKeyRegExReplace() {
-        preferences = new BibtexKeyPatternPreferences("2", "3", false, true, true, pattern, ',', false);
+        preferences = new BibtexKeyPatternPreferences("2", "3", false, true, pattern, ',', false, DEFAULT_UNWANTED_CHARACTERS);
         bibtexKeyPattern.setDefaultValue("[auth][year]");
         entry.setField(StandardField.AUTHOR, "John Doe and Donald Smith and Will Wonder");
         new BibtexKeyGenerator(bibtexKeyPattern, database, preferences).generateAndSetKey(entry);

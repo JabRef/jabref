@@ -18,6 +18,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableAddOrRemoveGroup;
 import org.jabref.gui.undo.NamedCompound;
@@ -31,6 +32,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -44,6 +46,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
     private final StringProperty message;
+    private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
     private final DialogService dialogService;
     private final UndoManager undoManager;
@@ -58,6 +61,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param task     the task executed for parsing the selected files(s).
      */
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task, TaskExecutor taskExecutor, BibDatabaseContext databaseContext, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
+        this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.undoManager = undoManager;
@@ -99,7 +103,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      *
      * @param entriesToImport subset of the entries contained in parserResult
      */
-    public void importEntries(List<BibEntry> entriesToImport) {
+    public void importEntries(List<BibEntry> entriesToImport, boolean downloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
@@ -124,6 +128,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }).executeWith(Globals.TASK_EXECUTOR);
         } else {
             buildImportHandlerThenImportEntries(entriesToImport);
+        }
+
+        if (downloadFiles) {
+            for (BibEntry bibEntry : entriesToImport) {
+                for (LinkedFile linkedFile : bibEntry.getFiles()) {
+                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, bibEntry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), ExternalFileTypes.getInstance());
+                    linkedFileViewModel.download();
+                }
+            }
         }
 
         NamedCompound namedCompound = new NamedCompound(Localization.lang("Import file"));

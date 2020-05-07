@@ -948,6 +948,12 @@ public class BibEntry implements Cloneable {
         return setFiles(linkedFiles);
     }
 
+    public Optional<FieldChange> addFile(int index, LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(index, file);
+        return setFiles(linkedFiles);
+    }
+
     public ObservableMap<Field, String> getFieldsObservable() {
         return fields;
     }
