@@ -14,6 +14,9 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -23,6 +26,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -32,6 +36,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -519,7 +524,9 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                 factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                new Separator(Orientation.VERTICAL),
+                createTaskIndicator()
         );
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
@@ -923,6 +930,24 @@ public class JabRefFrame extends BorderPane {
         return menu;
     }
 
+    private ProgressIndicator createTaskIndicator() {
+        ProgressIndicator indicator = new ProgressIndicator(1);
+        indicator.progressProperty().bind(stateManager.tasksProgressBinding);
+
+        indicator.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
+                // @TODO add localization
+                taskProgressDialog.setTitle("Task progress");
+                Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
+                dialogWindow.setOnCloseRequest(windowEvent -> dialogWindow.hide());
+                taskProgressDialog.showAndWait();
+            }
+        });
+        return indicator;
+    }
+
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
         if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
@@ -1076,12 +1101,6 @@ public class JabRefFrame extends BorderPane {
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();
-
-        TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
-        taskProgressDialog.setTitle("Task progress");
-        Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
-        dialogWindow.setOnCloseRequest(event -> dialogWindow.hide());
-        taskProgressDialog.showAndWait();
     }
 
     public FileHistoryMenu getFileHistory() {

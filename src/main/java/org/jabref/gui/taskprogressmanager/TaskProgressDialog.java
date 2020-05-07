@@ -36,8 +36,6 @@ public class TaskProgressDialog extends BaseDialog<Boolean> {
 
                     for (Task t : c.getAddedSubList()) {
                         taskProgressView.getTasks().add(t);
-                        System.out.println("MY LOG add TITLE \"" + t.getTitle() + "\"");
-                        System.out.println("MY LOG add MESSAGE \"" + t.getMessage()+ "\"");
                     }
                     for (Task t : c.getRemoved()) {
                         taskProgressView.getTasks().remove(t);

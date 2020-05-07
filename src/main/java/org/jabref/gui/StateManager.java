@@ -5,7 +5,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -18,6 +21,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -42,7 +46,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task> backgroundTasks = FXCollections.observableArrayList();
+    private final UiThreadObservableList<Task> backgroundTasks = new UiThreadObservableList(FXCollections.observableArrayList());
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -115,11 +119,19 @@ public class StateManager {
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
 
-    public ObservableList<Task> getBackgroundTasks() {
+    public UiThreadObservableList<Task> getBackgroundTasks() {
         return backgroundTasks;
     }
 
     public void addBackgroundTask(Task backgroundTask) {
         this.backgroundTasks.add(backgroundTask);
     }
+
+    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
+            () -> backgroundTasks.stream().anyMatch(Task::isRunning)
+    );
+
+    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
+            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1)
+    );
 }
