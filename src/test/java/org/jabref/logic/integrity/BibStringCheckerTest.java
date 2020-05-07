@@ -6,21 +6,14 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibStringCheckerTest {
 
-    private BibStringChecker checker;
-    private BibEntry entry;
-
-    @BeforeEach
-    void setUp() {
-        checker = new BibStringChecker();
-        entry = new BibEntry();
-    }
+    private final BibStringChecker checker = new BibStringChecker();
+    private final BibEntry entry = new BibEntry();
 
     @Test
     void fieldAcceptsNoHashMarks() {

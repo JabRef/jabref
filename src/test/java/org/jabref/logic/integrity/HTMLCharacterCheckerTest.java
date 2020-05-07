@@ -6,21 +6,14 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLCharacterCheckerTest {
 
-    private HTMLCharacterChecker checker;
-    private BibEntry entry;
-
-    @BeforeEach
-    void setUp() {
-        checker = new HTMLCharacterChecker();
-        entry = new BibEntry();
-    }
+    private final HTMLCharacterChecker checker = new HTMLCharacterChecker();
+    private final BibEntry entry = new BibEntry();
 
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {

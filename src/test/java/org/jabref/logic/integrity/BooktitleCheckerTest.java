@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class BooktitleCheckerTest {
 
-    private BooktitleChecker checker;
-
-    @BeforeEach
-    public void setUp() {
-        checker = new BooktitleChecker();
-    }
+    private final BooktitleChecker checker = new BooktitleChecker();
 
     @Test
     void booktitleAcceptsIfItDoesNotEndWithConferenceOn() {

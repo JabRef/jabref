@@ -7,20 +7,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TypeCheckerTest {
 
-    private TypeChecker checker;
+    private final TypeChecker checker = new TypeChecker();
     private BibEntry entry;
-
-    @BeforeEach
-    void setUp() {
-        checker = new TypeChecker();
-    }
 
     @Test
     void inProceedingshasPagesNumbers() {

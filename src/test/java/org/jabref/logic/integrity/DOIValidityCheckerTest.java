@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class DOIValidityCheckerTest {
 
-    private DOIValidityChecker checker;
-
-    @BeforeEach
-    void setUp() {
-        checker = new DOIValidityChecker();
-    }
+    private final DOIValidityChecker checker = new DOIValidityChecker();
 
     @Test
     void doiAcceptsValidInput() {

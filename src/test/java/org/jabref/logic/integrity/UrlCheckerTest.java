@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class UrlCheckerTest {
 
-    private UrlChecker checker;
-
-    @BeforeEach
-    void setUp() {
-        checker = new UrlChecker();
-    }
+    private final UrlChecker checker = new UrlChecker();
 
     @Test
     void urlFieldAcceptsHttpAddress() {
