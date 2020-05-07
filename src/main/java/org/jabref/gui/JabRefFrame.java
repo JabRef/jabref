@@ -428,7 +428,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void initLayout() {
-
         setId("frame");
 
         VBox head = new VBox(createMenu(), createToolbar());
