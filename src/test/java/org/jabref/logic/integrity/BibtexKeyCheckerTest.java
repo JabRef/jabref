@@ -1,27 +1,26 @@
 package org.jabref.logic.integrity;
 
-import org.jabref.model.database.BibDatabaseContext;
+import java.util.Collections;
+
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class BibtexKeyCheckerTest {
+
+    private final BibtexKeyChecker checker = new BibtexKeyChecker();
+    private final BibEntry entry = new BibEntry();
 
     @Test
     void bibTexAcceptsKeyFromAuthorAndYear() {
-        final BibDatabaseContext correctContext = IntegrityCheckTest.createContext(InternalField.KEY_FIELD, "Knuth2014");
-        correctContext.getDatabase().getEntries().get(0).setField(StandardField.AUTHOR, "Knuth");
-        correctContext.getDatabase().getEntries().get(0).setField(StandardField.YEAR, "2014");
-        IntegrityCheckTest.assertCorrect(correctContext);
-    }
-
-    @Test
-    void bibtexDooesNotAcceptRandomKey() {
-        final BibDatabaseContext wrongContext = IntegrityCheckTest.createContext(InternalField.KEY_FIELD, "Knuth2014a");
-        wrongContext.getDatabase().getEntries().get(0).setField(StandardField.AUTHOR, "Knuth");
-        wrongContext.getDatabase().getEntries().get(0).setField(StandardField.YEAR, "2014");
-        IntegrityCheckTest.assertWrong(wrongContext);
+        entry.setField(InternalField.KEY_FIELD, "Knuth2014");
+        entry.setField(StandardField.AUTHOR, "Knuth");
+        entry.setField(StandardField.YEAR, "2014");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
 }

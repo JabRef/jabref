@@ -1,7 +1,11 @@
 package org.jabref.logic.integrity;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
@@ -22,8 +26,12 @@ import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 
 class IntegrityCheckTest {
@@ -46,6 +54,32 @@ class IntegrityCheckTest {
     @Test
     void bibLaTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    void testFileChecks() {
+        MetaData metaData = mock(MetaData.class);
+        Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
+        Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
+        // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
+        Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
+
+        assertCorrect(createContext(StandardField.FILE, ":build.gradle:gradle", metaData));
+        assertCorrect(createContext(StandardField.FILE, "description:build.gradle:gradle", metaData));
+        assertWrong(createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData));
+    }
+
+    @Test
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
+        Path bibFile = testFolder.resolve("lit.bib");
+        Files.createFile(bibFile);
+        Path pdfFile = testFolder.resolve("file.pdf");
+        Files.createFile(pdfFile);
+
+        BibDatabaseContext databaseContext = createContext(StandardField.FILE, ":file.pdf:PDF");
+        databaseContext.setDatabasePath(bibFile);
+
+        assertCorrect(databaseContext);
     }
 
     @Test
@@ -75,7 +109,7 @@ class IntegrityCheckTest {
         assertEquals(clonedEntry, entry);
     }
 
-    protected static BibDatabaseContext createContext(Field field, String value, EntryType type) {
+    private BibDatabaseContext createContext(Field field, String value, EntryType type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         entry.setType(type);
@@ -84,7 +118,7 @@ class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase);
     }
 
-    protected static BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
+    private BibDatabaseContext createContext(Field field, String value, MetaData metaData) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
@@ -92,13 +126,13 @@ class IntegrityCheckTest {
         return new BibDatabaseContext(bibDatabase, metaData);
     }
 
-    protected static BibDatabaseContext createContext(Field field, String value) {
+    private BibDatabaseContext createContext(Field field, String value) {
         MetaData metaData = new MetaData();
         metaData.setMode(BibDatabaseMode.BIBTEX);
         return createContext(field, value, metaData);
     }
 
-    protected static void assertWrong(BibDatabaseContext context) {
+    private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
@@ -107,7 +141,7 @@ class IntegrityCheckTest {
         assertNotEquals(Collections.emptyList(), messages);
     }
 
-    protected static void assertCorrect(BibDatabaseContext context) {
+    private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
@@ -116,16 +150,16 @@ class IntegrityCheckTest {
         assertEquals(Collections.emptyList(), messages);
     }
 
-    protected static void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
+    private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                                                              mock(FilePreferences.class),
                                                              createBibtexKeyPatternPreferences(),
-                                                             new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")), true,
+                                                             JournalAbbreviationLoader.loadBuiltInRepository(),
                                                              allowIntegerEdition).checkDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 
-    private static BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
+    private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
         final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         return new BibtexKeyPatternPreferences(
                 "",
@@ -138,7 +172,7 @@ class IntegrityCheckTest {
                 BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
     }
 
-    protected static BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
+    private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
         context.setMode(mode);
         return context;
     }
