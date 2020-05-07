@@ -1,5 +1,7 @@
 package org.jabref.logic.formatter.minifier;
 
+import java.util.Objects;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
@@ -31,6 +33,7 @@ public class TruncateFormatter extends Formatter {
      */
     @Override
     public String format(final String input) {
+        Objects.requireNonNull(input);
         final int truncateIndex = Math.min(truncateAfter, input.length());
         return input.substring(0, truncateIndex).stripTrailing();
     }
