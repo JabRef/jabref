@@ -251,7 +251,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void truncateModifierKeepsIntenalWhitespace() {
+    void truncateModifierKeepsInternalWhitespace() {
         assertEquals("Open S",
                 BracketedPattern.expandBrackets("[fulltitle:truncate6]", ';', dbentry, database));
     }
