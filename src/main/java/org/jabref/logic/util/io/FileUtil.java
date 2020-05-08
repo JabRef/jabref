@@ -288,6 +288,9 @@ public class FileUtil {
 
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
+
+        // Truncates long directory names
+        targetName = getValidFileName(targetName);
         return targetName;
     }
 
