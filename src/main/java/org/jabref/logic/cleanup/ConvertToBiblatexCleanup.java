@@ -42,9 +42,9 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         } else {
             // If date field is filled and is equal to year it should be removed the year and month fields
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
-                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(yearl -> {
+                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(checkYear -> {
                     // Get the year of the date field (4 digits).
-                    if (date.substring(0, 4).equals(yearl)) {
+                    if (date.substring(0, 4).equals(checkYear)) {
                         entry.clearField(StandardField.YEAR).ifPresent(changes::add);
                         entry.clearField(StandardField.MONTH).ifPresent(changes::add);
                     }
