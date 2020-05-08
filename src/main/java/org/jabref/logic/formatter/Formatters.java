@@ -103,8 +103,8 @@ public class Formatters {
         if (modifier.startsWith(RegexFormatter.KEY)) {
             String regex = modifier.substring(RegexFormatter.KEY.length());
             return Optional.of(new RegexFormatter(regex));
-        } else if (modifier.matches(TruncateFormatter.KEY + "\\d+")) {
-            int truncateAfter = Integer.parseInt(modifier.substring(TruncateFormatter.KEY.length()));
+        } else if (modifier.matches("\\Atruncate\\d+\\z")) {
+            int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
             return getAll().stream().filter(f -> f.getKey().equals(modifier)).findAny();
