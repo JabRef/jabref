@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
@@ -17,6 +18,7 @@ import org.jabref.model.strings.StringUtil;
  */
 public class ConvertToBiblatexCleanup implements CleanupJob {
 
+    @SuppressWarnings("checkstyle:WhitespaceAround")
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
@@ -40,13 +42,17 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                 entry.clearField(StandardField.MONTH).ifPresent(changes::add);
             });
         } else {
-            // If field date is filled it should be removed the year and month fields
-            entry.getFieldOrAlias(StandardField.DATE).ifPresent(newDate -> {
-                entry.clearField(StandardField.YEAR).ifPresent(changes::add);
-                entry.clearField(StandardField.MONTH).ifPresent(changes::add);
+            // If date field is filled and is equal to year it should be removed the year and month fields
+            entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
+                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(yearl -> {
+                    // Get the year of the date field (4 digits).
+                    if (date.substring(0, 4).equals(yearl)) {
+                        entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                        entry.clearField(StandardField.MONTH).ifPresent(changes::add);
+                    }
+                });
             });
         }
         return changes;
     }
-
 }
