@@ -136,7 +136,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     /**
      * This is called, if a user starts typing some characters into the keyboard with focus on main table.
-     * The tableview will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+     * The tableview will scroll to the cell with the same starting column value and typed string
      * @param sortedColumn The ListView currently focused
      * @param keyEvent The pressed character
      */
