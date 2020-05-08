@@ -166,6 +166,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
                             entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 });
+                downloadTask.showToUser(true);
                 Globals.TASK_EXECUTOR.execute(downloadTask);
             } catch (MalformedURLException exception) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

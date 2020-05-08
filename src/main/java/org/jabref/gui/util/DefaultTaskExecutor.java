@@ -100,7 +100,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
-        Globals.stateManager.addBackgroundTask(new SimpleObjectProperty<Task<?>>(javafxTask));
+        if (task.showToUser()) {
+            Globals.stateManager.addBackgroundTask(new SimpleObjectProperty<Task<?>>(javafxTask));
+        }
         return execute(javafxTask);
     }
 

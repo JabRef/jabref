@@ -36,6 +36,7 @@ public abstract class BackgroundTask<V> {
     private StringProperty message = new SimpleStringProperty("");
     private StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
     private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
+    private BooleanProperty showToUser = new SimpleBooleanProperty(false);
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -109,6 +110,14 @@ public abstract class BackgroundTask<V> {
 
     public ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
+    }
+
+    public boolean showToUser() {
+        return showToUser.get();
+    }
+
+    public void showToUser(boolean show) {
+        showToUser.set(show);
     }
 
     /**
