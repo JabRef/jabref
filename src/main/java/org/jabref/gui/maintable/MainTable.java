@@ -281,6 +281,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         case MOVE:
                             LOGGER.debug("Mode MOVE"); // alt on win
                             importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
+                            panel.getEntryEditor().setEntry(entry);
                             break;
                         case COPY:
                             LOGGER.debug("Mode Copy"); // ctrl on win
