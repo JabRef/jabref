@@ -226,8 +226,7 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if ((c != '\\') || escaped)// (previous == '\\')))
-                {
+                if ((c != '\\') || escaped) /* (previous == '\\'))) */ {
                     buffer.append((char) c);
                 }
 

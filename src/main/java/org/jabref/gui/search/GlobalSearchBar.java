@@ -160,7 +160,9 @@ public class GlobalSearchBar extends HBox {
         );
         ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
-        Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
+        Platform.runLater(() -> {
+            visualizer.initVisualization(regexValidator.getValidationStatus(), searchField);
+        });
 
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
             if (isFocused) {
@@ -195,7 +197,7 @@ public class GlobalSearchBar extends HBox {
 
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                              query.isGrammarBasedSearch());
+                        query.isGrammarBasedSearch());
             });
         });
     }

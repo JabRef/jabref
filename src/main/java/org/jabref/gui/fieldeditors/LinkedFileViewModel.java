@@ -470,5 +470,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile;
     }
 
-    public ValidationStatus fileExistsValidationStatus() { return fileExistsValidator.getValidationStatus(); }
+    public ValidationStatus fileExistsValidationStatus() {
+        return fileExistsValidator.getValidationStatus();
+    }
 }

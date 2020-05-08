@@ -228,7 +228,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
     public void addToChosen() {
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
@@ -297,9 +299,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github: @cemartins)
-     * License: BSD-2-Clause
-     * see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE and:
+     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github: @cemartins) License:
+     * BSD-2-Clause see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE and:
      * https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
      *
      * @param text to parse and highlight
@@ -378,8 +379,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * This is called, when the user drops some PreviewLayouts either in the availableListView
-     * or in the empty space of chosenListView
+     * This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of
+     * chosenListView
      *
      * @param targetList either availableListView or chosenListView
      */
@@ -405,8 +406,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * This is called, when the user drops some PreviewLayouts on another cell in
-     * chosenListView to sort them
+     * This is called, when the user drops some PreviewLayouts on another cell in chosenListView to sort them
      *
      * @param targetLayout the Layout, the user drops a layout on
      */
@@ -452,17 +452,31 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return success;
     }
 
-    public ListProperty<PreviewLayout> availableListProperty() { return availableListProperty; }
+    public ListProperty<PreviewLayout> availableListProperty() {
+        return availableListProperty;
+    }
 
-    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() { return availableSelectionModelProperty; }
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> availableSelectionModelProperty() {
+        return availableSelectionModelProperty;
+    }
 
-    public ListProperty<PreviewLayout> chosenListProperty() { return chosenListProperty; }
+    public ListProperty<PreviewLayout> chosenListProperty() {
+        return chosenListProperty;
+    }
 
-    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty() { return chosenSelectionModelProperty; }
+    public ObjectProperty<MultipleSelectionModel<PreviewLayout>> chosenSelectionModelProperty() {
+        return chosenSelectionModelProperty;
+    }
 
-    public BooleanProperty selectedIsEditableProperty() { return selectedIsEditableProperty; }
+    public BooleanProperty selectedIsEditableProperty() {
+        return selectedIsEditableProperty;
+    }
 
-    public ObjectProperty<PreviewLayout> layoutProperty() { return layoutProperty; }
+    public ObjectProperty<PreviewLayout> layoutProperty() {
+        return layoutProperty;
+    }
 
-    public StringProperty sourceTextProperty() { return sourceTextProperty; }
+    public StringProperty sourceTextProperty() {
+        return sourceTextProperty;
+    }
 }

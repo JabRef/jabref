@@ -55,11 +55,19 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public ListProperty<String> defaultFileNamePatternsProperty() { return defaultFileNamePatternsProperty; }
+    public ListProperty<String> defaultFileNamePatternsProperty() {
+        return defaultFileNamePatternsProperty;
+    }
 
-    public StringProperty fileNamePatternProperty() { return fileNamePatternProperty; }
+    public StringProperty fileNamePatternProperty() {
+        return fileNamePatternProperty;
+    }
 
-    public StringProperty fileDirPatternProperty() { return fileDirPatternProperty; }
+    public StringProperty fileDirPatternProperty() {
+        return fileDirPatternProperty;
+    }
 
-    public BooleanProperty downloadLinkedFilesProperty() { return downloadLinkedFilesProperty; }
+    public BooleanProperty downloadLinkedFilesProperty() {
+        return downloadLinkedFilesProperty;
+    }
 }
