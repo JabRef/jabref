@@ -18,6 +18,7 @@ import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -43,6 +44,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import javafx.stage.Window;
@@ -930,22 +932,30 @@ public class JabRefFrame extends BorderPane {
         return menu;
     }
 
-    private ProgressIndicator createTaskIndicator() {
-        ProgressIndicator indicator = new ProgressIndicator(1);
+    private Group createTaskIndicator() {
+        ProgressIndicator indicator = new ProgressIndicator();
+        indicator.getStyleClass().setAll("progress-indicator");
         indicator.progressProperty().bind(stateManager.tasksProgressBinding);
 
-        indicator.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
-                // @TODO add localization
-                taskProgressDialog.setTitle("Task progress");
-                Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
-                dialogWindow.setOnCloseRequest(windowEvent -> dialogWindow.hide());
-                taskProgressDialog.showAndWait();
+        /*
+        The label of the indicator cannot be removed with styling. Therefore,
+        hide it and clip it to a square of (width x width) each time width is updated.
+         */
+        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue.doubleValue()>0){
+                Rectangle clip=new Rectangle(newValue.doubleValue(),newValue.doubleValue());
+                indicator.setClip(clip);
             }
         });
-        return indicator;
+
+        indicator.setOnMouseClicked(event -> {
+            TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
+            taskProgressDialog.setTitle(Localization.lang("Background Tasks"));
+            Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
+            dialogWindow.setOnCloseRequest(windowEvent -> dialogWindow.hide());
+            taskProgressDialog.showAndWait();
+        });
+        return new Group(indicator);
     }
 
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
