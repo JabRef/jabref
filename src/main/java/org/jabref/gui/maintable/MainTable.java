@@ -58,6 +58,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
 
+    private long lastKeyPressTime;
+    private String columnSearchTerm;
+
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
@@ -67,13 +70,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (this.getSortOrder().size() == 0) {
                 return;
             }
-            final char keyChar = key.getCharacter().charAt(0);
-            final TableColumn<BibEntryTableViewModel, ?> sortedColumn = getSortOrder().get(0);
-            final int target_row_index = this.getEntryIndexByInput(sortedColumn, keyChar);
-            if (Character.isLetterOrDigit(keyChar) && target_row_index != -1) {
-                this.scrollTo(target_row_index);
-                this.getSelectionModel().clearAndSelect(target_row_index);
-            }
+            this.jumpToSearchKey(getSortOrder().get(0), key);
         });
 
         this.model = model;
@@ -137,17 +134,33 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         database.getDatabase().registerListener(this);
     }
 
-    private int getEntryIndexByInput(TableColumn<BibEntryTableViewModel, ?> column, char target_char) {
-        for (int i = 0; i < this.getItems().size(); ++i) {
-            Object temp = column.getCellObservableValue(i).getValue();
-            if (temp == null) {
-                continue;
-            }
-            if (temp.toString().toLowerCase().charAt(0) == target_char) {
-                return i;
-            }
+    /**
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table.
+     * The tableview will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+     * @param sortedColumn The ListView currently focused
+     * @param keyEvent The pressed character
+     */
+
+    private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
+        if (keyEvent.getCharacter() == null || sortedColumn == null) {
+            return;
         }
-        return -1;
+
+        if (System.currentTimeMillis() - lastKeyPressTime < 700) {
+            columnSearchTerm += keyEvent.getCharacter().toLowerCase();
+        } else {
+            columnSearchTerm = keyEvent.getCharacter().toLowerCase();
+        }
+
+        lastKeyPressTime = System.currentTimeMillis();
+
+        this.getItems().stream()
+            .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
+                                    .map(Object::toString)
+                                    .orElse("")
+                                    .toLowerCase().startsWith(columnSearchTerm))
+            .findFirst()
+            .ifPresent(item -> { this.scrollTo(item); this.clearAndSelect(item.getEntry()); });
     }
 
     @Subscribe
