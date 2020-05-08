@@ -6,7 +6,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
 public class TruncateFormatter extends Formatter {
-    public static final String KEY = "truncate";
+    private static final String KEY = "truncate";
     private static Integer truncateAfter;
 
     /**
