@@ -24,7 +24,7 @@
       <if type="chapter paper-conference" match="any">
         <text term="in" text-case="capitalize-first" suffix=" "/>
         <names variable="editor translator" delimiter=", " suffix=", ">
-          <name and="symbol" initialize-with=". " delimiter=", "/>
+          <name and="text" initialize-with=". " delimiter=", "/>
           <label form="short" text-case="title" strip-periods="true" prefix=" (" suffix=".)"/>
         </names>
       </if>
@@ -34,7 +34,7 @@
     <choose>
       <if type="chapter paper-conference" match="none">
         <names variable="editor translator" delimiter=", " prefix=" (" suffix=")">
-          <name and="symbol" initialize-with=". " delimiter=", "/>
+          <name and="text" initialize-with=". " delimiter=", "/>
           <label form="short" prefix=", " text-case="capitalize-first"/>
         </names>
       </if>
@@ -42,7 +42,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
+      <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with=". " delimiter=", "/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
       <substitute>
         <names variable="editor"/>
@@ -53,7 +53,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter=", " initialize-with=". "/>
+      <name form="short" and="text" delimiter=", " initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>

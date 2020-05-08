@@ -218,6 +218,7 @@ public class JabRefPreferences implements PreferencesService {
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
+    public static final String UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -232,7 +233,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
@@ -572,6 +572,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
+        defaults.put(UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -603,7 +604,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
@@ -1287,14 +1287,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                getBoolean(KEY_GEN_FIRST_LETTER_A),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
-                getKeyPattern(),
-                getKeywordDelimiter(),
-                getBoolean(AVOID_OVERWRITING_KEY));
+                                               get(KEY_PATTERN_REGEX),
+                                               get(KEY_PATTERN_REPLACEMENT),
+                                               getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                                               getBoolean(KEY_GEN_FIRST_LETTER_A),
+                                               getKeyPattern(),
+                                               getKeywordDelimiter(),
+                                               getBoolean(AVOID_OVERWRITING_KEY),
+                                               get(UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -1469,12 +1469,14 @@ public class JabRefPreferences implements PreferencesService {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
     }
 
+    @Override
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
         return new CleanupPreferences(
                                       getLayoutFormatterPreferences(abbreviationRepository),
                                       getFilePreferences());
     }
 
+    @Override
     public CleanupPreset getCleanupPreset() {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
@@ -1489,6 +1491,7 @@ public class JabRefPreferences implements PreferencesService {
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
+    @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));
@@ -1896,8 +1899,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getEnforceLegalKeys() {
-        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    public String getUnwantedCharacters() {
+        return get(UNWANTED_BIBTEX_KEY_CHARACTERS);
     }
 
     @Override
@@ -1912,7 +1915,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
                 shouldCollectTelemetry(),
@@ -1925,7 +1927,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
         putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
-        putBoolean(ENFORCE_LEGAL_BIBTEX_KEY, preferences.isEnforceLegalBibtexKey());
         putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         setShouldCollectTelemetry(preferences.isCollectTelemetry());
