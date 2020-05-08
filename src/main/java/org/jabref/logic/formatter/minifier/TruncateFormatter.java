@@ -6,16 +6,17 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
 public class TruncateFormatter extends Formatter {
-    public static final String KEY = "truncate";
-    private static Integer truncateAfter;
+    private final int TRUNCATE_AFTER;
+    private final String KEY;
 
     /**
      * The TruncateFormatter truncates a string after the given index.
      *
      * @param truncateIndex truncate a string after this index.
      */
-    public TruncateFormatter(int truncateIndex) {
-        truncateAfter = truncateIndex;
+    public TruncateFormatter(final int truncateIndex) {
+        TRUNCATE_AFTER = truncateIndex;
+        KEY = "truncate" + TRUNCATE_AFTER;
     }
 
     @Override
@@ -34,8 +35,8 @@ public class TruncateFormatter extends Formatter {
     @Override
     public String format(final String input) {
         Objects.requireNonNull(input);
-        final int truncateIndex = Math.min(truncateAfter, input.length());
-        return input.substring(0, truncateIndex).stripTrailing();
+        final int index = Math.min(TRUNCATE_AFTER, input.length());
+        return input.substring(0, index).stripTrailing();
     }
 
     @Override
