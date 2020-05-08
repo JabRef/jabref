@@ -935,7 +935,7 @@ public class JabRefFrame extends BorderPane {
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().setAll("progress-indicator");
-        indicator.progressProperty().bind(stateManager.tasksProgressBinding);
+        //indicator.progressProperty().bind(stateManager.tasksProgressBinding);
 
         /*
         The label of the indicator cannot be removed with styling. Therefore,

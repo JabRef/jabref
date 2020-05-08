@@ -19,6 +19,8 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
@@ -46,7 +48,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final UiThreadObservableList<Task> backgroundTasks = new UiThreadObservableList(FXCollections.observableArrayList());
+    private final UiThreadObservableList<Task<?>> backgroundTasks = new UiThreadObservableList(FXCollections.observableArrayList());
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -119,19 +121,21 @@ public class StateManager {
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
 
-    public UiThreadObservableList<Task> getBackgroundTasks() {
+    public UiThreadObservableList<Task<?>> getBackgroundTasks() {
         return backgroundTasks;
     }
 
-    public void addBackgroundTask(Task backgroundTask) {
+    public void addBackgroundTask(Task<?> backgroundTask) {
         this.backgroundTasks.add(backgroundTask);
     }
-
-    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
-            () -> backgroundTasks.stream().anyMatch(Task::isRunning)
+/*
+    public Binding<Boolean> anyTaskRunningBinding = EasyBind.combine(
+            backgroundTasks,
+            stream -> stream.anyMatch(Task::getProgress)
     );
 
-    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
-            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1)
-    );
+    public Binding<Double> tasksProgressBinding = (Binding<Double>) EasyBind.combine(
+            backgroundTasks,
+            stream -> stream.filter(Task::isRunning).mapToDouble(Task::getProgress)
+                    .average().orElse(1));*/
 }

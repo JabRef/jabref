@@ -46,7 +46,7 @@ public class TaskViewModel extends AbstractViewModel {
     private final StringProperty message;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private ObservableList<Task> tasks;
+    private ObservableList<Task<?>> tasks;
 
     public TaskViewModel(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -59,7 +59,7 @@ public class TaskViewModel extends AbstractViewModel {
         return message.get();
     }
 
-    public ObservableList<Task> getBackgroundTasks() {return this.tasks;};
+    public ObservableList<Task<?>> getBackgroundTasks() {return this.tasks;};
 
     public StringProperty messageProperty() {
         return message;
