@@ -160,7 +160,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                                     .orElse("")
                                     .toLowerCase().startsWith(columnSearchTerm))
             .findFirst()
-            .ifPresent(item -> { this.scrollTo(item); this.clearAndSelect(item.getEntry()); });
+            .ifPresent(item -> {
+                this.scrollTo(item);
+                this.clearAndSelect(item.getEntry());
+            });
     }
 
     @Subscribe
