@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class IntegrityCheckTest {
 
@@ -414,8 +415,10 @@ class IntegrityCheckTest {
     }
 
     private void assertCorrect(BibDatabaseContext context) {
+        FilePreferences filePreferencesMock = mock(FilePreferences.class);
+        when(filePreferencesMock.isBibLocationAsPrimary()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
+                filePreferencesMock,
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).checkDatabase();
