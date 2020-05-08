@@ -1,5 +1,6 @@
 package org.jabref.gui.taskprogressmanager;
 
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -21,6 +22,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -46,7 +48,7 @@ public class TaskViewModel extends AbstractViewModel {
     private final StringProperty message;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private ObservableList<Task<?>> tasks;
+    private UiThreadObservableList<Property<Task<?>>> tasks;
 
     public TaskViewModel(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -59,7 +61,7 @@ public class TaskViewModel extends AbstractViewModel {
         return message.get();
     }
 
-    public ObservableList<Task<?>> getBackgroundTasks() {return this.tasks;};
+    public UiThreadObservableList<Property<Task<?>>> getBackgroundTasks() {return this.tasks;};
 
     public StringProperty messageProperty() {
         return message;

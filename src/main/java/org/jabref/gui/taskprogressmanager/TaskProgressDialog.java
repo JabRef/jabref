@@ -1,6 +1,7 @@
 package org.jabref.gui.taskprogressmanager;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import javafx.beans.property.Property;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -30,6 +31,18 @@ public class TaskProgressDialog extends BaseDialog<Boolean> {
         viewModel = new TaskViewModel(dialogService, stateManager);
         taskProgressView.setRetainTasks(true);
 
-        EasyBind.listBind(taskProgressView.getTasks(), viewModel.getBackgroundTasks());
+        viewModel.getBackgroundTasks().addListener(new ListChangeListener<Property<Task<?>>>() {
+            @Override
+            public void onChanged(Change<? extends Property<Task<?>>> c) {
+                while(c.next()) {
+                    for (Property<Task<?>> taskProperty : c.getAddedSubList()) {
+                        taskProgressView.getTasks().add(taskProperty.getValue());
+                    }
+                    for (Property<Task<?>> taskProperty : c.getRemoved()) {
+                        taskProgressView.getTasks().remove(taskProperty.getValue());
+                    }
+                }
+            }
+        });
     }
 }

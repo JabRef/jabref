@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
@@ -99,7 +100,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
         Task<V> javafxTask = getJavaFXTask(task);
-        Globals.stateManager.addBackgroundTask(javafxTask);
+        Globals.stateManager.addBackgroundTask(new SimpleObjectProperty<Task<?>>(javafxTask));
         return execute(javafxTask);
     }
 
