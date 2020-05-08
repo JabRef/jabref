@@ -129,14 +129,14 @@ public class StateManager {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
-    Binding<Boolean> anyTaskRunningBinding = EasyBind.<Task<?>, Boolean>combine(
+    Binding<Boolean> anyTaskRunningBinding = EasyBind.combine(
             backgroundTasks,
             tStream -> tStream.anyMatch(Task::isRunning)
     );
 
-    public Binding<Double> tasksProgressBinding = EasyBind.<Task<?>, Double>combine(
+    public Binding<Double> tasksProgressBinding = EasyBind.combine(
             backgroundTasks,
-            stream -> stream.<Task<?>>filter(Task::isRunning).mapToDouble(Task::getProgress)
+            stream -> stream.filter(Task::isRunning).mapToDouble(Task::getProgress)
                     .average().orElse(1)
     );
 
