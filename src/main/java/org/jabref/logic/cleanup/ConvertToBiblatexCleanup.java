@@ -17,7 +17,6 @@ import org.jabref.model.strings.StringUtil;
  */
 public class ConvertToBiblatexCleanup implements CleanupJob {
 
-    @SuppressWarnings("checkstyle:WhitespaceAround")
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
