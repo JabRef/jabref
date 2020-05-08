@@ -245,30 +245,6 @@ class BracketedPatternTest {
      * Test the [:truncate] modifier
      */
     @Test
-    void truncateModifierRemovesTrailingWhitespace() {
-        assertEquals("Open",
-                BracketedPattern.expandBrackets("[fulltitle:truncate5]", ';', dbentry, database));
-    }
-
-    @Test
-    void truncateModifierKeepsInternalWhitespace() {
-        assertEquals("Open S",
-                BracketedPattern.expandBrackets("[fulltitle:truncate6]", ';', dbentry, database));
-    }
-
-    @Test
-    void truncateModifierWorksWith0Length() {
-        assertEquals("",
-                BracketedPattern.expandBrackets("[fulltitle:truncate0]", ';', dbentry, database));
-    }
-
-    @Test
-    void truncateModifierWorksWith9999Length() {
-        assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
-                BracketedPattern.expandBrackets("[fulltitle:truncate9999]", ';', dbentry, database));
-    }
-
-    @Test
     void truncateModifiersWorksAppliedTwice() {
         assertEquals("Open",
                 BracketedPattern.expandBrackets("[fulltitle:truncate6:truncate5]", ';', dbentry, database));
