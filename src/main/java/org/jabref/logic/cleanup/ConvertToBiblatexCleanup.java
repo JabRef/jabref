@@ -3,8 +3,6 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
