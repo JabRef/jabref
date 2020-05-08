@@ -1,6 +1,6 @@
 package org.jabref.gui.taskprogressmanager;
 
-import javafx.beans.property.Property;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -48,7 +48,7 @@ public class TaskViewModel extends AbstractViewModel {
     private final StringProperty message;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private UiThreadObservableList<Property<Task<?>>> tasks;
+    private UiThreadObservableList<ObjectProperty<Task<?>>> tasks;
 
     public TaskViewModel(DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -61,7 +61,7 @@ public class TaskViewModel extends AbstractViewModel {
         return message.get();
     }
 
-    public UiThreadObservableList<Property<Task<?>>> getBackgroundTasks() {return this.tasks;};
+    public UiThreadObservableList<ObjectProperty<Task<?>>> getBackgroundTasks() {return this.tasks;};
 
     public StringProperty messageProperty() {
         return message;

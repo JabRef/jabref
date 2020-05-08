@@ -10,7 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.Property;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -48,7 +48,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final UiThreadObservableList<Property<Task<?>>> backgroundTasks = new UiThreadObservableList(FXCollections.observableArrayList());
+    private final UiThreadObservableList<ObjectProperty<Task<?>>> backgroundTasks = new UiThreadObservableList(FXCollections.observableArrayList());
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -121,11 +121,11 @@ public class StateManager {
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
 
-    public UiThreadObservableList<Property<Task<?>>> getBackgroundTasks() {
+    public UiThreadObservableList<ObjectProperty<Task<?>>> getBackgroundTasks() {
         return backgroundTasks;
     }
 
-    public void addBackgroundTask(Property<Task<?>> backgroundTask) {
+    public void addBackgroundTask(ObjectProperty<Task<?>> backgroundTask) {
         this.backgroundTasks.add(backgroundTask);
     }
 

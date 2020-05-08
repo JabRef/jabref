@@ -1,8 +1,9 @@
 package org.jabref.gui.taskprogressmanager;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import javafx.beans.property.Property;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import org.controlsfx.control.TaskProgressView;
@@ -20,6 +21,8 @@ public class TaskProgressDialog extends BaseDialog<Boolean> {
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
 
+    private ObservableList<Task<?>> tasks;
+
     public TaskProgressDialog() {
         ViewLoader.view(this)
                   .load()
@@ -31,18 +34,7 @@ public class TaskProgressDialog extends BaseDialog<Boolean> {
         viewModel = new TaskViewModel(dialogService, stateManager);
         taskProgressView.setRetainTasks(true);
 
-        viewModel.getBackgroundTasks().addListener(new ListChangeListener<Property<Task<?>>>() {
-            @Override
-            public void onChanged(Change<? extends Property<Task<?>>> c) {
-                while(c.next()) {
-                    for (Property<Task<?>> taskProperty : c.getAddedSubList()) {
-                        taskProgressView.getTasks().add(taskProperty.getValue());
-                    }
-                    for (Property<Task<?>> taskProperty : c.getRemoved()) {
-                        taskProgressView.getTasks().remove(taskProperty.getValue());
-                    }
-                }
-            }
-        });
+        tasks = EasyBind.map(viewModel.getBackgroundTasks(), ObjectProperty<Task<?>>::<Task<?>>get);
+        EasyBind.listBind(taskProgressView.getTasks(), tasks);
     }
 }
