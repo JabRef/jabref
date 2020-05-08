@@ -23,7 +23,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -155,7 +154,6 @@ public class JabRefFrame extends BorderPane {
     private final ThemeLoader themeLoader = Globals.getThemeLoader();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
-    private final ProgressBar progressBar = new ProgressBar();
     private final FileHistoryMenu fileHistory;
 
     private final Stage mainStage;
@@ -244,6 +242,30 @@ public class JabRefFrame extends BorderPane {
                         break;
                     case SEARCH:
                         getGlobalSearchBar().focus();
+                        break;
+                    case NEW_ARTICLE:
+                        new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_BOOK:
+                        new NewEntryAction(this, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_INBOOK:
+                        new NewEntryAction(this, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_MASTERSTHESIS:
+                        new NewEntryAction(this, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PHDTHESIS:
+                        new NewEntryAction(this, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PROCEEDINGS:
+                        new NewEntryAction(this, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_TECHREPORT:
+                        new NewEntryAction(this, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_UNPUBLISHED:
+                        new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
                     default:
                 }
@@ -406,8 +428,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void initLayout() {
-        setProgressBarVisible(false);
-
         setId("frame");
 
         VBox head = new VBox(createMenu(), createToolbar());
@@ -1058,21 +1078,6 @@ public class JabRefFrame extends BorderPane {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    /**
-     * Set the visibility of the progress bar in the right end of the status line at the bottom of the frame.
-     */
-    public void setProgressBarVisible(final boolean visible) {
-        progressBar.setVisible(visible);
-    }
-
-    /**
-     * Sets the indeterminate status of the progress bar.
-     * <p>
-     */
-    public void setProgressBarIndeterminate(final boolean value) {
-        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
     /**

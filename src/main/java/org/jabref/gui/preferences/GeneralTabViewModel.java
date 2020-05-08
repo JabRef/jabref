@@ -43,7 +43,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty memoryStickModeProperty = new SimpleBooleanProperty();
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enforceLegalKeysProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
@@ -105,7 +104,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(initialGeneralPreferences.isConfirmDelete());
-        enforceLegalKeysProperty.setValue(initialGeneralPreferences.isEnforceLegalBibtexKey());
         allowIntegerEditionProperty.setValue(initialGeneralPreferences.isAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(preferencesService.shouldCollectTelemetry());
@@ -141,7 +139,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 selectedBiblatexModeProperty.getValue(),
                 inspectionWarningDuplicateProperty.getValue(),
                 confirmDeleteProperty.getValue(),
-                enforceLegalKeysProperty.getValue(),
                 allowIntegerEditionProperty.getValue(),
                 memoryStickModeProperty.getValue(),
                 collectTelemetryProperty.getValue(),
@@ -198,8 +195,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty memoryStickModeProperty() { return this.memoryStickModeProperty; }
 
     public BooleanProperty collectTelemetryProperty() { return this.collectTelemetryProperty; }
-
-    public BooleanProperty enforceLegalKeysProperty() { return this.enforceLegalKeysProperty; }
 
     public BooleanProperty allowIntegerEditionProperty() { return this.allowIntegerEditionProperty; }
 

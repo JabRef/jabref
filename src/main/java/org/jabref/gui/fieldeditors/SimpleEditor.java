@@ -23,12 +23,10 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
                         final JabRefPreferences preferences,
-                        final boolean isSingleLine) {
+                        final boolean isMultiLine) {
         this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers);
 
-        textInput = isSingleLine
-                ? new EditorTextField()
-                : new EditorTextArea();
+        textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
         textInput.textProperty().bindBidirectional(viewModel.textProperty());

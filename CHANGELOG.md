@@ -11,12 +11,15 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a new field in the preferences in 'BibTeX key generator' for unwanted characters that can be user-specified. [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We added support for searching ShortScience for an entry through the user's browser. [#6018](https://github.com/JabRef/jabref/pull/6018)
 - We updated EditionChecker to permit edition to start with a number. [#6144](https://github.com/JabRef/jabref/issues/6144)
 - We added tooltips for most fields in the entry editor containing a short description. [#5847](https://github.com/JabRef/jabref/issues/5847)
 - We added support for basic markdown in custom formatted previews [#6194](https://github.com/JabRef/jabref/issues/6194)
 - We now show the number of items found and selected to import in the online search dialog. [#6248](https://github.com/JabRef/jabref/pull/6248)
 - We created a new install screen for macOS. [#5759](https://github.com/JabRef/jabref/issues/5759)
+- We implemented an option to download fulltext files while importing. [#6381](https://github.com/JabRef/jabref/pull/6381)
+- We fixed the bug when strike the delete key in the text field. [#6421](https://github.com/JabRef/jabref/issues/6421)
 
 ### Changed
 
@@ -26,11 +29,14 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the buttons for import/export/show all/reset of preferences to smaller icon buttons in the preferences dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We moved the functionality "Manage field names & content" from the "Library" menu to the "Edit" menu, because it affects the selected entries and not the whole library
 - We merged the functionality "Append contents from a BibTeX library into the currently viewed library" into the "Import into database" functionality. Fixes [#6049](https://github.com/JabRef/jabref/issues/6049).
+- We changed the directory where fulltext downloads are stored to the directory set in the import-tab in preferences. [#6381](https://github.com/JabRef/jabref/pull/6381)
 - We improved the error message for invalid jstyles. [#6303](https://github.com/JabRef/jabref/issues/6303)
 
 ### Fixed
 
 - We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
+- We fixed an issue with incompatible characters at BibTeX key [#6257](https://github.com/JabRef/jabref/issues/6257)
+- We fixed an issue where dash (`-`) was reported as illegal BibTeX key [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We greatly improved the performance of the overall application and many operations. [#5071](https://github.com/JabRef/jabref/issues/5071)
 - We fixed an issue where sort by priority was broken. [#6222](https://github.com/JabRef/jabref/issues/6222)
 - We fixed an issue where opening a library from the recent libraries menu was not possible. [#5939](https://github.com/JabRef/jabref/issues/5939)
@@ -45,12 +51,15 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the display of icon both in the main table and linked file editor. [#6169](https://github.com/JabRef/jabref/issues/6169)
 - We fixed the paste entry command in the menu and toolbar, that did not do anything. [#6293](https://github.com/JabRef/jabref/issues/6293)
 - We fixed an issue where the windows installer did not create an entry in the start menu [bug report in the forum](https://discourse.jabref.org/t/error-while-fetching-from-doi/2018/3)
+- We fixed an issue where only the field `abstract` and `comment` were declared as multiline fields. Other fields can now be configured in the preferences using "Do not wrap the following fields when saving" [4373](https://github.com/JabRef/jabref/issues/4373)
 - We fixed an issue where JabRef switched to discrete graphics under macOS [#5935](https://github.com/JabRef/jabref/issues/5935)
 - We fixed an issue where the Preferences entry preview will be unexpected modified leads to Value too long exception [#6198](https://github.com/JabRef/jabref/issues/6198)
 - We fixed an issue where custom jstyles for Open/LibreOffice would only be valid if a layout line for the entry type `default` was at the end of the layout section [#6303](https://github.com/JabRef/jabref/issues/6303)
 
+
 ### Removed
 
+- We removed the option of the "enforce legal key". [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We removed the obsolete `External programs / Open PDF` section in the preferences, as the default application to open PDFs is now set in the `Manage external file types` dialog. [#6130](https://github.com/JabRef/jabref/pull/6130)
 - We removed the option to configure whether a `.bib.bak` file should be generated upon save. It is now always enabled. Documentation at <https://docs.jabref.org/general/autosave>. [#6092](https://github.com/JabRef/jabref/issues/6092)
 - We removed the built-in list of IEEE journal abbreviations using BibTeX strings. If you still want to use them, you have to download them separately from <https://abbrv.jabref.org>.
@@ -102,7 +111,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where adding the addition of a new entry was not completely validated [#6370](https://github.com/JabRef/jabref/issues/6370)
 - We fixed an issue where the blue and red text colors in the Merge entries dialog were not quite visible [#6334](https://github.com/JabRef/jabref/issues/6334)
 - We fixed an issue where underscore character was removed from the file name in the Recent Libraries list in File menu [#6383](https://github.com/JabRef/jabref/issues/6383)
-
+- We fixed an issue where few keyboard shortcuts regarding new entries were missing [#6403](https://github.com/JabRef/jabref/issues/6403)
 ### Removed
 
 - Ampersands are no longer escaped by default in the `bib` file. If you want to keep the current behaviour, you can use the new "Escape Ampersands" formatter as a save action. [#5869](https://github.com/JabRef/jabref/issues/5869)
