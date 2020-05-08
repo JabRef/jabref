@@ -126,7 +126,7 @@ public class StateManager {
     }
 
     public void addBackgroundTask(ObjectProperty<Task<?>> backgroundTask) {
-        this.backgroundTasks.add(backgroundTask);
+        this.backgroundTasks.add(0, backgroundTask);
     }
 
     Binding<Boolean> anyTaskRunningBinding = EasyBind.<Task<?>, Boolean>combine(
