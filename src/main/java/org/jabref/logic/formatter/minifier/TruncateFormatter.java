@@ -10,7 +10,7 @@ public class TruncateFormatter extends Formatter {
     private final String KEY;
 
     /**
-     * The TruncateFormatter truncates a string after the given index.
+     * The TruncateFormatter truncates a string after the given index and removes trailing whitespaces.
      *
      * @param truncateIndex truncate a string after this index.
      */
@@ -30,7 +30,7 @@ public class TruncateFormatter extends Formatter {
     }
 
     /**
-     * Truncates a string after a given index.
+     * Truncates a string after the given index.
      */
     @Override
     public String format(final String input) {
