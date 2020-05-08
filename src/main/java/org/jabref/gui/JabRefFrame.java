@@ -12,9 +12,11 @@ import java.util.Optional;
 import java.util.TimerTask;
 
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -48,6 +50,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import javafx.stage.Window;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
@@ -115,7 +119,6 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
-import org.jabref.gui.taskprogressmanager.TaskProgressDialog;
 import org.jabref.gui.texparser.ParseLatexAction;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
@@ -948,13 +951,21 @@ public class JabRefFrame extends BorderPane {
             }
         });
 
+
         indicator.setOnMouseClicked(event -> {
-            TaskProgressDialog taskProgressDialog = new TaskProgressDialog();
-            taskProgressDialog.setTitle(Localization.lang("Background Tasks"));
-            Window dialogWindow = taskProgressDialog.getDialogPane().getScene().getWindow();
-            dialogWindow.setOnCloseRequest(windowEvent -> dialogWindow.hide());
-            taskProgressDialog.showAndWait();
+
+            TaskProgressView taskProgressView = new TaskProgressView();
+            ObservableList<Task<?>> tasks = EasyBind.map(stateManager.getBackgroundTasks(), ObjectProperty<Task<?>>::<Task<?>>get);
+            EasyBind.listBind(taskProgressView.getTasks(), tasks);
+            taskProgressView.setRetainTasks(true);
+
+            PopOver progressViewPopOver = new PopOver(taskProgressView);
+            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+
+            progressViewPopOver.show(indicator);
         });
+
         return new Group(indicator);
     }
 
