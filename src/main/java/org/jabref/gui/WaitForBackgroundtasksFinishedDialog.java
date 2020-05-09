@@ -44,11 +44,6 @@ public class WaitForBackgroundtasksFinishedDialog {
                     Localization.lang("Waiting for background tasks to finish") + "...",
                     waitForBackgroundtasksFinished
             );
-            try {
-                Thread.sleep(60000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
