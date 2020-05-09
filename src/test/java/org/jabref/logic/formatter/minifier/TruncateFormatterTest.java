@@ -3,6 +3,7 @@ package org.jabref.logic.formatter.minifier;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -38,5 +39,17 @@ public class TruncateFormatterTest {
     void truncateModifierIgnoreNegativeIndex() {
         TruncateFormatter formatter = new TruncateFormatter(-1);
         assertEquals(TITLE, formatter.format(TITLE));
+    }
+
+    @Test
+    void truncateModifierWorksWithEmptyString() {
+        TruncateFormatter formatter = new TruncateFormatter(9999);
+        assertEquals("", formatter.format(""));
+    }
+
+    @Test
+    void truncateModifierThrowsExceptionNullString() {
+        TruncateFormatter formatter = new TruncateFormatter(9999);
+        assertThrows(NullPointerException.class, () -> formatter.format(null));
     }
 }
