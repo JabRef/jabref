@@ -6,10 +6,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -19,7 +19,6 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
-import org.fxmisc.easybind.EasyBind;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
@@ -46,8 +45,8 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<ObjectProperty<Task<?>>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
-        return new Observable[] { taskProperty.get().progressProperty()};
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
+        return new Observable[] { taskProperty.progressProperty()};
     });
 
     public StateManager() {
@@ -121,22 +120,20 @@ public class StateManager {
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
 
-    public ObservableList<ObjectProperty<Task<?>>> getBackgroundTasks() {
+    public ObservableList<Task<?>> getBackgroundTasks() {
         return backgroundTasks;
     }
 
-    public void addBackgroundTask(ObjectProperty<Task<?>> backgroundTask) {
+    public void addBackgroundTask(Task<?> backgroundTask) {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
-    public Binding<Boolean> anyTaskRunningBinding = EasyBind.combine(
-            backgroundTasks,
-            tStream -> tStream.anyMatch(Task::isRunning)
+    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
+            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
     );
 
-    public Binding<Double> tasksProgressBinding = EasyBind.combine(
-            backgroundTasks,
-            stream -> stream.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1)
+    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
+            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
     );
 
 }

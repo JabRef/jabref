@@ -951,8 +951,7 @@ public class JabRefFrame extends BorderPane {
         indicator.setOnMouseClicked(event -> {
 
             TaskProgressView taskProgressView = new TaskProgressView();
-            ObservableList<Task<?>> tasks = EasyBind.map(stateManager.getBackgroundTasks(), ObjectProperty<Task<?>>::<Task<?>>get);
-            EasyBind.listBind(taskProgressView.getTasks(), tasks);
+            EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
 
             PopOver progressViewPopOver = new PopOver(taskProgressView);
