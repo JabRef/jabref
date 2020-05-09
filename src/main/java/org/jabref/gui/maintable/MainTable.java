@@ -67,7 +67,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
 
         this.setOnKeyTyped(key -> {
-            if (this.getSortOrder().size() == 0) {
+            if (this.getSortOrder().isEmpty()) {
                 return;
             }
             this.jumpToSearchKey(getSortOrder().get(0), key);
@@ -136,8 +136,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     /**
      * This is called, if a user starts typing some characters into the keyboard with focus on main table.
-     * The tableview will scroll to the cell with the same starting column value and typed string
-     * @param sortedColumn The ListView currently focused
+     * The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+     *
+     * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent The pressed character
      */
 
@@ -158,7 +159,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
                                     .map(Object::toString)
                                     .orElse("")
-                                    .toLowerCase().startsWith(columnSearchTerm))
+                                    .toLowerCase()
+                                    .startsWith(columnSearchTerm))
             .findFirst()
             .ifPresent(item -> {
                 this.scrollTo(item);
