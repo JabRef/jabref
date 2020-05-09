@@ -405,7 +405,13 @@ public class JabRefFrame extends BorderPane {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
-        // First ask if the user really wants to close, if the library has not been saved since last save.
+        // First ask if the user really wants to close, if there are still background tasks running
+        if (stateManager.anyTaskRunningBinding.getValue()) {
+            WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
+            waitForBackgroundtasksFinishedDialog.showAndWait(stateManager);
+        }
+
+        // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
