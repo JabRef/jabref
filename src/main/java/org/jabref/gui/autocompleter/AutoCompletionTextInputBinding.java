@@ -33,6 +33,8 @@ import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
+
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
@@ -73,9 +75,9 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
                                            Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
 
         this(textInputControl,
-                suggestionProvider,
-                AutoCompletionTextInputBinding.defaultStringConverter(),
-                new ReplaceStrategy());
+             suggestionProvider,
+             AutoCompletionTextInputBinding.defaultStringConverter(),
+             new ReplaceStrategy());
     }
 
     private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
@@ -98,7 +100,8 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
     }
 
     private static <T> StringConverter<T> defaultStringConverter() {
-        return new StringConverter<T>() {
+        return new StringConverter<>() {
+
             @Override
             public String toString(T t) {
                 return t == null ? null : t.toString();
@@ -133,7 +136,8 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
             newText = "";
         }
         AutoCompletionInput input = inputAnalyzer.analyze(newText);
-        setUserInput(input.getUnfinishedPart());
+        DefaultTaskExecutor.runInJavaFXThread(() -> setUserInput(input.getUnfinishedPart()));
+
     }
 
     @Override
