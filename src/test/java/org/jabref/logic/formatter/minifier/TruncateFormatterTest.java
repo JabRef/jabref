@@ -12,43 +12,43 @@ public class TruncateFormatterTest {
     private final String TITLE = "A Title";
 
     @Test
-    void truncateModifierWorksWith0Length() {
+    void formatWorksWith0Index() {
         TruncateFormatter formatter = new TruncateFormatter(0);
         assertEquals("", formatter.format(TITLE));
     }
 
     @Test
-    void truncateModifierRemovesTrailingWhitespace() {
+    void formatRemovesTrailingWhitespace() {
         TruncateFormatter formatter = new TruncateFormatter(2);
         assertEquals("A", formatter.format(TITLE));
     }
 
     @Test
-    void truncateModifierKeepsInternalWhitespace() {
+    void formatKeepsInternalWhitespace() {
         TruncateFormatter formatter = new TruncateFormatter(3);
         assertEquals("A T", formatter.format(TITLE));
     }
 
     @Test
-    void truncateModifierWorksWith9999Length() {
+    void formatWorksWith9999Length() {
         TruncateFormatter formatter = new TruncateFormatter(9999);
         assertEquals(TITLE, formatter.format(TITLE));
     }
 
     @Test
-    void truncateModifierIgnoreNegativeIndex() {
+    void formatIgnoresNegativeIndex() {
         TruncateFormatter formatter = new TruncateFormatter(-1);
         assertEquals(TITLE, formatter.format(TITLE));
     }
 
     @Test
-    void truncateModifierWorksWithEmptyString() {
+    void formatWorksWithEmptyString() {
         TruncateFormatter formatter = new TruncateFormatter(9999);
         assertEquals("", formatter.format(""));
     }
 
     @Test
-    void truncateModifierThrowsExceptionNullString() {
+    void formatThrowsExceptionNullString() {
         TruncateFormatter formatter = new TruncateFormatter(9999);
         assertThrows(NullPointerException.class, () -> formatter.format(null));
     }
