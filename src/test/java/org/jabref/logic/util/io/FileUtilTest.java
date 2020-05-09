@@ -1,5 +1,6 @@
 package org.jabref.logic.util.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -379,5 +380,23 @@ class FileUtilTest {
     public void testIsNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
+    }
+
+    @Test
+    void createDirNameTruncatesLongDirName() {
+        String fileNamePattern = "[fulltitle]" + (File.separator + "[fulltitle]").repeat(2);
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "a".repeat(300));
+        assertEquals("a".repeat(255) + (File.separator + "a".repeat(255)).repeat(2),
+                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    void createDirNameAllowsCorrectDirName() {
+        String fileNamePattern = "[fulltitle]" + (File.separator + "[fulltitle]").repeat(2);
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "a".repeat(100));
+        assertEquals("a".repeat(100) + (File.separator + "a".repeat(100)).repeat(2),
+                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
     }
 }
