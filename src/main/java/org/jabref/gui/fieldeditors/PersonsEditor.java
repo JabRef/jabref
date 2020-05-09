@@ -23,12 +23,10 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
                          final SuggestionProvider<?> suggestionProvider,
                          final JabRefPreferences preferences,
                          final FieldCheckers fieldCheckers,
-                         final boolean isSingleLine) {
+                         final boolean isMultiLine) {
         this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
-        textInput = isSingleLine
-                ? new EditorTextField()
-                : new EditorTextArea();
+        textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
         decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
         textInput.textProperty().bindBidirectional(decoratedStringProperty);

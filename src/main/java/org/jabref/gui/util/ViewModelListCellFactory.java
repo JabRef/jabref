@@ -154,7 +154,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
 
         return new ListCell<>() {
 
-            List<Subscription> subscriptions = new ArrayList<>();
+            final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override
             protected void updateItem(T item, boolean empty) {
@@ -170,6 +170,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     setGraphic(null);
                     setOnMouseClicked(null);
                     setTooltip(null);
+                    pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
                     if (toText != null) {
                         setText(toText.call(viewModel));
@@ -206,14 +207,20 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
-                        Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
-                        subscriptions.add(subscription);
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                pseudoClassWithCondition.getKey(),
+                                condition));
                     }
                     if (validationStatusProperty != null) {
-                        validationStatusProperty.call(viewModel).getHighestMessage().ifPresent(message -> {
-                            setTooltip(new Tooltip(message.getMessage()));
-                            subscriptions.add(BindingsHelper.includePseudoClassWhen(this, INVALID_PSEUDO_CLASS, validationStatusProperty.call(viewModel).validProperty().not()));
-                        });
+                        validationStatusProperty.call(viewModel)
+                                                .getHighestMessage()
+                                                .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                INVALID_PSEUDO_CLASS,
+                                validationStatusProperty.call(viewModel).validProperty().not()));
                     }
                 }
             }

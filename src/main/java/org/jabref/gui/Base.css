@@ -613,6 +613,11 @@
     -fx-text-fill: -jr-black;
 }
 
+.table-cell:invalid,
+.list-cell:invalid {
+        -fx-background-color: -jr-warn;
+}
+
 .combo-box-base {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
