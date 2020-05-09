@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ public class EditionCheckerTest {
     @Test
     void isFirstCharacterANumber() {
         boolean allowIntegerEdition = false;
-        var editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
+        EditionChecker editionChecker = new EditionChecker(bibDatabaseContextEdition, allowIntegerEdition);
         assertTrue(editionChecker.isFirstCharDigit("0HelloWorld"));
     }
 

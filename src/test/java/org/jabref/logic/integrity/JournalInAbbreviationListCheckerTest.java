@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,7 +20,6 @@ public class JournalInAbbreviationListCheckerTest {
     private JournalInAbbreviationListChecker checkerb;
     private JournalAbbreviationRepository abbreviationRepository;
     private BibEntry entry;
-    Path file;
 
     @BeforeEach
     void setUp() {

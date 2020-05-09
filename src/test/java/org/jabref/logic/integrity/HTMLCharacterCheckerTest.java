@@ -51,5 +51,4 @@ public class HTMLCharacterCheckerTest {
         assertEquals(List.of(new IntegrityMessage("HTML encoded character found", entry, StandardField.JOURNAL)), checker.check(entry));
     }
 
-
 }
