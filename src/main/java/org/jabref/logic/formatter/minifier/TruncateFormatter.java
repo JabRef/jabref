@@ -35,6 +35,10 @@ public class TruncateFormatter extends Formatter {
     @Override
     public String format(final String input) {
         Objects.requireNonNull(input);
+        if (TRUNCATE_AFTER < 0) {
+            return input;
+        }
+
         final int index = Math.min(TRUNCATE_AFTER, input.length());
         return input.substring(0, index).stripTrailing();
     }
