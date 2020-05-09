@@ -33,4 +33,10 @@ public class TruncateFormatterTest {
         TruncateFormatter formatter = new TruncateFormatter(9999);
         assertEquals(TITLE, formatter.format(TITLE));
     }
+
+    @Test
+    void truncateModifierIgnoreNegativeIndex() {
+        TruncateFormatter formatter = new TruncateFormatter(-1);
+        assertEquals(TITLE, formatter.format(TITLE));
+    }
 }
