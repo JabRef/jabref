@@ -129,7 +129,7 @@ public class StateManager {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
-    Binding<Boolean> anyTaskRunningBinding = EasyBind.combine(
+    public Binding<Boolean> anyTaskRunningBinding = EasyBind.combine(
             backgroundTasks,
             tStream -> tStream.anyMatch(Task::isRunning)
     );
