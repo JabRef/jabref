@@ -286,11 +286,13 @@ public class FileUtil {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
-        // Removes illegal characters from filename
+        // Removes illegal characters from directory name
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
 
-        // Truncates long directory names
-        targetName = getValidFileName(targetName);
+        // Only use valid filenames for the directories in the path
+        targetName = Arrays.stream(targetName.split(Pattern.quote(File.separator)))
+                            .map(FileUtil::getValidFileName)
+                            .collect(Collectors.joining(File.separator));
         return targetName;
     }
 
