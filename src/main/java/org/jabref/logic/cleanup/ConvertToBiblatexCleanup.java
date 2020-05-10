@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -40,15 +41,25 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                 entry.clearField(StandardField.MONTH).ifPresent(changes::add);
             });
         } else {
-            // If date field is filled and is equal to year it should be removed the year and month fields
+            // If the year from date field is filled and equal to year it should be removed the year field
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
                 entry.getFieldOrAlias(StandardField.YEAR).ifPresent(checkYear -> {
                     // Get the year of the date field (4 digits).
                     if (date.substring(0, 4).equals(checkYear)) {
                         entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                    }
+                });
+
+                // If the month from date field is filled and is equal to month it should be removed the month field
+                var data = Date.parse(date);
+                var monthFromDate = data.get().getMonth().get().getJabRefFormat();
+                entry.getFieldOrAlias(StandardField.MONTH).ifPresent(checkMonth -> {
+                    // Check if the month is equal to month date field.
+                    if (checkMonth.equals(monthFromDate)) {
                         entry.clearField(StandardField.MONTH).ifPresent(changes::add);
                     }
                 });
+
             });
         }
         return changes;
