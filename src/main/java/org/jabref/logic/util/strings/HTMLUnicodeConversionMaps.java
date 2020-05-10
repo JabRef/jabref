@@ -436,7 +436,6 @@ public class HTMLUnicodeConversionMaps {
             {"60", "lt", "$<$"}, // less-than sign, U+003C ISOnum
             {"62", "gt", "$>$"}, // greater-than sign, U+003E ISOnum
 
-
             /* General Punctuation */
             {"8194", "ensp", "\\hspace{0.5em}"}, // en space, U+2002 ISOpub
             {"8195", "emsp", "\\hspace{1em}"}, // em space, U+2003 ISOpub
@@ -907,5 +906,4 @@ public class HTMLUnicodeConversionMaps {
         // Get rid of \{}$ from the LaTeX-string
         return escapedString.replaceAll("[\\\\\\{\\}\\$]", "");
     }
-
 }

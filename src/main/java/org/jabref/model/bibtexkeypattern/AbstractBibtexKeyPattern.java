@@ -120,6 +120,7 @@ public abstract class AbstractBibtexKeyPattern {
 
     /**
      * Sets the DEFAULT PATTERN for this key pattern
+     *
      * @param bibtexKeyPattern the pattern to store
      */
     public void setDefaultValue(String bibtexKeyPattern) {

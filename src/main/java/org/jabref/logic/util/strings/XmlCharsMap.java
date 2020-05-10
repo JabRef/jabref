@@ -131,5 +131,4 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\~a\\}", "&#x00E3;");
         put("\\{\\\\\\~A\\}", "&#x00C3;");
     }
-
 }

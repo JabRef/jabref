@@ -42,5 +42,4 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         }
         return changes;
     }
-
 }

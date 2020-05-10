@@ -86,8 +86,9 @@ public class ExportToClipboardAction extends SimpleCommand {
                                           .findAny()
                                           .orElse(null);
 
-        Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(Localization.lang("Export"), Localization.lang("Select export format"),
-                                                                                    Localization.lang("Export"), defaultChoice, exporters);
+        Optional<Exporter> selectedExporter = dialogService.showChoiceDialogAndWait(
+                Localization.lang("Export"), Localization.lang("Select export format"),
+                Localization.lang("Export"), defaultChoice, exporters);
 
         selectedExporter.ifPresent(exporter -> BackgroundTask.wrap(() -> exportToClipboard(exporter))
                                                              .onSuccess(this::setContentToClipboard)
@@ -117,15 +118,14 @@ public class ExportToClipboardAction extends SimpleCommand {
 
             // Write to file:
             exporter.export(panel.getBibDatabaseContext(), tmp,
-                            panel.getBibDatabaseContext()
-                                 .getMetaData()
-                                 .getEncoding()
-                                 .orElse(Globals.prefs.getDefaultEncoding()),
-                            entries);
+                    panel.getBibDatabaseContext()
+                         .getMetaData()
+                         .getEncoding()
+                         .orElse(Globals.prefs.getDefaultEncoding()),
+                    entries);
             // Read the file and put the contents on the clipboard:
 
             return new ExportResult(readFileToString(tmp), exporter.getFileType());
-
         } finally {
             // Clean up:
             if ((tmp != null) && Files.exists(tmp)) {
@@ -152,7 +152,6 @@ public class ExportToClipboardAction extends SimpleCommand {
         this.clipBoardManager.setContent(clipboardContent);
 
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
-
     }
 
     private String readFileToString(Path tmp) throws IOException {

@@ -54,12 +54,14 @@ public class Globals {
 
     /**
      * This field is initialized upon startup.
+     * <p>
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static JournalAbbreviationRepository journalAbbreviationRepository;
 
     /**
      * This field is initialized upon startup.
+     * <p>
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;

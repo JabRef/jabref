@@ -97,7 +97,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public String toString() {
         return "TexGroup{" +
-               "filePath=" + filePath +
+                "filePath=" + filePath +
                 ", keysUsedInAux=" + keysUsedInAux +
                 ", auxParser=" + auxParser +
                 ", fileMonitor=" + fileMonitor +

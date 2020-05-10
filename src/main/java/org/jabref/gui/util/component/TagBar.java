@@ -42,8 +42,8 @@ public class TagBar<T> extends HBox {
 
         // Load FXML
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
         getStylesheets().add(0, TagBar.class.getResource("TagBar.css").toExternalForm());
     }
 

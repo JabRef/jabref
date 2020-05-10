@@ -94,9 +94,9 @@ public class SaveOrderConfig {
     @Override
     public String toString() {
         return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder
-               + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
-               + ", sortCriteria=" + sortCriteria +
-               '}';
+                + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
+                + ", sortCriteria=" + sortCriteria +
+                '}';
     }
 
     public void setSaveInOriginalOrder() {
@@ -150,8 +150,8 @@ public class SaveOrderConfig {
         @Override
         public String toString() {
             return "SortCriterion{" + "field='" + field + '\'' +
-                   ", descending=" + descending +
-                   '}';
+                    ", descending=" + descending +
+                    '}';
         }
 
         @Override
@@ -164,14 +164,12 @@ public class SaveOrderConfig {
             }
             SortCriterion that = (SortCriterion) o;
             return Objects.equals(descending, that.descending) &&
-                   Objects.equals(field, that.field);
+                    Objects.equals(field, that.field);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(field, descending);
         }
-
     }
-
 }

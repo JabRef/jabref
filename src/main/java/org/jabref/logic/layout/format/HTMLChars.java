@@ -18,10 +18,10 @@ public class HTMLChars implements LayoutFormatter {
     public String format(String inField) {
         int i;
         String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                .replace("\n", "<br>") // Replace single line breaks with <br>
-                .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                              .replace("\n", "<br>") // Replace single line breaks with <br>
+                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -55,7 +55,8 @@ public class HTMLChars implements LayoutFormatter {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom: if ((currentCommand.length() == 1)
+                    testCharCom:
+                    if ((currentCommand.length() == 1)
                             && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -90,7 +91,6 @@ public class HTMLChars implements LayoutFormatter {
                              * the text of the parameter intact.
                              */
                             sb.append(Objects.requireNonNullElse(result, command));
-
                         }
                     }
                 }
@@ -162,45 +162,44 @@ public class HTMLChars implements LayoutFormatter {
     private String getHTMLTag(String latexCommand) {
         String result = "";
         switch (latexCommand) {
-        // Italic
-        case "textit":
-        case "it":
-            result = "i";
-            break;
-        // Emphasize
-        case "emph":
-        case "em":
-            result = "em";
-            break;
-        // Bold font
-        case "textbf":
-        case "bf":
-            result = "b";
-            break;
-        // Underline
-        case "underline":
-            result = "u";
-            break;
-        // Strikeout, sout is the "standard" command, although it is actually based on the package ulem
-        case "sout":
-            result = "s";
-            break;
-        // Monospace font
-        case "texttt":
-            result = "tt";
-            break;
-        // Superscript
-        case "textsuperscript":
-            result = "sup";
-            break;
-        // Subscript
-        case "textsubscript":
-            result = "sub";
-            break;
-        default:
-            break;
+            // Italic
+            case "textit":
+            case "it":
+                result = "i";
+                break;
+            // Emphasize
+            case "emph":
+            case "em":
+                result = "em";
+                break;
+            // Bold font
+            case "textbf":
+            case "bf":
+                result = "b";
+                break;
+            // Underline
+            case "underline":
+                result = "u";
+                break;
+            // Strikeout, sout is the "standard" command, although it is actually based on the package ulem
+            case "sout":
+                result = "s";
+                break;
+            // Monospace font
+            case "texttt":
+                result = "tt";
+                break;
+            // Superscript
+            case "textsuperscript":
+                result = "sup";
+                break;
+            // Subscript
+            case "textsubscript":
+                result = "sub";
+                break;
+            default:
+                break;
         }
         return result;
     }
-
 }

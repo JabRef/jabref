@@ -11,11 +11,12 @@ import java.util.Objects;
 /**
  * Helper class to get a Layout object.
  *
+ * <pre>
  * <code>
  * LayoutHelper helper = new LayoutHelper(...a reader...);
  * Layout layout = helper.getLayoutFromText();
  * </code>
- *
+ * </pre>
  */
 public class LayoutHelper {
 

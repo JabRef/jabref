@@ -13,27 +13,27 @@ import org.jabref.model.entry.KeywordList;
 public enum SpecialField implements Field {
 
     PRINTED("printed",
-        SpecialFieldValue.PRINTED
+            SpecialFieldValue.PRINTED
     ),
 
     PRIORITY("priority",
-        SpecialFieldValue.CLEAR_PRIORITY,
-        SpecialFieldValue.PRIORITY_HIGH,
-        SpecialFieldValue.PRIORITY_MEDIUM,
-        SpecialFieldValue.PRIORITY_LOW
+            SpecialFieldValue.CLEAR_PRIORITY,
+            SpecialFieldValue.PRIORITY_HIGH,
+            SpecialFieldValue.PRIORITY_MEDIUM,
+            SpecialFieldValue.PRIORITY_LOW
     ),
 
     QUALITY("qualityassured",
-        SpecialFieldValue.QUALITY_ASSURED
+            SpecialFieldValue.QUALITY_ASSURED
     ),
 
     RANKING("ranking",
-        SpecialFieldValue.CLEAR_RANK,
-        SpecialFieldValue.RANK_1,
-        SpecialFieldValue.RANK_2,
-        SpecialFieldValue.RANK_3,
-        SpecialFieldValue.RANK_4,
-        SpecialFieldValue.RANK_5
+            SpecialFieldValue.CLEAR_RANK,
+            SpecialFieldValue.RANK_1,
+            SpecialFieldValue.RANK_2,
+            SpecialFieldValue.RANK_3,
+            SpecialFieldValue.RANK_4,
+            SpecialFieldValue.RANK_5
     ),
 
     READ_STATUS("readstatus",
@@ -99,5 +99,4 @@ public enum SpecialField implements Field {
     public boolean isStandardField() {
         return false;
     }
-
 }

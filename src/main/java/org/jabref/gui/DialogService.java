@@ -30,7 +30,7 @@ public interface DialogService {
      * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
      *
      * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
-    */
+     */
     <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
 
     /**
@@ -189,9 +189,9 @@ public interface DialogService {
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
      *
-     * @param title title of the dialog
+     * @param title   title of the dialog
      * @param content message to show above the progress bar
-     * @param task The {@link Task} which executes the work and for which to show the dialog
+     * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
     <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
 

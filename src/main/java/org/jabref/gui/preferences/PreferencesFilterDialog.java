@@ -76,5 +76,4 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
             preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }
     }
-
 }

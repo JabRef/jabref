@@ -147,7 +147,6 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
                 // Found it
                 stampString = stampMatcher.group(1);
             }
-
         }
 
         // If not, try DOI

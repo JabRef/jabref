@@ -57,8 +57,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
-                .map(LogEventViewModel::getDetailedText)
-                .collect(Collectors.joining(OS.NEWLINE));
+                       .map(LogEventViewModel::getDetailedText)
+                       .collect(Collectors.joining(OS.NEWLINE));
     }
 
     /**

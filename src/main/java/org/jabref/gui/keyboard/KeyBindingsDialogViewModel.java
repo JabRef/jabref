@@ -85,10 +85,10 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
-                    if (response == resetButtonType) {
-                        keyBindingRepository.resetToDefault();
-                        populateTable();
-                    }
-                });
+            if (response == resetButtonType) {
+                keyBindingRepository.resetToDefault();
+                populateTable();
+            }
+        });
     }
 }

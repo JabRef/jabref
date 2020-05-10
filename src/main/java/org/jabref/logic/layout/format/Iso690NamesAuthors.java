@@ -31,7 +31,6 @@ public class Iso690NamesAuthors implements LayoutFormatter {
 
                 if (author.length == 1) { // Caso 1.0: Sólo un campo
                     sb.append(author[0].trim().toUpperCase(Locale.ROOT));
-
                 } else if (author.length == 2) { // Caso 1.1: Nombre Apellido
                     // primer campo Nombre
                     name = author[0].trim();
@@ -42,7 +41,6 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     sb.append(surname);
                     sb.append(", ");
                     sb.append(name);
-
                 } else if (author.length == 3) { // Caso 1.2: Nombre Apellido1 Apellido2
                     // primer campo Nombre
                     name = author[0].trim();
@@ -53,7 +51,6 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     sb.append(surname);
                     sb.append(", ");
                     sb.append(name);
-
                 } else if (author.length == 4) { // Caso 1.3: Nombre SegundoNombre Apellido1 Apellido2
                     // primer y segundo campo Nombre SegundoNombre
                     name = author[0].trim() + ' ' + author[1].trim();
@@ -65,7 +62,6 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     sb.append(", ");
                     sb.append(name);
                 }
-
             } else { // Caso 2: Apellidos, Nombre
                 // Campo 1 apellidos, lo pasamos a mayusculas
                 String surname = author[0].trim().toUpperCase(Locale.ROOT);

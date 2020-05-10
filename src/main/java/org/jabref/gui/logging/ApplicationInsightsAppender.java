@@ -57,5 +57,4 @@ public class ApplicationInsightsAppender extends AbstractAppender {
             return new ApplicationInsightsAppender(this.getName(), this.getFilter(), this.isIgnoreExceptions(), this.getPropertyArray());
         }
     }
-
 }

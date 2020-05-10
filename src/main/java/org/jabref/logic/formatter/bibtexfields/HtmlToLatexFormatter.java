@@ -49,7 +49,6 @@ public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {
             } else {
                 sb.append((char) c);
             }
-
         }
         result = sb.toString();
 
