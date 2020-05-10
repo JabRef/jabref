@@ -56,7 +56,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the Preferences entry preview will be unexpected modified leads to Value too long exception [#6198](https://github.com/JabRef/jabref/issues/6198)
 - We fixed an issue where custom jstyles for Open/LibreOffice would only be valid if a layout line for the entry type `default` was at the end of the layout section [#6303](https://github.com/JabRef/jabref/issues/6303)
 - We fixed an issue where sort on numeric cases was broken. [#6349](https://github.com/JabRef/jabref/issues/6349)
-
+- We fixed an issue where an "Not on FX thread" exception occured when saving on linux [#6453](https://github.com/JabRef/jabref/issues/6453)
 
 ### Removed
 
