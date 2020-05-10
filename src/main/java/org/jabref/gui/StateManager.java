@@ -46,7 +46,7 @@ public class StateManager {
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
-        return new Observable[] { taskProperty.progressProperty()};
+        return new Observable[] { taskProperty.progressProperty(), taskProperty.runningProperty()};
     });
 
     public StateManager() {
