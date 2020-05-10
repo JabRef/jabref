@@ -9,10 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
-import org.controlsfx.control.TaskProgressView;
-import org.fxmisc.easybind.EasyBind;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
+
+import org.controlsfx.control.TaskProgressView;
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * Dialog shown when closing of application needs to wait for some background tasks.

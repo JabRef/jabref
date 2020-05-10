@@ -1,7 +1,5 @@
 package org.jabref.gui.util;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -20,9 +18,11 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.util.Callback;
 
-import org.fxmisc.easybind.EasyBind;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
+
+import com.google.common.collect.ImmutableMap;
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * This class is essentially a wrapper around {@link Task}.
