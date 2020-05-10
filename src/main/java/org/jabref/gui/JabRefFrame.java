@@ -408,7 +408,9 @@ public class JabRefFrame extends BorderPane {
         // First ask if the user really wants to close, if there are still background tasks running
         if (stateManager.anyTaskRunningBinding.getValue()) {
             WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
-            waitForBackgroundtasksFinishedDialog.showAndWait(stateManager);
+            if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager)) {
+                return false;
+            }
         }
 
         // Then ask if the user really wants to close, if the library has not been saved since last save.
