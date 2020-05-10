@@ -14,7 +14,6 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -403,6 +402,15 @@ public class JabRefFrame extends BorderPane {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
+        // First ask if the user really wants to close, if there are still background tasks running
+        if (stateManager.anyTaskRunningBinding.getValue()) {
+            WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
+            if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager)) {
+                return false;
+            }
+        }
+
+        // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
@@ -423,35 +431,8 @@ public class JabRefFrame extends BorderPane {
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
 
-        // Check if any tabs are saving. If so, create a task waiting for them
-        if (getBasePanelList().stream().anyMatch(BasePanel::isSaving)) {
-            Task<Void> waitForSaveFinished = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    updateTitle("Saving");
-                    while (getBasePanelList().stream().anyMatch(BasePanel::isSaving)) {
-                        if (isCancelled()) {
-                            return null;
-                        } else {
-                            Thread.sleep(100);
-                        }
-                    }
-                    return null;
-                }
-            };
-
-            stateManager.getBackgroundTasks().add(waitForSaveFinished);
-            Globals.TASK_EXECUTOR.execute(waitForSaveFinished);
-
-        }
-        
-        // Ask if the user really wants to close, if there are background tasks running.
-        if (stateManager.anyTaskRunningBinding.getValue()) {
-            WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
-            if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager)) {
-                return false;
-            }
-        }
+        WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
+        waitForSaveFinishedDialog.showAndWait(getBasePanelList());
 
         // Good bye!
         tearDownJabRef(filenames);

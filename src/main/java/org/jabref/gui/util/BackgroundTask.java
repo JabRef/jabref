@@ -35,8 +35,7 @@ import org.jabref.logic.l10n.Localization;
 public abstract class BackgroundTask<V> {
 
     public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
-            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode(),
-            Localization.lang("Saving"), IconTheme.JabRefIcons.SAVE_ALL.getGraphicNode()
+            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
 
     public static Callback<Task<?>, Node> iconCallback = task -> {
