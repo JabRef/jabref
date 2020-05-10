@@ -26,8 +26,9 @@ public interface FieldEditorFX {
     /**
      * Returns relative size of the field editor in terms of display space.
      * <p>
-     * A value of 1 means that the editor gets exactly as much space as all other regular editors. A value of 2 means
-     * that the editor gets twice as much space as regular editors.
+     * A value of 1 means that the editor gets exactly as much space as all other regular editors.
+     * <p>
+     * A value of 2 means that the editor gets twice as much space as regular editors.
      *
      * @return the relative weight of the editor in terms of display space
      */

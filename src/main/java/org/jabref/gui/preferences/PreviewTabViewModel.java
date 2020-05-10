@@ -299,9 +299,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github: @cemartins) License:
-     * BSD-2-Clause see https://github.com/FXMisc/RichTextFX/blob/master/LICENSE and:
-     * https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor
+     * XML-Syntax-Highlighting for RichTextFX-Codearea created by (c) Carlos Martins (github:
+     * <a href="https://github.com/cmartins">@cemartins</a>)
+     * <p>
+     * License: <a href="https://github.com/FXMisc/RichTextFX/blob/master/LICENSE">BSD-2-Clause</a>
+     * <p>
+     * See also
+     * <a href="https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor">https://github.com/FXMisc/RichTextFX/blob/master/richtextfx-demos/README.md#xml-editor</a>
      *
      * @param text to parse and highlight
      * @return highlighted span for codeArea
@@ -379,8 +383,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of
-     * chosenListView
+     * This is called, when the user drops some PreviewLayouts either in the availableListView or in the empty space of chosenListView
      *
      * @param targetList either availableListView or chosenListView
      */

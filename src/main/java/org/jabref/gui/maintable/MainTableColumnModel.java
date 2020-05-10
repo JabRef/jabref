@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a
- * qualifier, like the field name to be displayed in the column.
+ * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
+ * field name to be displayed in the column.
  */
 public class MainTableColumnModel {
 
@@ -99,8 +99,7 @@ public class MainTableColumnModel {
     }
 
     /**
-     * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the
-     * table.
+     * This is used by the preferences dialog, to initialize available basic icon columns, the user can add to the table.
      *
      * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "GROUPS" or "LINKED_IDENTIFIER"
      */
