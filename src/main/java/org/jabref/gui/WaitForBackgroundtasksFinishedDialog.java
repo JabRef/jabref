@@ -5,6 +5,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.easybind.EasyBind;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class WaitForBackgroundtasksFinishedDialog {
         TaskProgressView taskProgressView = new TaskProgressView();
         EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
         taskProgressView.setRetainTasks(false);
+        taskProgressView.setGraphicFactory(BackgroundTask.iconCallback);
 
         Label message = new Label(Localization.lang("Waiting for background tasks to finish. Quit anyway?"));
 
