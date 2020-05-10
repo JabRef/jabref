@@ -26,6 +26,12 @@
     <module name="FileTabCharacter"/>
     <module name="NewlineAtEndOfFile"/>
 
+    <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
+
+    <module name="LineLength">
+        <property name="max" value="500"/>
+    </module>
+
     <module name="TreeWalker">
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
         <module name="InvalidJavadocPosition"/>
@@ -46,12 +52,6 @@
             <property name="separated" value="true"/>
             <property name="option" value="bottom"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
-        </module>
-
-        <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
-
-        <module name="LineLength">
-            <property name="max" value="500"/>
         </module>
 
         <!-- Checks for whitespace: https://checkstyle.org/config_whitespace.html -->
