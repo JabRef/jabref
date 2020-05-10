@@ -51,7 +51,7 @@
         <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
 
         <module name="LineLength">
-            <property name="max" value="140"/>
+            <property name="max" value="500"/>
         </module>
 
         <!-- Checks for whitespace: https://checkstyle.org/config_whitespace.html -->
