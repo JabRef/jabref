@@ -403,6 +403,10 @@ public class JabRefFrame extends BorderPane {
      */
     public boolean quit() {
         // First ask if the user really wants to close, if there are still background tasks running
+        /*
+        It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
+        the background tasks may make changes themselves that need saving.
+         */
         if (stateManager.anyTaskRunningBinding.getValue()) {
             WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
             if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager)) {
