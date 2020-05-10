@@ -1,12 +1,13 @@
 package org.jabref.gui.util;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.google.common.collect.ImmutableMap;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,9 +17,9 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
-
 import javafx.scene.Node;
 import javafx.util.Callback;
+
 import org.fxmisc.easybind.EasyBind;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
@@ -32,6 +33,19 @@ import org.jabref.logic.l10n.Localization;
  * @param <V> type of the return value of the task
  */
 public abstract class BackgroundTask<V> {
+
+    public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
+            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
+    );
+
+    public static Callback<Task<?>, Node> iconCallback = task -> {
+        if (BackgroundTask.iconMap.containsKey(task.getTitle())) {
+            return BackgroundTask.iconMap.get(task.getTitle());
+        } else {
+            return null;
+        }
+    };
+
     private Runnable onRunning;
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
@@ -42,18 +56,6 @@ public abstract class BackgroundTask<V> {
     private StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
     private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
     private BooleanProperty showToUser = new SimpleBooleanProperty(false);
-
-    public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
-        Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
-    );
-
-    public static Callback<Task<?>, Node> iconCallback = task -> {
-        if(BackgroundTask.iconMap.containsKey(task.getTitle())) {
-            return BackgroundTask.iconMap.get(task.getTitle());
-        } else {
-            return null;
-        }
-    };
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));

@@ -1,14 +1,18 @@
 package org.jabref.gui;
 
-import javafx.scene.control.*;
+import java.util.Optional;
+
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.easybind.EasyBind;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
-
-import java.util.Optional;
 
 /**
  * Dialog shown when closing of application needs to wait for some background tasks.
@@ -49,7 +53,7 @@ public class WaitForBackgroundtasksFinishedDialog {
 
         Dialog<ButtonType> dialog = () -> alert.showAndWait();
 
-        Optional<ButtonType> pressedButton =dialogService.showCustomDialogAndWait(dialog);
+        Optional<ButtonType> pressedButton = dialogService.showCustomDialogAndWait(dialog);
 
         return pressedButton.isPresent() && pressedButton.get() == ButtonType.YES;
     }

@@ -46,8 +46,16 @@ public class StateManager {
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
     private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
-        return new Observable[] { taskProperty.progressProperty(), taskProperty.runningProperty()};
+        return new Observable[] {taskProperty.progressProperty(), taskProperty.runningProperty()};
     });
+
+    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
+            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
+    );
+
+    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
+            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
+    );
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -127,13 +135,5 @@ public class StateManager {
     public void addBackgroundTask(Task<?> backgroundTask) {
         this.backgroundTasks.add(0, backgroundTask);
     }
-
-    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
-            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
-    );
-
-    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
-            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
-    );
 
 }

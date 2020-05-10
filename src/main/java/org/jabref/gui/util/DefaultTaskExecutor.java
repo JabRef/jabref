@@ -14,11 +14,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 
 import org.jabref.Globals;
-import org.jabref.gui.StateManager;
 import org.jabref.logic.util.DelayTaskThrottler;
 
 import org.slf4j.Logger;

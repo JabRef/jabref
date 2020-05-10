@@ -12,11 +12,8 @@ import java.util.Optional;
 import java.util.TimerTask;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -949,15 +946,13 @@ public class JabRefFrame extends BorderPane {
         hide it and clip it to a square of (width x width) each time width is updated.
          */
         indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue.doubleValue()>0){
-                Rectangle clip=new Rectangle(newValue.doubleValue(),newValue.doubleValue());
+            if (newValue.doubleValue() > 0) {
+                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
                 indicator.setClip(clip);
             }
         });
 
-
         indicator.setOnMouseClicked(event -> {
-
             TaskProgressView taskProgressView = new TaskProgressView();
             EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
