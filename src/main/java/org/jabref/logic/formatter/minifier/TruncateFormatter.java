@@ -15,7 +15,7 @@ public class TruncateFormatter extends Formatter {
      * @param truncateIndex truncate a string after this index.
      */
     public TruncateFormatter(final int truncateIndex) {
-        TRUNCATE_AFTER = truncateIndex;
+        TRUNCATE_AFTER = (truncateIndex >= 0) ? truncateIndex : Integer.MAX_VALUE;
         KEY = "truncate" + TRUNCATE_AFTER;
     }
 
@@ -35,10 +35,6 @@ public class TruncateFormatter extends Formatter {
     @Override
     public String format(final String input) {
         Objects.requireNonNull(input);
-        if (TRUNCATE_AFTER < 0) {
-            return input;
-        }
-
         final int index = Math.min(TRUNCATE_AFTER, input.length());
         return input.substring(0, index).stripTrailing();
     }
