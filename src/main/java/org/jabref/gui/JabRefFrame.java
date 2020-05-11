@@ -950,6 +950,13 @@ public class JabRefFrame extends BorderPane {
         hide it and clip it to a square of (width x width) each time width is updated.
          */
         indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
+            /*
+            The indeterminate spinner is wider than the determinate spinner.
+            We must make sure they are the same width for the clipping to result in a square of the same size always.
+             */
+            if (!indicator.isIndeterminate()) {
+                indicator.setPrefWidth(newValue.doubleValue());
+            }
             if (newValue.doubleValue() > 0) {
                 Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
                 indicator.setClip(clip);
