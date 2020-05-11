@@ -49,11 +49,11 @@ public class StateManager {
         return new Observable[] {taskProperty.progressProperty(), taskProperty.runningProperty()};
     });
 
-    public BooleanBinding anyTaskRunningBinding = Bindings.createBooleanBinding(
+    private BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(
             () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
     );
 
-    public DoubleBinding tasksProgressBinding = Bindings.createDoubleBinding(
+    private DoubleBinding tasksProgress = Bindings.createDoubleBinding(
             () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
     );
 
@@ -136,4 +136,11 @@ public class StateManager {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
+    public BooleanBinding getAnyTaskRunning() {
+        return anyTaskRunning;
+    }
+
+    public DoubleBinding getTasksProgress() {
+        return tasksProgress;
+    }
 }

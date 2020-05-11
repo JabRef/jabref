@@ -12,8 +12,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.Bindings;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.Group;
@@ -314,7 +312,7 @@ public class JabRefDialogService implements DialogService {
         alert.setResizable(true);
         themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
 
-        stateManager.anyTaskRunningBinding.addListener((observable, oldValue, newValue) -> {
+        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
                 alert.setResult(ButtonType.YES);
                 alert.close();

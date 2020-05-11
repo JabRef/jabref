@@ -407,7 +407,7 @@ public class JabRefFrame extends BorderPane {
         It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
         the background tasks may make changes themselves that need saving.
          */
-        if (stateManager.anyTaskRunningBinding.getValue()) {
+        if (stateManager.getAnyTaskRunning().getValue()) {
             if (!(dialogService.showBackgroundProgressDialogAndWait(
                     Localization.lang("Please wait..."),
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
@@ -946,7 +946,7 @@ public class JabRefFrame extends BorderPane {
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().setAll("progress-indicator");
-        indicator.progressProperty().bind(stateManager.tasksProgressBinding);
+        indicator.progressProperty().bind(stateManager.getTasksProgress());
 
         /*
         The label of the indicator cannot be removed with styling. Therefore,
