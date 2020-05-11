@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.18.0'
+    id 'org.beryx.jlink' version '2.19.0'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -191,9 +191,9 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.61.24'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.24'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.24'
+    implementation 'com.vladsch.flexmark:flexmark:0.61.26'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.26'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.26'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.78'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
