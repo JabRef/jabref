@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EditionCheckerTest {
 
+    public BibDatabaseContext bibDatabaseContextEdition = new BibDatabaseContext();
+
     private EditionChecker checker;
     private EditionChecker checkerb;
     private BibDatabaseContext bibtex;
@@ -29,8 +31,6 @@ public class EditionCheckerTest {
         checker = new EditionChecker(bibtex, true);
         checkerb = new EditionChecker(biblatex, true);
     }
-
-    public BibDatabaseContext bibDatabaseContextEdition = new BibDatabaseContext();
 
     @Test
     void isFirstCharacterANumber() {
