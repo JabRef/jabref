@@ -984,7 +984,7 @@ public class JabRefFrame extends BorderPane {
             TaskProgressView taskProgressView = new TaskProgressView();
             EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
-            taskProgressView.setGraphicFactory(BackgroundTask.iconCallback);
+            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
             PopOver progressViewPopOver = new PopOver(taskProgressView);
             progressViewPopOver.setTitle(Localization.lang("Background Tasks"));

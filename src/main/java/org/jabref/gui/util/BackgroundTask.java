@@ -16,7 +16,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
-import javafx.util.Callback;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
@@ -37,14 +36,6 @@ public abstract class BackgroundTask<V> {
     public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
             Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
     );
-
-    public static Callback<Task<?>, Node> iconCallback = task -> {
-        if (BackgroundTask.iconMap.containsKey(task.getTitle())) {
-            return BackgroundTask.iconMap.get(task.getTitle());
-        } else {
-            return null;
-        }
-    };
 
     private Runnable onRunning;
     private Consumer<V> onSuccess;
@@ -264,6 +255,13 @@ public abstract class BackgroundTask<V> {
     public BackgroundTask<V> withInitialMessage(String message) {
         updateMessage(message);
         return this;
+    }
+
+    public static Node getIcon(Object task) {
+        if (task instanceof Task) {
+            return BackgroundTask.iconMap.getOrDefault(((Task<?>) task).getTitle(), null);
+        }
+        return null;
     }
 
     static class BackgroundProgress {
