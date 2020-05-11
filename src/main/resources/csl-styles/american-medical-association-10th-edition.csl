@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
   <info>
-    <title>American Medical Association 11th edition (no URL)</title>
-    <title-short>AMA (11th ed.)</title-short>
-    <id>http://www.zotero.org/styles/american-medical-association-no-url</id>
-    <link href="http://www.zotero.org/styles/american-medical-association-no-url" rel="self"/>
-    <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
+    <title>American Medical Association 10th edition</title>
+    <title-short>AMA (10th ed.)</title-short>
+    <id>http://www.zotero.org/styles/american-medical-association-10th-edition</id>
+    <link href="http://www.zotero.org/styles/american-medical-association-10th-edition" rel="self"/>
     <link href="https://westlibrary.txwes.edu/sites/default/files/pdf/AMACitationStyle.pdf" rel="documentation"/>
-    <link href="https://www.amamanualofstyle.com/fileasset/AMAMOS/aaaAMWA%20presentation%20Nov%202019%20FULL.pdf" rel="documentation"/>
     <author>
       <name>Julian Onions</name>
       <email>julian.onions@gmail.com</email>
@@ -20,14 +18,10 @@
       <name>Daniel W Chan</name>
       <email>danwchan@protonmail.com</email>
     </contributor>
-    <contributor>
-      <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
-    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <summary>The American Medical Association style as used in JAMA, without the URL. Version 11 as per November-2019.</summary>
-    <updated>2020-04-23T13:38:04+00:00</updated>
+    <summary>The American Medical Association style as used in JAMA.</summary>
+    <updated>2018-01-18T11:17:00-05:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -53,6 +47,36 @@
       </names>
     </group>
   </macro>
+  <macro name="access">
+    <choose>
+      <if type="article-newspaper" match="none">
+        <choose>
+          <if variable="DOI">
+            <text value="doi:"/>
+            <text variable="DOI"/>
+          </if>
+          <else-if variable="URL">
+            <group delimiter=". " suffix=".">
+              <text variable="URL"/>
+              <choose>
+                <if type="webpage">
+                  <date variable="issued" prefix="Published " form="text"/>
+                </if>
+              </choose>
+              <group>
+                <text term="accessed" text-case="capitalize-first" suffix=" "/>
+                <date variable="accessed">
+                  <date-part name="month" suffix=" "/>
+                  <date-part name="day" suffix=", "/>
+                  <date-part name="year"/>
+                </date>
+              </group>
+            </group>
+          </else-if>
+        </choose>
+      </if>
+    </choose>
+  </macro>
   <macro name="title">
     <choose>
       <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
@@ -64,7 +88,10 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <text variable="publisher"/>
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
   </macro>
   <macro name="edition">
     <choose>
@@ -189,7 +216,7 @@
             </date>
           </group>
         </else-if>
-        <else-if type="webpage post post-weblog" match="any">
+        <else-if type="webpage">
           <text variable="container-title" prefix=" " suffix="."/>
         </else-if>
         <else-if type="speech">
@@ -228,10 +255,10 @@
                   </date>
                 </if>
                 <else>
-                  <group delimiter=" ">
-                    <text value="Published online"/>
-                    <date form="text" date-parts="year-month-day" variable="issued"/>
-                  </group>
+                  <date variable="issued">
+                    <date-part name="month" suffix=" "/>
+                    <date-part name="year"/>
+                  </date>
                 </else>
               </choose>
               <group>
@@ -243,6 +270,7 @@
           </group>
         </else>
       </choose>
+      <text prefix=" " macro="access"/>
     </layout>
   </bibliography>
 </style>

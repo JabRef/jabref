@@ -125,7 +125,7 @@ public interface PreferencesService {
 
     void askedToCollectTelemetry();
 
-    boolean getEnforceLegalKeys();
+    String getUnwantedCharacters();
 
     boolean getAllowIntegerEdition();
 
