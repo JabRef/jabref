@@ -948,6 +948,20 @@ public class JabRefFrame extends BorderPane {
         indicator.getStyleClass().setAll("progress-indicator");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        indicator.setTooltip(noTasksRunning);
+        stateManager.getAnyTaskRunning().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue.booleanValue()) {
+                    indicator.setTooltip(someTasksRunning);
+                } else {
+                    indicator.setTooltip(noTasksRunning);
+                }
+            }
+        });
+
         /*
         The label of the indicator cannot be removed with styling. Therefore,
         hide it and clip it to a square of (width x width) each time width is updated.
