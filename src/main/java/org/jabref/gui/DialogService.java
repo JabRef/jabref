@@ -197,6 +197,18 @@ public interface DialogService {
     <V> Optional<Void> showProgressDialogAndWait(String title, String content, Task<V> task);
 
     /**
+     * Constructs and shows a dialog showing the progress of running background tasks.
+     * Clicking cancel will cancel the underlying service and close the dialog.
+     * The dialog will exit as soon as none of the background tasks are running
+     *
+     * @param title title of the dialog
+     * @param content message to show below the list of background tasks
+     * @param stateManager The {@link StateManager} which contains the background tasks
+     * @return
+     */
+    <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
+
+    /**
      * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
