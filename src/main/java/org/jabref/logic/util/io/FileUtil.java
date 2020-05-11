@@ -289,10 +289,6 @@ public class FileUtil {
         // Removes illegal characters from directory name
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
 
-        // Only use valid filenames for the directories in the path
-        targetName = Arrays.stream(targetName.split(Pattern.quote(File.separator)))
-                            .map(FileUtil::getValidFileName)
-                            .collect(Collectors.joining(File.separator));
         return targetName;
     }
 
