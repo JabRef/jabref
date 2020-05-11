@@ -409,7 +409,7 @@ public class JabRefFrame extends BorderPane {
          */
         if (stateManager.anyTaskRunningBinding.getValue()) {
             WaitForBackgroundtasksFinishedDialog waitForBackgroundtasksFinishedDialog = new WaitForBackgroundtasksFinishedDialog(dialogService);
-            if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager)) {
+            if (!waitForBackgroundtasksFinishedDialog.showAndWait(stateManager, themeLoader, prefs)) {
                 return false;
             }
         }

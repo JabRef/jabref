@@ -10,7 +10,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.easybind.EasyBind;
@@ -26,7 +28,7 @@ public class WaitForBackgroundtasksFinishedDialog {
         this.dialogService = dialogService;
     }
 
-    public boolean showAndWait(StateManager stateManager) {
+    public boolean showAndWait(StateManager stateManager, ThemeLoader themeLoader, JabRefPreferences preferences) {
         TaskProgressView taskProgressView = new TaskProgressView();
         EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
         taskProgressView.setRetainTasks(false);
@@ -44,6 +46,7 @@ public class WaitForBackgroundtasksFinishedDialog {
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.CANCEL);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
+        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
 
         stateManager.anyTaskRunningBinding.addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
