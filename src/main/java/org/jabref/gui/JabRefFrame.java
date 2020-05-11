@@ -945,7 +945,7 @@ public class JabRefFrame extends BorderPane {
 
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
-        indicator.getStyleClass().setAll("progress-indicator");
+        indicator.getStyleClass().setAll("progress-indicatorToolbar");
         indicator.progressProperty().bind(stateManager.getTasksProgress());
 
         Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
