@@ -7,6 +7,8 @@ import org.jabref.model.database.BibDatabaseMode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -14,12 +16,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class PersonNamesCheckerTest {
 
     private PersonNamesChecker checker;
+    private PersonNamesChecker checkerb;
 
     @BeforeEach
     public void setUp() throws Exception {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new PersonNamesChecker(databaseContext);
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setMode(BibDatabaseMode.BIBLATEX);
+        checkerb = new PersonNamesChecker(database);
     }
 
     @Test
@@ -64,50 +70,28 @@ public class PersonNamesCheckerTest {
         assertEquals(Optional.empty(), checker.checkValue("{JabRef} and Kolb, Stefan"));
     }
 
-    @Test
-    void authorAcceptsVoidInput() {
-        assertEquals(Optional.empty(), checker.checkValue(""));
+    @ParameterizedTest
+    @MethodSource("provideCorrectFormats")
+    public void authorNameInCorrectFormatsShouldNotComplain(String input) {
+        assertEquals(Optional.empty(), checkerb.checkValue(input));
     }
 
-    @Test
-    void authorAcceptsLastNameOnly() {
-        assertEquals(Optional.empty(), checker.checkValue("Knuth"));
+    @ParameterizedTest
+    @MethodSource("provideIncorrectFormats")
+    public void authorNameInIncorrectFormatsShouldComplain(String input) {
+        assertNotEquals(Optional.empty(), checkerb.checkValue(input));
     }
 
-    @Test
-    void authorDoesNotAcceptSpacesBeforeFormat() {
-        assertNotEquals(Optional.empty(), checker.checkValue("   Knuth, Donald E. "));
+    private static String[] provideCorrectFormats() {
+        String[] data = new String[] {"", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein"};
+        return data;
     }
 
-    @Test
-    void authorDoesNotAcceptDifferentFormats() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Knuth, Donald E. and Kurt Cobain and A. Einstein"));
-    }
-
-    @Test
-    void authorAcceptsMultipleAuthors() {
-        assertEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and A. Einstein"));
-    }
-
-    @Test
-    void authorCanNotStartWithComma() {
-        assertNotEquals(Optional.empty(), checker.checkValue(", and Kurt Cobain and A. Einstein"));
-    }
-
-    @Test
-    void authorDoesNotAcceptCommaAsAuthor() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and ,"));
-
-    }
-
-    @Test
-    void authorCanNotStartWithAnd() {
-        assertNotEquals(Optional.empty(), checker.checkValue("and Kurt Cobain and A. Einstein"));
-    }
-
-    @Test
-    void authorDoesNotAcceptUnfinishedSentence() {
-        assertNotEquals(Optional.empty(), checker.checkValue("Donald E. Knuth and Kurt Cobain and"));
+    private static String[] provideIncorrectFormats() {
+        String[] data = new String[] {"   Knuth, Donald E. ", "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+                                      ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
+                                      "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and"};
+        return data;
     }
 
 }
