@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -34,6 +35,7 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.cleanup.Formatter;
 
 public class Formatters {
+    private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
 
     private Formatters() {
     }
@@ -103,7 +105,7 @@ public class Formatters {
         if (modifier.startsWith(RegexFormatter.KEY)) {
             String regex = modifier.substring(RegexFormatter.KEY.length());
             return Optional.of(new RegexFormatter(regex));
-        } else if (modifier.matches("\\Atruncate\\d+\\z")) {
+        } else if (TRUNCATE_PATTERN.matcher(modifier).matches()) {
             int truncateAfter = Integer.parseInt(modifier.substring(8));
             return Optional.of(new TruncateFormatter(truncateAfter));
         } else {
