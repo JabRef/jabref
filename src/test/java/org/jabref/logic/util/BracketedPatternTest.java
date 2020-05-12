@@ -241,4 +241,10 @@ class BracketedPatternTest {
         assertEquals("2003-JabRef Science",
                 BracketedPattern.expandBrackets("[year]-[journal:regex(\"Organization\",\"JabRef\")]", ';', dbentry, database));
     }
+
+    @Test
+    void regularExpressionWithBrackets() {
+        assertEquals("2003-JabRef Science",
+                BracketedPattern.expandBrackets("[year]-[journal:regex(\"[OX]rganization\",\"JabRef\")]", ';', dbentry, database));
+    }
 }
