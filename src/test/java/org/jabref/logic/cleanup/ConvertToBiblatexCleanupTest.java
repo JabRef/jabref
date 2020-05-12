@@ -33,20 +33,21 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentDoesNothing() {
+    public void cleanupWithDateAlreadyPresentAndDifferentFromYearDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
-        entry.setField(StandardField.DATE, "2012");
+        entry.setField(StandardField.DATE, "2012-01");
+
         worker.cleanup(entry);
 
         assertEquals(Optional.of("2011"), entry.getField(StandardField.YEAR));
         assertEquals(Optional.of("#jan#"), entry.getField(StandardField.MONTH));
-        assertEquals(Optional.of("2012"), entry.getField(StandardField.DATE));
+        assertEquals(Optional.of("2012-01"), entry.getField(StandardField.DATE));
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentAndEqualsToYearRemovesYearAndMonth() {
+    public void cleanupWithDateAlreadyPresentAndEqualsToYearAndMonth() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
