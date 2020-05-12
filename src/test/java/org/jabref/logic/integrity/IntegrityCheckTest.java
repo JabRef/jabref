@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -27,12 +28,20 @@ import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+
+/**
+ * This class tests the Integrity Checker as a whole.
+ * Aspects are: selected fields, issues arising in a complete BibTeX entry, ... When testing a checker works with a certain input,
+ * this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
+ */
 
 class IntegrityCheckTest {
 
@@ -54,6 +63,33 @@ class IntegrityCheckTest {
     @Test
     void bibLaTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCorrectFormat")
+    void authorNameChecksCorrectFormat(String input) {
+        for (Field field : FieldFactory.getPersonNameFields()) {
+            assertCorrect(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideIncorrectFormat")
+    void authorNameChecksIncorrectFormat(String input) {
+        for (Field field : FieldFactory.getPersonNameFields()) {
+            assertWrong(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
+        }
+    }
+
+    private static Stream<String> provideCorrectFormat() {
+        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
+    }
+
+    private static Stream<String> provideIncorrectFormat() {
+        return Stream.of("   Knuth, Donald E. ",
+                         "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+                         ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
+                         "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
 
     @Test
