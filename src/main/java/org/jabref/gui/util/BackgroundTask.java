@@ -258,7 +258,7 @@ public abstract class BackgroundTask<V> {
     }
 
     public static <T> Node getIcon(Task<T> task) {
-        return BackgroundTask.iconMap.getOrDefault((task).getTitle(), null);
+        return BackgroundTask.iconMap.getOrDefault(task).getTitle(), null);
     }
 
     static class BackgroundProgress {
