@@ -1,6 +1,7 @@
 package org.jabref.logic.integrity;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -82,16 +83,15 @@ public class PersonNamesCheckerTest {
         assertNotEquals(Optional.empty(), checkerb.checkValue(input));
     }
 
-    private static String[] provideCorrectFormats() {
-        String[] data = new String[] {"", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein"};
-        return data;
+    private static Stream<String> provideCorrectFormats() {
+        return Stream.of("", "Knuth", "Donald E. Knuth and Kurt Cobain and A. Einstein");
     }
 
-    private static String[] provideIncorrectFormats() {
-        String[] data = new String[] {"   Knuth, Donald E. ", "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+    private static Stream<String> provideIncorrectFormats() {
+        return Stream.of("   Knuth, Donald E. ",
+                         "Knuth, Donald E. and Kurt Cobain and A. Einstein",
                                       ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
-                                      "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and"};
-        return data;
+                         "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
 
 }
