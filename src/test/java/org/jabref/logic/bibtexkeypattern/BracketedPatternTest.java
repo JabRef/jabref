@@ -257,13 +257,13 @@ class BracketedPatternTest {
      * Test the [:truncate] modifier
      */
     @Test
-    void truncateModifiersWorksAppliedTwice() {
+    void expandBracketsChainsTwoTruncateModifiers() {
         assertEquals("Open",
                 BracketedPattern.expandBrackets("[fulltitle:truncate6:truncate5]", ';', dbentry, database));
     }
 
     @Test
-    void truncateModifierIsIgnoredWithoutAnArgument() {
+    void expandBracketsDoesNotTruncateWithoutAnArgumentToTruncateModifier() {
         assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
