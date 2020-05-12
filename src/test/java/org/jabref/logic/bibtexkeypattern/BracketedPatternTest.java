@@ -1,6 +1,5 @@
-package org.jabref.logic.util;
+package org.jabref.logic.bibtexkeypattern;
 
-import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -21,7 +20,7 @@ class BracketedPatternTest {
     private BibEntry dbentry;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         bibentry = new BibEntry();
         bibentry.setField(StandardField.AUTHOR, "O. Kitsune");
         bibentry.setField(StandardField.YEAR, "2017");
