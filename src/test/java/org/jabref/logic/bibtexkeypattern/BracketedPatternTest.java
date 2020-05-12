@@ -1,5 +1,6 @@
-package org.jabref.logic.bibtexkeypattern;
+package org.jabref.logic.util;
 
+import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -239,6 +240,18 @@ class BracketedPatternTest {
     void regularExpressionReplace() {
         assertEquals("2003-JabRef Science",
                 BracketedPattern.expandBrackets("[year]-[journal:regex(\"Organization\",\"JabRef\")]", ';', dbentry, database));
+    }
+
+    @Test
+    void regularExpressionWithBrackets() {
+        assertEquals("2003-JabRef Science",
+                BracketedPattern.expandBrackets("[year]-[journal:regex(\"[OX]rganization\",\"JabRef\")]", ';', dbentry, database));
+    }
+
+    @Test
+    void testEmptyBrackets() {
+        assertEquals("2003-Organization Science",
+                BracketedPattern.expandBrackets("[year][]-[journal]", ';', dbentry, database));
     }
 
     /**

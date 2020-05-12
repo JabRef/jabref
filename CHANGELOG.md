@@ -19,8 +19,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We now show the number of items found and selected to import in the online search dialog. [#6248](https://github.com/JabRef/jabref/pull/6248)
 - We created a new install screen for macOS. [#5759](https://github.com/JabRef/jabref/issues/5759)
 - We implemented an option to download fulltext files while importing. [#6381](https://github.com/JabRef/jabref/pull/6381)
+- We added a progress-indicator showing the average progress of background tasks to the toolbar. Clicking it reveals a pop-over with a list of running background tasks. [6443](https://github.com/JabRef/jabref/pull/6443)
 - We fixed the bug when strike the delete key in the text field. [#6421](https://github.com/JabRef/jabref/issues/6421)
 - We added a BibTex key modifier for truncating strings. [#3915](https://github.com/JabRef/jabref/issues/3915)
+- We added support for jumping to target entry when typing letter/digit after sorting a column in maintable [#6146](https://github.com/JabRef/jabref/issues/6146)
 
 ### Changed
 
@@ -58,6 +60,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where custom jstyles for Open/LibreOffice would only be valid if a layout line for the entry type `default` was at the end of the layout section [#6303](https://github.com/JabRef/jabref/issues/6303)
 - We fixed an issue where long directory names created from patterns could create an exception. [#3915](https://github.com/JabRef/jabref/issues/3915)
 
+- We fixed an issue where sort on numeric cases was broken. [#6349](https://github.com/JabRef/jabref/issues/6349)
+- We fixed an issue where an "Not on FX thread" exception occured when saving on linux [#6453](https://github.com/JabRef/jabref/issues/6453)
+- We fixed an issue where the library sort order was lost. [#6091](https://github.com/JabRef/jabref/issues/6091)
+- We fixed an issue where brackets in regular expressions were not working. [6469](https://github.com/JabRef/jabref/pull/6469)
 
 ### Removed
 

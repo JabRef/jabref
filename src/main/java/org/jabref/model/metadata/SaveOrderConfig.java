@@ -81,7 +81,9 @@ public class SaveOrderConfig {
         }
         if (o instanceof SaveOrderConfig) {
             SaveOrderConfig that = (SaveOrderConfig) o;
-            return Objects.equals(sortCriteria, that.sortCriteria) && Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder);
+            return Objects.equals(sortCriteria, that.sortCriteria) && 
+            Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) && 
+            Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder);
         }
         return false;
     }

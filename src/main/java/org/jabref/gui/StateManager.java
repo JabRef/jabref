@@ -5,7 +5,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -13,6 +16,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.concurrent.Task;
 import javafx.scene.Node;
 
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -41,6 +45,17 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
+        return new Observable[] {taskProperty.progressProperty(), taskProperty.runningProperty()};
+    });
+
+    private BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(
+            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
+    );
+
+    private DoubleBinding tasksProgress = Bindings.createDoubleBinding(
+            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
+    );
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -112,4 +127,20 @@ public class StateManager {
     public OptionalObjectProperty<Node> focusOwnerProperty() { return focusOwner; }
 
     public Optional<Node> getFocusOwner() { return focusOwner.get(); }
+
+    public ObservableList<Task<?>> getBackgroundTasks() {
+        return backgroundTasks;
+    }
+
+    public void addBackgroundTask(Task<?> backgroundTask) {
+        this.backgroundTasks.add(0, backgroundTask);
+    }
+
+    public BooleanBinding getAnyTaskRunning() {
+        return anyTaskRunning;
+    }
+
+    public DoubleBinding getTasksProgress() {
+        return tasksProgress;
+    }
 }
