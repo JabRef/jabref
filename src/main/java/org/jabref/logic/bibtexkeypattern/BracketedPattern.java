@@ -106,40 +106,68 @@ public class BracketedPattern {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(pattern, "\\[]", true);
+        StringTokenizer st = new StringTokenizer(pattern, "\\[]\"", true);
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if ("\\".equals(token)) {
-                if (st.hasMoreTokens()) {
-                    sb.append(st.nextToken());
-                }
-                // FIXME: else -> raise exception or log? (S.G.)
-            } else {
-                if ("[".equals(token)) {
-                    // Fetch the next token after the '[':
+            if ("\"".equals(token)) {
+                sb.append(token);
+                while (st.hasMoreTokens()) {
                     token = st.nextToken();
-                    List<String> fieldParts = parseFieldMarker(token);
-                    // check whether there is a modifier on the end such as
-                    // ":lower":
-                    if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(entry, token, keywordDelimiter, database));
-                    } else {
-                        // apply modifiers:
-                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
-                        sb.append(applyModifiers(fieldValue, fieldParts, 1));
-                    }
-                    // Fetch and discard the closing ']'
-                    if (st.hasMoreTokens()) {
-                        token = st.nextToken();
-                    } else {
-                        token = "";
-                    }
-                    if (!"]".equals(token)) {
-                        LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
-                    }
-                } else {
                     sb.append(token);
+                    if ("\"".equals(token)) {
+                        break;
+                    }
+                }
+            } else {
+                if ("\\".equals(token)) {
+                    if (st.hasMoreTokens()) {
+                        sb.append(st.nextToken());
+                    }
+                    // FIXME: else -> raise exception or log? (S.G.)
+                } else {
+                    if ("[".equals(token)) {
+                        // Fetch the next token after the '[':
+                        token = st.nextToken();
+                        Boolean foundClosingBracket = false;
+                        // make sure to read until the next ']'
+                        while (st.hasMoreTokens()) {
+                            String subtoken = st.nextToken();
+                            // I the beginning of a quote is found, include the content in the original token
+                            if ("\"".equals(subtoken)) {
+                                token = token + subtoken;
+                                while (st.hasMoreTokens()) {
+                                    subtoken = st.nextToken();
+                                    token = token + subtoken;
+                                    if ("\"".equals(subtoken)) {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                if ("]".equals(subtoken)) {
+                                    foundClosingBracket = true;
+                                    break;
+                                } else {
+                                    token = token + subtoken;
+                                }
+                            }
+                        }
+                        if (!foundClosingBracket) {
+                            LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
+                        }
+                        List<String> fieldParts = parseFieldMarker(token);
+                        // check whether there is a modifier on the end such as
+                        // ":lower":
+                        if (fieldParts.size() <= 1) {
+                            sb.append(getFieldValue(entry, token, keywordDelimiter, database));
+                        } else {
+                            // apply modifiers:
+                            String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+                            sb.append(applyModifiers(fieldValue, fieldParts, 1));
+                        }
+                    } else {
+                        sb.append(token);
+                    }
                 }
             }
         }
