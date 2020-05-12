@@ -387,6 +387,24 @@
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }
 
+.progress-indicator {
+    -fx-progress-color: -jr-theme;
+    -fx-border-width: 0px;
+    -fx-background-color: -jr-icon-background;
+}
+
+.progress-indicator:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.progress-indicatorToolbar {
+    -fx-padding: 0.5em;
+}
+
+.progress-indicatorToolbar .percentage {
+    -fx-fill:null;
+}
+
 .check-box {
     -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
     -fx-text-fill: -fx-text-background-color;
