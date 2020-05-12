@@ -408,11 +408,12 @@ public class JabRefFrame extends BorderPane {
         the background tasks may make changes themselves that need saving.
          */
         if (stateManager.getAnyTaskRunning().getValue()) {
-            if (!(dialogService.showBackgroundProgressDialogAndWait(
+            Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
                     Localization.lang("Please wait..."),
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
                     stateManager
-            ).orElse(ButtonType.CANCEL) == ButtonType.YES)) {
+            );
+            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
                 return false;
             }
         }
