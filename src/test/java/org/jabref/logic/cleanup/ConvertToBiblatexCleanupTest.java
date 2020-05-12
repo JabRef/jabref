@@ -29,7 +29,7 @@ public class ConvertToBiblatexCleanupTest {
 
         assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
         assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
-        assertEquals(Optional.of("2011"), entry.getField(StandardField.DATE));
+        assertEquals(Optional.of("2011-01"), entry.getField(StandardField.DATE));
     }
 
     @Test
