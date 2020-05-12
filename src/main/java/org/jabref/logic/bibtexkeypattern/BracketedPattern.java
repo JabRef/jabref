@@ -127,11 +127,15 @@ public class BracketedPattern {
                     // FIXME: else -> raise exception or log? (S.G.)
                 } else {
                     if ("[".equals(token)) {
+                        Boolean foundClosingBracket = false;
                         // Fetch the next token after the '[':
                         token = st.nextToken();
-                        Boolean foundClosingBracket = false;
+                        if ("]".equals(token)) {
+                            LOGGER.warn("Found empty brackets \"[]\" in '" + pattern + "'");
+                            foundClosingBracket = true;
+                        }
                         // make sure to read until the next ']'
-                        while (st.hasMoreTokens()) {
+                        while (st.hasMoreTokens() && !foundClosingBracket) {
                             String subtoken = st.nextToken();
                             // I the beginning of a quote is found, include the content in the original token
                             if ("\"".equals(subtoken)) {
