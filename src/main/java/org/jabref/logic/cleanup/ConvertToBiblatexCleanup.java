@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
@@ -43,23 +44,21 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         } else {
             // If the year from date field is filled and equal to year it should be removed the year field
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
-                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(checkYear -> {
-                    // Get the year of the date field (4 digits).
-                    if (date.substring(0, 4).equals(checkYear)) {
-                        entry.clearField(StandardField.YEAR).ifPresent(changes::add);
-                    }
-                });
+                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> {
+                    entry.getFieldOrAlias(StandardField.MONTH).ifPresent(month -> {
 
-                // If the month from date field is filled and is equal to month it should be removed the month field
-                var data = Date.parse(date);
-                var monthFromDate = data.get().getMonth().get().getJabRefFormat();
-                entry.getFieldOrAlias(StandardField.MONTH).ifPresent(checkMonth -> {
-                    // Check if the month is equal to month date field.
-                    if (checkMonth.equals(monthFromDate)) {
-                        entry.clearField(StandardField.MONTH).ifPresent(changes::add);
-                    }
-                });
+                        Optional<Date> checkDate = Date.parse(date);
+                        // Converts using this format: "MMMM, uuuu". Ex: September, 2015
+                        month = month.replaceAll("#", "").toLowerCase();
+                        month = month.substring(0, 1).toUpperCase() + month.substring(1, month.length());
+                        Optional<Date> checkMonthAndYear = Date.parse(month + ", " + year);
 
+                        if (checkDate.isPresent() && checkMonthAndYear.isPresent() && checkDate.equals(checkMonthAndYear)) {
+                            entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                            entry.clearField(StandardField.MONTH).ifPresent(changes::add);
+                        }
+                    });
+                });
             });
         }
         return changes;

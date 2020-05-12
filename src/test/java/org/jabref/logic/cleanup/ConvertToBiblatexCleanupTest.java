@@ -29,33 +29,18 @@ public class ConvertToBiblatexCleanupTest {
 
         assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
         assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
-        assertEquals(Optional.of("2011-01"), entry.getField(StandardField.DATE));
+        assertEquals(Optional.of("2011"), entry.getField(StandardField.DATE));
     }
 
     @Test
-    public void cleanupWithDateAlreadyPresentAndDifferentFromYearDoesNotClearTheYear() {
+    public void cleanupWithDateAlreadyPresentDoesNothing() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
         entry.setField(StandardField.DATE, "2012");
-
         worker.cleanup(entry);
 
         assertEquals(Optional.of("2011"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
-        assertEquals(Optional.of("2012-01"), entry.getField(StandardField.DATE));
-    }
-
-    @Test
-    public void cleanupWithDateAlreadyPresentAndDifferentFromMonthDoesNotClearTheMonth() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.YEAR, "2012");
-        entry.setField(StandardField.MONTH, "#jan#");
-        entry.setField(StandardField.DATE, "2012-02");
-
-        worker.cleanup(entry);
-
-        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
         assertEquals(Optional.of("#jan#"), entry.getField(StandardField.MONTH));
         assertEquals(Optional.of("2012"), entry.getField(StandardField.DATE));
     }
@@ -65,7 +50,7 @@ public class ConvertToBiblatexCleanupTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
         entry.setField(StandardField.MONTH, "#jan#");
-        entry.setField(StandardField.DATE, "2011");
+        entry.setField(StandardField.DATE, "2011-01");
 
         worker.cleanup(entry);
 
@@ -83,4 +68,5 @@ public class ConvertToBiblatexCleanupTest {
         assertEquals(Optional.empty(), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("Best of JabRef"), entry.getField(StandardField.JOURNALTITLE));
     }
+
 }
