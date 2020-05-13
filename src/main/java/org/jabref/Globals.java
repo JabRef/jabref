@@ -44,8 +44,13 @@ public class Globals {
     // Remote listener
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
 
+    /**
+     * Manager for the state of the GUI.
+     */
+    public static StateManager stateManager = new StateManager();
+
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
-    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
+    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor(stateManager);
 
     /**
      * Each test case initializes this field if required
@@ -65,11 +70,6 @@ public class Globals {
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;
-
-    /**
-     * Manager for the state of the GUI.
-     */
-    public static StateManager stateManager = new StateManager();
 
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
