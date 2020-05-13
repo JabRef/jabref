@@ -42,7 +42,6 @@ import static org.mockito.Mockito.mock;
  * Aspects are: selected fields, issues arising in a complete BibTeX entry, ... When testing a checker works with a certain input,
  * this test has to go to a test belonging to the respective checker. See PersonNamesCheckerTest for an example test.
  */
-
 class IntegrityCheckTest {
 
     @Test
