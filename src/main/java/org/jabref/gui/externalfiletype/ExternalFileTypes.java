@@ -190,7 +190,7 @@ public class ExternalFileTypes {
      * @return A String[] containing all information about this file type.
      */
     private String[] getStringArrayRepresentation(ExternalFileType type) {
-        return new String[]{type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
+        return new String[] {type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
     }
 
     /**
@@ -267,7 +267,7 @@ public class ExternalFileTypes {
 
             // No type could be found from mime type. Try based on the extension:
             return FileHelper.getFileExtension(linkedFile.getLink())
-                    .flatMap(this::getExternalFileTypeByExt);
+                             .flatMap(this::getExternalFileTypeByExt);
         } else {
             return type;
         }

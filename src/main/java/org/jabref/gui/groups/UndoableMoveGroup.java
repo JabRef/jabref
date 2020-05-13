@@ -9,7 +9,6 @@ import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * @author jzieren
- *
  */
 class UndoableMoveGroup extends AbstractUndoableJabRefEdit {
 

@@ -20,7 +20,7 @@ public final class TextExtractor {
     private final PDPage page;
 
     /**
-     * @param page       the page the annotation is on, must not be null
+     * @param page          the page the annotation is on, must not be null
      * @param boundingBoxes the raw annotation, must not be null
      */
     public TextExtractor(PDPage page, COSArray boundingBoxes) {

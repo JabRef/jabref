@@ -76,5 +76,4 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
         //        e -> frame.getCurrentBasePanel().highlightEntry(e)
         // );
     }
-
 }

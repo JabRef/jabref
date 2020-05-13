@@ -35,10 +35,10 @@ class OpenDatabaseTest {
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     OpenDatabaseTest() throws URISyntaxException {
-        bibNoHeader = Paths.get(OpenDatabaseTest.class.getResource("headerless.bib").toURI());
-        bibWrongHeader = Paths.get(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
-        bibHeader = Paths.get(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
-        bibHeaderAndSignature = Paths.get(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
+        bibNoHeader = Path.of(OpenDatabaseTest.class.getResource("headerless.bib").toURI());
+        bibWrongHeader = Path.of(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
+        bibHeader = Path.of(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
+        bibHeaderAndSignature = Path.of(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
         bibEncodingWithoutNewline = Paths
                 .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
     }

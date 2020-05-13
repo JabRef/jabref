@@ -1,55 +1,43 @@
 package org.jabref.model.metadata;
 
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
-    public static final String DIR_SUFFIX = "Directory";
 
     private final String user;
-    private final Map<Field, String> fieldFileDirectories;
+    private final String mainFileDirectory;
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
+    private final boolean downloadLinkedFiles;
 
     public FilePreferences(String user,
-                           Map<Field, String> fieldFileDirectories,
+                           String mainFileDirectory,
                            boolean bibLocationAsPrimary,
                            String fileNamePattern,
-                           String fileDirPattern) {
+                           String fileDirPattern,
+                           boolean downloadLinkedFiles) {
         this.user = user;
-        this.fieldFileDirectories = fieldFileDirectories;
+        this.mainFileDirectory = mainFileDirectory;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
         this.fileNamePattern = fileNamePattern;
         this.fileDirPattern = fileDirPattern;
+        this.downloadLinkedFiles = downloadLinkedFiles;
     }
 
     public String getUser() {
         return user;
     }
 
-    public Optional<Path> getFileDirectory(Field field) {
-        try {
-            String value = fieldFileDirectories.get(field);
-            // filter empty paths
-            if ((value != null) && !value.isEmpty()) {
-                Path path = Paths.get(value);
-                return Optional.of(path);
-            }
-            return Optional.empty();
-        } catch (InvalidPathException ex) {
-            return Optional.empty();
-        }
-    }
-
     public Optional<Path> getFileDirectory() {
-        return getFileDirectory(StandardField.FILE);
+        if (StringUtil.isBlank(mainFileDirectory)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(Path.of(mainFileDirectory));
+        }
     }
 
     public boolean isBibLocationAsPrimary() {
@@ -62,5 +50,9 @@ public class FilePreferences {
 
     public String getFileDirPattern() {
         return fileDirPattern;
+    }
+
+    public boolean getDownloadLinkedFiles() {
+        return downloadLinkedFiles;
     }
 }

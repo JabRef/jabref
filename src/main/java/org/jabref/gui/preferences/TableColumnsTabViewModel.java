@@ -256,20 +256,35 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         return restartWarnings;
     }
 
-    public ListProperty<MainTableColumnModel> columnsListProperty() { return this.columnsListProperty; }
+    public ListProperty<MainTableColumnModel> columnsListProperty() {
+        return this.columnsListProperty;
+    }
 
-    public ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty() { return selectedColumnModelProperty; }
+    public ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty() {
+        return selectedColumnModelProperty;
+    }
 
-    public ListProperty<MainTableColumnModel> availableColumnsProperty() { return this.availableColumnsProperty; }
+    public ListProperty<MainTableColumnModel> availableColumnsProperty() {
+        return this.availableColumnsProperty;
+    }
 
-    public ObjectProperty<MainTableColumnModel> addColumnProperty() { return this.addColumnProperty; }
+    public ObjectProperty<MainTableColumnModel> addColumnProperty() {
+        return this.addColumnProperty;
+    }
 
-    public BooleanProperty specialFieldsEnabledProperty() { return this.specialFieldsEnabledProperty; }
+    public BooleanProperty specialFieldsEnabledProperty() {
+        return this.specialFieldsEnabledProperty;
+    }
 
-    public BooleanProperty specialFieldsSyncKeywordsProperty() { return this.specialFieldsSyncKeywordsProperty; }
+    public BooleanProperty specialFieldsSyncKeywordsProperty() {
+        return this.specialFieldsSyncKeywordsProperty;
+    }
 
-    public BooleanProperty specialFieldsSerializeProperty() { return this.specialFieldsSerializeProperty; }
+    public BooleanProperty specialFieldsSerializeProperty() {
+        return this.specialFieldsSerializeProperty;
+    }
 
-    public BooleanProperty extraFileColumnsEnabledProperty() { return this.extraFileColumnsEnabledProperty; }
-
+    public BooleanProperty extraFileColumnsEnabledProperty() {
+        return this.extraFileColumnsEnabledProperty;
+    }
 }

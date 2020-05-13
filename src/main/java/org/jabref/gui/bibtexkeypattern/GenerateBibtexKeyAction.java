@@ -53,13 +53,12 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
         if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
-                                                                         Localization.lang("Overwrite keys"),
-                                                                         Localization.lang("One or more keys will be overwritten. Continue?"),
-                                                                         Localization.lang("Overwrite keys"),
-                                                                         Localization.lang("Cancel"),
-                                                                         Localization.lang("Disable this confirmation dialog"),
-                                                                         optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
-
+                    Localization.lang("Overwrite keys"),
+                    Localization.lang("One or more keys will be overwritten. Continue?"),
+                    Localization.lang("Overwrite keys"),
+                    Localization.lang("Cancel"),
+                    Localization.lang("Disable this confirmation dialog"),
+                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
         } else {
             // Always overwrite keys by default
             return true;
@@ -109,6 +108,6 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
 
     private String formatOutputMessage(String start, int count) {
         return String.format("%s %d %s.", start, count,
-                             (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+                (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
 }

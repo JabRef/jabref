@@ -3,7 +3,6 @@ package org.jabref.gui.importer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class ImportAction {
      * @param filenames List of files to import
      */
     public void automatedImport(List<String> filenames) {
-        List<Path> files = filenames.stream().map(Paths::get).collect(Collectors.toList());
+        List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> {
             List<ImportFormatReader.UnknownFormatImport> imports = doImport(files);
             // Ok, done. Then try to gather in all we have found. Since we might
@@ -185,7 +184,6 @@ public class ImportAction {
                 for (ContentSelector selector : parserResult.getMetaData().getContentSelectorList()) {
                     result.getMetaData().addContentSelector(selector);
                 }
-
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }
@@ -195,5 +193,4 @@ public class ImportAction {
 
         return result;
     }
-
 }

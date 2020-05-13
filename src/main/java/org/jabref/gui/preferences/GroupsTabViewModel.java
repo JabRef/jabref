@@ -66,22 +66,40 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty grayNonHitsProperty() { return grayNonHitsProperty; }
+    public BooleanProperty grayNonHitsProperty() {
+        return grayNonHitsProperty;
+    }
 
-    public BooleanProperty groupViewModeIntersectionProperty() { return groupViewModeIntersectionProperty; }
+    public BooleanProperty groupViewModeIntersectionProperty() {
+        return groupViewModeIntersectionProperty;
+    }
 
-    public BooleanProperty groupViewModeUnionProperty() { return groupViewModeUnionProperty; }
+    public BooleanProperty groupViewModeUnionProperty() {
+        return groupViewModeUnionProperty;
+    }
 
-    public BooleanProperty autoAssignGroupProperty() { return autoAssignGroupProperty; }
+    public BooleanProperty autoAssignGroupProperty() {
+        return autoAssignGroupProperty;
+    }
 
-    public BooleanProperty displayGroupCount() { return displayGroupCountProperty; }
+    public BooleanProperty displayGroupCount() {
+        return displayGroupCountProperty;
+    }
 
-    public StringProperty defaultGroupingFieldProperty() { return defaultGroupingFieldProperty; }
+    public StringProperty defaultGroupingFieldProperty() {
+        return defaultGroupingFieldProperty;
+    }
 
-    public StringProperty keywordSeparatorProperty() { return keywordSeparatorProperty; }
+    public StringProperty keywordSeparatorProperty() {
+        return keywordSeparatorProperty;
+    }
 }

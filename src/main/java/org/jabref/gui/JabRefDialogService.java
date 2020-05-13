@@ -23,9 +23,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,16 +35,21 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
+import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,16 +68,22 @@ public class JabRefDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
+    private static JabRefPreferences preferences;
+    private static ThemeLoader themeLoader;
+
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane) {
+    public JabRefDialogService(Window mainWindow, Pane mainPane, JabRefPreferences preferences, ThemeLoader themeLoader) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
+        this.preferences = preferences;
+        this.themeLoader = themeLoader;
     }
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
+        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -103,7 +116,7 @@ public class JabRefDialogService implements DialogService {
 
         // Reset the dialog graphic using the default style
         alert.getDialogPane().setGraphic(graphic);
-
+        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -126,6 +139,7 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setHeaderText(title);
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
+        themeLoader.installCss(choiceDialog.getDialogPane().getScene(), preferences);
         return choiceDialog.showAndWait();
     }
 
@@ -134,6 +148,7 @@ public class JabRefDialogService implements DialogService {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
+        themeLoader.installCss(inputDialog.getDialogPane().getScene(), preferences);
         return inputDialog.showAndWait();
     }
 
@@ -142,6 +157,7 @@ public class JabRefDialogService implements DialogService {
         TextInputDialog inputDialog = new TextInputDialog(defaultValue);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
+        themeLoader.installCss(inputDialog.getDialogPane().getScene(), preferences);
         return inputDialog.showAndWait();
     }
 
@@ -168,6 +184,7 @@ public class JabRefDialogService implements DialogService {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
+        themeLoader.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
         exceptionDialog.showAndWait();
     }
 
@@ -176,6 +193,7 @@ public class JabRefDialogService implements DialogService {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
+        themeLoader.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
         exceptionDialog.showAndWait();
     }
 
@@ -244,6 +262,7 @@ public class JabRefDialogService implements DialogService {
         alert.getButtonTypes().setAll(buttonTypes);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
+        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
         return alert.showAndWait();
     }
 
@@ -253,7 +272,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
+    public <V> Optional<Void> showProgressDialogAndWait(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
         progressDialog.setTitle(title);
@@ -268,7 +287,41 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        progressDialog.show();
+        themeLoader.installCss(progressDialog.getDialogPane().getScene(), preferences);
+        return progressDialog.showAndWait();
+    }
+
+    @Override
+    public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
+        TaskProgressView taskProgressView = new TaskProgressView();
+        EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+        taskProgressView.setRetainTasks(false);
+        taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+
+        Label message = new Label(content);
+
+        VBox box = new VBox(taskProgressView, message);
+
+        DialogPane contentPane = new DialogPane();
+        contentPane.setContent(box);
+
+        FXDialog alert = new FXDialog(AlertType.WARNING, title);
+        alert.setDialogPane(contentPane);
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.CANCEL);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alert.setResizable(true);
+        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
+
+        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                alert.setResult(ButtonType.YES);
+                alert.close();
+            }
+        });
+
+        Dialog<ButtonType> dialog = () -> alert.showAndWait();
+
+        return showCustomDialogAndWait(dialog);
     }
 
     @Override

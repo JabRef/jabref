@@ -1,7 +1,8 @@
 package org.jabref.logic.layout.format;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,14 +202,14 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             // ugly hack, the export routine has set a global variable before
                             // starting the export, which contains the database's file directory:
                             if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                                dirs = prefs.getGeneratedDirForDatabase();
+                                dirs = Collections.singletonList(prefs.getMainFileDirectory());
                             } else {
                                 dirs = prefs.getFileDirForDatabase();
                             }
 
-                            String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
-                                    .map(path -> path.toAbsolutePath().toString())
-                                    .orElse(flEntry.getLink());
+                            String pathString = flEntry.findIn(dirs.stream().map(Path::of).collect(Collectors.toList()))
+                                                       .map(path -> path.toAbsolutePath().toString())
+                                                       .orElse(flEntry.getLink());
 
                             sb.append(replaceStrings(pathString));
                             break;
@@ -224,7 +225,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         case FILE_EXTENSION:
                             FileHelper.getFileExtension(flEntry.getLink())
-                                    .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                                      .ifPresent(extension -> sb.append(replaceStrings(extension)));
                             break;
                         case FILE_TYPE:
                             sb.append(replaceStrings(flEntry.getFileType()));
@@ -251,7 +252,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             result = result.replaceAll(stringStringEntry.getKey(), to);
         }
         return result;
-
     }
 
     /**
@@ -284,5 +284,4 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             return string;
         }
     }
-
 }

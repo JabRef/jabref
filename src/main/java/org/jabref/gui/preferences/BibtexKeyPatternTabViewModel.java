@@ -29,6 +29,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
     private BooleanProperty letterAlwaysAddProperty = new SimpleBooleanProperty();
     private StringProperty keyPatternRegexProperty = new SimpleStringProperty();
     private StringProperty keyPatternReplacementProperty = new SimpleStringProperty();
+    private StringProperty unwantedCharactersProperty = new SimpleStringProperty();
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
@@ -66,6 +67,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
         keyPatternRegexProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REGEX));
         keyPatternReplacementProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
+        unwantedCharactersProperty.setValue(preferences.get(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -92,6 +94,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
         preferences.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegexProperty.getValue());
         preferences.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, keyPatternReplacementProperty.getValue());
+        preferences.put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, unwantedCharactersProperty.getValue());
 
         GlobalBibtexKeyPattern newKeyPattern = GlobalBibtexKeyPattern.fromPattern(preferences.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         patternListProperty.forEach(item -> {
@@ -112,28 +115,56 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty overwriteAllowProperty() { return overwriteAllowProperty; }
+    public BooleanProperty overwriteAllowProperty() {
+        return overwriteAllowProperty;
+    }
 
-    public BooleanProperty overwriteWarningProperty() { return overwriteWarningProperty; }
+    public BooleanProperty overwriteWarningProperty() {
+        return overwriteWarningProperty;
+    }
 
-    public BooleanProperty generateOnSaveProperty() { return generateOnSaveProperty; }
+    public BooleanProperty generateOnSaveProperty() {
+        return generateOnSaveProperty;
+    }
 
-    public BooleanProperty letterStartAProperty() { return letterStartAProperty; }
+    public BooleanProperty letterStartAProperty() {
+        return letterStartAProperty;
+    }
 
-    public BooleanProperty letterStartBProperty() { return letterStartBProperty; }
+    public BooleanProperty letterStartBProperty() {
+        return letterStartBProperty;
+    }
 
-    public BooleanProperty letterAlwaysAddProperty() { return letterAlwaysAddProperty; }
+    public BooleanProperty letterAlwaysAddProperty() {
+        return letterAlwaysAddProperty;
+    }
 
-    public StringProperty keyPatternRegexProperty() { return keyPatternRegexProperty; }
+    public StringProperty keyPatternRegexProperty() {
+        return keyPatternRegexProperty;
+    }
 
-    public StringProperty keyPatternReplacementProperty() { return keyPatternReplacementProperty; }
+    public StringProperty keyPatternReplacementProperty() {
+        return keyPatternReplacementProperty;
+    }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() { return patternListProperty; }
+    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+        return patternListProperty;
+    }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() { return defaultKeyPatternProperty; }
+    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+        return defaultKeyPatternProperty;
+    }
+
+    public StringProperty unwantedCharactersProperty() {
+        return unwantedCharactersProperty;
+    }
 }

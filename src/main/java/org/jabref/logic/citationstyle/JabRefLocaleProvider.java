@@ -11,7 +11,7 @@ import de.undercouch.citeproc.helper.CSLUtils;
 
 /**
  * A {@link LocaleProvider} that loads locales from a directory in the current module.
- *
+ * <p>
  * This implementation is only a slight adaption of {@link de.undercouch.citeproc.DefaultLocaleProvider}.
  */
 public class JabRefLocaleProvider implements LocaleProvider {

@@ -114,6 +114,7 @@ public enum KeyBinding {
 
     /**
      * This method returns the default key binding, the key(s) which are assigned
+     *
      * @return The default key binding
      */
     public String getDefaultKeyBinding() {
@@ -123,5 +124,4 @@ public enum KeyBinding {
     public KeyBindingCategory getCategory() {
         return category;
     }
-
 }

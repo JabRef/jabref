@@ -32,7 +32,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
-    @FXML private CheckBox enforceLegalKeys;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
@@ -61,7 +60,9 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     }
 
     @Override
-    public String getTabName() { return Localization.lang("General"); }
+    public String getTabName() {
+        return Localization.lang("General");
+    }
 
     public void initialize() {
         this.viewModel = new GeneralTabViewModel(dialogService, preferences);
@@ -86,7 +87,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
-        enforceLegalKeys.selectedProperty().bindBidirectional(viewModel.enforceLegalKeysProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());

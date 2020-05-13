@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -24,7 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -40,6 +40,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
@@ -115,6 +116,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -137,6 +139,8 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,9 +157,9 @@ public class JabRefFrame extends BorderPane {
 
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
+    private final ThemeLoader themeLoader = Globals.getThemeLoader();
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
 
-    private final ProgressBar progressBar = new ProgressBar();
     private final FileHistoryMenu fileHistory;
 
     private final Stage mainStage;
@@ -170,7 +174,7 @@ public class JabRefFrame extends BorderPane {
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
-        this.dialogService = new JabRefDialogService(mainStage, this);
+        this.dialogService = new JabRefDialogService(mainStage, this, prefs, themeLoader);
         this.stateManager = Globals.stateManager;
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
         this.undoManager = Globals.undoManager;
@@ -244,6 +248,30 @@ public class JabRefFrame extends BorderPane {
                         break;
                     case SEARCH:
                         getGlobalSearchBar().focus();
+                        break;
+                    case NEW_ARTICLE:
+                        new NewEntryAction(this, StandardEntryType.Article, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_BOOK:
+                        new NewEntryAction(this, StandardEntryType.Book, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_INBOOK:
+                        new NewEntryAction(this, StandardEntryType.InBook, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_MASTERSTHESIS:
+                        new NewEntryAction(this, StandardEntryType.MastersThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PHDTHESIS:
+                        new NewEntryAction(this, StandardEntryType.PhdThesis, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_PROCEEDINGS:
+                        new NewEntryAction(this, StandardEntryType.Proceedings, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_TECHREPORT:
+                        new NewEntryAction(this, StandardEntryType.TechReport, dialogService, prefs, stateManager).execute();
+                        break;
+                    case NEW_UNPUBLISHED:
+                        new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
                     default:
                 }
@@ -319,7 +347,7 @@ public class JabRefFrame extends BorderPane {
      * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
      */
     public void openAction(String filePath) {
-        Path file = Paths.get(filePath);
+        Path file = Path.of(filePath);
         // all the logic is done in openIt. Even raising an existing panel
         getOpenDatabaseAction().openFile(file, true);
     }
@@ -375,7 +403,23 @@ public class JabRefFrame extends BorderPane {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
-        // First ask if the user really wants to close, if the library has not been saved since last save.
+        // First ask if the user really wants to close, if there are still background tasks running
+        /*
+        It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
+        the background tasks may make changes themselves that need saving.
+         */
+        if (stateManager.getAnyTaskRunning().getValue()) {
+            Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
+                    Localization.lang("Please wait..."),
+                    Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
+                    stateManager
+            );
+            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
+                return false;
+            }
+        }
+
+        // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
@@ -406,8 +450,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void initLayout() {
-        setProgressBarVisible(false);
-
         setId("frame");
 
         VBox head = new VBox(createMenu(), createToolbar());
@@ -497,7 +539,9 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                 factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                new Separator(Orientation.VERTICAL),
+                createTaskIndicator()
         );
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
@@ -715,7 +759,7 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, Globals.clipboardManager, prefs)),
                         factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, Globals.clipboardManager, prefs)),
                         factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, Globals.clipboardManager, prefs.getPreviewPreferences())),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(this, dialogService))),
+                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(this, dialogService, Globals.exportFactory, Globals.clipboardManager, Globals.TASK_EXECUTOR))),
 
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
 
@@ -771,11 +815,11 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager, prefs)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new AbbreviateAction(StandardActions.ABBREVIATE_MEDLINE, this, dialogService, stateManager, prefs)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager, prefs))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, this, dialogService, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_MEDLINE, new AbbreviateAction(StandardActions.ABBREVIATE_MEDLINE, this, dialogService, stateManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, this, dialogService, stateManager))),
 
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager, prefs))
+                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, this, dialogService, stateManager))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);
@@ -903,6 +947,59 @@ public class JabRefFrame extends BorderPane {
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
+    }
+
+    private Group createTaskIndicator() {
+        ProgressIndicator indicator = new ProgressIndicator();
+        indicator.getStyleClass().add("progress-indicatorToolbar");
+        indicator.progressProperty().bind(stateManager.getTasksProgress());
+
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        indicator.setTooltip(noTasksRunning);
+        stateManager.getAnyTaskRunning().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue.booleanValue()) {
+                    indicator.setTooltip(someTasksRunning);
+                } else {
+                    indicator.setTooltip(noTasksRunning);
+                }
+            }
+        });
+
+        /*
+        The label of the indicator cannot be removed with styling. Therefore,
+        hide it and clip it to a square of (width x width) each time width is updated.
+         */
+        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
+            /*
+            The indeterminate spinner is wider than the determinate spinner.
+            We must make sure they are the same width for the clipping to result in a square of the same size always.
+             */
+            if (!indicator.isIndeterminate()) {
+                indicator.setPrefWidth(newValue.doubleValue());
+            }
+            if (newValue.doubleValue() > 0) {
+                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
+                indicator.setClip(clip);
+            }
+        });
+
+        indicator.setOnMouseClicked(event -> {
+            TaskProgressView taskProgressView = new TaskProgressView();
+            EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            taskProgressView.setRetainTasks(true);
+            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+
+            PopOver progressViewPopOver = new PopOver(taskProgressView);
+            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+
+            progressViewPopOver.show(indicator);
+        });
+
+        return new Group(indicator);
     }
 
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
@@ -1062,21 +1159,6 @@ public class JabRefFrame extends BorderPane {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    /**
-     * Set the visibility of the progress bar in the right end of the status line at the bottom of the frame.
-     */
-    public void setProgressBarVisible(final boolean visible) {
-        progressBar.setVisible(visible);
-    }
-
-    /**
-     * Sets the indeterminate status of the progress bar.
-     * <p>
-     */
-    public void setProgressBarIndeterminate(final boolean value) {
-        progressBar.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
     }
 
     /**

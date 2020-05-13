@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,13 +38,13 @@ public class BibtexImporterTest {
 
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
-        Path file = Paths.get(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
+        Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
     @Test
     public void testImportEntries() throws IOException, URISyntaxException {
-        Path file = Paths.get(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
+        Path file = Path.of(BibtexImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(4, bibEntries.size());
@@ -124,7 +123,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testRecognizesDatabaseID() throws Exception {
-        Path file = Paths.get(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
+        Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }

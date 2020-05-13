@@ -29,7 +29,8 @@ public class FileChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        List<LinkedFile> linkedFiles = FileFieldParser.parse(value).stream()
+        List<LinkedFile> linkedFiles = FileFieldParser
+                .parse(value).stream()
                 .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());
 

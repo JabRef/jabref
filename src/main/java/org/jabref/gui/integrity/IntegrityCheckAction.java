@@ -44,8 +44,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
                 Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
+                Globals.journalAbbreviationRepository,
                 Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
         Task<List<IntegrityMessage>> task = new Task<>() {

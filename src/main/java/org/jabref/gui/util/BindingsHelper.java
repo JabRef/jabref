@@ -111,10 +111,10 @@ public class BindingsHelper {
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ListProperty<B> propertyB, Consumer<ObservableList<B>> updateA, Consumer<List<A>> updateB) {
         bindContentBidirectional(
-                                 propertyA,
-                                 (ObservableValue<ObservableList<B>>) propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                (ObservableValue<ObservableList<B>>) propertyB,
+                updateA,
+                updateB);
     }
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<List<A>> updateB) {
@@ -132,10 +132,10 @@ public class BindingsHelper {
         Consumer<List<A>> updateB = newValueList -> property.setValue(mapToB.apply(newValueList));
 
         bindContentBidirectional(
-                                 listProperty,
-                                 property,
-                                 updateList,
-                                 updateB);
+                listProperty,
+                property,
+                updateList,
+                updateB);
     }
 
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
@@ -151,10 +151,10 @@ public class BindingsHelper {
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
         Consumer<Map<A, V>> updateB = newValueList -> propertyB.setValue(mapToB.apply(newValueList));
         bindContentBidirectional(
-                                 propertyA,
-                                 propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                propertyB,
+                updateA,
+                updateB);
     }
 
     public static <T> ObservableValue<T> constantOf(T value) {

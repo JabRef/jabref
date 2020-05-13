@@ -19,6 +19,7 @@ import javafx.stage.Screen;
 import org.jabref.Globals;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -33,11 +34,13 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.fxmisc.easybind.EasyBind;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- * Returns null if canceled.
+ *
+ * @return null if canceled
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
@@ -59,6 +62,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     private EntryType type;
     private EntryTypeViewModel viewModel;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public EntryTypeView(BasePanel basePanel, DialogService dialogService, JabRefPreferences preferences) {
         this.basePanel = basePanel;
@@ -80,14 +84,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         Button btnGenerate = (Button) this.getDialogPane().lookupButton(generateButton);
 
         btnGenerate.textProperty().bind(EasyBind.map(viewModel.searchingProperty(), searching -> (searching) ? Localization.lang("Searching...") : Localization.lang("Generate")));
-        btnGenerate.disableProperty().bind(viewModel.searchingProperty());
+        btnGenerate.disableProperty().bind(viewModel.idFieldValidationStatus().validProperty().not().or(viewModel.searchingProperty()));
 
         EasyBind.subscribe(viewModel.searchSuccesfulProperty(), value -> {
             if (value) {
                 setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
-
     }
 
     private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
@@ -112,6 +115,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     @FXML
     public void initialize() {
+        visualizer.setDecoration(new IconValidationDecorator());
         viewModel = new EntryTypeViewModel(prefs, basePanel, dialogService);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
@@ -146,7 +150,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
-
         } else {
             biblatexTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
@@ -160,7 +163,10 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         }
 
-        Platform.runLater(() -> idTextField.requestFocus());
+        Platform.runLater(() -> {
+            idTextField.requestFocus();
+            visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true);
+        });
     }
 
     public EntryType getChoice() {
@@ -297,5 +303,4 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         //CHECKSTYLE:ON
 
     }
-
 }

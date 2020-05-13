@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 
 /**
  * This class represents all supported IEEETran entry types.
- *
+ * <p>
  * See <a href="http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf">http://ctan.sharelatex.com/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEtran_bst_HOWTO.pdf</a>
  * <p>
  * Electronic, IEEETranBSTCTL, Periodical, Patent, Standard
