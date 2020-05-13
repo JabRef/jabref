@@ -43,7 +43,14 @@ public class BracketedPattern {
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
+
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
+    /** Matches with "uni", case insensitive */
+    private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+    /** Matches with "tech", case insensitive */
+    private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
+    /** Matches with "dep"/"dip"/"lab", case insensitive */
+    private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
     private final String pattern;
 
@@ -1325,16 +1332,16 @@ public class BracketedPattern {
 
             // Deciding about a part type...
             for (String k : part) {
-                if (k.matches("^[Uu][Nn][Ii].*")) { // Starts with "uni" case and locale independent
+                if (UNIVERSITY_PATTERN.matcher(k).matches()) {
                     isUniversity = true;
                 }
-                if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
+                if (TECHNOLOGY_PATTERN.matcher(k).matches()) {
                     isTechnology = true;
                 }
                 if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
-                if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
+                if (DEPARTMENT_PATTERN.matcher(k).matches()) {
                     isDepartment = true;
                 }
             }
@@ -1350,7 +1357,7 @@ public class BracketedPattern {
                 StringBuilder universitySB = new StringBuilder();
                 universitySB.append("Uni");
                 for (String k : part) {
-                    if (!k.matches("^[Uu][Nn][Ii].*")) {
+                    if (!UNIVERSITY_PATTERN.matcher(k).matches()) {
                         universitySB.append(k);
                     }
                 }
