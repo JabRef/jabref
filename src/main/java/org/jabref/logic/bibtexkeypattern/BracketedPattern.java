@@ -41,9 +41,10 @@ import static org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator.DEFAULT_UNWAN
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
-    private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
 
+    /** Matches everything that is not an uppercase ASCII letter */
+    private static final Pattern STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
     /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
     private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
     /** Matches with "uni", case insensitive */
@@ -1379,12 +1380,12 @@ public class BracketedPattern {
                 for (String k : part) {
                     if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
-                            && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
+                            && !STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
                         if (isSchool) {
-                            schoolSB.append(k.replaceAll(STARTING_CAPITAL_PATTERN, ""));
+                            schoolSB.append(STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                         if (isDepartment) {
-                            departmentSB.append(k.replaceAll(STARTING_CAPITAL_PATTERN, ""));
+                            departmentSB.append(STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                     }
                 }
