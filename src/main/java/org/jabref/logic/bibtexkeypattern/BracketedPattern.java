@@ -70,8 +70,7 @@ public class BracketedPattern {
     }
 
     public String expand(BibEntry bibentry) {
-        BibDatabase null_database = null;
-        return expand(bibentry, null_database);
+        return expand(bibentry, null);
     }
 
     /**
@@ -1297,7 +1296,7 @@ public class BracketedPattern {
 
         String result = content;
         result = unifyDiacritics(result);
-        result = result.replaceAll("^\\{", "").replaceAll("\\}$", "");
+        result = result.replaceAll("^\\{", "").replaceAll("}$", "");
         Matcher matcher = REGEX_PATTERN.matcher(result);
         if (matcher.matches()) {
             return matcher.group(1);
@@ -1317,7 +1316,7 @@ public class BracketedPattern {
             List<String> part = new ArrayList<>();
 
             // Cleanup: remove unnecessary words.
-            for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
+            for (String k : parts[index].replaceAll("\\{[A-Z]+}", "").split("[ \\-_]")) {
                 if ((!(k.isEmpty()) // remove empty
                         && !ignore.contains(k.toLowerCase(Locale.ENGLISH)) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
@@ -1419,6 +1418,6 @@ public class BracketedPattern {
         return (university == null ? rest : university)
                 + (school == null ? "" : school)
                 + ((department == null)
-                        || ((school != null) && department.equals(school)) ? "" : department);
+                        || department.equals(school) ? "" : department);
     }
 }
