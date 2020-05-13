@@ -53,7 +53,6 @@ public class PdfContentImporter extends Importer {
 
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-
     }
 
     /**
@@ -164,7 +163,7 @@ public class PdfContentImporter extends Importer {
                             res = res.concat(" and ");
                         }
                         if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
-                            && "al.".equalsIgnoreCase(splitNames[i + 1])) {
+                                && "al.".equalsIgnoreCase(splitNames[i + 1])) {
                             res = res.concat("others");
                             break;
                         } else {
@@ -192,14 +191,14 @@ public class PdfContentImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(BufferedReader reader)."
-                                                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
         throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
-                                                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
@@ -219,7 +218,6 @@ public class PdfContentImporter extends Importer {
 
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
-
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch (IOException exception) {
@@ -535,7 +533,6 @@ public class PdfContentImporter extends Importer {
         if (m.find()) {
             year = curString.substring(m.start(), m.end());
         }
-
     }
 
     /**

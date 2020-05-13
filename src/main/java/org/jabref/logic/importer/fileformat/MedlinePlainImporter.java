@@ -23,9 +23,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the MEDLINE Plain format.
- *
- * check here for details on the format
- * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
+ * <p>
+ * check here for details on the format http://www.nlm.nih.gov/bsd/mms/medlineelements.html
  */
 public class MedlinePlainImporter extends Importer {
 
@@ -78,7 +77,7 @@ public class MedlinePlainImporter extends Importer {
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                .split("\\n\\n");
+                                        .split("\\n\\n");
 
         for (String entry1 : entries) {
 
@@ -218,7 +217,6 @@ public class MedlinePlainImporter extends Importer {
         }
 
         return new ParserResult(bibitems);
-
     }
 
     private boolean checkLineValidity(String line) {
@@ -293,7 +291,6 @@ public class MedlinePlainImporter extends Importer {
                 idValue = value.substring(0, startOfIdentifier - 1);
             }
             hm.put(key, idValue);
-
         } else if ("LID".equals(lab)) {
             hm.put(new UnknownField("location-id"), value);
         } else if ("MID".equals(lab)) {

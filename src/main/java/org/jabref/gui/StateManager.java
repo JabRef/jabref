@@ -29,11 +29,14 @@ import org.jabref.model.util.OptionalUtil;
 
 /**
  * This class manages the GUI-state of JabRef, including:
- * - currently selected database
- * - currently selected group
- * - active search
- * - active number of search results
- * - focus owner
+ *
+ * <ul>
+ *   <li>currently selected database</li>
+ *   <li>currently selected group</li>
+ *   <li>active search</li>
+ *   <li>active number of search results</li>
+ *   <li>focus owner</li>
+ * </ul>
  */
 public class StateManager {
 
@@ -124,9 +127,13 @@ public class StateManager {
         activeSearchQuery.setValue(Optional.of(searchQuery));
     }
 
-    public OptionalObjectProperty<Node> focusOwnerProperty() { return focusOwner; }
+    public OptionalObjectProperty<Node> focusOwnerProperty() {
+        return focusOwner;
+    }
 
-    public Optional<Node> getFocusOwner() { return focusOwner.get(); }
+    public Optional<Node> getFocusOwner() {
+        return focusOwner.get();
+    }
 
     public ObservableList<Task<?>> getBackgroundTasks() {
         return backgroundTasks;

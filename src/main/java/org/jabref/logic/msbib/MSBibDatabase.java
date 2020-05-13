@@ -46,10 +46,12 @@ public class MSBibDatabase {
     }
 
     // TODO: why an additonal entry list? entries are included inside database!
+
     /**
      * Creates a new {@link MSBibDatabase} for <b>export</b>
+     *
      * @param database The bib database
-     * @param entries List of {@link BibEntry}
+     * @param entries  List of {@link BibEntry}
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
@@ -61,6 +63,7 @@ public class MSBibDatabase {
 
     /**
      * Imports entries from an office xml file
+     *
      * @param reader
      * @return List of {@link BibEntry}
      */
@@ -105,6 +108,7 @@ public class MSBibDatabase {
 
     /**
      * Gets the assembled dom for export
+     *
      * @return XML Document
      */
     public Document getDomForExport() {

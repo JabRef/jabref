@@ -80,36 +80,37 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             XMLInputFactory inputFactory = XMLInputFactory.newFactory();
             XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());
 
-            fetchLoop: while (streamReader.hasNext()) {
+            fetchLoop:
+            while (streamReader.hasNext()) {
                 int event = streamReader.getEventType();
 
                 switch (event) {
-                case XMLStreamConstants.START_ELEMENT:
-                    if (streamReader.getName().toString().equals("Count")) {
-                        firstOccurrenceOfCount = true;
-                    }
+                    case XMLStreamConstants.START_ELEMENT:
+                        if (streamReader.getName().toString().equals("Count")) {
+                            firstOccurrenceOfCount = true;
+                        }
 
-                    if (streamReader.getName().toString().equals("IdList")) {
-                        fetchIDs = true;
-                    }
-                    break;
+                        if (streamReader.getName().toString().equals("IdList")) {
+                            fetchIDs = true;
+                        }
+                        break;
 
-                case XMLStreamConstants.CHARACTERS:
-                    if (firstOccurrenceOfCount) {
-                        numberOfResultsFound = Integer.parseInt(streamReader.getText());
-                        firstOccurrenceOfCount = false;
-                    }
+                    case XMLStreamConstants.CHARACTERS:
+                        if (firstOccurrenceOfCount) {
+                            numberOfResultsFound = Integer.parseInt(streamReader.getText());
+                            firstOccurrenceOfCount = false;
+                        }
 
-                    if (fetchIDs) {
-                        idList.add(streamReader.getText());
-                    }
-                    break;
+                        if (fetchIDs) {
+                            idList.add(streamReader.getText());
+                        }
+                        break;
 
-                case XMLStreamConstants.END_ELEMENT:
-                    // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                    if (streamReader.getName().toString().equals("IdList")) {
-                        break fetchLoop;
-                    }
+                    case XMLStreamConstants.END_ELEMENT:
+                        // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+                        if (streamReader.getName().toString().equals("IdList")) {
+                            break fetchLoop;
+                        }
                 }
                 streamReader.next();
             }
@@ -223,5 +224,4 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                     Localization.lang("Error while fetching from %0", "Medline"), e);
         }
     }
-
 }

@@ -70,10 +70,8 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
             } else {
                 entry.setField(field, newValue);
             }
-
         } catch (IllegalArgumentException ex) {
             LOGGER.info("Cannot perform redo", ex);
         }
     }
-
 }

@@ -153,5 +153,4 @@ public class OpenOfficePreferences {
         this.executablePath = "";
         this.jarsPath = "";
     }
-
 }

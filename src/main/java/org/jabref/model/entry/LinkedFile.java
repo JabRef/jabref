@@ -110,6 +110,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Writes serialized object to ObjectOutputStream, automatically called
+     *
      * @param out {@link ObjectOutputStream}
      * @throws IOException
      */
@@ -122,6 +123,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Reads serialized object from ObjectInputStreamm, automatically called
+     *
      * @param in {@link ObjectInputStream}
      * @throws IOException
      */
@@ -133,6 +135,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Checks if the given String is an online link
+     *
      * @param toCheck The String to check
      * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
      */

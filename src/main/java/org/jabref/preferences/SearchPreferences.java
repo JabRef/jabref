@@ -100,5 +100,4 @@ public class SearchPreferences {
         preferences.putInt(SEARCH_DIALOG_POS_Y, y);
         return this;
     }
-
 }

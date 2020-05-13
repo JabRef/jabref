@@ -126,8 +126,8 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
             initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
-           cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
-           cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
+            cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
+            cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });
     }
 
@@ -314,7 +314,11 @@ public class LibraryPropertiesDialogViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return cleanupsProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+        return cleanupsProperty;
+    }
 }

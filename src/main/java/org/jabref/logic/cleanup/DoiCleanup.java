@@ -48,7 +48,7 @@ public class DoiCleanup implements CleanupJob {
                 // Doi field seems to contain Doi -> cleanup note, url, ee field
                 for (Field field : FIELDS) {
                     entry.getField(field).flatMap(DOI::parse)
-                            .ifPresent(unused -> removeFieldValue(entry, field, changes));
+                         .ifPresent(unused -> removeFieldValue(entry, field, changes));
                 }
             }
         } else {

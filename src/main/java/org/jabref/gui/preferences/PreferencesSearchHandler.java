@@ -94,5 +94,4 @@ class PreferencesSearchHandler {
     protected ListProperty<PreferencesTab> filteredPreferenceTabsProperty() {
         return filteredPreferenceTabs;
     }
-
 }

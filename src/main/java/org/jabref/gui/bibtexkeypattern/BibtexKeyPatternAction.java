@@ -18,6 +18,6 @@ public class BibtexKeyPatternAction extends SimpleCommand {
 
     @Override
     public void execute() {
-       new BibtexKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
+        new BibtexKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
     }
 }

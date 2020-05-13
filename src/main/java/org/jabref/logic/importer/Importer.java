@@ -21,13 +21,12 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Check whether the source is in the correct format for this importer.
-     *
-     * The effect of this method is primarily to avoid unnecessary processing of
-     * files when searching for a suitable import format. If this method returns
-     * false, the import routine will move on to the next import format.
-     *
-     * Thus the correct behaviour is to return false if it is certain that the file is
-     * not of the suitable type, and true otherwise. Returning true is the safe choice if not certain.
+     * <p>
+     * The effect of this method is primarily to avoid unnecessary processing of files when searching for a suitable
+     * import format. If this method returns false, the import routine will move on to the next import format.
+     * <p>
+     * Thus the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
+     * true otherwise. Returning true is the safe choice if not certain.
      */
     public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
@@ -53,22 +52,21 @@ public abstract class Importer implements Comparable<Importer> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public boolean isRecognizedFormat(String data) throws IOException {
-        try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+        try (StringReader stringReader = new StringReader(data);
+             BufferedReader bufferedReader = new BufferedReader(stringReader)) {
             return isRecognizedFormat(bufferedReader);
         }
     }
 
     /**
      * Parse the database in the source.
-     *
-     * This method can be called in two different contexts - either when importing in
-     * a specified format, or when importing in unknown format. In the latter case,
-     * JabRef cycles through all available import formats. No error messages or feedback
-     * is displayed from individual import formats in this case.
-     *
-     * If importing in a specified format and an empty library is returned, JabRef reports
-     * that no entries were found.
-     *
+     * <p>
+     * This method can be called in two different contexts - either when importing in a specified format, or when
+     * importing in unknown format. In the latter case, JabRef cycles through all available import formats. No error
+     * messages or feedback is displayed from individual import formats in this case.
+     * <p>
+     * If importing in a specified format and an empty library is returned, JabRef reports that no entries were found.
+     * <p>
      * This method should never return null.
      *
      * @param input the input to read from
@@ -77,9 +75,9 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Parse the database in the specified file.
-     *
-     * Importer having the facilities to detect the correct encoding of a file should overwrite this method,
-     * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
+     * <p>
+     * Importer having the facilities to detect the correct encoding of a file should overwrite this method, determine
+     * the encoding and then call {@link #importDatabase(BufferedReader)}.
      *
      * @param filePath the path to the file which should be imported
      * @param encoding the encoding used to decode the file
@@ -100,16 +98,17 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Parse the database in the specified string.
-     *
-     * Importer having the facilities to detect the correct encoding of a string should overwrite this method,
-     * determine the encoding and then call {@link #importDatabase(BufferedReader)}.
+     * <p>
+     * Importer having the facilities to detect the correct encoding of a string should overwrite this method, determine
+     * the encoding and then call {@link #importDatabase(BufferedReader)}.
      *
      * @param data the string which should be imported
      * @return the parsed result
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public ParserResult importDatabase(String data) throws IOException {
-        try (StringReader stringReader = new StringReader(data); BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+        try (StringReader stringReader = new StringReader(data);
+             BufferedReader bufferedReader = new BufferedReader(stringReader)) {
             return importDatabase(bufferedReader);
         }
     }
@@ -139,13 +138,14 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Returns the type of files that this importer can read
+     *
      * @return {@link FileType} corresponding to the importer
      */
     public abstract FileType getFileType();
 
     /**
-     * Returns a one-word ID which identifies this importer.
-     * Used for example, to identify the importer when used from the command line.
+     * Returns a one-word ID which identifies this importer. Used for example, to identify the importer when used from
+     * the command line.
      *
      * @return ID, must be unique and not <code>null</code>
      */
@@ -163,7 +163,7 @@ public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Returns the description of the import format.
-     *
+     * <p>
      * The description should specify
      * <ul><li>
      *   what kind of entries from what sources and based on what specification it is able to import

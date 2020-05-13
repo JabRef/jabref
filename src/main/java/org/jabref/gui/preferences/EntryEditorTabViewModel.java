@@ -125,31 +125,59 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public BooleanProperty openOnNewEntryProperty() { return openOnNewEntryProperty; }
+    public BooleanProperty openOnNewEntryProperty() {
+        return openOnNewEntryProperty;
+    }
 
-    public BooleanProperty defaultSourceProperty() { return defaultSourceProperty; }
+    public BooleanProperty defaultSourceProperty() {
+        return defaultSourceProperty;
+    }
 
-    public BooleanProperty enableRelatedArticlesTabProperty() { return enableRelatedArticlesTabProperty; }
+    public BooleanProperty enableRelatedArticlesTabProperty() {
+        return enableRelatedArticlesTabProperty;
+    }
 
-    public BooleanProperty acceptRecommendationsProperty() { return acceptRecommendationsProperty; }
+    public BooleanProperty acceptRecommendationsProperty() {
+        return acceptRecommendationsProperty;
+    }
 
-    public BooleanProperty enableLatexCitationsTabProperty() { return enableLatexCitationsTabProperty; }
+    public BooleanProperty enableLatexCitationsTabProperty() {
+        return enableLatexCitationsTabProperty;
+    }
 
-    public BooleanProperty enableValidationProperty() { return enableValidationProperty; }
+    public BooleanProperty enableValidationProperty() {
+        return enableValidationProperty;
+    }
 
-    public BooleanProperty enableAutoCompleteProperty() { return enableAutoCompleteProperty; }
+    public BooleanProperty enableAutoCompleteProperty() {
+        return enableAutoCompleteProperty;
+    }
 
-    public StringProperty autoCompleteFieldsProperty() { return autoCompleteFieldsProperty; }
+    public StringProperty autoCompleteFieldsProperty() {
+        return autoCompleteFieldsProperty;
+    }
 
-    public BooleanProperty autoCompleteFirstLastProperty() { return autoCompleteFirstLastProperty; }
+    public BooleanProperty autoCompleteFirstLastProperty() {
+        return autoCompleteFirstLastProperty;
+    }
 
-    public BooleanProperty autoCompleteLastFirstProperty() { return autoCompleteLastFirstProperty; }
+    public BooleanProperty autoCompleteLastFirstProperty() {
+        return autoCompleteLastFirstProperty;
+    }
 
-    public BooleanProperty autoCompleteBothProperty() { return autoCompleteBothProperty; }
+    public BooleanProperty autoCompleteBothProperty() {
+        return autoCompleteBothProperty;
+    }
 
-    public BooleanProperty firstNameModeAbbreviatedProperty() { return firstNameModeAbbreviatedProperty; }
+    public BooleanProperty firstNameModeAbbreviatedProperty() {
+        return firstNameModeAbbreviatedProperty;
+    }
 
-    public BooleanProperty firstNameModeFullProperty() { return firstNameModeFullProperty; }
+    public BooleanProperty firstNameModeFullProperty() {
+        return firstNameModeFullProperty;
+    }
 
-    public BooleanProperty firstNameModeBothProperty() { return firstNameModeBothProperty; }
+    public BooleanProperty firstNameModeBothProperty() {
+        return firstNameModeBothProperty;
+    }
 }
