@@ -1321,7 +1321,7 @@ public class BracketedPattern {
                         && !ignore.contains(k.toLowerCase(Locale.ENGLISH)) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
                         && (String.valueOf(k.charAt(0))).matches("[A-Z]"))
-                        || ((k.length() >= 3) && "uni".equalsIgnoreCase(k.substring(0, 2)))) {
+                        || ((k.length() >= 3) && "uni".equalsIgnoreCase(k.substring(0, 3)))) {
                     part.add(k);
                 }
             }
