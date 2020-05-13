@@ -1413,7 +1413,7 @@ public class BracketedPattern {
         }
 
         // Putting parts together.
-        return (university == null ? rest : university)
+        return (university == null ? Objects.toString(rest, "") : university)
                 + (school == null ? "" : school)
                 + ((department == null)
                         || department.equals(school) ? "" : department);
