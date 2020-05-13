@@ -273,22 +273,23 @@ public class FileUtil {
     }
 
     /**
-     * Determines filename provided by an entry in a database
+     * Determines directory name provided by an entry in a database
      *
      * @param database        the database, where the entry is located
-     * @param entry           the entry to which the file should be linked to
-     * @param fileNamePattern the filename pattern
-     * @return a suggested fileName
+     * @param entry           the entry to which the directory should be linked to
+     * @param directoryNamePattern the dirname pattern
+     * @return a suggested dirName
      */
-    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String directoryNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(directoryNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
-        // Removes illegal characters from filename
+        // Removes illegal characters from directory name
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
+
         return targetName;
     }
 
