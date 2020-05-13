@@ -10,8 +10,10 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
@@ -1395,24 +1397,18 @@ public class BracketedPattern {
                 if (isDepartment) {
                     department = departmentSB.toString();
                 }
-                // A part not matching university, department nor school.
             } else if (rest == null) {
-                StringBuilder restSB = new StringBuilder();
-                // Less than 3 parts -> concatenate those
+                // A part not matching university, department nor school.
                 if (part.size() < 3) {
-                    for (String k : part) {
-                        restSB.append(k);
-                        // More than 3 parts -> use 1st letter abbreviation
-                    }
+                    // Less than 3 parts -> concatenate those
+                    rest = String.join("", part);
                 } else {
-                    for (String k : part) {
-                        k = k.replaceAll(STARTING_CAPITAL_PATTERN, "");
-                        if (!(k.isEmpty())) {
-                            restSB.append(k);
-                        }
-                    }
+                    // More than 3 parts -> use 1st letter abbreviation
+                    rest = part.stream()
+                               .filter(Predicate.not(String::isBlank))
+                               .map((word) -> Character.toString(word.charAt(0)))
+                               .collect(Collectors.joining());
                 }
-                rest = restSB.toString();
             }
         }
 
