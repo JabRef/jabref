@@ -70,7 +70,6 @@ public class BracketedPattern {
      *
      * @param bibentry The bibentry to expand.
      * @param database The database to use for string-lookups and cross-refs. May be null.
-     *
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
     public String expand(BibEntry bibentry, BibDatabase database) {
@@ -82,10 +81,9 @@ public class BracketedPattern {
     /**
      * Expands the current pattern using the given bibentry, keyword delimiter, and database.
      *
-     * @param bibentry The bibentry to expand.
+     * @param bibentry         The bibentry to expand.
      * @param keywordDelimiter The keyword delimiter to use.
-     * @param database The database to use for string-lookups and cross-refs. May be null.
-     *
+     * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
     public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
@@ -96,10 +94,10 @@ public class BracketedPattern {
     /**
      * Expands a pattern
      *
-     * @param pattern The pattern to expand
+     * @param pattern          The pattern to expand
      * @param keywordDelimiter The keyword delimiter to use
-     * @param entry The bibentry to use for expansion
-     * @param database The database for field resolving. May be null.
+     * @param entry            The bibentry to use for expansion
+     * @param database         The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
@@ -182,11 +180,10 @@ public class BracketedPattern {
     /**
      * Evaluates the given pattern ("value") to the given bibentry and database
      *
-     * @param entry The entry to get the field value from
-     * @param value A pattern string (such as auth, pureauth, authorLast)
+     * @param entry            The entry to get the field value from
+     * @param value            A pattern string (such as auth, pureauth, authorLast)
      * @param keywordDelimiter The de
-     * @param database The database to use for field resolving. May be null.
-     *
+     * @param database         The database to use for field resolving. May be null.
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
     public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
@@ -386,8 +383,9 @@ public class BracketedPattern {
 
     /**
      * Applies modifiers to a label generated based on a field marker.
-     * @param label The generated label.
-     * @param parts String array containing the modifiers.
+     *
+     * @param label  The generated label.
+     * @param parts  String array containing the modifiers.
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
@@ -533,7 +531,8 @@ public class BracketedPattern {
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            mainl: while (titleScanner.hasNext()) {
+            mainl:
+            while (titleScanner.hasNext()) {
                 String word = titleScanner.next();
 
                 for (String smallWord : Word.SMALLER_WORDS) {
@@ -579,13 +578,9 @@ public class BracketedPattern {
     /**
      * Gets the last name of the first author/editor
      *
-     * @param authorField
-     *            a <code>String</code>
-     * @return the surname of an author/editor or "" if no author was found
-     *    This method is guaranteed to never return null.
-     *
-     * @throws NullPointerException
-     *             if authorField == null
+     * @param authorField a <code>String</code>
+     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @throws NullPointerException if authorField == null
      */
     public static String firstAuthor(String authorField) {
         AuthorList authorList = AuthorList.parse(authorField);
@@ -593,19 +588,14 @@ public class BracketedPattern {
             return "";
         }
         return authorList.getAuthor(0).getLast().orElse("");
-
     }
 
     /**
      * Gets the first name initials of the first author/editor
      *
-     * @param authorField
-     *            a <code>String</code>
-     * @return the first name initial of an author/editor or "" if no author was found
-     *    This method is guaranteed to never return null.
-     *
-     * @throws NullPointerException
-     *             if authorField == null
+     * @param authorField a <code>String</code>
+     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @throws NullPointerException if authorField == null
      */
     public static String firstAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.parse(authorField);
@@ -616,16 +606,11 @@ public class BracketedPattern {
     }
 
     /**
-     * Gets the von part and the last name of the first author/editor
-     * No spaces are returned
+     * Gets the von part and the last name of the first author/editor No spaces are returned
      *
-     * @param authorField
-     *            a <code>String</code>
-     * @return the von part and surname of an author/editor or "" if no author was found.
-     *  This method is guaranteed to never return null.
-     *
-     * @throws NullPointerException
-     *             if authorField == null
+     * @param authorField a <code>String</code>
+     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
+     * @throws NullPointerException if authorField == null
      */
     public static String firstAuthorVonAndLast(String authorField) {
         AuthorList authorList = AuthorList.parse(authorField);
@@ -641,6 +626,7 @@ public class BracketedPattern {
 
     /**
      * Gets the last name of the last author/editor
+     *
      * @param authorField a <code>String</code>
      * @return the surname of an author/editor
      */
@@ -658,13 +644,9 @@ public class BracketedPattern {
     /**
      * Gets the forename initials of the last author/editor
      *
-     * @param authorField
-     *            a <code>String</code>
-     * @return the forename initial of an author/editor or "" if no author was found
-     *    This method is guaranteed to never return null.
-     *
-     * @throws NullPointerException
-     *             if authorField == null
+     * @param authorField a <code>String</code>
+     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @throws NullPointerException if authorField == null
      */
     public static String lastAuthorForenameInitials(String authorField) {
         AuthorList authorList = AuthorList.parse(authorField);
@@ -672,11 +654,12 @@ public class BracketedPattern {
             return "";
         }
         return authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr().map(s -> s.substring(0, 1))
-                .orElse("");
+                         .orElse("");
     }
 
     /**
      * Gets the last name of all authors/editors
+     *
      * @param authorField a <code>String</code>
      * @return the sur name of all authors/editors
      */
@@ -687,6 +670,7 @@ public class BracketedPattern {
 
     /**
      * Returns the authors according to the BibTeX-alpha-Style
+     *
      * @param authorField string containing the value of the author field
      * @return the initials of all authornames
      */
@@ -729,8 +713,9 @@ public class BracketedPattern {
 
     /**
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+     *
      * @param authorField a <code>String</code>
-     * @param n the number of desired authors
+     * @param n           the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     public static String nAuthors(String authorField, int n) {
@@ -822,7 +807,7 @@ public class BracketedPattern {
      * Note that [authEtAl] equals [authors2]
      */
     public static String authEtal(String authorField, String delim,
-            String append) {
+                                  String append) {
         String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
 
         String[] tokens = fixedAuthorField.split("\\s*\\band\\b\\s*");
@@ -990,8 +975,7 @@ public class BracketedPattern {
      *
      * @return the first page number or "" if no number is found in the string
      *
-     * @throws NullPointerException
-     *             if pages is null
+     * @throws NullPointerException if pages is null
      */
     public static String firstPage(String pages) {
         // FIXME: incorrectly exracts the first page when pages are
@@ -1035,13 +1019,9 @@ public class BracketedPattern {
     /**
      * Split the pages field into separate numbers and return the highest
      *
-     * @param pages
-     *            a pages string such as 42--111 or 7,41,73--97 or 43+
-     *
+     * @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
      * @return the first page number or "" if no number is found in the string
-     *
-     * @throws NullPointerException
-     *             if pages is null.
+     * @throws NullPointerException if pages is null.
      */
     public static String lastPage(String pages) {
         final String[] splitPages = pages.split("\\D+");
@@ -1185,8 +1165,8 @@ public class BracketedPattern {
         return content.replaceAll(
                 "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
                 "{\\\"$1}").replaceAll(
-                        "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
-                        "{$1$2}");
+                "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
+                "{$1$2}");
     }
 
     /**
@@ -1262,7 +1242,7 @@ public class BracketedPattern {
      * from the first letters of words starting with and uppercase letter.</li>
      * </ul>
      * </ol>
-     *
+     * <p>
      * Parts are concatenated together in the following way:
      * <ul>
      * <li>If there is a university part use it otherwise use the rest part.</li>
@@ -1270,7 +1250,7 @@ public class BracketedPattern {
      * <li>If there is a department part and it is not same as school part
      * append it.</li>
      * </ul>
-     *
+     * <p>
      * Rest part is only the first part which do not match any other type. All
      * other parts (address, ...) are ignored.
      *
@@ -1410,6 +1390,6 @@ public class BracketedPattern {
         return (university == null ? rest : university)
                 + (school == null ? "" : school)
                 + ((department == null)
-                        || ((school != null) && department.equals(school)) ? "" : department);
+                || ((school != null) && department.equals(school)) ? "" : department);
     }
 }

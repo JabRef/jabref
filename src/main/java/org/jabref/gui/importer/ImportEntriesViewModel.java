@@ -58,7 +58,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     /**
      * @param databaseContext the database to import into
-     * @param task     the task executed for parsing the selected files(s).
+     * @param task            the task executed for parsing the selected files(s).
      */
     public ImportEntriesViewModel(BackgroundTask<ParserResult> task, TaskExecutor taskExecutor, BibDatabaseContext databaseContext, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
@@ -108,7 +108,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
-                    .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
+                                                     .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                             Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
@@ -177,7 +177,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                         new GroupTreeNodeViewModel(groupTreeNode),
                                         new GroupTreeNodeViewModel(newGroupsTreeNode),
                                         UndoableAddOrRemoveGroup.ADD_NODE));
-
                     } else {
                         // target does not contain any groups, so we can just use the new groups
                         targetMetada.setGroups(newGroupsTreeNode);

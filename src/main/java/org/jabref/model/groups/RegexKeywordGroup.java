@@ -23,7 +23,6 @@ public class RegexKeywordGroup extends KeywordGroup {
 
         return caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
                 "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
-
     }
 
     @Override

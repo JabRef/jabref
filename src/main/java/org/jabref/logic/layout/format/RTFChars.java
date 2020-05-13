@@ -54,7 +54,8 @@ public class RTFChars implements LayoutFormatter {
                 if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
-                    testCharCom: if ((currentCommand.length() == 1)
+                    testCharCom:
+                    if ((currentCommand.length() == 1)
                             && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -82,14 +83,13 @@ public class RTFChars implements LayoutFormatter {
 
                         incommand = false;
                         escaped = false;
-
                     }
                 } else {
                     sb.append(c);
                 }
-
             } else {
-                testContent: if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
+                testContent:
+                if (!incommand || (!Character.isWhitespace(c) && (c != '{') && (c != '}'))) {
                     sb.append(c);
                 } else {
                     assert incommand;
@@ -140,7 +140,6 @@ public class RTFChars implements LayoutFormatter {
                     } else {
                         sb.append(c);
                     }
-
                 }
                 incommand = false;
                 escaped = false;
@@ -159,12 +158,12 @@ public class RTFChars implements LayoutFormatter {
         }
 
         return sb.toString().replace("---", "{\\emdash}").replace("--", "{\\endash}").replace("``", "{\\ldblquote}")
-                .replace("''", "{\\rdblquote}");
+                 .replace("''", "{\\rdblquote}");
     }
 
     /**
-     * @param text the text to extract the part from
-     * @param i the position to start
+     * @param text                  the text to extract the part from
+     * @param i                     the position to start
      * @param commandNestedInBraces true if the command is nested in braces (\emph{xy}), false if spaces are sued (\emph xy)
      * @return a tuple of number of added characters and the extracted part
      */
@@ -173,24 +172,25 @@ public class RTFChars implements LayoutFormatter {
         int count = 0;
         int icount = i;
         StringBuilder part = new StringBuilder();
-        loop: while ((count >= 0) && (icount < text.length())) {
+        loop:
+        while ((count >= 0) && (icount < text.length())) {
             icount++;
             c = text.charAt(icount);
             switch (c) {
-            case '}':
-                count--;
-                break;
-            case '{':
-                count++;
-                break;
-            case ' ':
-                if (!commandNestedInBraces) {
-                    // in any case, a space terminates the loop
-                    break loop;
-                }
-                break;
-            default:
-                break;
+                case '}':
+                    count--;
+                    break;
+                case '{':
+                    count++;
+                    break;
+                case ' ':
+                    if (!commandNestedInBraces) {
+                        // in any case, a space terminates the loop
+                        break loop;
+                    }
+                    break;
+                default:
+                    break;
             }
             part.append(c);
         }
@@ -201,6 +201,7 @@ public class RTFChars implements LayoutFormatter {
 
     /**
      * This method transforms the unicode of a special character into its base character: 233 (é) - > e
+     *
      * @param c long
      * @return returns the basic character of the given unicode
      */

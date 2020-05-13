@@ -20,8 +20,8 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     public void initialize() {
@@ -34,5 +34,7 @@ public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel>
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Import"); }
+    public String getTabName() {
+        return Localization.lang("Import");
+    }
 }

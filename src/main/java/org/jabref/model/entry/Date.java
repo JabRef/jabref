@@ -58,20 +58,20 @@ public class Date {
                 "uuuu.M.d", "uuuu",
                 "MMM, uuuu");
 
-            for (String formatString : formatStrings) {
-                try {
-                    TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                    return Optional.of(new Date(parsedDate));
-                } catch (DateTimeParseException ignored) {
-                    // Ignored
-                }
+        for (String formatString : formatStrings) {
+            try {
+                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
+                return Optional.of(new Date(parsedDate));
+            } catch (DateTimeParseException ignored) {
+                // Ignored
             }
+        }
 
         return Optional.empty();
     }
 
     public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
-            Optional<String> dayValue) {
+                                       Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);

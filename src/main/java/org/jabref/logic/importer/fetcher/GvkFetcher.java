@@ -86,5 +86,4 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     public Parser getParser() {
         return new GvkParser();
     }
-
 }

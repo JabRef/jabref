@@ -55,8 +55,8 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         });
 
         VBox leftContent = new VBox(changesList,
-                                    selectAllChangesFromDisk,
-                                    unselectAllAcceptChanges);
+                selectAllChangesFromDisk,
+                unselectAllAcceptChanges);
 
         ScrollPane leftScroll = new ScrollPane(leftContent);
         leftScroll.setFitToHeight(true);
@@ -74,7 +74,7 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss"), ButtonData.CANCEL_CLOSE);
 
         getDialogPane().getButtonTypes().setAll(new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                                                dismissChanges);
+                dismissChanges);
 
         setResultConverter(button -> {
             if (button == dismissChanges) {
@@ -96,7 +96,6 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
                 return true;
             }
         });
-
     }
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
@@ -107,11 +106,9 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
                 cb.setManaged(true);
                 infoPanel.setBottom(cb);
                 cb.selectedProperty().bindBidirectional(currentChange.acceptedProperty());
-
             } else {
                 cb.setManaged(false);
             }
-
         }
     }
 }

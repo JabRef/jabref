@@ -51,6 +51,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
 
     /**
      * Gets the {@link URLDownload} object for downloading content. Overwrite, if you need to send additional headers for the download
+     *
      * @param query The search query
      * @throws MalformedURLException
      * @throws FetcherException

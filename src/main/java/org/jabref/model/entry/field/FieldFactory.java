@@ -47,8 +47,8 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+                                  .map(FieldFactory::parseField)
+                                  .collect(Collectors.toSet());
         return new OrFields(fields);
     }
 
@@ -142,6 +142,6 @@ public class FieldFactory {
     // TODO: This should ideally be user configurable! Move somewhere more appropriate in the future
     public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         // Treat unknown fields as multi-line fields
-       return (field instanceof UnknownField) || nonWrappableFields.contains(field) || field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT) || field.equals(StandardField.REVIEW);
+        return (field instanceof UnknownField) || nonWrappableFields.contains(field) || field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT) || field.equals(StandardField.REVIEW);
     }
 }

@@ -21,7 +21,7 @@ public class FileDialogConfiguration {
     private FileChooser.ExtensionFilter selectedExtensionFilter;
 
     private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
         this.initialDirectory = initialDirectory;
         this.extensionFilters = Objects.requireNonNull(extensionFilters);
         this.defaultExtension = defaultExtension;
@@ -112,9 +112,9 @@ public class FileDialogConfiguration {
 
         public Builder withDefaultExtension(String fileTypeDescription) {
             extensionFilters.stream()
-                    .filter(type -> type.getDescription().equalsIgnoreCase(fileTypeDescription))
-                    .findFirst()
-                    .ifPresent(extensionFilter -> defaultExtension = extensionFilter);
+                            .filter(type -> type.getDescription().equalsIgnoreCase(fileTypeDescription))
+                            .findFirst()
+                            .ifPresent(extensionFilter -> defaultExtension = extensionFilter);
 
             return this;
         }

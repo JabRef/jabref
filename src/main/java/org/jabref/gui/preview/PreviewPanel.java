@@ -170,7 +170,8 @@ public class PreviewPanel extends VBox {
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
+        PreviewPreferences previewPreferences = preferences
+                .getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
                 .build();

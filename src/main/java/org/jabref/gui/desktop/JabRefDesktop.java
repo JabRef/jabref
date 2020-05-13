@@ -50,7 +50,7 @@ public class JabRefDesktop {
      * Open a http/pdf/ps viewer for the given link string.
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, Field initialField)
-        throws IOException {
+            throws IOException {
         String link = initialLink;
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
@@ -71,7 +71,7 @@ public class JabRefDesktop {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     field = StandardField.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                           || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     field = StandardField.PS;
                 }
             }
@@ -111,15 +111,13 @@ public class JabRefDesktop {
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
-     * @param databaseContext
-     *            The database this file belongs to.
-     * @param link
-     *            The filename.
+     * @param databaseContext The database this file belongs to.
+     * @param link            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
                                                     final Optional<ExternalFileType> type)
-        throws IOException {
+            throws IOException {
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
@@ -139,7 +137,7 @@ public class JabRefDesktop {
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
-        throws IOException {
+            throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
@@ -157,6 +155,7 @@ public class JabRefDesktop {
 
     /**
      * Opens a file browser of the folder of the given file. If possible, the file is selected
+     *
      * @param fileLink the location of the file
      * @throws IOException
      */
@@ -194,7 +193,6 @@ public class JabRefDesktop {
      * Opens the given URL using the system browser
      *
      * @param url the URL to open
-     * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
@@ -209,7 +207,7 @@ public class JabRefDesktop {
      * Opens the url with the users standard Browser.
      * If that fails a popup will be shown to instruct the user to open the link manually
      * and the link gets copied to the clipboard
-     * @param url
+     * @param url the URL to open
      */
     public static void openBrowserShowPopup(String url) {
         try {
@@ -227,9 +225,8 @@ public class JabRefDesktop {
 
     /**
      * Opens a new console starting on the given file location
-     *
-     * If no command is specified in {@link Globals},
-     * the default system console will be executed.
+     * <p>
+     * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
      */

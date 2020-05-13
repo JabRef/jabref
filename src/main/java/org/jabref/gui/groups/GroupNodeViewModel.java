@@ -337,15 +337,15 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-            case BOTTOM:
-                this.moveTo(targetParent.get(), targetIndex + 1);
-                break;
-            case CENTER:
-                this.moveTo(target);
-                break;
-            case TOP:
-                this.moveTo(targetParent.get(), targetIndex);
-                break;
+                case BOTTOM:
+                    this.moveTo(targetParent.get(), targetIndex + 1);
+                    break;
+                case CENTER:
+                    this.moveTo(target);
+                    break;
+                case TOP:
+                    this.moveTo(targetParent.get(), targetIndex);
+                    break;
             }
         } else {
             // No parent = root -> just add

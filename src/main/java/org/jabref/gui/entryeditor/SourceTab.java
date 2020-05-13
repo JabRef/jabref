@@ -84,21 +84,21 @@ public class SourceTab extends EntryEditorTab {
 
         @Override
         public void execute() {
-                switch (command) {
-                    case COPY:
-                        codeArea.copy();
-                        break;
-                    case CUT:
-                        codeArea.cut();
-                        break;
-                    case PASTE:
-                        codeArea.paste();
-                        break;
-                    case SELECT_ALL:
-                        codeArea.selectAll();
-                        break;
-                }
-                codeArea.requestFocus();
+            switch (command) {
+                case COPY:
+                    codeArea.copy();
+                    break;
+                case CUT:
+                    codeArea.cut();
+                    break;
+                case PASTE:
+                    codeArea.paste();
+                    break;
+                case SELECT_ALL:
+                    codeArea.selectAll();
+                    break;
+            }
+            codeArea.requestFocus();
         }
     }
 
@@ -119,7 +119,6 @@ public class SourceTab extends EntryEditorTab {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });
-
     }
 
     private void highlightSearchPattern() {

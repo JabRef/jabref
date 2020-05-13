@@ -1,5 +1,5 @@
 .keybinding-table {
-	-fx-table-cell-border-color: transparent;
+    -fx-table-cell-border-color: transparent;
 }
 
 .tree-table-row-cell:empty {
@@ -7,5 +7,5 @@
 }
 
 .tree-table-row-cell:selected > .tree-table-cell > .icon, .tree-table-row-cell:pressed > .tree-table-cell > .icon {
-   -fx-fill: white;
+    -fx-fill: white;
 }

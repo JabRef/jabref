@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class for working with Eprint identifiers
- *
+ * <p>
  * See also <a href="https://arxiv.org/help/arxiv_identifier">https://arxiv.org/help/arxiv_identifier</a> and <a href="https://arxiv.org/hypertex/bibstyles/">https://arxiv.org/hypertex/bibstyles/</a>
  */
 public class Eprint implements Identifier {
@@ -48,7 +48,7 @@ public class Eprint implements Identifier {
      * Creates a Eprint from various schemes including URL.
      *
      * @param eprint the Eprint identifier string
-     * @throws NullPointerException if eprint is null
+     * @throws NullPointerException     if eprint is null
      * @throws IllegalArgumentException if eprint does not include a valid Eprint identifier
      */
     public Eprint(String eprint) {

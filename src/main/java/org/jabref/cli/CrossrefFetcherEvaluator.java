@@ -71,7 +71,6 @@ public class CrossrefFetcherEvaluator {
                             } catch (FetcherException e) {
                                 e.printStackTrace();
                             }
-
                         } else {
                             try {
                                 Optional<DOI> crossrefDOI = new CrossRef().findIdentifier(entry);
@@ -86,7 +85,6 @@ public class CrossrefFetcherEvaluator {
                         countDownLatch.countDown();
                     }
                 });
-
             }
             countDownLatch.await();
 

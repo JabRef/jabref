@@ -25,7 +25,7 @@ public class OpenExternalFileAction extends SimpleCommand {
         this.preferencesService = preferencesService;
 
         this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService)
-                .and(ActionHelper.needsEntriesSelected(1, stateManager)));
+                                         .and(ActionHelper.needsEntriesSelected(1, stateManager)));
     }
 
     @Override

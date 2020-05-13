@@ -50,7 +50,6 @@ public class FieldFormatterCleanups {
             return false;
         }
         return actions.equals(that.actions);
-
     }
 
     @Override
@@ -120,5 +119,4 @@ public class FieldFormatterCleanups {
 
         return result.toString();
     }
-
 }

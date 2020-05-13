@@ -266,7 +266,7 @@ public class ArgumentProcessor {
                     break;
                 default:
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                            .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                                                   .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
                     noGUINeeded = true;
                     return false;
             }
@@ -442,7 +442,7 @@ public class ArgumentProcessor {
                 try {
                     exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
-                                    .orElse(Globals.prefs.getDefaultEncoding()),
+                              .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
@@ -516,8 +516,7 @@ public class ArgumentProcessor {
     /**
      * Run an entry fetcher from the command line.
      *
-     * @param fetchCommand A string containing both the name of the fetcher to use and
-     *                     the search query, separated by a :
+     * @param fetchCommand A string containing both the name of the fetcher to use and the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {

@@ -80,7 +80,8 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
         Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
 
-        List<FileAnnotationViewModel> newAnnotations = fileAnnotations.getOrDefault(currentFile, new ArrayList<>())
+        List<FileAnnotationViewModel> newAnnotations = fileAnnotations
+                .getOrDefault(currentFile, new ArrayList<>())
                 .stream()
                 .filter(annotation -> (null != annotation.getContent()))
                 .sorted(byPage)

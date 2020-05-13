@@ -58,7 +58,7 @@ public class ProtectedTermsParser {
     public void readTermsFromFile(File file, Charset encoding) throws FileNotFoundException {
         location = file.getAbsolutePath();
         try (FileInputStream stream = new FileInputStream(Objects.requireNonNull(file));
-                InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
+             InputStreamReader reader = new InputStreamReader(stream, Objects.requireNonNull(encoding))) {
             readTermsList(reader);
         } catch (FileNotFoundException e) {
             throw e;
@@ -79,7 +79,6 @@ public class ProtectedTermsParser {
             while ((line = reader.readLine()) != null) {
                 addLine(line);
             }
-
         } catch (IOException ex) {
             LOGGER.info("Could not read journal list from file ", ex);
         }
