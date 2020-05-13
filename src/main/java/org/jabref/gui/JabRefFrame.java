@@ -170,6 +170,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
+    private PopOver existedProgressViewPopOver; // Used to hide the existed pop over before a new pop over shows
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -943,8 +944,6 @@ public class JabRefFrame extends BorderPane {
         menu.setUseSystemMenuBar(true);
         return menu;
     }
-
-    private PopOver existedProgressViewPopOver; // Used to hide the existed pop over before a new pop over shows
 
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
