@@ -54,8 +54,7 @@ public class Date {
                 "MMMM d, uuuu",
                 "MMMM, uuuu",
                 "d.M.uuuu",
-                "uuuu.M.d", "uuuu",
-                "MMM, uuuu");
+                "uuuu.M.d", "uuuu");
 
             for (String formatString : formatStrings) {
                 try {

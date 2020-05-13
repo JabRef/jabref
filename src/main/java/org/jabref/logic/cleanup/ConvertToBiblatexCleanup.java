@@ -44,21 +44,14 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         } else {
             // If the year from date field is filled and equal to year it should be removed the year field
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
-                entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -> {
-                    entry.getFieldOrAlias(StandardField.MONTH).ifPresent(month -> {
+                Optional<Date> newDate = Date.parse(date);
+                Optional<Date> checkDate = Date.parse(entry.getFieldOrAlias(StandardField.YEAR),
+                        entry.getFieldOrAlias(StandardField.MONTH), Optional.empty());
 
-                        Optional<Date> checkDate = Date.parse(date);
-                        // Converts using this format: "MMMM, uuuu". Ex: September, 2015
-                        month = month.replaceAll("#", "").toLowerCase();
-                        month = month.substring(0, 1).toUpperCase() + month.substring(1, month.length());
-                        Optional<Date> checkMonthAndYear = Date.parse(month + ", " + year);
-
-                        if (checkDate.isPresent() && checkMonthAndYear.isPresent() && checkDate.equals(checkMonthAndYear)) {
-                            entry.clearField(StandardField.YEAR).ifPresent(changes::add);
-                            entry.clearField(StandardField.MONTH).ifPresent(changes::add);
-                        }
-                    });
-                });
+                if (checkDate.equals(newDate)) {
+                    entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                    entry.clearField(StandardField.MONTH).ifPresent(changes::add);
+                }
             });
         }
         return changes;
