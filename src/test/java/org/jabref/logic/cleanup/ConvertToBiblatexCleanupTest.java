@@ -61,6 +61,20 @@ public class ConvertToBiblatexCleanupTest {
     }
 
     @Test
+    public void cleanupWithEmptyDateDoesNothing() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.YEAR, "");
+        entry.setField(StandardField.MONTH, "");
+        entry.setField(StandardField.DATE, "");
+
+        worker.cleanup(entry);
+
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
+        assertEquals(Optional.empty(), entry.getField(StandardField.MONTH));
+        assertEquals(Optional.empty(), entry.getField(StandardField.DATE));
+    }
+
+    @Test
     public void cleanupWithDateAlreadyPresentAndEqualsToYearAndMonth() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.YEAR, "2011");
