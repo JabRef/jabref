@@ -1377,7 +1377,7 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
+                    if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {
