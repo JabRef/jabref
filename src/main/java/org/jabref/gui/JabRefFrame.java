@@ -944,6 +944,8 @@ public class JabRefFrame extends BorderPane {
         return menu;
     }
 
+    private PopOver existedProgressViewPopOver; // Used to hide the existed pop over before a new pop over shows
+
     private Group createTaskIndicator() {
         ProgressIndicator indicator = new ProgressIndicator();
         indicator.getStyleClass().add("progress-indicatorToolbar");
@@ -988,10 +990,14 @@ public class JabRefFrame extends BorderPane {
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
             PopOver progressViewPopOver = new PopOver(taskProgressView);
+            if (this.existedProgressViewPopOver == null) {
+                this.existedProgressViewPopOver = progressViewPopOver;
+            }
             progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
             progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-
+            this.existedProgressViewPopOver.hide();
             progressViewPopOver.show(indicator);
+            this.existedProgressViewPopOver = progressViewPopOver;
         });
 
         return new Group(indicator);
