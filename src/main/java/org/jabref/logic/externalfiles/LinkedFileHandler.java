@@ -124,8 +124,8 @@ public class LinkedFileHandler {
 
     public String getSuggestedFileName(String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim()
-                                + '.'
-                                + extension;
+                + '.'
+                + extension;
 
         // Only create valid file names
         return FileUtil.getValidFileName(targetFileName);
@@ -142,8 +142,8 @@ public class LinkedFileHandler {
         Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
                                      .get().getParent().resolve(targetFileName);
         Path oldFilePath = flEntry.findIn(databaseContext, filePreferences).get();
-        //Check if file already exists in directory with different case.
-        //This is necessary because other entries may have such a file.
+        // Check if file already exists in directory with different case.
+        // This is necessary because other entries may have such a file.
         Optional<Path> matchedByDiffCase = Optional.empty();
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream.filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))

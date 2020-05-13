@@ -155,5 +155,4 @@ public class AboutDialogViewModel extends AbstractViewModel {
             logger.error("Could not open default browser.", e);
         }
     }
-
 }

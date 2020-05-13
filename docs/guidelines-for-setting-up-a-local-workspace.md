@@ -10,7 +10,7 @@ In case you know how to install JDK14 and to fork JabRef's code,
 
 For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
 
- [![](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
+ [![YouTube video showing the step-by-step guide](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
 ## Prerequisites
 
@@ -29,9 +29,9 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 Proposals for account names:
 
-- Login similar to your university account. Example: `koppor`
-- Use your last name prefixed by the first letter of your first name. Example: `okopp`
-- Use `firstname.lastname`. Example: `oliver.kopp`
+* Login similar to your university account. Example: `koppor`
+* Use your last name prefixed by the first letter of your first name. Example: `okopp`
+* Use `firstname.lastname`. Example: `oliver.kopp`
 
 You can hide your email adress by following the recommendations at <https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/>.
 
@@ -41,9 +41,9 @@ That account then be used for develoment mailing lists, mail exchange with other
 
 Examples:
 
-- Same login as in GitHub (see above). Example: `koppor@gmail.com`
-- "`it`" in the name. Example:  `kopp.it@gmail.com`
-- Use the university login. Example: `st342435@stud.uni-stuttgart.de`
+* Same login as in GitHub (see above). Example: `koppor@gmail.com`
+* "`it`" in the name. Example:  `kopp.it@gmail.com`
+* Use the university login. Example: `st342435@stud.uni-stuttgart.de`
 
 ### git
 
@@ -98,26 +98,20 @@ IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal bu
 To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_
 
 * Navigate to **File \| Settings \| Plugins \| Installed** and check that you have
-
   the _Gradle_ and _Gradle Extension_ enabled.
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
 * Ensure you have a Java 14 SDK configured by navigating to
-
   **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
-
   location of a JDK 14.
-
 * Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
-
   the Gradle JVM at the bottom.
 
 To prepare IntelliJ's build system two additional steps are required
 
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under
-
   "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module:
 
   ```text
@@ -134,21 +128,16 @@ To prepare IntelliJ's build system two additional steps are required
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
 * Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to
-
   **View \| Tool Windows \| Gradle**.
-
 * In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
-
   with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
 
 * Build and run JabRef by double-clicking **JabRef \| Tasks \| application \| run**.
 
-  After that a new entry called "jabref \[run\]" will appear in the run configurations.
-
-* Now you can also select "jabref \[run\]" and either run or debug the application from within IntelliJ.
-
+After that a new entry called "jabref \[run\]" will appear in the run configurations.
+Now you can also select "jabref \[run\]" and either run or debug the application from within IntelliJ.
 You can run any other development task in a similar way. Equivalently, this can also be executed from the terminal by running `./gradlew run`.
 
 #### Using IntelliJ's internal build system
@@ -158,38 +147,41 @@ You should use IntelliJ IDEA's internal build system for compiling and running J
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
 * in **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and
-
   "Test using" is set to "IntelliJ IDEA".
+* Ignore the Gradle project "buildSrc":  
+  ![Ignore the Gradle project "buildSrc"](intellij-gradle-config-ignore-buildSrc.png)
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
-#### Using JabRef's code-style
+#### Using JabRef's code style
 
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-  1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
-  2. Close the settings afterwards and restart IntelliJ
+   1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+   2. Close the settings afterwards and restart IntelliJ
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
-* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`.
+* Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
 * Go to **File \| Settings \| Checkstyle \| Configuration File**
-  1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide e.g. "JabRef"
-  3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Check "Store relative to project location"
-  5. Click "Next" and "Finish"
-  6. Activate the CheckStyle configuration file by ticking it in the list
-  7. Save settings by clicking "OK"
+   1. Import the CheckStyle configuration file by clicking the \[+\] button
+   2. For the description provide "JabRef"
+   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
+   4. Check "Store relative to project location"
+   5. Click "Next" and "Finish"
+   6. Activate the CheckStyle configuration file by ticking it in the list
+   7. Ensure that the latest CheckStyle version is selected (8.32 or higher)
+   8. Set the "Scan Scope" to "Only Java sources (including tests)
+   9. Save settings by clicking "OK"
+   10. Your configuration should now look like this:  
+      ![checkstyle settings](images/intellij-checkstyle-settings.png)
 
 #### Troubleshooting when using both IDEA and Eclipse
 
 If you have configured Eclipse for the same project \(the required steps are described below\), then the additionally added file `Log4jPlugins.java` must be excluded from the compilation process, otherwise an error will occur during the compilation of the project:
 
 * **File \| Settings \| Build, Execution, Deployment \| Compiler \| Excludes** and add the following file to the
-
   list \(\[+\]\), in order to exclude it:
-
   * `src/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`
 
 ### Setup for Eclipse
@@ -200,7 +192,7 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
    * The JabRef GUI should finally appear.
    * This step is only required once.
-2. Run `./gradlew eclipse` 
+2. Run `./gradlew eclipse`
    * **This must always be executed, when there are new upstream changes.**
 3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
    * Usually, the folder `plugins` must be created for that.
@@ -210,30 +202,34 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
 5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
-     * Set "VM Arguments" to:
+        ```text
+        --patch-module test=fastparse_2.12-1.0.0.jar
+        --patch-module test2=fastparse-utils_2.12-1.0.0.jar
+        --patch-module test3=sourcecode_2.12-0.1.4.jar
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
+        --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+        --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
+        --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
+        --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
+        --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
+        --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
+        --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
+        --patch-module org.jabref=build\resources\main
+        ```
 
-     ```text
-     --patch-module test=fastparse_2.12-1.0.0.jar
-     --patch-module test2=fastparse-utils_2.12-1.0.0.jar
-     --patch-module test3=sourcecode_2.12-0.1.4.jar
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref
-     --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
-     --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls
-     --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls
-     --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls
-     --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls
-     --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix
-     --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
-     --patch-module org.jabref=build\resources\main
-     ```
-6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
+6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace:
+    1. Help -&gt; Eclipse Marketplace... -&gt; Search tab
+    2. Enter "e\(fx\)clipse" in the search dialogue
+    3. Click "Go"
+    4. Click "Install" button next to the plugin
+    5. Click "Finish"
 7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
 ## Final comments

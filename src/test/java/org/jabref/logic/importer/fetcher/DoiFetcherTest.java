@@ -21,7 +21,8 @@ import static org.mockito.Mockito.mock;
 public class DoiFetcherTest {
 
     private DoiFetcher fetcher;
-    private BibEntry bibEntryBurd2011, bibEntryDecker2007;
+    private BibEntry bibEntryBurd2011;
+    private BibEntry bibEntryDecker2007;
 
     @BeforeEach
     public void setUp() {

@@ -17,20 +17,17 @@ public class IntegrityCheck {
     private final FilePreferences filePreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final boolean enforceLegalKey;
     private final boolean allowIntegerEdition;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
-                          boolean enforceLegalKey,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.enforceLegalKey = enforceLegalKey;
         this.allowIntegerEdition = allowIntegerEdition;
     }
 
@@ -52,10 +49,9 @@ public class IntegrityCheck {
         }
 
         FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext,
-                                                        filePreferences,
-                                                        journalAbbreviationRepository,
-                                                        enforceLegalKey,
-                                                        allowIntegerEdition);
+                filePreferences,
+                journalAbbreviationRepository,
+                allowIntegerEdition);
         for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }

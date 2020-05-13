@@ -200,7 +200,7 @@ public class SearchQueryTest {
         String query = "progress";
         SearchQuery result = new SearchQuery(query, false, false);
         Pattern pattern = Pattern.compile("(\\Qprogress\\E)");
-        //We can't directly compare the pattern objects
+        // We can't directly compare the pattern objects
         assertEquals(Optional.of(pattern.toString()), result.getPatternForWords().map(Pattern::toString));
     }
 
@@ -222,7 +222,7 @@ public class SearchQueryTest {
 
     @Test
     public void testEscapingInPattern() {
-        //first word contain all java special regex characters
+        // first word contain all java special regex characters
         String queryText = "<([{\\\\^-=$!|]})?*+.> word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, false, false);
         String pattern = "(\\Q<([{\\^-=$!|]})?*+.>\\E)|(\\Qword1\\E)|(\\Qword2.\\E)";
@@ -231,7 +231,7 @@ public class SearchQueryTest {
 
     @Test
     public void testEscapingInJavascriptPattern() {
-        //first word contain all javascript special regex characters that should be escaped individually in text based search
+        // first word contain all javascript special regex characters that should be escaped individually in text based search
         String queryText = "([{\\\\^$|]})?*+./ word1 word2.";
         SearchQuery textQueryWithSpecialChars = new SearchQuery(queryText, false, false);
         String pattern = "(\\(\\[\\{\\\\\\^\\$\\|\\]\\}\\)\\?\\*\\+\\.\\/)|(word1)|(word2\\.)";

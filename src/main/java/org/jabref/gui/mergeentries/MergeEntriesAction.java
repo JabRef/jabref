@@ -76,5 +76,4 @@ public class MergeEntriesAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Canceled merging entries"));
         }
     }
-
 }

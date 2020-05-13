@@ -55,8 +55,8 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         });
 
         VBox leftContent = new VBox(changesList,
-                                    selectAllChangesFromDisk,
-                                    unselectAllAcceptChanges);
+                selectAllChangesFromDisk,
+                unselectAllAcceptChanges);
 
         ScrollPane leftScroll = new ScrollPane(leftContent);
         leftScroll.setFitToHeight(true);
@@ -74,29 +74,28 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss"), ButtonData.CANCEL_CLOSE);
 
         getDialogPane().getButtonTypes().setAll(new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                                                dismissChanges);
+                dismissChanges);
 
         setResultConverter(button -> {
             if (button == dismissChanges) {
                 return false;
-
             } else {
                 // Perform all accepted changes
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 for (DatabaseChangeViewModel change : changes) {
                     if (change instanceof EntryChangeViewModel) {
-                        change.makeChange(database, ce); //We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        // We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        change.makeChange(database, ce);
                     } else if (change.isAccepted()) {
                         change.makeChange(database, ce);
                     }
                 }
                 ce.end();
-                //TODO: panel.getUndoManager().addEdit(ce);
+                // TODO: panel.getUndoManager().addEdit(ce);
 
                 return true;
             }
         });
-
     }
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
@@ -107,11 +106,9 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
                 cb.setManaged(true);
                 infoPanel.setBottom(cb);
                 cb.selectedProperty().bindBidirectional(currentChange.acceptedProperty());
-
             } else {
                 cb.setManaged(false);
             }
-
         }
     }
 }

@@ -99,7 +99,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             }
         }
 
-        //Marked text that has a sticky note on it should be linked to the sticky note
+        // Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 

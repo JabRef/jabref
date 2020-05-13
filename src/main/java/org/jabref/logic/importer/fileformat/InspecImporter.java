@@ -112,7 +112,6 @@ public class InspecImporter extends Importer {
                             }
                         }
                     }
-
                 } else if ("RT".equals(f3)) {
                     frest = frest.trim();
                     if ("Journal-Paper".equals(frest)) {
@@ -128,7 +127,6 @@ public class InspecImporter extends Importer {
             b.setField(h);
 
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);

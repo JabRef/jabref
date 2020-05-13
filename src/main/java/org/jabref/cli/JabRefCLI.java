@@ -162,75 +162,85 @@ public class JabRefCLI {
         // The "-console" option is handled by the install4j launcher
         options.addOption(null, "console", false, Localization.lang("Show console output (only when the launcher is used)"));
 
-        options.addOption(Option.builder("i").
-                longOpt("import").
-                desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib")).
-                hasArg().
-                argName("FILE[,FORMAT]").
-                build());
+        options.addOption(Option
+                .builder("i")
+                .longOpt("import")
+                .desc(String.format("%s: '%s'", Localization.lang("Import file"), "-i library.bib"))
+                .hasArg()
+                .argName("FILE[,FORMAT]")
+                .build());
 
-        options.addOption(Option.builder().
-                longOpt("importToOpen").
-                desc(Localization.lang("Same as --import, but will be imported to the opened tab")).
-                hasArg().
-                argName("FILE[,FORMAT]").
-                build());
+        options.addOption(Option
+                .builder()
+                .longOpt("importToOpen")
+                .desc(Localization.lang("Same as --import, but will be imported to the opened tab"))
+                .hasArg()
+                .argName("FILE[,FORMAT]")
+                .build());
 
-        options.addOption(Option.builder("ib").
-                longOpt("importBibtex").
-                desc(String.format("%s: '%s'", Localization.lang("Import BibTeX"), "-ib @article{entry}")).
-                hasArg().
-                argName("BIBTEXT_STRING").
-                build());
+        options.addOption(Option
+                .builder("ib")
+                .longOpt("importBibtex")
+                .desc(String.format("%s: '%s'", Localization.lang("Import BibTeX"), "-ib @article{entry}"))
+                .hasArg()
+                .argName("BIBTEXT_STRING")
+                .build());
 
-        options.addOption(Option.builder("o").
-                longOpt("output").
-                desc(String.format("%s: '%s'", Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html")).
-                hasArg().
-                argName("FILE[,FORMAT]").
-                build());
+        options.addOption(Option
+                .builder("o")
+                .longOpt("output")
+                .desc(String.format("%s: '%s'", Localization.lang("Export an input to a file"), "-i db.bib -o db.htm,html"))
+                .hasArg()
+                .argName("FILE[,FORMAT]")
+                .build());
 
-        options.addOption(Option.builder("m").
-                longOpt("exportMatches").
-                desc(String.format("%s: '%s'", Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html")).
-                hasArg().
-                argName("QUERY,FILE[,FORMAT]").
-                build());
+        options.addOption(Option
+                .builder("m")
+                .longOpt("exportMatches")
+                .desc(String.format("%s: '%s'", Localization.lang("Matching"), "-i db.bib -m author=Newton,search.htm,html"))
+                .hasArg()
+                .argName("QUERY,FILE[,FORMAT]")
+                .build());
 
-        options.addOption(Option.builder("f").
-                longOpt("fetch").
-                desc(String.format("%s: '%s'", Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer")).
-                hasArg().
-                argName("FETCHER:QUERY").
-                build());
+        options.addOption(Option
+                .builder("f")
+                .longOpt("fetch")
+                .desc(String.format("%s: '%s'", Localization.lang("Run fetcher"), "-f Medline/PubMed:cancer"))
+                .hasArg()
+                .argName("FETCHER:QUERY")
+                .build());
 
-        options.addOption(Option.builder("a").
-                longOpt("aux").
-                desc(String.format("%s: '%s'", Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib")).
-                hasArg().
-                argName("FILE[.aux],FILE[.bib] FILE").
-                build());
+        options.addOption(Option
+                .builder("a")
+                .longOpt("aux")
+                .desc(String.format("%s: '%s'", Localization.lang("Sublibrary from AUX to BibTeX"), "-a thesis.aux,new.bib"))
+                .hasArg()
+                .argName("FILE[.aux],FILE[.bib] FILE")
+                .build());
 
-        options.addOption(Option.builder("x").
-                longOpt("prexp").
-                desc(String.format("%s: '%s'", Localization.lang("Export preferences to a file"), "-x prefs.xml")).
-                hasArg().
-                argName("[FILE]").
-                build());
+        options.addOption(Option
+                .builder("x")
+                .longOpt("prexp")
+                .desc(String.format("%s: '%s'", Localization.lang("Export preferences to a file"), "-x prefs.xml"))
+                .hasArg()
+                .argName("[FILE]")
+                .build());
 
-        options.addOption(Option.builder("p").
-                longOpt("primp").
-                desc(String.format("%s: '%s'", Localization.lang("Import preferences from a file"), "-p prefs.xml")).
-                hasArg().
-                argName("[FILE]").
-                build());
+        options.addOption(Option
+                .builder("p")
+                .longOpt("primp")
+                .desc(String.format("%s: '%s'", Localization.lang("Import preferences from a file"), "-p prefs.xml"))
+                .hasArg()
+                .argName("[FILE]")
+                .build());
 
-        options.addOption(Option.builder("d").
-                longOpt("prdef").
-                desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all")).
-                hasArg().
-                argName("KEY1[,KEY2][,KEYn] | all").
-                build());
+        options.addOption(Option
+                .builder("d")
+                .longOpt("prdef")
+                .desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
+                .hasArg()
+                .argName("KEY1[,KEY2][,KEYn] | all")
+                .build());
 
         return options;
     }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,7 +67,7 @@ public class MetaDataParser {
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 6);
-                Path path = Paths.get(getSingleItem(value)).normalize();
+                Path path = Path.of(getSingleItem(value)).normalize();
                 metaData.setLatexFileDirectory(user, path);
                 continue;
             }

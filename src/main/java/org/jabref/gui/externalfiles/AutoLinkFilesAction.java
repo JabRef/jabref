@@ -75,9 +75,9 @@ public class AutoLinkFilesAction extends SimpleCommand {
         };
 
         dialogService.showProgressDialogAndWait(
-                                                Localization.lang("Automatically setting file links"),
-                                                Localization.lang("Searching for files"),
-                                                linkFilesTask);
+                Localization.lang("Automatically setting file links"),
+                Localization.lang("Searching for files"),
+                linkFilesTask);
         taskExecutor.execute(linkFilesTask);
     }
 }

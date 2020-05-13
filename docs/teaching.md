@@ -33,7 +33,11 @@ Typically, they have constructive feedback on their contribution.
 This means, that the contributors get comments on their contribution enabling them to level-up their coding skill.
 Incorporating improvements takes time, too.
 The benefit is two-fold: a) contributors improve their coding skills and b) JabRef's code quality improves.
-All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments
+All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
+
+GitHub describes that in their page [Unterstanding the GitHub flow](https://guides.github.com/introduction/flow/):
+
+[![GitHub flow](images/github-flow.png)](images/github-flow.png)
 
 ## Process for Java newcomers
 
@@ -115,6 +119,15 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 
 - Summary: Students are requested to contribute to an Open Source project to learn about the maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
 - Course offered from 2013 to 2016 with different names
+
+## Interesting Read for Students and Advisors
+
+- [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) by [@ayaankazerouni](https://github.com/ayaankazerouni?tab=overview&from=2015-12-01&to=2015-12-31)  
+  > When students worked earlier and more often, they produced projects that:
+  >
+  > - were more correct,
+  > - were completed earlier,
+  > - took no more or less time to complete
 
 ## References
 

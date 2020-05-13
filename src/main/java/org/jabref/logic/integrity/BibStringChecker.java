@@ -17,7 +17,6 @@ public class BibStringChecker implements Checker {
     // Detect # if it doesn't have a \ in front of it or if it starts the string
     private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
 
-
     /**
      * Checks, if there is an even number of unescaped #
      */

@@ -20,9 +20,13 @@ public class BibtexKeyPatternPanelItemModel {
         this.pattern.setValue(pattern);
     }
 
-    public EntryType getEntryType() { return entryType.getValue(); }
+    public EntryType getEntryType() {
+        return entryType.getValue();
+    }
 
-    public ObjectProperty<EntryType> entryType() { return entryType; }
+    public ObjectProperty<EntryType> entryType() {
+        return entryType;
+    }
 
     public void setPattern(String pattern) {
         this.pattern.setValue(pattern);
@@ -32,8 +36,12 @@ public class BibtexKeyPatternPanelItemModel {
         return pattern.getValue();
     }
 
-    public StringProperty pattern() { return pattern; }
+    public StringProperty pattern() {
+        return pattern;
+    }
 
     @Override
-    public String toString() { return "[" + entryType.getValue().getName() + "," + pattern.getValue() + "]"; }
+    public String toString() {
+        return "[" + entryType.getValue().getName() + "," + pattern.getValue() + "]";
+    }
 }

@@ -103,8 +103,8 @@ public class CustomEntryTypeDialogViewModel {
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                                                      input -> input != null && !input.getDisplayName().isEmpty(),
-                                                      ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+                input -> input != null && !input.getDisplayName().isEmpty(),
+                ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
     public ListProperty<BibEntryType> entryTypes() {
@@ -208,9 +208,9 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(type, mode);
         }
         preferencesService.saveCustomEntryTypes();
-        //Reload types from preferences to make sure any modifications are present when reopening the dialog
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        // Reload types from preferences to make sure any modifications are present when reopening the dialog
+        entryTypesManager.addCustomOrModifiedTypes(
+                preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
-
 }

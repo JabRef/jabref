@@ -12,11 +12,13 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
  * An Action for launching mass field.
- *
+ * <p>
  * Functionality:
- * * Defaults to selected entries, or all entries if none are selected.
- * * Input field name
- * * Either set field, or clear field.
+ * <ul>
+ *     <li>Defaults to selected entries, or all entries if none are selected.</li>
+ *     <li>Input field name</li>
+ *     <li>Either set field, or clear field.</li>
+ * </ul>
  */
 public class MassSetFieldsAction extends SimpleCommand {
 
@@ -38,5 +40,4 @@ public class MassSetFieldsAction extends SimpleCommand {
         MassSetFieldsDialog dialog = new MassSetFieldsDialog(stateManager.getSelectedEntries(), database, dialogService, undoManager);
         dialog.showAndWait();
     }
-
 }

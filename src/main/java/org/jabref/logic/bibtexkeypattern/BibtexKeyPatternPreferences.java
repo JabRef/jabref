@@ -8,20 +8,28 @@ public class BibtexKeyPatternPreferences {
     private final String keyPatternReplacement;
     private final boolean alwaysAddLetter;
     private final boolean firstLetterA;
-    private final boolean enforceLegalKey;
     private final GlobalBibtexKeyPattern keyPattern;
     private Character keywordDelimiter;
+    private boolean avoidOverwritingCiteKey;
+    private String unwantedCharacters;
 
-    public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement, boolean alwaysAddLetter,
-                                       boolean firstLetterA, boolean enforceLegalKey, GlobalBibtexKeyPattern keyPattern,
-                                       Character keywordDelimiter) {
+    public BibtexKeyPatternPreferences(String keyPatternRegex,
+                                       String keyPatternReplacement,
+                                       boolean alwaysAddLetter,
+                                       boolean firstLetterA,
+                                       GlobalBibtexKeyPattern keyPattern,
+                                       Character keywordDelimiter,
+                                       boolean avoidOverwritingCiteKey,
+                                       String unwantedCharacters) {
+
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
         this.alwaysAddLetter = alwaysAddLetter;
         this.firstLetterA = firstLetterA;
-        this.enforceLegalKey = enforceLegalKey;
         this.keyPattern = keyPattern;
         this.keywordDelimiter = keywordDelimiter;
+        this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
+        this.unwantedCharacters = unwantedCharacters;
     }
 
     public String getKeyPatternRegex() {
@@ -40,8 +48,8 @@ public class BibtexKeyPatternPreferences {
         return firstLetterA;
     }
 
-    public boolean isEnforceLegalKey() {
-        return enforceLegalKey;
+    public String getUnwantedCharacters() {
+        return unwantedCharacters;
     }
 
     public GlobalBibtexKeyPattern getKeyPattern() {
@@ -50,5 +58,9 @@ public class BibtexKeyPatternPreferences {
 
     public Character getKeywordDelimiter() {
         return keywordDelimiter;
+    }
+
+    public boolean avoidOverwritingCiteKey() {
+        return avoidOverwritingCiteKey;
     }
 }
