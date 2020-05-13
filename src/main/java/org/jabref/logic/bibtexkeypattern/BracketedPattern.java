@@ -44,7 +44,8 @@ public class BracketedPattern {
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
 
-    private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
+    /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
+    private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
     /** Matches with "uni", case insensitive */
     private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
     /** Matches with "tech", case insensitive */
@@ -1297,7 +1298,7 @@ public class BracketedPattern {
         String result = content;
         result = unifyDiacritics(result);
         result = result.replaceAll("^\\{", "").replaceAll("}$", "");
-        Matcher matcher = REGEX_PATTERN.matcher(result);
+        Matcher matcher = ABBREVIATION_PATTERN.matcher(result);
         if (matcher.matches()) {
             return matcher.group(1);
         }
