@@ -50,7 +50,9 @@ public class BracketedPattern {
     /** Matches with "tech", case insensitive */
     private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
     /** Matches with "dep"/"dip"/"lab", case insensitive */
-    private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DEPARTMENT_OR_LAB_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
+    /** Matches with "dep"/"dip", case insensitive */
+    private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
 
     private final String pattern;
 
@@ -1341,7 +1343,7 @@ public class BracketedPattern {
                 if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
-                if (DEPARTMENT_PATTERN.matcher(k).matches()) {
+                if (DEPARTMENT_OR_LAB_PATTERN.matcher(k).matches()) {
                     isDepartment = true;
                 }
             }
