@@ -12,7 +12,7 @@ public class ProxyPreferences {
     private final String password;
 
     public ProxyPreferences(Boolean useProxy, String hostname, String port, Boolean useAuthentication, String username,
-            String password) {
+                            String password) {
         this.useProxy = useProxy;
         this.hostname = hostname;
         this.port = port;

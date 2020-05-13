@@ -49,9 +49,9 @@ public class IntegrityCheck {
         }
 
         FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext,
-                                                        filePreferences,
-                                                        journalAbbreviationRepository,
-                                                        allowIntegerEdition);
+                filePreferences,
+                journalAbbreviationRepository,
+                allowIntegerEdition);
         for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }

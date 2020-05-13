@@ -140,7 +140,7 @@ public class ActionFactory {
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
         ActionUtils.configureButton(
-                                    new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
+                new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 

@@ -75,9 +75,9 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         String fileName = Path.of(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(workingDir)
-                                                                                               .withInitialFileName(fileName)
-                                                                                               .build();
+                .withInitialDirectory(workingDir)
+                .withInitialFileName(fileName)
+                .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
             // Store the directory for next time:
@@ -132,5 +132,4 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
         List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFilePreferences());
         return FileUtil.relativize(filePath, fileDirectories).toString();
     }
-
 }

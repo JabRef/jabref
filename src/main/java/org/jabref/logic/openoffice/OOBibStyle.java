@@ -298,7 +298,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                     continue;
                 default:
                     break;
-
             }
 
             switch (mode) {
@@ -322,7 +321,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 default:
                     break;
             }
-
         }
         // Set validity boolean based on whether we found anything interesting
         // in the file:
@@ -361,7 +359,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 } else {
                     bibLayout.put(type, layout);
                 }
-
             } catch (IOException ex) {
                 LOGGER.warn("Cannot parse bibliography structure", ex);
             }
@@ -470,11 +467,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                         }
                     }
                     combineFrom = -1;
-
                 }
                 // If it doesn't end here, just keep iterating.
             }
-
         }
         sb.append(bracketAfter);
         return sb.toString();
@@ -517,20 +512,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                     if (piv == -1) {
                         piv = i;
                         tmpMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry), database,
-                                                                   null, unlimAuthors);
+                                null, unlimAuthors);
                     } else {
                         // See if this entry can go into a group with the previous one:
                         String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry),
-                                                                           database, null, unlimAuthors);
+                                database, null, unlimAuthors);
 
                         String authorField = getStringCitProperty(AUTHOR_FIELD);
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);
                         String author = getCitationMarkerField(currentEntry, database.get(currentEntry),
-                                                               authorField);
+                                authorField);
                         AuthorList al = AuthorList.parse(author);
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
-                            || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
+                                || ((al.getNumberOfAuthors() > maxAuthors) && (unlimAuthors[i] != prevALim))) {
                             // No match. Update piv to exclude the previous entry. But first check if the
                             // previous entry was part of a group:
                             if ((piv > -1) && (i > (piv + 1))) {
@@ -627,7 +622,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         sb.append(endBrace);
         return sb.toString();
-
     }
 
     /**
@@ -867,9 +861,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (o instanceof OOBibStyle) {
             OOBibStyle otherStyle = (OOBibStyle) o;
             return Objects.equals(path, otherStyle.path)
-                   && Objects.equals(name, otherStyle.name)
-                   && Objects.equals(citProperties, otherStyle.citProperties)
-                   && Objects.equals(properties, otherStyle.properties);
+                    && Objects.equals(name, otherStyle.name)
+                    && Objects.equals(citProperties, otherStyle.citProperties)
+                    && Objects.equals(properties, otherStyle.properties);
         }
         return false;
     }

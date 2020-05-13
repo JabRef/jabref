@@ -47,7 +47,8 @@ class ProtectedTermsMenu extends Menu {
     private void updateFiles() {
         externalFiles.getItems().clear();
         ProtectedTermsLoader loader = Globals.protectedTermsLoader;
-        List<ProtectedTermsList> nonInternal = loader.getProtectedTermsLists().stream()
+        List<ProtectedTermsList> nonInternal = loader
+                .getProtectedTermsLists().stream()
                 .filter(list -> !list.isInternalList())
                 .collect(Collectors.toList());
         for (ProtectedTermsList list : nonInternal) {

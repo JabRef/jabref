@@ -159,7 +159,6 @@ public enum StandardActions implements Action {
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
     ABOUT(Localization.lang("About JabRef"), Localization.lang("About JabRef"));
 
-
     private final String text;
     private final String description;
     private final Optional<JabRefIcon> icon;

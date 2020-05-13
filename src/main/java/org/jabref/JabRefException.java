@@ -39,5 +39,4 @@ public class JabRefException extends Exception {
             return localizedMessage;
         }
     }
-
 }

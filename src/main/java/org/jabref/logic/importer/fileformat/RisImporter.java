@@ -91,7 +91,7 @@ public class RisImporter extends Importer {
                 while (!done && (j < (lines.length - 1))) {
                     if ((lines[j + 1].length() >= 6) && !"  - ".equals(lines[j + 1].substring(2, 6))) {
                         if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))
-                            && !Character.isWhitespace(lines[j + 1].charAt(0))) {
+                                && !Character.isWhitespace(lines[j + 1].charAt(0))) {
                             current.append(' ');
                         }
                         current.append(lines[j + 1]);
@@ -210,11 +210,11 @@ public class RisImporter extends Importer {
                             String year = value.substring(0, 4);
 
                             try {
-                                    Year.parse(year, formatter);
-                                    // if the year is parsebale we have found a higher priority date
-                                    dateTag = tag;
-                                    dateValue = value;
-                                    datePriority = tagPriority;
+                                Year.parse(year, formatter);
+                                // if the year is parsebale we have found a higher priority date
+                                dateTag = tag;
+                                dateValue = value;
+                                datePriority = tagPriority;
                             } catch (DateTimeParseException ex) {
                                 // We can't parse the year, we ignore it
                             }
@@ -245,7 +245,7 @@ public class RisImporter extends Importer {
                     } else if ("TA".equals(tag)) {
                         fields.put(StandardField.TRANSLATOR, value);
 
-                    // fields for which there is no direct mapping in the bibtext standard
+                        // fields for which there is no direct mapping in the bibtext standard
                     } else if ("AV".equals(tag)) {
                         fields.put(new UnknownField("archive_location"), value);
                     } else if ("CN".equals(tag) || "VO".equals(tag)) {
@@ -307,10 +307,8 @@ public class RisImporter extends Importer {
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
             month.ifPresent(entry::setMonth);
             bibitems.add(entry);
-
         }
         return new ParserResult(bibitems);
-
     }
 
     private void addDoi(Map<Field, String> hm, String val) {

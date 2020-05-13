@@ -51,8 +51,8 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
         this.basePanel = basePanel;
 
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndClose());
     }

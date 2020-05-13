@@ -96,10 +96,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
         new ValueTableCellFactory<BibEntryType, String>()
-             .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-             .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
-             .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
-             .install(entryTypeActionsColumn);
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
+                .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
+                .install(entryTypeActionsColumn);
 
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
         fieldTypeColumn.setCellValueFactory(item -> item.getValue().fieldType());
@@ -122,10 +122,10 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
 
         new ValueTableCellFactory<FieldViewModel, String>()
-           .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-           .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-           .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
-           .install(fieldTypeActionColumn);
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
+                .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
+                .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
         fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
@@ -140,5 +140,4 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     void addNewField() {
         viewModel.addNewField();
     }
-
 }

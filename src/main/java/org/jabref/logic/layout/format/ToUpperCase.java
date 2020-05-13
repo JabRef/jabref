@@ -17,5 +17,4 @@ public class ToUpperCase implements LayoutFormatter {
 
         return fieldText.toUpperCase(Locale.ROOT);
     }
-
 }

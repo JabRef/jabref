@@ -44,5 +44,4 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
         super.redo();
         entry.setCiteKey(newValue);
     }
-
 }

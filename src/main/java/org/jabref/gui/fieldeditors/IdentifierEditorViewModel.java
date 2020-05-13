@@ -76,7 +76,6 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                     }
                 }
         );
-
     }
 
     public boolean getIdentifierLookupInProgress() {

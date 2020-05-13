@@ -16,7 +16,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
 
-    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[]{"[bibtexkey]", "[bibtexkey] - [title]"};
+    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
     private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
@@ -55,11 +55,19 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public ListProperty<String> defaultFileNamePatternsProperty() { return defaultFileNamePatternsProperty; }
+    public ListProperty<String> defaultFileNamePatternsProperty() {
+        return defaultFileNamePatternsProperty;
+    }
 
-    public StringProperty fileNamePatternProperty() { return fileNamePatternProperty; }
+    public StringProperty fileNamePatternProperty() {
+        return fileNamePatternProperty;
+    }
 
-    public StringProperty fileDirPatternProperty() { return fileDirPatternProperty; }
+    public StringProperty fileDirPatternProperty() {
+        return fileDirPatternProperty;
+    }
 
-    public BooleanProperty downloadLinkedFilesProperty() { return downloadLinkedFilesProperty; }
+    public BooleanProperty downloadLinkedFilesProperty() {
+        return downloadLinkedFilesProperty;
+    }
 }

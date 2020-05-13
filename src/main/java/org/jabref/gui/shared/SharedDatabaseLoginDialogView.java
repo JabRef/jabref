@@ -129,5 +129,4 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void showOpenKeystoreFileDialog(ActionEvent event) {
         viewModel.showOpenKeystoreFileDialog();
     }
-
 }

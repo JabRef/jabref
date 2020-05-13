@@ -57,10 +57,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
             if (textPre.contains("#" + namePost + "#")) {
                 res = -res;
             }
-
         }
 
         return res;
     }
-
 }

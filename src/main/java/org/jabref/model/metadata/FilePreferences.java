@@ -52,5 +52,7 @@ public class FilePreferences {
         return fileDirPattern;
     }
 
-    public boolean getDownloadLinkedFiles() { return downloadLinkedFiles; }
+    public boolean getDownloadLinkedFiles() {
+        return downloadLinkedFiles;
+    }
 }

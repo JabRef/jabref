@@ -98,6 +98,7 @@ public class BibtexString implements Cloneable {
 
     /**
      * Returns the name/label of the string
+     *
      * @return
      */
     public String getName() {
