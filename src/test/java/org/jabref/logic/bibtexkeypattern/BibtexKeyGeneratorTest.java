@@ -387,6 +387,26 @@ class BibtexKeyGeneratorTest {
     }
 
     @Test
+    void generateKeyAbbreviateCorporateAuthorDepartmentWithoutAcademicInstitute() throws ParseException {
+        Optional<BibEntry> entry = BibtexParser.singleFromString(
+                "@ARTICLE{null, author={{Department of Localhost Nullgenerators}}}",
+                importFormatPreferences, fileMonitor);
+        assertEquals("LN",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
+                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @Test
+    void generateKeyAbbreviateCorporateAuthorSchoolWithoutAcademicInstitute() throws ParseException {
+        Optional<BibEntry> entry = BibtexParser.singleFromString(
+                "@ARTICLE{null, author={{The School of Null}}}",
+                importFormatPreferences, fileMonitor);
+        assertEquals("N",
+                BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
+                        new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
+    }
+
+    @Test
     void testcrossrefSchool() throws Exception {
         BibDatabase database = new BibDatabase();
         BibEntry entry1 = new BibEntry();
