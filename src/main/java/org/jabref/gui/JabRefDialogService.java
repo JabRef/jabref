@@ -272,7 +272,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public <V> Optional<Void> showProgressDialogAndWait(String title, String content, Task<V> task) {
+    public <V> void showProgressDialogAndWait(String title, String content, Task<V> task) {
         ProgressDialog progressDialog = new ProgressDialog(task);
         progressDialog.setHeaderText(null);
         progressDialog.setTitle(title);
@@ -288,8 +288,9 @@ public class JabRefDialogService implements DialogService {
             progressDialog.close();
         });
         themeLoader.installCss(progressDialog.getDialogPane().getScene(), preferences);
-        return progressDialog.showAndWait();
+        progressDialog.show();
     }
+
 
     @Override
     public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {

@@ -333,7 +333,7 @@ public class OpenOfficePanel {
             connect();
         } else {
 
-            Task<Void> taskConnectIfInstalled = new Task<Void>() {
+            Task<Void> taskConnectIfInstalled = new Task<>() {
 
                 @Override
                 protected Void call() throws Exception {
