@@ -41,7 +41,7 @@ import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

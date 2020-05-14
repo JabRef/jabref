@@ -11,15 +11,15 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class BasePanelPreferences {
-    private MainTablePreferences tablePreferences;
+    private final MainTablePreferences tablePreferences;
     private AutoCompletePreferences autoCompletePreferences;
-    private EntryEditorPreferences entryEditorPreferences;
-    private KeyBindingRepository keyBindings;
-    private PreviewPreferences previewPreferences;
-    private DoubleProperty entryEditorDividerPosition = new SimpleDoubleProperty();
+    private final EntryEditorPreferences entryEditorPreferences;
+    private final KeyBindingRepository keyBindings;
+    private final PreviewPreferences previewPreferences;
+    private final DoubleProperty entryEditorDividerPosition = new SimpleDoubleProperty();
 
     public BasePanelPreferences(MainTablePreferences tablePreferences, AutoCompletePreferences autoCompletePreferences, EntryEditorPreferences entryEditorPreferences, KeyBindingRepository keyBindings, PreviewPreferences previewPreferences, Double entryEditorDividerPosition) {
         this.tablePreferences = tablePreferences;

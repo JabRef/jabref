@@ -54,8 +54,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

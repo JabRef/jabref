@@ -46,10 +46,10 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
 import com.jfoenix.controls.JFXSnackbarLayout;
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.TaskProgressView;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.controlsfx.dialog.ProgressDialog;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +77,8 @@ public class JabRefDialogService implements DialogService {
     public JabRefDialogService(Window mainWindow, Pane mainPane, JabRefPreferences preferences, ThemeLoader themeLoader) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
-        this.preferences = preferences;
-        this.themeLoader = themeLoader;
+        JabRefDialogService.preferences = preferences;
+        JabRefDialogService.themeLoader = themeLoader;
     }
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
@@ -293,7 +293,7 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager) {
-        TaskProgressView taskProgressView = new TaskProgressView<>();
+        TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
         EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
         taskProgressView.setRetainTasks(false);
         taskProgressView.setGraphicFactory(BackgroundTask::getIcon);

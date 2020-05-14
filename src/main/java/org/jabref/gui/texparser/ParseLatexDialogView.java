@@ -24,9 +24,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckTreeView;
-import org.fxmisc.easybind.EasyBind;
 
 public class ParseLatexDialogView extends BaseDialog<Void> {
 

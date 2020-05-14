@@ -22,8 +22,8 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
 
+import com.tobiasdiez.easybind.Subscription;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import org.fxmisc.easybind.Subscription;
 
 /**
  * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
@@ -45,7 +45,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
-    private Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
+    private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
     private Callback<T, ValidationStatus> validationStatusProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
