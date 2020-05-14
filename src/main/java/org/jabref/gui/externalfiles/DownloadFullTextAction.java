@@ -100,7 +100,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value ->
                 downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Download full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
