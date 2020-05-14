@@ -193,7 +193,7 @@ public interface DialogService {
      * @param content message to show above the progress bar
      * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
+    <V> void showProgressDialog(String title, String content, Task<V> task);
 
     /**
      * Constructs and shows a dialog showing the progress of running background tasks.
