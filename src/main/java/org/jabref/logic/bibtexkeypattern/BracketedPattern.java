@@ -46,7 +46,7 @@ public class BracketedPattern {
     private static final int CHARS_OF_FIRST = 5;
 
     /** Matches everything that is not an uppercase ASCII letter */
-    private static final Pattern STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
+    private static final Pattern NOT_STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
     /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
     private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
     /** Matches with "uni", case insensitive */
@@ -1382,12 +1382,12 @@ public class BracketedPattern {
                 for (String k : part) {
                     if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
-                            && !STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
+                            && !NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
                         if (isSchool) {
-                            schoolSB.append(STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
+                            schoolSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                         if (isDepartment) {
-                            departmentSB.append(STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
+                            departmentSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                     }
                 }
