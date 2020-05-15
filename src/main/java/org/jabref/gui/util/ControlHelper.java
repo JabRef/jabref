@@ -128,13 +128,11 @@ public class ControlHelper {
 
         if (text.length() > maxCharacters) {
             // truncation necessary
-            int partialLength;
-
             switch (ellipsisPosition) {
                 case BEGINNING:
                     return ellipsisString + text.substring(text.length() - (maxCharacters - ellipsisString.length()));
                 case CENTER:
-                    partialLength = (int) Math.floor((maxCharacters - ellipsisString.length()) / 2f);
+                    int partialLength = (int) Math.floor((maxCharacters - ellipsisString.length()) / 2f);
                     return text.substring(0, partialLength) + ellipsisString + text.substring(text.length() - partialLength);
                 case ENDING:
                     return text.substring(0, maxCharacters - ellipsisString.length()) + ellipsisString;
