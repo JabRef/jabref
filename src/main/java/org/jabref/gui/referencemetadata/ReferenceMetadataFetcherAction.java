@@ -117,7 +117,7 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
             }
         };
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Fetching reference metadata online"),
                 Localization.lang("Querying reference metadata") + ":",
                 fetchReferenceMetadataTask);
