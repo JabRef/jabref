@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -28,8 +29,11 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BibEntryTableViewModel {
+    static private final Logger LOGGER = LoggerFactory.getLogger(BibEntryTableViewModel.class);
     private final BibEntry entry;
     private final BibDatabase database;
     private final MainTableNameFormatter nameFormatter;
@@ -119,9 +123,11 @@ public class BibEntryTableViewModel {
                 boolean isName = false;
 
                 Optional<String> content = Optional.empty();
+                Field anEntry = null;
                 for (Field field : fields) {
                     content = entry.getResolvedFieldOrAliasLatexFree(field, database);
                     if (content.isPresent()) {
+                        anEntry = field;
                         isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
                         break;
                     }
@@ -129,7 +135,18 @@ public class BibEntryTableViewModel {
 
                 String result = content.orElse(null);
                 if (isName) {
-                    return nameFormatter.formatName(result);
+                    String latexFreeBeforeNameFormatter = nameFormatter.formatName(result);
+
+                    String unformattedName = entry.getResolvedFieldOrAlias(anEntry, database).orElse(null);
+                    String formattedName = nameFormatter.formatName(unformattedName);
+                    String latexFreeAfterNameFormatter = new LatexToUnicodeFormatter().format(formattedName);
+
+                    if (!latexFreeAfterNameFormatter.equals(latexFreeBeforeNameFormatter)) {
+                        LOGGER.info("latexFreeBeforeNameFormatter = " + latexFreeBeforeNameFormatter);
+                        LOGGER.info("latexFreeAfterNameFormatter = " + latexFreeAfterNameFormatter);
+                    }
+
+                    return latexFreeAfterNameFormatter;
                 } else {
                     return result;
                 }
