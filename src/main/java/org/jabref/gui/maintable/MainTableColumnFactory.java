@@ -24,7 +24,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -403,16 +402,11 @@ class MainTableColumnFactory {
 
         ContextMenu contextMenu = new ContextMenu();
 
-        Screen currentScreen = Screen.getPrimary();
-        double maxWidth = currentScreen.getBounds().getWidth();
-
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
             MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
-            menuItem.setStyle("-fx-pref-width: " + maxWidth * 2 / 3 + "; -fx-text-overrun: center-ellipses;");
-            // -fx-min-width; -fx-pref-width; -fx-max-width; -fx-text-overrun: center-ellipses; -fx-wrap-text: true;
             contextMenu.getItems().add(menuItem);
         }
 
