@@ -15,7 +15,7 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 /**
  * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
  */
-public class NoBibtexFieldChecker implements Checker {
+public class NoBibtexFieldChecker implements EntryChecker {
 
     private Set<Field> getAllBiblatexOnlyFields() {
         Set<BibField> allBibtexFields = BibtexEntryTypeDefinitions.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());

@@ -29,7 +29,7 @@ public class DoiDuplicationChecker implements DatabaseChecker {
         return duplicateMap.inverse().keySet().stream()
                            .filter(list -> list.size() > 1)
                            .flatMap(list -> list.stream())
-                           .map(item -> new IntegrityMessage(Localization.lang("Unique DOI used in multiple entries"), item, StandardField.DOI))
+                           .map(item -> new IntegrityMessage(Localization.lang("Same DOI used in multiple entries"), item, StandardField.DOI))
                            .collect(Collectors.toList());
     }
 }

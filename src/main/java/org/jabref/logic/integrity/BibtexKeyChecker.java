@@ -13,7 +13,7 @@ import org.jabref.model.strings.StringUtil;
 /**
  * Currently only checks the key if there is an author, year, and title present.
  */
-public class BibtexKeyChecker implements Checker {
+public class BibtexKeyChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {

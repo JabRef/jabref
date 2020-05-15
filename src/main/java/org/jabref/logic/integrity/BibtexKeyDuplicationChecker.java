@@ -10,7 +10,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-public class BibtexKeyDuplicationChecker implements Checker {
+public class BibtexKeyDuplicationChecker implements EntryChecker {
 
     private final BibDatabase database;
 

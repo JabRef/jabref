@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.FieldProperty;
 /**
  * Checks, if there is an even number of unescaped #
  */
-public class BibStringChecker implements Checker {
+public class BibStringChecker implements EntryChecker {
 
     // Detect # if it doesn't have a \ in front of it or if it starts the string
     private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");

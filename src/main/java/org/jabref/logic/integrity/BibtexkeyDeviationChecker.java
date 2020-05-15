@@ -12,7 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
-public class BibtexkeyDeviationChecker implements Checker {
+public class BibtexkeyDeviationChecker implements EntryChecker {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;

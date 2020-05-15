@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
-public class FieldChecker implements Checker {
+public class FieldChecker implements EntryChecker {
     protected final Field field;
     private final ValueChecker checker;
 

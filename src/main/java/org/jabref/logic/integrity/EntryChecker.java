@@ -5,6 +5,6 @@ import java.util.List;
 import org.jabref.model.entry.BibEntry;
 
 @FunctionalInterface
-public interface Checker {
+public interface EntryChecker {
     List<IntegrityMessage> check(BibEntry entry);
 }

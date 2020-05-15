@@ -11,7 +11,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 /**
  * BibTeX mode only checker
  */
-public class BibTeXEntryTypeChecker implements Checker {
+public class BibTeXEntryTypeChecker implements EntryChecker {
     /**
      * Will check if the current library uses any entry types from another mode.
      * For example it will warn the user if he uses entry types defined for Biblatex inside a BibTeX library.

@@ -15,7 +15,7 @@ public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final FieldCheckers fieldCheckers;
-    private final List<Checker> entryCheckers;
+    private final List<EntryChecker> entryCheckers;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
@@ -51,7 +51,7 @@ public class IntegrityCheck {
         }
     }
 
-    List<IntegrityMessage> executeAllCheckers() {
+    List<IntegrityMessage> check() {
         List<IntegrityMessage> result = new ArrayList<>();
 
         BibDatabase database = bibDatabaseContext.getDatabase();
@@ -75,7 +75,7 @@ public class IntegrityCheck {
             result.addAll(fieldChecker.check(entry));
         }
 
-        for (Checker entryChecker : entryCheckers) {
+        for (EntryChecker entryChecker : entryCheckers) {
             result.addAll(entryChecker.check(entry));
         }
 

@@ -10,7 +10,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.google.common.base.CharMatcher;
 
-public class ASCIICharacterChecker implements Checker {
+public class ASCIICharacterChecker implements EntryChecker {
 
     /**
      * Detect any non ASCII encoded characters, e.g., umlauts or unicode in the fields

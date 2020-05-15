@@ -10,7 +10,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-public class JournalInAbbreviationListChecker implements Checker {
+public class JournalInAbbreviationListChecker implements EntryChecker {
 
     private final Field field;
     private final JournalAbbreviationRepository abbreviationRepository;

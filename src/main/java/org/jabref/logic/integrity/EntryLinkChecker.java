@@ -13,7 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 
-public class EntryLinkChecker implements Checker {
+public class EntryLinkChecker implements EntryChecker {
 
     private final BibDatabase database;
 
