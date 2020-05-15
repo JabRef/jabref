@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added support for basic markdown in custom formatted previews [#6194](https://github.com/JabRef/jabref/issues/6194)
 - We now show the number of items found and selected to import in the online search dialog. [#6248](https://github.com/JabRef/jabref/pull/6248)
 - We created a new install screen for macOS. [#5759](https://github.com/JabRef/jabref/issues/5759)
+- We added a new integrity check for duplicate DOIs. [koppor#339](https://github.com/koppor/jabref/issues/339)
 - We implemented an option to download fulltext files while importing. [#6381](https://github.com/JabRef/jabref/pull/6381)
 - We added a progress-indicator showing the average progress of background tasks to the toolbar. Clicking it reveals a pop-over with a list of running background tasks. [6443](https://github.com/JabRef/jabref/pull/6443)
 - We fixed the bug when strike the delete key in the text field. [#6421](https://github.com/JabRef/jabref/issues/6421)
