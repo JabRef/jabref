@@ -106,10 +106,10 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
             protected void succeeded() {
                 if (!getValue().isEmpty()) {
                     // reserved for future use
-                    //if (nc.hasEdits()) {
+                    // if (nc.hasEdits()) {
                     //    nc.end();
                     //    undoManager.addEdit(nc);
-                    //}
+                    // }
                     dialogService.notify(Localization.lang("Finished fetching reference metadata."));
                 } else {
                     dialogService.notify(Localization.lang("Cancelled fetching reference metadata."));
