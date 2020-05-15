@@ -42,7 +42,7 @@ class CustomEntryTypePreferenceMigration {
 
     /**
      * Retrieves all deprecated information about the entry type in preferences, with the tag given by number.
-     *
+     * <p>
      * (old implementation which has been copied)
      */
     private static Optional<BibEntryType> getBibEntryType(int number) {

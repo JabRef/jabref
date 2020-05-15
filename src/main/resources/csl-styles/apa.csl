@@ -491,18 +491,18 @@
       </else-if>
       <else-if type="legislation treaty" match="any">
         <!-- Legislation and treaties not italicized or quoted -->
-        <text variable="title" form="short" text-case="title" />
+        <text variable="title" form="short" text-case="title"/>
       </else-if>
       <else-if type="post webpage" match="any">
         <!-- Webpages are always italicized -->
-        <text variable="title" form="short" font-style="italic" text-case="title" />
+        <text variable="title" form="short" font-style="italic" text-case="title"/>
       </else-if>
       <else-if variable="container-title" match="any">
         <!-- Other types are italicized or quoted based on presence of container-title. As in title macro. -->
-        <text variable="title" form="short" quotes="true" text-case="title" />
+        <text variable="title" form="short" quotes="true" text-case="title"/>
       </else-if>
       <else>
-        <text variable="title" form="short" font-style="italic" text-case="title" />
+        <text variable="title" form="short" font-style="italic" text-case="title"/>
       </else>
     </choose>
   </macro>

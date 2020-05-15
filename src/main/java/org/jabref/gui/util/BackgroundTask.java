@@ -21,7 +21,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.ImmutableMap;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * This class is essentially a wrapper around {@link Task}.
@@ -41,12 +41,12 @@ public abstract class BackgroundTask<V> {
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
     private Runnable onFinished;
-    private BooleanProperty isCanceled = new SimpleBooleanProperty(false);
-    private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
-    private StringProperty message = new SimpleStringProperty("");
-    private StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
-    private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
-    private BooleanProperty showToUser = new SimpleBooleanProperty(false);
+    private final BooleanProperty isCanceled = new SimpleBooleanProperty(false);
+    private final ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
+    private final StringProperty message = new SimpleStringProperty("");
+    private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
+    private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
+    private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -257,11 +257,8 @@ public abstract class BackgroundTask<V> {
         return this;
     }
 
-    public static Node getIcon(Object task) {
-        if (task instanceof Task) {
-            return BackgroundTask.iconMap.getOrDefault(((Task<?>) task).getTitle(), null);
-        }
-        return null;
+    public static Node getIcon(Task<?> task) {
+        return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
     static class BackgroundProgress {

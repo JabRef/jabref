@@ -116,7 +116,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
-    */
+     */
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
@@ -660,25 +660,25 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
-                     "<font face=\"sans-serif\">"
-                                    + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                                    + "\\end{bibtexkey}</b><br>__NEWLINE__"
-                                    + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                                    + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                                    + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                                    + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                                    + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                                    + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                                    // Include the booktitle field for @inproceedings, @proceedings, etc.
-                                    + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                                    + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                                    + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                                    + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                                    + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                                    + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                                    + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                                    + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
-                                    + "</dd>__NEWLINE__<p></p></font>");
+                "<font face=\"sans-serif\">"
+                        + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                        + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                        + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                        + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                        + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                        + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                        + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                        + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                        // Include the booktitle field for @inproceedings, @proceedings, etc.
+                        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                        + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                        + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                        + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                        + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                        + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                        + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                        + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
+                        + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
@@ -754,11 +754,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
         EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
-                                                                        CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                                                                        CleanupPreset.CleanupStep.MOVE_PDF,
-                                                                        CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
@@ -942,10 +942,9 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys
-     * they use.
+     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys they use.
      *
-     * @param key The preferences key.
+     * @param key   The preferences key.
      * @param value The default value.
      */
     public void putDefaultValue(String key, Object value) {
@@ -955,7 +954,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Stores a color in preferences.
      *
-     * @param key The key for this setting.
+     * @param key   The key for this setting.
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
@@ -998,8 +997,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Fetches key patterns from preferences.
-     * The implementation doesn't cache the results
+     * Fetches key patterns from preferences. The implementation doesn't cache the results
      *
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
@@ -1148,7 +1146,7 @@ public class JabRefPreferences implements PreferencesService {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
-                                      ex);
+                    ex);
         }
     }
 
@@ -1156,8 +1154,7 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param filename String File to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException
-     *                         or an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
         importPreferences(Path.of(filename));
@@ -1168,13 +1165,13 @@ public class JabRefPreferences implements PreferencesService {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                                      ex);
+                    ex);
         }
     }
 
     /**
      * ONLY FOR TESTING!
-     *
+     * <p>
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
      *
      * @param owPrefs The custom preferences to overwrite the currently present
@@ -1287,14 +1284,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(
-                                               get(KEY_PATTERN_REGEX),
-                                               get(KEY_PATTERN_REPLACEMENT),
-                                               getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                                               getBoolean(KEY_GEN_FIRST_LETTER_A),
-                                               getKeyPattern(),
-                                               getKeywordDelimiter(),
-                                               getBoolean(AVOID_OVERWRITING_KEY),
-                                               get(UNWANTED_BIBTEX_KEY_CHARACTERS));
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
+                getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getKeyPattern(),
+                getKeywordDelimiter(),
+                getBoolean(AVOID_OVERWRITING_KEY),
+                get(UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -1430,9 +1427,11 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
-                                             getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL), getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                                             getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+        return new ProtectedTermsPreferences(
+                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
     @Override
@@ -1472,8 +1471,8 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
         return new CleanupPreferences(
-                                      getLayoutFormatterPreferences(abbreviationRepository),
-                                      getFilePreferences());
+                getLayoutFormatterPreferences(abbreviationRepository),
+                getFilePreferences());
     }
 
     @Override
@@ -1576,10 +1575,10 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
         return new AutoLinkPreferences(
-                                       getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
-                                       get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
-                                       getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
-                                       getKeywordDelimiter());
+                getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
+                get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
+                getKeywordDelimiter());
     }
 
     public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
@@ -1636,10 +1635,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(COLUMN_SORT_ORDER).forEach(columnName -> columns.stream().filter(column ->
-                column.getName().equals(columnName))
-                .findFirst()
-                .ifPresent(columnsOrdered::add)
+        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
+                columns.stream().filter(column ->
+                        column.getName().equals(columnName))
+                       .findFirst()
+                       .ifPresent(columnsOrdered::add)
         );
         return columnsOrdered;
     }
@@ -1666,15 +1666,16 @@ public class JabRefPreferences implements PreferencesService {
         columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
         putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
 
-        putStringList(COLUMN_SORT_ORDER, columnPreferences.getColumnSortOrder().stream()
+        putStringList(COLUMN_SORT_ORDER, columnPreferences
+                .getColumnSortOrder().stream()
                 .map(MainTableColumnModel::getName)
                 .collect(Collectors.toList()));
     }
 
     public MainTablePreferences getMainTablePreferences() {
         return new MainTablePreferences(getColumnPreferences(),
-                                        getBoolean(AUTO_RESIZE_MODE),
-                                        getBoolean(EXTRA_FILE_COLUMNS));
+                getBoolean(AUTO_RESIZE_MODE),
+                getBoolean(EXTRA_FILE_COLUMNS));
     }
 
     public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
@@ -1704,7 +1705,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setWorkingDir(Path dir) {
         put(WORKING_DIRECTORY, dir.toString());
-
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -1762,7 +1762,7 @@ public class JabRefPreferences implements PreferencesService {
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                                                           layoutPreferences, savePreferences);
+                    layoutPreferences, savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;

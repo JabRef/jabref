@@ -34,8 +34,8 @@ public class TypedBibEntry {
     }
 
     /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
+     * Returns true if this entry contains the fields it needs to be complete.
+     *
      * @param entryTypesManager
      */
     public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {

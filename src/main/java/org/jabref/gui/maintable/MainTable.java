@@ -90,10 +90,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
-                                                                  if (event.getClickCount() == 2) {
-                                                                      panel.showAndEdit(entry.getEntry());
-                                                                  }
-                                                              })
+                    if (event.getClickCount() == 2) {
+                        panel.showAndEdit(entry.getEntry());
+                    }
+                })
                 .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService(), Globals.stateManager, Globals.prefs))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -105,10 +105,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSortOrder().clear();
         preferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
-                        .map(column -> (MainTableColumn<?>) column)
-                        .filter(column -> column.getModel().equals(columnModel))
-                        .findFirst()
-                        .ifPresent(column -> this.getSortOrder().add(column)));
+                    .map(column -> (MainTableColumn<?>) column)
+                    .filter(column -> column.getModel().equals(columnModel))
+                    .findFirst()
+                    .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (preferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -356,10 +356,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                                  .getSelectedItems()
-                                  .stream()
-                                  .map(BibEntryTableViewModel::getEntry)
-                                  .collect(Collectors.toList());
+                .getSelectedItems()
+                .stream()
+                .map(BibEntryTableViewModel::getEntry)
+                .collect(Collectors.toList());
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {

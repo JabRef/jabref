@@ -124,6 +124,5 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
             textList.addAll(formattedTexts);
             return textList;
         }
-
     }
 }

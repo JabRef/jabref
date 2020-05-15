@@ -23,7 +23,12 @@ import static org.mockito.Mockito.when;
 public class AstrophysicsDataSystemTest {
 
     private AstrophysicsDataSystem fetcher;
-    private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
+    private BibEntry diezSliceTheoremEntry;
+    private BibEntry famaeyMcGaughEntry;
+    private BibEntry sunWelchEntry;
+    private BibEntry xiongSunEntry;
+    private BibEntry ingersollPollardEntry;
+    private BibEntry luceyPaulEntry;
 
     @BeforeEach
     public void setUp() throws Exception {

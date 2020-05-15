@@ -25,6 +25,7 @@ public class CitationStyleGenerator {
 
     /**
      * Generates a Citation based on the given entry and style
+     *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, CitationStyle style) {
@@ -33,6 +34,7 @@ public class CitationStyleGenerator {
 
     /**
      * Generates a Citation based on the given entry and style
+     *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, String style) {
@@ -41,6 +43,7 @@ public class CitationStyleGenerator {
 
     /**
      * Generates a Citation based on the given entry, style, and output format
+     *
      * @implNote the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      */
     public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
@@ -49,6 +52,7 @@ public class CitationStyleGenerator {
 
     /**
      * Generates the citation for multiple entries at once.
+     *
      * @implNote The citations are generated using JavaScript which may take some time, better call it from outside the main thread.
      */
     public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) {

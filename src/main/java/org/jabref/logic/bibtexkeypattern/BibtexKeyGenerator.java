@@ -64,8 +64,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
      * Computes an appendix to a BibTeX key that could make it unique. We use
      * a-z for numbers 0-25, and then aa-az, ba-bz, etc.
      *
-     * @param number
-     *            The appendix number.
+     * @param number The appendix number.
      * @return The String to append.
      */
     private static String getAppendix(int number) {

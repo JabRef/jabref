@@ -28,7 +28,6 @@ public class JabRefExecutorService {
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
-
     });
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
@@ -165,5 +164,4 @@ public class JabRefExecutorService {
             }
         }
     }
-
 }

@@ -83,6 +83,7 @@ class MSBibEntry {
 
     /**
      * Createa new {@link MsBibEntry} to import from an xml element
+     *
      * @param entry
      */
     public MSBibEntry(Element entry) {
@@ -236,6 +237,7 @@ class MSBibEntry {
 
     /**
      * Gets the dom representation for one entry, used for export
+     *
      * @param document XmlDocument
      * @return XmlElement represenation of one entry
      */
@@ -312,7 +314,7 @@ class MSBibEntry {
         Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);
 
         Optional<MsBibAuthor> personName = authorsLst.stream().filter(MsBibAuthor::isCorporate)
-                .findFirst();
+                                                     .findFirst();
         if (personName.isPresent()) {
             MsBibAuthor person = personName.get();
 
@@ -329,12 +331,10 @@ class MSBibEntry {
                 addField(document, person, "Middle", name.getMiddleName());
                 addField(document, person, "First", name.getFirstName());
                 nameList.appendChild(person);
-
             }
             authorTop.appendChild(nameList);
         }
         allAuthors.appendChild(authorTop);
-
     }
 
     private void addDateAcessedFields(Document document, Element rootNode) {
@@ -345,13 +345,11 @@ class MSBibEntry {
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                              .map(Month::getTwoDigitNumber).ifPresent(monthAcessed -> {
-                    addField(document, rootNode, "Month" + "Accessed", monthAcessed);
-
-                });
+            addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+        });
         parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
             addField(document, rootNode, "Day" + "Accessed", dayAccessed);
         });
-
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

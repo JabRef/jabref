@@ -81,6 +81,7 @@ sourceSets {
 }
 
 repositories {
+    mavenLocal()
     jcenter()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
@@ -158,7 +159,7 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'org.fxmisc.easybind:easybind:1.0.3'
+    implementation 'com.tobiasdiez:easybind:2.0.0-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'

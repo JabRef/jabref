@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The search query must be specified in an expression that is acceptable by the Search.g4 grammar.
- *
+ * <p>
  * This class implements the "Advanced Search Mode" described in the help
  */
 public class GrammarBasedSearchRule implements SearchRule {
@@ -48,7 +48,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
-                int line, int charPositionInLine, String msg, RecognitionException e)
+                                int line, int charPositionInLine, String msg, RecognitionException e)
                 throws ParseCancellationException {
             throw new ParseCancellationException("line " + line + ":" + charPositionInLine + " " + msg);
         }
@@ -193,7 +193,6 @@ public class GrammarBasedSearchRule implements SearchRule {
                 throw new IllegalStateException("MUST NOT HAPPEN");
             }
         }
-
     }
 
     /**
@@ -256,5 +255,4 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
         }
     }
-
 }

@@ -247,8 +247,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     /**
      * @param identifiers bibcodes for which bibentries ahould be fetched
-     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested
-     * bibcodes
+     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
      */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());

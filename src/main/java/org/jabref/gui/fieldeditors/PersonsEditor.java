@@ -52,5 +52,4 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     public void requestFocus() {
         textInput.requestFocus();
     }
-
 }

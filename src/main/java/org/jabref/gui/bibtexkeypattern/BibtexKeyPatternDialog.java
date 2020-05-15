@@ -61,5 +61,4 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
      } */
 
     }
-
 }

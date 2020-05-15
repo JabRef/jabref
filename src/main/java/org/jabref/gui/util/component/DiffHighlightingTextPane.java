@@ -21,5 +21,4 @@ public class DiffHighlightingTextPane extends TextFlow {
 //        sheet.addRule(CHANGE_STYLE);
 //        setEditable(false);
     }
-
 }

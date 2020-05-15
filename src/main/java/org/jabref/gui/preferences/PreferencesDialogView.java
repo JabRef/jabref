@@ -19,12 +19,13 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
-import org.fxmisc.easybind.EasyBind;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in separate classes. Tabs MUST implement the
- * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses ok.
+ * PreferencesTab interface, since this dialog will call the storeSettings() method of all tabs when the user presses
+ * ok.
  */
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
@@ -36,7 +37,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
 
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private PreferencesDialogViewModel viewModel;
 
     public PreferencesDialogView(JabRefFrame frame) {
@@ -44,8 +45,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
         this.setTitle(Localization.lang("JabRef preferences"));
 
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
@@ -104,14 +105,22 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     }
 
     @FXML
-    void exportPreferences() { viewModel.exportPreferences(); }
+    void exportPreferences() {
+        viewModel.exportPreferences();
+    }
 
     @FXML
-    void importPreferences() { viewModel.importPreferences(); }
+    void importPreferences() {
+        viewModel.importPreferences();
+    }
 
     @FXML
-    void showAllPreferences() { viewModel.showPreferences(); }
+    void showAllPreferences() {
+        viewModel.showPreferences();
+    }
 
     @FXML
-    void resetPreferences() { viewModel.resetPreferences(); }
+    void resetPreferences() {
+        viewModel.resetPreferences();
+    }
 }
