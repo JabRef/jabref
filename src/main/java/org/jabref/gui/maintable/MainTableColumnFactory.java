@@ -405,7 +405,7 @@ class MainTableColumnFactory {
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
-            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
+            MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
             contextMenu.getItems().add(menuItem);
         }
