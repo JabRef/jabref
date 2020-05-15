@@ -102,5 +102,4 @@ public class ChangeEntryTypeMenu {
     private void populate(Menu menu, Collection<BibEntryType> types, BibEntry entry, UndoManager undoManager) {
         populate(menu.getItems(), types, entry, undoManager);
     }
-
 }

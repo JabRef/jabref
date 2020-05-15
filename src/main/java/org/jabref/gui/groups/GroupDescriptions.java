@@ -29,31 +29,30 @@ public class GroupDescriptions {
         sb.append(StringUtil.quoteForHTML(keywordGroup.getSearchExpression()));
         sb.append("</b>)");
         switch (keywordGroup.getHierarchicalContext()) {
-        case INCLUDING:
-            sb.append(", ").append(Localization.lang("includes subgroups"));
-            break;
-        case REFINING:
-            sb.append(", ").append(Localization.lang("refines supergroup"));
-            break;
-        default:
-            break;
+            case INCLUDING:
+                sb.append(", ").append(Localization.lang("includes subgroups"));
+                break;
+            case REFINING:
+                sb.append(", ").append(Localization.lang("refines supergroup"));
+                break;
+            default:
+                break;
         }
         return sb.toString();
-
     }
 
     public static String getShortDescriptionExplicitGroup(ExplicitGroup explicitGroup) {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(explicitGroup.getName()).append("</b> - ").append(Localization.lang("static group"));
         switch (explicitGroup.getHierarchicalContext()) {
-        case INCLUDING:
-            sb.append(", ").append(Localization.lang("includes subgroups"));
-            break;
-        case REFINING:
-            sb.append(", ").append(Localization.lang("refines supergroup"));
-            break;
-        default:
-            break;
+            case INCLUDING:
+                sb.append(", ").append(Localization.lang("includes subgroups"));
+                break;
+            case REFINING:
+                sb.append(", ").append(Localization.lang("refines supergroup"));
+                break;
+            default:
+                break;
         }
         return sb.toString();
     }
@@ -76,14 +75,14 @@ public class GroupDescriptions {
         sb.append(Localization.lang("search expression"));
         sb.append(" <b>").append(StringUtil.quoteForHTML(searchGroup.getSearchExpression())).append("</b>)");
         switch (searchGroup.getHierarchicalContext()) {
-        case INCLUDING:
-            sb.append(", ").append(Localization.lang("includes subgroups"));
-            break;
-        case REFINING:
-            sb.append(", ").append(Localization.lang("refines supergroup"));
-            break;
-        default:
-            break;
+            case INCLUDING:
+                sb.append(", ").append(Localization.lang("includes subgroups"));
+                break;
+            case REFINING:
+                sb.append(", ").append(Localization.lang("refines supergroup"));
+                break;
+            default:
+                break;
         }
         return sb.toString();
     }

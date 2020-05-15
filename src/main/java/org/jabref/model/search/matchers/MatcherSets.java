@@ -14,5 +14,4 @@ public class MatcherSets {
             return new OrMatcher();
         }
     }
-
 }

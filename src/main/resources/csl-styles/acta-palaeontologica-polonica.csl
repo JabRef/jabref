@@ -23,12 +23,12 @@
   </info>
   <macro name="author">
     <names variable="author" suffix=".">
-      <name sort-separator=", " initialize-with="." and="text" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="never" form="long"></name>
+      <name sort-separator=", " initialize-with="." and="text" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="never" form="long"/>
     </names>
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name sort-separator=", " initialize-with="." and="text" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="never"></name>
+      <name sort-separator=", " initialize-with="." and="text" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="never"/>
       <label form="short" prefix=" (" suffix=".)"/>
     </names>
   </macro>

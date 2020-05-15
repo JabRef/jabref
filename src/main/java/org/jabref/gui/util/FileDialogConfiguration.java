@@ -2,7 +2,6 @@ package org.jabref.gui.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,7 @@ public class FileDialogConfiguration {
     private FileChooser.ExtensionFilter selectedExtensionFilter;
 
     private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
         this.initialDirectory = initialDirectory;
         this.extensionFilters = Objects.requireNonNull(extensionFilters);
         this.defaultExtension = defaultExtension;
@@ -84,7 +83,7 @@ public class FileDialogConfiguration {
 
         public Builder withInitialDirectory(String directory) {
             if (directory != null) {
-                withInitialDirectory(Paths.get(directory));
+                withInitialDirectory(Path.of(directory));
             } else {
                 initialDirectory = null;
             }
@@ -113,9 +112,9 @@ public class FileDialogConfiguration {
 
         public Builder withDefaultExtension(String fileTypeDescription) {
             extensionFilters.stream()
-                    .filter(type -> type.getDescription().equalsIgnoreCase(fileTypeDescription))
-                    .findFirst()
-                    .ifPresent(extensionFilter -> defaultExtension = extensionFilter);
+                            .filter(type -> type.getDescription().equalsIgnoreCase(fileTypeDescription))
+                            .findFirst()
+                            .ifPresent(extensionFilter -> defaultExtension = extensionFilter);
 
             return this;
         }

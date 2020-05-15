@@ -132,7 +132,7 @@ public class KeyBindingRepository {
     /**
      * Check if the given KeyBinding equals the given keyEvent
      *
-     * @param binding as KeyBinding
+     * @param binding  as KeyBinding
      * @param keyEvent as KeEvent
      * @return true if matching, else false
      */

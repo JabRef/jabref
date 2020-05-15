@@ -3,7 +3,6 @@ package org.jabref.model.strings;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ class StringUtilTest {
 
     @Test
     void StringUtilClassIsSmall() throws Exception {
-        Path path = Paths.get("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
+        Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
         assertTrue(lineCount <= 756, "StringUtil increased in size to " + lineCount + ". "

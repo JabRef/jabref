@@ -12,7 +12,6 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
-import org.jabref.Globals;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,15 +20,14 @@ import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.MonadicBinding;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
@@ -37,14 +35,14 @@ public class BibEntryTableViewModel {
     private final MainTableNameFormatter nameFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, ObservableValue<Optional<SpecialFieldValueViewModel>>> specialFieldValues = new HashMap<>();
-    private final MonadicBinding<List<LinkedFile>> linkedFiles;
+    private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final ObjectBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, MainTableNameFormatter nameFormatter) {
         this.entry = entry;
         this.database = database.getDatabase();
-        this.nameFormatter = new MainTableNameFormatter(Globals.prefs);
+        this.nameFormatter = nameFormatter;
 
         this.linkedFiles = EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
@@ -100,7 +98,7 @@ public class BibEntryTableViewModel {
     private ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database) {
         Optional<GroupTreeNode> root = database.getMetaData().getGroups();
         if (root.isPresent()) {
-            return EasyBind.map(entry.getFieldBinding(InternalField.GROUPS), field -> {
+            return EasyBind.map(entry.getFieldBinding(StandardField.GROUPS), field -> {
                 List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
                                                  .stream()
                                                  .map(GroupTreeNode::getGroup)
@@ -122,7 +120,7 @@ public class BibEntryTableViewModel {
 
                 Optional<String> content = Optional.empty();
                 for (Field field : fields) {
-                    content = entry.getResolvedFieldOrAlias(field, database);
+                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
                     if (content.isPresent()) {
                         isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
                         break;

@@ -35,11 +35,11 @@ public class PersistenceVisualStateTable {
     private void updateColumnPreferences() {
         preferences.storeColumnPreferences(new ColumnPreferences(
                 mainTable.getColumns().stream()
-                        .map(column -> ((MainTableColumn<?>) column).getModel())
-                        .collect(Collectors.toList()),
+                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                         .collect(Collectors.toList()),
                 mainTable.getSortOrder().stream()
-                        .map(column -> ((MainTableColumn<?>) column).getModel())
-                        .collect(Collectors.toList())
+                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                         .collect(Collectors.toList())
         ));
     }
 }

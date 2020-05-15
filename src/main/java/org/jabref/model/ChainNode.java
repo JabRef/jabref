@@ -102,9 +102,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * Removes this node from its parent and makes it a child of the specified node.
      * In this way the whole subchain based at this node is moved to the given node.
      *
-     * @param target      the new parent
-     * @throws NullPointerException           if target is null
-     * @throws UnsupportedOperationException  if target is an descendant of this node
+     * @param target the new parent
+     * @throws NullPointerException          if target is null
+     * @throws UnsupportedOperationException if target is an descendant of this node
      */
     public void moveTo(T target) {
         Objects.requireNonNull(target);
@@ -123,7 +123,6 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /**
      * Removes the child from this node's child list, giving it an empty parent.
-     *
      */
     public void removeChild() {
         if (child != null) {

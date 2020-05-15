@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -127,7 +126,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
@@ -148,7 +147,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
@@ -165,7 +164,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesINSPEC() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
@@ -202,7 +201,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesWOS() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
@@ -258,7 +257,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportIEEEExport() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
@@ -281,7 +280,7 @@ public class IsiImporterTest {
 
     @Test
     public void testIEEEImport() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntry entry = entries.get(0);
 
@@ -305,7 +304,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesMedline() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         BibEntry first = entries.get(0);
@@ -341,7 +340,7 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesEmpty() throws IOException, URISyntaxException {
-        Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
+        Path file = Path.of(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 

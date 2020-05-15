@@ -2,7 +2,6 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
@@ -127,8 +126,8 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
             initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
-           cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
-           cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
+            cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
+            cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });
     }
 
@@ -155,7 +154,7 @@ public class LibraryPropertiesDialogViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getUser());
         } else {
-            newMetaData.setLatexFileDirectory(preferences.getUser(), Paths.get(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getUser(), Path.of(latexFileDirectory));
         }
 
         if (libraryProtectedProperty.getValue()) {
@@ -315,7 +314,11 @@ public class LibraryPropertiesDialogViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return cleanupsProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+        return cleanupsProperty;
+    }
 }

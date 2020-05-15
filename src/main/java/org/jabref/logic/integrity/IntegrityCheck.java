@@ -21,14 +21,12 @@ public class IntegrityCheck {
                           FilePreferences filePreferences,
                           BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
-                          boolean enforceLegalKey,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
 
         fieldCheckers = new FieldCheckers(bibDatabaseContext,
                 filePreferences,
                 journalAbbreviationRepository,
-                enforceLegalKey,
                 allowIntegerEdition);
 
         entryCheckers = new ArrayList<>(List.of(

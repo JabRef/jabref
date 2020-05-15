@@ -45,7 +45,9 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     }
 
     @Override
-    public String getTabName() { return Localization.lang("External programs"); }
+    public String getTabName() {
+        return Localization.lang("External programs");
+    }
 
     public void initialize() {
         this.viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
@@ -76,20 +78,32 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     }
 
     @FXML
-    void pushToApplicationSettings() { viewModel.pushToApplicationSettings(); }
+    void pushToApplicationSettings() {
+        viewModel.pushToApplicationSettings();
+    }
 
     @FXML
-    void manageExternalFileTypes() { viewModel.manageExternalFileTypes(); }
+    void manageExternalFileTypes() {
+        viewModel.manageExternalFileTypes();
+    }
 
     @FXML
-    void useTerminalCommandBrowse() { viewModel.useTerminalCommandBrowse(); }
+    void useTerminalCommandBrowse() {
+        viewModel.useTerminalCommandBrowse();
+    }
 
     @FXML
-    void usePDFAcrobatCommandBrowse() { viewModel.usePDFAcrobatCommandBrowse(); }
+    void usePDFAcrobatCommandBrowse() {
+        viewModel.usePDFAcrobatCommandBrowse();
+    }
 
     @FXML
-    void usePDFSumatraCommandBrowse() { viewModel.usePDFSumatraCommandBrowse(); }
+    void usePDFSumatraCommandBrowse() {
+        viewModel.usePDFSumatraCommandBrowse();
+    }
 
     @FXML
-    void useFileBrowserSpecialCommandBrowse() { viewModel.useFileBrowserSpecialCommandBrowse(); }
+    void useFileBrowserSpecialCommandBrowse() {
+        viewModel.useFileBrowserSpecialCommandBrowse();
+    }
 }

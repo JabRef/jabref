@@ -44,5 +44,4 @@ public class EntryLinkChecker implements Checker {
         }
         return result;
     }
-
 }

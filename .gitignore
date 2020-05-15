@@ -2,6 +2,9 @@
 src/main/gen/
 src/main/generated/
 
+# the journal list cache
+*.mv
+
 # private data
 /buildres/jabref-cert-2016.p12
 

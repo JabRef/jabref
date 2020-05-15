@@ -38,7 +38,6 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -51,8 +50,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,28 +252,24 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-            try {
-                bibDatabaseContext.getDatabase().insertEntries(entries);
+            bibDatabaseContext.getDatabase().insertEntries(entries);
 
-                // Set owner and timestamp
-                for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry,
-                            true,
-                            true,
-                            Globals.prefs.getOwnerPreferences(),
-                            Globals.prefs.getTimestampPreferences());
-                }
-                // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-                markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(entries.get(0));
-                }
-                clearAndSelect(entries.get(0));
-            } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
+            // Set owner and timestamp
+            for (BibEntry entry : entries) {
+                UpdateField.setAutomaticFields(entry,
+                        true,
+                        true,
+                        Globals.prefs.getOwnerPreferences(),
+                        Globals.prefs.getTimestampPreferences());
             }
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+
+            markBaseChanged(); // The database just changed.
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+                showAndEdit(entries.get(0));
+            }
+            clearAndSelect(entries.get(0));
         }
     }
 
@@ -377,9 +372,9 @@ public class BasePanel extends StackPane {
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                                              .flatMap(SplitPane.Divider::positionProperty)
-                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+        dividerPositionSubscription = EasyBind.wrapNullable(Bindings.valueAt(splitPane.getDividers(), 0))
+                                              .mapObservable(SplitPane.Divider::positionProperty)
+                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -404,7 +399,7 @@ public class BasePanel extends StackPane {
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
-            suggestionProviders = new SuggestionProviders(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
+            suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository);
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
@@ -580,10 +575,6 @@ public class BasePanel extends StackPane {
      * preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (position == null) {
-            return;
-        }
-
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }

@@ -60,13 +60,13 @@ import org.jabref.model.entry.Author;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class GlobalSearchBar extends HBox {
     private final Tooltip tooltip = new Tooltip();
     private final StateManager stateManager;
     private SearchDisplayMode searchDisplayMode;
-    private Validator regexValidator;
+    private final Validator regexValidator;
 
     public GlobalSearchBar(JabRefFrame frame, StateManager stateManager) {
         super();
@@ -160,7 +160,9 @@ public class GlobalSearchBar extends HBox {
         );
         ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
-        Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
+        Platform.runLater(() -> {
+            visualizer.initVisualization(regexValidator.getValidationStatus(), searchField);
+        });
 
         EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
             if (isFocused) {
@@ -195,7 +197,7 @@ public class GlobalSearchBar extends HBox {
 
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                              query.isGrammarBasedSearch());
+                        query.isGrammarBasedSearch());
             });
         });
     }

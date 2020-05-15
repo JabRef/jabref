@@ -16,5 +16,4 @@ public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
     public List<String> getLastLevelBibtexKeyPattern(EntryType entryType) {
         return globalBibtexKeyPattern.getValue(entryType);
     }
-
 }

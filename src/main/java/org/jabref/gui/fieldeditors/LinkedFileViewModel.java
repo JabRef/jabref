@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +38,7 @@ import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileNameUniqueness;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -101,7 +101,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     if (linkedFile.isOnlineLink()) {
                         return true;
                     } else {
-                        Optional<Path> path = FileHelper.expandFilename(databaseContext, link, filePreferences);
+                        Optional<Path> path = FileHelper.find(databaseContext, link, filePreferences);
                         return path.isPresent() && Files.exists(path.get());
                     }
                 },
@@ -192,7 +192,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void openFolder() {
         try {
             if (!linkedFile.isOnlineLink()) {
-                Optional<Path> resolvedPath = FileHelper.expandFilename(
+                Optional<Path> resolvedPath = FileHelper.find(
                         databaseContext,
                         linkedFile.getLink(),
                         filePreferences);
@@ -216,7 +216,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
-        Path oldFilePath = Paths.get(oldFile);
+        Path oldFilePath = Path.of(oldFile);
         Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
@@ -293,7 +293,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
      * @return true if the suggested filename is same as current filename.
      */
     public boolean isGeneratedNameSameAsOriginal() {
-        Path file = Paths.get(this.linkedFile.getLink());
+        Path file = Path.of(this.linkedFile.getLink());
         String currentFileName = file.getFileName().toString();
         String suggestedFileName = this.linkedFileHandler.getSuggestedFileName();
 
@@ -414,10 +414,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
                 LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
-                linkedFile.setLink(newLinkedFile.getLink());
-                linkedFile.setFileType(newLinkedFile.getFileType());
+                entry.addFile(0, newLinkedFile);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            downloadTask.titleProperty().set(Localization.lang("Downloading"));
+            downloadTask.messageProperty().set(
+                    Localization.lang("Fulltext for") + ": " + entry.getCiteKeyOptional().orElse(Localization.lang("New entry")));
+            downloadTask.showToUser(true);
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
@@ -432,8 +435,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
-                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, suggestedName);
-                    return targetDirectory.resolve(suggestedName);
+                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirPattern());
+                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
+                    return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
                 .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
@@ -470,5 +474,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile;
     }
 
-    public ValidationStatus fileExistsValidationStatus() { return fileExistsValidator.getValidationStatus(); }
+    public ValidationStatus fileExistsValidationStatus() {
+        return fileExistsValidator.getValidationStatus();
+    }
 }

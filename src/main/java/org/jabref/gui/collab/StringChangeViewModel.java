@@ -50,5 +50,4 @@ class StringChangeViewModel extends DatabaseChangeViewModel {
 
         return container;
     }
-
 }

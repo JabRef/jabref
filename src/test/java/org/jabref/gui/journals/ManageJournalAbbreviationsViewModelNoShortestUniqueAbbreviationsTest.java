@@ -55,8 +55,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        JournalAbbreviationLoader journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, JournalAbbreviationLoader.loadBuiltInRepository());
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "");
@@ -195,27 +194,11 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(false);
-        viewModel.addBuiltInLists();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
+        viewModel.addBuiltInList();
+        assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
-        ObservableList<Abbreviation> actualAbbreviations = FXCollections
-                .observableArrayList(viewModel.abbreviationsProperty().stream()
-                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
-
-        assertEquals(expected, actualAbbreviations);
-    }
-
-    @Test
-    void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(true);
-        viewModel.addBuiltInLists();
-        viewModel.selectLastJournalFile();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
-        ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getOfficialIEEEAbbreviations());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
                                               .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
@@ -415,19 +398,19 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb",
-                "Test Entry;TE",
-                "MoreEntries;ME",
-                "JabRefTestEntry;JTE");
+                "Abbreviations;Abb;Abb",
+                "Test Entry;TE;TE",
+                "MoreEntries;ME;ME",
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
-                "Abbreviations;Abb",
-                "Test Entry;TE",
-                "SomeOtherEntry;SOE");
+                "EntryEntry;EE;EE",
+                "Abbreviations;Abb;Abb",
+                "Test Entry;TE;TE",
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
@@ -464,7 +447,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
     }
 
     /**

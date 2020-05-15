@@ -1,6 +1,5 @@
-package org.jabref.logic.util;
+package org.jabref.logic.bibtexkeypattern;
 
-import org.jabref.logic.bibtexkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -21,7 +20,7 @@ class BracketedPatternTest {
     private BibEntry dbentry;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         bibentry = new BibEntry();
         bibentry.setField(StandardField.AUTHOR, "O. Kitsune");
         bibentry.setField(StandardField.YEAR, "2017");
@@ -240,5 +239,32 @@ class BracketedPatternTest {
     void regularExpressionReplace() {
         assertEquals("2003-JabRef Science",
                 BracketedPattern.expandBrackets("[year]-[journal:regex(\"Organization\",\"JabRef\")]", ';', dbentry, database));
+    }
+
+    @Test
+    void regularExpressionWithBrackets() {
+        assertEquals("2003-JabRef Science",
+                BracketedPattern.expandBrackets("[year]-[journal:regex(\"[OX]rganization\",\"JabRef\")]", ';', dbentry, database));
+    }
+
+    @Test
+    void testEmptyBrackets() {
+        assertEquals("2003-Organization Science",
+                BracketedPattern.expandBrackets("[year][]-[journal]", ';', dbentry, database));
+    }
+
+    /**
+     * Test the [:truncate] modifier
+     */
+    @Test
+    void expandBracketsChainsTwoTruncateModifiers() {
+        assertEquals("Open",
+                BracketedPattern.expandBrackets("[fulltitle:truncate6:truncate5]", ';', dbentry, database));
+    }
+
+    @Test
+    void expandBracketsDoesNotTruncateWithoutAnArgumentToTruncateModifier() {
+        assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
+                BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
 }

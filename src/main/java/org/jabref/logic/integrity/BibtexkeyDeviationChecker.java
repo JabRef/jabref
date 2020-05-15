@@ -41,5 +41,4 @@ public class BibtexkeyDeviationChecker implements Checker {
 
         return Collections.emptyList();
     }
-
 }
