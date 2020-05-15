@@ -39,7 +39,7 @@ public class IntegrityCheck {
                 new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase())
         ));
 
-        if (!bibDatabaseContext.isBiblatexMode()) {
+        if (bibDatabaseContext.isBiblatexMode()) {
             entryCheckers.add(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository));
         } else {
             entryCheckers.addAll(List.of(
