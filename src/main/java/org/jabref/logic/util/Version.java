@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents the Application Version with the major and minor number, the full Version String and if it's a developer
- * version
+ * Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
  */
 public class Version {
 
@@ -47,8 +46,7 @@ public class Version {
     }
 
     /**
-     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?}
-     *                (e.g., 3.3; 3.4-dev)
+     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
      * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
     public static Version parse(String version) {

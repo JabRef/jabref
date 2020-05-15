@@ -174,7 +174,6 @@ public class GroupTreeView {
 
                 boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
                 row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
-
             });
             // Remove disclosure node since we display custom version in separate column
             // Simply setting to null is not enough since it would be replaced by the default node on every change
@@ -243,7 +242,8 @@ public class GroupTreeView {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
                     List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
-                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
+                        Optional<GroupNodeViewModel> source = viewModel
+                                .rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));

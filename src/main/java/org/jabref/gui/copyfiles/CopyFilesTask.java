@@ -104,7 +104,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             numberSucessful++;
                             writeLogMessage(newFile, bw, localizedSucessMessage);
                             addResultToList(newFile, success, localizedSucessMessage);
-
                         } else {
 
                             updateMessage(localizedErrorMessage);
@@ -112,7 +111,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             addResultToList(newFile, success, localizedErrorMessage);
                         }
                     }
-
                 }
             }
             updateMessage(Localization.lang("Finished copying"));
@@ -137,5 +135,4 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         CopyFilesResultItemViewModel result = new CopyFilesResultItemViewModel(newFile, success, logMessage);
         results.add(result);
     }
-
 }

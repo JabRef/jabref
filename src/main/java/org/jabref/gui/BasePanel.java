@@ -252,24 +252,24 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-                bibDatabaseContext.getDatabase().insertEntries(entries);
+            bibDatabaseContext.getDatabase().insertEntries(entries);
 
-                // Set owner and timestamp
-                for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry,
-                            true,
-                            true,
-                            Globals.prefs.getOwnerPreferences(),
-                            Globals.prefs.getTimestampPreferences());
-                }
-                // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+            // Set owner and timestamp
+            for (BibEntry entry : entries) {
+                UpdateField.setAutomaticFields(entry,
+                        true,
+                        true,
+                        Globals.prefs.getOwnerPreferences(),
+                        Globals.prefs.getTimestampPreferences());
+            }
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
-                markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(entries.get(0));
-                }
-                clearAndSelect(entries.get(0));
+            markBaseChanged(); // The database just changed.
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+                showAndEdit(entries.get(0));
+            }
+            clearAndSelect(entries.get(0));
         }
     }
 

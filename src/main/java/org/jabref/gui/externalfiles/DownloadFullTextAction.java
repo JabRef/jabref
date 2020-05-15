@@ -100,7 +100,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value ->
                 downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Download full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
@@ -166,6 +166,10 @@ public class DownloadFullTextAction extends SimpleCommand {
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
                             entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
                 });
+                downloadTask.titleProperty().set(Localization.lang("Downloading"));
+                downloadTask.messageProperty().set(
+                        Localization.lang("Fulltext for") + ": " + entry.getCiteKeyOptional().orElse(Localization.lang("New entry")));
+                downloadTask.showToUser(true);
                 Globals.TASK_EXECUTOR.execute(downloadTask);
             } catch (MalformedURLException exception) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);

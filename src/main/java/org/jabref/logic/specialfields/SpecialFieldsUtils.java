@@ -23,9 +23,9 @@ import org.jabref.model.entry.field.StandardField;
 public class SpecialFieldsUtils {
 
     /**
-     * @param field                         - Field to be handled
+     * @param field                     - Field to be handled
      * @param value                     - may be null to state that field should be emptied
-     * @param entry                        - BibTeXEntry to be handled
+     * @param entry                     - BibTeXEntry to be handled
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
     public static List<FieldChange> updateField(SpecialField field, String value, BibEntry entry, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {

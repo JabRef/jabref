@@ -39,16 +39,16 @@ abstract class DatabaseChangeViewModel {
 
     /**
      * This method returns a {@link Node} detailing the nature and look of the change, e.g. how it is displayed
+     *
      * @return Node the Node with the layout of the change
      */
     public abstract Node description();
 
     /**
-     * Performs the change. This method is responsible for adding a proper undo edit to
-     * the NamedCompound, so the change can be undone.
+     * Performs the change. This method is responsible for adding a proper undo edit to the NamedCompound, so the change can be undone.
+     *
      * @param database the database that should be modified accordingly.
      * @param undoEdit NamedCompound The compound to hold the undo edits.
      */
     public abstract void makeChange(BibDatabaseContext database, NamedCompound undoEdit);
-
 }

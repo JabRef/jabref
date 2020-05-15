@@ -57,9 +57,9 @@
     -jr-drag-target-hover: -jr-accent;
 }
 
-#previewBody{
+#previewBody {
     background-color: #272b38; /* -fx-control-inner-background*/
-    color : #7d8591; /* -fx-mid-text-color*/
+    color: #7d8591; /* -fx-mid-text-color*/
 }
 
 .table-view .groupColumnBackground {

@@ -25,9 +25,9 @@ public class SavePreferences {
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
 
     private SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
-                           DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
-                           FieldWriterPreferences fieldWriterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern,
-                           Boolean generateBibtexKeysBeforeSaving, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+                            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
+                            FieldWriterPreferences fieldWriterPreferences, GlobalBibtexKeyPattern globalCiteKeyPattern,
+                            Boolean generateBibtexKeysBeforeSaving, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
         this.encoding = encoding;

@@ -184,7 +184,6 @@ public class ImportAction {
                 for (ContentSelector selector : parserResult.getMetaData().getContentSelectorList()) {
                     result.getMetaData().addContentSelector(selector);
                 }
-
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }
@@ -194,5 +193,4 @@ public class ImportAction {
 
         return result;
     }
-
 }

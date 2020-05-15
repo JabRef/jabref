@@ -38,6 +38,7 @@ import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.NumericFieldComparator;
 import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
@@ -212,6 +213,7 @@ class MainTableColumnFactory {
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);
+        column.setComparator(new NumericFieldComparator());
         column.setSortable(true);
         return column;
     }

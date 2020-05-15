@@ -53,7 +53,7 @@ public class FieldViewModel {
     public FieldType getFieldType() {
         return this.fieldType.getValue();
     }
-    
+
     public void setFieldType(FieldType type) {
         this.fieldType.setValue(type);
     }

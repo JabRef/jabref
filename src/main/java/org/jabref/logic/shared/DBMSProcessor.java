@@ -136,10 +136,10 @@ public abstract class DBMSProcessor {
      * For use in test only. Inserts the BibEntry into the shared database.
      *
      * @param bibEntry {@link BibEntry} to be inserted.
-     * */
-     public void insertEntry(BibEntry bibEntry) {
-         insertEntries(Collections.singletonList(bibEntry));
-     }
+     */
+    public void insertEntry(BibEntry bibEntry) {
+        insertEntries(Collections.singletonList(bibEntry));
+    }
 
     /**
      * Inserts the List of BibEntry into the shared database.
@@ -173,7 +173,7 @@ public abstract class DBMSProcessor {
         }
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[]{"SHARED_ID"})) {
+                new String[] {"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -228,8 +228,8 @@ public abstract class DBMSProcessor {
         }
         return bibEntries.stream().filter((entry) ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
-                .collect(Collectors.toList());
-        }
+                         .collect(Collectors.toList());
+    }
 
     /**
      * Inserts the given list of BibEntry into FIELD table.

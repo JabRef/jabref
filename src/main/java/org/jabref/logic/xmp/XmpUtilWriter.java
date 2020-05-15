@@ -56,7 +56,7 @@ public class XmpUtilWriter {
      * @throws IOException          If the file could not be written to or could not be found.
      */
     public static void writeXmp(String fileName, BibEntry entry,
-            BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         XmpUtilWriter.writeXmp(Path.of(fileName), entry, database, xmpPreferences);
     }
 
@@ -80,7 +80,7 @@ public class XmpUtilWriter {
      * @throws IOException          If the file could not be written to or could not be found.
      */
     public static void writeXmp(Path file, BibEntry entry,
-            BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                BibDatabase database, XmpPreferences xmpPreferences) throws IOException, TransformerException {
         List<BibEntry> bibEntryList = new ArrayList<>();
         bibEntryList.add(entry);
         XmpUtilWriter.writeXmp(file, bibEntryList, database, xmpPreferences);
@@ -97,7 +97,7 @@ public class XmpUtilWriter {
      * @param xmpPreferences    The user's xmp preferences.
      */
     private static void writeToDCSchema(DublinCoreSchema dcSchema, BibEntry entry, BibDatabase database,
-            XmpPreferences xmpPreferences) {
+                                        XmpPreferences xmpPreferences) {
 
         BibEntry resolvedEntry = XmpUtilWriter.getDefaultOrDatabaseEntry(entry, database);
 
@@ -238,7 +238,7 @@ public class XmpUtilWriter {
      *                 resolve strings. If the database is null the strings will not be resolved.
      */
     private static void writeDocumentInformation(PDDocument document,
-            BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
+                                                 BibEntry entry, BibDatabase database, XmpPreferences xmpPreferences) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
@@ -302,8 +302,8 @@ public class XmpUtilWriter {
      * @throws IOException          If the file could not be written to or could not be found.
      */
     public static void writeXmp(Path path,
-            List<BibEntry> bibtexEntries, BibDatabase database,
-            XmpPreferences xmpPreferences) throws IOException, TransformerException {
+                                List<BibEntry> bibtexEntries, BibDatabase database,
+                                XmpPreferences xmpPreferences) throws IOException, TransformerException {
 
         List<BibEntry> resolvedEntries;
         if (database == null) {

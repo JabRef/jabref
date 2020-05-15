@@ -12,7 +12,7 @@ import org.jabref.model.strings.StringUtil;
 public class MonthChecker implements ValueChecker {
 
     private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("[1-9]|10|11|12")
-            .asPredicate();
+                                                                    .asPredicate();
     private static final Predicate<String> MONTH_NORMALIZED = Pattern
             .compile("#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
             .asPredicate();

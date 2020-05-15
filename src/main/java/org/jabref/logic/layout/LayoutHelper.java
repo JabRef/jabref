@@ -11,11 +11,12 @@ import java.util.Objects;
 /**
  * Helper class to get a Layout object.
  *
+ * <pre>
  * <code>
  * LayoutHelper helper = new LayoutHelper(...a reader...);
  * Layout layout = helper.getLayoutFromText();
  * </code>
- *
+ * </pre>
  */
 public class LayoutHelper {
 
@@ -226,8 +227,7 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if ((c != '\\') || escaped)// (previous == '\\')))
-                {
+                if ((c != '\\') || escaped) /* (previous == '\\'))) */ {
                     buffer.append((char) c);
                 }
 

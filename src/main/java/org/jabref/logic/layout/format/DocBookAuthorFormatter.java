@@ -5,7 +5,6 @@ import org.jabref.model.entry.AuthorList;
 
 /**
  * DocBook author formatter for both version 4 and 5
- *
  */
 public class DocBookAuthorFormatter {
 

@@ -31,6 +31,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
     /**
      * especially for the track execute when the action run the same function but from different source.
+     *
      * @param source is a string contains the source, for example "button"
      */
     public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, Sources source) {
