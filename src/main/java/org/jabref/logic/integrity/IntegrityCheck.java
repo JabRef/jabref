@@ -1,7 +1,6 @@
 package org.jabref.logic.integrity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
