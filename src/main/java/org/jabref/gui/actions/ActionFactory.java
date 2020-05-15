@@ -16,9 +16,9 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

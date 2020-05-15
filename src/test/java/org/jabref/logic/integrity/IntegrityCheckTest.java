@@ -139,7 +139,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
-                .checkDatabase();
+                .check();
 
         assertEquals(clonedEntry, entry);
     }
@@ -172,7 +172,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
-                .checkDatabase();
+                .check();
         assertNotEquals(Collections.emptyList(), messages);
     }
 
@@ -181,7 +181,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
-        ).checkDatabase();
+        ).check();
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -190,7 +190,7 @@ class IntegrityCheckTest {
                                                              mock(FilePreferences.class),
                                                              createBibtexKeyPatternPreferences(),
                                                              JournalAbbreviationLoader.loadBuiltInRepository(),
-                                                             allowIntegerEdition).checkDatabase();
+                                                             allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 

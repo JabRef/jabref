@@ -333,7 +333,7 @@ public class OpenOfficePanel {
             connect();
         } else {
 
-            Task<Void> taskConnectIfInstalled = new Task<Void>() {
+            Task<Void> taskConnectIfInstalled = new Task<>() {
 
                 @Override
                 protected Void call() throws Exception {
@@ -350,7 +350,7 @@ public class OpenOfficePanel {
             taskConnectIfInstalled.setOnSucceeded(value -> connect());
             taskConnectIfInstalled.setOnFailed(value -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), taskConnectIfInstalled.getException()));
 
-            dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), taskConnectIfInstalled);
+            dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), taskConnectIfInstalled);
             taskExecutor.execute(taskConnectIfInstalled);
         }
     }
@@ -418,7 +418,7 @@ public class OpenOfficePanel {
             }
         });
 
-        dialogService.showProgressDialogAndWait(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), connectTask);
+        dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), connectTask);
         taskExecutor.execute(connectTask);
     }
 

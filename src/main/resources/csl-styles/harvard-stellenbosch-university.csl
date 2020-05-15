@@ -195,7 +195,7 @@
       <text variable="publisher"/>
     </group>
   </macro>
-  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix" et-al-min="4" et-al-use-first="3"  et-al-subsequent-min="3" et-al-subsequent-use-first="1">
+  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1">
     <sort>
       <key macro="author"/>
       <key macro="date-issued-no-parentheses"/>
