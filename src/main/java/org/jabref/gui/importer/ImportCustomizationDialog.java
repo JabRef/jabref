@@ -20,7 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ImportCustomizationDialog extends BaseDialog<Void> {
 

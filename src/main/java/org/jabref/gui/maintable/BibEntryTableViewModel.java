@@ -26,8 +26,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.MonadicBinding;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
@@ -35,7 +35,7 @@ public class BibEntryTableViewModel {
     private final MainTableNameFormatter nameFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, ObservableValue<Optional<SpecialFieldValueViewModel>>> specialFieldValues = new HashMap<>();
-    private final MonadicBinding<List<LinkedFile>> linkedFiles;
+    private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final ObjectBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 

@@ -24,7 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are

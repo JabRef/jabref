@@ -38,8 +38,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import com.tobiasdiez.easybind.EasyBind;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 

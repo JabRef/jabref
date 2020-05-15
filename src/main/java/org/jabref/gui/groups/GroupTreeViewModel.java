@@ -31,7 +31,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
