@@ -14,6 +14,7 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -139,9 +140,9 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -987,7 +988,7 @@ public class JabRefFrame extends BorderPane {
         });
 
         indicator.setOnMouseClicked(event -> {
-            TaskProgressView taskProgressView = new TaskProgressView();
+            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
             EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);

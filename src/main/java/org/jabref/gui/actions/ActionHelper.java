@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
@@ -16,9 +17,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.MonadicBinding;
-import org.fxmisc.easybind.monadic.MonadicObservableValue;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ActionHelper {
 
@@ -41,18 +40,18 @@ public class ActionHelper {
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        MonadicBinding<Boolean> fieldsAreSet = EasyBind.monadic(Bindings.valueAt(selectedEntries, 0))
-                                                       .flatMap(entry -> Bindings.createBooleanBinding(() -> {
+        Binding<Boolean> fieldsAreSet = EasyBind.wrapNullable(Bindings.valueAt(selectedEntries, 0))
+                                                .mapObservable(entry -> Bindings.createBooleanBinding(() -> {
                                                            return entry.getFields().stream().anyMatch(fields::contains);
                                                        }, entry.getFieldsObservable()))
-                                                       .orElse(false);
+                                                .orElse(false);
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
 
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        MonadicObservableValue<Boolean> fileIsPresent = EasyBind.monadic(Bindings.valueAt(selectedEntries, 0)).map(entry -> {
+        Binding<Boolean> fileIsPresent = EasyBind.wrapNullable(Bindings.valueAt(selectedEntries, 0)).map(entry -> {
             List<LinkedFile> files = entry.getFiles();
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
