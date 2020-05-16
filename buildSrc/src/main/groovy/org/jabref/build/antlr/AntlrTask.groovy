@@ -25,8 +25,8 @@ class AntlrTask extends JavaExec {
     void exec() {
         AntlrCommandLine commandLine = antlr.newInstance(this)
 
-        main = commandLine.main
-        classpath = commandLine.classpath
+        setMain(commandLine.main)
+        setClasspath(commandLine.classpath)
         args = commandLine.arguments
 
         super.exec()
