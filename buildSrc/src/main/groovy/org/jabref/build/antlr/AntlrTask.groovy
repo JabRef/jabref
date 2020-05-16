@@ -1,5 +1,6 @@
 package org.jabref.build.antlr
 
+import org.gradle.api.Task
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.TaskAction
 
@@ -12,6 +13,7 @@ class AntlrTask extends JavaExec {
     private String inputFile = ""
     private String outputDir = ""
     private String javaPackage = ""
+    private AntlrCommandLine commandLine
 
     AntlrTask() {
         project.configurations {
@@ -20,13 +22,19 @@ class AntlrTask extends JavaExec {
         }
     }
 
+    @Override
+    Task configure(Closure closure) {
+        commandLine = antlr.newInstance(this)
+
+        setMain(commandLine.main)
+
+        return super.configure(closure)
+    }
+
     @TaskAction
     @Override
     void exec() {
-        AntlrCommandLine commandLine = antlr.newInstance(this)
-
-        setMain(commandLine.main)
-        setClasspath(commandLine.classpath)
+        classpath(commandLine.classpath)
         args = commandLine.arguments
 
         super.exec()
