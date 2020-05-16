@@ -41,7 +41,9 @@ public class ExportSortingTabView extends AbstractPreferenceTabView<ExportSortin
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Export sorting"); }
+    public String getTabName() {
+        return Localization.lang("Export sorting");
+    }
 
     @Override
     public boolean validateSettings() {

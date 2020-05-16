@@ -34,12 +34,13 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- * Returns null if canceled.
+ *
+ * @return null if canceled
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
@@ -90,7 +91,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
-
     }
 
     private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
@@ -150,7 +150,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
-
         } else {
             biblatexTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
@@ -304,5 +303,4 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         //CHECKSTYLE:ON
 
     }
-
 }

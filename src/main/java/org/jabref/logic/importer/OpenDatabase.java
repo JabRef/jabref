@@ -59,7 +59,7 @@ public class OpenDatabase {
      * Opens a new database.
      */
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
-        throws IOException {
+            throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
 

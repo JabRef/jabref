@@ -84,19 +84,35 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public BooleanProperty autoResizeNameProperty() { return autoResizeNameProperty; }
+    public BooleanProperty autoResizeNameProperty() {
+        return autoResizeNameProperty;
+    }
 
-    public BooleanProperty namesNatbibProperty() { return namesNatbibProperty; }
+    public BooleanProperty namesNatbibProperty() {
+        return namesNatbibProperty;
+    }
 
-    public BooleanProperty nameAsIsProperty() { return nameAsIsProperty; }
+    public BooleanProperty nameAsIsProperty() {
+        return nameAsIsProperty;
+    }
 
-    public BooleanProperty nameFirstLastProperty() { return nameFirstLastProperty; }
+    public BooleanProperty nameFirstLastProperty() {
+        return nameFirstLastProperty;
+    }
 
-    public BooleanProperty nameLastFirstProperty() { return nameLastFirstProperty; }
+    public BooleanProperty nameLastFirstProperty() {
+        return nameLastFirstProperty;
+    }
 
-    public BooleanProperty abbreviationDisabledProperty() { return abbreviationDisabledProperty; }
+    public BooleanProperty abbreviationDisabledProperty() {
+        return abbreviationDisabledProperty;
+    }
 
-    public BooleanProperty abbreviationEnabledProperty() { return abbreviationEnabledProperty; }
+    public BooleanProperty abbreviationEnabledProperty() {
+        return abbreviationEnabledProperty;
+    }
 
-    public BooleanProperty abbreviationLastNameOnlyProperty() { return abbreviationLastNameOnlyProperty; }
+    public BooleanProperty abbreviationLastNameOnlyProperty() {
+        return abbreviationLastNameOnlyProperty;
+    }
 }

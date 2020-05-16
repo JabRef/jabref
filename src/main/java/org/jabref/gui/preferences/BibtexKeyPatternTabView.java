@@ -85,5 +85,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     }
 
     @FXML
-    public void resetAllKeyPatterns() { bibtexKeyPatternTable.resetAll(); }
+    public void resetAllKeyPatterns() {
+        bibtexKeyPatternTable.resetAll();
+    }
 }

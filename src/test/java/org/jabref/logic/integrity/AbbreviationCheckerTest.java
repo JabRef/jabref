@@ -34,4 +34,15 @@ class AbbreviationCheckerTest {
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
         assertEquals(Optional.empty(), checker.checkValue("Journal"));
     }
+
+    @Test
+    void checkValueDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
+        assertEquals(Optional.empty(), checker.checkValue("IEEE Software"));
+    }
+
+    @Test
+    void checkValueDoesNotComplainAboutJournalNameThatHasΝοInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
+    }
+
 }

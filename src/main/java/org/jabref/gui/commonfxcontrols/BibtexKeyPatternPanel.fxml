@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-
 <fx:root editable="true" minWidth="280.0" type="TableView"
          xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanel">

@@ -180,6 +180,7 @@ public enum Month {
 
     /**
      * Returns the number of the Month in a 1-indexed fashion: 1 -> January, 2 -> February etc.
+     *
      * @return number of the month in the Year
      */
     public int getNumber() {
@@ -188,6 +189,7 @@ public enum Month {
 
     /**
      * Returns the name of the long in unabbreviated english.
+     *
      * @return Month
      */
     public String getFullName() {
@@ -196,6 +198,7 @@ public enum Month {
 
     /**
      * Returns the number of the Month in a 1-indexed fashion using exactly two digits: 01 -> January, 02 -> February...
+     *
      * @return number of the month in the Year with two digits
      */
     public String getTwoDigitNumber() {

@@ -12,14 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * A tag item in a {@link TagBar}.
  */
 public class Tag<T> extends HBox {
 
-    private ObjectProperty<T> value;
+    private final ObjectProperty<T> value;
     private Consumer<T> tagRemovedConsumer;
     @FXML private Label text;
 

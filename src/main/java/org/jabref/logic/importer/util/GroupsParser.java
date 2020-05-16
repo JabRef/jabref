@@ -84,11 +84,10 @@ public class GroupsParser {
     /**
      * Re-create a group instance from a textual representation.
      *
-     * @param s The result from the group's toString() method.
+     * @param s           The result from the group's toString() method.
      * @param fileMonitor
      * @return New instance of the encoded group.
-     * @throws ParseException If an error occurred and a group could not be created,
-     *                        e.g. due to a malformed regular expression.
+     * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
     public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
@@ -180,8 +179,7 @@ public class GroupsParser {
     /**
      * Parses s and recreates the KeywordGroup from it.
      *
-     * @param s The String representation obtained from
-     *          KeywordGroup.toString()
+     * @param s The String representation obtained from KeywordGroup.toString()
      */
     private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
@@ -265,8 +263,7 @@ public class GroupsParser {
     /**
      * Parses s and recreates the SearchGroup from it.
      *
-     * @param s The String representation obtained from
-     *          SearchGroup.toString(), or null if incompatible
+     * @param s The String representation obtained from SearchGroup.toString(), or null if incompatible
      */
     private static AbstractGroup searchGroupFromString(String s) {
         if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {

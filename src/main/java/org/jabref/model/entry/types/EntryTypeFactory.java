@@ -28,9 +28,9 @@ public class EntryTypeFactory {
             return false;
         } else {
             return Objects.equals(type1.getType(), type2.getType())
-                   && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
-                   && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
-                   && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
+                    && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
+                    && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
+                    && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
         }
     }
 

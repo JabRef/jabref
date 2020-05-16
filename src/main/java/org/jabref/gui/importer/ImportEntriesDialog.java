@@ -42,8 +42,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.easybind.EasyBind;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
@@ -60,7 +60,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private PreferencesService preferences;
     @Inject private StateManager stateManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
 
     /**
      * Imports the given entries into the given database. The entries are provided using the BackgroundTask

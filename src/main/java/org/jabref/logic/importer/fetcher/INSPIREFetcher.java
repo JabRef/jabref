@@ -25,7 +25,6 @@ import org.apache.http.client.utils.URIBuilder;
 
 /**
  * Fetches data from the INSPIRE database.
- *
  */
 public class INSPIREFetcher implements SearchBasedParserFetcher {
 

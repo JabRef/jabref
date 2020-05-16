@@ -91,13 +91,12 @@ public class DuplicateCheck {
                 (compareSingleField(StandardField.TITLE, one, two) == EQUAL) &&
                 ((compareSingleField(StandardField.CHAPTER, one, two) == NOT_EQUAL) ||
                         (compareSingleField(StandardField.PAGES, one, two) == NOT_EQUAL));
-
     }
 
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields == null
-                ? new double[]{0., 0.}
+                ? new double[] {0., 0.}
                 : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
@@ -134,9 +133,9 @@ public class DuplicateCheck {
             }
         }
         if (totWeights > 0) {
-            return new double[]{res / totWeights, totWeights};
+            return new double[] {res / totWeights, totWeights};
         }
-        return new double[]{0.5, 0.0};
+        return new double[] {0.5, 0.0};
     }
 
     private static int compareSingleField(final Field field, final BibEntry one, final BibEntry two) {

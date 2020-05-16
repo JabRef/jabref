@@ -46,8 +46,8 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
@@ -117,12 +117,19 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         extraFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
     }
 
-    public void updateToCurrentColumnOrder() { viewModel.fillColumnList(); }
+    public void updateToCurrentColumnOrder() {
+        viewModel.fillColumnList();
+    }
 
-    public void sortColumnUp() { viewModel.moveColumnUp(); }
+    public void sortColumnUp() {
+        viewModel.moveColumnUp();
+    }
 
-    public void sortColumnDown() { viewModel.moveColumnDown(); }
+    public void sortColumnDown() {
+        viewModel.moveColumnDown();
+    }
 
-    public void addColumn() { viewModel.insertColumnInList(); }
-
+    public void addColumn() {
+        viewModel.insertColumnInList();
+    }
 }

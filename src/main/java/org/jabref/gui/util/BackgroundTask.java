@@ -15,8 +15,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
+import javafx.scene.Node;
 
-import org.fxmisc.easybind.EasyBind;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.logic.l10n.Localization;
+
+import com.google.common.collect.ImmutableMap;
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * This class is essentially a wrapper around {@link Task}.
@@ -27,14 +32,21 @@ import org.fxmisc.easybind.EasyBind;
  * @param <V> type of the return value of the task
  */
 public abstract class BackgroundTask<V> {
+
+    public static ImmutableMap<String, Node> iconMap = ImmutableMap.of(
+            Localization.lang("Downloading"), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()
+    );
+
     private Runnable onRunning;
     private Consumer<V> onSuccess;
     private Consumer<Exception> onException;
     private Runnable onFinished;
-    private BooleanProperty isCanceled = new SimpleBooleanProperty(false);
-    private ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
-    private StringProperty message = new SimpleStringProperty("");
-    private DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
+    private final BooleanProperty isCanceled = new SimpleBooleanProperty(false);
+    private final ObjectProperty<BackgroundProgress> progress = new SimpleObjectProperty<>(new BackgroundProgress(0, 0));
+    private final StringProperty message = new SimpleStringProperty("");
+    private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());
+    private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);
+    private final BooleanProperty showToUser = new SimpleBooleanProperty(false);
 
     public BackgroundTask() {
         workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));
@@ -90,6 +102,10 @@ public abstract class BackgroundTask<V> {
         return message;
     }
 
+    public StringProperty titleProperty() {
+        return title;
+    }
+
     public double getWorkDonePercentage() {
         return workDonePercentage.get();
     }
@@ -104,6 +120,14 @@ public abstract class BackgroundTask<V> {
 
     public ObjectProperty<BackgroundProgress> progressProperty() {
         return progress;
+    }
+
+    public boolean showToUser() {
+        return showToUser.get();
+    }
+
+    public void showToUser(boolean show) {
+        showToUser.set(show);
     }
 
     /**
@@ -231,6 +255,10 @@ public abstract class BackgroundTask<V> {
     public BackgroundTask<V> withInitialMessage(String message) {
         updateMessage(message);
         return this;
+    }
+
+    public static Node getIcon(Task<?> task) {
+        return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
     static class BackgroundProgress {

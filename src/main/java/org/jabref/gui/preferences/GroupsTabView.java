@@ -29,7 +29,9 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Groups"); }
+    public String getTabName() {
+        return Localization.lang("Groups");
+    }
 
     public void initialize() {
         this.viewModel = new GroupsTabViewModel(dialogService, preferences);

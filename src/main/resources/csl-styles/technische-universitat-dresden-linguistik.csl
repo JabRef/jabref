@@ -119,7 +119,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="9" et-al-use-first="1">
+  <bibliography et-al-min="9" et-al-use-first="1" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="creator-short"/>
       <key macro="creator-year-short"/>

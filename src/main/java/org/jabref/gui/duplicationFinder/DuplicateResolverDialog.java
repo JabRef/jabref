@@ -122,5 +122,4 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
     public BibEntry getMergedEntry() {
         return me.getMergeEntry();
     }
-
 }
