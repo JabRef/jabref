@@ -1,24 +1,25 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
+
+import com.google.common.collect.Streams;
 
 public class JournalsSuggestionProvider extends FieldValueSuggestionProvider {
 
-    JournalsSuggestionProvider(Field field, AutoCompletePreferences preferences,
-                               JournalAbbreviationLoader abbreviationLoader) {
-        super(field);
+    private final JournalAbbreviationRepository repository;
 
-        JournalAbbreviationPreferences journalAbbreviationPreferences = preferences.getJournalAbbreviationPreferences();
-        List<String> journals = abbreviationLoader.getRepository(journalAbbreviationPreferences)
-                .getAbbreviations().stream()
-                .map(Abbreviation::getName)
-                .collect(Collectors.toList());
-        addPossibleSuggestions(journals);
+    JournalsSuggestionProvider(Field field, BibDatabase database, JournalAbbreviationRepository repository) {
+        super(field, database);
+
+        this.repository = repository;
+    }
+
+    @Override
+    public Stream<String> getSource() {
+        return Streams.concat(super.getSource(), repository.getFullNames().stream());
     }
 }

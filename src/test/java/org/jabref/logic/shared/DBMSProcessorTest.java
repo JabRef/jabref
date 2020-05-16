@@ -190,7 +190,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(bibEntry);
 
-        //simulate older version
+        // simulate older version
         bibEntry.getSharedBibEntryData().setVersion(0);
         bibEntry.setField(StandardField.YEAR, "1993");
 
@@ -202,7 +202,7 @@ class DBMSProcessorTest {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
-        //simulate older version
+        // simulate older version
         expectedBibEntry.getSharedBibEntryData().setVersion(0);
         dbmsProcessor.updateEntry(expectedBibEntry);
 

@@ -8,5 +8,4 @@ public class CustomizeKeyBindingAction extends SimpleCommand {
     public void execute() {
         new KeyBindingsDialogView().show();
     }
-
 }

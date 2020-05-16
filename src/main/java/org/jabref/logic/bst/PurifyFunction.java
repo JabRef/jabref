@@ -19,7 +19,6 @@ public class PurifyFunction implements BstFunction {
 
     private final VM vm;
 
-
     public PurifyFunction(VM vm) {
         this.vm = vm;
     }

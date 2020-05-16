@@ -27,7 +27,6 @@ public class FormatNameFunction implements BstFunction {
 
     private final VM vm;
 
-
     public FormatNameFunction(VM vm) {
         this.vm = vm;
     }

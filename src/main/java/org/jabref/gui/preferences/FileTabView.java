@@ -25,7 +25,6 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
-    @FXML private CheckBox backupOldFile;
     @FXML private TextField noWrapFiles;
     @FXML private RadioButton resolveStringsBibTex;
     @FXML private RadioButton resolveStringsAll;
@@ -57,13 +56,14 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     }
 
     @Override
-    public String getTabName() { return Localization.lang("File"); }
+    public String getTabName() {
+        return Localization.lang("File");
+    }
 
     public void initialize() {
         this.viewModel = new FileTabViewModel(dialogService, preferences);
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
-        backupOldFile.selectedProperty().bindBidirectional(viewModel.backupOldFileProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
         resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
@@ -96,5 +96,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
-    public void mainFileDirBrowse() { viewModel.mainFileDirBrowse(); }
+    public void mainFileDirBrowse() {
+        viewModel.mainFileDirBrowse();
+    }
 }

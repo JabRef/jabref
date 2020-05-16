@@ -55,13 +55,12 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        JournalAbbreviationLoader journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, JournalAbbreviationLoader.loadBuiltInRepository());
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
         testFile4Entries = createTestFile(tempFolder, "testFile4Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;E" + NEWLINE + "");
-        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv","Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
+        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
     }
 
     @Test
@@ -195,9 +194,8 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(false);
-        viewModel.addBuiltInLists();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
+        viewModel.addBuiltInList();
+        assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
@@ -209,22 +207,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
     }
 
     @Test
-    void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(true);
-        viewModel.addBuiltInLists();
-        viewModel.selectLastJournalFile();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
-        ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getOfficialIEEEAbbreviations());
-        ObservableList<Abbreviation> actualAbbreviations = FXCollections
-                .observableArrayList(viewModel.abbreviationsProperty().stream()
-                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
-
-        assertEquals(expected, actualAbbreviations);
-    }
-
-    @Test
-    void testcurrentFilePropertyChangeActiveFile() throws Exception {
+    void testCurrentFilePropertyChangeActiveFile() throws Exception {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile1Entries));
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile3Entries));
@@ -415,19 +398,19 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb",
+                "Abbreviations;Abb;Abb",
                 "Test Entry;TE;T",
                 "MoreEntries;ME;M",
-                "JabRefTestEntry;JTE");
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
-                "Abbreviations;Abb",
+                "EntryEntry;EE;EE",
+                "Abbreviations;Abb;Abb",
                 "Test Entry;TE;T",
-                "SomeOtherEntry;SOE");
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
@@ -464,7 +447,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
     }
 
     /**

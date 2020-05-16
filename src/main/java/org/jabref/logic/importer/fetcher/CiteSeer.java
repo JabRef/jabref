@@ -49,7 +49,7 @@ public class CiteSeer implements SearchBasedParserFetcher {
         uriBuilder.addParameter("sort", "rlv"); // Sort by relevance
         uriBuilder.addParameter("q", query); // Query
         uriBuilder.addParameter("t", "doc"); // Type: documents
-        //uriBuilder.addParameter("start", "0"); // Start index (not supported at the moment)
+        // uriBuilder.addParameter("start", "0"); // Start index (not supported at the moment)
         return uriBuilder.build().toURL();
     }
 

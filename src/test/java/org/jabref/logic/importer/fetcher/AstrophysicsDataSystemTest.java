@@ -23,7 +23,12 @@ import static org.mockito.Mockito.when;
 public class AstrophysicsDataSystemTest {
 
     private AstrophysicsDataSystem fetcher;
-    private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
+    private BibEntry diezSliceTheoremEntry;
+    private BibEntry famaeyMcGaughEntry;
+    private BibEntry sunWelchEntry;
+    private BibEntry xiongSunEntry;
+    private BibEntry ingersollPollardEntry;
+    private BibEntry luceyPaulEntry;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -159,7 +164,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT));//Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
@@ -177,7 +182,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 

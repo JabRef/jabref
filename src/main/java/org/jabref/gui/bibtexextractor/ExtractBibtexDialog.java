@@ -52,7 +52,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        this.viewModel = new BibtexExtractorViewModel(database, dialogService, JabRefPreferences.getInstance(), fileUpdateMonitor, taskExecutor,undoManager,stateManager);
+        this.viewModel = new BibtexExtractorViewModel(database, dialogService, JabRefPreferences.getInstance(), fileUpdateMonitor, taskExecutor, undoManager, stateManager);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
     }
 }

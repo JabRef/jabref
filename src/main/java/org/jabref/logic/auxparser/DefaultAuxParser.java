@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -97,7 +96,7 @@ public class DefaultAuxParser implements AuxParser {
             if (rootPath != null) {
                 inputFile = rootPath.resolve(inputString);
             } else {
-                inputFile = Paths.get(inputString);
+                inputFile = Path.of(inputString);
             }
 
             if (!fileList.contains(inputFile)) {

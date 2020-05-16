@@ -61,9 +61,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
-    private Validator columnsNotEmptyValidator;
+    private final Validator columnsNotEmptyValidator;
 
-    private List<String> restartWarnings = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -119,9 +119,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
                 new MainTableColumnModel(MainTableColumnModel.Type.GROUPS),
                 new MainTableColumnModel(MainTableColumnModel.Type.FILES),
-                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TIMESTAMP.getName()),
-                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.OWNER.getName()),
-                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.GROUPS.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.TIMESTAMP.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.OWNER.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.GROUPS.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName())
         );
@@ -255,20 +255,35 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
         return restartWarnings;
     }
 
-    public ListProperty<MainTableColumnModel> columnsListProperty() { return this.columnsListProperty; }
+    public ListProperty<MainTableColumnModel> columnsListProperty() {
+        return this.columnsListProperty;
+    }
 
-    public ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty() { return selectedColumnModelProperty; }
+    public ObjectProperty<SelectionModel<MainTableColumnModel>> selectedColumnModelProperty() {
+        return selectedColumnModelProperty;
+    }
 
-    public ListProperty<MainTableColumnModel> availableColumnsProperty() { return this.availableColumnsProperty; }
+    public ListProperty<MainTableColumnModel> availableColumnsProperty() {
+        return this.availableColumnsProperty;
+    }
 
-    public ObjectProperty<MainTableColumnModel> addColumnProperty() { return this.addColumnProperty; }
+    public ObjectProperty<MainTableColumnModel> addColumnProperty() {
+        return this.addColumnProperty;
+    }
 
-    public BooleanProperty specialFieldsEnabledProperty() { return this.specialFieldsEnabledProperty; }
+    public BooleanProperty specialFieldsEnabledProperty() {
+        return this.specialFieldsEnabledProperty;
+    }
 
-    public BooleanProperty specialFieldsSyncKeywordsProperty() { return this.specialFieldsSyncKeywordsProperty; }
+    public BooleanProperty specialFieldsSyncKeywordsProperty() {
+        return this.specialFieldsSyncKeywordsProperty;
+    }
 
-    public BooleanProperty specialFieldsSerializeProperty() { return this.specialFieldsSerializeProperty; }
+    public BooleanProperty specialFieldsSerializeProperty() {
+        return this.specialFieldsSerializeProperty;
+    }
 
-    public BooleanProperty extraFileColumnsEnabledProperty() { return this.extraFileColumnsEnabledProperty; }
-
+    public BooleanProperty extraFileColumnsEnabledProperty() {
+        return this.extraFileColumnsEnabledProperty;
+    }
 }

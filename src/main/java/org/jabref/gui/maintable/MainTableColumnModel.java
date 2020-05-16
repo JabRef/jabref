@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents the full internal name of a column in the main table. Consists of two parts:
- * The type of the column and a qualifier, like the field name to be displayed in the column.
+ * Represents the full internal name of a column in the main table. Consists of two parts: The type of the column and a qualifier, like the
+ * field name to be displayed in the column.
  */
 public class MainTableColumnModel {
 
@@ -38,7 +38,7 @@ public class MainTableColumnModel {
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special"));
 
-        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE,FILES,GROUPS,LINKED_IDENTIFIER);
+        public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, LINKED_IDENTIFIER);
 
         private String name;
         private String displayName;
@@ -80,7 +80,7 @@ public class MainTableColumnModel {
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
      *
-     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
+     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
     public MainTableColumnModel(Type type, String qualifier) {
@@ -110,9 +110,9 @@ public class MainTableColumnModel {
     /**
      * This is used by the preference migrations.
      *
-     * @param type the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
+     * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "GROUPS"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
-     * @param width the stored width of the column
+     * @param width     the stored width of the column
      */
     public MainTableColumnModel(Type type, String qualifier, double width) {
         this(type, qualifier);
@@ -120,9 +120,13 @@ public class MainTableColumnModel {
         this.widthProperty.setValue(width);
     }
 
-    public Type getType() { return typeProperty.getValue(); }
+    public Type getType() {
+        return typeProperty.getValue();
+    }
 
-    public String getQualifier() { return qualifierProperty.getValue(); }
+    public String getQualifier() {
+        return qualifierProperty.getValue();
+    }
 
     public String getName() {
         if (qualifierProperty.getValue().isBlank()) {
@@ -141,15 +145,25 @@ public class MainTableColumnModel {
         }
     }
 
-    public StringProperty nameProperty() { return new ReadOnlyStringWrapper(getDisplayName()); }
+    public StringProperty nameProperty() {
+        return new ReadOnlyStringWrapper(getDisplayName());
+    }
 
-    public double getWidth() { return widthProperty.getValue(); }
+    public double getWidth() {
+        return widthProperty.getValue();
+    }
 
-    public DoubleProperty widthProperty() { return widthProperty; }
+    public DoubleProperty widthProperty() {
+        return widthProperty;
+    }
 
-    public TableColumn.SortType getSortType() { return sortTypeProperty.getValue(); }
+    public TableColumn.SortType getSortType() {
+        return sortTypeProperty.getValue();
+    }
 
-    public ObjectProperty<TableColumn.SortType> sortTypeProperty() { return sortTypeProperty; }
+    public ObjectProperty<TableColumn.SortType> sortTypeProperty() {
+        return sortTypeProperty;
+    }
 
     public boolean equals(Object o) {
         if (this == o) {
@@ -176,7 +190,6 @@ public class MainTableColumnModel {
      * This creates a new {@code MainTableColumnModel} out of a given string
      *
      * @param rawColumnName the name of the column, e.g. "field:author", or "author"
-     *
      * @return A new {@code MainTableColumnModel}
      */
     public static MainTableColumnModel parse(String rawColumnName) {

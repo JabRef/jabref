@@ -7,25 +7,25 @@ import org.jabref.model.entry.field.Field;
 
 public class TimestampPreferences {
     private final boolean useTimestamps;
-    private final boolean useModifiedTimestamp;
+    private final boolean updateTimestamp;
     private final Field timestampField;
     private final String timestampFormat;
     private final boolean overwriteTimestamp;
 
-    public TimestampPreferences(boolean useTimestamps, boolean useModifiedTimestamp, Field timestampField, String timestampFormat, boolean overwriteTimestamp) {
+    public TimestampPreferences(boolean useTimestamps, boolean updateTimestamp, Field timestampField, String timestampFormat, boolean overwriteTimestamp) {
         this.useTimestamps = useTimestamps;
-        this.useModifiedTimestamp = useModifiedTimestamp;
+        this.updateTimestamp = updateTimestamp;
         this.timestampField = timestampField;
         this.timestampFormat = timestampFormat;
         this.overwriteTimestamp = overwriteTimestamp;
     }
 
-    public boolean includeCreatedTimestamp() {
+    public boolean isUseTimestamps() {
         return useTimestamps;
     }
 
-    public boolean includeModifiedTimestamp() {
-        return useModifiedTimestamp;
+    public boolean isUpdateTimestamp() {
+        return updateTimestamp;
     }
 
     public Field getTimestampField() {
@@ -36,16 +36,15 @@ public class TimestampPreferences {
         return timestampFormat;
     }
 
-    public boolean overwriteTimestamp() {
+    public boolean isOverwriteTimestamp() {
         return overwriteTimestamp;
     }
 
     public boolean includeTimestamps() {
-        return useTimestamps && useModifiedTimestamp;
+        return useTimestamps && updateTimestamp;
     }
 
     public String now() {
-        String timeStampFormat = timestampFormat;
-        return DateTimeFormatter.ofPattern(timeStampFormat).format(LocalDateTime.now());
+        return DateTimeFormatter.ofPattern(timestampFormat).format(LocalDateTime.now());
     }
 }

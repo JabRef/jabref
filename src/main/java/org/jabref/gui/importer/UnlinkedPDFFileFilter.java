@@ -23,7 +23,6 @@ public class UnlinkedPDFFileFilter implements FileFilter {
     private final DatabaseFileLookup lookup;
     private final FileFilter fileFilter;
 
-
     public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext) {
         this.fileFilter = fileFilter;
         this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFilePreferences());

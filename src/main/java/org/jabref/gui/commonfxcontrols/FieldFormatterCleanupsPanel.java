@@ -75,9 +75,9 @@ public class FieldFormatterCleanupsPanel extends VBox {
         viewModel.selectedCleanupProperty().setValue(cleanupsList.getSelectionModel());
 
         cleanupsList.setOnKeyPressed(event -> {
-           if (event.getCode() == KeyCode.DELETE) {
-               viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem());
-           }
+            if (event.getCode() == KeyCode.DELETE) {
+                viewModel.removeCleanup(cleanupsList.getSelectionModel().getSelectedItem());
+            }
         });
     }
 
@@ -87,10 +87,10 @@ public class FieldFormatterCleanupsPanel extends VBox {
                 .install(addableFields);
         addableFields.setConverter(FieldsUtil.fieldStringConverter);
         addableFields.setOnKeyPressed(event -> {
-           if (event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.ENTER) {
-               addableFormatters.requestFocus();
-               event.consume();
-           }
+            if (event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.ENTER) {
+                addableFormatters.requestFocus();
+                event.consume();
+            }
         });
 
         new ViewModelListCellFactory<Formatter>()
@@ -98,10 +98,10 @@ public class FieldFormatterCleanupsPanel extends VBox {
                 .withStringTooltip(Formatter::getDescription)
                 .install(addableFormatters);
         addableFormatters.setOnKeyPressed(event -> {
-           if (event.getCode() == KeyCode.ENTER) {
-               viewModel.addCleanup();
-               event.consume();
-           }
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.addCleanup();
+                event.consume();
+            }
         });
     }
 
@@ -129,7 +129,11 @@ public class FieldFormatterCleanupsPanel extends VBox {
         viewModel.addCleanup();
     }
 
-    public BooleanProperty cleanupsDisableProperty() { return viewModel.cleanupsDisableProperty(); }
+    public BooleanProperty cleanupsDisableProperty() {
+        return viewModel.cleanupsDisableProperty();
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return viewModel.cleanupsListProperty(); }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+        return viewModel.cleanupsListProperty();
+    }
 }

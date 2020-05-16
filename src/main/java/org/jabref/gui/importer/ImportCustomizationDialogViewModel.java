@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -48,7 +47,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
      * @return class name
      */
     private static String pathToClass(String basePath, Path path) {
-        String className = FileUtil.relativize(path, Collections.singletonList(Paths.get(basePath))).toString();
+        String className = FileUtil.relativize(path, Collections.singletonList(Path.of(basePath))).toString();
         if (className != null) {
             int lastDot = className.lastIndexOf('.');
             if (lastDot < 0) {

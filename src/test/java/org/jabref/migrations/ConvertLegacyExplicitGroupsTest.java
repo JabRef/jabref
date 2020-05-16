@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -16,14 +16,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConvertLegacyExplicitGroupsTest {
+class ConvertLegacyExplicitGroupsTest {
 
     private PostOpenMigration action;
     private BibEntry entry;
     private ExplicitGroup group;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         action = new ConvertLegacyExplicitGroups();
 
         entry = new BibEntry();
@@ -33,16 +33,16 @@ public class ConvertLegacyExplicitGroupsTest {
     }
 
     @Test
-    public void performActionWritesGroupMembershipInEntry() throws Exception {
+    void performActionWritesGroupMembershipInEntry() throws Exception {
         ParserResult parserResult = generateParserResult(GroupTreeNode.fromGroup(group));
 
         action.performMigration(parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getField(InternalField.GROUPS));
+        assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
     }
 
     @Test
-    public void performActionClearsLegacyKeys() throws Exception {
+    void performActionClearsLegacyKeys() throws Exception {
         ParserResult parserResult = generateParserResult(GroupTreeNode.fromGroup(group));
 
         action.performMigration(parserResult);
@@ -51,7 +51,7 @@ public class ConvertLegacyExplicitGroupsTest {
     }
 
     @Test
-    public void performActionWritesGroupMembershipInEntryForComplexGroupTree() throws Exception {
+    void performActionWritesGroupMembershipInEntryForComplexGroupTree() throws Exception {
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, ','));
         root.addSubgroup(group);
@@ -59,7 +59,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performMigration(parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getField(InternalField.GROUPS));
+        assertEquals(Optional.of("TestGroup"), entry.getField(StandardField.GROUPS));
     }
 
     private ParserResult generateParserResult(GroupTreeNode groupRoot) {

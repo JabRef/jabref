@@ -141,17 +141,16 @@ public class OpenDatabaseAction extends SimpleCommand {
             final List<Path> theFiles = Collections.unmodifiableList(filesToOpen);
 
             for (Path theFile : theFiles) {
-                //This method will execute the concrete file opening and loading in a background thread
+                // This method will execute the concrete file opening and loading in a background thread
                 openTheFile(theFile, raisePanel);
             }
 
             for (Path theFile : theFiles) {
                 frame.getFileHistory().newFile(theFile);
             }
-        }
-        // If no files are remaining to open, this could mean that a file was
-        // already open. If so, we may have to raise the correct tab:
-        else if (toRaise != null) {
+        } else if (toRaise != null) {
+            // If no files are remaining to open, this could mean that a file was
+            // already open. If so, we may have to raise the correct tab:
             frame.showBasePanel(toRaise);
         }
     }

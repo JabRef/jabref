@@ -17,7 +17,7 @@ public class MainTableColumnModelTest {
     public void testMainTableColumnModelParser() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testQualifier);
 
-        assertEquals(testColumnModel.getType(),testType);
+        assertEquals(testColumnModel.getType(), testType);
         assertEquals(testColumnModel.getQualifier(), testQualifier);
     }
 
@@ -25,7 +25,7 @@ public class MainTableColumnModelTest {
     public void testMainTableColumnModelParserFull() {
         MainTableColumnModel testColumnModel = MainTableColumnModel.parse(testName);
 
-        assertEquals(testColumnModel.getType(),testType);
+        assertEquals(testColumnModel.getType(), testType);
         assertEquals(testColumnModel.getQualifier(), testQualifier);
     }
 

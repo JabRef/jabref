@@ -38,7 +38,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeDocumentCreator.class);
 
-
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
@@ -62,7 +61,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
             OpenOfficeDocumentCreator.addResourceFile("mimetype", "/resource/openoffice/mimetype", out);
             OpenOfficeDocumentCreator.addResourceFile("META-INF/manifest.xml", "/resource/openoffice/manifest.xml",
                     out);
-
         }
     }
 
@@ -104,7 +102,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
         } catch (Exception e) {
             throw new Error(e);
         }
-
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {

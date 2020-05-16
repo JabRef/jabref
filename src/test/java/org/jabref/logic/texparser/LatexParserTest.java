@@ -3,7 +3,6 @@ package org.jabref.logic.texparser;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -32,10 +31,10 @@ public class LatexParserTest {
     private final static String EINSTEIN_B = "Einstein1920b";
     private final static String EINSTEIN_C = "Einstein1920c";
 
-    private static FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    private static ImportFormatPreferences importFormatPreferences;
-    private static BibDatabase database;
-    private static BibDatabase database2;
+    private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
+    private ImportFormatPreferences importFormatPreferences;
+    private BibDatabase database;
+    private BibDatabase database2;
 
     @BeforeEach
     private void setUp() {
@@ -91,7 +90,7 @@ public class LatexParserTest {
 
     @Test
     public void testSameFileDifferentDatabases() throws URISyntaxException {
-        Path texFile = Paths.get(LatexParserTest.class.getResource("paper.tex").toURI());
+        Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
         LatexParserResult expectedParserResult = new LatexParserResult();
@@ -119,8 +118,8 @@ public class LatexParserTest {
 
     @Test
     public void testTwoFilesDifferentDatabases() throws URISyntaxException {
-        Path texFile = Paths.get(LatexParserTest.class.getResource("paper.tex").toURI());
-        Path texFile2 = Paths.get(LatexParserTest.class.getResource("paper2.tex").toURI());
+        Path texFile = Path.of(LatexParserTest.class.getResource("paper.tex").toURI());
+        Path texFile2 = Path.of(LatexParserTest.class.getResource("paper2.tex").toURI());
 
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
         LatexParserResult expectedParserResult = new LatexParserResult();

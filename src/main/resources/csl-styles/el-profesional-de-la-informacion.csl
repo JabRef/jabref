@@ -13,7 +13,7 @@
     <category field="social_science"/>
     <issn>1386-6710</issn>
     <eissn>1699-2407</eissn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-04-27T22:06:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -77,7 +77,7 @@
           </group>
           <text macro="title"/>
           <choose>
-            <if type="paper-conference" match="any">
+            <if type="chapter paper-conference" match="any">
               <text variable="container-title" prefix="En: " font-style="italic"/>
             </if>
             <else>
@@ -89,13 +89,17 @@
           <if type="book" match="any">
             <group delimiter=", ">
               <text macro="publisher"/>
-              <choose>
-                <if variable="ISBN">
-                  <text variable="ISBN" prefix="ISBN "/>
-                </if>
-              </choose>
+              <text variable="ISBN" prefix="ISBN "/>
             </group>
           </if>
+          <else-if type="chapter" match="any">
+            <text macro="publisher" suffix=". "/>
+            <group delimiter=" " suffix=". ">
+              <label variable="page" form="short"/>
+              <text variable="page"/>
+            </group>
+            <text variable="ISBN" prefix="ISBN "/>
+          </else-if>
           <else>
             <group delimiter=", ">
               <text variable="volume" prefix="v. "/>

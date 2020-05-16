@@ -156,7 +156,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         entry.getField(StandardField.ABSTRACT)
              .map(abstractText -> abstractText.replace("<P />", "").trim())
-             .ifPresent(abstractText-> entry.setField(StandardField.ABSTRACT,abstractText));
+             .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
     }
@@ -247,8 +247,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     /**
      * @param identifiers bibcodes for which bibentries ahould be fetched
-     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested
-     * bibcodes
+     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
      */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());

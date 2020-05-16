@@ -16,12 +16,11 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.fileformat.CustomImporter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ImportCustomizationDialog extends BaseDialog<Void> {
 
@@ -35,7 +34,6 @@ public class ImportCustomizationDialog extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private JournalAbbreviationLoader loader;
     private ImportCustomizationDialogViewModel viewModel;
 
     public ImportCustomizationDialog() {

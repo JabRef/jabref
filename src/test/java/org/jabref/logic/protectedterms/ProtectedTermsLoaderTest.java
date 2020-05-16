@@ -38,7 +38,7 @@ class ProtectedTermsLoaderTest {
             loader.removeProtectedTermsList(list);
         }
         assertTrue(loader.getProtectedTermsLists().isEmpty());
-        String filename = Paths.get(
+        String filename = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                                .toFile().getPath();
         loader.addProtectedTermsListFromFile(filename, true);
@@ -58,7 +58,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -67,7 +67,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
@@ -76,7 +76,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -85,7 +85,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -95,7 +95,7 @@ class ProtectedTermsLoaderTest {
     @Test
     void testReadProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
             throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/unnamedterms.terms")
                                           .toURI())
                          .toFile();

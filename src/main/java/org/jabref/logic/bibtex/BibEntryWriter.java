@@ -87,11 +87,7 @@ public class BibEntryWriter {
     }
 
     /**
-     * Write fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
-     *
-     * @param entry
-     * @param out
-     * @throws IOException
+     * Writes fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out,
                                                                BibDatabaseMode bibDatabaseMode) throws IOException {

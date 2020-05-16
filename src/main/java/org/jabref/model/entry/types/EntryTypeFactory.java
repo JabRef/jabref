@@ -28,9 +28,9 @@ public class EntryTypeFactory {
             return false;
         } else {
             return Objects.equals(type1.getType(), type2.getType())
-                   && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
-                   && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
-                   && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
+                    && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
+                    && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
+                    && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
         }
     }
 
@@ -48,8 +48,8 @@ public class EntryTypeFactory {
 
     public static EntryType parse(String typeName) {
 
-        List<EntryType> types = new ArrayList<>(Arrays.<EntryType> asList(StandardEntryType.values()));
-        types.addAll(Arrays.<EntryType> asList(IEEETranEntryType.values()));
+        List<EntryType> types = new ArrayList<>(Arrays.<EntryType>asList(StandardEntryType.values()));
+        types.addAll(Arrays.<EntryType>asList(IEEETranEntryType.values()));
 
         return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
     }

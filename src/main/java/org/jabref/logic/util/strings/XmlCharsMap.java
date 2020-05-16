@@ -15,7 +15,7 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\\"\\{u\\}\\}", "&#x00FC;");
         put("\\{\\\\\\\"\\{U\\}\\}", "&#x00DC;");
 
-        //next 2 rows were missing...
+        // next 2 rows were missing...
         put("\\{\\\\\\`\\{a\\}\\}", "&#x00E0;");
         put("\\{\\\\\\`\\{A\\}\\}", "&#x00C0;");
 
@@ -28,7 +28,7 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\`\\{u\\}\\}", "&#x00F9;");
         put("\\{\\\\\\`\\{U\\}\\}", "&#x00D9;");
 
-        //corrected these 10 lines below...
+        // corrected these 10 lines below...
         put("\\{\\\\\\'\\{a\\}\\}", "&#x00E1;");
         put("\\{\\\\\\'\\{A\\}\\}", "&#x00C1;");
         put("\\{\\\\\\'\\{e\\}\\}", "&#x00E9;");
@@ -39,7 +39,7 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\'\\{O\\}\\}", "&#x00D3;");
         put("\\{\\\\\\'\\{u\\}\\}", "&#x00FA;");
         put("\\{\\\\\\'\\{U\\}\\}", "&#x00DA;");
-        //added next four chars...
+        // added next four chars...
         put("\\{\\\\\\'\\{c\\}\\}", "&#x0107;");
         put("\\{\\\\\\'\\{C\\}\\}", "&#x0106;");
         put("\\{\\\\c\\{c\\}\\}", "&#x00E7;");
@@ -55,7 +55,7 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\\uFFFD\\{a\\}\\}", "&#x00E1;");
         put("\\{\\\\\\\uFFFD\\{A\\}\\}", "&#x00C1;");
 
-        //next 2 rows were missing...
+        // next 2 rows were missing...
         put("\\{\\\\\\^\\{a\\}\\}", "&#x00E2;");
         put("\\{\\\\\\^\\{A\\}\\}", "&#x00C2;");
 
@@ -86,7 +86,7 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\\"u\\}", "&#x00FC;");
         put("\\{\\\\\\\"U\\}", "&#x00DC;");
 
-        //next 2 rows were missing...
+        // next 2 rows were missing...
         put("\\{\\\\\\`a\\}", "&#x00E0;");
         put("\\{\\\\\\`A\\}", "&#x00C0;");
 
@@ -108,11 +108,11 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\'U\\}", "&#x00DA;");
         put("\\{\\\\\\'a\\}", "&#x00E1;");
         put("\\{\\\\\\'A\\}", "&#x00C1;");
-        //added next two chars...
+        // added next two chars...
         put("\\{\\\\\\'c\\}", "&#x0107;");
         put("\\{\\\\\\'C\\}", "&#x0106;");
 
-        //next two lines were wrong...
+        // next two lines were wrong...
         put("\\{\\\\\\^a\\}", "&#x00E2;");
         put("\\{\\\\\\^A\\}", "&#x00C2;");
 
@@ -131,5 +131,4 @@ public class XmlCharsMap extends HashMap<String, String> {
         put("\\{\\\\\\~a\\}", "&#x00E3;");
         put("\\{\\\\\\~A\\}", "&#x00C3;");
     }
-
 }

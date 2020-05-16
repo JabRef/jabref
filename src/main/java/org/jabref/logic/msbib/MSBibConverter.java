@@ -69,7 +69,7 @@ public class MSBibConverter {
         result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);
 
         // Value must be converted
-        //Currently only english is supported
+        // Currently only english is supported
         entry.getLatexFreeField(StandardField.LANGUAGE)
              .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();
@@ -87,7 +87,6 @@ public class MSBibConverter {
 
         if (entry.getLatexFreeField(StandardField.TYPE).isPresent()) {
             result.thesisType = entry.getLatexFreeField(StandardField.TYPE).get();
-
         } else {
             if (entry.getType().equals(StandardEntryType.TechReport)) {
                 result.thesisType = "Tech. rep.";
@@ -120,12 +119,12 @@ public class MSBibConverter {
     private static List<MsBibAuthor> getAuthors(BibEntry entry, String authors, Field field) {
         List<MsBibAuthor> result = new ArrayList<>();
         boolean corporate = false;
-        //Only one corporate author is supported
-        //We have the possible rare case that are multiple authors which start and end with latex , this is currently not considered
+        // Only one corporate author is supported
+        // We have the possible rare case that are multiple authors which start and end with latex , this is currently not considered
         if (authors.startsWith("{") && authors.endsWith("}")) {
             corporate = true;
         }
-        //FIXME: #4152 This is an ugly hack because the latex2unicode formatter kills of all curly braces, so no more corporate author parsing possible
+        // FIXME: #4152 This is an ugly hack because the latex2unicode formatter kills of all curly braces, so no more corporate author parsing possible
         String authorLatexFree = entry.getLatexFreeField(field).orElse("");
         if (corporate) {
             authorLatexFree = "{" + authorLatexFree + "}";
@@ -139,5 +138,4 @@ public class MSBibConverter {
 
         return result;
     }
-
 }

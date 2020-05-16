@@ -24,7 +24,6 @@ public class TextPrefixFunction implements BstFunction {
 
     private final VM vm;
 
-
     public TextPrefixFunction(VM vm) {
         this.vm = vm;
     }

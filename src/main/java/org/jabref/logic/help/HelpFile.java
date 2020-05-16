@@ -21,7 +21,7 @@ public enum HelpFile {
     REGEX_SEARCH("fields/filelinks#RegularExpressionSearch"),
     PREVIEW("setup/preview"),
     AUTOSAVE("general/autosave"),
-    //The help page covers both OO and LO.
+    // The help page covers both OO and LO.
     OPENOFFICE_LIBREOFFICE("import-export/openofficeintegration"),
     FETCHER_ACM("import-using-online-bibliographic-database/acmportal"),
     FETCHER_ADS("import-using-online-bibliographic-database/ads"),

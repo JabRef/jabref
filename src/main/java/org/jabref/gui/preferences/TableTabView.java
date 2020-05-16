@@ -24,14 +24,16 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Entry table"); }
+    public String getTabName() {
+        return Localization.lang("Entry table");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new TableTabViewModel(dialogService, preferences);
 
         autoResizeName.selectedProperty().bindBidirectional(viewModel.autoResizeNameProperty());
