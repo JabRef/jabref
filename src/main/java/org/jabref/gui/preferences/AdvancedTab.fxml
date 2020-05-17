@@ -24,11 +24,6 @@
         <Button fx:id="remoteHelp" prefWidth="20.0"/>
     </HBox>
 
-    <Label styleClass="sectionHeader" text="%Import conversions"/>
-    <CheckBox fx:id="useCaseKeeper" text="%Add {} to specified title words on search to keep the correct case"/>
-    <CheckBox fx:id="useUnitFormatter"
-              text="%Format units by adding non-breaking separators and keeping the correct case on search"/>
-
     <Label styleClass="sectionHeader" text="%Network"/>
     <GridPane maxHeight="-Infinity" maxWidth="-Infinity" hgap="10.0" vgap="10.0">
         <columnConstraints>

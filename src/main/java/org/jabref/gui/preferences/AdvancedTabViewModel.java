@@ -18,7 +18,7 @@ import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -29,8 +29,6 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
-    private final BooleanProperty useCaseKeeperProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useUnitFormatterProperty = new SimpleBooleanProperty();
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
     private final StringProperty proxyHostnameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPortProperty = new SimpleStringProperty("");
@@ -45,13 +43,13 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public AdvancedTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public AdvancedTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.remotePreferences = preferences.getRemotePreferences();
@@ -109,9 +107,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
-        useCaseKeeperProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
-        useUnitFormatterProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
-
         proxyUseProperty.setValue(proxyPreferences.isUseProxy());
         proxyHostnameProperty.setValue(proxyPreferences.getHostname());
         proxyPortProperty.setValue(proxyPreferences.getPort());
@@ -122,10 +117,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         storeRemoteSettings();
-
-        preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterProperty.getValue());
-
         storeProxySettings();
     }
 
@@ -151,7 +142,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
             Globals.REMOTE_LISTENER.stop();
         }
 
-        preferences.setRemotePreferences(newRemotePreferences);
+        preferences.storeRemotePreferences(newRemotePreferences);
     }
 
     private void storeProxySettings() {
@@ -235,14 +226,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty remotePortProperty() {
         return remotePortProperty;
-    }
-
-    public BooleanProperty useCaseKeeperProperty() {
-        return useCaseKeeperProperty;
-    }
-
-    public BooleanProperty useUnitFormatterProperty() {
-        return useUnitFormatterProperty;
     }
 
     public BooleanProperty proxyUseProperty() {

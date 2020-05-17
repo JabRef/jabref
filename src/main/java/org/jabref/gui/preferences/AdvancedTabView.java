@@ -28,8 +28,6 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
-    @FXML private CheckBox useCaseKeeper;
-    @FXML private CheckBox useUnitFormatter;
 
     @FXML private CheckBox proxyUse;
     @FXML private Label proxyHostnameLabel;
@@ -68,9 +66,6 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
-
-        useCaseKeeper.selectedProperty().bindBidirectional(viewModel.useCaseKeeperProperty());
-        useUnitFormatter.selectedProperty().bindBidirectional(viewModel.useUnitFormatterProperty());
 
         proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());

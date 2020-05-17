@@ -245,8 +245,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
-    public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
-    public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
@@ -638,8 +636,6 @@ public class JabRefPreferences implements PreferencesService {
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
-        defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
@@ -1407,25 +1403,6 @@ public class JabRefPreferences implements PreferencesService {
         return new PreviewPreferences(layouts, cyclePos, panelHeight, style, styleDefault, showAsTab);
     }
 
-    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
-        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
-        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
-        put(PROXY_PORT, proxyPreferences.getPort());
-        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
-        put(PROXY_USERNAME, proxyPreferences.getUsername());
-        put(PROXY_PASSWORD, proxyPreferences.getPassword());
-    }
-
-    public ProxyPreferences getProxyPreferences() {
-        Boolean useProxy = getBoolean(PROXY_USE);
-        String hostname = get(PROXY_HOSTNAME);
-        String port = get(PROXY_PORT);
-        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
-        String username = get(PROXY_USERNAME);
-        String password = get(PROXY_PASSWORD);
-        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
-    }
-
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
         return new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
@@ -1497,15 +1474,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
-    }
-
-    public RemotePreferences getRemotePreferences() {
-        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
-    }
-
-    public void setRemotePreferences(RemotePreferences remotePreferences) {
-        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
-        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
     @Override
@@ -2115,6 +2083,38 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+    }
+
+    //*************************************************************************************************************
+    // Advanced preferences
+    //*************************************************************************************************************
+
+    public RemotePreferences getRemotePreferences() {
+        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
+    }
+
+    public void storeRemotePreferences(RemotePreferences remotePreferences) {
+        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
+        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
+    }
+
+    public ProxyPreferences getProxyPreferences() {
+        Boolean useProxy = getBoolean(PROXY_USE);
+        String hostname = get(PROXY_HOSTNAME);
+        String port = get(PROXY_PORT);
+        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
+        String username = get(PROXY_USERNAME);
+        String password = get(PROXY_PASSWORD);
+        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
+    }
+
+    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
+        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
+        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
+        put(PROXY_PORT, proxyPreferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
+        put(PROXY_USERNAME, proxyPreferences.getUsername());
+        put(PROXY_PASSWORD, proxyPreferences.getPassword());
     }
 
     //*************************************************************************************************************
