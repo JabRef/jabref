@@ -386,7 +386,7 @@ public class JabRefPreferences implements PreferencesService {
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
     private final Preferences prefs;
-    private GlobalBibtexKeyPattern keyPattern;
+    private GlobalBibtexKeyPattern globalBibtexKeyPattern;
     // Object containing info about customized entry editor tabs.
     private Map<String, Set<Field>> tabList;
 
@@ -992,58 +992,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    /**
-     * Fetches key patterns from preferences. The implementation doesn't cache the results
-     *
-     * @return LabelPattern containing all keys. Returned LabelPattern has no parent
-     */
-    public GlobalBibtexKeyPattern getKeyPattern() {
-        keyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        try {
-            String[] keys = pre.keys();
-            if (keys.length > 0) {
-                for (String key : keys) {
-                    keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), pre.get(key, null));
-                }
-            }
-        } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
-        }
-        return keyPattern;
-    }
-
-    /**
-     * Adds the given key pattern to the preferences
-     *
-     * @param pattern the pattern to store
-     */
-    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
-        keyPattern = pattern;
-
-        // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        try {
-            pre.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
-        }
-
-        for (EntryType entryType : pattern.getAllKeys()) {
-            if (!pattern.isDefaultValue(entryType)) {
-                // no default value
-                // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
-                pre.put(entryType.getName(), pattern.getValue(entryType).get(0));
-            }
-        }
-    }
-
-    private void clearKeyPatterns() throws BackingStoreException {
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        pre.clear();
-    }
-
     public void storeBibEntryTypes(List<BibEntryType> BibEntryTypes, BibDatabaseMode bibDatabaseMode) {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
@@ -1250,8 +1198,7 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                this.getGlobalBibtexKeyPattern(),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -1264,8 +1211,7 @@ public class JabRefPreferences implements PreferencesService {
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
+                this.getGlobalBibtexKeyPattern(),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -1275,19 +1221,6 @@ public class JabRefPreferences implements PreferencesService {
         SavePreferences savePreferences = this.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = this.getXMPPreferences();
         return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
-    }
-
-    @Override
-    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return new BibtexKeyPatternPreferences(
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                getBoolean(KEY_GEN_FIRST_LETTER_A),
-                getKeyPattern(),
-                getKeywordDelimiter(),
-                getBoolean(AVOID_OVERWRITING_KEY),
-                get(UNWANTED_BIBTEX_KEY_CHARACTERS));
     }
 
     @Override
@@ -2115,6 +2048,121 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
         put(PROXY_USERNAME, proxyPreferences.getUsername());
         put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    }
+
+    //*************************************************************************************************************
+    // BibtexKeyPatternPreferences
+    //*************************************************************************************************************
+
+    /**
+     * Fetches key patterns from preferences. The implementation doesn't cache the results
+     *
+     * @return LabelPattern containing all keys. Returned LabelPattern has no parent
+     */
+    public GlobalBibtexKeyPattern getGlobalBibtexKeyPattern() {
+        this.globalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        try {
+            String[] keys = pre.keys();
+            if (keys.length > 0) {
+                for (String key : keys) {
+                    this.globalBibtexKeyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), pre.get(key, null));
+                }
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+        }
+        return this.globalBibtexKeyPattern;
+    }
+
+    /**
+     * Adds the given key pattern to the preferences
+     *
+     * @param pattern the pattern to store
+     */
+    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
+        this.globalBibtexKeyPattern = pattern;
+
+        if ((this.globalBibtexKeyPattern.getDefaultValue() == null)
+                || this.globalBibtexKeyPattern.getDefaultValue().isEmpty()) {
+            put(DEFAULT_BIBTEX_KEY_PATTERN, "");
+        } else {
+            put(DEFAULT_BIBTEX_KEY_PATTERN, globalBibtexKeyPattern.getDefaultValue().get(0));
+        }
+
+        // Store overridden definitions to Preferences.
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        try {
+            pre.clear(); // We remove all old entries.
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
+        }
+
+        for (EntryType entryType : pattern.getAllKeys()) {
+            if (!pattern.isDefaultValue(entryType)) {
+                // no default value
+                // the first entry in the array is the full pattern
+                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
+                pre.put(entryType.getName(), pattern.getValue(entryType).get(0));
+            }
+        }
+    }
+
+    private void clearKeyPatterns() throws BackingStoreException {
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        pre.clear();
+    }
+
+    @Override
+    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
+        BibtexKeyPatternPreferences.KeyLetters keyLetters =
+                BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B;
+
+        if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
+            keyLetters = BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+        } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
+            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
+        }
+
+        return new BibtexKeyPatternPreferences(
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                keyLetters,
+                getGlobalBibtexKeyPattern(),
+                getKeywordDelimiter(),
+                getBoolean(AVOID_OVERWRITING_KEY),
+                getBoolean(WARN_BEFORE_OVERWRITING_KEY),
+                getBoolean(GENERATE_KEYS_BEFORE_SAVING),
+                get(UNWANTED_BIBTEX_KEY_CHARACTERS));
+    }
+
+    @Override
+    public void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences) {
+        putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, preferences.avoidOverwritingCiteKey());
+        putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, preferences.isWarningBeforeOverwrite());
+        putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, preferences.isGenerateKeysBeforeSaving());
+
+        switch (preferences.getKeyLetters()) {
+            case ALWAYS:
+                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
+                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
+                break;
+            case SECOND_WITH_A:
+                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
+                break;
+            default:
+            case SECOND_WITH_B:
+                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
+                break;
+        }
+
+        put(JabRefPreferences.KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
+        put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
+        put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
+
+        putKeyPattern(preferences.getKeyPattern());
     }
 
     //*************************************************************************************************************

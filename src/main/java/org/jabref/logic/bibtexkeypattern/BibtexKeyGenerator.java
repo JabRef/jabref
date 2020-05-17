@@ -56,7 +56,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, DEFAULT_UNWANTED_CHARACTERS))
+        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A, keyPattern, ',', false, false, false, DEFAULT_UNWANTED_CHARACTERS))
                 .generateKey(entry);
     }
 
@@ -148,8 +148,11 @@ public class BibtexKeyGenerator extends BracketedPattern {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = bibtexKeyPatternPreferences.isAlwaysAddLetter();
-        boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
+        boolean alwaysAddLetter = bibtexKeyPatternPreferences.getKeyLetters()
+                == BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+
+        boolean firstLetterA = bibtexKeyPatternPreferences.getKeyLetters()
+                == BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
 
         String newKey;
         if (!alwaysAddLetter && (occurrences == 0)) {

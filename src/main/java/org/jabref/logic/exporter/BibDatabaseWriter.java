@@ -94,7 +94,7 @@ public abstract class BibDatabaseWriter {
         // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
         comparators.add(new CrossRefEntryComparator());
 
-        if (!saveOrder.isPresent()) {
+        if (saveOrder.isEmpty()) {
             // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
@@ -189,7 +189,7 @@ public abstract class BibDatabaseWriter {
         List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (preferences.generateBibtexKeysBeforeSaving()) {
+        if (preferences.getBibtexKeyPatternPreferences().isGenerateKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateBibtexKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }

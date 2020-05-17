@@ -39,7 +39,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
 
         bibtexKeyPatternTable = new BibtexKeyPatternPanel(preferences,
                 Globals.entryTypesManager.getAllTypes(preferences.getDefaultBibDatabaseMode()),
-                preferences.getKeyPattern());
+                preferences.getGlobalBibtexKeyPattern());
 
         ViewLoader.view(this)
                   .root(this)

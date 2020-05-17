@@ -16,46 +16,51 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelViewModel;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.preferences.JabRefPreferences;
 
 public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
-    private BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
-    private BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
-    private BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();
-    private BooleanProperty letterStartAProperty = new SimpleBooleanProperty();
-    private BooleanProperty letterStartBProperty = new SimpleBooleanProperty();
-    private BooleanProperty letterAlwaysAddProperty = new SimpleBooleanProperty();
-    private StringProperty keyPatternRegexProperty = new SimpleStringProperty();
-    private StringProperty keyPatternReplacementProperty = new SimpleStringProperty();
-    private StringProperty unwantedCharactersProperty = new SimpleStringProperty();
+    private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
+    private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
+    private final BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();
+    private final BooleanProperty letterStartAProperty = new SimpleBooleanProperty();
+    private final BooleanProperty letterStartBProperty = new SimpleBooleanProperty();
+    private final BooleanProperty letterAlwaysAddProperty = new SimpleBooleanProperty();
+    private final StringProperty keyPatternRegexProperty = new SimpleStringProperty();
+    private final StringProperty keyPatternReplacementProperty = new SimpleStringProperty();
+    private final StringProperty unwantedCharactersProperty = new SimpleStringProperty();
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
-    private ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+    private final ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
             new BibtexKeyPatternPanelItemModel(new BibtexKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
+    private final BibtexKeyPatternPreferences initialBibtexKeyPatternPreferences;
 
     public BibtexKeyPatternTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialBibtexKeyPatternPreferences = preferences.getBibtexKeyPatternPreferences();
     }
 
     @Override
     public void setValues() {
-        overwriteAllowProperty.setValue(!preferences.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY));
-        overwriteWarningProperty.setValue(preferences.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY));
-        generateOnSaveProperty.setValue(preferences.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING));
+        overwriteAllowProperty.setValue(!initialBibtexKeyPatternPreferences.avoidOverwritingCiteKey());
+        overwriteWarningProperty.setValue(initialBibtexKeyPatternPreferences.isWarningBeforeOverwrite());
+        generateOnSaveProperty.setValue(initialBibtexKeyPatternPreferences.isGenerateKeysBeforeSaving());
 
-        if (preferences.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER)) {
+        if (initialBibtexKeyPatternPreferences.getKeyLetters()
+                == BibtexKeyPatternPreferences.KeyLetters.ALWAYS) {
             letterAlwaysAddProperty.setValue(true);
             letterStartAProperty.setValue(false);
             letterStartBProperty.setValue(false);
-        } else if (preferences.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A)) {
+        } else if (initialBibtexKeyPatternPreferences.getKeyLetters()
+                == BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
             letterStartBProperty.setValue(false);
@@ -65,37 +70,13 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             letterStartBProperty.setValue(true);
         }
 
-        keyPatternRegexProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REGEX));
-        keyPatternReplacementProperty.setValue(preferences.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
-        unwantedCharactersProperty.setValue(preferences.get(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS));
+        keyPatternRegexProperty.setValue(initialBibtexKeyPatternPreferences.getKeyPatternRegex());
+        keyPatternReplacementProperty.setValue(initialBibtexKeyPatternPreferences.getKeyPatternReplacement());
+        unwantedCharactersProperty.setValue(initialBibtexKeyPatternPreferences.getUnwantedCharacters());
     }
 
     @Override
     public void storeSettings() {
-        preferences.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, defaultKeyPatternProperty.getValue().getPattern());
-        preferences.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, !overwriteAllowProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, overwriteWarningProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSaveProperty.getValue());
-
-        if (letterAlwaysAddProperty.getValue()) {
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
-        } else if (letterStartAProperty.getValue()) {
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
-        } else if (letterStartBProperty.getValue()) {
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
-        } else {
-            // No Radioitem selected, should not happen, but if, make KEY_GEN_FIRST_LETTER_A default
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
-            preferences.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
-        }
-
-        preferences.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegexProperty.getValue());
-        preferences.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, keyPatternReplacementProperty.getValue());
-        preferences.put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, unwantedCharactersProperty.getValue());
-
         GlobalBibtexKeyPattern newKeyPattern = GlobalBibtexKeyPattern.fromPattern(preferences.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
@@ -111,7 +92,25 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
-        preferences.putKeyPattern(newKeyPattern);
+
+        BibtexKeyPatternPreferences.KeyLetters keyLetters = BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+
+        if (letterStartAProperty.getValue()) {
+            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
+        } else if (letterStartBProperty.getValue()) {
+            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B;
+        }
+
+        preferences.storeBibtexKeyPatternPreferences(new BibtexKeyPatternPreferences(
+                keyPatternRegexProperty.getValue(),
+                keyPatternReplacementProperty.getValue(),
+                keyLetters,
+                newKeyPattern,
+                initialBibtexKeyPatternPreferences.getKeywordDelimiter(),
+                !overwriteAllowProperty.getValue(),
+                overwriteWarningProperty.getValue(),
+                generateOnSaveProperty.getValue(),
+                unwantedCharactersProperty.getValue()));
     }
 
     @Override

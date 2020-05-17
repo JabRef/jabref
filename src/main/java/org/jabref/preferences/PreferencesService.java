@@ -73,8 +73,6 @@ public interface PreferencesService {
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
-
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
@@ -178,6 +176,14 @@ public interface PreferencesService {
     ProxyPreferences getProxyPreferences();
 
     void storeProxyPreferences(ProxyPreferences proxyPreferences);
+
+    //*************************************************************************************************************
+    // BibtexKeyPatternPreferences
+    //*************************************************************************************************************
+
+    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
+
+    void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences

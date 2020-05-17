@@ -34,7 +34,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -199,10 +199,11 @@ class IntegrityCheckTest {
         return new BibtexKeyPatternPreferences(
                 "",
                 "",
-                false,
-                false,
+                BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B,
                 keyPattern,
                 ',',
+                false,
+                false,
                 false,
                 BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
     }
