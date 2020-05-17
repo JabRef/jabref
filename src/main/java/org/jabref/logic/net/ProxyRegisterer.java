@@ -7,14 +7,14 @@ public class ProxyRegisterer {
 
     public static void register(ProxyPreferences proxyPrefs) {
         if (proxyPrefs.isUseProxy()) {
-            // NetworkTabView.java ensures that proxyHostname and proxyPort are not null
+            // AdvancedTabView.java ensures that proxyHostname and proxyPort are not null
             System.setProperty("http.proxyHost", proxyPrefs.getHostname());
             System.setProperty("http.proxyPort", proxyPrefs.getPort());
 
             System.setProperty("https.proxyHost", proxyPrefs.getHostname());
             System.setProperty("https.proxyPort", proxyPrefs.getPort());
 
-            // NetworkTabView.java ensures that proxyUsername and proxyPassword are neither null nor empty
+            // AdvancedTabView.java ensures that proxyUsername and proxyPassword are neither null nor empty
             if (proxyPrefs.isUseAuthentication()) {
                 System.setProperty("http.proxyUser", proxyPrefs.getUsername());
                 System.setProperty("http.proxyPassword", proxyPrefs.getPassword());

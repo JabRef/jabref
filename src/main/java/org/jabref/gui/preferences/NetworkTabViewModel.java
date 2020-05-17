@@ -26,7 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class AdvancedTabViewModel implements PreferenceTabViewModel {
+public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
@@ -49,7 +49,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public AdvancedTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.remotePreferences = preferences.getRemotePreferences();

@@ -23,7 +23,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
-public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewModel> implements PreferencesTab {
+public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
@@ -46,7 +46,7 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AdvancedTabView(JabRefPreferences preferences) {
+    public NetworkTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -60,7 +60,7 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new AdvancedTabViewModel(dialogService, preferences);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
         remoteLabel.setVisible(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());

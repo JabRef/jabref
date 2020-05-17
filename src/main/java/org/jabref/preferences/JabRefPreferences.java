@@ -2086,7 +2086,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // Advanced preferences
+    // Network preferences
     //*************************************************************************************************************
 
     public RemotePreferences getRemotePreferences() {

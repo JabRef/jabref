@@ -168,7 +168,7 @@ public interface PreferencesService {
     void storeEntryEditorPreferences(EntryEditorPreferences preferences);
 
     //*************************************************************************************************************
-    // Advanced preferences
+    // Network preferences
     //*************************************************************************************************************
 
     RemotePreferences getRemotePreferences();
