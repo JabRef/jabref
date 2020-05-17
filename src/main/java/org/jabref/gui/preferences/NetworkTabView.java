@@ -56,7 +56,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
 
     @Override
     public String getTabName() {
-        return Localization.lang("Advanced");
+        return Localization.lang("Network");
     }
 
     public void initialize() {
