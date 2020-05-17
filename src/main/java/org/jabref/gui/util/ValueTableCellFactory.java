@@ -105,7 +105,6 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             double maxWidth = currentScreen.getBounds().getWidth();
                             Tooltip tooltip = new Tooltip(tooltipText);
                             tooltip.setMaxWidth(maxWidth * 2 / 3);
-                            // tooltip.setTextOverrun(OverrunStyle.CENTER_ELLIPSIS); // info: can be enabled instead of wrapping the text
                             tooltip.setWrapText(true);
                             setTooltip(tooltip);
                         }
