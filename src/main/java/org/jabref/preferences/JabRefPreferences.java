@@ -2080,7 +2080,7 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param pattern the pattern to store
      */
-    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
+    public void storeGlobalBibtexKeyPattern(GlobalBibtexKeyPattern pattern) {
         this.globalBibtexKeyPattern = pattern;
 
         if ((this.globalBibtexKeyPattern.getDefaultValue() == null)
@@ -2125,15 +2125,15 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         return new BibtexKeyPatternPreferences(
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                keyLetters,
-                getGlobalBibtexKeyPattern(),
-                getKeywordDelimiter(),
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
-                get(UNWANTED_BIBTEX_KEY_CHARACTERS));
+                keyLetters,
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                get(UNWANTED_BIBTEX_KEY_CHARACTERS),
+                getGlobalBibtexKeyPattern(),
+                getKeywordDelimiter());
     }
 
     @Override
@@ -2162,7 +2162,7 @@ public class JabRefPreferences implements PreferencesService {
         put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
         put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
 
-        putKeyPattern(preferences.getKeyPattern());
+        storeGlobalBibtexKeyPattern(preferences.getKeyPattern());
     }
 
     //*************************************************************************************************************

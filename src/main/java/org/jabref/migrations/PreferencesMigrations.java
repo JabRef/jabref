@@ -300,7 +300,7 @@ public class PreferencesMigrations {
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
-        prefs.putKeyPattern(keyPattern);
+        prefs.storeGlobalBibtexKeyPattern(keyPattern);
     }
 
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {

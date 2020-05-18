@@ -102,15 +102,15 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
         }
 
         preferences.storeBibtexKeyPatternPreferences(new BibtexKeyPatternPreferences(
-                keyPatternRegexProperty.getValue(),
-                keyPatternReplacementProperty.getValue(),
-                keyLetters,
-                newKeyPattern,
-                initialBibtexKeyPatternPreferences.getKeywordDelimiter(),
                 !overwriteAllowProperty.getValue(),
                 overwriteWarningProperty.getValue(),
                 generateOnSaveProperty.getValue(),
-                unwantedCharactersProperty.getValue()));
+                keyLetters,
+                keyPatternRegexProperty.getValue(),
+                keyPatternReplacementProperty.getValue(),
+                unwantedCharactersProperty.getValue(),
+                newKeyPattern,
+                initialBibtexKeyPatternPreferences.getKeywordDelimiter()));
     }
 
     @Override

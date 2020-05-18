@@ -197,15 +197,15 @@ class IntegrityCheckTest {
     private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
         final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         return new BibtexKeyPatternPreferences(
-                "",
-                "",
+                false,
+                false,
+                false,
                 BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B,
+                "",
+                "",
+                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                ',',
-                false,
-                false,
-                false,
-                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+                ',');
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

@@ -10,55 +10,35 @@ public class BibtexKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
-    private final String keyPatternRegex;
-    private final String keyPatternReplacement;
-    private final KeyLetters keyLetters;
-    private final GlobalBibtexKeyPattern keyPattern;
-    private final Character keywordDelimiter;
     private final boolean avoidOverwritingCiteKey;
     private final boolean warningBeforeOverwritingCiteKey;
     private final boolean generateKeysBeforeSaving;
+    private final KeyLetters keyLetters;
+    private final String keyPatternRegex;
+    private final String keyPatternReplacement;
     private final String unwantedCharacters;
+    private final GlobalBibtexKeyPattern keyPattern;
+    private final Character keywordDelimiter;
 
-    public BibtexKeyPatternPreferences(String keyPatternRegex,
-                                       String keyPatternReplacement,
-                                       KeyLetters keyLetters,
-                                       GlobalBibtexKeyPattern keyPattern,
-                                       Character keywordDelimiter,
-                                       boolean avoidOverwritingCiteKey,
+    public BibtexKeyPatternPreferences(boolean avoidOverwritingCiteKey,
                                        boolean warningBeforeOverwritingCiteKey,
                                        boolean generateKeysBeforeSaving,
-                                       String unwantedCharacters) {
+                                       KeyLetters keyLetters,
+                                       String keyPatternRegex,
+                                       String keyPatternReplacement,
+                                       String unwantedCharacters,
+                                       GlobalBibtexKeyPattern keyPattern,
+                                       Character keywordDelimiter) {
 
-        this.keyPatternRegex = keyPatternRegex;
-        this.keyPatternReplacement = keyPatternReplacement;
-        this.keyLetters = keyLetters;
-        this.keyPattern = keyPattern;
-        this.keywordDelimiter = keywordDelimiter;
         this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
         this.warningBeforeOverwritingCiteKey = warningBeforeOverwritingCiteKey;
         this.generateKeysBeforeSaving = generateKeysBeforeSaving;
+        this.keyLetters = keyLetters;
+        this.keyPatternRegex = keyPatternRegex;
+        this.keyPatternReplacement = keyPatternReplacement;
         this.unwantedCharacters = unwantedCharacters;
-    }
-
-    public String getKeyPatternRegex() {
-        return keyPatternRegex;
-    }
-
-    public String getKeyPatternReplacement() {
-        return keyPatternReplacement;
-    }
-
-    public KeyLetters getKeyLetters() {
-        return keyLetters;
-    }
-
-    public GlobalBibtexKeyPattern getKeyPattern() {
-        return keyPattern;
-    }
-
-    public Character getKeywordDelimiter() {
-        return keywordDelimiter;
+        this.keyPattern = keyPattern;
+        this.keywordDelimiter = keywordDelimiter;
     }
 
     public boolean avoidOverwritingCiteKey() {
@@ -73,7 +53,27 @@ public class BibtexKeyPatternPreferences {
         return generateKeysBeforeSaving;
     }
 
+    public KeyLetters getKeyLetters() {
+        return keyLetters;
+    }
+
+    public String getKeyPatternRegex() {
+        return keyPatternRegex;
+    }
+
+    public String getKeyPatternReplacement() {
+        return keyPatternReplacement;
+    }
+
     public String getUnwantedCharacters() {
         return unwantedCharacters;
+    }
+
+    public GlobalBibtexKeyPattern getKeyPattern() {
+        return keyPattern;
+    }
+
+    public Character getKeywordDelimiter() {
+        return keywordDelimiter;
     }
 }
