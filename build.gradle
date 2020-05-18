@@ -192,7 +192,7 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.61.26'
+    implementation 'com.vladsch.flexmark:flexmark:0.61.30'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.30'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.26'
 
