@@ -9,11 +9,11 @@ import java.util.Optional;
  * <p>
  * In usual implementations, nodes function as wrappers around a data object. Thus normally they have a value property
  * which allows access to the value stored in the node.
- * In contrast to this approach, the ChainNode<T> class is designed to be used as a base class which provides the
+ * In contrast to this approach, the ChainNode&lt;T> class is designed to be used as a base class which provides the
  * tree traversing functionality via inheritance.
  * <p>
  * Example usage:
- * private class BasicChainNode extends ChainNode<BasicChainNode> {
+ * private class BasicChainNode extends ChainNode&lt;BasicChainNode> {
  * public BasicChainNode() {
  * super(BasicChainNode.class);
  * }
@@ -36,7 +36,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     /**
      * Constructs a chain node without parent and no child.
      *
-     * @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
+     * @param derivingClass class deriving from TreeNode&lt;T>. It should always be "T.class".
      *                      We need this parameter since it is hard to get this information by other means.
      */
     public ChainNode(Class<T> derivingClass) {
@@ -102,9 +102,9 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      * Removes this node from its parent and makes it a child of the specified node.
      * In this way the whole subchain based at this node is moved to the given node.
      *
-     * @param target      the new parent
-     * @throws NullPointerException           if target is null
-     * @throws UnsupportedOperationException  if target is an descendant of this node
+     * @param target the new parent
+     * @throws NullPointerException          if target is null
+     * @throws UnsupportedOperationException if target is an descendant of this node
      */
     public void moveTo(T target) {
         Objects.requireNonNull(target);
@@ -123,7 +123,6 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /**
      * Removes the child from this node's child list, giving it an empty parent.
-     *
      */
     public void removeChild() {
         if (child != null) {

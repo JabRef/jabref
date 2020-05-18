@@ -8,5 +8,4 @@ public class ManageCustomExportsAction extends SimpleCommand {
     public void execute() {
         new ExportCustomizationDialogView().show();
     }
-
 }

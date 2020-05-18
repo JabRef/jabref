@@ -12,6 +12,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -57,10 +58,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
 
+    private long lastKeyPressTime;
+    private String columnSearchTerm;
+
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
         super();
+
+        this.setOnKeyTyped(key -> {
+            if (this.getSortOrder().isEmpty()) {
+                return;
+            }
+            this.jumpToSearchKey(getSortOrder().get(0), key);
+        });
 
         this.model = model;
         this.database = Objects.requireNonNull(database);
@@ -79,10 +90,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
-                                                                  if (event.getClickCount() == 2) {
-                                                                      panel.showAndEdit(entry.getEntry());
-                                                                  }
-                                                              })
+                    if (event.getClickCount() == 2) {
+                        panel.showAndEdit(entry.getEntry());
+                    }
+                })
                 .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService(), Globals.stateManager, Globals.prefs))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -94,10 +105,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSortOrder().clear();
         preferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
-                        .map(column -> (MainTableColumn<?>) column)
-                        .filter(column -> column.getModel().equals(columnModel))
-                        .findFirst()
-                        .ifPresent(column -> this.getSortOrder().add(column)));
+                    .map(column -> (MainTableColumn<?>) column)
+                    .filter(column -> column.getModel().equals(columnModel))
+                    .findFirst()
+                    .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (preferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -116,11 +127,45 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new PersistenceVisualStateTable(this, Globals.prefs);
 
         // TODO: Float marked entries
-        //model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
+        // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
 
         database.getDatabase().registerListener(this);
+    }
+
+    /**
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table.
+     * The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+     *
+     * @param sortedColumn The sorted column in {@link MainTable}
+     * @param keyEvent The pressed character
+     */
+
+    private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
+        if (keyEvent.getCharacter() == null || sortedColumn == null) {
+            return;
+        }
+
+        if (System.currentTimeMillis() - lastKeyPressTime < 700) {
+            columnSearchTerm += keyEvent.getCharacter().toLowerCase();
+        } else {
+            columnSearchTerm = keyEvent.getCharacter().toLowerCase();
+        }
+
+        lastKeyPressTime = System.currentTimeMillis();
+
+        this.getItems().stream()
+            .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
+                                    .map(Object::toString)
+                                    .orElse("")
+                                    .toLowerCase()
+                                    .startsWith(columnSearchTerm))
+            .findFirst()
+            .ifPresent(item -> {
+                this.scrollTo(item);
+                this.clearAndSelect(item.getEntry());
+            });
     }
 
     @Subscribe
@@ -242,8 +287,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        //The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
-        //It doesn't work without
+        // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
+        // It doesn't work without
         ClipboardContent content = new ClipboardContent();
         Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
         content.put(DragAndDropDataFormats.ENTRIES, "");
@@ -275,15 +320,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
                         case LINK:
-                            LOGGER.debug("Mode LINK"); //shift on win or no modifier
+                            LOGGER.debug("Mode LINK"); // shift on win or no modifier
                             importHandler.getLinker().addFilesToEntry(entry, files);
                             break;
                         case MOVE:
-                            LOGGER.debug("Mode MOVE"); //alt on win
+                            LOGGER.debug("Mode MOVE"); // alt on win
                             importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
                             break;
                         case COPY:
-                            LOGGER.debug("Mode Copy"); //ctrl on win
+                            LOGGER.debug("Mode Copy"); // ctrl on win
                             importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
                             break;
                     }
@@ -311,10 +356,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public List<BibEntry> getSelectedEntries() {
         return getSelectionModel()
-                                  .getSelectedItems()
-                                  .stream()
-                                  .map(BibEntryTableViewModel::getEntry)
-                                  .collect(Collectors.toList());
+                .getSelectedItems()
+                .stream()
+                .map(BibEntryTableViewModel::getEntry)
+                .collect(Collectors.toList());
     }
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {

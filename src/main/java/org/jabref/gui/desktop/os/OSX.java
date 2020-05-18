@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -48,6 +47,6 @@ public class OSX implements NativeDesktop {
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/Applications");
+        return Path.of("/Applications");
     }
 }

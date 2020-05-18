@@ -27,6 +27,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,7 @@ public class EntryTypeViewModel {
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final BasePanel basePanel;
     private final DialogService dialogService;
+    private final Validator idFieldValidator;
 
     public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService) {
         this.basePanel = basePanel;
@@ -51,7 +56,7 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
-
+        idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
 
     public BooleanProperty searchSuccesfulProperty() {
@@ -64,6 +69,10 @@ public class EntryTypeViewModel {
 
     public ObjectProperty<IdBasedFetcher> selectedItemProperty() {
         return selectedItemProperty;
+    }
+
+    public ValidationStatus idFieldValidationStatus() {
+        return idFieldValidator.getValidationStatus();
     }
 
     public StringProperty idTextProperty() {
@@ -94,7 +103,6 @@ public class EntryTypeViewModel {
     }
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
-
         private IdBasedFetcher fetcher = null;
         private String searchID = "";
 
@@ -111,7 +119,6 @@ public class EntryTypeViewModel {
             }
             return bibEntry;
         }
-
     }
 
     public void runFetcherWorker() {
@@ -132,7 +139,6 @@ public class EntryTypeViewModel {
             searchingProperty.set(false);
 
             fetcherWorker = new FetcherWorker();
-
         });
 
         fetcherWorker.setOnSucceeded(evt -> {
@@ -164,7 +170,6 @@ public class EntryTypeViewModel {
                     basePanel.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);
-
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }
@@ -172,7 +177,6 @@ public class EntryTypeViewModel {
 
             focusAndSelectAllProperty.set(true);
             searchingProperty().setValue(false);
-
         });
     }
 }

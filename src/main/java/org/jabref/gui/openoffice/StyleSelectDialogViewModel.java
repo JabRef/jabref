@@ -51,7 +51,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isFromResource() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
     public OOBibStyle toOOBibStyle(StyleSelectItemViewModel item) {
@@ -71,7 +71,7 @@ public class StyleSelectDialogViewModel {
                 styles.setAll(loadStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file."));
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
             }
         });
     }
@@ -94,9 +94,7 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
-
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
         } catch (IOException e) {
@@ -105,7 +103,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void viewStyle(StyleSelectItemViewModel item) {
-
         DialogPane pane = new DialogPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
@@ -121,6 +118,8 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
+        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style -> !style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
+        preferences.setExternalStyles(externalStyles);
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
     }

@@ -25,7 +25,7 @@ public class StyleSelectItemViewModel {
         this.journals.setValue(journals);
         this.file.setValue(file);
         this.style = style;
-        this.internalStyle.set(style.isFromResource());
+        this.internalStyle.set(style.isInternalStyle());
     }
 
     public StringProperty nameProperty() {

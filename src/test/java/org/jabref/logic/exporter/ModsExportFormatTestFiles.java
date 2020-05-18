@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +38,7 @@ public class ModsExportFormatTestFiles {
     private Path importFile;
 
     public static Stream<String> fileNames() throws Exception {
-        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
+        resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
         System.out.println(resourceDir);
 
         try (Stream<Path> stream = Files.list(resourceDir)) {
@@ -66,10 +65,10 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testPerformExport(String filename) throws Exception {
-        importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
-        Path expectedFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
+        Path expectedFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         exporter.export(databaseContext, exportedFile, charset, entries);
 
@@ -81,7 +80,7 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testExportAsModsAndThenImportAsMods(String filename) throws Exception {
-        importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
         exporter.export(databaseContext, exportedFile, charset, entries);
@@ -91,9 +90,9 @@ public class ModsExportFormatTestFiles {
     @ParameterizedTest
     @MethodSource("fileNames")
     public final void testImportAsModsAndExportAsMods(String filename) throws Exception {
-        importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        importFile = Path.of(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
+        Path xmlFile = Path.of(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 

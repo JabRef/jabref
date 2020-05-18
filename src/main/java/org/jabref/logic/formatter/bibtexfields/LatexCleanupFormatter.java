@@ -41,7 +41,7 @@ public class LatexCleanupFormatter extends Formatter {
         newValue = REPLACE_WITH_AT.matcher(newValue).replaceAll("$1@@"); // Replace $, but not \$ with @@
 
         newValue = REPLACE_EVERY_OTHER_AT.matcher(newValue).replaceAll("$1\\$$2@@"); // Replace every other @@ with $
-        //newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
+        // newValue = newValue.replaceAll("([0-9\\(\\.]+) \\$","\\$$1\\\\ "); // Move numbers followed by a space left of $ inside the equation, e.g., 0.35 $\mu$m
 
         newValue = MOVE_NUMBERS_WITH_OPERATORS.matcher(newValue).replaceAll("\\$$1"); // Move numbers, possibly with operators +, -, or /,  left of $ into the equation
         newValue = MOVE_NUMBERS_RIGHT_INTO_EQUATION.matcher(newValue).replaceAll(" $1@@"); // Move numbers right of @@ into the equation

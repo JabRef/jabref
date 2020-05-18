@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -28,11 +28,11 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected final Field field;
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
-    private final AutoCompleteSuggestionProvider<?> suggestionProvider;
+    private final SuggestionProvider<?> suggestionProvider;
     private final CompositeValidator fieldValidator;
     private ObjectBinding<String> fieldBinding;
 
-    public AbstractEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public AbstractEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.field = field;
         this.suggestionProvider = suggestionProvider;
 
@@ -72,6 +72,6 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     }
 
     public Collection<?> complete(AutoCompletionBinding.ISuggestionRequest request) {
-        return suggestionProvider.call(request);
+        return suggestionProvider.provideSuggestions(request);
     }
 }

@@ -6,19 +6,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 
-public class HTMLCharacterChecker implements Checker {
-    // Detect any HTML encoded character,
+/**
+ * Checks, if there are any HTML encoded characters in nonverbatim fields.
+ */
+public class HTMLCharacterChecker implements EntryChecker {
+    // Detect any HTML encoded character
     private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
 
-    /**
-     * Checks, if there are any HTML encoded characters in nonverbatim fields.
-     */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();

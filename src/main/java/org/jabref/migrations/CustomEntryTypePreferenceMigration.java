@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 class CustomEntryTypePreferenceMigration {
 
-    //non-default preferences
+    // non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
@@ -42,7 +42,7 @@ class CustomEntryTypePreferenceMigration {
 
     /**
      * Retrieves all deprecated information about the entry type in preferences, with the tag given by number.
-     *
+     * <p>
      * (old implementation which has been copied)
      */
     private static Optional<BibEntryType> getBibEntryType(int number) {

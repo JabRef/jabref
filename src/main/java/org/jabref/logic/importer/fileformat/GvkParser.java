@@ -49,7 +49,7 @@ public class GvkParser implements Parser {
         // Namespace srwNamespace = Namespace.getNamespace("srw","http://www.loc.gov/zing/srw/");
 
         // Schleife ueber allen Teilergebnissen
-        //Element root = content.getDocumentElement();
+        // Element root = content.getDocumentElement();
         Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
         Element srwrecords = getChild("zs:records", root);
         if (srwrecords == null) {
@@ -111,12 +111,12 @@ public class GvkParser implements Parser {
                 }
             }
 
-            //ppn
+            // ppn
             if ("003@".equals(tag)) {
                 ppn = getSubfield("0", datafield);
             }
 
-            //author
+            // author
             if ("028A".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
@@ -128,7 +128,7 @@ public class GvkParser implements Parser {
                 }
                 author = author.concat(vorname + " " + nachname);
             }
-            //author (weiterer)
+            // author (weiterer)
             if ("028B".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
@@ -141,7 +141,7 @@ public class GvkParser implements Parser {
                 author = author.concat(vorname + " " + nachname);
             }
 
-            //editor
+            // editor
             if ("028C".equals(tag)) {
                 String vorname = getSubfield("d", datafield);
                 String nachname = getSubfield("a", datafield);
@@ -154,31 +154,30 @@ public class GvkParser implements Parser {
                 editor = editor.concat(vorname + " " + nachname);
             }
 
-            //title and subtitle
+            // title and subtitle
             if ("021A".equals(tag)) {
                 title = getSubfield("a", datafield);
                 subtitle = getSubfield("d", datafield);
             }
 
-            //publisher and address
+            // publisher and address
             if ("033A".equals(tag)) {
                 publisher = getSubfield("n", datafield);
                 address = getSubfield("p", datafield);
             }
 
-            //year
+            // year
             if ("011@".equals(tag)) {
                 year = getSubfield("a", datafield);
             }
 
-            //year, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
+            // year, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
             if ("031A".equals(tag)) {
                 year = getSubfield("j", datafield);
 
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
                 pages = getSubfield("h", datafield);
-
             }
 
             // 036D seems to contain more information than the other fields
@@ -194,13 +193,13 @@ public class GvkParser implements Parser {
                     }
                     number = title;
                 }
-                //title and subtitle
+                // title and subtitle
                 title = getSubfield("a", datafield);
                 subtitle = getSubfield("d", datafield);
                 volume = getSubfield("l", datafield);
             }
 
-            //series and number
+            // series and number
             if ("036E".equals(tag)) {
                 series = getSubfield("a", datafield);
                 number = getSubfield("l", datafield);
@@ -211,17 +210,17 @@ public class GvkParser implements Parser {
                 }
             }
 
-            //note
+            // note
             if ("037A".equals(tag)) {
                 note = getSubfield("a", datafield);
             }
 
-            //edition
+            // edition
             if ("032@".equals(tag)) {
                 edition = getSubfield("a", datafield);
             }
 
-            //isbn
+            // isbn
             if ("004A".equals(tag)) {
                 final String isbn10 = getSubfield("0", datafield);
                 final String isbn13 = getSubfield("A", datafield);
@@ -233,7 +232,6 @@ public class GvkParser implements Parser {
                 if (isbn13 != null) {
                     isbn = isbn13;
                 }
-
             }
 
             // Hochschulschriftenvermerk
@@ -252,7 +250,7 @@ public class GvkParser implements Parser {
                 }
             }
 
-            //journal oder booktitle
+            // journal oder booktitle
 
             /* Problematiken hier: Sowohl für Artikel in
              * Zeitschriften als für Beiträge in Büchern
@@ -271,7 +269,7 @@ public class GvkParser implements Parser {
                 publisher = getSubfield("n", datafield);
             }
 
-            //pagetotal
+            // pagetotal
             if ("034D".equals(tag)) {
                 pagetotal = getSubfield("a", datafield);
 
@@ -297,13 +295,13 @@ public class GvkParser implements Parser {
                 entryType = StandardEntryType.Book;
             }
 
-            //Hilfskategorien zur Entscheidung @article
-            //oder @incollection; hier könnte man auch die
-            //ISBN herausparsen als Erleichterung für das
-            //Auffinden der Quelle, die über die
-            //SRU-Schnittstelle gelieferten Daten zur
-            //Quelle unvollständig sind (z.B. nicht Serie
-            //und Nummer angegeben werden)
+            // Hilfskategorien zur Entscheidung @article
+            // oder @incollection; hier könnte man auch die
+            // ISBN herausparsen als Erleichterung für das
+            // Auffinden der Quelle, die über die
+            // SRU-Schnittstelle gelieferten Daten zur
+            // Quelle unvollständig sind (z.B. nicht Serie
+            // und Nummer angegeben werden)
             if ("039B".equals(tag)) {
                 quelle = getSubfield("8", datafield);
             }
@@ -353,7 +351,7 @@ public class GvkParser implements Parser {
         } else if (mak.startsWith("O")) {
             entryType = BibEntry.DEFAULT_TYPE;
             // FIXME: online only available in Biblatex
-            //entryType = "online";
+            // entryType = "online";
         }
 
         /*
@@ -492,5 +490,4 @@ public class GvkParser implements Parser {
     private String removeSortCharacters(String input) {
         return input.replaceAll("\\@", "");
     }
-
 }

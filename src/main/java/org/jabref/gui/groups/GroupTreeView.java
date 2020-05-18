@@ -46,9 +46,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
@@ -120,7 +120,7 @@ public class GroupTreeView {
                 .withTooltip(GroupNodeViewModel::getDescription)
                 .install(mainColumn);
 
-        // Number of hits
+        // Number of hits (only if user wants to see them)
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
@@ -134,7 +134,9 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    text.textProperty().bind(group.getHits().asString());
+                    if (preferencesService.getDisplayGroupCount()) {
+                        text.textProperty().bind(group.getHits().asString());
+                    }
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -172,7 +174,6 @@ public class GroupTreeView {
 
                 boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
                 row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
-
             });
             // Remove disclosure node since we display custom version in separate column
             // Simply setting to null is not enough since it would be replaced by the default node on every change
@@ -181,7 +182,7 @@ public class GroupTreeView {
 
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
-                    EasyBind.monadic(row.itemProperty())
+                    EasyBind.wrapNullable(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -218,7 +219,7 @@ public class GroupTreeView {
                 if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
-                    //expand node and all children on drag over
+                    // expand node and all children on drag over
                     dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     if (localDragboard.hasBibEntries()) {
@@ -241,7 +242,8 @@ public class GroupTreeView {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
                     List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
-                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
+                        Optional<GroupNodeViewModel> source = viewModel
+                                .rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
@@ -356,20 +358,20 @@ public class GroupTreeView {
         menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
-        //if (group.canBeEdited()) {
-        //editGroupPopupAction.setEnabled(false);
-        //addGroupPopupAction.setEnabled(false);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(false);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(false);
-        //} else {
-        //editGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setEnabled(true);
-        //addGroupPopupAction.setNode(node);
-        //removeGroupAndSubgroupsPopupAction.setEnabled(true);
-        //removeGroupKeepSubgroupsPopupAction.setEnabled(true);
-        //}
-        //sortSubmenu.setEnabled(!node.isLeaf());
-        //removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
+        // if (group.canBeEdited()) {
+        // editGroupPopupAction.setEnabled(false);
+        // addGroupPopupAction.setEnabled(false);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(false);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(false);
+        // } else {
+        // editGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setEnabled(true);
+        // addGroupPopupAction.setNode(node);
+        // removeGroupAndSubgroupsPopupAction.setEnabled(true);
+        // removeGroupKeepSubgroupsPopupAction.setEnabled(true);
+        // }
+        // sortSubmenu.setEnabled(!node.isLeaf());
+        // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
     }

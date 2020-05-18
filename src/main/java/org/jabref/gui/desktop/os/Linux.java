@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -67,7 +66,7 @@ public class Linux implements NativeDesktop {
     public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); //default command
+        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); // default command
 
         if (desktopSession != null) {
             desktopSession = desktopSession.toLowerCase(Locale.ROOT);
@@ -109,6 +108,6 @@ public class Linux implements NativeDesktop {
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/usr/lib/");
+        return Path.of("/usr/lib/");
     }
 }

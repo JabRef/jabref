@@ -77,8 +77,8 @@ public class SpecialFieldViewModel {
 
     public List<SpecialFieldValueViewModel> getValues() {
         return field.getValues().stream()
-                .map(SpecialFieldValueViewModel::new)
-                .collect(Collectors.toList());
+                    .map(SpecialFieldValueViewModel::new)
+                    .collect(Collectors.toList());
     }
 
     public void setSpecialFieldValue(BibEntry be, SpecialFieldValue value) {

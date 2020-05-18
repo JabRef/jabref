@@ -20,7 +20,6 @@
     <Label styleClass="titleHeader" text="%File"/>
 
     <CheckBox fx:id="openLastStartup" text="%Open last edited libraries at startup"/>
-    <CheckBox fx:id="backupOldFile" text="%Backup old file when saving"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Do not wrap the following fields when saving"/>
         <TextField fx:id="noWrapFiles" HBox.hgrow="ALWAYS"/>

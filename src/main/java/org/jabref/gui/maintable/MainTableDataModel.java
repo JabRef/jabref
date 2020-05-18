@@ -27,7 +27,8 @@ public class MainTableDataModel {
     public MainTableDataModel(BibDatabaseContext context) {
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
 
-        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, BibEntryTableViewModel::new);
+        MainTableNameFormatter nameFormatter = new MainTableNameFormatter(Globals.prefs);
+        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
@@ -49,7 +50,8 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(BibEntryTableViewModel entry) {
-        return Globals.stateManager.activeSearchQueryProperty().getValue()
+        return Globals.stateManager
+                .activeSearchQueryProperty().getValue()
                 .map(matcher -> matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }
