@@ -18,7 +18,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
     private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces

@@ -27,18 +27,18 @@ public class MergeReviewIntoCommentMigration {
         List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         entries.stream()
-                .filter(MergeReviewIntoCommentMigration::hasReviewField)
-                .filter(entry -> !MergeReviewIntoCommentMigration.hasCommentField(entry))
-                .forEach(entry -> migrate(entry, parserResult));
+               .filter(MergeReviewIntoCommentMigration::hasReviewField)
+               .filter(entry -> !MergeReviewIntoCommentMigration.hasCommentField(entry))
+               .forEach(entry -> migrate(entry, parserResult));
     }
 
     public static List<BibEntry> collectConflicts(ParserResult parserResult) {
         List<BibEntry> entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();
 
         return entries.stream()
-                .filter(MergeReviewIntoCommentMigration::hasReviewField)
-                .filter(MergeReviewIntoCommentMigration::hasCommentField)
-                .collect(Collectors.toList());
+                      .filter(MergeReviewIntoCommentMigration::hasReviewField)
+                      .filter(MergeReviewIntoCommentMigration::hasCommentField)
+                      .collect(Collectors.toList());
     }
 
     public void performConflictingMigration(ParserResult parserResult) {

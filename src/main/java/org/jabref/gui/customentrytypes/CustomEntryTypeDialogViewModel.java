@@ -34,11 +34,11 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
@@ -103,8 +103,8 @@ public class CustomEntryTypeDialogViewModel {
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                                                      input -> input != null && !input.getDisplayName().isEmpty(),
-                                                      ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+                input -> input != null && !input.getDisplayName().isEmpty(),
+                ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
     public ListProperty<BibEntryType> entryTypes() {
@@ -120,7 +120,7 @@ public class CustomEntryTypeDialogViewModel {
         REQUIRED(Localization.lang("Required")),
         OPTIONAL(Localization.lang("Optional"));
 
-        private String name;
+        private final String name;
 
         FieldType(String name) {
             this.name = name;
@@ -209,8 +209,8 @@ public class CustomEntryTypeDialogViewModel {
         }
         preferencesService.saveCustomEntryTypes();
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        entryTypesManager.addCustomOrModifiedTypes(
+                preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
-
 }

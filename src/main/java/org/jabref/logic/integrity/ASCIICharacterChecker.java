@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 import com.google.common.base.CharMatcher;
 
-public class ASCIICharacterChecker implements Checker {
+public class ASCIICharacterChecker implements EntryChecker {
 
     /**
      * Detect any non ASCII encoded characters, e.g., umlauts or unicode in the fields

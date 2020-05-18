@@ -208,8 +208,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             }
 
                             String pathString = flEntry.findIn(dirs.stream().map(Path::of).collect(Collectors.toList()))
-                                    .map(path -> path.toAbsolutePath().toString())
-                                    .orElse(flEntry.getLink());
+                                                       .map(path -> path.toAbsolutePath().toString())
+                                                       .orElse(flEntry.getLink());
 
                             sb.append(replaceStrings(pathString));
                             break;
@@ -225,7 +225,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             break;
                         case FILE_EXTENSION:
                             FileHelper.getFileExtension(flEntry.getLink())
-                                    .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                                      .ifPresent(extension -> sb.append(replaceStrings(extension)));
                             break;
                         case FILE_TYPE:
                             sb.append(replaceStrings(flEntry.getFileType()));
@@ -252,7 +252,6 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             result = result.replaceAll(stringStringEntry.getKey(), to);
         }
         return result;
-
     }
 
     /**
@@ -285,5 +284,4 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             return string;
         }
     }
-
 }

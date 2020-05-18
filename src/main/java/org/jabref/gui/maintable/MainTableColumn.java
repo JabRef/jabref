@@ -25,7 +25,11 @@ public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
                 value -> model.sortTypeProperty().setValue(this.getSortType()));
     }
 
-    public MainTableColumnModel getModel() { return model; }
+    public MainTableColumnModel getModel() {
+        return model;
+    }
 
-    public String getDisplayName() { return model.getDisplayName(); }
+    public String getDisplayName() {
+        return model.getDisplayName();
+    }
 }

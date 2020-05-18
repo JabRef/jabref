@@ -11,6 +11,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
@@ -100,7 +101,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);
                         if (StringUtil.isNotBlank(tooltipText)) {
-                            setTooltip(new Tooltip(tooltipText));
+                            Screen currentScreen = Screen.getPrimary();
+                            double maxWidth = currentScreen.getBounds().getWidth();
+                            Tooltip tooltip = new Tooltip(tooltipText);
+                            tooltip.setMaxWidth(maxWidth * 2 / 3);
+                            tooltip.setWrapText(true);
+                            setTooltip(tooltip);
                         }
                     }
 

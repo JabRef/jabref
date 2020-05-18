@@ -13,5 +13,4 @@ public class VersionPreferences {
     public Version getIgnoredVersion() {
         return ignoredVersion;
     }
-
 }

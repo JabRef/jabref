@@ -66,10 +66,10 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         this.preferences = preferences;
 
         BindingsHelper.bindContentBidirectional(
-                                                files,
-                                                text,
-                                                LinkedFilesEditorViewModel::getStringRepresentation,
-                                                this::parseToFileViewModel);
+                files,
+                text,
+                LinkedFilesEditorViewModel::getStringRepresentation,
+                this::parseToFileViewModel);
     }
 
     private static String getStringRepresentation(List<LinkedFileViewModel> files) {
@@ -91,8 +91,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalFileTypes externalFileTypesFile) {
         String fileExtension = FileHelper.getFileExtension(file).orElse("");
         ExternalFileType suggestedFileType = externalFileTypesFile
-                                                                  .getExternalFileTypeByExt(fileExtension)
-                                                                  .orElse(new UnknownExternalFileType(fileExtension));
+                .getExternalFileTypeByExt(fileExtension)
+                .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
         return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
@@ -102,7 +102,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes);
         return new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes);
-
     }
 
     public boolean isFulltextLookupInProgress() {
@@ -132,8 +131,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                                .orElse(preferences.getWorkingDir());
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .withInitialDirectory(workingDirectory)
-                                                                                               .build();
+                .withInitialDirectory(workingDirectory)
+                .build();
 
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
@@ -148,8 +147,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         if (entry != null) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask
-                                                                                                   .wrap(() -> findAssociatedNotLinkedFiles(entry))
-                                                                                                   .onSuccess(files::addAll);
+                    .wrap(() -> findAssociatedNotLinkedFiles(entry))
+                    .onSuccess(files::addAll);
             taskExecutor.execute(findAssociatedNotLinkedFiles);
         }
     }
@@ -178,30 +177,30 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     public void fetchFulltext() {
         FulltextFetchers fetcher = new FulltextFetchers(preferences.getImportFormatPreferences());
         BackgroundTask
-                      .wrap(() -> fetcher.findFullTextPDF(entry))
-                      .onRunning(() -> fulltextLookupInProgress.setValue(true))
-                      .onFinished(() -> fulltextLookupInProgress.setValue(false))
-                      .onSuccess(url -> {
-                          if (url.isPresent()) {
-                              addFromURL(url.get());
-                          } else {
-                              dialogService.notify(Localization.lang("No full text document found"));
-                          }
-                      })
-                      .executeWith(taskExecutor);
+                .wrap(() -> fetcher.findFullTextPDF(entry))
+                .onRunning(() -> fulltextLookupInProgress.setValue(true))
+                .onFinished(() -> fulltextLookupInProgress.setValue(false))
+                .onSuccess(url -> {
+                    if (url.isPresent()) {
+                        addFromURL(url.get());
+                    } else {
+                        dialogService.notify(Localization.lang("No full text document found"));
+                    }
+                })
+                .executeWith(taskExecutor);
     }
 
     public void addFromURL() {
         Optional<String> urlText = dialogService.showInputDialogAndWait(
-                                                                        Localization.lang("Download file"), Localization.lang("Enter URL to download"));
+                Localization.lang("Download file"), Localization.lang("Enter URL to download"));
         if (urlText.isPresent()) {
             try {
                 URL url = new URL(urlText.get());
                 addFromURL(url);
             } catch (MalformedURLException exception) {
                 dialogService.showErrorDialogAndWait(
-                                                     Localization.lang("Invalid URL"),
-                                                     exception);
+                        Localization.lang("Invalid URL"),
+                        exception);
             }
         }
     }

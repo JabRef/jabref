@@ -28,5 +28,4 @@ public class BracesCorrector {
             return addedBraces;
         }
     }
-
 }

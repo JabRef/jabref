@@ -50,7 +50,8 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(BibEntryTableViewModel entry) {
-        return Globals.stateManager.activeSearchQueryProperty().getValue()
+        return Globals.stateManager
+                .activeSearchQueryProperty().getValue()
                 .map(matcher -> matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }

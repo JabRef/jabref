@@ -29,8 +29,7 @@ public class XmpUtilReader {
     }
 
     /**
-     * Will read the XMPMetadata from the given pdf file, closing the file
-     * afterwards.
+     * Will read the XMPMetadata from the given pdf file, closing the file afterwards.
      *
      * @param path The path to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file

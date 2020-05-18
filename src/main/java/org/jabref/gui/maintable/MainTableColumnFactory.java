@@ -54,8 +54,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -405,7 +405,7 @@ class MainTableColumnFactory {
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
-            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
+            MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
             contextMenu.getItems().add(menuItem);
         }

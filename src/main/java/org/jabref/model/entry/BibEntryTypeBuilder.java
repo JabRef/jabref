@@ -34,7 +34,7 @@ public class BibEntryTypeBuilder {
 
     public BibEntryTypeBuilder withImportantFields(Collection<Field> newFields) {
         this.fields = Streams.concat(fields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
-                            .collect(Collectors.toSet());
+                             .collect(Collectors.toSet());
         return this;
     }
 

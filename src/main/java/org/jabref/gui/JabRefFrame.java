@@ -14,7 +14,9 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -23,6 +25,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
@@ -38,6 +41,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.jabref.Globals;
@@ -135,7 +139,9 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,7 +403,23 @@ public class JabRefFrame extends BorderPane {
      * @return true if the user chose to quit; false otherwise
      */
     public boolean quit() {
-        // First ask if the user really wants to close, if the library has not been saved since last save.
+        // First ask if the user really wants to close, if there are still background tasks running
+        /*
+        It is important to wait for unfinished background tasks before checking if a save-operation is needed, because
+        the background tasks may make changes themselves that need saving.
+         */
+        if (stateManager.getAnyTaskRunning().getValue()) {
+            Optional<ButtonType> shouldClose = dialogService.showBackgroundProgressDialogAndWait(
+                    Localization.lang("Please wait..."),
+                    Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
+                    stateManager
+            );
+            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
+                return false;
+            }
+        }
+
+        // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
             BasePanel panel = getBasePanelAt(i);
@@ -435,6 +457,7 @@ public class JabRefFrame extends BorderPane {
         setTop(head);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
+        splitPane.setResizableWithParent(sidePane, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -517,7 +540,9 @@ public class JabRefFrame extends BorderPane {
                 new Separator(Orientation.VERTICAL),
                 factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
                 factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
+                new Separator(Orientation.VERTICAL),
+                createTaskIndicator()
         );
 
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
@@ -919,6 +944,59 @@ public class JabRefFrame extends BorderPane {
                 help);
         menu.setUseSystemMenuBar(true);
         return menu;
+    }
+
+    private Group createTaskIndicator() {
+        ProgressIndicator indicator = new ProgressIndicator();
+        indicator.getStyleClass().add("progress-indicatorToolbar");
+        indicator.progressProperty().bind(stateManager.getTasksProgress());
+
+        Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
+        Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
+        indicator.setTooltip(noTasksRunning);
+        stateManager.getAnyTaskRunning().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue.booleanValue()) {
+                    indicator.setTooltip(someTasksRunning);
+                } else {
+                    indicator.setTooltip(noTasksRunning);
+                }
+            }
+        });
+
+        /*
+        The label of the indicator cannot be removed with styling. Therefore,
+        hide it and clip it to a square of (width x width) each time width is updated.
+         */
+        indicator.widthProperty().addListener((observable, oldValue, newValue) -> {
+            /*
+            The indeterminate spinner is wider than the determinate spinner.
+            We must make sure they are the same width for the clipping to result in a square of the same size always.
+             */
+            if (!indicator.isIndeterminate()) {
+                indicator.setPrefWidth(newValue.doubleValue());
+            }
+            if (newValue.doubleValue() > 0) {
+                Rectangle clip = new Rectangle(newValue.doubleValue(), newValue.doubleValue());
+                indicator.setClip(clip);
+            }
+        });
+
+        indicator.setOnMouseClicked(event -> {
+            TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
+            EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            taskProgressView.setRetainTasks(true);
+            taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
+
+            PopOver progressViewPopOver = new PopOver(taskProgressView);
+            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+
+            progressViewPopOver.show(indicator);
+        });
+
+        return new Group(indicator);
     }
 
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {

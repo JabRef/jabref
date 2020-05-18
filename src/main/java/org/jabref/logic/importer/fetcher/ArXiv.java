@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
  * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
  * description on how to use the API
- *
+ * <p>
  * Similar implementions:
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
@@ -194,7 +194,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
-                                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -251,7 +251,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
         return searchForEntries(query).stream().map(
-                                                    (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                       .collect(Collectors.toList());
     }
 

@@ -66,14 +66,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                   .withStringTooltip(LinkedFileViewModel::getDescription)
-                   .withGraphic(LinkedFilesEditor::createFileDisplay)
-                   .withContextMenu(this::createContextMenuForFile)
-                   .withOnMouseClickedEvent(this::handleItemMouseClick)
-                   .setOnDragDetected(this::handleOnDragDetected)
-                   .setOnDragDropped(this::handleOnDragDropped)
-                   .setOnDragOver(this::handleOnDragOver)
-                   .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
+                .withStringTooltip(LinkedFileViewModel::getDescription)
+                .withGraphic(LinkedFilesEditor::createFileDisplay)
+                .withContextMenu(this::createContextMenuForFile)
+                .withOnMouseClickedEvent(this::handleItemMouseClick)
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
 
@@ -126,7 +126,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         event.setDropCompleted(success);
         event.consume();
-
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {

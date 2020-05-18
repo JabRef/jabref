@@ -93,7 +93,7 @@
   <macro name="translator">
     <text value="Traducao "/>
     <names variable="translator" delimiter="; ">
-      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"></name>
+      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always"/>
     </names>
   </macro>
   <macro name="author">

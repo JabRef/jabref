@@ -22,9 +22,9 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.PreboundBinding;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.PreboundBinding;
+import com.tobiasdiez.easybind.Subscription;
 
 /**
  * Helper methods for javafx binding.
@@ -57,7 +57,7 @@ public class BindingsHelper {
      * Creates a new list in which each element is converted using the provided mapping.
      * All changes to the underlying list are propagated to the converted list.
      *
-     * In contrast to {@link org.fxmisc.easybind.EasyBind#map(ObservableList, Function)},
+     * In contrast to {@link com.tobiasdiez.easybind.EasyBind#map(ObservableList, Function)},
      * the items are converted when the are inserted (and at the initialization) instead of when they are accessed.
      * Thus the initial CPU overhead and memory consumption is higher but the access to list items is quicker.
      */
@@ -111,10 +111,10 @@ public class BindingsHelper {
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ListProperty<B> propertyB, Consumer<ObservableList<B>> updateA, Consumer<List<A>> updateB) {
         bindContentBidirectional(
-                                 propertyA,
-                                 (ObservableValue<ObservableList<B>>) propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                (ObservableValue<ObservableList<B>>) propertyB,
+                updateA,
+                updateB);
     }
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<List<A>> updateB) {
@@ -132,10 +132,10 @@ public class BindingsHelper {
         Consumer<List<A>> updateB = newValueList -> property.setValue(mapToB.apply(newValueList));
 
         bindContentBidirectional(
-                                 listProperty,
-                                 property,
-                                 updateList,
-                                 updateB);
+                listProperty,
+                property,
+                updateList,
+                updateB);
     }
 
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
@@ -151,10 +151,10 @@ public class BindingsHelper {
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
         Consumer<Map<A, V>> updateB = newValueList -> propertyB.setValue(mapToB.apply(newValueList));
         bindContentBidirectional(
-                                 propertyA,
-                                 propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                propertyB,
+                updateA,
+                updateB);
     }
 
     public static <T> ObservableValue<T> constantOf(T value) {

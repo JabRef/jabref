@@ -77,7 +77,7 @@
                     <JabRefIconView glyph="REFRESH"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Reset default preview style" />
+                    <Tooltip text="%Reset default preview style"/>
                 </tooltip>
             </Button>
         </HBox>
