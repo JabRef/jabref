@@ -3,6 +3,7 @@ package org.jabref.logic.bibtexkeypattern;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,7 +50,7 @@ public class BracketedPattern {
     private static final Pattern NOT_STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
     /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
     private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
-    /** Matches with "uni", case insensitive */
+    /** Matches "uni" at the start of a string or after a space, case insensitive */
     private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
     /** Matches with "tech", case insensitive */
     private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
@@ -57,6 +58,12 @@ public class BracketedPattern {
     private static final Pattern DEPARTMENT_OR_LAB_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
     /** Matches with "dep"/"dip", case insensitive */
     private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+    private enum INSTITUTION {
+        SCHOOL,
+        DEPARTMENT,
+        UNIVERSITY,
+        TECHNOLOGY;
+    }
 
     private final String pattern;
 
@@ -1288,7 +1295,7 @@ public class BracketedPattern {
         }
 
         result = removeDiacritics(result);
-        String[] parts = result.split(",");
+        String[] institutionName = result.split(",");
 
         // Key parts
         String university = null;
@@ -1296,60 +1303,26 @@ public class BracketedPattern {
         String school = null;
         String rest = null;
 
-        List<String> ignore = Arrays.asList("press", "the");
-        for (int index = 0; index < parts.length; index++) {
-            List<String> part = new ArrayList<>();
-
-            // Cleanup: remove unnecessary words.
-            for (String k : parts[index].replaceAll("\\{[A-Z]+}", "").split("[ \\-_]")) {
-                if ((!(k.isEmpty()) // remove empty
-                        && !ignore.contains(k.toLowerCase(Locale.ENGLISH)) // remove ignored words
-                        && (k.charAt(k.length() - 1) != '.')
-                        && Character.isUpperCase(k.charAt(0)))
-                        || ((k.length() >= 3) && "uni".equalsIgnoreCase(k.substring(0, 3)))) {
-                    part.add(k);
-                }
-            }
-
-            boolean isUniversity = false; // university
-            boolean isTechnology = false; // technology institute
-            boolean isDepartment = false; // departments
-            boolean isSchool = false; // schools
-
-            // Deciding about a part type...
-            for (String k : part) {
-                if (UNIVERSITY_PATTERN.matcher(k).matches()) {
-                    isUniversity = true;
-                }
-                if (TECHNOLOGY_PATTERN.matcher(k).matches()) {
-                    isTechnology = true;
-                }
-                if (StandardField.SCHOOL.getName().equalsIgnoreCase(k)) {
-                    isSchool = true;
-                }
-                if (DEPARTMENT_OR_LAB_PATTERN.matcher(k).matches()) {
-                    isDepartment = true;
-                }
-            }
-            if (isTechnology) {
-                isUniversity = false; // technology institute isn't university :-)
-            }
+        for (int index = 0; index < institutionName.length; index++) {
+            List<String> nameParts = removeUnnecessaryInstitutionWords(institutionName[index]);
+            EnumSet<INSTITUTION> nameTypes = institutionNameTypes(nameParts);
 
             // University part looks like: Uni[NameOfTheUniversity]
             //
             // If university is detected than the previous part is suggested
             // as department
-            if (isUniversity) {
+            if (nameTypes.contains(INSTITUTION.UNIVERSITY)) {
                 StringBuilder universitySB = new StringBuilder();
                 universitySB.append("Uni");
-                for (String k : part) {
-                    if (!UNIVERSITY_PATTERN.matcher(k).matches()) {
+                for (String k : nameParts) {
+                    if ("uni".regionMatches(true, 0, k, 0, 3)) {
+                    // if (!UNIVERSITY_PATTERN.matcher(k).matches()) {
                         universitySB.append(k);
                     }
                 }
                 university = universitySB.toString();
                 if ((index > 0) && (department == null)) {
-                    department = parts[index - 1];
+                    department = institutionName[index - 1];
                 }
 
                 // School is an abbreviation of all the words beginning with a
@@ -1357,35 +1330,37 @@ public class BracketedPattern {
                 //
                 // Explicitly defined department part is build the same way as
                 // school
-            } else if (isSchool || isDepartment) {
+            // } else if (isSchool || isDepartment) {
+            } else if (nameTypes.contains(INSTITUTION.SCHOOL)
+                    || nameTypes.contains(INSTITUTION.DEPARTMENT)) {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
-                for (String k : part) {
+                for (String k : nameParts) {
                     if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
-                        if (isSchool) {
+                        if (nameTypes.contains(INSTITUTION.SCHOOL)) {
                             schoolSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
-                        if (isDepartment) {
+                        if (nameTypes.contains(INSTITUTION.DEPARTMENT)) {
                             departmentSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                     }
                 }
-                if (isSchool) {
+                if (nameTypes.contains(INSTITUTION.SCHOOL)) {
                     school = schoolSB.toString();
                 }
-                if (isDepartment) {
+                if (nameTypes.contains(INSTITUTION.DEPARTMENT)) {
                     department = departmentSB.toString();
                 }
             } else if (rest == null) {
                 // A part not matching university, department nor school.
-                if (part.size() < 3) {
+                if (nameParts.size() < 3) {
                     // Less than 3 parts -> concatenate those
-                    rest = String.join("", part);
+                    rest = String.join("", nameParts);
                 } else {
                     // More than 3 parts -> use 1st letter abbreviation
-                    rest = part.stream()
+                    rest = nameParts.stream()
                                .filter(Predicate.not(String::isBlank))
                                .map((word) -> Character.toString(word.charAt(0)))
                                .collect(Collectors.joining());
@@ -1398,5 +1373,44 @@ public class BracketedPattern {
                 + (school == null ? "" : school)
                 + ((department == null)
                 || ((school != null) && department.equals(school)) ? "" : department);
+    }
+
+    private static EnumSet<INSTITUTION> institutionNameTypes(List<String> nameParts) {
+        EnumSet<INSTITUTION> parts = EnumSet.noneOf(INSTITUTION.class);
+        // Deciding about a part type...
+        for (String namePart : nameParts) {
+            if (UNIVERSITY_PATTERN.matcher(namePart).matches()) {
+                parts.add(INSTITUTION.UNIVERSITY);
+            } else if (TECHNOLOGY_PATTERN.matcher(namePart).matches()) {
+                parts.add(INSTITUTION.TECHNOLOGY);
+            } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {
+                parts.add(INSTITUTION.SCHOOL);
+            } else if (DEPARTMENT_OR_LAB_PATTERN.matcher(namePart).matches()) {
+                parts.add(INSTITUTION.DEPARTMENT);
+            }
+        }
+
+        if (parts.contains(INSTITUTION.TECHNOLOGY)) {
+            parts.remove(INSTITUTION.UNIVERSITY); // technology institute isn't university :-)
+        }
+
+        return parts;
+    }
+
+    private static List<String> removeUnnecessaryInstitutionWords(String name) {
+        List<String> nameParts = new ArrayList<>();
+        List<String> ignore = Arrays.asList("press", "the");
+
+        // Cleanup: remove unnecessary words.
+        for (String part : name.replaceAll("\\{[A-Z]+}", "").split("[ \\-_]")) {
+            if ((!(part.isEmpty()) // remove empty
+                    && !ignore.contains(part.toLowerCase(Locale.ENGLISH)) // remove ignored words
+                    && (part.charAt(part.length() - 1) != '.')
+                    && Character.isUpperCase(part.charAt(0)))
+                    || ((part.length() >= 3) && "uni".equalsIgnoreCase(part.substring(0, 3)))) {
+                nameParts.add(part);
+            }
+        }
+        return nameParts;
     }
 }
