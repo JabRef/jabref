@@ -1315,7 +1315,7 @@ public class BracketedPattern {
                 StringBuilder universitySB = new StringBuilder();
                 universitySB.append("Uni");
                 for (String k : nameParts) {
-                    if ("uni".regionMatches(true, 0, k, 0, 3)) {
+                    if (!"uni".regionMatches(true, 0, k, 0, 3)) {
                     // if (!UNIVERSITY_PATTERN.matcher(k).matches()) {
                         universitySB.append(k);
                     }
