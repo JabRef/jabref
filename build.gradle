@@ -130,7 +130,7 @@ dependencies {
     libreoffice 'org.libreoffice:unoil:6.4.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.7'
-    implementation 'info.debatty:java-string-similarity:1.2.1'
+    implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
