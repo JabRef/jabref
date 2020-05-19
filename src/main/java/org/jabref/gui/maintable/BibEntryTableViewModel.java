@@ -29,11 +29,8 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BibEntryTableViewModel {
-    static private final Logger LOGGER = LoggerFactory.getLogger(BibEntryTableViewModel.class);
     static private final LatexToUnicodeFormatter LATEXFORMATTER = new LatexToUnicodeFormatter();
     private final BibEntry entry;
     private final BibDatabase database;
