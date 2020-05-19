@@ -1314,7 +1314,6 @@ public class BracketedPattern {
                 universitySB.append("Uni");
                 for (String k : nameParts) {
                     if (!"uni".regionMatches(true, 0, k, 0, 3)) {
-                    // if (!UNIVERSITY_PATTERN.matcher(k).matches()) {
                         universitySB.append(k);
                     }
                 }
@@ -1328,7 +1327,6 @@ public class BracketedPattern {
                 //
                 // Explicitly defined department part is build the same way as
                 // school
-            // } else if (isSchool || isDepartment) {
             } else if (nameTypes.contains(INSTITUTION.SCHOOL)
                     || nameTypes.contains(INSTITUTION.DEPARTMENT)) {
                 StringBuilder schoolSB = new StringBuilder();
