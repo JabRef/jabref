@@ -11,10 +11,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
@@ -1355,15 +1353,11 @@ public class BracketedPattern {
                 }
             } else if (rest == null) {
                 // A part not matching university, department nor school.
-                if (nameParts.size() < 3) {
-                    // Less than 3 parts -> concatenate those
-                    rest = String.join("", nameParts);
-                } else {
-                    // More than 3 parts -> use 1st letter abbreviation
-                    rest = nameParts.stream()
-                               .filter(Predicate.not(String::isBlank))
-                               .map((word) -> Character.toString(word.charAt(0)))
-                               .collect(Collectors.joining());
+                rest = String.join("", nameParts);
+                if (nameParts.size() >= 3) {
+                    // If there are more than 3 parts, only keep uppercase characters
+                    final int[] codePoints = rest.chars().filter(Character::isUpperCase).toArray();
+                    rest = new String(codePoints, 0, codePoints.length);
                 }
             }
         }
