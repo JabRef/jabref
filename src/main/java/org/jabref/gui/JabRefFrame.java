@@ -202,6 +202,31 @@ public class JabRefFrame extends BorderPane {
                     .filter(node -> node.getStyleClass().contains("tab-header-area"))
                     .findFirst()
                     .orElseThrow();
+            // Add drag and drop listeners to JabRefFrame
+            this.getScene().setOnDragOver(event -> {
+                if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
+                    event.acceptTransferModes(TransferMode.ANY);
+                    if (!tabbedPane.getTabs().contains(dndIndicator)) {
+                        tabbedPane.getTabs().add(dndIndicator);
+                    }
+                    event.consume();
+                } else {
+                    tabbedPane.getTabs().remove(dndIndicator);
+                }
+            });
+
+            this.getScene().setOnDragExited(event -> {
+                tabbedPane.getTabs().remove(dndIndicator);
+            });
+
+            this.getScene().setOnDragDropped(event -> {
+                tabbedPane.getTabs().remove(dndIndicator);
+                List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
+                OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
+                openDatabaseAction.openFiles(bibFiles, true);
+                event.setDropCompleted(true);
+                event.consume();
+            });
 
             tabHeaderArea.setOnDragOver(event -> {
                 if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
@@ -633,24 +658,25 @@ public class JabRefFrame extends BorderPane {
             }
 
             BasePanel newBasePanel = getBasePanel(tab);
+            if (newBasePanel != null) {
+                // Poor-mans binding to global state
+                stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
 
-            // Poor-mans binding to global state
-            stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
+                // Update active search query when switching between databases
+                stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
 
-            // Update active search query when switching between databases
-            stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
+                // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+                // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+                // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
+                // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
 
-            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+                setWindowTitle();
+                // Update search autocompleter with information for the correct database:
+                newBasePanel.updateSearchManager();
 
-            setWindowTitle();
-            // Update search autocompleter with information for the correct database:
-            newBasePanel.updateSearchManager();
-
-            newBasePanel.getUndoManager().postUndoRedoEvent();
-            newBasePanel.getMainTable().requestFocus();
+                newBasePanel.getUndoManager().postUndoRedoEvent();
+                newBasePanel.getMainTable().requestFocus();
+            }
         });
         initShowTrackingNotification();
     }
