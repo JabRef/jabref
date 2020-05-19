@@ -56,7 +56,6 @@ open module org.jabref {
     requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
-    requires com.github.tomtung.latex2unicode;
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
