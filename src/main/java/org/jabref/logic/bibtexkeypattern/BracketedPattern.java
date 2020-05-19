@@ -1320,7 +1320,7 @@ public class BracketedPattern {
         }
 
         result = removeDiacritics(result);
-        String[] institutionName = result.split(",");
+        String[] institutionNameTokens = result.split(",");
 
         // Key parts
         String university = null;
@@ -1328,59 +1328,55 @@ public class BracketedPattern {
         String school = null;
         String rest = null;
 
-        for (int index = 0; index < institutionName.length; index++) {
-            List<String> nameParts = removeUnnecessaryInstitutionWords(institutionName[index]);
-            EnumSet<INSTITUTION> nameTypes = INSTITUTION.findTypes(nameParts);
+        for (int index = 0; index < institutionNameTokens.length; index++) {
+            List<String> tokenParts = getValidInstitutionNameParts(institutionNameTokens[index]);
+            EnumSet<INSTITUTION> tokenTypes = INSTITUTION.findTypes(tokenParts);
 
-            // University part looks like: Uni[NameOfTheUniversity]
-            //
-            // If university is detected than the previous part is suggested
-            // as department
-            if (nameTypes.contains(INSTITUTION.UNIVERSITY)) {
+            if (tokenTypes.contains(INSTITUTION.UNIVERSITY)) {
                 StringBuilder universitySB = new StringBuilder();
+                // University part looks like: Uni[NameOfTheUniversity]
                 universitySB.append("Uni");
-                for (String k : nameParts) {
+                for (String k : tokenParts) {
                     if (!"uni".regionMatches(true, 0, k, 0, 3)) {
                         universitySB.append(k);
                     }
                 }
                 university = universitySB.toString();
+                // If university is detected than the previous part is suggested
+                // as department
                 if ((index > 0) && (department == null)) {
-                    department = institutionName[index - 1];
+                    department = institutionNameTokens[index - 1];
                 }
-
+            } else if ((tokenTypes.contains(INSTITUTION.SCHOOL)
+                    || tokenTypes.contains(INSTITUTION.DEPARTMENT))
+                    && institutionNameTokens.length > 1) {
                 // School is an abbreviation of all the words beginning with a
                 // capital letter excluding: department, school and faculty words.
-                //
-                // Explicitly defined department part is build the same way as
-                // school
-            } else if ((nameTypes.contains(INSTITUTION.SCHOOL)
-                    || nameTypes.contains(INSTITUTION.DEPARTMENT))
-                    && institutionName.length > 1) {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
-                for (String k : nameParts) {
+                for (String k : tokenParts) {
                     if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
-                        if (nameTypes.contains(INSTITUTION.SCHOOL)) {
+                        if (tokenTypes.contains(INSTITUTION.SCHOOL)) {
                             schoolSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
-                        if (nameTypes.contains(INSTITUTION.DEPARTMENT)) {
+                        // Explicitly defined department part is build the same way as school
+                        if (tokenTypes.contains(INSTITUTION.DEPARTMENT)) {
                             departmentSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
                     }
                 }
-                if (nameTypes.contains(INSTITUTION.SCHOOL)) {
+                if (tokenTypes.contains(INSTITUTION.SCHOOL)) {
                     school = schoolSB.toString();
                 }
-                if (nameTypes.contains(INSTITUTION.DEPARTMENT)) {
+                if (tokenTypes.contains(INSTITUTION.DEPARTMENT)) {
                     department = departmentSB.toString();
                 }
             } else if (rest == null) {
                 // A part not matching university, department nor school.
-                rest = String.join("", nameParts);
-                if (nameParts.size() >= 3) {
+                rest = String.join("", tokenParts);
+                if (tokenParts.size() >= 3) {
                     // If there are more than 3 parts, only keep uppercase characters
                     final int[] codePoints = rest.chars().filter(Character::isUpperCase).toArray();
                     rest = new String(codePoints, 0, codePoints.length);
@@ -1395,7 +1391,7 @@ public class BracketedPattern {
                 || ((school != null) && department.equals(school)) ? "" : department);
     }
 
-    private static List<String> removeUnnecessaryInstitutionWords(String name) {
+    private static List<String> getValidInstitutionNameParts(String name) {
         List<String> nameParts = new ArrayList<>();
         List<String> ignore = Arrays.asList("press", "the");
 
