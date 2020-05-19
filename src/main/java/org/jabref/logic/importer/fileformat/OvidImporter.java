@@ -113,7 +113,6 @@ public class OvidImporter extends Importer {
                 if (isAuthor) {
 
                     h.put(StandardField.AUTHOR, content);
-
                 } else if (fieldName.startsWith("Title")) {
                     content = content.replaceAll("\\[.+\\]", "").trim();
                     if (content.endsWith(".")) {
@@ -143,7 +142,6 @@ public class OvidImporter extends Importer {
                         h.put(StandardField.MONTH, matcher.group(4));
                         h.put(StandardField.YEAR, matcher.group(5));
                         h.put(StandardField.PAGES, matcher.group(6));
-
                     } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
                         h.put(StandardField.EDITOR, matcher.group(1).replace(" (Ed)", ""));
                         h.put(StandardField.YEAR, matcher.group(2));
@@ -156,16 +154,13 @@ public class OvidImporter extends Importer {
                         h.put(StandardField.PAGES, matcher.group(2));
                         h.put(StandardField.ADDRESS, matcher.group(3));
                         h.put(StandardField.PUBLISHER, matcher.group(4));
-
                     }
                     // Add double hyphens to page ranges:
                     if (h.get(StandardField.PAGES) != null) {
                         h.put(StandardField.PAGES, h.get(StandardField.PAGES).replace("-", "--"));
                     }
-
                 } else if ("Abstract".equals(fieldName)) {
                     h.put(StandardField.ABSTRACT, content);
-
                 } else if ("Publication Type".equals(fieldName)) {
                     if (content.contains("Book")) {
                         h.put(InternalField.TYPE_HEADER, "book");
@@ -217,7 +212,6 @@ public class OvidImporter extends Importer {
             b.setField(h);
 
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);
@@ -225,12 +219,13 @@ public class OvidImporter extends Importer {
 
     /**
      * Convert a string of author names into a BibTeX-compatible format.
+     *
      * @param content The name string.
      * @return The formatted names.
      */
     private static String fixNames(String content) {
         String names;
-        if (content.indexOf(';') > 0) { //LN FN; [LN FN;]*
+        if (content.indexOf(';') > 0) { // LN FN; [LN FN;]*
             names = content.replaceAll("[^\\.A-Za-z,;\\- ]", "").replace(";", " and");
         } else if (content.indexOf("  ") > 0) {
             String[] sNames = content.split("  ");
@@ -247,5 +242,4 @@ public class OvidImporter extends Importer {
         }
         return AuthorList.fixAuthorLastNameFirst(names);
     }
-
 }

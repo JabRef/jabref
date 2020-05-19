@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
@@ -19,7 +19,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private DateEditorViewModel viewModel;
     @FXML private TemporalAccessorPicker datePicker;
 
-    public DateEditor(Field field, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public DateEditor(Field field, DateTimeFormatter dateFormatter, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new DateEditorViewModel(field, suggestionProvider, dateFormatter, fieldCheckers);
 
         ViewLoader.view(this)

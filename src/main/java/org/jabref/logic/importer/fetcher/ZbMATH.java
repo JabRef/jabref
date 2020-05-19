@@ -48,7 +48,6 @@ public class ZbMATH implements SearchBasedParserFetcher {
         // Example: https://zbmath.org/citationmatching/match?q=Ratiu
     }
     */
-
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
@@ -73,5 +72,4 @@ public class ZbMATH implements SearchBasedParserFetcher {
         new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
     }
-
 }

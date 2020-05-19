@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="en-GB" version="1.0" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
     <title>Animal Welfare</title>
     <id>http://www.zotero.org/styles/animal-welfare</id>
     <link href="http://www.zotero.org/styles/animal-welfare" rel="self"/>
-    <link href="http://www.ufaw.org.uk/instructions-authors.php" rel="documentation"/>
+    <link href="https://www.ufaw.org.uk/the-ufaw-journal/instructions-for-authors" rel="documentation"/>
     <author>
       <name>Sjúrður Hammer</name>
       <uri>http://www.mendeley.com/profiles/sjurur-hammer/</uri>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0962-7286</issn>
-    <updated>2015-07-27T13:15:14+00:00</updated>
+    <updated>2020-04-18T10:32:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference" match="any">
-        <text term="in" text-case="capitalize-first" font-style="normal" suffix=" "/>
+        <text term="in" text-case="capitalize-first" suffix=": "/>
         <names variable="editor translator" delimiter=", ">
           <name and="text" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
-          <label form="short" prefix=" (" suffix=")"/>
+          <label form="short" strip-periods="true" prefix=" (" suffix=")"/>
         </names>
       </if>
     </choose>
@@ -66,9 +69,12 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="webpage">
-        <text variable="URL"/>
+      <if type="article-journal">
+        <text variable="DOI" prefix="https://doi.org/"/>
       </if>
+      <else-if type="webpage post post-weblog">
+        <text variable="URL"/>
+      </else-if>
     </choose>
   </macro>
   <macro name="publisher">
@@ -135,7 +141,7 @@
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
         <text variable="container-title" form="long" font-style="italic" prefix=". "/>
-        <text variable="volume" font-weight="normal" prefix=" "/>
+        <text variable="volume" font-style="italic" prefix=" "/>
         <text variable="page" prefix=": " suffix="."/>
       </if>
       <else-if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
@@ -177,7 +183,7 @@
       <text macro="author" font-weight="bold"/>
       <text macro="issued" suffix=" "/>
       <text variable="title"/>
-      <text macro="locators" font-weight="normal"/>
+      <text macro="locators"/>
       <text macro="edition" font-weight="bold"/>
       <group delimiter=". " prefix=". ">
         <text macro="publisher"/>

@@ -18,6 +18,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty groupViewModeIntersectionProperty = new SimpleBooleanProperty();
     private final BooleanProperty groupViewModeUnionProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
+    private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
     private final StringProperty defaultGroupingFieldProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
@@ -43,6 +44,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
                 break;
         }
         autoAssignGroupProperty.setValue(preferences.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
+        displayGroupCountProperty.setValue(preferences.getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT));
 
         defaultGroupingFieldProperty.setValue(preferences.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         keywordSeparatorProperty.setValue(preferences.get(JabRefPreferences.KEYWORD_SEPARATOR));
@@ -57,26 +59,47 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
             preferences.setGroupViewMode(GroupViewMode.UNION);
         }
         preferences.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroupProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT, displayGroupCountProperty.getValue());
 
         preferences.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, defaultGroupingFieldProperty.getValue().trim());
         preferences.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparatorProperty.getValue());
     }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty grayNonHitsProperty() { return grayNonHitsProperty; }
+    public BooleanProperty grayNonHitsProperty() {
+        return grayNonHitsProperty;
+    }
 
-    public BooleanProperty groupViewModeIntersectionProperty() { return groupViewModeIntersectionProperty; }
+    public BooleanProperty groupViewModeIntersectionProperty() {
+        return groupViewModeIntersectionProperty;
+    }
 
-    public BooleanProperty groupViewModeUnionProperty() { return groupViewModeUnionProperty; }
+    public BooleanProperty groupViewModeUnionProperty() {
+        return groupViewModeUnionProperty;
+    }
 
-    public BooleanProperty autoAssignGroupProperty() { return autoAssignGroupProperty; }
+    public BooleanProperty autoAssignGroupProperty() {
+        return autoAssignGroupProperty;
+    }
 
-    public StringProperty defaultGroupingFieldProperty() { return defaultGroupingFieldProperty; }
+    public BooleanProperty displayGroupCount() {
+        return displayGroupCountProperty;
+    }
 
-    public StringProperty keywordSeparatorProperty() { return keywordSeparatorProperty; }
+    public StringProperty defaultGroupingFieldProperty() {
+        return defaultGroupingFieldProperty;
+    }
+
+    public StringProperty keywordSeparatorProperty() {
+        return keywordSeparatorProperty;
+    }
 }

@@ -36,8 +36,11 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.NumericFieldComparator;
+import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
 import org.jabref.logic.l10n.Localization;
@@ -52,8 +55,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +162,7 @@ class MainTableColumnFactory {
         column.getStyleClass().add(STYLE_ICON_COLUMN);
         setExactWidth(column, ColumnPreferences.ICON_COLUMN_WIDTH);
         column.setResizable(false);
-        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups(database));
+        column.setCellValueFactory(cellData -> cellData.getValue().getMatchedGroups());
         new ValueTableCellFactory<BibEntryTableViewModel, List<AbstractGroup>>()
                 .withGraphic(this::createGroupColorRegion)
                 .install(column);
@@ -206,11 +209,12 @@ class MainTableColumnFactory {
      */
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
         FieldColumn column = new FieldColumn(columnModel,
-                FieldFactory.parseOrFields(columnModel.getQualifier()),
-                database.getDatabase());
+                FieldFactory.parseOrFields(columnModel.getQualifier())
+        );
         new ValueTableCellFactory<BibEntryTableViewModel, String>()
                 .withText(text -> text)
                 .install(column);
+        column.setComparator(new NumericFieldComparator());
         column.setSortable(true);
         return column;
     }
@@ -253,7 +257,9 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         values.keySet().forEach(field -> {
-            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " + values.get(field), cellFactory.getTableIcon(field));
+            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " +
+                    ControlHelper.truncateString(values.get(field), -1, "...", ControlHelper.EllipsisPosition.CENTER),
+                    cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
                     JabRefDesktop.openExternalViewer(database, values.get(field), field);
@@ -314,6 +320,10 @@ class MainTableColumnFactory {
         // Added comparator for Read Status
         if (specialField == SpecialField.READ_STATUS) {
             column.setComparator(new ReadStatusFieldComparator());
+        }
+
+        if (specialField == SpecialField.PRIORITY) {
+            column.setComparator(new PriorityFieldComparator());
         }
 
         column.setSortable(true);
@@ -398,7 +408,7 @@ class MainTableColumnFactory {
         for (LinkedFile linkedFile : linkedFiles) {
             LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, entry.getEntry(), database, Globals.TASK_EXECUTOR, dialogService, Globals.prefs.getXMPPreferences(), Globals.prefs.getFilePreferences(), externalFileTypes);
 
-            MenuItem menuItem = new MenuItem(linkedFileViewModel.getDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
+            MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(), linkedFileViewModel.getTypeIcon().getGraphicNode());
             menuItem.setOnAction(event -> linkedFileViewModel.open());
             contextMenu.getItems().add(menuItem);
         }

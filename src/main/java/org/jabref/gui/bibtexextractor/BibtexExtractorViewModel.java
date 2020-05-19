@@ -30,12 +30,25 @@ public class BibtexExtractorViewModel {
     private TaskExecutor taskExecutor;
     private ImportHandler importHandler;
 
-    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext, DialogService dialogService,
-                                    JabRefPreferences jabRefPreferences, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, UndoManager undoManager, StateManager stateManager) {
+    public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
+                                    DialogService dialogService,
+                                    JabRefPreferences jabRefPreferences,
+                                    FileUpdateMonitor fileUpdateMonitor,
+                                    TaskExecutor taskExecutor,
+                                    UndoManager undoManager,
+                                    StateManager stateManager) {
+
         this.dialogService = dialogService;
         currentCitationfetcher = new GrobidCitationFetcher(jabRefPreferences.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
-        this.importHandler = new ImportHandler(dialogService, bibdatabaseContext, ExternalFileTypes.getInstance(), jabRefPreferences.getFilePreferences(), jabRefPreferences.getImportFormatPreferences(), jabRefPreferences.getUpdateFieldPreferences(), fileUpdateMonitor, undoManager, stateManager);
+        this.importHandler = new ImportHandler(
+                dialogService,
+                bibdatabaseContext,
+                ExternalFileTypes.getInstance(),
+                jabRefPreferences,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager);
     }
 
     public StringProperty inputTextProperty() {
@@ -44,14 +57,14 @@ public class BibtexExtractorViewModel {
 
     public void startParsing() {
         BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
-                .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
-                .onSuccess(parsedEntries -> {
-                    dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
-                    importHandler.importEntries(parsedEntries);
-                    for (BibEntry bibEntry : parsedEntries) {
-                        trackNewEntry(bibEntry);
-                    }
-                }).executeWith(taskExecutor);
+                      .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
+                      .onSuccess(parsedEntries -> {
+                          dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
+                          importHandler.importEntries(parsedEntries);
+                          for (BibEntry bibEntry : parsedEntries) {
+                              trackNewEntry(bibEntry);
+                          }
+                      }).executeWith(taskExecutor);
     }
 
     private void trackNewEntry(BibEntry bibEntry) {

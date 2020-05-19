@@ -28,7 +28,6 @@ public class JabRefExecutorService {
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
-
     });
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
@@ -136,14 +135,14 @@ public class JabRefExecutorService {
     public void shutdownEverything() {
         // those threads will be allowed to finish
         this.executorService.shutdown();
-        //those threads will be interrupted in their current task
+        // those threads will be interrupted in their current task
         this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();
         timer.cancel();
     }
 
-    private class NamedRunnable implements Runnable {
+    private static class NamedRunnable implements Runnable {
 
         private final String name;
 
@@ -165,5 +164,4 @@ public class JabRefExecutorService {
             }
         }
     }
-
 }

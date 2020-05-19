@@ -6,7 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ public class ThemeLoader {
             LOGGER.info("Using css from VM option: " + cssVmArgument);
             URL cssVmUrl = null;
             try {
-                cssVmUrl = Paths.get(cssVmArgument).toUri().toURL();
+                cssVmUrl = Path.of(cssVmArgument).toUri().toURL();
             } catch (MalformedURLException e) {
                 LOGGER.warn("Cannot load css " + cssVmArgument, e);
             }
@@ -93,7 +92,7 @@ public class ThemeLoader {
             if (!cssUri.toString().contains("jrt")) {
                 LOGGER.debug("CSS URI {}", cssUri);
 
-                Path cssPath = Paths.get(cssUri).toAbsolutePath();
+                Path cssPath = Path.of(cssUri).toAbsolutePath();
                 LOGGER.info("Enabling live reloading of {}", cssPath);
                 fileUpdateMonitor.addListenerForFile(cssPath, () -> {
                     LOGGER.info("Reload css file {}", cssFile);

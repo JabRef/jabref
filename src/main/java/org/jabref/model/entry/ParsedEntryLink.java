@@ -55,5 +55,4 @@ public class ParsedEntryLink {
     public BibDatabase getDataBase() {
         return dataBase;
     }
-
 }

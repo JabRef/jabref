@@ -38,12 +38,11 @@ public class FieldContentFormatter {
      * Performs the reformatting
      *
      * @param fieldContent the content to format
-     * @param field the name of the bibtex field
+     * @param field        the name of the bibtex field
      * @return the formatted field content.
      */
     public String format(String fieldContent, Field field) {
         if (multiLineFields.contains(field)) {
-            // Unify line breaks
             return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
         }
 

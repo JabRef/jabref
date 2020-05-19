@@ -2,8 +2,15 @@
 src/main/gen/
 src/main/generated/
 
+# the journal list cache
+*.mv
+
 # private data
 /buildres/jabref-cert-2016.p12
+
+# GitBook assets
+docs/book.pdf
+docs/_book/
 
 # ignore the generated markdown file if the user forgets to delete it
 status.md
@@ -45,6 +52,8 @@ gradle.properties
 # UNKNWON
 jabref.xml
 *.sonargraph
+
+## !! IN CASE YOU UPDATE, PLEASE KEEP THE LINES AT THE END OF THE FILE !!
 
 
 # Created by https://www.gitignore.io/api/gradle,java,jabref,intellij,eclipse,netbeans,windows,linux,macos,node,snapcraft
@@ -366,8 +375,16 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# react / gatsby 
-public/
+# rollup.js default build output
+
+# Uncomment the public line if your project uses Gatsby
+# https://nextjs.org/blog/next-9-1#public-directory-support
+# https://create-react-app.dev/docs/using-the-public-folder/#docsNav
+# public
+
+# Storybook build outputs
+.out
+.storybook-out
 
 # vuepress build output
 .vuepress/dist
@@ -380,6 +397,9 @@ public/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Temporary folders
+temp/
 
 ### Snapcraft ###
 /parts/
@@ -440,15 +460,17 @@ gradle-app.setting
 
 # End of https://www.gitignore.io/api/gradle,java,jabref,intellij,eclipse,netbeans,windows,linux,macos,node,snapcraft
 
--# we really version .jar files - needs to be go after the www.gitignore.io-generated ones, because they ignore *.jar files
--!/lib/*.jar
--
--# do not distribute Oracle's JDBC driver
--lib/ojdbc.jar
--
--# do not ignore the source of the build
--!/buildSrc/src/
--!/buildSrc/src/main/groovy/org/jabref/build
--
--# do not ignore JabRef icons (they are ignored by the macos setting above)
--!src/main/java/org/jabref/gui/icon
+## !! KEEP THESE LINES !!
+
+# we really version .jar files - needs to be go after the www.gitignore.io-generated ones, because they ignore *.jar files
+!/lib/*.jar
+
+# do not distribute Oracle's JDBC driver
+lib/ojdbc.jar
+
+# do not ignore the source of the build
+!/buildSrc/src/
+!/buildSrc/src/main/groovy/org/jabref/build
+
+# do not ignore JabRef icons (they are ignored by the macos setting above)
+!src/main/java/org/jabref/gui/icon

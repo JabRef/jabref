@@ -23,9 +23,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.citationstyle.PreviewLayout;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -114,7 +114,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             highlightSearchPattern();
         });
-
     }
 
     public void setTheme(String theme) {
@@ -169,7 +168,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             observable.addListener(this);
         }
         update();
-
     }
 
     private void update() {
@@ -181,14 +179,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                      .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                      .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
-                      .onSuccess(this::setPreviewText)
-                      .onFailure(exception -> {
-                          LOGGER.error("Error while generating citation style", exception);
-                          setPreviewText(Localization.lang("Error while generating citation style"));
-                      })
-                      .executeWith(taskExecutor);
+                .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onSuccess(this::setPreviewText)
+                .onFailure(exception -> {
+                    LOGGER.error("Error while generating citation style", exception);
+                    setPreviewText(Localization.lang("Error while generating citation style"));
+                })
+                .executeWith(taskExecutor);
     }
 
     private void setPreviewText(String text) {
@@ -207,13 +205,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         BackgroundTask
-                      .wrap(() -> {
-                          job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
-                          previewView.getEngine().print(job);
-                          job.endJob();
-                      })
-                      .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
-                      .executeWith(taskExecutor);
+                .wrap(() -> {
+                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
+                    previewView.getEngine().print(job);
+                    job.endJob();
+                })
+                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
+                .executeWith(taskExecutor);
     }
 
     public void copyPreviewToClipBoard() {
