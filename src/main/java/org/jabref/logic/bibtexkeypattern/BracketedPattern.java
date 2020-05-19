@@ -61,6 +61,33 @@ public class BracketedPattern {
         DEPARTMENT,
         UNIVERSITY,
         TECHNOLOGY;
+
+        /**
+         * Finds which types of institutions have words in common with the given name parts.
+         * @param nameParts a list of words that constitute parts of an institution's name.
+         * @return
+         */
+        public static EnumSet<INSTITUTION> findTypes(List<String> nameParts) {
+            EnumSet<INSTITUTION> parts = EnumSet.noneOf(INSTITUTION.class);
+            // Deciding about a part type…
+            for (String namePart : nameParts) {
+                if (UNIVERSITY_PATTERN.matcher(namePart).matches()) {
+                    parts.add(INSTITUTION.UNIVERSITY);
+                } else if (TECHNOLOGY_PATTERN.matcher(namePart).matches()) {
+                    parts.add(INSTITUTION.TECHNOLOGY);
+                } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {
+                    parts.add(INSTITUTION.SCHOOL);
+                } else if (DEPARTMENT_OR_LAB_PATTERN.matcher(namePart).matches()) {
+                    parts.add(INSTITUTION.DEPARTMENT);
+                }
+            }
+
+            if (parts.contains(INSTITUTION.TECHNOLOGY)) {
+                parts.remove(INSTITUTION.UNIVERSITY); // technology institute isn't university :-)
+            }
+
+            return parts;
+        }
     }
 
     private final String pattern;
@@ -1303,7 +1330,7 @@ public class BracketedPattern {
 
         for (int index = 0; index < institutionName.length; index++) {
             List<String> nameParts = removeUnnecessaryInstitutionWords(institutionName[index]);
-            EnumSet<INSTITUTION> nameTypes = institutionNameTypes(nameParts);
+            EnumSet<INSTITUTION> nameTypes = INSTITUTION.findTypes(nameParts);
 
             // University part looks like: Uni[NameOfTheUniversity]
             //
@@ -1366,28 +1393,6 @@ public class BracketedPattern {
                 + (school == null ? "" : school)
                 + ((department == null)
                 || ((school != null) && department.equals(school)) ? "" : department);
-    }
-
-    private static EnumSet<INSTITUTION> institutionNameTypes(List<String> nameParts) {
-        EnumSet<INSTITUTION> parts = EnumSet.noneOf(INSTITUTION.class);
-        // Deciding about a part type...
-        for (String namePart : nameParts) {
-            if (UNIVERSITY_PATTERN.matcher(namePart).matches()) {
-                parts.add(INSTITUTION.UNIVERSITY);
-            } else if (TECHNOLOGY_PATTERN.matcher(namePart).matches()) {
-                parts.add(INSTITUTION.TECHNOLOGY);
-            } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {
-                parts.add(INSTITUTION.SCHOOL);
-            } else if (DEPARTMENT_OR_LAB_PATTERN.matcher(namePart).matches()) {
-                parts.add(INSTITUTION.DEPARTMENT);
-            }
-        }
-
-        if (parts.contains(INSTITUTION.TECHNOLOGY)) {
-            parts.remove(INSTITUTION.UNIVERSITY); // technology institute isn't university :-)
-        }
-
-        return parts;
     }
 
     private static List<String> removeUnnecessaryInstitutionWords(String name) {
