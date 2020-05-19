@@ -401,7 +401,7 @@ class BibtexKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{The School of Null}}}",
                 importFormatPreferences, fileMonitor);
-        assertEquals("SN",
+        assertEquals("SchoolNull",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
