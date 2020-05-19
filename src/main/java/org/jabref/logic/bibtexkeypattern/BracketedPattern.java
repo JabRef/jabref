@@ -1327,8 +1327,9 @@ public class BracketedPattern {
                 //
                 // Explicitly defined department part is build the same way as
                 // school
-            } else if (nameTypes.contains(INSTITUTION.SCHOOL)
-                    || nameTypes.contains(INSTITUTION.DEPARTMENT)) {
+            } else if ((nameTypes.contains(INSTITUTION.SCHOOL)
+                    || nameTypes.contains(INSTITUTION.DEPARTMENT))
+                    && institutionName.length > 1) {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : nameParts) {
