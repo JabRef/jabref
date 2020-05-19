@@ -1279,10 +1279,10 @@ public class BracketedPattern {
      * department, school, rest
      * <ul>
      * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
-     * <li>Department: If the instituion value contains more than one comma
-     * separated part, it will be an abbreviation of all words beginning with the
-     * uppercase letter except of words: <code>d[ei]p.*</code>, school,
-     * faculty</li>
+     * <li>Department: If the institution value contains more than one comma
+     * separated part, the department will be an abbreviation of all words
+     * beginning with the uppercase letter except of words:
+     * <code>d[ei]p.*</code>, school, faculty</li>
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
      * is a concatenation of those tokens. Otherwise the result will be built
