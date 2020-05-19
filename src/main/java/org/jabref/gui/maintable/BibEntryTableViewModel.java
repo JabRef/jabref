@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 public class BibEntryTableViewModel {
     static private final Logger LOGGER = LoggerFactory.getLogger(BibEntryTableViewModel.class);
+    static private final LatexToUnicodeFormatter LATEXFORMATTER = new LatexToUnicodeFormatter();
     private final BibEntry entry;
     private final BibDatabase database;
     private final MainTableNameFormatter nameFormatter;
@@ -118,41 +119,28 @@ public class BibEntryTableViewModel {
         ObservableValue<String> value = fieldValues.get(fields);
         if (value != null) {
             return value;
-        } else {
-            value = Bindings.createStringBinding(() -> {
-                boolean isName = false;
-
-                Optional<String> content = Optional.empty();
-                Field anEntry = null;
-                for (Field field : fields) {
-                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
-                    if (content.isPresent()) {
-                        anEntry = field;
-                        isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                        break;
-                    }
-                }
-
-                String result = content.orElse(null);
-                if (isName) {
-                    String latexFreeBeforeNameFormatter = nameFormatter.formatName(result);
-
-                    String unformattedName = entry.getResolvedFieldOrAlias(anEntry, database).orElse(null);
-                    String formattedName = nameFormatter.formatName(unformattedName);
-                    String latexFreeAfterNameFormatter = new LatexToUnicodeFormatter().format(formattedName);
-
-                    if (!latexFreeAfterNameFormatter.equals(latexFreeBeforeNameFormatter)) {
-                        LOGGER.info("latexFreeBeforeNameFormatter = " + latexFreeBeforeNameFormatter);
-                        LOGGER.info("latexFreeAfterNameFormatter = " + latexFreeAfterNameFormatter);
-                    }
-
-                    return latexFreeAfterNameFormatter;
-                } else {
-                    return result;
-                }
-            }, entry.getObservables());
-            fieldValues.put(fields, value);
-            return value;
         }
+
+        value = Bindings.createStringBinding(() -> {
+            boolean isName = false;
+
+            Optional<String> content = Optional.empty();
+            for (Field field : fields) {
+                content = entry.getResolvedFieldOrAlias(field, database);
+                if (content.isPresent()) {
+                    isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
+                    break;
+                }
+            }
+
+            String result = content.orElse("");
+            if (isName) {
+                result = nameFormatter.formatName(result);
+                result = LATEXFORMATTER.format(result);
+            }
+            return result;
+        }, entry.getObservables());
+        fieldValues.put(fields, value);
+        return value;
     }
 }
