@@ -48,12 +48,6 @@ public class BracketedPattern {
     private static final Pattern NOT_STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
     /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
     private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
-    /** Matches "uni" at the start of a string or after a space, case insensitive */
-    private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
-    /** Matches with "tech", case insensitive */
-    private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
-    /** Matches with "dep"/"dip"/"lab", case insensitive */
-    private static final Pattern DEPARTMENT_OR_LAB_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
     /** Matches with "dep"/"dip", case insensitive */
     private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
     private enum INSTITUTION {
@@ -62,10 +56,17 @@ public class BracketedPattern {
         UNIVERSITY,
         TECHNOLOGY;
 
+        /** Matches "uni" at the start of a string or after a space, case insensitive */
+        private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+        /** Matches with "tech", case insensitive */
+        private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
+        /** Matches with "dep"/"dip"/"lab", case insensitive */
+        private static final Pattern DEPARTMENT_OR_LAB_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
+
         /**
-         * Finds which types of institutions have words in common with the given name parts.
+         * Find which types of institutions have words in common with the given name parts.
          * @param nameParts a list of words that constitute parts of an institution's name.
-         * @return
+         * @return set containing all types that matches
          */
         public static EnumSet<INSTITUTION> findTypes(List<String> nameParts) {
             EnumSet<INSTITUTION> parts = EnumSet.noneOf(INSTITUTION.class);
@@ -1355,7 +1356,8 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : tokenParts) {
-                    if (!DEPARTMENT_PATTERN.matcher(k).matches() && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
+                    if (!DEPARTMENT_PATTERN.matcher(k).matches()
+                            && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
                         if (tokenTypes.contains(INSTITUTION.SCHOOL)) {
