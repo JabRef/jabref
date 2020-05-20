@@ -10,7 +10,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,9 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers) {
         // Remove the Composite Fetcher instance from its own fetcher set to prevent a StackOverflow
-        this.fetchers = searchBasedFetchers.stream().filter(searchBasedFetcher -> searchBasedFetcher != this).collect(Collectors.toSet());
+        this.fetchers = searchBasedFetchers.stream()
+                .filter(searchBasedFetcher -> searchBasedFetcher != this)
+                .collect(Collectors.toSet());
     }
 
     @Override
