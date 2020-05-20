@@ -13,7 +13,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -31,7 +30,6 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 
 public class BibEntryTableViewModel {
-    static private final LatexToUnicodeFormatter LATEXFORMATTER = new LatexToUnicodeFormatter();
     private final BibEntry entry;
     private final BibDatabase database;
     private final MainTableNameFormatter nameFormatter;
@@ -132,8 +130,7 @@ public class BibEntryTableViewModel {
 
             String result = content.orElse("");
             if (isName) {
-                result = nameFormatter.formatName(result);
-                result = LATEXFORMATTER.format(result);
+                result = nameFormatter.formatNameLatexFree(result);
             }
             return result;
         }, entry.getObservables());
