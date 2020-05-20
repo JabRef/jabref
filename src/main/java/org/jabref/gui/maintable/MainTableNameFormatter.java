@@ -20,6 +20,31 @@ public class MainTableNameFormatter {
     }
 
     /**
+     * Format a name field for the table, according to user preferences and with latex expressions translated if
+     * possible.
+     *
+     * @param nameToFormat The contents of the name field.
+     * @return The formatted name field.
+     */
+    public String formatNameLatexFree(final String nameToFormat) {
+        if (nameToFormat == null) {
+            return null;
+        }
+
+        if (namesAsIs) {
+            return nameToFormat;
+        } else if (namesNatbib) {
+            return AuthorList.fixAuthorNatbibLatexFree(nameToFormat);
+        } else if (namesLastOnly) {
+            return AuthorList.fixAuthorLastNameOnlyCommasLatexFree(nameToFormat, false);
+        } else if (namesFf) {
+            return AuthorList.fixAuthorFirstNameFirstCommasLatexFree(nameToFormat, abbrAuthorNames, false);
+        } else {
+            return AuthorList.fixAuthorLastNameFirstCommasLatexFree(nameToFormat, abbrAuthorNames, false);
+        }
+    }
+
+    /**
      * Format a name field for the table, according to user preferences.
      *
      * @param nameToFormat The contents of the name field.
