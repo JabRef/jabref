@@ -44,6 +44,6 @@ public class CompositeSearchBasedFetcherTest {
 
     @Test
     public void performSearchContainsResultsOfSearchBasedParserFetcher() throws FetcherException {
-        Assertions.assertTrue(finder.performSearch("quantum").containsAll(searchBasedFetcher.performSearch("quantum")));
+        Assertions.assertTrue(finder.performSearch("quantum").containsAll(searchBasedParserFetcher.performSearch("quantum")));
     }
 }

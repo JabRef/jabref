@@ -10,6 +10,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

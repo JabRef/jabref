@@ -24,7 +24,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the bug when strike the delete key in the text field. [#6421](https://github.com/JabRef/jabref/issues/6421)
 - We added a BibTex key modifier for truncating strings. [#3915](https://github.com/JabRef/jabref/issues/3915)
 - We added support for jumping to target entry when typing letter/digit after sorting a column in maintable [#6146](https://github.com/JabRef/jabref/issues/6146)
-
+- We added a new fetcher to enable users to search all available E-Libraries simultaneously. [#369](https://github.com/koppor/jabref/issues/369)
 ### Changed
 
 - We improved the arXiv fetcher. Now it should find entries even more reliably and does no longer include the version (e.g `v1`) in the `eprint` field. [forum#1941](https://discourse.jabref.org/t/remove-version-in-arxiv-import/1941)
