@@ -1285,8 +1285,8 @@ public class BracketedPattern {
      * <code>d[ei]p.*</code>, school, faculty</li>
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
-     * is a concatenation of those tokens. Otherwise the result will be built
-     * from all uppercase letters in the concatenation.</li>
+     * is a concatenation of those tokens. Otherwise, the result will be built
+     * from all uppercase letters in the concatenated string.</li>
      * </ul>
      * </ol>
      * <p>
