@@ -391,7 +391,7 @@ class BibtexKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{null, author={{Department of Localhost NullGenerators}}}",
                 importFormatPreferences, fileMonitor);
-        assertEquals("DLNG",
+        assertEquals("DLN",
                 BibtexKeyGenerator.cleanKey(BibtexKeyGenerator.generateKey(entry.get(), "auth",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
