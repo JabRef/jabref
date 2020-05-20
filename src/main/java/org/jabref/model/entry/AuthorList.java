@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
+
 /**
  * This is an immutable class representing information of either <CODE>author</CODE>
  * or <CODE>editor</CODE> field in bibtex record.
@@ -125,14 +127,18 @@ public class AuthorList {
     private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
     private final String[] authorsFirstFirst = new String[4];
+    private final String[] authorsFirstFirstLatexFree = new String[4];
     private final String[] authorsLastOnly = new String[2];
+    private final String[] authorsLastOnlyLatexFree = new String[2];
     private final String[] authorLastFirstAnds = new String[2];
     private final String[] authorsLastFirst = new String[4];
+    private final String[] authorsLastFirstLatexFree = new String[4];
     private final String[] authorsLastFirstFirstLast = new String[2];
     // Variables for storing computed strings, so they only need to be created once:
     private String authorsNatbib;
     private String authorsFirstFirstAnds;
     private String authorsAlph;
+    private String authorsNatbibLatexFree;
 
     /**
      * Creates a new list of authors.
@@ -228,6 +234,15 @@ public class AuthorList {
     }
 
     /**
+     * This is a convenience method for getAuthorsFirstFirstLatexFree()
+     *
+     * @see AuthorList#getAsFirstLastNames
+     */
+    public static String fixAuthorFirstNameFirstCommasLatexFree(String authors, boolean abbr, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsFirstLastNamesLatexFree(abbr, oxfordComma);
+    }
+
+    /**
      * This is a convenience method for getAuthorsFirstFirstAnds()
      *
      * @see AuthorList#getAsFirstLastNamesWithAnd
@@ -243,6 +258,15 @@ public class AuthorList {
      */
     public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
         return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
+    }
+
+    /**
+     * This is a convenience method for getAuthorsLastFirstLatexFree()
+     *
+     * @see AuthorList#getAsLastFirstNames
+     */
+    public static String fixAuthorLastNameFirstCommasLatexFree(String authors, boolean abbr, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsLastFirstNamesLatexFree(abbr, oxfordComma);
     }
 
     /**
@@ -273,6 +297,15 @@ public class AuthorList {
     }
 
     /**
+     * This is a convenience method for getAuthorsLastOnlyLatexFree()
+     *
+     * @see AuthorList#getAsLastNames
+     */
+    public static String fixAuthorLastNameOnlyCommasLatexFree(String authors, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsLastNamesLatexFree(oxfordComma);
+    }
+
+    /**
      * This is a convenience method for getAuthorsForAlphabetization()
      *
      * @see AuthorList#getForAlphabetization
@@ -288,6 +321,15 @@ public class AuthorList {
      */
     public static String fixAuthorNatbib(String authors) {
         return AuthorList.parse(authors).getAsNatbib();
+    }
+
+    /**
+     * This is a convenience method for getAuthorsNatbibLatexFree()
+     *
+     * @see AuthorList#getAsNatbib
+     */
+    public static String fixAuthorNatbibLatexFree(String authors) {
+        return AuthorList.parse(authors).getAsNatbibLatexFree();
     }
 
     /**
@@ -390,6 +432,15 @@ public class AuthorList {
         return authorsNatbib;
     }
 
+    public String getAsNatbibLatexFree() {
+        // Check if we've computed this before:
+        if (authorsNatbibLatexFree != null) {
+            return authorsNatbibLatexFree;
+        }
+        authorsNatbibLatexFree = LatexToUnicodeAdapter.format(getAsNatbib());
+        return authorsNatbibLatexFree;
+    }
+
     /**
      * Returns the list of authors separated by commas with last name only; If
      * the list consists of two or more authors, "and" is inserted before the
@@ -435,6 +486,17 @@ public class AuthorList {
         }
         authorsLastOnly[abbrInt] = result.toString();
         return authorsLastOnly[abbrInt];
+    }
+
+    public String getAsLastNamesLatexFree(boolean oxfordComma) {
+        int abbrInt = oxfordComma ? 0 : 1;
+
+        // Check if we've computed this before:
+        if (authorsLastOnlyLatexFree[abbrInt] != null) {
+            return authorsLastOnlyLatexFree[abbrInt];
+        }
+        authorsLastOnlyLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsLastNames(oxfordComma));
+        return authorsLastOnlyLatexFree[abbrInt];
     }
 
     /**
@@ -487,6 +549,19 @@ public class AuthorList {
         }
         authorsLastFirst[abbrInt] = result.toString();
         return authorsLastFirst[abbrInt];
+    }
+
+    public String getAsLastFirstNamesLatexFree(boolean abbreviate, boolean oxfordComma) {
+        int abbrInt = abbreviate ? 0 : 1;
+        abbrInt += oxfordComma ? 0 : 2;
+
+        // Check if we've computed this before:
+        if (authorsLastFirstLatexFree[abbrInt] != null) {
+            return authorsLastFirstLatexFree[abbrInt];
+        }
+
+        authorsLastFirstLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsLastFirstNames(abbreviate, oxfordComma));
+        return authorsLastFirstLatexFree[abbrInt];
     }
 
     @Override
@@ -590,6 +665,19 @@ public class AuthorList {
         }
         authorsFirstFirst[abbrInt] = result.toString();
         return authorsFirstFirst[abbrInt];
+    }
+
+    public String getAsFirstLastNamesLatexFree(boolean abbr, boolean oxfordComma) {
+        int abbrInt = abbr ? 0 : 1;
+        abbrInt += oxfordComma ? 0 : 2;
+
+        // Check if we've computed this before:
+        if (authorsFirstFirstLatexFree[abbrInt] != null) {
+            return authorsFirstFirstLatexFree[abbrInt];
+        }
+
+        authorsFirstFirstLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsFirstLastNames(abbr, oxfordComma));
+        return authorsFirstFirstLatexFree[abbrInt];
     }
 
     /**
