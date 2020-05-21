@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -18,6 +17,7 @@ import org.jabref.logic.integrity.ValueChecker;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import com.tobiasdiez.easybind.EasyObservableValue;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -30,7 +30,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected BibEntry entry;
     private final SuggestionProvider<?> suggestionProvider;
     private final CompositeValidator fieldValidator;
-    private ObjectBinding<String> fieldBinding;
+    private EasyObservableValue<String> fieldBinding;
 
     public AbstractEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.field = field;
@@ -56,7 +56,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
         this.entry = entry;
 
         // We need to keep a reference to the binding since it otherwise gets discarded
-        fieldBinding = entry.getFieldBinding(field);
+        fieldBinding = entry.getFieldBinding(field).asOrdinary();
 
         BindingsHelper.bindBidirectional(
                 this.textProperty(),

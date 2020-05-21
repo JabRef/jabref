@@ -450,7 +450,7 @@ public class JabRefFrame extends BorderPane {
         setTop(head);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
-        splitPane.setResizableWithParent(sidePane, false);
+        SplitPane.setResizableWithParent(sidePane, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -948,14 +948,11 @@ public class JabRefFrame extends BorderPane {
         Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
         Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
         indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue.booleanValue()) {
-                    indicator.setTooltip(someTasksRunning);
-                } else {
-                    indicator.setTooltip(noTasksRunning);
-                }
+        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                indicator.setTooltip(someTasksRunning);
+            } else {
+                indicator.setTooltip(noTasksRunning);
             }
         });
 
