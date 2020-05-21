@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
@@ -372,7 +371,7 @@ public class BasePanel extends StackPane {
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.wrapNullable(Bindings.valueAt(splitPane.getDividers(), 0))
+        dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
                                               .mapObservable(SplitPane.Divider::positionProperty)
                                               .subscribeToValues(this::saveDividerLocation);
 

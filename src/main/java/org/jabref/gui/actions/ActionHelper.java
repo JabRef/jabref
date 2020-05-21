@@ -40,10 +40,10 @@ public class ActionHelper {
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        Binding<Boolean> fieldsAreSet = EasyBind.wrapNullable(Bindings.valueAt(selectedEntries, 0))
+        Binding<Boolean> fieldsAreSet = EasyBind.valueAt(selectedEntries, 0)
                                                 .mapObservable(entry -> Bindings.createBooleanBinding(() -> {
-                                                           return entry.getFields().stream().anyMatch(fields::contains);
-                                                       }, entry.getFieldsObservable()))
+                                                    return entry.getFields().stream().anyMatch(fields::contains);
+                                                }, entry.getFieldsObservable()))
                                                 .orElse(false);
         return BooleanExpression.booleanExpression(fieldsAreSet);
     }
@@ -51,14 +51,14 @@ public class ActionHelper {
     public static BooleanExpression isFilePresentForSelectedEntry(StateManager stateManager, PreferencesService preferencesService) {
 
         ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-        Binding<Boolean> fileIsPresent = EasyBind.wrapNullable(Bindings.valueAt(selectedEntries, 0)).map(entry -> {
+        Binding<Boolean> fileIsPresent = EasyBind.valueAt(selectedEntries, 0).map(entry -> {
             List<LinkedFile> files = entry.getFiles();
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
                 Optional<Path> filename = FileHelper.find(
-                                                          stateManager.getActiveDatabase().get(),
-                                                          files.get(0).getLink(),
-                                                          preferencesService.getFilePreferences());
+                        stateManager.getActiveDatabase().get(),
+                        files.get(0).getLink(),
+                        preferencesService.getFilePreferences());
                 return filename.isPresent();
             } else {
                 return false;
