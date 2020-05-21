@@ -7,10 +7,20 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthorListTest {
+
+    /*
+    Examples are similar to page 4 in
+    [BibTeXing by Oren Patashnik](https://ctan.org/tex-archive/biblio/bibtex/contrib/doc/)
+    */
+    private static final String MUHAMMAD_ALKHWARIZMI = "Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}}";
+    private static final String CORRADO_BOHM = "Corrado B{\\\"o}hm";
+    private static final String KURT_GODEL = "Kurt G{\\\"{o}}del";
+    private static final String BANU_MOSA = "{The Ban\\={u} M\\={u}s\\={a} brothers}";
 
     public static int size(String bibtex) {
         return AuthorList.parse(bibtex).getNumberOfAuthors();
@@ -29,6 +39,70 @@ public class AuthorListTest {
         assertTrue(AuthorList
                 .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter").equals(AuthorList
                         .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter")));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexNullAuthorStringThrowsException() {
+        assertThrows(NullPointerException.class, () -> AuthorList.fixAuthorNatbibLatexFree(null));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexFreeEmptyAuthorStringForEmptyInput() {
+        assertEquals("", AuthorList.fixAuthorNatbibLatexFree(""));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexCachesLatexFreeString() {
+        String cachedString = AuthorList
+                .fixAuthorNatbibLatexFree(MUHAMMAD_ALKHWARIZMI);
+        assertSame(cachedString, AuthorList
+                .fixAuthorNatbibLatexFree(MUHAMMAD_ALKHWARIZMI));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeOneAuthorNameFromLatex() {
+        assertEquals("al-Khwārizmī",
+                AuthorList.fixAuthorNatbibLatexFree(MUHAMMAD_ALKHWARIZMI));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeTwoAuthorNamesFromLatex() {
+        assertEquals("al-Khwārizmī and Böhm",
+                AuthorList.fixAuthorNatbibLatexFree(MUHAMMAD_ALKHWARIZMI
+                + " and " + CORRADO_BOHM));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeAuthorEtAlFromLatex() {
+        assertEquals("al-Khwārizmī et al.",
+                AuthorList.fixAuthorNatbibLatexFree(MUHAMMAD_ALKHWARIZMI
+                        + " and " + CORRADO_BOHM + " and " + KURT_GODEL));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeOneInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers",
+                AuthorList.fixAuthorNatbibLatexFree(BANU_MOSA));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeTwoInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
+                AuthorList.fixAuthorNatbibLatexFree(BANU_MOSA
+                + " and " + BANU_MOSA));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexUnicodeMixedAuthorsFromLatex() {
+        assertEquals("The Banū Mūsā brothers and Böhm",
+                AuthorList.fixAuthorNatbibLatexFree(BANU_MOSA
+                + " and " + CORRADO_BOHM));
+    }
+
+    @Test
+    public void fixAuthorNatbibLatexOneInstitutionWithParanthesisAtStart() {
+        assertEquals("Łukasz Michał",
+                AuthorList.fixAuthorNatbibLatexFree("{{\\L{}}ukasz Micha\\l{}}"));
     }
 
     @Test
