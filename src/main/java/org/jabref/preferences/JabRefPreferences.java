@@ -1198,7 +1198,6 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getGlobalBibtexKeyPattern(),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -1211,7 +1210,6 @@ public class JabRefPreferences implements PreferencesService {
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getGlobalBibtexKeyPattern(),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -2055,24 +2053,34 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Fetches key patterns from preferences. The implementation doesn't cache the results
+     * Creates the GlobalBibtexKeyPattern
      *
-     * @return LabelPattern containing all keys. Returned LabelPattern has no parent
+     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
      */
+    @Override
     public GlobalBibtexKeyPattern getGlobalBibtexKeyPattern() {
+        if (this.globalBibtexKeyPattern == null) {
+            updateGlobalBibtexKeyPattern();
+        }
+        return this.globalBibtexKeyPattern;
+    }
+
+    @Override
+    public void updateGlobalBibtexKeyPattern() {
         this.globalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
-            String[] keys = pre.keys();
+            String[] keys = preferences.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    this.globalBibtexKeyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), pre.get(key, null));
+                    this.globalBibtexKeyPattern.addBibtexKeyPattern(
+                            EntryTypeFactory.parse(key),
+                            preferences.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
             LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
-        return this.globalBibtexKeyPattern;
     }
 
     /**
@@ -2091,26 +2099,27 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
-            pre.clear(); // We remove all old entries.
+            preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
+            LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
         }
 
         for (EntryType entryType : pattern.getAllKeys()) {
             if (!pattern.isDefaultValue(entryType)) {
-                // no default value
-                // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
-                pre.put(entryType.getName(), pattern.getValue(entryType).get(0));
+                // first entry in the map is the full pattern
+                preferences.put(entryType.getName(), pattern.getValue(entryType).get(0));
             }
         }
+
+        updateGlobalBibtexKeyPattern();
     }
 
     private void clearKeyPatterns() throws BackingStoreException {
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        pre.clear();
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        preferences.clear();
+        updateGlobalBibtexKeyPattern();
     }
 
     @Override

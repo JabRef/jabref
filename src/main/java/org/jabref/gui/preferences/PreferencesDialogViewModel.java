@@ -141,6 +141,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         preferences.updateEntryEditorTabList();
+        preferences.updateGlobalBibtexKeyPattern();
     }
 
     /**

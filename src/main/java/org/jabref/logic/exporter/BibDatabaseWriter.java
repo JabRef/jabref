@@ -209,7 +209,7 @@ public abstract class BibDatabaseWriter {
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getBibtexKeyPatternPreferences().getKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);

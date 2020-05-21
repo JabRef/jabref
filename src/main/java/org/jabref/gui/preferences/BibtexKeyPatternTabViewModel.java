@@ -18,7 +18,7 @@ import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelViewModel;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -39,10 +39,10 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             new BibtexKeyPatternPanelItemModel(new BibtexKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final BibtexKeyPatternPreferences initialBibtexKeyPatternPreferences;
 
-    public BibtexKeyPatternTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public BibtexKeyPatternTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialBibtexKeyPatternPreferences = preferences.getBibtexKeyPatternPreferences();
@@ -77,7 +77,8 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        GlobalBibtexKeyPattern newKeyPattern = GlobalBibtexKeyPattern.fromPattern(preferences.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        GlobalBibtexKeyPattern newKeyPattern =
+                new GlobalBibtexKeyPattern(initialBibtexKeyPatternPreferences.getKeyPattern().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {

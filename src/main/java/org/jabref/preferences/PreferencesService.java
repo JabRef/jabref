@@ -29,6 +29,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
@@ -180,6 +181,10 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // BibtexKeyPatternPreferences
     //*************************************************************************************************************
+
+    GlobalBibtexKeyPattern getGlobalBibtexKeyPattern();
+
+    void updateGlobalBibtexKeyPattern();
 
     BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
 
