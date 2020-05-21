@@ -194,14 +194,6 @@ public class JabRefFrame extends BorderPane {
             if (!(skin instanceof TabPaneSkin)) {
                 return;
             }
-
-            // We need to get the tab header, the following is a ugly workaround
-            Node tabHeaderArea = ((TabPaneSkin) this.tabbedPane.getSkin())
-                    .getChildren()
-                    .stream()
-                    .filter(node -> node.getStyleClass().contains("tab-header-area"))
-                    .findFirst()
-                    .orElseThrow();
             // Add drag and drop listeners to JabRefFrame
             this.getScene().setOnDragOver(event -> {
                 if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
@@ -221,30 +213,6 @@ public class JabRefFrame extends BorderPane {
 
             this.getScene().setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
-                List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
-                OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
-                openDatabaseAction.openFiles(bibFiles, true);
-                event.setDropCompleted(true);
-                event.consume();
-            });
-
-            tabHeaderArea.setOnDragOver(event -> {
-                if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
-                    event.acceptTransferModes(TransferMode.ANY);
-                    if (!tabbedPane.getTabs().contains(dndIndicator)) {
-                        tabbedPane.getTabs().add(dndIndicator);
-                    }
-                    event.consume();
-                } else {
-                    tabbedPane.getTabs().remove(dndIndicator);
-                }
-            });
-
-            tabHeaderArea.setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
-
-            tabHeaderArea.setOnDragDropped(event -> {
-                tabbedPane.getTabs().remove(dndIndicator);
-
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
                 OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
                 openDatabaseAction.openFiles(bibFiles, true);
