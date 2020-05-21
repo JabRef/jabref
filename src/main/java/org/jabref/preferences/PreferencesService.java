@@ -166,6 +166,14 @@ public interface PreferencesService {
     void storeEntryEditorPreferences(EntryEditorPreferences preferences);
 
     //*************************************************************************************************************
+    // ExternalApplicationsPreferences
+    //*************************************************************************************************************
+
+    ExternalApplicationsPreferences getExternalApplicationsPreferences();
+
+    void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 

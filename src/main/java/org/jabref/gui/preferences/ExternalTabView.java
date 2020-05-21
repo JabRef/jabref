@@ -25,11 +25,11 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
 
-    @FXML private CheckBox useCustomTerminalCommand;
+    @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
     @FXML private Button customTerminalBrowse;
 
-    @FXML private CheckBox useCustomFileBrowserCommand;
+    @FXML private CheckBox useCustomFileBrowser;
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
 
@@ -66,15 +66,15 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
         pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
         citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
 
-        useCustomTerminalCommand.selectedProperty().bindBidirectional(viewModel.useCustomTerminalCommandProperty());
+        useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
         customTerminalCommand.textProperty().bindBidirectional(viewModel.customTerminalCommandProperty());
-        customTerminalCommand.disableProperty().bind(useCustomTerminalCommand.selectedProperty().not());
-        customTerminalBrowse.disableProperty().bind(useCustomTerminalCommand.selectedProperty().not());
+        customTerminalCommand.disableProperty().bind(useCustomTerminal.selectedProperty().not());
+        customTerminalBrowse.disableProperty().bind(useCustomTerminal.selectedProperty().not());
 
-        useCustomFileBrowserCommand.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserCommandProperty());
+        useCustomFileBrowser.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserProperty());
         customFileBrowserCommand.textProperty().bindBidirectional(viewModel.customFileBrowserCommandProperty());
-        customFileBrowserCommand.disableProperty().bind(useCustomFileBrowserCommand.selectedProperty().not());
-        customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowserCommand.selectedProperty().not());
+        customFileBrowserCommand.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
+        customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> {

@@ -72,7 +72,7 @@
             <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
         </rowConstraints>
 
-        <CheckBox fx:id="useCustomTerminalCommand" text="%Use custom terminal emulator"/>
+        <CheckBox fx:id="useCustomTerminal" text="%Use custom terminal emulator"/>
         <TextField fx:id="customTerminalCommand" prefWidth="350.0" GridPane.columnIndex="1">
             <tooltip>
                 <Tooltip text="%Note: Use the placeholder %DIR% for the location of the opened library file."/>
@@ -81,7 +81,7 @@
         <Button fx:id="customTerminalBrowse" text="%Browse" onAction="#useTerminalCommandBrowse"
                 GridPane.columnIndex="2"/>
 
-        <CheckBox fx:id="useCustomFileBrowserCommand" text="%Use custom file browser" GridPane.rowIndex="1"/>
+        <CheckBox fx:id="useCustomFileBrowser" text="%Use custom file browser" GridPane.rowIndex="1"/>
         <TextField fx:id="customFileBrowserCommand" prefWidth="350.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
             <tooltip>
                 <Tooltip text="%Note: Use the placeholder %DIR% for the location of the opened library file."/>

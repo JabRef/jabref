@@ -1827,17 +1827,6 @@ public class JabRefPreferences implements PreferencesService {
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
 
-    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
-        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
-    }
-
-    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
-            put(PUSH_TO_APPLICATION, application.getApplicationName());
-            manager.updateApplicationAction();
-        }
-    }
-
     public NewLineSeparator getNewLineSeparator() {
         return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
     }
@@ -2115,6 +2104,44 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+    }
+
+    //*************************************************************************************************************
+    // ExternalApplicationsPreferences
+    //*************************************************************************************************************
+
+    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
+        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
+    }
+
+    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
+        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
+            put(PUSH_TO_APPLICATION, application.getApplicationName());
+            manager.updateApplicationAction();
+        }
+    }
+
+    public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
+        return new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
+                get(PUSH_TO_APPLICATION),
+                get(CITE_COMMAND),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
+                get(CONSOLE_COMMAND),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
+                get(FILE_BROWSER_COMMAND));
+    }
+
+    public void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences) {
+        put(EMAIL_SUBJECT, preferences.getEmailSubject());
+        putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, preferences.shouldAutoOpenEmailAttachmentsFolder());
+        put(PUSH_TO_APPLICATION, preferences.getPushToApplicationName());
+        put(CITE_COMMAND, preferences.getCiteCommand());
+        putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !preferences.useCustomTerminal()); // mind the !
+        put(CONSOLE_COMMAND, preferences.getCustomTerminalCommand());
+        putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !preferences.useCustomFileBrowser()); // mind the !
+        put(FILE_BROWSER_COMMAND, preferences.getCustomFileBrowserCommand());
     }
 
     //*************************************************************************************************************
