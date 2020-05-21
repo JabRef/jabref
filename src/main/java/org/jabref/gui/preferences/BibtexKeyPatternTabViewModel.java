@@ -50,9 +50,9 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        overwriteAllowProperty.setValue(!initialBibtexKeyPatternPreferences.avoidOverwritingCiteKey());
-        overwriteWarningProperty.setValue(initialBibtexKeyPatternPreferences.isWarningBeforeOverwrite());
-        generateOnSaveProperty.setValue(initialBibtexKeyPatternPreferences.isGenerateKeysBeforeSaving());
+        overwriteAllowProperty.setValue(!initialBibtexKeyPatternPreferences.shouldAvoidOverwriteCiteKey());
+        overwriteWarningProperty.setValue(initialBibtexKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
+        generateOnSaveProperty.setValue(initialBibtexKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
 
         if (initialBibtexKeyPatternPreferences.getKeySuffix()
                 == BibtexKeyPatternPreferences.KeySuffix.ALWAYS) {

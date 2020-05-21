@@ -2147,9 +2147,9 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences) {
-        putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, preferences.avoidOverwritingCiteKey());
-        putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, preferences.isWarningBeforeOverwrite());
-        putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, preferences.isGenerateKeysBeforeSaving());
+        putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
+        putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
+        putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
 
         switch (preferences.getKeySuffix()) {
             case ALWAYS:

@@ -10,9 +10,9 @@ public class BibtexKeyPatternPreferences {
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
     }
 
-    private final boolean avoidOverwritingCiteKey;
-    private final boolean warningBeforeOverwritingCiteKey;
-    private final boolean generateKeysBeforeSaving;
+    private final boolean shouldAvoidOverwriteCiteKey;
+    private final boolean shouldWarnBeforeOverwriteCiteKey;
+    private final boolean shouldGenerateCiteKeysBeforeSaving;
     private final KeySuffix keySuffix;
     private final String keyPatternRegex;
     private final String keyPatternReplacement;
@@ -30,9 +30,9 @@ public class BibtexKeyPatternPreferences {
                                        GlobalBibtexKeyPattern keyPattern,
                                        Character keywordDelimiter) {
 
-        this.avoidOverwritingCiteKey = shouldAvoidOverwriteCiteKey;
-        this.warningBeforeOverwritingCiteKey = shouldWarnBeforeOverwriteCiteKey;
-        this.generateKeysBeforeSaving = shouldGenerateCiteKeysBeforeSaving;
+        this.shouldAvoidOverwriteCiteKey = shouldAvoidOverwriteCiteKey;
+        this.shouldWarnBeforeOverwriteCiteKey = shouldWarnBeforeOverwriteCiteKey;
+        this.shouldGenerateCiteKeysBeforeSaving = shouldGenerateCiteKeysBeforeSaving;
         this.keySuffix = keySuffix;
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
@@ -41,16 +41,16 @@ public class BibtexKeyPatternPreferences {
         this.keywordDelimiter = keywordDelimiter;
     }
 
-    public boolean avoidOverwritingCiteKey() {
-        return avoidOverwritingCiteKey;
+    public boolean shouldAvoidOverwriteCiteKey() {
+        return shouldAvoidOverwriteCiteKey;
     }
 
-    public boolean isWarningBeforeOverwrite() {
-        return warningBeforeOverwritingCiteKey;
+    public boolean shouldWarnBeforeOverwriteCiteKey() {
+        return shouldWarnBeforeOverwriteCiteKey;
     }
 
-    public boolean isGenerateKeysBeforeSaving() {
-        return generateKeysBeforeSaving;
+    public boolean shouldGenerateCiteKeysBeforeSaving() {
+        return shouldGenerateCiteKeysBeforeSaving;
     }
 
     public KeySuffix getKeySuffix() {

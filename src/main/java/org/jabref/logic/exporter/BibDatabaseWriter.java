@@ -189,7 +189,7 @@ public abstract class BibDatabaseWriter {
         List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (preferences.getBibtexKeyPatternPreferences().isGenerateKeysBeforeSaving()) {
+        if (preferences.getBibtexKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
             List<FieldChange> keyChanges = generateBibtexKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
