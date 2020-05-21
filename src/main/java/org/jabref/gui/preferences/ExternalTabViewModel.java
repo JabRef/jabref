@@ -26,6 +26,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+
 public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty eMailReferenceSubjectProperty = new SimpleStringProperty("");
@@ -33,20 +39,17 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<PushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
+
     private final StringProperty citeCommandProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty useTerminalDefaultProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useTerminalSpecialProperty = new SimpleBooleanProperty();
-    private final StringProperty useTerminalCommandProperty = new SimpleStringProperty("");
+    private final BooleanProperty useCustomTerminalCommandProperty = new SimpleBooleanProperty();
+    private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty usePDFAcrobatProperty = new SimpleBooleanProperty();
-    private final StringProperty usePDFAcrobatCommandProperty = new SimpleStringProperty("");
-    private final BooleanProperty usePDFSumatraProperty = new SimpleBooleanProperty();
-    private final StringProperty usePDFSumatraCommandProperty = new SimpleStringProperty("");
+    private final BooleanProperty useCustomFileBrowserCommandProperty = new SimpleBooleanProperty();
+    private final StringProperty customFileBrowserCommandProperty = new SimpleStringProperty("");
 
-    private final BooleanProperty useFileBrowserDefaultProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useFileBrowserSpecialProperty = new SimpleBooleanProperty();
-    private final StringProperty useFileBrowserSpecialCommandProperty = new SimpleStringProperty("");
+    private final Validator terminalCommandValidator;
+    private final Validator fileBrowserCommandValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -58,10 +61,25 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.frame = frame;
+
+        terminalCommandValidator = new FunctionBasedValidator<>(
+                customTerminalCommandProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("External programs"),
+                        Localization.lang("Custom applications"),
+                        Localization.lang("Please specify a terminal application."))));
+
+        fileBrowserCommandValidator = new FunctionBasedValidator<>(
+                customFileBrowserCommandProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("External programs"),
+                        Localization.lang("Custom applications"),
+                        Localization.lang("Please specify a file browser."))));
     }
 
     public void setValues() {
-
         eMailReferenceSubjectProperty.setValue(preferences.get(JabRefPreferences.EMAIL_SUBJECT));
         autoOpenAttachedFoldersProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES));
 
@@ -69,13 +87,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         selectedPushToApplicationProperty.setValue(preferences.getActivePushToApplication(frame.getPushToApplicationsManager()));
         citeCommandProperty.setValue(preferences.get(JabRefPreferences.CITE_COMMAND));
 
-        useTerminalDefaultProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
-        useTerminalCommandProperty.setValue(preferences.get(JabRefPreferences.CONSOLE_COMMAND));
-        useTerminalSpecialProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
+        useCustomTerminalCommandProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
+        customTerminalCommandProperty.setValue(preferences.get(JabRefPreferences.CONSOLE_COMMAND));
 
-        useFileBrowserDefaultProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION));
-        useFileBrowserSpecialProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION));
-        useFileBrowserSpecialCommandProperty.setValue(preferences.get(JabRefPreferences.FILE_BROWSER_COMMAND));
+        useCustomFileBrowserCommandProperty.setValue(!preferences.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION));
+        customFileBrowserCommandProperty.setValue(preferences.get(JabRefPreferences.FILE_BROWSER_COMMAND));
     }
 
     public void storeSettings() {
@@ -85,18 +101,46 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         preferences.setActivePushToApplication(selectedPushToApplicationProperty.getValue(), frame.getPushToApplicationsManager());
         preferences.put(JabRefPreferences.CITE_COMMAND, citeCommandProperty.getValue());
 
-        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, useTerminalDefaultProperty.getValue());
-        preferences.put(JabRefPreferences.CONSOLE_COMMAND, useTerminalCommandProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, !useCustomTerminalCommandProperty.getValue());
+        if (StringUtil.isNotBlank(customTerminalCommandProperty.getValue())) {
+            preferences.put(JabRefPreferences.CONSOLE_COMMAND, customTerminalCommandProperty.getValue());
+        } else {
+            preferences.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, true); // default if no command specified
+        }
 
-        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, useFileBrowserDefaultProperty.getValue());
-        if (StringUtil.isNotBlank(useFileBrowserSpecialCommandProperty.getValue())) {
-            preferences.put(JabRefPreferences.FILE_BROWSER_COMMAND, useFileBrowserSpecialCommandProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, !useCustomFileBrowserCommandProperty.getValue());
+        if (StringUtil.isNotBlank(customFileBrowserCommandProperty.getValue())) {
+            preferences.put(JabRefPreferences.FILE_BROWSER_COMMAND, customFileBrowserCommandProperty.getValue());
         } else {
             preferences.putBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION, true); // default if no command specified
         }
     }
 
+    public ValidationStatus terminalCommandValidationStatus() {
+        return terminalCommandValidator.getValidationStatus();
+    }
+
+    public ValidationStatus fileBrowserCommandValidationStatus() {
+        return fileBrowserCommandValidator.getValidationStatus();
+    }
+
     public boolean validateSettings() {
+        CompositeValidator validator = new CompositeValidator();
+
+        if (useCustomTerminalCommandProperty.getValue()) {
+            validator.addValidators(terminalCommandValidator);
+        }
+
+        if (useCustomFileBrowserCommandProperty.getValue()) {
+            validator.addValidators(fileBrowserCommandValidator);
+        }
+
+        ValidationStatus validationStatus = validator.getValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
+            return false;
+        }
         return true;
     }
 
@@ -129,20 +173,14 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         new EditExternalFileTypesAction().execute();
     }
 
-    public void useTerminalCommandBrowse() {
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> useTerminalCommandProperty.setValue(file.toAbsolutePath().toString()));
+    public void customTerminalBrowse() {
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                     .ifPresent(file -> customTerminalCommandProperty.setValue(file.toAbsolutePath().toString()));
     }
 
-    public void usePDFAcrobatCommandBrowse() {
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> usePDFAcrobatCommandProperty.setValue(file.toAbsolutePath().toString()));
-    }
-
-    public void usePDFSumatraCommandBrowse() {
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> usePDFSumatraCommandProperty.setValue(file.toAbsolutePath().toString()));
-    }
-
-    public void useFileBrowserSpecialCommandBrowse() {
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> useFileBrowserSpecialCommandProperty.setValue(file.toAbsolutePath().toString()));
+    public void customFileBrowserBrowse() {
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                     .ifPresent(file -> customFileBrowserCommandProperty.setValue(file.toAbsolutePath().toString()));
     }
 
     // EMail
@@ -171,47 +209,21 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     // Open console
 
-    public BooleanProperty useTerminalDefaultProperty() {
-        return this.useTerminalDefaultProperty;
+    public BooleanProperty useCustomTerminalCommandProperty() {
+        return this.useCustomTerminalCommandProperty;
     }
 
-    public BooleanProperty useTerminalSpecialProperty() {
-        return this.useTerminalSpecialProperty;
-    }
-
-    public StringProperty useTerminalCommandProperty() {
-        return this.useTerminalCommandProperty;
-    }
-
-    // Open PDF
-
-    public BooleanProperty usePDFAcrobatProperty() {
-        return this.usePDFAcrobatProperty;
-    }
-
-    public StringProperty usePDFAcrobatCommandProperty() {
-        return this.usePDFAcrobatCommandProperty;
-    }
-
-    public BooleanProperty usePDFSumatraProperty() {
-        return this.usePDFSumatraProperty;
-    }
-
-    public StringProperty usePDFSumatraCommandProperty() {
-        return this.usePDFSumatraCommandProperty;
+    public StringProperty customTerminalCommandProperty() {
+        return this.customTerminalCommandProperty;
     }
 
     // Open File Browser
 
-    public BooleanProperty useFileBrowserDefaultProperty() {
-        return this.useFileBrowserDefaultProperty;
+    public BooleanProperty useCustomFileBrowserCommandProperty() {
+        return this.useCustomFileBrowserCommandProperty;
     }
 
-    public BooleanProperty useFileBrowserSpecialProperty() {
-        return this.useFileBrowserSpecialProperty;
-    }
-
-    public StringProperty useFileBrowserSpecialCommandProperty() {
-        return this.useFileBrowserSpecialCommandProperty;
+    public StringProperty customFileBrowserCommandProperty() {
+        return this.customFileBrowserCommandProperty;
     }
 }
