@@ -35,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We merged the functionality "Append contents from a BibTeX library into the currently viewed library" into the "Import into database" functionality. Fixes [#6049](https://github.com/JabRef/jabref/issues/6049).
 - We changed the directory where fulltext downloads are stored to the directory set in the import-tab in preferences. [#6381](https://github.com/JabRef/jabref/pull/6381)
 - We improved the error message for invalid jstyles. [#6303](https://github.com/JabRef/jabref/issues/6303)
+- We changed the section name of 'Advanced' to 'Network' in the preferences and removed some obsolete options.[#6489](https://github.com/JabRef/jabref/pull/6489)
 
 ### Fixed
 

@@ -200,7 +200,7 @@ class IntegrityCheckTest {
                 false,
                 false,
                 false,
-                BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B,
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
                 BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,

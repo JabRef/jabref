@@ -2115,20 +2115,20 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        BibtexKeyPatternPreferences.KeyLetters keyLetters =
-                BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B;
+        BibtexKeyPatternPreferences.KeySuffix keySuffix =
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
 
         if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
-            keyLetters = BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
         } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
-            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         }
 
         return new BibtexKeyPatternPreferences(
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
-                keyLetters,
+                keySuffix,
                 get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT),
                 get(UNWANTED_BIBTEX_KEY_CHARACTERS),
@@ -2142,7 +2142,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, preferences.isWarningBeforeOverwrite());
         putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, preferences.isGenerateKeysBeforeSaving());
 
-        switch (preferences.getKeyLetters()) {
+        switch (preferences.getKeySuffix()) {
             case ALWAYS:
                 putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
                 putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);

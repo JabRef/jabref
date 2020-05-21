@@ -60,7 +60,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
                 false,
                 false,
                 false,
-                BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A,
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
@@ -158,11 +158,11 @@ public class BibtexKeyGenerator extends BracketedPattern {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = bibtexKeyPatternPreferences.getKeyLetters()
-                == BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+        boolean alwaysAddLetter = bibtexKeyPatternPreferences.getKeySuffix()
+                == BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
 
-        boolean firstLetterA = bibtexKeyPatternPreferences.getKeyLetters()
-                == BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
+        boolean firstLetterA = bibtexKeyPatternPreferences.getKeySuffix()
+                == BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
 
         String newKey;
         if (!alwaysAddLetter && (occurrences == 0)) {

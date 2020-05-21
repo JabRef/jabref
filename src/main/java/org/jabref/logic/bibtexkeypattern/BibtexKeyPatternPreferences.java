@@ -4,7 +4,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 
 public class BibtexKeyPatternPreferences {
 
-    public enum KeyLetters {
+    public enum KeySuffix {
         ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...
         SECOND_WITH_A,  // CiteKey, CiteKeyA, CiteKeyB ...
         SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
@@ -13,27 +13,27 @@ public class BibtexKeyPatternPreferences {
     private final boolean avoidOverwritingCiteKey;
     private final boolean warningBeforeOverwritingCiteKey;
     private final boolean generateKeysBeforeSaving;
-    private final KeyLetters keyLetters;
+    private final KeySuffix keySuffix;
     private final String keyPatternRegex;
     private final String keyPatternReplacement;
     private final String unwantedCharacters;
     private final GlobalBibtexKeyPattern keyPattern;
     private final Character keywordDelimiter;
 
-    public BibtexKeyPatternPreferences(boolean avoidOverwritingCiteKey,
-                                       boolean warningBeforeOverwritingCiteKey,
-                                       boolean generateKeysBeforeSaving,
-                                       KeyLetters keyLetters,
+    public BibtexKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+                                       boolean shouldWarnBeforeOverwriteCiteKey,
+                                       boolean shouldGenerateCiteKeysBeforeSaving,
+                                       KeySuffix keySuffix,
                                        String keyPatternRegex,
                                        String keyPatternReplacement,
                                        String unwantedCharacters,
                                        GlobalBibtexKeyPattern keyPattern,
                                        Character keywordDelimiter) {
 
-        this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
-        this.warningBeforeOverwritingCiteKey = warningBeforeOverwritingCiteKey;
-        this.generateKeysBeforeSaving = generateKeysBeforeSaving;
-        this.keyLetters = keyLetters;
+        this.avoidOverwritingCiteKey = shouldAvoidOverwriteCiteKey;
+        this.warningBeforeOverwritingCiteKey = shouldWarnBeforeOverwriteCiteKey;
+        this.generateKeysBeforeSaving = shouldGenerateCiteKeysBeforeSaving;
+        this.keySuffix = keySuffix;
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
         this.unwantedCharacters = unwantedCharacters;
@@ -53,8 +53,8 @@ public class BibtexKeyPatternPreferences {
         return generateKeysBeforeSaving;
     }
 
-    public KeyLetters getKeyLetters() {
-        return keyLetters;
+    public KeySuffix getKeySuffix() {
+        return keySuffix;
     }
 
     public String getKeyPatternRegex() {

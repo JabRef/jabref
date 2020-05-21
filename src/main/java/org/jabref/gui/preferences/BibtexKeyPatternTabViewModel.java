@@ -54,13 +54,13 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
         overwriteWarningProperty.setValue(initialBibtexKeyPatternPreferences.isWarningBeforeOverwrite());
         generateOnSaveProperty.setValue(initialBibtexKeyPatternPreferences.isGenerateKeysBeforeSaving());
 
-        if (initialBibtexKeyPatternPreferences.getKeyLetters()
-                == BibtexKeyPatternPreferences.KeyLetters.ALWAYS) {
+        if (initialBibtexKeyPatternPreferences.getKeySuffix()
+                == BibtexKeyPatternPreferences.KeySuffix.ALWAYS) {
             letterAlwaysAddProperty.setValue(true);
             letterStartAProperty.setValue(false);
             letterStartBProperty.setValue(false);
-        } else if (initialBibtexKeyPatternPreferences.getKeyLetters()
-                == BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A) {
+        } else if (initialBibtexKeyPatternPreferences.getKeySuffix()
+                == BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
             letterStartBProperty.setValue(false);
@@ -93,19 +93,19 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
 
-        BibtexKeyPatternPreferences.KeyLetters keyLetters = BibtexKeyPatternPreferences.KeyLetters.ALWAYS;
+        BibtexKeyPatternPreferences.KeySuffix keySuffix = BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
 
         if (letterStartAProperty.getValue()) {
-            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_A;
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         } else if (letterStartBProperty.getValue()) {
-            keyLetters = BibtexKeyPatternPreferences.KeyLetters.SECOND_WITH_B;
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
         }
 
         preferences.storeBibtexKeyPatternPreferences(new BibtexKeyPatternPreferences(
                 !overwriteAllowProperty.getValue(),
                 overwriteWarningProperty.getValue(),
                 generateOnSaveProperty.getValue(),
-                keyLetters,
+                keySuffix,
                 keyPatternRegexProperty.getValue(),
                 keyPatternReplacementProperty.getValue(),
                 unwantedCharactersProperty.getValue(),
