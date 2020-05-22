@@ -46,11 +46,11 @@ public class BracketedPattern {
     private static final int CHARS_OF_FIRST = 5;
 
     /** Matches everything that is not an uppercase ASCII letter */
-    private static final Pattern NOT_STARTING_CAPITAL_PATTERN = Pattern.compile("[^A-Z]");
+    private static final Pattern NOT_CAPITAL_FIRST_CHARACTER = Pattern.compile("[^A-Z]");
     /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
-    private static final Pattern ABBREVIATION_PATTERN = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
+    private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
     /** Matches with "dep"/"dip", case insensitive */
-    private static final Pattern DEPARTMENT_PATTERN = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
     private enum INSTITUTION {
         SCHOOL,
         DEPARTMENT,
@@ -58,11 +58,11 @@ public class BracketedPattern {
         TECHNOLOGY;
 
         /** Matches "uni" at the start of a string or after a space, case insensitive */
-        private static final Pattern UNIVERSITY_PATTERN = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
         /** Matches with "tech", case insensitive */
-        private static final Pattern TECHNOLOGY_PATTERN = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
         /** Matches with "dep"/"dip"/"lab", case insensitive */
-        private static final Pattern DEPARTMENT_OR_LAB_PATTERN = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
         /**
          * Find which types of institutions have words in common with the given name parts.
@@ -73,13 +73,13 @@ public class BracketedPattern {
             EnumSet<INSTITUTION> parts = EnumSet.noneOf(INSTITUTION.class);
             // Deciding about a part type…
             for (String namePart : nameParts) {
-                if (UNIVERSITY_PATTERN.matcher(namePart).matches()) {
+                if (UNIVERSITIES.matcher(namePart).matches()) {
                     parts.add(INSTITUTION.UNIVERSITY);
-                } else if (TECHNOLOGY_PATTERN.matcher(namePart).matches()) {
+                } else if (TECHNOLOGICAL_INSTITUTES.matcher(namePart).matches()) {
                     parts.add(INSTITUTION.TECHNOLOGY);
                 } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {
                     parts.add(INSTITUTION.SCHOOL);
-                } else if (DEPARTMENT_OR_LAB_PATTERN.matcher(namePart).matches()) {
+                } else if (DEPARTMENTS_OR_LABS.matcher(namePart).matches()) {
                     parts.add(INSTITUTION.DEPARTMENT);
                 }
             }
@@ -1320,7 +1320,7 @@ public class BracketedPattern {
         String result = content;
         result = unifyDiacritics(result);
         result = result.replaceAll("^\\{", "").replaceAll("}$", "");
-        Matcher matcher = ABBREVIATION_PATTERN.matcher(result);
+        Matcher matcher = ABBREVIATIONS.matcher(result);
         if (matcher.matches()) {
             return matcher.group(1);
         }
@@ -1363,11 +1363,11 @@ public class BracketedPattern {
                 for (String k : tokenParts) {
                     if (noOtherInstitutionKeyWord(k)) {
                         if (tokenTypes.contains(INSTITUTION.SCHOOL)) {
-                            schoolSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
+                            schoolSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
                         }
                         // Explicitly defined department part is build the same way as school
                         if (tokenTypes.contains(INSTITUTION.DEPARTMENT)) {
-                            departmentSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
+                            departmentSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
                         }
                     }
                 }
@@ -1405,10 +1405,10 @@ public class BracketedPattern {
      * @return
      */
     private static boolean noOtherInstitutionKeyWord(String word) {
-        return !DEPARTMENT_PATTERN.matcher(word).matches()
+        return !DEPARTMENTS.matcher(word).matches()
                 && !StandardField.SCHOOL.getName().equalsIgnoreCase(word)
                 && !"faculty".equalsIgnoreCase(word)
-                && !NOT_STARTING_CAPITAL_PATTERN.matcher(word).replaceAll("").isEmpty();
+                && !NOT_CAPITAL_FIRST_CHARACTER.matcher(word).replaceAll("").isEmpty();
     }
 
     private static List<String> getValidInstitutionNameParts(String name) {
