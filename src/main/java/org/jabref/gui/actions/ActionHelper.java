@@ -56,7 +56,7 @@ public class ActionHelper {
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
 
-                if(files.get(0).isOnlineLink()) {
+                if (files.get(0).isOnlineLink()) {
                     return true;
                 }
 
