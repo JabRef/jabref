@@ -194,16 +194,8 @@ public class JabRefFrame extends BorderPane {
             if (!(skin instanceof TabPaneSkin)) {
                 return;
             }
-
-            // We need to get the tab header, the following is a ugly workaround
-            Node tabHeaderArea = ((TabPaneSkin) this.tabbedPane.getSkin())
-                    .getChildren()
-                    .stream()
-                    .filter(node -> node.getStyleClass().contains("tab-header-area"))
-                    .findFirst()
-                    .orElseThrow();
-
-            tabHeaderArea.setOnDragOver(event -> {
+            // Add drag and drop listeners to JabRefFrame
+            this.getScene().setOnDragOver(event -> {
                 if (DragAndDropHelper.hasBibFiles(event.getDragboard())) {
                     event.acceptTransferModes(TransferMode.ANY);
                     if (!tabbedPane.getTabs().contains(dndIndicator)) {
@@ -215,11 +207,12 @@ public class JabRefFrame extends BorderPane {
                 }
             });
 
-            tabHeaderArea.setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
-
-            tabHeaderArea.setOnDragDropped(event -> {
+            this.getScene().setOnDragExited(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
+            });
 
+            this.getScene().setOnDragDropped(event -> {
+                tabbedPane.getTabs().remove(dndIndicator);
                 List<Path> bibFiles = DragAndDropHelper.getBibFiles(event.getDragboard());
                 OpenDatabaseAction openDatabaseAction = this.getOpenDatabaseAction();
                 openDatabaseAction.openFiles(bibFiles, true);
@@ -457,7 +450,7 @@ public class JabRefFrame extends BorderPane {
         setTop(head);
 
         splitPane.getItems().addAll(sidePane, tabbedPane);
-        splitPane.setResizableWithParent(sidePane, false);
+        SplitPane.setResizableWithParent(sidePane, false);
 
         // We need to wait with setting the divider since it gets reset a few times during the initial set-up
         mainStage.showingProperty().addListener(new ChangeListener<>() {
@@ -633,24 +626,25 @@ public class JabRefFrame extends BorderPane {
             }
 
             BasePanel newBasePanel = getBasePanel(tab);
+            if (newBasePanel != null) {
+                // Poor-mans binding to global state
+                stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
 
-            // Poor-mans binding to global state
-            stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
+                // Update active search query when switching between databases
+                stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
 
-            // Update active search query when switching between databases
-            stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
+                // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
+                // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
+                // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
+                // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
 
-            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+                setWindowTitle();
+                // Update search autocompleter with information for the correct database:
+                newBasePanel.updateSearchManager();
 
-            setWindowTitle();
-            // Update search autocompleter with information for the correct database:
-            newBasePanel.updateSearchManager();
-
-            newBasePanel.getUndoManager().postUndoRedoEvent();
-            newBasePanel.getMainTable().requestFocus();
+                newBasePanel.getUndoManager().postUndoRedoEvent();
+                newBasePanel.getMainTable().requestFocus();
+            }
         });
         initShowTrackingNotification();
     }
@@ -954,14 +948,11 @@ public class JabRefFrame extends BorderPane {
         Tooltip someTasksRunning = new Tooltip(Localization.lang("Background Tasks are running"));
         Tooltip noTasksRunning = new Tooltip(Localization.lang("Background Tasks are done"));
         indicator.setTooltip(noTasksRunning);
-        stateManager.getAnyTaskRunning().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue.booleanValue()) {
-                    indicator.setTooltip(someTasksRunning);
-                } else {
-                    indicator.setTooltip(noTasksRunning);
-                }
+        stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                indicator.setTooltip(someTasksRunning);
+            } else {
+                indicator.setTooltip(noTasksRunning);
             }
         });
 
