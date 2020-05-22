@@ -46,6 +46,7 @@ import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
@@ -107,6 +108,9 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 
 public class JabRefPreferences implements PreferencesService {
 
@@ -1494,108 +1498,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
-    private List<MainTableColumnModel> createMainTableColumns() {
-        List<String> columnNames = getStringList(COLUMN_NAMES);
-
-        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
-                .stream()
-                .map(string -> {
-                    try {
-                        return Double.parseDouble(string);
-                    } catch (NumberFormatException e) {
-                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
-                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        List<SortType> columnSortTypes = getStringList(COLUMN_SORT_TYPES)
-                .stream()
-                .map(SortType::valueOf)
-                .collect(Collectors.toList());
-
-        List<MainTableColumnModel> columns = new ArrayList<>();
-        for (int i = 0; i < columnNames.size(); i++) {
-            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
-
-            if (i < columnWidths.size()) {
-                columnModel.widthProperty().setValue(columnWidths.get(i));
-            }
-
-            if (i < columnSortTypes.size()) {
-                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
-            }
-
-            columns.add(columnModel);
-        }
-
-        return columns;
-    }
-
-    private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
-        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
-                columns.stream().filter(column ->
-                        column.getName().equals(columnName))
-                       .findFirst()
-                       .ifPresent(columnsOrdered::add)
-        );
-        return columnsOrdered;
-    }
-
-    public ColumnPreferences getColumnPreferences() {
-        List<MainTableColumnModel> mainTableColumns = createMainTableColumns();
-
-        return new ColumnPreferences(
-                mainTableColumns,
-                createColumnSortOrder(mainTableColumns)
-        );
-    }
-
-    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
-        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
-                                                     .map(MainTableColumnModel::getName)
-                                                     .collect(Collectors.toList()));
-
-        List<String> columnWidthsInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
-        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
-
-        List<String> columnSortTypesInOrder = new ArrayList<>();
-        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
-        putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
-
-        putStringList(COLUMN_SORT_ORDER, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
-    }
-
-    public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(getColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
-    }
-
-    public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
-        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
-        putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
-        putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
-    }
-
-    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
-        return new SpecialFieldsPreferences(
-                getBoolean(SPECIALFIELDSENABLED),
-                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
-                getBoolean(SERIALIZESPECIALFIELDS));
-    }
-
-    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
-        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.getSpecialFieldsEnabled());
-        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.getSerializeSpecialFields());
-    }
-
     @Override
     public Path getWorkingDir() {
         return Path.of(get(WORKING_DIRECTORY));
@@ -2175,6 +2077,137 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
+    // MainTablePreferences
+    //*************************************************************************************************************
+
+    private List<MainTableColumnModel> createMainTableColumns() {
+        List<String> columnNames = getStringList(COLUMN_NAMES);
+
+        List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
+                .stream()
+                .map(string -> {
+                    try {
+                        return Double.parseDouble(string);
+                    } catch (NumberFormatException e) {
+                        LOGGER.error("Exception while parsing column widths. Choosing default.", e);
+                        return ColumnPreferences.DEFAULT_COLUMN_WIDTH;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        List<SortType> columnSortTypes = getStringList(COLUMN_SORT_TYPES)
+                .stream()
+                .map(SortType::valueOf)
+                .collect(Collectors.toList());
+
+        List<MainTableColumnModel> columns = new ArrayList<>();
+        for (int i = 0; i < columnNames.size(); i++) {
+            MainTableColumnModel columnModel = MainTableColumnModel.parse(columnNames.get(i));
+
+            if (i < columnWidths.size()) {
+                columnModel.widthProperty().setValue(columnWidths.get(i));
+            }
+
+            if (i < columnSortTypes.size()) {
+                columnModel.sortTypeProperty().setValue(columnSortTypes.get(i));
+            }
+
+            columns.add(columnModel);
+        }
+
+        return columns;
+    }
+
+    private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
+        List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
+        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
+                columns.stream().filter(column ->
+                        column.getName().equals(columnName))
+                       .findFirst()
+                       .ifPresent(columnsOrdered::add));
+
+        return columnsOrdered;
+    }
+
+    @Override
+    public ColumnPreferences getColumnPreferences() {
+        List<MainTableColumnModel> mainTableColumns = createMainTableColumns();
+
+        return new ColumnPreferences(
+                mainTableColumns,
+                createColumnSortOrder(mainTableColumns));
+    }
+
+    @Override
+    public void storeColumnPreferences(ColumnPreferences columnPreferences) {
+        putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
+                                                     .map(MainTableColumnModel::getName)
+                                                     .collect(Collectors.toList()));
+
+        List<String> columnWidthsInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnWidthsInOrder.add(column.widthProperty().getValue().toString()));
+        putStringList(COLUMN_WIDTHS, columnWidthsInOrder);
+
+        List<String> columnSortTypesInOrder = new ArrayList<>();
+        columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
+        putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
+
+        putStringList(COLUMN_SORT_ORDER, columnPreferences
+                .getColumnSortOrder().stream()
+                .map(MainTableColumnModel::getName)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public MainTablePreferences getMainTablePreferences() {
+        return new MainTablePreferences(getColumnPreferences(),
+                getBoolean(AUTO_RESIZE_MODE),
+                getBoolean(EXTRA_FILE_COLUMNS));
+    }
+
+    @Override
+    public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
+        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
+        putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
+        putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
+    }
+
+    @Override
+    public MainTableNameFormatPreferences getMainTableNameFormatPreferences() {
+        DisplayStyle displayStyle =
+                DisplayStyle.LASTNAME_FIRSTNAME;
+
+        if (getBoolean(JabRefPreferences.NAMES_NATBIB)) {
+            displayStyle = DisplayStyle.NATBIB;
+        } else if (getBoolean(JabRefPreferences.NAMES_AS_IS)) {
+            displayStyle = DisplayStyle.AS_IS;
+        } else if (getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
+            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+
+        AbbreviationStyle abbreviationStyle =
+                AbbreviationStyle.NONE;
+
+        if (getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
+            abbreviationStyle = AbbreviationStyle.FULL;
+        } else if (getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
+            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
+        }
+
+        return new MainTableNameFormatPreferences(displayStyle, abbreviationStyle);
+    }
+
+    @Override
+    public void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences) {
+        putBoolean(JabRefPreferences.NAMES_NATBIB, preferences.getDisplayStyle() == DisplayStyle.NATBIB);
+        putBoolean(JabRefPreferences.NAMES_AS_IS, preferences.getDisplayStyle() == DisplayStyle.AS_IS);
+        putBoolean(JabRefPreferences.NAMES_FIRST_LAST, preferences.getDisplayStyle() == DisplayStyle.FIRSTNAME_LASTNAME);
+
+        putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
+        putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 
@@ -2211,5 +2244,20 @@ public class JabRefPreferences implements PreferencesService {
             putBoolean(AUTOCOMPLETER_LAST_FIRST, false);
             putBoolean(AUTOCOMPLETER_FIRST_LAST, true);
         }
+    }
+
+    @Override
+    public SpecialFieldsPreferences getSpecialFieldsPreferences() {
+        return new SpecialFieldsPreferences(
+                getBoolean(SPECIALFIELDSENABLED),
+                getBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS),
+                getBoolean(SERIALIZESPECIALFIELDS));
+    }
+
+    @Override
+    public void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences) {
+        putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.getSpecialFieldsEnabled());
+        putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.getSerializeSpecialFields());
     }
 }

@@ -7,71 +7,96 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences;
+import org.jabref.preferences.PreferencesService;
+
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 
 public class TableTabViewModel implements PreferenceTabViewModel {
 
-    private BooleanProperty autoResizeNameProperty = new SimpleBooleanProperty();
-    private BooleanProperty namesNatbibProperty = new SimpleBooleanProperty();
-    private BooleanProperty nameAsIsProperty = new SimpleBooleanProperty();
-    private BooleanProperty nameFirstLastProperty = new SimpleBooleanProperty();
-    private BooleanProperty nameLastFirstProperty = new SimpleBooleanProperty();
-    private BooleanProperty abbreviationDisabledProperty = new SimpleBooleanProperty();
-    private BooleanProperty abbreviationEnabledProperty = new SimpleBooleanProperty();
-    private BooleanProperty abbreviationLastNameOnlyProperty = new SimpleBooleanProperty();
+    private final BooleanProperty namesNatbibProperty = new SimpleBooleanProperty();
+    private final BooleanProperty nameAsIsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty nameFirstLastProperty = new SimpleBooleanProperty();
+    private final BooleanProperty nameLastFirstProperty = new SimpleBooleanProperty();
+    private final BooleanProperty abbreviationDisabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty abbreviationEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty abbreviationLastNameOnlyProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public TableTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public TableTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
     }
 
     @Override
     public void setValues() {
-        autoResizeNameProperty.setValue(preferences.getBoolean(JabRefPreferences.AUTO_RESIZE_MODE));
+        MainTableNameFormatPreferences initialPreferences = preferences.getMainTableNameFormatPreferences();
 
-        if (preferences.getBoolean(JabRefPreferences.NAMES_NATBIB)) {
-            namesNatbibProperty.setValue(true);
-            nameAsIsProperty.setValue(false);
-            nameFirstLastProperty.setValue(false);
-            nameLastFirstProperty.setValue(false);
-        } else if (preferences.getBoolean(JabRefPreferences.NAMES_AS_IS)) {
-            namesNatbibProperty.setValue(false);
-            nameAsIsProperty.setValue(true);
-            nameFirstLastProperty.setValue(false);
-            nameLastFirstProperty.setValue(false);
-        } else if (preferences.getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
-            namesNatbibProperty.setValue(false);
-            nameAsIsProperty.setValue(false);
-            nameFirstLastProperty.setValue(true);
-            nameLastFirstProperty.setValue(false);
-        } else {
-            namesNatbibProperty.setValue(false);
-            nameAsIsProperty.setValue(false);
-            nameFirstLastProperty.setValue(false);
-            nameLastFirstProperty.setValue(true);
+        switch (initialPreferences.getDisplayStyle()) {
+            case NATBIB:
+                namesNatbibProperty.setValue(true);
+                nameAsIsProperty.setValue(false);
+                nameFirstLastProperty.setValue(false);
+                nameLastFirstProperty.setValue(false);
+                break;
+            case AS_IS:
+                namesNatbibProperty.setValue(false);
+                nameAsIsProperty.setValue(true);
+                nameFirstLastProperty.setValue(false);
+                nameLastFirstProperty.setValue(false);
+                break;
+            case FIRSTNAME_LASTNAME:
+                namesNatbibProperty.setValue(false);
+                nameAsIsProperty.setValue(false);
+                nameFirstLastProperty.setValue(true);
+                nameLastFirstProperty.setValue(false);
+                break;
+            default:
+            case LASTNAME_FIRSTNAME:
+                namesNatbibProperty.setValue(false);
+                nameAsIsProperty.setValue(false);
+                nameFirstLastProperty.setValue(false);
+                nameLastFirstProperty.setValue(true);
+                break;
         }
 
-        if (preferences.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
-            abbreviationEnabledProperty.setValue(true);
-        } else if (preferences.getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
-            abbreviationLastNameOnlyProperty.setValue(true);
-        } else {
-            abbreviationDisabledProperty.setValue(true);
+        switch (initialPreferences.getAbbreviationStyle()) {
+            case FULL:
+                abbreviationEnabledProperty.setValue(true);
+                break;
+            case LASTNAME_ONLY:
+                abbreviationLastNameOnlyProperty.setValue(true);
+                break;
+            default:
+            case NONE:
+                abbreviationDisabledProperty.setValue(true);
         }
     }
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.AUTO_RESIZE_MODE, autoResizeNameProperty.getValue());
+        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME;
 
-        preferences.putBoolean(JabRefPreferences.NAMES_NATBIB, namesNatbibProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.NAMES_AS_IS, nameAsIsProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.NAMES_FIRST_LAST, nameFirstLastProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, abbreviationEnabledProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.NAMES_LAST_ONLY, abbreviationLastNameOnlyProperty.getValue());
+        if (namesNatbibProperty.getValue()) {
+            displayStyle = DisplayStyle.NATBIB;
+        } else if (nameAsIsProperty.getValue()) {
+            displayStyle = DisplayStyle.AS_IS;
+        } else if (nameFirstLastProperty.getValue()) {
+            displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
+        }
+
+        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE;
+
+        if (abbreviationEnabledProperty.getValue()) {
+            abbreviationStyle = AbbreviationStyle.FULL;
+        } else if (abbreviationLastNameOnlyProperty.getValue()) {
+            abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
+        }
+
+        preferences.storeMainTableNameFormatPreferences(new MainTableNameFormatPreferences(displayStyle, abbreviationStyle));
     }
 
     @Override
@@ -82,10 +107,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     @Override
     public List<String> getRestartWarnings() {
         return new ArrayList<>();
-    }
-
-    public BooleanProperty autoResizeNameProperty() {
-        return autoResizeNameProperty;
     }
 
     public BooleanProperty namesNatbibProperty() {

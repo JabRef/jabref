@@ -9,6 +9,10 @@ import java.util.Set;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences;
+import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -191,10 +195,30 @@ public interface PreferencesService {
     void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
+    // MainTablePreferences
+    //*************************************************************************************************************
+
+    ColumnPreferences getColumnPreferences();
+
+    void storeColumnPreferences(ColumnPreferences columnPreferences);
+
+    MainTablePreferences getMainTablePreferences();
+
+    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
+
+    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
+
+    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 
     AutoCompletePreferences getAutoCompletePreferences();
 
     void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
+
+    SpecialFieldsPreferences getSpecialFieldsPreferences();
+
+    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 }

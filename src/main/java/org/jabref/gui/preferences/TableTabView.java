@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 
 import org.jabref.logic.l10n.Localization;
@@ -11,7 +10,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> implements PreferencesTab {
 
-    @FXML private CheckBox autoResizeName;
     @FXML private RadioButton namesNatbib;
     @FXML private RadioButton nameAsIs;
     @FXML private RadioButton nameFirstLast;
@@ -36,7 +34,6 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
     public void initialize() {
         this.viewModel = new TableTabViewModel(dialogService, preferences);
 
-        autoResizeName.selectedProperty().bindBidirectional(viewModel.autoResizeNameProperty());
         namesNatbib.selectedProperty().bindBidirectional(viewModel.namesNatbibProperty());
         nameAsIs.selectedProperty().bindBidirectional(viewModel.nameAsIsProperty());
         nameFirstLast.selectedProperty().bindBidirectional(viewModel.nameFirstLastProperty());

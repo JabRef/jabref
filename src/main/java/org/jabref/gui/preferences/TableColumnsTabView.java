@@ -37,6 +37,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
     @FXML private RadioButton specialFieldsSyncKeywords;
     @FXML private RadioButton specialFieldsSerialize;
     @FXML private CheckBox extraFileColumnsEnable;
+    @FXML private CheckBox autoResizeColumns;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -115,6 +116,7 @@ public class TableColumnsTabView extends AbstractPreferenceTabView<TableColumnsT
         specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
         specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
         extraFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
+        autoResizeColumns.selectedProperty().bindBidirectional(viewModel.autoResizeColumnsProperty());
     }
 
     public void updateToCurrentColumnOrder() {

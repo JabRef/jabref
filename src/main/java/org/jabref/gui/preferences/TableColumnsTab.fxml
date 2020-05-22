@@ -97,6 +97,7 @@
                              toggleGroup="$specialFieldsStoreMode"/>
             </VBox>
             <CheckBox fx:id="extraFileColumnsEnable" text="%Show extra columns"/>
+            <CheckBox fx:id="autoResizeColumns" text="%Fit table horizontally on screen"/>
         </VBox>
     </HBox>
 </fx:root>

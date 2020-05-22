@@ -27,7 +27,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -60,23 +60,21 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
     private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
+    private final BooleanProperty autoResizeColumnsProperty = new SimpleBooleanProperty();
 
     private final Validator columnsNotEmptyValidator;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
-    private final MainTablePreferences mainTablePreferences;
-    private final ColumnPreferences columnPreferences;
-    private final SpecialFieldsPreferences specialFieldsPreferences;
+    private final PreferencesService preferences;
 
-    public TableColumnsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    private ColumnPreferences initialColumnPreferences;
+    private SpecialFieldsPreferences initialSpecialFieldsPreferences;
+
+    public TableColumnsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.mainTablePreferences = preferences.getMainTablePreferences();
-        this.columnPreferences = mainTablePreferences.getColumnPreferences();
-        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -105,15 +103,19 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        specialFieldsEnabledProperty.setValue(specialFieldsPreferences.getSpecialFieldsEnabled());
-        specialFieldsSyncKeywordsProperty.setValue(specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(specialFieldsPreferences.getSerializeSpecialFields());
-        extraFileColumnsEnabledProperty.setValue(mainTablePreferences.getExtraFileColumnsEnabled());
+        MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
+        initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
+        initialSpecialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+
+        specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.getSpecialFieldsEnabled());
+        specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
+        specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.getSerializeSpecialFields());
+        extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
+        autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
 
         fillColumnList();
 
         availableColumnsProperty.clear();
-
         availableColumnsProperty.addAll(
                 new MainTableColumnModel(MainTableColumnModel.Type.INDEX),
                 new MainTableColumnModel(MainTableColumnModel.Type.LINKED_IDENTIFIER),
@@ -142,7 +144,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public void fillColumnList() {
         columnsListProperty.getValue().clear();
-        columnPreferences.getColumns().forEach(columnsListProperty.getValue()::add);
+        if (initialColumnPreferences != null) {
+            initialColumnPreferences.getColumns().forEach(columnsListProperty.getValue()::add);
+        }
     }
 
     private void insertSpecialFieldColumns() {
@@ -215,7 +219,7 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 new ColumnPreferences(
                         columnsListProperty.getValue(),
                         newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
-                newMainTablePreferences.getResizeColumnsToFit(),
+                autoResizeColumnsProperty.getValue(),
                 extraFileColumnsEnabledProperty.getValue()
         ));
 
@@ -224,11 +228,11 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
                 specialFieldsSyncKeywordsProperty.getValue(),
                 specialFieldsSerializeProperty.getValue());
 
-        if (specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
+        if (initialSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
             restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
         }
 
-        if (specialFieldsPreferences.getSerializeSpecialFields() != newSpecialFieldsPreferences.getSerializeSpecialFields()) {
+        if (initialSpecialFieldsPreferences.getSerializeSpecialFields() != newSpecialFieldsPreferences.getSerializeSpecialFields()) {
             restartWarnings.add(Localization.lang("Serialize special fields"));
         }
 
@@ -285,5 +289,9 @@ public class TableColumnsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty extraFileColumnsEnabledProperty() {
         return this.extraFileColumnsEnabledProperty;
+    }
+
+    public BooleanProperty autoResizeColumnsProperty() {
+        return autoResizeColumnsProperty;
     }
 }

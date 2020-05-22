@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -12,10 +11,6 @@
         <ToggleGroup fx:id="abbreviationMode"/>
     </fx:define>
     <Label styleClass="titleHeader" text="%Entry table"/>
-
-    <Label styleClass="sectionHeader" text="%General"/>
-    <CheckBox fx:id="autoResizeName" text="%Fit table horizontally on screen"/>
-
     <Label styleClass="sectionHeader" text="%Format of author and editor names"/>
     <RadioButton fx:id="namesNatbib" mnemonicParsing="false" text="%Natbib style" toggleGroup="$namesFormat"/>
     <RadioButton fx:id="nameAsIs" mnemonicParsing="false" text="%Show names unchanged" toggleGroup="$namesFormat"/>
