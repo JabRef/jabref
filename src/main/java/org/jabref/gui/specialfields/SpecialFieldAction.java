@@ -64,7 +64,7 @@ public class SpecialFieldAction extends SimpleCommand {
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, value, be, nullFieldIfValueIsTheSame, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
-                for (FieldChange change: changes) {
+                for (FieldChange change : changes) {
                     ce.addEdit(new UndoableFieldChange(change));
                 }
             }
@@ -110,5 +110,4 @@ public class SpecialFieldAction extends SimpleCommand {
             return "";
         }
     }
-
 }

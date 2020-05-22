@@ -86,10 +86,6 @@
     -fx-background-color: -jr-error;
 }
 
-.list-cell:invalid {
-    -fx-background-color: -jr-warn;
-}
-
 .code-area .context-menu {
     -fx-font-family: sans-serif;
 }

@@ -26,6 +26,10 @@
     <module name="FileTabCharacter"/>
     <module name="NewlineAtEndOfFile"/>
 
+    <!-- Checks for size violations: https://checkstyle.sourceforge.io/config_sizes.html -->
+
+    <!-- LineLength not in place as PreviewerViewer and RelatedArticlesTab have line length with more than 500 charachters -->
+
     <module name="TreeWalker">
         <!-- Checks for Javadoc comments: https://checkstyle.org/config_javadoc.html -->
         <module name="InvalidJavadocPosition"/>
@@ -35,6 +39,7 @@
         </module>
 
         <!-- Checks for imports: https://checkstyle.org/config_import.html -->
+
         <module name="UnusedImports"/>
         <module name="RedundantImport"/>
         <module name="AvoidStarImport"/>
@@ -85,6 +90,9 @@
         </module>
 
         <!-- Checks for blocks: https://checkstyle.org/config_blocks.html -->
+
+        <module name="AvoidNestedBlocks"/>
+
         <module name="NeedBraces"/>
 
         <module name="EmptyBlock">
@@ -99,15 +107,24 @@
 
               public String getTabName() { return Localization.lang("XMP metadata"); }
 
-            Since it is too much effort to reformat all code, it is currently not enabled -->
-        <!-- <module name="LeftCurly"/> -->
+        -->
+        <module name="LeftCurly"/>
 
         <module name="RightCurly"/>
+
         <!-- coding - https://checkstyle.sourceforge.io/config_coding.html -->
 
         <module name="AvoidDoubleBraceInitialization"/>
 
         <module name="CovariantEquals"/>
+
+        <module name="MultipleVariableDeclarations"/>
+
+        <module name="OneStatementPerLine">
+            <property name="treatTryResourcesAsStatement" value="true"/>
+        </module>
+
+        <module name="UnnecessarySemicolonInTryWithResources"/>
 
         <!-- Checks for common coding problems: https://checkstyle.org/config_coding.html -->
 

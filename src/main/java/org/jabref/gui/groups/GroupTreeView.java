@@ -46,9 +46,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
@@ -174,7 +174,6 @@ public class GroupTreeView {
 
                 boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
                 row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
-
             });
             // Remove disclosure node since we display custom version in separate column
             // Simply setting to null is not enough since it would be replaced by the default node on every change
@@ -183,7 +182,7 @@ public class GroupTreeView {
 
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
-                    EasyBind.monadic(row.itemProperty())
+                    EasyBind.wrapNullable(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -243,7 +242,8 @@ public class GroupTreeView {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
                     List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
-                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
+                        Optional<GroupNodeViewModel> source = viewModel
+                                .rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));

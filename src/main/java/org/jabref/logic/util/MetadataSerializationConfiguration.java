@@ -34,8 +34,7 @@ public class MetadataSerializationConfiguration {
     public static final String ALL_ENTRIES_GROUP_ID = "AllEntriesGroup:";
 
     /**
-     * Old identifier for {@link ExplicitGroup} (explicitly contained a list of {@link
-     * org.jabref.model.entry.BibEntry}).
+     * Old identifier for {@link ExplicitGroup} (explicitly contained a list of {@link org.jabref.model.entry.BibEntry}).
      */
     public static final String LEGACY_EXPLICIT_GROUP_ID = "ExplicitGroup:";
 

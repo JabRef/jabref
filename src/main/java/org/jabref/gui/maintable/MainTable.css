@@ -47,7 +47,7 @@
     -fx-background-size: 16 16;
     -fx-border-style: none;
     -fx-border-width: 0;
-    -fx-padding:  0;
+    -fx-padding: 0;
 }
 
 .rating > .container > .button.strong {

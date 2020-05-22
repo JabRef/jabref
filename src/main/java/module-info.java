@@ -19,6 +19,7 @@ open module org.jabref {
     requires de.jensd.fx.fontawesomefx.materialdesignicons;
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
+    requires com.tobiasdiez.easybind;
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
@@ -51,7 +52,6 @@ open module org.jabref {
     // Other modules
     requires commons.logging;
     requires com.google.common;
-    requires easybind;
     requires jakarta.inject;
     requires org.apache.pdfbox;
     requires reactfx;

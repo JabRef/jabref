@@ -10,7 +10,6 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
  * An Action for launching keyword managing dialog
- *
  */
 public class ManageKeywordsAction extends SimpleCommand {
 

@@ -19,5 +19,7 @@ public class MainTablePreferences {
         return resizeColumnsToFit;
     }
 
-    public boolean getExtraFileColumnsEnabled() { return extraFileColumnsEnabled; }
+    public boolean getExtraFileColumnsEnabled() {
+        return extraFileColumnsEnabled;
+    }
 }

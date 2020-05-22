@@ -114,9 +114,9 @@ public class JabRefMain extends Application {
 
         if (java9Fail || versionFail) {
             StringBuilder versionError = new StringBuilder(
-                                                           Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
-                                                                             checker.getJavaVersion(),
-                                                                   buildInfo.minRequiredJavaVersion));
+                    Localization.lang("Your current Java version (%0) is not supported. Please install version %1 or higher.",
+                            checker.getJavaVersion(),
+                            buildInfo.minRequiredJavaVersion));
 
             versionError.append("\n");
             versionError.append(Localization.lang("Your Java Runtime Environment is located at %0.", checker.getJavaInstallationDirectory()));
@@ -165,7 +165,7 @@ public class JabRefMain extends Application {
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                                                        Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationRepository);

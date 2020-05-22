@@ -101,7 +101,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
     public void pushToApplicationSettings() {
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
@@ -145,41 +147,71 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     // EMail
 
-    public StringProperty eMailReferenceSubjectProperty() { return this.eMailReferenceSubjectProperty; }
+    public StringProperty eMailReferenceSubjectProperty() {
+        return this.eMailReferenceSubjectProperty;
+    }
 
-    public BooleanProperty autoOpenAttachedFoldersProperty() { return this.autoOpenAttachedFoldersProperty; }
+    public BooleanProperty autoOpenAttachedFoldersProperty() {
+        return this.autoOpenAttachedFoldersProperty;
+    }
 
     // Push-To-Application
 
-    public ListProperty<PushToApplication> pushToApplicationsListProperty() { return this.pushToApplicationsListProperty; }
+    public ListProperty<PushToApplication> pushToApplicationsListProperty() {
+        return this.pushToApplicationsListProperty;
+    }
 
-    public ObjectProperty<PushToApplication> selectedPushToApplication() { return this.selectedPushToApplicationProperty; }
+    public ObjectProperty<PushToApplication> selectedPushToApplication() {
+        return this.selectedPushToApplicationProperty;
+    }
 
-    public StringProperty citeCommandProperty() { return this.citeCommandProperty; }
+    public StringProperty citeCommandProperty() {
+        return this.citeCommandProperty;
+    }
 
     // Open console
 
-    public BooleanProperty useTerminalDefaultProperty() { return this.useTerminalDefaultProperty; }
+    public BooleanProperty useTerminalDefaultProperty() {
+        return this.useTerminalDefaultProperty;
+    }
 
-    public BooleanProperty useTerminalSpecialProperty() { return this.useTerminalSpecialProperty; }
+    public BooleanProperty useTerminalSpecialProperty() {
+        return this.useTerminalSpecialProperty;
+    }
 
-    public StringProperty useTerminalCommandProperty() { return this.useTerminalCommandProperty; }
+    public StringProperty useTerminalCommandProperty() {
+        return this.useTerminalCommandProperty;
+    }
 
     // Open PDF
 
-    public BooleanProperty usePDFAcrobatProperty() { return this.usePDFAcrobatProperty; }
+    public BooleanProperty usePDFAcrobatProperty() {
+        return this.usePDFAcrobatProperty;
+    }
 
-    public StringProperty usePDFAcrobatCommandProperty() { return this.usePDFAcrobatCommandProperty; }
+    public StringProperty usePDFAcrobatCommandProperty() {
+        return this.usePDFAcrobatCommandProperty;
+    }
 
-    public BooleanProperty usePDFSumatraProperty() { return this.usePDFSumatraProperty; }
+    public BooleanProperty usePDFSumatraProperty() {
+        return this.usePDFSumatraProperty;
+    }
 
-    public StringProperty usePDFSumatraCommandProperty() { return this.usePDFSumatraCommandProperty; }
+    public StringProperty usePDFSumatraCommandProperty() {
+        return this.usePDFSumatraCommandProperty;
+    }
 
     // Open File Browser
 
-    public BooleanProperty useFileBrowserDefaultProperty() { return this.useFileBrowserDefaultProperty; }
+    public BooleanProperty useFileBrowserDefaultProperty() {
+        return this.useFileBrowserDefaultProperty;
+    }
 
-    public BooleanProperty useFileBrowserSpecialProperty() { return this.useFileBrowserSpecialProperty; }
+    public BooleanProperty useFileBrowserSpecialProperty() {
+        return this.useFileBrowserSpecialProperty;
+    }
 
-    public StringProperty useFileBrowserSpecialCommandProperty() { return this.useFileBrowserSpecialCommandProperty; }
+    public StringProperty useFileBrowserSpecialCommandProperty() {
+        return this.useFileBrowserSpecialCommandProperty;
+    }
 }

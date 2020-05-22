@@ -76,5 +76,4 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
         super.redo();
         database.insertEntries(entries);
     }
-
 }

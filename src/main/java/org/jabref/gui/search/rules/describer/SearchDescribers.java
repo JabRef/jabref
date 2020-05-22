@@ -33,5 +33,4 @@ public class SearchDescribers {
             throw new IllegalStateException("Cannot find a describer for searchRule " + searchQuery.getRule() + " and query " + searchQuery.getQuery());
         }
     }
-
 }

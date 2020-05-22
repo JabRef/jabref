@@ -8,23 +8,30 @@ import org.jabref.model.groups.GroupTreeNode;
 
 public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
 
-    /** A backup of the groups before the modification */
+    /**
+     * A backup of the groups before the modification
+     */
     private final GroupTreeNode m_groupRoot;
+
     private final GroupTreeNode m_subtreeBackup;
-    /** The path to the global groups root node */
+
+    /**
+     * The path to the global groups root node
+     */
     private final List<Integer> m_subtreeRootPath;
-    /** This holds the new subtree (the root's modified children) to allow redo. */
+
+    /**
+     * This holds the new subtree (the root's modified children) to allow redo.
+     */
     private final List<GroupTreeNode> m_modifiedSubtree = new ArrayList<>();
+
     private final String m_name;
 
     /**
-     *
-     * @param subtree
-     *            The root node of the subtree that was modified (this node may
-     *            not be modified, it is just used as a convenience handle).
+     * @param subtree The root node of the subtree that was modified (this node may not be modified, it is just used as a convenience handle).
      */
     public UndoableModifySubtree(GroupTreeNodeViewModel groupRoot,
-            GroupTreeNodeViewModel subtree, String name) {
+                                 GroupTreeNodeViewModel subtree, String name) {
         m_subtreeBackup = subtree.getNode().copySubtree();
         m_groupRoot = groupRoot.getNode();
         m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();

@@ -14,7 +14,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class BibtexStringViewModel {
+public class BibtexStringEditorItemModel {
 
     private final static Pattern IS_NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
 
@@ -25,12 +25,12 @@ public class BibtexStringViewModel {
     private final Validator contentValidator;
     private final CompositeValidator combinedValidator;
 
-    public BibtexStringViewModel(String label, String content) {
+    public BibtexStringEditorItemModel(String label, String content) {
         this.labelProperty.setValue(label);
         this.contentProperty.setValue(content);
 
-        labelValidator = new FunctionBasedValidator<>(this.labelProperty, BibtexStringViewModel::validateLabel);
-        contentValidator = new FunctionBasedValidator<>(this.contentProperty, BibtexStringViewModel::validateContent);
+        labelValidator = new FunctionBasedValidator<>(this.labelProperty, BibtexStringEditorItemModel::validateLabel);
+        contentValidator = new FunctionBasedValidator<>(this.contentProperty, BibtexStringEditorItemModel::validateContent);
         combinedValidator = new CompositeValidator(labelValidator, contentValidator);
     }
 

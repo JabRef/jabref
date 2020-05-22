@@ -19,7 +19,7 @@
     <category field="history"/>
     <category field="anthropology"/>
     <summary>Author-date style for IFAO series</summary>
-    <updated>2020-04-24T10:09:48+00:00</updated>
+    <updated>2020-04-29T00:53:29+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -39,10 +39,7 @@
     </terms>
   </locale>
   <macro name="volume">
-    <group delimiter="&#160;">
-      <text term="volume" form="short"/>
-      <text variable="volume"/>
-    </group>
+    <text variable="volume"/>
   </macro>
   <macro name="book">
     <group delimiter=", ">
@@ -68,7 +65,7 @@
   </macro>
   <macro name="URL">
     <group delimiter=", ">
-      <text variable="URL" prefix="&lt;" suffix="&gt;"/>
+      <text variable="URL"/>
       <text macro="access"/>
     </group>
   </macro>
@@ -242,11 +239,11 @@
                 <text variable="volume"/>
               </group>
               <text macro="year-date"/>
-              <group delimiter="&#160; ">
+              <group delimiter="&#160;">
                 <text term="column" form="short"/>
                 <text variable="page"/>
               </group>
-              <group delimiter="&#160; ">
+              <group delimiter="&#160;">
                 <text term="sub verbo" form="short" font-style="italic"/>
                 <text macro="title" quotes="true"/>
               </group>
@@ -289,27 +286,30 @@
           </else-if>
           <else-if type="chapter paper-conference" match="any">
             <group delimiter=", ">
-              <text macro="title" quotes="true"/>
-              <choose>
-                <if variable="editor container-author" match="any">
-                  <group>
-                    <text value="in" font-style="italic" suffix=" "/>
-                    <text macro="editor" suffix=", "/>
-                    <text variable="container-title" font-style="italic" text-case="title"/>
-                  </group>
-                </if>
-                <else>
-                  <group>
-                    <text value="in" suffix=" "/>
-                    <text variable="container-title" font-style="italic" text-case="title"/>
-                  </group>
-                </else>
-              </choose>
+              <group delimiter=" ">
+                <text macro="title" quotes="true"/>
+                <choose>
+                  <if variable="editor container-author" match="any">
+                    <group>
+                      <text value="in" font-style="italic" suffix=" "/>
+                      <text macro="editor" suffix=", "/>
+                      <text variable="container-title" font-style="italic" text-case="title"/>
+                    </group>
+                  </if>
+                  <else>
+                    <group>
+                      <text value="in" suffix=" "/>
+                      <text variable="container-title" font-style="italic" text-case="title"/>
+                    </group>
+                  </else>
+                </choose>
+              </group>
               <text macro="volume"/>
               <text macro="genre"/>
               <text macro="edition"/>
               <text macro="collection"/>
               <text macro="publisher"/>
+              <text macro="year-date"/>
               <text macro="pages"/>
             </group>
           </else-if>
