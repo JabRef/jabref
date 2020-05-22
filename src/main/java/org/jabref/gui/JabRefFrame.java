@@ -1079,7 +1079,7 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel,  StateManager stateManager){
+    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
