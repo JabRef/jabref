@@ -58,5 +58,4 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void unregister() {
         database.getDatabasePath().ifPresent(file -> fileMonitor.removeListener(file, this));
     }
-
 }

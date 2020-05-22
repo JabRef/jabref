@@ -6,7 +6,7 @@ import javafx.scene.Node;
 
 /**
  * A prefsTab is a component displayed in the PreferenceDialog.
- *
+ * <p>
  * It needs to extend from Component.
  */
 interface PreferencesTab {

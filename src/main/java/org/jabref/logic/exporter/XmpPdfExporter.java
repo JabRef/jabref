@@ -32,5 +32,4 @@ public class XmpPdfExporter extends Exporter {
             XmpUtilWriter.writeXmp(pdfFile, entries, databaseContext.getDatabase(), xmpPreferences);
         }
     }
-
 }

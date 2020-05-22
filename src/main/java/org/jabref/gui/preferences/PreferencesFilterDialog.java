@@ -21,6 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class PreferencesFilterDialog extends BaseDialog<Void> {
 
@@ -52,14 +53,13 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         showOnlyDeviatingPreferenceOptions.setOnAction(event -> updateModel());
-        filteredOptions.predicateProperty().bind(Bindings.createObjectBinding(() -> {
-            String searchText = searchField.getText();
+        filteredOptions.predicateProperty().bind(EasyBind.map(searchField.textProperty(), searchText -> {
             if ((searchText == null) || searchText.isEmpty()) {
                 return null;
             }
             String lowerCaseSearchText = searchText.toLowerCase(Locale.ROOT);
             return (option) -> option.getKey().toLowerCase(Locale.ROOT).contains(lowerCaseSearchText);
-        }, searchField.textProperty()));
+        }));
         columnType.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getType()));
         columnKey.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getKey()));
         columnValue.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getValue()));
@@ -76,5 +76,4 @@ public class PreferencesFilterDialog extends BaseDialog<Void> {
             preferenceOptions.setAll(preferencesFilter.getPreferenceOptions());
         }
     }
-
 }

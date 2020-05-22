@@ -28,6 +28,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @FXML public RadioButton letterAlwaysAdd;
     @FXML public TextField keyPatternRegex;
     @FXML public TextField keyPatternReplacement;
+    @FXML public TextField unwantedCharacters;
     @FXML public HBox keyPatternContainer;
     @FXML public Button keyPatternHelp;
 
@@ -38,7 +39,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
 
         bibtexKeyPatternTable = new BibtexKeyPatternPanel(preferences,
                 Globals.entryTypesManager.getAllTypes(preferences.getDefaultBibDatabaseMode()),
-                preferences.getKeyPattern());
+                preferences.getGlobalBibtexKeyPattern());
 
         ViewLoader.view(this)
                   .root(this)
@@ -61,6 +62,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
         letterAlwaysAdd.selectedProperty().bindBidirectional(viewModel.letterAlwaysAddProperty());
         keyPatternRegex.textProperty().bindBidirectional(viewModel.keyPatternRegexProperty());
         keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
+        unwantedCharacters.textProperty().bindBidirectional(viewModel.unwantedCharactersProperty());
 
         bibtexKeyPatternTable.setPrefWidth(650.0);
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
@@ -83,5 +85,7 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     }
 
     @FXML
-    public void resetAllKeyPatterns() { bibtexKeyPatternTable.resetAll(); }
+    public void resetAllKeyPatterns() {
+        bibtexKeyPatternTable.resetAll();
+    }
 }

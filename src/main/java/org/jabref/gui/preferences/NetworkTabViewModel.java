@@ -12,14 +12,13 @@ import javafx.beans.property.StringProperty;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.remote.JabRefMessageHandler;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -27,12 +26,9 @@ import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class AdvancedTabViewModel implements PreferenceTabViewModel {
+public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
-    private final BooleanProperty useIEEELatexAbbreviationsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useCaseKeeperProperty = new SimpleBooleanProperty();
-    private final BooleanProperty useUnitFormatterProperty = new SimpleBooleanProperty();
     private final BooleanProperty proxyUseProperty = new SimpleBooleanProperty();
     private final StringProperty proxyHostnameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPortProperty = new SimpleStringProperty("");
@@ -40,20 +36,20 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
     private final StringProperty proxyUsernameProperty = new SimpleStringProperty("");
     private final StringProperty proxyPasswordProperty = new SimpleStringProperty("");
 
-    private Validator remotePortValidator;
-    private Validator proxyHostnameValidator;
-    private Validator proxyPortValidator;
-    private Validator proxyUsernameValidator;
-    private Validator proxyPasswordValidator;
+    private final Validator remotePortValidator;
+    private final Validator proxyHostnameValidator;
+    private final Validator proxyPortValidator;
+    private final Validator proxyUsernameValidator;
+    private final Validator proxyPasswordValidator;
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final RemotePreferences remotePreferences;
     private final ProxyPreferences proxyPreferences;
 
-    private List<String> restartWarning = new ArrayList<>();
+    private final List<String> restartWarning = new ArrayList<>();
 
-    public AdvancedTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.remotePreferences = preferences.getRemotePreferences();
@@ -70,7 +66,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
+                        Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
 
@@ -78,43 +74,38 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
                 proxyHostnameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a hostname"))));
 
         proxyPortValidator = new FunctionBasedValidator<>(
                 proxyPortProperty,
                 input -> getPortAsInt(input).isPresent(),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a port"))));
 
         proxyUsernameValidator = new FunctionBasedValidator<>(
                 proxyUsernameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a username"))));
 
         proxyPasswordValidator = new FunctionBasedValidator<>(
                 proxyPasswordProperty,
                 input -> input.length() > 0,
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
     }
 
     public void setValues() {
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
-
-        useIEEELatexAbbreviationsProperty.setValue(preferences.getJournalAbbreviationPreferences().useIEEEAbbreviations());
-
-        useCaseKeeperProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
-        useUnitFormatterProperty.setValue(preferences.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
 
         proxyUseProperty.setValue(proxyPreferences.isUseProxy());
         proxyHostnameProperty.setValue(proxyPreferences.getHostname());
@@ -126,17 +117,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
     public void storeSettings() {
         storeRemoteSettings();
-
-        JournalAbbreviationPreferences journalAbbreviationPreferences = preferences.getJournalAbbreviationPreferences();
-        if (journalAbbreviationPreferences.useIEEEAbbreviations() != useIEEELatexAbbreviationsProperty.getValue()) {
-            journalAbbreviationPreferences.setUseIEEEAbbreviations(useIEEELatexAbbreviationsProperty.getValue());
-            preferences.storeJournalAbbreviationPreferences(journalAbbreviationPreferences);
-            Globals.journalAbbreviationLoader.update(journalAbbreviationPreferences);
-        }
-
-        preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterProperty.getValue());
-
         storeProxySettings();
     }
 
@@ -162,7 +142,7 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
             Globals.REMOTE_LISTENER.stop();
         }
 
-        preferences.setRemotePreferences(newRemotePreferences);
+        preferences.storeRemotePreferences(newRemotePreferences);
     }
 
     private void storeProxySettings() {
@@ -246,18 +226,6 @@ public class AdvancedTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty remotePortProperty() {
         return remotePortProperty;
-    }
-
-    public BooleanProperty useIEEELatexAbbreviationsProperty() {
-        return useIEEELatexAbbreviationsProperty;
-    }
-
-    public BooleanProperty useCaseKeeperProperty() {
-        return useCaseKeeperProperty;
-    }
-
-    public BooleanProperty useUnitFormatterProperty() {
-        return useUnitFormatterProperty;
     }
 
     public BooleanProperty proxyUseProperty() {

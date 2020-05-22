@@ -51,8 +51,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,19 +221,19 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new PreviewTab(databaseContext, dialogService, Globals.prefs, ExternalFileTypes.getInstance()));
 
         // Required fields
-        entryEditorTabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+        entryEditorTabs.add(new RequiredFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // Optional fields
-        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
-        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
-        entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+        entryEditorTabs.add(new OptionalFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
+        entryEditorTabs.add(new OptionalFields2Tab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
+        entryEditorTabs.add(new DeprecatedFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // Other fields
-        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+        entryEditorTabs.add(new OtherFieldsTab(databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
 
         // General fields from preferences
         for (Map.Entry<String, Set<Field>> tab : entryEditorPreferences.getEntryEditorTabList().entrySet()) {
-            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationLoader));
+            entryEditorTabs.add(new UserDefinedFieldsTab(tab.getKey(), tab.getValue(), databaseContext, panel.getSuggestionProviders(), undoManager, dialogService, Globals.prefs, Globals.entryTypesManager, ExternalFileTypes.getInstance(), Globals.TASK_EXECUTOR, Globals.journalAbbreviationRepository));
         }
 
         // Special tabs

@@ -11,19 +11,13 @@ import org.jabref.model.strings.StringUtil;
  */
 public class ValidBibtexKeyChecker implements ValueChecker {
 
-    private final boolean enforceLegalKey;
-
-    public ValidBibtexKeyChecker(boolean enforceLegalKey) {
-        this.enforceLegalKey = enforceLegalKey;
-    }
-
     @Override
     public Optional<String> checkValue(String value) {
         if (StringUtil.isNullOrEmpty(value)) {
             return Optional.of(Localization.lang("empty BibTeX key"));
         }
 
-        String cleaned = BibtexKeyGenerator.cleanKey(value, enforceLegalKey);
+        String cleaned = BibtexKeyGenerator.cleanKey(value, "");
 
         if (cleaned.equals(value)) {
             return Optional.empty();

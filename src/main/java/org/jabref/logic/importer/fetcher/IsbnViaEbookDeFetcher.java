@@ -49,5 +49,4 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
         new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
-
 }

@@ -28,7 +28,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 

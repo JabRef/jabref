@@ -28,6 +28,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
 
     /**
      * Constructs a URL based on the query.
+     *
      * @param identifier the ID
      */
     URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;

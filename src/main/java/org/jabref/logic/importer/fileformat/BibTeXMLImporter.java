@@ -166,7 +166,7 @@ public class BibTeXMLImporter extends Importer {
      * Some <Code>get</Code> methods shouldn't be mapped to fields, so <Code>getClass</Code> for example will be skipped.
      *
      * @param entryType This can be all possible BibTeX types. It contains all fields of the entry and their values.
-     * @param fields A map where the name and the value of all fields that the entry contains will be put.
+     * @param fields    A map where the name and the value of all fields that the entry contains will be put.
      */
     private <T> void parse(T entryType, Map<Field, String> fields) {
         Method[] declaredMethods = entryType.getClass().getDeclaredMethods();

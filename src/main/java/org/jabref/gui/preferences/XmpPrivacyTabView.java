@@ -38,12 +38,14 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("XMP metadata"); }
+    public String getTabName() {
+        return Localization.lang("XMP metadata");
+    }
 
     public void initialize() {
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
@@ -97,5 +99,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));
     }
 
-    public void addField() { viewModel.addField(); }
+    public void addField() {
+        viewModel.addField();
+    }
 }

@@ -62,5 +62,4 @@ public class ChangeCaseFunction implements BstFunction {
 
         stack.push(BibtexCaseChanger.changeCase(s, FORMAT_MODE.getFormatModeForBSTFormat(format)));
     }
-
 }

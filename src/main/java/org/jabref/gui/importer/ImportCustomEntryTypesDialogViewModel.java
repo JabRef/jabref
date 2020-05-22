@@ -34,7 +34,6 @@ public class ImportCustomEntryTypesDialogViewModel {
                 }
             }
         }
-
     }
 
     public ObservableList<BibEntryType> newTypes() {
@@ -54,6 +53,5 @@ public class ImportCustomEntryTypesDialogViewModel {
             checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomOrModifiedType(type, mode));
             preferencesService.saveCustomEntryTypes();
         }
-
     }
 }

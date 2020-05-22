@@ -13,11 +13,14 @@ import javafx.collections.transformation.SortedList;
 import org.jabref.Globals;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
@@ -28,13 +31,11 @@ public class MainTableDataModel {
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
 
         MainTableNameFormatter nameFormatter = new MainTableNameFormatter(Globals.prefs);
-        ObservableList<BibEntryTableViewModel> entriesViewModel = BindingsHelper.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                Bindings.createObjectBinding(() -> this::isMatched,
-                        Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty())
-
+                EasyBind.combine(Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
         );
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
@@ -45,18 +46,17 @@ public class MainTableDataModel {
         groupViewMode = Globals.prefs.getGroupViewMode();
     }
 
-    private boolean isMatched(BibEntryTableViewModel entry) {
-        return isMatchedByGroup(entry) && isMatchedBySearch(entry);
+    private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        return isMatchedByGroup(groups, entry) && isMatchedBySearch(query, entry);
     }
 
-    private boolean isMatchedBySearch(BibEntryTableViewModel entry) {
-        return Globals.stateManager.activeSearchQueryProperty().getValue()
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
-                .orElse(true);
+    private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
+        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
+                    .orElse(true);
     }
 
-    private boolean isMatchedByGroup(BibEntryTableViewModel entry) {
-        return createGroupMatcher(Globals.stateManager.activeGroupProperty().getValue())
+    private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
+        return createGroupMatcher(groups)
                 .map(matcher -> matcher.isMatch(entry.getEntry()))
                 .orElse(true);
     }

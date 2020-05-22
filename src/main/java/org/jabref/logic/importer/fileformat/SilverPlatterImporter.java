@@ -21,8 +21,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 
 /**
- * Imports a SilverPlatter exported file. This is a poor format to parse,
- * so it currently doesn't handle everything correctly.
+ * Imports a SilverPlatter exported file. This is a poor format to parse, so it currently doesn't handle everything correctly.
  */
 public class SilverPlatterImporter extends Importer {
 
@@ -146,13 +145,10 @@ public class SilverPlatterImporter extends Importer {
                                 // Let's assume that this wasn't a number, since it
                                 // couldn't be parsed as an integer.
                             }
-
                         }
-
                     }
                 } else if ("AF".equals(f3)) {
                     h.put(StandardField.SCHOOL, frest.trim());
-
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
                     if ("Monograph".equals(frest)) {
@@ -181,7 +177,6 @@ public class SilverPlatterImporter extends Importer {
                         h.put(StandardField.TITLE, title.substring(0, inPos));
                     }
                 }
-
             }
 
             BibEntry b = new BibEntry(type);
@@ -189,7 +184,6 @@ public class SilverPlatterImporter extends Importer {
             b.setField(h);
 
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);

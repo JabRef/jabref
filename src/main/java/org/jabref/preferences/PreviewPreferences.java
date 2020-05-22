@@ -54,7 +54,7 @@ public class PreviewPreferences {
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
-        return Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        return Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
     }
 
     public PreviewLayout getTextBasedPreviewLayout() {
@@ -120,5 +120,4 @@ public class PreviewPreferences {
             return new PreviewPreferences(previewCycle, previewCyclePosition, previewPanelDividerPosition, previewStyle, previewStyleDefault, showPreviewAsExtraTab);
         }
     }
-
 }
