@@ -25,7 +25,7 @@
 
     <Label styleClass="sectionHeader" text="%Push applications"/>
     <HBox>
-        <GridPane alignment="CENTER_LEFT" hgap="10.0">
+        <GridPane alignment="CENTER_LEFT" hgap="4.0">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
@@ -61,10 +61,10 @@
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom applications"/>
-    <GridPane alignment="CENTER_LEFT" hgap="10.0">
+    <GridPane alignment="CENTER_LEFT" hgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" minWidth="50" prefWidth="200.0"/>
-            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0"/>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="100.0"/>
             <ColumnConstraints hgrow="SOMETIMES"/>
         </columnConstraints>
         <rowConstraints>
@@ -78,8 +78,16 @@
                 <Tooltip text="%Note: Use the placeholder %DIR% for the location of the opened library file."/>
             </tooltip>
         </TextField>
-        <Button fx:id="customTerminalBrowse" text="%Browse" onAction="#useTerminalCommandBrowse"
-                GridPane.columnIndex="2"/>
+        <Button fx:id="customTerminalBrowse" onAction="#useTerminalCommandBrowse"
+                styleClass="icon-button,narrow"
+                prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2">
+            <graphic>
+                <JabRefIconView glyph="OPEN"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Browse"/>
+            </tooltip>
+        </Button>
 
         <CheckBox fx:id="useCustomFileBrowser" text="%Use custom file browser" GridPane.rowIndex="1"/>
         <TextField fx:id="customFileBrowserCommand" prefWidth="350.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -87,7 +95,15 @@
                 <Tooltip text="%Note: Use the placeholder %DIR% for the location of the opened library file."/>
             </tooltip>
         </TextField>
-        <Button fx:id="customFileBrowserBrowse" onAction="#useFileBrowserSpecialCommandBrowse" text="%Browse"
-                GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+        <Button fx:id="customFileBrowserBrowse" onAction="#useFileBrowserSpecialCommandBrowse"
+                styleClass="icon-button,narrow"
+                prefHeight="20.0" prefWidth="20.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <graphic>
+                <JabRefIconView glyph="OPEN"/>
+            </graphic>
+            <tooltip>
+                <Tooltip text="%Browse"/>
+            </tooltip>
+        </Button>
     </GridPane>
 </fx:root>
