@@ -7,8 +7,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -33,13 +33,13 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;
 
-    private final JabRefFrame frame;
+    private final PushToApplicationsManager pushToApplicationsManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTabView(JabRefPreferences preferences, JabRefFrame frame) {
+    public ExternalTabView(JabRefPreferences preferences, PushToApplicationsManager pushToApplicationsManager) {
         this.preferences = preferences;
-        this.frame = frame;
+        this.pushToApplicationsManager = pushToApplicationsManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -52,7 +52,7 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferences, pushToApplicationsManager);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getApplicationName)

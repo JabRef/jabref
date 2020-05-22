@@ -49,8 +49,6 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
-import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -2109,17 +2107,6 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
-
-    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
-        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
-    }
-
-    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
-            put(PUSH_TO_APPLICATION, application.getApplicationName());
-            manager.updateApplicationAction();
-        }
-    }
 
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
         return new ExternalApplicationsPreferences(
