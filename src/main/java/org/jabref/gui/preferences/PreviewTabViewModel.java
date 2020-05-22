@@ -61,12 +61,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> layoutProperty = new SimpleObjectProperty<>();
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
+
+    private final Validator chosenListValidator;
+
     private final CustomLocalDragboard localDragboard;
-    private Validator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
