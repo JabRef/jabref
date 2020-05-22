@@ -13,7 +13,7 @@ public class LinkedHashSetEqualsUtil {
             K leftEntry = leftItr.next();
             K rightEntry = rightItr.next();
 
-            //AbstractList does null checks here but for sets we can assume you never get null entries
+            // AbstractList does null checks here but for sets we can assume you never get null entries
             if (!leftEntry.equals(rightEntry)) {
                 return false;
             }

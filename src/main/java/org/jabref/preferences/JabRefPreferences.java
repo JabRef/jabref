@@ -1038,25 +1038,25 @@ public class JabRefPreferences implements PreferencesService {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            dump(this.prefs, result);
-
+            addPrefsRecursively(this.prefs, result);
         } catch (BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
     }
 
-    private void dump(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
-        for(String key : prefs.keys()) {
+    private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
+        for (String key : prefs.keys()) {
             result.put(key, getObject(prefs, key));
         }
-        for(String child : prefs.childrenNames()) {
-            dump(prefs.node(child), result);
+        for (String child : prefs.childrenNames()) {
+            addPrefsRecursively(prefs.node(child), result);
         }
     }
+
     private Object getObject(Preferences prefs, String key) {
         try {
-            return  prefs.get(key, (String) defaults.get(key));
+            return prefs.get(key, (String) defaults.get(key));
         } catch (ClassCastException e) {
             try {
                 return prefs.getBoolean(key, getBooleanDefault(key));
@@ -2029,15 +2029,18 @@ public class JabRefPreferences implements PreferencesService {
     // Network preferences
     //*************************************************************************************************************
 
+    @Override
     public RemotePreferences getRemotePreferences() {
         return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
     }
 
+    @Override
     public void storeRemotePreferences(RemotePreferences remotePreferences) {
         putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
+    @Override
     public ProxyPreferences getProxyPreferences() {
         Boolean useProxy = getBoolean(PROXY_USE);
         String hostname = get(PROXY_HOSTNAME);
@@ -2048,6 +2051,7 @@ public class JabRefPreferences implements PreferencesService {
         return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
     }
 
+    @Override
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
         putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
         put(PROXY_HOSTNAME, proxyPreferences.getHostname());

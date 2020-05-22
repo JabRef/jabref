@@ -100,10 +100,11 @@ public class CustomEntryTypeDialogViewModel {
             }
         });
 
+
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                input -> input != null && !input.getDisplayName().isEmpty(),
+                input -> (input != null) && !input.getDisplayName().isEmpty(),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
