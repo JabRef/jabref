@@ -65,7 +65,7 @@ public class CustomEntryTypeDialogViewModel {
     private final ObservableList<FieldViewModel> allFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldName(), extractor.fieldType()});
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
+    private final Map<BibEntryType, ObservableList<FieldViewModel>> typesWithFields = new HashMap<>();
     private final List<BibEntryType> typesToRemove = new ArrayList<>();
 
     private final PreferencesService preferencesService;
@@ -89,7 +89,7 @@ public class CustomEntryTypeDialogViewModel {
 
         for (BibEntryType entryType : allTypes) {
             List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList());
-            typesWithFields.put(entryType, fields);
+            typesWithFields.put(entryType, FXCollections.observableArrayList(fields));
         }
 
         this.fieldsForType = new SimpleListProperty<>(allFieldsForType);
@@ -139,7 +139,7 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
         FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, selectedEntryTypes.getValue());
-        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> new ArrayList<>()).add(model);
+        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> FXCollections.observableArrayList()).add(model);
         allFieldsForType.add(model);
         newFieldToAddProperty().setValue(null);
     }
@@ -149,7 +149,7 @@ public class CustomEntryTypeDialogViewModel {
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
         this.allEntryTypes.add(type);
         this.entryTypeToAdd.setValue("");
-        this.typesWithFields.put(type, new ArrayList<>());
+        this.typesWithFields.put(type, FXCollections.observableArrayList());
     }
 
     public ObjectProperty<BibEntryType> selectedEntryTypeProperty() {
@@ -187,7 +187,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeField(FieldViewModel focusedItem) {
-        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> new ArrayList<>()).remove(focusedItem);
+        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> FXCollections.observableArrayList()).remove(focusedItem);
         allFieldsForType.remove(focusedItem);
     }
 
