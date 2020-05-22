@@ -61,8 +61,18 @@ class BibtexKeyGeneratorTest {
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        return new BibtexKeyGenerator(keyPattern, database, new BibtexKeyPatternPreferences("", "", false, true, keyPattern, ',', false, DEFAULT_UNWANTED_CHARACTERS))
-                .generateKey(entry);
+        BibtexKeyPatternPreferences patternPreferences = new BibtexKeyPatternPreferences(
+                false,
+                false,
+                false,
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                ',');
+
+        return new BibtexKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
     }
 
     @Test
