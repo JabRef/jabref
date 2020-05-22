@@ -8,7 +8,6 @@ import java.util.Optional;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
