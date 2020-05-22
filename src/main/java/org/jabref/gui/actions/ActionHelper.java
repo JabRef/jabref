@@ -55,6 +55,11 @@ public class ActionHelper {
             List<LinkedFile> files = entry.getFiles();
 
             if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
+
+                if(files.get(0).isOnlineLink()) {
+                    return true;
+                }
+
                 Optional<Path> filename = FileHelper.find(
                         stateManager.getActiveDatabase().get(),
                         files.get(0).getLink(),
