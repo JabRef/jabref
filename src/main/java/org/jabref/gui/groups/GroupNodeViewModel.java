@@ -255,10 +255,6 @@ public class GroupNodeViewModel {
         // for example, a previously matched entry gets removed -> hits = hits - 1
         if (preferencesService.getDisplayGroupCount()) {
             BackgroundTask
-                    .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                    .onSuccess(hits::setValue)
-                    .executeWith(taskExecutor);
-            BackgroundTask
                     .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
                     .onSuccess(entries -> {
                         matchedEntries.clear();
