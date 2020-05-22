@@ -439,6 +439,166 @@ public class AuthorListTest {
     }
 
     @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeNullAuthorStringThrowsExceptionAbbr() {
+        assertThrows(NullPointerException.class,
+                () -> AuthorList.fixAuthorLastNameFirstCommasLatexFree(null, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeEmptyAuthorStringForEmptyInputAbbr() {
+        assertEquals("", AuthorList.fixAuthorLastNameFirstCommasLatexFree("", true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeCachesLatexFreeStringAbbr() {
+        String cachedString = AuthorList
+                .fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, true, false);
+        assertSame(cachedString, AuthorList
+                .fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeOneAuthorNameFromLatexAbbr() {
+        assertEquals("al-Khwārizmī, M.",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeTwoAuthorNamesFromLatexAbbr() {
+        assertEquals("al-Khwārizmī, M. and Böhm, C.",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI
+                        + " and " + CORRADO_BOHM, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeThreeUnicodeAuthorsFromLatexAbbr() {
+        assertEquals("al-Khwārizmī, M., Böhm, C. and Gödel, K.",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI
+                        + " and " + CORRADO_BOHM + " and " + KURT_GODEL, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeOneInsitutionNameFromLatexAbbr() {
+        assertEquals("The Banū Mūsā brothers",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeTwoInsitutionNameFromLatexAbbr() {
+        assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA
+                        + " and " + BANU_MOSA, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeMixedAuthorsFromLatexAbbr() {
+        assertEquals("The Banū Mūsā brothers and Böhm, C.",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA
+                        + " and " + CORRADO_BOHM, true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeOneInstitutionWithParanthesisAtStartAbbr() {
+        assertEquals("Łukasz Michał",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{{\\L{}}ukasz Micha\\l{}}",
+                        true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeAuthorWithEscapedBracketsAbbr() {
+        assertEquals("Mic}h{ał, Ł.",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{\\L{}}ukasz Mic\\}h\\{a\\l{}",
+                        true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeInstituteAuthorWithEscapedBracketsAbbr() {
+        assertEquals("Łukasz Mic}h{ał",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{{\\L{}}ukasz Mic\\}h\\{a\\l{}}",
+                        true, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeNullAuthorStringThrowsException() {
+        assertThrows(NullPointerException.class,
+                () -> AuthorList.fixAuthorLastNameFirstCommasLatexFree(null, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeEmptyAuthorStringForEmptyInput() {
+        assertEquals("", AuthorList.fixAuthorLastNameFirstCommasLatexFree("", false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeCachesLatexFreeString() {
+        String cachedString = AuthorList
+                .fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, false, false);
+        assertSame(cachedString, AuthorList
+                .fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeOneAuthorNameFromLatex() {
+        assertEquals("al-Khwārizmī, Muḥammad",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeTwoAuthorNamesFromLatex() {
+        assertEquals("al-Khwārizmī, Muḥammad and Böhm, Corrado",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI
+                        + " and " + CORRADO_BOHM, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeThreeUnicodeAuthorsFromLatex() {
+        assertEquals("al-Khwārizmī, Muḥammad, Böhm, Corrado and Gödel, Kurt",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(MUHAMMAD_ALKHWARIZMI
+                        + " and " + CORRADO_BOHM + " and " + KURT_GODEL, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeOneInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeTwoInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA
+                        + " and " + BANU_MOSA, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeUnicodeMixedAuthorsFromLatex() {
+        assertEquals("The Banū Mūsā brothers and Böhm, Corrado",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree(BANU_MOSA
+                        + " and " + CORRADO_BOHM, false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeOneInstitutionWithParanthesisAtStart() {
+        assertEquals("Łukasz Michał",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{{\\L{}}ukasz Micha\\l{}}",
+                        false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeAuthorWithEscapedBrackets() {
+        assertEquals("Mic}h{ał, Łukasz",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{\\L{}}ukasz Mic\\}h\\{a\\l{}",
+                        false, false));
+    }
+
+    @Test
+    public void fixAuthorLastNameFirstCommasLatexFreeInstituteAuthorWithEscapedBrackets() {
+        assertEquals("Łukasz Mic}h{ał",
+                AuthorList.fixAuthorLastNameFirstCommasLatexFree("{{\\L{}}ukasz Mic\\}h\\{a\\l{}}",
+                        false, false));
+    }
+
+    @Test
     public void testFixAuthorLastNameFirst() {
 
         // Test helper method
