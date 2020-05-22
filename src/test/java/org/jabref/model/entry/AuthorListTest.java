@@ -106,6 +106,12 @@ public class AuthorListTest {
     }
 
     @Test
+    public void fixAuthorNatbibLatexFreeAuthorWithEscapedBrackets() {
+        assertEquals("Mic}h{ał",
+                AuthorList.fixAuthorNatbibLatexFree("{\\L{}}ukasz Mic\\}h\\{a\\l{}"));
+    }
+
+    @Test
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
