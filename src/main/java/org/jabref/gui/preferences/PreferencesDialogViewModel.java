@@ -57,7 +57,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExportSortingTabView(preferences),
                 new NameFormatterTabView(preferences),
                 new XmpPrivacyTabView(preferences),
-                new AdvancedTabView(preferences),
+                new NetworkTabView(preferences),
                 new AppearanceTabView(preferences)
         );
     }
@@ -148,6 +148,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
 
         preferences.updateEntryEditorTabList();
+        preferences.updateGlobalBibtexKeyPattern();
     }
 
     /**

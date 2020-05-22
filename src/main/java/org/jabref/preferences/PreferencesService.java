@@ -21,12 +21,15 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
@@ -70,8 +73,6 @@ public interface PreferencesService {
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
-
-    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
@@ -164,6 +165,30 @@ public interface PreferencesService {
     EntryEditorPreferences getEntryEditorPreferences();
 
     void storeEntryEditorPreferences(EntryEditorPreferences preferences);
+
+    //*************************************************************************************************************
+    // Network preferences
+    //*************************************************************************************************************
+
+    RemotePreferences getRemotePreferences();
+
+    void storeRemotePreferences(RemotePreferences remotePreferences);
+
+    ProxyPreferences getProxyPreferences();
+
+    void storeProxyPreferences(ProxyPreferences proxyPreferences);
+
+    //*************************************************************************************************************
+    // BibtexKeyPatternPreferences
+    //*************************************************************************************************************
+
+    GlobalBibtexKeyPattern getGlobalBibtexKeyPattern();
+
+    void updateGlobalBibtexKeyPattern();
+
+    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
+
+    void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences

@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -26,6 +24,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.OptionalUtil;
+
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -48,17 +49,13 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
-        return new Observable[] {taskProperty.progressProperty(), taskProperty.runningProperty()};
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> {
+        return new Observable[]{task.progressProperty(), task.runningProperty()};
     });
 
-    private BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(
-            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
-    );
+    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
 
-    private DoubleBinding tasksProgress = Bindings.createDoubleBinding(
-            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
-    );
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -143,11 +140,11 @@ public class StateManager {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
-    public BooleanBinding getAnyTaskRunning() {
+    public EasyBinding<Boolean> getAnyTaskRunning() {
         return anyTaskRunning;
     }
 
-    public DoubleBinding getTasksProgress() {
+    public EasyBinding<Double> getTasksProgress() {
         return tasksProgress;
     }
 }
