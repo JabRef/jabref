@@ -1287,7 +1287,7 @@ public class BracketedPattern {
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
      * is a concatenation of those tokens. Otherwise, the result will be built
-     * from all uppercase letters in the concatenated string.</li>
+     * from the first letter in each token.</li>
      * </ul>
      * </ol>
      * <p>
@@ -1310,8 +1310,11 @@ public class BracketedPattern {
      *         </ul>
      */
     private static String generateInstitutionKey(String content) {
-        if (content.isEmpty()) {
-            return content;
+        if (content == null) {
+            return null;
+        }
+        if (content.isBlank()) {
+            return "";
         }
 
         String result = content;
@@ -1358,10 +1361,7 @@ public class BracketedPattern {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : tokenParts) {
-                    if (!DEPARTMENT_PATTERN.matcher(k).matches()
-                            && !StandardField.SCHOOL.getName().equalsIgnoreCase(k)
-                            && !"faculty".equalsIgnoreCase(k)
-                            && !NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll("").isEmpty()) {
+                    if (noOtherInstitutionKeyWord(k)) {
                         if (tokenTypes.contains(INSTITUTION.SCHOOL)) {
                             schoolSB.append(NOT_STARTING_CAPITAL_PATTERN.matcher(k).replaceAll(""));
                         }
@@ -1397,6 +1397,18 @@ public class BracketedPattern {
                 + (school == null ? "" : school)
                 + ((department == null)
                 || ((school != null) && department.equals(school)) ? "" : department);
+    }
+
+    /**
+     * Checks that this is not an institution keyword and has an uppercase first letter, except univ/tech key word.
+     * @param word to check
+     * @return
+     */
+    private static boolean noOtherInstitutionKeyWord(String word) {
+        return !DEPARTMENT_PATTERN.matcher(word).matches()
+                && !StandardField.SCHOOL.getName().equalsIgnoreCase(word)
+                && !"faculty".equalsIgnoreCase(word)
+                && !NOT_STARTING_CAPITAL_PATTERN.matcher(word).replaceAll("").isEmpty();
     }
 
     private static List<String> getValidInstitutionNameParts(String name) {
