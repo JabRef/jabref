@@ -55,7 +55,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExportSortingTabView(preferences),
                 new NameFormatterTabView(preferences),
                 new XmpPrivacyTabView(preferences),
-                new AdvancedTabView(preferences),
+                new NetworkTabView(preferences),
                 new AppearanceTabView(preferences)
         );
     }
@@ -141,6 +141,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         preferences.updateEntryEditorTabList();
+        preferences.updateGlobalBibtexKeyPattern();
     }
 
     /**

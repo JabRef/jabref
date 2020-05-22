@@ -118,7 +118,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
-        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style->!style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
+        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style -> !style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
         preferences.setExternalStyles(externalStyles);
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);

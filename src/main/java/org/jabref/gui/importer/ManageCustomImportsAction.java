@@ -11,5 +11,4 @@ public class ManageCustomImportsAction extends SimpleCommand {
     public void execute() {
         new ImportCustomizationDialog().showAndWait();
     }
-
 }

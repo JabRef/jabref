@@ -120,5 +120,4 @@ public class PreviewPreferences {
             return new PreviewPreferences(previewCycle, previewCyclePosition, previewPanelDividerPosition, previewStyle, previewStyleDefault, showPreviewAsExtraTab);
         }
     }
-
 }

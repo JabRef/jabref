@@ -21,8 +21,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.shared.DBMSType;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
 
@@ -129,5 +129,4 @@ public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     private void showOpenKeystoreFileDialog(ActionEvent event) {
         viewModel.showOpenKeystoreFileDialog();
     }
-
 }

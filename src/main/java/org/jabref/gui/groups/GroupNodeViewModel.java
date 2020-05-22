@@ -22,7 +22,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
@@ -38,8 +37,9 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Enums;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
@@ -76,7 +76,7 @@ public class GroupNodeViewModel {
                                      .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                                      .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
-            children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
+            children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
@@ -89,9 +89,10 @@ public class GroupNodeViewModel {
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
 
-        ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
-        anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
-        allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
+        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
+        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
+        // 'all' returns 'true' for empty streams, so this has to be checked explicitly
+        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard) {
@@ -337,15 +338,15 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-            case BOTTOM:
-                this.moveTo(targetParent.get(), targetIndex + 1);
-                break;
-            case CENTER:
-                this.moveTo(target);
-                break;
-            case TOP:
-                this.moveTo(targetParent.get(), targetIndex);
-                break;
+                case BOTTOM:
+                    this.moveTo(targetParent.get(), targetIndex + 1);
+                    break;
+                case CENTER:
+                    this.moveTo(target);
+                    break;
+                case TOP:
+                    this.moveTo(targetParent.get(), targetIndex);
+                    break;
             }
         } else {
             // No parent = root -> just add

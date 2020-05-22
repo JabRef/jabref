@@ -179,7 +179,8 @@ public class ModsImporter extends Importer implements Parser {
 
             nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
 
-            originInfoDefinition.ifPresent(originInfo -> originInfo.getPlaceOrPublisherOrDateIssued().stream()
+            originInfoDefinition.ifPresent(originInfo -> originInfo
+                    .getPlaceOrPublisherOrDateIssued().stream()
                     .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
                             element.getValue())));
 
@@ -278,11 +279,11 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseLocationAndUrl(Map<Field, String> fields, LocationDefinition locationDefinition) {
         List<String> locations = locationDefinition.getPhysicalLocation().stream()
-                .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
+                                                   .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
         putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
 
         List<String> urls = locationDefinition.getUrl().stream().map(UrlDefinition::getValue)
-                .collect(Collectors.toList());
+                                              .collect(Collectors.toList());
         putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
     }
 
@@ -297,7 +298,7 @@ public class ModsImporter extends Importer implements Parser {
                 LanguageDefinition language = (LanguageDefinition) value;
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
                 List<String> languages = languageTerms.stream().map(LanguageTermDefinition::getValue)
-                        .collect(Collectors.toList());
+                                                      .collect(Collectors.toList());
                 putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
             }
         }
@@ -374,7 +375,7 @@ public class ModsImporter extends Importer implements Parser {
         List<String> places = new ArrayList<>();
         placeDefinition
                 .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                        .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
+                                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));

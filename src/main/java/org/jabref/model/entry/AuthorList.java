@@ -516,7 +516,7 @@ public class AuthorList {
         }
 
         authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
-                .collect(Collectors.joining(" and "));
+                                                   .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
     }
 
@@ -633,7 +633,7 @@ public class AuthorList {
         }
 
         authorsFirstFirstAnds = getAuthors().stream().map(author -> author.getFirstLast(false))
-                .collect(Collectors.joining(" and "));
+                                            .collect(Collectors.joining(" and "));
         return authorsFirstFirstAnds;
     }
 
@@ -656,7 +656,7 @@ public class AuthorList {
         }
 
         authorsAlph = getAuthors().stream().map(Author::getNameForAlphabetization)
-                .collect(Collectors.joining(" and "));
+                                  .collect(Collectors.joining(" and "));
         return authorsAlph;
     }
 

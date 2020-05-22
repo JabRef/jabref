@@ -58,5 +58,4 @@ public class ContainBasedSearchRule implements SearchRule {
 
         return false; // Didn't match all words.
     }
-
 }

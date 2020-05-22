@@ -116,7 +116,7 @@ public class JabRefPreferences implements PreferencesService {
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
-    */
+     */
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
@@ -218,6 +218,7 @@ public class JabRefPreferences implements PreferencesService {
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
+    public static final String UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -232,7 +233,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String ALLOW_INTEGER_EDITION_BIBTEX = "allowIntegerEditionBibtex";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
@@ -245,13 +245,12 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
-    public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
-    public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP = "CleanUp";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+    public static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -387,7 +386,7 @@ public class JabRefPreferences implements PreferencesService {
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
     private final Preferences prefs;
-    private GlobalBibtexKeyPattern keyPattern;
+    private GlobalBibtexKeyPattern globalBibtexKeyPattern;
     // Object containing info about customized entry editor tabs.
     private Map<String, Set<Field>> tabList;
 
@@ -571,6 +570,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
+        defaults.put(UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -602,7 +602,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
@@ -629,14 +628,14 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
+        // Don't download files by default
+        defaults.put(DOWNLOAD_LINKED_FILES, false);
 
         customImports = new CustomImportList(this);
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
-        defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
-        defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         defaults.put(USE_DEFAULT_FILE_BROWSER_APPLICATION, Boolean.TRUE);
@@ -657,25 +656,25 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREVIEW_PANEL_HEIGHT, 0.65);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
-                     "<font face=\"sans-serif\">"
-                                    + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                                    + "\\end{bibtexkey}</b><br>__NEWLINE__"
-                                    + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                                    + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                                    + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                                    + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                                    + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                                    + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                                    // Include the booktitle field for @inproceedings, @proceedings, etc.
-                                    + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                                    + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                                    + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                                    + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                                    + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                                    + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                                    + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                                    + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
-                                    + "</dd>__NEWLINE__<p></p></font>");
+                "<font face=\"sans-serif\">"
+                        + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                        + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                        + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
+                        + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
+                        + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
+                        + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
+                        + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
+                        + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
+                        // Include the booktitle field for @inproceedings, @proceedings, etc.
+                        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
+                        + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
+                        + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
+                        + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
+                        + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
+                        + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
+                        + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
+                        + "\\begin{comment}<BR><BR><b>Comment: </b> \\format[Markdown,HTMLChars]{\\comment} \\end{comment}"
+                        + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
@@ -751,11 +750,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
         EnumSet<CleanupPreset.CleanupStep> deactivatedJobs = EnumSet.of(
-                                                                        CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                                                                        CleanupPreset.CleanupStep.MOVE_PDF,
-                                                                        CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
-                                                                        CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.MOVE_PDF,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
@@ -939,10 +938,9 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys
-     * they use.
+     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys they use.
      *
-     * @param key The preferences key.
+     * @param key   The preferences key.
      * @param value The default value.
      */
     public void putDefaultValue(String key, Object value) {
@@ -952,7 +950,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Stores a color in preferences.
      *
-     * @param key The key for this setting.
+     * @param key   The key for this setting.
      * @param color The Color to store.
      */
     public void putColor(String key, Color color) {
@@ -992,59 +990,6 @@ public class JabRefPreferences implements PreferencesService {
         } catch (BackingStoreException ex) {
             LOGGER.warn("Cannot communicate with backing store", ex);
         }
-    }
-
-    /**
-     * Fetches key patterns from preferences.
-     * The implementation doesn't cache the results
-     *
-     * @return LabelPattern containing all keys. Returned LabelPattern has no parent
-     */
-    public GlobalBibtexKeyPattern getKeyPattern() {
-        keyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        try {
-            String[] keys = pre.keys();
-            if (keys.length > 0) {
-                for (String key : keys) {
-                    keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), pre.get(key, null));
-                }
-            }
-        } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
-        }
-        return keyPattern;
-    }
-
-    /**
-     * Adds the given key pattern to the preferences
-     *
-     * @param pattern the pattern to store
-     */
-    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
-        keyPattern = pattern;
-
-        // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        try {
-            pre.clear(); // We remove all old entries.
-        } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
-        }
-
-        for (EntryType entryType : pattern.getAllKeys()) {
-            if (!pattern.isDefaultValue(entryType)) {
-                // no default value
-                // the first entry in the array is the full pattern
-                // see org.jabref.logic.labelPattern.BibtexKeyGenerator.split(String)
-                pre.put(entryType.getName(), pattern.getValue(entryType).get(0));
-            }
-        }
-    }
-
-    private void clearKeyPatterns() throws BackingStoreException {
-        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
-        pre.clear();
     }
 
     public void storeBibEntryTypes(List<BibEntryType> BibEntryTypes, BibDatabaseMode bibDatabaseMode) {
@@ -1145,7 +1090,7 @@ public class JabRefPreferences implements PreferencesService {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
             throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
-                                      ex);
+                    ex);
         }
     }
 
@@ -1153,8 +1098,7 @@ public class JabRefPreferences implements PreferencesService {
      * Imports Preferences from an XML file.
      *
      * @param filename String File to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException
-     *                         or an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
      */
     public void importPreferences(String filename) throws JabRefException {
         importPreferences(Path.of(filename));
@@ -1165,13 +1109,13 @@ public class JabRefPreferences implements PreferencesService {
             Preferences.importPreferences(is);
         } catch (InvalidPreferencesFormatException | IOException ex) {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
-                                      ex);
+                    ex);
         }
     }
 
     /**
      * ONLY FOR TESTING!
-     *
+     * <p>
      * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
      *
      * @param owPrefs The custom preferences to overwrite the currently present
@@ -1201,7 +1145,8 @@ public class JabRefPreferences implements PreferencesService {
                 get(MAIN_FILE_DIRECTORY),
                 getBoolean(BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
-                get(IMPORT_FILEDIRPATTERN));
+                get(IMPORT_FILEDIRPATTERN),
+                getBoolean(DOWNLOAD_LINKED_FILES));
     }
 
     @Override
@@ -1253,8 +1198,6 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -1267,8 +1210,6 @@ public class JabRefPreferences implements PreferencesService {
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                this.getKeyPattern(),
-                getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING),
                 getBibtexKeyPatternPreferences());
     }
 
@@ -1278,19 +1219,6 @@ public class JabRefPreferences implements PreferencesService {
         SavePreferences savePreferences = this.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = this.getXMPPreferences();
         return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
-    }
-
-    @Override
-    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return new BibtexKeyPatternPreferences(
-                get(KEY_PATTERN_REGEX),
-                get(KEY_PATTERN_REPLACEMENT),
-                getBoolean(KEY_GEN_ALWAYS_ADD_LETTER),
-                getBoolean(KEY_GEN_FIRST_LETTER_A),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
-                getKeyPattern(),
-                getKeywordDelimiter(),
-                getBoolean(AVOID_OVERWRITING_KEY));
     }
 
     @Override
@@ -1406,29 +1334,12 @@ public class JabRefPreferences implements PreferencesService {
         return new PreviewPreferences(layouts, cyclePos, panelHeight, style, styleDefault, showAsTab);
     }
 
-    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
-        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
-        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
-        put(PROXY_PORT, proxyPreferences.getPort());
-        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
-        put(PROXY_USERNAME, proxyPreferences.getUsername());
-        put(PROXY_PASSWORD, proxyPreferences.getPassword());
-    }
-
-    public ProxyPreferences getProxyPreferences() {
-        Boolean useProxy = getBoolean(PROXY_USE);
-        String hostname = get(PROXY_HOSTNAME);
-        String port = get(PROXY_PORT);
-        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
-        String username = get(PROXY_USERNAME);
-        String password = get(PROXY_PASSWORD);
-        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
-    }
-
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
-                                             getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL), getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                                             getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+        return new ProtectedTermsPreferences(
+                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
     @Override
@@ -1465,12 +1376,14 @@ public class JabRefPreferences implements PreferencesService {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
     }
 
+    @Override
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository abbreviationRepository) {
         return new CleanupPreferences(
-                                      getLayoutFormatterPreferences(abbreviationRepository),
-                                      getFilePreferences());
+                getLayoutFormatterPreferences(abbreviationRepository),
+                getFilePreferences());
     }
 
+    @Override
     public CleanupPreset getCleanupPreset() {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
@@ -1485,21 +1398,13 @@ public class JabRefPreferences implements PreferencesService {
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
 
+    @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
             putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));
         }
 
         putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
-    }
-
-    public RemotePreferences getRemotePreferences() {
-        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
-    }
-
-    public void setRemotePreferences(RemotePreferences remotePreferences) {
-        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
-        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
     @Override
@@ -1569,10 +1474,10 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
         return new AutoLinkPreferences(
-                                       getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
-                                       get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
-                                       getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
-                                       getKeywordDelimiter());
+                getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
+                get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
+                getKeywordDelimiter());
     }
 
     public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
@@ -1629,10 +1534,11 @@ public class JabRefPreferences implements PreferencesService {
 
     private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
-        getStringList(COLUMN_SORT_ORDER).forEach(columnName -> columns.stream().filter(column ->
-                column.getName().equals(columnName))
-                .findFirst()
-                .ifPresent(columnsOrdered::add)
+        getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
+                columns.stream().filter(column ->
+                        column.getName().equals(columnName))
+                       .findFirst()
+                       .ifPresent(columnsOrdered::add)
         );
         return columnsOrdered;
     }
@@ -1659,15 +1565,16 @@ public class JabRefPreferences implements PreferencesService {
         columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
         putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
 
-        putStringList(COLUMN_SORT_ORDER, columnPreferences.getColumnSortOrder().stream()
+        putStringList(COLUMN_SORT_ORDER, columnPreferences
+                .getColumnSortOrder().stream()
                 .map(MainTableColumnModel::getName)
                 .collect(Collectors.toList()));
     }
 
     public MainTablePreferences getMainTablePreferences() {
         return new MainTablePreferences(getColumnPreferences(),
-                                        getBoolean(AUTO_RESIZE_MODE),
-                                        getBoolean(EXTRA_FILE_COLUMNS));
+                getBoolean(AUTO_RESIZE_MODE),
+                getBoolean(EXTRA_FILE_COLUMNS));
     }
 
     public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
@@ -1697,7 +1604,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setWorkingDir(Path dir) {
         put(WORKING_DIRECTORY, dir.toString());
-
     }
 
     public GroupViewMode getGroupViewMode() {
@@ -1755,7 +1661,7 @@ public class JabRefPreferences implements PreferencesService {
             filename = formatData.get(EXPORTER_FILENAME_INDEX);
             extension = formatData.get(EXPORTER_EXTENSION_INDEX);
             TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                                                           layoutPreferences, savePreferences);
+                    layoutPreferences, savePreferences);
             format.setCustomExport(true);
             formats.add(format);
             i++;
@@ -1892,8 +1798,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getEnforceLegalKeys() {
-        return getBoolean(ENFORCE_LEGAL_BIBTEX_KEY);
+    public String getUnwantedCharacters() {
+        return get(UNWANTED_BIBTEX_KEY_CHARACTERS);
     }
 
     @Override
@@ -1908,7 +1814,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),
                 getBoolean(CONFIRM_DELETE),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
                 shouldCollectTelemetry(),
@@ -1921,7 +1826,6 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
         putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
-        putBoolean(ENFORCE_LEGAL_BIBTEX_KEY, preferences.isEnforceLegalBibtexKey());
         putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         setShouldCollectTelemetry(preferences.isCollectTelemetry());
@@ -2110,6 +2014,164 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+    }
+
+    //*************************************************************************************************************
+    // Network preferences
+    //*************************************************************************************************************
+
+    public RemotePreferences getRemotePreferences() {
+        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
+    }
+
+    public void storeRemotePreferences(RemotePreferences remotePreferences) {
+        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
+        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
+    }
+
+    public ProxyPreferences getProxyPreferences() {
+        Boolean useProxy = getBoolean(PROXY_USE);
+        String hostname = get(PROXY_HOSTNAME);
+        String port = get(PROXY_PORT);
+        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
+        String username = get(PROXY_USERNAME);
+        String password = get(PROXY_PASSWORD);
+        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
+    }
+
+    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
+        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
+        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
+        put(PROXY_PORT, proxyPreferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
+        put(PROXY_USERNAME, proxyPreferences.getUsername());
+        put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    }
+
+    //*************************************************************************************************************
+    // BibtexKeyPatternPreferences
+    //*************************************************************************************************************
+
+    /**
+     * Creates the GlobalBibtexKeyPattern
+     *
+     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
+     */
+    @Override
+    public GlobalBibtexKeyPattern getGlobalBibtexKeyPattern() {
+        if (this.globalBibtexKeyPattern == null) {
+            updateGlobalBibtexKeyPattern();
+        }
+        return this.globalBibtexKeyPattern;
+    }
+
+    @Override
+    public void updateGlobalBibtexKeyPattern() {
+        this.globalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        try {
+            String[] keys = preferences.keys();
+            if (keys.length > 0) {
+                for (String key : keys) {
+                    this.globalBibtexKeyPattern.addBibtexKeyPattern(
+                            EntryTypeFactory.parse(key),
+                            preferences.get(key, null));
+                }
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+        }
+    }
+
+    /**
+     * Adds the given key pattern to the preferences
+     *
+     * @param pattern the pattern to store
+     */
+    public void storeGlobalBibtexKeyPattern(GlobalBibtexKeyPattern pattern) {
+        this.globalBibtexKeyPattern = pattern;
+
+        if ((this.globalBibtexKeyPattern.getDefaultValue() == null)
+                || this.globalBibtexKeyPattern.getDefaultValue().isEmpty()) {
+            put(DEFAULT_BIBTEX_KEY_PATTERN, "");
+        } else {
+            put(DEFAULT_BIBTEX_KEY_PATTERN, globalBibtexKeyPattern.getDefaultValue().get(0));
+        }
+
+        // Store overridden definitions to Preferences.
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        try {
+            preferences.clear(); // We remove all old entries.
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
+        }
+
+        for (EntryType entryType : pattern.getAllKeys()) {
+            if (!pattern.isDefaultValue(entryType)) {
+                // first entry in the map is the full pattern
+                preferences.put(entryType.getName(), pattern.getValue(entryType).get(0));
+            }
+        }
+
+        updateGlobalBibtexKeyPattern();
+    }
+
+    private void clearKeyPatterns() throws BackingStoreException {
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        preferences.clear();
+        updateGlobalBibtexKeyPattern();
+    }
+
+    @Override
+    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
+        BibtexKeyPatternPreferences.KeySuffix keySuffix =
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+
+        if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
+        } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
+            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+        }
+
+        return new BibtexKeyPatternPreferences(
+                getBoolean(AVOID_OVERWRITING_KEY),
+                getBoolean(WARN_BEFORE_OVERWRITING_KEY),
+                getBoolean(GENERATE_KEYS_BEFORE_SAVING),
+                keySuffix,
+                get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT),
+                get(UNWANTED_BIBTEX_KEY_CHARACTERS),
+                getGlobalBibtexKeyPattern(),
+                getKeywordDelimiter());
+    }
+
+    @Override
+    public void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences) {
+        putBoolean(AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
+        putBoolean(WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
+        putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
+
+        switch (preferences.getKeySuffix()) {
+            case ALWAYS:
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                break;
+            case SECOND_WITH_A:
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, true);
+                break;
+            default:
+            case SECOND_WITH_B:
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
+                break;
+        }
+
+        put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
+        put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
+        put(UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
+
+        storeGlobalBibtexKeyPattern(preferences.getKeyPattern());
     }
 
     //*************************************************************************************************************

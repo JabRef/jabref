@@ -4,32 +4,57 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 
 public class BibtexKeyPatternPreferences {
 
+    public enum KeySuffix {
+        ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...
+        SECOND_WITH_A,  // CiteKey, CiteKeyA, CiteKeyB ...
+        SECOND_WITH_B   // CiteKey, CiteKeyB, CiteKeyC ...
+    }
+
+    private final boolean shouldAvoidOverwriteCiteKey;
+    private final boolean shouldWarnBeforeOverwriteCiteKey;
+    private final boolean shouldGenerateCiteKeysBeforeSaving;
+    private final KeySuffix keySuffix;
     private final String keyPatternRegex;
     private final String keyPatternReplacement;
-    private final boolean alwaysAddLetter;
-    private final boolean firstLetterA;
-    private final boolean enforceLegalKey;
+    private final String unwantedCharacters;
     private final GlobalBibtexKeyPattern keyPattern;
-    private Character keywordDelimiter;
-    private boolean avoidOverwritingCiteKey;
+    private final Character keywordDelimiter;
 
-    public BibtexKeyPatternPreferences(String keyPatternRegex,
+    public BibtexKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+                                       boolean shouldWarnBeforeOverwriteCiteKey,
+                                       boolean shouldGenerateCiteKeysBeforeSaving,
+                                       KeySuffix keySuffix,
+                                       String keyPatternRegex,
                                        String keyPatternReplacement,
-                                       boolean alwaysAddLetter,
-                                       boolean firstLetterA,
-                                       boolean enforceLegalKey,
+                                       String unwantedCharacters,
                                        GlobalBibtexKeyPattern keyPattern,
-                                       Character keywordDelimiter,
-                                       boolean avoidOverwritingCiteKey) {
+                                       Character keywordDelimiter) {
 
+        this.shouldAvoidOverwriteCiteKey = shouldAvoidOverwriteCiteKey;
+        this.shouldWarnBeforeOverwriteCiteKey = shouldWarnBeforeOverwriteCiteKey;
+        this.shouldGenerateCiteKeysBeforeSaving = shouldGenerateCiteKeysBeforeSaving;
+        this.keySuffix = keySuffix;
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
-        this.alwaysAddLetter = alwaysAddLetter;
-        this.firstLetterA = firstLetterA;
-        this.enforceLegalKey = enforceLegalKey;
+        this.unwantedCharacters = unwantedCharacters;
         this.keyPattern = keyPattern;
         this.keywordDelimiter = keywordDelimiter;
-        this.avoidOverwritingCiteKey = avoidOverwritingCiteKey;
+    }
+
+    public boolean shouldAvoidOverwriteCiteKey() {
+        return shouldAvoidOverwriteCiteKey;
+    }
+
+    public boolean shouldWarnBeforeOverwriteCiteKey() {
+        return shouldWarnBeforeOverwriteCiteKey;
+    }
+
+    public boolean shouldGenerateCiteKeysBeforeSaving() {
+        return shouldGenerateCiteKeysBeforeSaving;
+    }
+
+    public KeySuffix getKeySuffix() {
+        return keySuffix;
     }
 
     public String getKeyPatternRegex() {
@@ -40,16 +65,8 @@ public class BibtexKeyPatternPreferences {
         return keyPatternReplacement;
     }
 
-    public boolean isAlwaysAddLetter() {
-        return alwaysAddLetter;
-    }
-
-    public boolean isFirstLetterA() {
-        return firstLetterA;
-    }
-
-    public boolean isEnforceLegalKey() {
-        return enforceLegalKey;
+    public String getUnwantedCharacters() {
+        return unwantedCharacters;
     }
 
     public GlobalBibtexKeyPattern getKeyPattern() {
@@ -58,9 +75,5 @@ public class BibtexKeyPatternPreferences {
 
     public Character getKeywordDelimiter() {
         return keywordDelimiter;
-    }
-
-    public boolean avoidOverwritingCiteKey() {
-        return avoidOverwritingCiteKey;
     }
 }

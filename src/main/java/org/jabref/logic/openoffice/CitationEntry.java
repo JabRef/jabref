@@ -56,5 +56,4 @@ public class CitationEntry implements Comparable<CitationEntry> {
     public String getContext() {
         return context;
     }
-
 }

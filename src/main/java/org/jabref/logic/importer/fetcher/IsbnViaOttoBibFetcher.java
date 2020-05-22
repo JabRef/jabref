@@ -65,6 +65,5 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
             throw new FetcherException("An internal parser error occurred", e);
         }
         return entry;
-
     }
 }

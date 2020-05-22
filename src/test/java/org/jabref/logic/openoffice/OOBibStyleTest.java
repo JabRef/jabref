@@ -509,8 +509,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testIsValidWithDefaultSectionAtTheStart() throws Exception
-    {
+    void testIsValidWithDefaultSectionAtTheStart() throws Exception {
         OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences);
         assertTrue(style.isValid());
     }

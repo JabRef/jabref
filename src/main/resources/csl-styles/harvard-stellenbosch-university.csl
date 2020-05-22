@@ -45,7 +45,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="never" et-al-min="9" et-al-use-first="8"/>
+      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="never"/>
       <label form="short" prefix=" " text-case="capitalize-first"/>
       <substitute>
         <names variable="editor"/>
@@ -63,7 +63,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="symbol" delimiter-precedes-last="never" et-al-subsequent-min="3" et-al-subsequent-use-first="1" initialize-with="." sort-separator=" "/>
+      <name form="short" and="symbol" delimiter-precedes-last="never" initialize-with="." sort-separator=" "/>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
@@ -195,7 +195,7 @@
       <text variable="publisher"/>
     </group>
   </macro>
-  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix">
+  <citation disambiguate-add-year-suffix="true" year-suffix-delimiter="," disambiguate-add-names="true" disambiguate-add-givenname="false" collapse="year-suffix" et-al-min="4" et-al-use-first="3" et-al-subsequent-min="3" et-al-subsequent-use-first="1">
     <sort>
       <key macro="author"/>
       <key macro="date-issued-no-parentheses"/>
@@ -218,7 +218,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true">
+  <bibliography hanging-indent="true" et-al-min="9" et-al-use-first="8">
     <sort>
       <key macro="author-short" names-min="1" names-use-first="1"/>
       <key macro="author-count" names-min="3" names-use-first="3"/>

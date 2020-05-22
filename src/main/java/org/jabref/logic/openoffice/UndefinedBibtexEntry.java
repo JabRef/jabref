@@ -4,8 +4,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 /**
- * Subclass of BibEntry for representing entries referenced in a document that can't
- * be found in JabRef's current database.
+ * Subclass of BibEntry for representing entries referenced in a document that can't be found in JabRef's current database.
  */
 public class UndefinedBibtexEntry extends BibEntry {
 

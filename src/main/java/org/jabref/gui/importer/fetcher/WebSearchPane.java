@@ -25,7 +25,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class WebSearchPane extends SidePaneComponent {
 

@@ -232,8 +232,7 @@ public class EndnoteImporter extends Importer {
                         type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
-                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
+                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val, ""));
                 }
             }
 
@@ -261,11 +260,9 @@ public class EndnoteImporter extends Importer {
             if (!b.getFields().isEmpty()) {
                 bibitems.add(b);
             }
-
         }
 
         return new ParserResult(bibitems);
-
     }
 
     /**
@@ -291,5 +288,4 @@ public class EndnoteImporter extends Importer {
             return AuthorList.fixAuthorLastNameFirst(s);
         }
     }
-
 }

@@ -25,8 +25,8 @@ public class GenerateBibtexKeySingleAction extends SimpleCommand {
         this.preferencesService = preferencesService;
         this.undoManager = undoManager;
 
-        if (preferencesService.getBibtexKeyPatternPreferences().avoidOverwritingCiteKey()) {
-            this.executable.bind(entry.getCiteKeyBinding().isNull());
+        if (preferencesService.getBibtexKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
+            this.executable.bind(entry.getCiteKeyBinding().isEmpty());
         }
     }
 
