@@ -66,7 +66,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
+                        Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
 
@@ -74,32 +74,32 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 proxyHostnameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a hostname"))));
 
         proxyPortValidator = new FunctionBasedValidator<>(
                 proxyPortProperty,
                 input -> getPortAsInt(input).isPresent(),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a port"))));
 
         proxyUsernameValidator = new FunctionBasedValidator<>(
                 proxyUsernameProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a username"))));
 
         proxyPasswordValidator = new FunctionBasedValidator<>(
                 proxyPasswordProperty,
                 input -> input.length() > 0,
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("Advanced"),
                         Localization.lang("Network"),
+                        Localization.lang("Proxy configuration"),
                         Localization.lang("Please specify a password"))));
     }
 

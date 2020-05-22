@@ -2147,29 +2147,29 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences) {
-        putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
-        putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
-        putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
+        putBoolean(AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
+        putBoolean(WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
+        putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
 
         switch (preferences.getKeySuffix()) {
             case ALWAYS:
-                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, true);
-                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
                 break;
             case SECOND_WITH_A:
-                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, true);
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, true);
                 break;
             default:
             case SECOND_WITH_B:
-                putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
-                putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
+                putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
+                putBoolean(KEY_GEN_FIRST_LETTER_A, false);
                 break;
         }
 
-        put(JabRefPreferences.KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
-        put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
-        put(JabRefPreferences.UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
+        put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
+        put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
+        put(UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
 
         storeGlobalBibtexKeyPattern(preferences.getKeyPattern());
     }
