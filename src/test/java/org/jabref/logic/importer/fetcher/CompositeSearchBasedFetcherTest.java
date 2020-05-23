@@ -14,6 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,6 +29,16 @@ public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
 
+    @Test
+    public void performSearchWithoutFetchers() {
+        Set<SearchBasedFetcher> empty = new HashSet<>();
+        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty);
+
+        List<BibEntry> result = fetcher.performSearch("quantum");
+
+        Assertions.assertTrue(result.isEmpty());
+    }
+
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
@@ -38,7 +49,8 @@ public class CompositeSearchBasedFetcherTest {
         Assertions.assertTrue(queryResult.isEmpty());
     }
 
-    @ParameterizedTest(name = "Perform search on query \"quantum\".")
+    @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
+            "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers);
