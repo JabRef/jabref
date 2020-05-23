@@ -138,8 +138,8 @@ public class WebFetchers {
     /**
      * @return sorted set containing id fetchers
      */
-    public static SortedSet<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
-        SortedSet<IdFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+    public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new CrossRef());
         set.add(new ArXiv(importFormatPreferences));
         return set;
