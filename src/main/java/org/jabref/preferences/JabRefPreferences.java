@@ -390,9 +390,26 @@ public class JabRefPreferences implements PreferencesService {
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
     private final Preferences prefs;
+
+    /**
+     * Cache variable for <code>getGlobalBibtexKeyPattern</code>
+     */
     private GlobalBibtexKeyPattern globalBibtexKeyPattern;
-    // Object containing info about customized entry editor tabs.
-    private Map<String, Set<Field>> tabList;
+
+    /**
+     * Cache variable for getEntryEditorTabList
+     */
+    private Map<String, Set<Field>> entryEditorTabList;
+
+    /**
+     * Cache variable for getMainTableColumns
+     */
+    private List<MainTableColumnModel> mainTableColumns;
+
+    /**
+     * Cache variable for getColumnSortOrder
+     */
+    private List<MainTableColumnModel> mainTableColumnSortOrder;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -1426,7 +1443,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private SaveOrderConfig loadTableSaveOrder() {
         SaveOrderConfig config = new SaveOrderConfig();
-        List<MainTableColumnModel> sortOrder = createColumnSortOrder(createMainTableColumns());
+        List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
 
         sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
                 FieldFactory.parseField(column.getQualifier()),
@@ -1782,20 +1799,20 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Cache a list of defined tabs in the entry editor
+     * Creates a list of defined tabs in the entry editor from cache
      *
      * @return a list of defined tabs
      */
     @Override
     public Map<String, Set<Field>> getEntryEditorTabList() {
-        if (tabList == null) {
+        if (entryEditorTabList == null) {
             updateEntryEditorTabList();
         }
-        return tabList;
+        return entryEditorTabList;
     }
 
     /**
-     * Create a list of currently defined tabs in the entry editor
+     * Reloads the list of the currently defined tabs  in the entry editor from scratch to cache
      */
     @Override
     public void updateEntryEditorTabList() {
@@ -1819,7 +1836,7 @@ public class JabRefPreferences implements PreferencesService {
                 i++;
             }
         }
-        tabList = tabs;
+        entryEditorTabList = tabs;
     }
 
     /**
@@ -1955,7 +1972,7 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Creates the GlobalBibtexKeyPattern
+     * Creates the GlobalBibtexKeyPattern from cache
      *
      * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
      */
@@ -1967,6 +1984,9 @@ public class JabRefPreferences implements PreferencesService {
         return this.globalBibtexKeyPattern;
     }
 
+    /**
+     * Reloads the GlobalBibtexKeyPattern from scratch to cache
+     */
     @Override
     public void updateGlobalBibtexKeyPattern() {
         this.globalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
@@ -1986,7 +2006,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Adds the given key pattern to the preferences
+     * Stores the given key pattern in the preferences
      *
      * @param pattern the pattern to store
      */
@@ -2080,7 +2100,23 @@ public class JabRefPreferences implements PreferencesService {
     // MainTablePreferences
     //*************************************************************************************************************
 
+    /**
+     * Creates the GlobalBibtexKeyPattern from cache
+     *
+     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
+     */
     private List<MainTableColumnModel> createMainTableColumns() {
+        if (this.mainTableColumns == null) {
+            updateMainTableColumns();
+        }
+        return this.mainTableColumns;
+    }
+
+    /**
+     * Reloads the GlobalBibtexKeyPattern from scratch
+     */
+
+    private void updateMainTableColumns() {
         List<String> columnNames = getStringList(COLUMN_NAMES);
 
         List<Double> columnWidths = getStringList(COLUMN_WIDTHS)
@@ -2115,29 +2151,47 @@ public class JabRefPreferences implements PreferencesService {
             columns.add(columnModel);
         }
 
-        return columns;
+        mainTableColumns = columns;
     }
 
-    private List<MainTableColumnModel> createColumnSortOrder(List<MainTableColumnModel> columns) {
+    /**
+     * Creates the ColumnSortOrder from cache
+     *
+     * @return List containing only the the columns in its proper sort order
+     */
+    private List<MainTableColumnModel> createMainTableColumnSortOrder() {
+        if (this.mainTableColumnSortOrder == null) {
+            updateColumnSortOrder();
+        }
+        return this.mainTableColumnSortOrder;
+    }
+
+    /**
+     * Reloads the MainTableColumnSortOrder from scratch to cache
+     */
+    private void updateColumnSortOrder() {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
         getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
-                columns.stream().filter(column ->
+                this.mainTableColumnSortOrder.stream().filter(column ->
                         column.getName().equals(columnName))
-                       .findFirst()
-                       .ifPresent(columnsOrdered::add));
+                                             .findFirst()
+                                             .ifPresent(columnsOrdered::add));
 
-        return columnsOrdered;
+        mainTableColumnSortOrder = columnsOrdered;
     }
 
     @Override
     public ColumnPreferences getColumnPreferences() {
-        List<MainTableColumnModel> mainTableColumns = createMainTableColumns();
-
         return new ColumnPreferences(
-                mainTableColumns,
-                createColumnSortOrder(mainTableColumns));
+                createMainTableColumns(),
+                createMainTableColumnSortOrder());
     }
 
+    /**
+     * Stores the ColumnPreferences in the preferences
+     *
+     * @param columnPreferences the preferences to store
+     */
     @Override
     public void storeColumnPreferences(ColumnPreferences columnPreferences) {
         putStringList(COLUMN_NAMES, columnPreferences.getColumns().stream()
@@ -2156,6 +2210,9 @@ public class JabRefPreferences implements PreferencesService {
                 .getColumnSortOrder().stream()
                 .map(MainTableColumnModel::getName)
                 .collect(Collectors.toList()));
+
+        // Update cache
+        mainTableColumns = columnPreferences.getColumns();
     }
 
     @Override
