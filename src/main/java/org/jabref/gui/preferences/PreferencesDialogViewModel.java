@@ -45,7 +45,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTabView(preferences),
                 new FileTabView(preferences),
                 new TableTabView(preferences),
-                new TableColumnsTabView(preferences),
                 new PreviewTabView(preferences),
                 new ExternalTabView(preferences, frame),
                 new GroupsTabView(preferences),
