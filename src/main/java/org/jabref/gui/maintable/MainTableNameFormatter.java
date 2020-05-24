@@ -1,22 +1,14 @@
 package org.jabref.gui.maintable;
 
 import org.jabref.model.entry.AuthorList;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class MainTableNameFormatter {
 
-    private final boolean namesNatbib;
-    private final boolean namesLastOnly;
-    private final boolean namesAsIs;
-    private final boolean namesFf;
-    private final boolean abbrAuthorNames;
+    private final PreferencesService preferencesService;
 
-    MainTableNameFormatter(JabRefPreferences preferences) {
-        namesNatbib = preferences.getBoolean(JabRefPreferences.NAMES_NATBIB);
-        namesLastOnly = preferences.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
-        namesAsIs = preferences.getBoolean(JabRefPreferences.NAMES_AS_IS);
-        namesFf = preferences.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
-        abbrAuthorNames = preferences.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES);
+    MainTableNameFormatter(PreferencesService preferences) {
+        this.preferencesService = preferences;
     }
 
     /**
@@ -30,16 +22,27 @@ public class MainTableNameFormatter {
             return null;
         }
 
-        if (namesAsIs) {
-            return nameToFormat;
-        } else if (namesNatbib) {
-            return AuthorList.fixAuthorNatbib(nameToFormat);
-        } else if (namesLastOnly) {
+        MainTableNameFormatPreferences nameFormatPreferences = preferencesService.getMainTableNameFormatPreferences();
+        MainTableNameFormatPreferences.DisplayStyle displayStyle = nameFormatPreferences.getDisplayStyle();
+        MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
+
+        if (((displayStyle == MainTableNameFormatPreferences.DisplayStyle.FIRSTNAME_LASTNAME)
+                || (displayStyle == MainTableNameFormatPreferences.DisplayStyle.LASTNAME_FIRSTNAME))
+                && abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.LASTNAME_ONLY) {
             return AuthorList.fixAuthorLastNameOnlyCommas(nameToFormat, false);
-        } else if (namesFf) {
-            return AuthorList.fixAuthorFirstNameFirstCommas(nameToFormat, abbrAuthorNames, false);
-        } else {
-            return AuthorList.fixAuthorLastNameFirstCommas(nameToFormat, abbrAuthorNames, false);
         }
+
+        return switch (nameFormatPreferences.getDisplayStyle()) {
+            case AS_IS -> nameToFormat;
+            case NATBIB -> AuthorList.fixAuthorNatbib(nameToFormat);
+            case FIRSTNAME_LASTNAME -> AuthorList.fixAuthorFirstNameFirstCommas(
+                    nameToFormat,
+                    abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                    false);
+            case LASTNAME_FIRSTNAME -> AuthorList.fixAuthorLastNameFirstCommas(
+                    nameToFormat,
+                    abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                    false);
+        };
     }
 }
