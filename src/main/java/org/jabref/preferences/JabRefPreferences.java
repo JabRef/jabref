@@ -50,8 +50,6 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
-import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -1645,17 +1643,6 @@ public class JabRefPreferences implements PreferencesService {
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
 
-    public PushToApplication getActivePushToApplication(PushToApplicationsManager manager) {
-        return manager.getApplicationByName(get(JabRefPreferences.PUSH_TO_APPLICATION));
-    }
-
-    public void setActivePushToApplication(PushToApplication application, PushToApplicationsManager manager) {
-        if (!application.getApplicationName().equals(get(PUSH_TO_APPLICATION))) {
-            put(PUSH_TO_APPLICATION, application.getApplicationName());
-            manager.updateApplicationAction();
-        }
-    }
-
     public NewLineSeparator getNewLineSeparator() {
         return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
     }
@@ -2094,6 +2081,33 @@ public class JabRefPreferences implements PreferencesService {
         put(UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
 
         storeGlobalBibtexKeyPattern(preferences.getKeyPattern());
+    }
+
+    //*************************************************************************************************************
+    // ExternalApplicationsPreferences
+    //*************************************************************************************************************
+
+    public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
+        return new ExternalApplicationsPreferences(
+                get(EMAIL_SUBJECT),
+                getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
+                get(PUSH_TO_APPLICATION),
+                get(CITE_COMMAND),
+                !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
+                get(CONSOLE_COMMAND),
+                !getBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION), // mind the !
+                get(FILE_BROWSER_COMMAND));
+    }
+
+    public void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences) {
+        put(EMAIL_SUBJECT, preferences.getEmailSubject());
+        putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, preferences.shouldAutoOpenEmailAttachmentsFolder());
+        put(PUSH_TO_APPLICATION, preferences.getPushToApplicationName());
+        put(CITE_COMMAND, preferences.getCiteCommand());
+        putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !preferences.useCustomTerminal()); // mind the !
+        put(CONSOLE_COMMAND, preferences.getCustomTerminalCommand());
+        putBoolean(USE_DEFAULT_FILE_BROWSER_APPLICATION, !preferences.useCustomFileBrowser()); // mind the !
+        put(FILE_BROWSER_COMMAND, preferences.getCustomFileBrowserCommand());
     }
 
     //*************************************************************************************************************

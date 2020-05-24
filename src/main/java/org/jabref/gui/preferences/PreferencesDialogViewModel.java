@@ -13,6 +13,7 @@ import org.jabref.JabRefException;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
@@ -21,6 +22,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
@@ -46,7 +48,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new FileTabView(preferences),
                 new TableTabView(preferences),
                 new PreviewTabView(preferences),
-                new ExternalTabView(preferences, frame),
+                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
                 new BibtexKeyPatternTabView(preferences),
@@ -139,6 +141,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
+
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
+        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
+
         preferences.updateEntryEditorTabList();
         preferences.updateGlobalBibtexKeyPattern();
     }
