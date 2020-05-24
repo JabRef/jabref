@@ -34,11 +34,11 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.preferences.PreferencesService;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
@@ -120,7 +120,7 @@ public class CustomEntryTypeDialogViewModel {
         REQUIRED(Localization.lang("Required")),
         OPTIONAL(Localization.lang("Optional"));
 
-        private String name;
+        private final String name;
 
         FieldType(String name) {
             this.name = name;

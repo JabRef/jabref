@@ -118,7 +118,7 @@ public class BibtexKeyPatternPanel extends Pane {
     }
 
     public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
-        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
+        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getGlobalBibtexKeyPattern());
         fillPatternUsingPanelData(res);
         return res;
     }

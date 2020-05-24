@@ -53,6 +53,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 List<IntegrityMessage> result = new ArrayList<>();
 
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
+                result.addAll(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
