@@ -72,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where brackets in regular expressions were not working. [6469](https://github.com/JabRef/jabref/pull/6469)
 - We fixed an issue where LaTeX citations for specific commands (\autocites) of biblatex-mla were not recognized. [#6476](https://github.com/JabRef/jabref/issues/6476)
 - We fixed an issue where drag and drop was not working on empty database. [#6487](https://github.com/JabRef/jabref/issues/6487)
+- We fixed an issue where the name fields were not updated after the preferences changed. [#6515](https://github.com/JabRef/jabref/issues/6515)
 
 ### Removed
 
