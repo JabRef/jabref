@@ -134,6 +134,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Reloads the JabRefPreferences into the UI
      */
     private void updateAfterPreferenceChanges() {
+        // Reload internal preferences cache
+        preferences.updateEntryEditorTabList();
+        preferences.updateGlobalBibtexKeyPattern();
+        preferences.updateMainTableColumns();
+
         setValues();
 
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
@@ -146,8 +151,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
         manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
 
-        preferences.updateEntryEditorTabList();
-        preferences.updateGlobalBibtexKeyPattern();
+        frame.getBasePanelList().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**
@@ -190,6 +194,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));
+
+        updateAfterPreferenceChanges();
     }
 
     /**

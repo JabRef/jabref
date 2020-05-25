@@ -1523,14 +1523,6 @@ public class JabRefPreferences implements PreferencesService {
         put(WORKING_DIRECTORY, dir.toString());
     }
 
-    public GroupViewMode getGroupViewMode() {
-        return GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE));
-    }
-
-    public void setGroupViewMode(GroupViewMode mode) {
-        put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
-    }
-
     public void setPreviewStyle(String previewStyle) {
         put(PREVIEW_STYLE, previewStyle);
     }
@@ -1775,6 +1767,16 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ToDo: GroupPreferences
     //*************************************************************************************************************
+
+    @Override
+    public GroupViewMode getGroupViewMode() {
+        return GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE));
+    }
+
+    @Override
+    public void setGroupViewMode(GroupViewMode mode) {
+        put(GROUP_INTERSECT_UNION_VIEW_MODE, mode.name());
+    }
 
     @Override
     public boolean getDisplayGroupCount() {
@@ -2129,8 +2131,8 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Reloads the GlobalBibtexKeyPattern from scratch
      */
-
-    private void updateMainTableColumns() {
+    @Override
+    public void updateMainTableColumns() {
         List<String> columnNames = getStringList(COLUMN_NAMES);
 
         List<Double> columnWidths = getStringList(COLUMN_WIDTHS)

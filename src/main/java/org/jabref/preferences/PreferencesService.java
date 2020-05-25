@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
@@ -150,6 +151,10 @@ public interface PreferencesService {
     // ToDo: GroupPreferences
     //*************************************************************************************************************
 
+    GroupViewMode getGroupViewMode();
+
+    void setGroupViewMode(GroupViewMode mode);
+
     boolean getDisplayGroupCount();
 
     //*************************************************************************************************************
@@ -205,6 +210,8 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // MainTablePreferences
     //*************************************************************************************************************
+
+    void updateMainTableColumns();
 
     ColumnPreferences getColumnPreferences();
 
