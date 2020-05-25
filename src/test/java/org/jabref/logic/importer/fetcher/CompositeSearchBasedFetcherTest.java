@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,50 +31,55 @@ public class CompositeSearchBasedFetcherTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
 
     @Test
+    public void createCompositeFetcherWithNullSet() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new CompositeSearchBasedFetcher(null, 0));
+    }
+
+    @Test
     public void performSearchWithoutFetchers() {
         Set<SearchBasedFetcher> empty = new HashSet<>();
-        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty);
+        CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
-        Assertions.assertTrue(result.isEmpty());
+        Assertions.assertEquals(result, Collections.EMPTY_LIST);
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers);
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
-        Assertions.assertTrue(queryResult.isEmpty());
+        Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
     }
 
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
-        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers);
+        CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
-
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum")));
+                    Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum")));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
-                 * and just leads to no additional results in the returned list. Therefor the test should not fail
+                 * and just leads to no additional results in the returned list. Therefore the test should not fail
                  * due to the fetcher exception
                  */
-                LOGGER.warn(String.format("Fetcher %s failed ", fetcher.getName()), e);
+                LOGGER.debug(String.format("Fetcher %s failed ", fetcher.getName()), e);
             }
         }
     }
 
     /**
-     * This method provides other methods with different sized sets of Searchbased fetchers wrapped in Arguments.
+     * This method provides other methods with different sized sets of search-based fetchers wrapped in arguments.
      *
-     * @return A stream of Arguments wrapping the sets.
+     * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
@@ -95,7 +101,7 @@ public class CompositeSearchBasedFetcherTest {
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
         list.add(new IEEE(importFormatPreferences));
-        /* Disabled due to issue regarding Comparison: Title fields of the entries that otherwise are equivalent differ
+        /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */
         // list.add(new MedlineFetcher());

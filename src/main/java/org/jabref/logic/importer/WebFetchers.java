@@ -100,7 +100,7 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
-        set.add(new CompositeSearchBasedFetcher(set));
+        set.add(new CompositeSearchBasedFetcher(set, 30));
         return set;
     }
 

@@ -19,12 +19,18 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
     private final Set<SearchBasedFetcher> fetchers;
+    private final int maximumNumberOfReturnedResults;
 
-    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers) {
+    public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, int maximumNumberOfReturnedResults)
+            throws IllegalArgumentException {
+        if (searchBasedFetchers == null) {
+            throw new IllegalArgumentException("The set of searchBasedFetchers must not be null!");
+        }
         // Remove the Composite Fetcher instance from its own fetcher set to prevent a StackOverflow
         this.fetchers = searchBasedFetchers.stream()
-                .filter(searchBasedFetcher -> searchBasedFetcher != this)
-                .collect(Collectors.toSet());
+                                           .filter(searchBasedFetcher -> searchBasedFetcher != this)
+                                           .collect(Collectors.toSet());
+        this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                 LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                 return Stream.empty();
             }
-        }).parallel().collect(Collectors.toList());
+        }).parallel().limit(maximumNumberOfReturnedResults).collect(Collectors.toList());
     }
 
     @Override
