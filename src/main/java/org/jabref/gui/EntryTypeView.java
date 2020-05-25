@@ -7,6 +7,7 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javax.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -55,6 +56,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TitledPane bibTexTitlePane;
     @FXML private TitledPane ieeeTranTitlePane;
     @FXML private TitledPane customTitlePane;
+
+    @Inject StateManager stateManager;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
@@ -187,6 +190,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
         type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
+        this.stateManager.clearSearchQuery();
         this.close();
     }
 
