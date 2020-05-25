@@ -34,7 +34,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -197,14 +197,15 @@ class IntegrityCheckTest {
     private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
         final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         return new BibtexKeyPatternPreferences(
-                "",
-                "",
                 false,
                 false,
+                false,
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                "",
+                "",
+                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                ',',
-                false,
-                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+                ',');
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

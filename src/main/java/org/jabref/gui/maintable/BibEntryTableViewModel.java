@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
@@ -28,15 +27,16 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
     private final BibDatabase database;
     private final MainTableNameFormatter nameFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
-    private final Map<SpecialField, ObservableValue<Optional<SpecialFieldValueViewModel>>> specialFieldValues = new HashMap<>();
+    private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
     private final EasyBinding<List<LinkedFile>> linkedFiles;
-    private final ObjectBinding<Map<Field, String>> linkedIdentifiers;
+    private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, MainTableNameFormatter nameFormatter) {
@@ -44,43 +44,48 @@ public class BibEntryTableViewModel {
         this.database = database.getDatabase();
         this.nameFormatter = nameFormatter;
 
-        this.linkedFiles = EasyBind.map(getField(StandardField.FILE), FileFieldParser::parse);
+        this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
-        this.matchedGroups = createMatchedGroupsBinding(database);
+        this.matchedGroups = createMatchedGroupsBinding(database, entry);
     }
 
-    private ObjectBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
-        return Bindings.createObjectBinding(() -> {
+    private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
+        return EasyBind.combine(
+                entry.getFieldBinding(StandardField.URL),
+                entry.getFieldBinding(StandardField.DOI),
+                entry.getFieldBinding(StandardField.URI),
+                entry.getFieldBinding(StandardField.EPRINT),
+                (url, doi, uri, eprint) -> {
                     Map<Field, String> identifiers = new HashMap<>();
-                    entry.getField(StandardField.URL).ifPresent(value -> identifiers.put(StandardField.URL, value));
-                    entry.getField(StandardField.DOI).ifPresent(value -> identifiers.put(StandardField.DOI, value));
-                    entry.getField(StandardField.URI).ifPresent(value -> identifiers.put(StandardField.URI, value));
-                    entry.getField(StandardField.EPRINT).ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
+                    url.ifPresent(value -> identifiers.put(StandardField.URL, value));
+                    doi.ifPresent(value -> identifiers.put(StandardField.DOI, value));
+                    uri.ifPresent(value -> identifiers.put(StandardField.URI, value));
+                    eprint.ifPresent(value -> identifiers.put(StandardField.EPRINT, value));
                     return identifiers;
-                },
-                getEntry().getFieldBinding(StandardField.URL),
-                getEntry().getFieldBinding(StandardField.DOI),
-                getEntry().getFieldBinding(StandardField.URI),
-                getEntry().getFieldBinding(StandardField.EPRINT));
+                });
     }
 
     public BibEntry getEntry() {
         return entry;
     }
 
-    public ObjectBinding<String> getField(Field field) {
-        return entry.getFieldBinding(field);
+    private static ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
+        Optional<GroupTreeNode> root = database.getMetaData().getGroups();
+        if (root.isPresent()) {
+            return EasyBind.map(entry.getFieldBinding(StandardField.GROUPS), field -> {
+                List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
+                                                 .stream()
+                                                 .map(GroupTreeNode::getGroup)
+                                                 .collect(Collectors.toList());
+                groups.remove(root.get().getGroup());
+                return groups;
+            });
+        }
+        return new SimpleObjectProperty<>(Collections.emptyList());
     }
 
-    public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
-        ObservableValue<Optional<SpecialFieldValueViewModel>> value = specialFieldValues.get(field);
-        if (value != null) {
-            return value;
-        } else {
-            value = EasyBind.map(getField(field), fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
-            specialFieldValues.put(field, value);
-            return value;
-        }
+    public OptionalBinding<String> getField(Field field) {
+        return entry.getFieldBinding(field);
     }
 
     public ObservableValue<List<LinkedFile>> getLinkedFiles() {
@@ -95,19 +100,15 @@ public class BibEntryTableViewModel {
         return matchedGroups;
     }
 
-    private ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database) {
-        Optional<GroupTreeNode> root = database.getMetaData().getGroups();
-        if (root.isPresent()) {
-            return EasyBind.map(entry.getFieldBinding(StandardField.GROUPS), field -> {
-                List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
-                                                 .stream()
-                                                 .map(GroupTreeNode::getGroup)
-                                                 .collect(Collectors.toList());
-                groups.remove(root.get().getGroup());
-                return groups;
-            });
+    public ObservableValue<Optional<SpecialFieldValueViewModel>> getSpecialField(SpecialField field) {
+        OptionalBinding<SpecialFieldValueViewModel> value = specialFieldValues.get(field);
+        if (value != null) {
+            return value;
+        } else {
+            value = getField(field).flatMap(fieldValue -> field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));
+            specialFieldValues.put(field, value);
+            return value;
         }
-        return new SimpleObjectProperty<>(Collections.emptyList());
     }
 
     public ObservableValue<String> getFields(OrFields fields) {
