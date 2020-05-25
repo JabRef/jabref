@@ -32,17 +32,22 @@ public class MainTableNameFormatter {
             return AuthorList.fixAuthorLastNameOnlyCommas(nameToFormat, false);
         }
 
-        return switch (nameFormatPreferences.getDisplayStyle()) {
-            case AS_IS -> nameToFormat;
-            case NATBIB -> AuthorList.fixAuthorNatbib(nameToFormat);
-            case FIRSTNAME_LASTNAME -> AuthorList.fixAuthorFirstNameFirstCommas(
-                    nameToFormat,
-                    abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
-                    false);
-            case LASTNAME_FIRSTNAME -> AuthorList.fixAuthorLastNameFirstCommas(
-                    nameToFormat,
-                    abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
-                    false);
-        };
+        switch (nameFormatPreferences.getDisplayStyle()) {
+            case AS_IS:
+                return nameToFormat;
+            case NATBIB:
+                return AuthorList.fixAuthorNatbib(nameToFormat);
+            case FIRSTNAME_LASTNAME:
+                return AuthorList.fixAuthorFirstNameFirstCommas(
+                        nameToFormat,
+                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        false);
+            default:
+            case LASTNAME_FIRSTNAME:
+                return AuthorList.fixAuthorLastNameFirstCommas(
+                        nameToFormat,
+                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        false);
+        }
     }
 }
