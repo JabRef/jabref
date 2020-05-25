@@ -30,6 +30,7 @@ Principles:
             Localization.lang("Something went wrong...", ioe);
     }
     ```
+
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -45,7 +46,7 @@ To show error message two different ways are usually used in JabRef:
 * showing an error dialog
 * updating the status bar at the bottom of the main window
 
-_TODO: Usage of status bar and Swing Dialogs_
+_*TODO: Usage of status bar and Swing Dialogs*_
 
 ## Using the EventSystem
 

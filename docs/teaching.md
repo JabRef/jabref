@@ -69,7 +69,7 @@ Course: Open Source Software Development
 
 Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
 
-- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
+- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project.
 - Course offered in 2018
 
 ### German
@@ -122,12 +122,13 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 
 ## Interesting Read for Students and Advisors
 
-- [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) by [@ayaankazerouni](https://github.com/ayaankazerouni?tab=overview&from=2015-12-01&to=2015-12-31)  
+- [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) by [@ayaankazerouni](https://github.com/ayaankazerouni?tab=overview&from=2015-12-01&to=2015-12-31)
+
   > When students worked earlier and more often, they produced projects that:
   >
-  > - were more correct,
-  > - were completed earlier,
-  > - took no more or less time to complete
+  >   - were more correct,
+  >   - were completed earlier,
+  >   - took no more or less time to complete
 
 ## References
 

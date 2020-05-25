@@ -1,0 +1,10 @@
+{
+    "ignorePatterns": [
+        {
+            "pattern": "^https://dl\\.acm\\.org"
+        },
+        {
+            "pattern": "^http://purl\\.org/net/bibteXMP"
+        }
+    ]
+}

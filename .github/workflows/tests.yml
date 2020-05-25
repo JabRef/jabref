@@ -216,3 +216,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: 'mlc_config.json'
+          folder-path: 'docs/'
+  markdown-lint-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+      - name: Lint all files
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: 'docs/ CHANGELOG.md README.md'
+          config: '.markdownlint.yml'
