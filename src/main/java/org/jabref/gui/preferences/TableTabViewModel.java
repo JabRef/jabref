@@ -155,16 +155,30 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         }
 
         switch (initialNameFormatPreferences.getDisplayStyle()) {
-            case NATBIB -> namesNatbibProperty.setValue(true);
-            case AS_IS -> nameAsIsProperty.setValue(true);
-            case FIRSTNAME_LASTNAME -> nameFirstLastProperty.setValue(true);
-            case LASTNAME_FIRSTNAME -> nameLastFirstProperty.setValue(true);
+            case NATBIB:
+                namesNatbibProperty.setValue(true);
+                break;
+            case AS_IS:
+                nameAsIsProperty.setValue(true);
+                break;
+            case FIRSTNAME_LASTNAME:
+                nameFirstLastProperty.setValue(true);
+                break;
+            case LASTNAME_FIRSTNAME:
+                nameLastFirstProperty.setValue(true);
+                break;
         }
 
         switch (initialNameFormatPreferences.getAbbreviationStyle()) {
-            case FULL -> abbreviationEnabledProperty.setValue(true);
-            case LASTNAME_ONLY -> abbreviationLastNameOnlyProperty.setValue(true);
-            case NONE -> abbreviationDisabledProperty.setValue(true);
+            case FULL:
+                abbreviationEnabledProperty.setValue(true);
+                break;
+            case LASTNAME_ONLY:
+                abbreviationLastNameOnlyProperty.setValue(true);
+                break;
+            case NONE:
+                abbreviationDisabledProperty.setValue(true);
+                break;
         }
     }
 
