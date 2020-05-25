@@ -41,6 +41,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.comparator.NumericFieldComparator;
@@ -265,7 +266,9 @@ class MainTableColumnFactory {
         ContextMenu contextMenu = new ContextMenu();
 
         values.keySet().forEach(field -> {
-            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " + values.get(field), cellFactory.getTableIcon(field));
+            MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " +
+                    ControlHelper.truncateString(values.get(field), -1, "...", ControlHelper.EllipsisPosition.CENTER),
+                    cellFactory.getTableIcon(field));
             menuItem.setOnAction(event -> {
                 try {
                     JabRefDesktop.openExternalViewer(database, values.get(field), field);
