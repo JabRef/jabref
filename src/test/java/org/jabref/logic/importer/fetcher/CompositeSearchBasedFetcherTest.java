@@ -95,7 +95,6 @@ public class CompositeSearchBasedFetcherTest {
         list.add(new CiteSeer());
         list.add(new DOAJFetcher(importFormatPreferences));
         list.add(new IEEE(importFormatPreferences));
-        list.add(new GrobidCitationFetcher(importFormatPreferences));
         /* Disabled due to issue regarding Comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */
