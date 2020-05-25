@@ -37,6 +37,18 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Run markdown-link-check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: 'mlc_config.json'
+          folder-path: 'docs/'
+      - name: Run markdown-lint
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: 'docs/ CHANGELOG.md README.md'
+          config: '.markdownlint.yml'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -216,24 +228,3 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-  markdown-link-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v2
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-          config-file: 'mlc_config.json'
-          folder-path: 'docs/'
-  markdown-lint-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Git repository
-        uses: actions/checkout@v2
-      - name: Lint all files
-        uses: avto-dev/markdown-lint@v1
-        with:
-          args: 'docs/ CHANGELOG.md README.md'
-          config: '.markdownlint.yml'
