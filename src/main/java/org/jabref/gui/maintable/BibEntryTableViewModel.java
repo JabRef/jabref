@@ -118,22 +118,22 @@ public class BibEntryTableViewModel {
         }
 
         value = Bindings.createStringBinding(() -> {
-            boolean isName = false;
-
-            Optional<String> content = Optional.empty();
             for (Field field : fields) {
-                content = entry.getResolvedFieldOrAlias(field, database);
-                if (content.isPresent()) {
-                    isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                    break;
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
+
+                    if (name.isPresent()) {
+                        return nameFormatter.formatNameLatexFree(name.get());
+                    }
+                } else {
+                    Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+
+                    if (content.isPresent()) {
+                        return content.get();
+                    }
                 }
             }
-
-            String result = content.orElse("");
-            if (isName) {
-                result = nameFormatter.formatNameLatexFree(result);
-            }
-            return result;
+            return "";
         }, entry.getObservables());
         fieldValues.put(fields, value);
         return value;
