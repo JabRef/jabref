@@ -229,8 +229,8 @@ public class AuthorList {
      *
      * @see AuthorList#getAsFirstLastNames
      */
-    public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsFirstLastNames(abbr, oxfordComma);
+    public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsFirstLastNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -247,8 +247,8 @@ public class AuthorList {
      *
      * @see AuthorList#getAsLastFirstNames
      */
-    public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
+    public static String fixAuthorLastNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsLastFirstNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -424,11 +424,11 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
-        int abbrInt = oxfordComma ? 0 : 1;
+        int abbreviationIndex = oxfordComma ? 0 : 1;
 
         // Check if we've computed this before:
-        if (authorsLastOnly[abbrInt] != null) {
-            return authorsLastOnly[abbrInt];
+        if (authorsLastOnly[abbreviationIndex] != null) {
+            return authorsLastOnly[abbreviationIndex];
         }
 
         StringBuilder result = new StringBuilder();
@@ -448,19 +448,19 @@ public class AuthorList {
                 result.append(getAuthor(i).getLastOnly());
             }
         }
-        authorsLastOnly[abbrInt] = result.toString();
-        return authorsLastOnly[abbrInt];
+        authorsLastOnly[abbreviationIndex] = result.toString();
+        return authorsLastOnly[abbreviationIndex];
     }
 
     public String getAsLastNamesLatexFree(boolean oxfordComma) {
-        int abbrInt = oxfordComma ? 0 : 1;
+        int abbreviationIndex = oxfordComma ? 0 : 1;
 
         // Check if we've computed this before:
-        if (authorsLastOnlyLatexFree[abbrInt] != null) {
-            return authorsLastOnlyLatexFree[abbrInt];
+        if (authorsLastOnlyLatexFree[abbreviationIndex] != null) {
+            return authorsLastOnlyLatexFree[abbreviationIndex];
         }
-        authorsLastOnlyLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsLastNames(oxfordComma));
-        return authorsLastOnlyLatexFree[abbrInt];
+        authorsLastOnlyLatexFree[abbreviationIndex] = LatexToUnicodeAdapter.format(getAsLastNames(oxfordComma));
+        return authorsLastOnlyLatexFree[abbreviationIndex];
     }
 
     /**
@@ -486,12 +486,12 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
-        int abbrInt = abbreviate ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
+        int abbreviationIndex = abbreviate ? 0 : 1;
+        abbreviationIndex += oxfordComma ? 0 : 2;
 
         // Check if we've computed this before:
-        if (authorsLastFirst[abbrInt] != null) {
-            return authorsLastFirst[abbrInt];
+        if (authorsLastFirst[abbreviationIndex] != null) {
+            return authorsLastFirst[abbreviationIndex];
         }
 
         StringBuilder result = new StringBuilder();
@@ -511,21 +511,21 @@ public class AuthorList {
                 result.append(getAuthor(i).getLastFirst(abbreviate));
             }
         }
-        authorsLastFirst[abbrInt] = result.toString();
-        return authorsLastFirst[abbrInt];
+        authorsLastFirst[abbreviationIndex] = result.toString();
+        return authorsLastFirst[abbreviationIndex];
     }
 
     public String getAsLastFirstNamesLatexFree(boolean abbreviate, boolean oxfordComma) {
-        int abbrInt = abbreviate ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
+        int abbreviationIndex = abbreviate ? 0 : 1;
+        abbreviationIndex += oxfordComma ? 0 : 2;
 
         // Check if we've computed this before:
-        if (authorsLastFirstLatexFree[abbrInt] != null) {
-            return authorsLastFirstLatexFree[abbrInt];
+        if (authorsLastFirstLatexFree[abbreviationIndex] != null) {
+            return authorsLastFirstLatexFree[abbreviationIndex];
         }
 
-        authorsLastFirstLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsLastFirstNames(abbreviate, oxfordComma));
-        return authorsLastFirstLatexFree[abbrInt];
+        authorsLastFirstLatexFree[abbreviationIndex] = LatexToUnicodeAdapter.format(getAsLastFirstNames(abbreviate, oxfordComma));
+        return authorsLastFirstLatexFree[abbreviationIndex];
     }
 
     @Override
@@ -548,22 +548,22 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
-        int abbrInt = abbreviate ? 0 : 1;
+        int abbreviationIndex = abbreviate ? 0 : 1;
         // Check if we've computed this before:
-        if (authorLastFirstAnds[abbrInt] != null) {
-            return authorLastFirstAnds[abbrInt];
+        if (authorLastFirstAnds[abbreviationIndex] != null) {
+            return authorLastFirstAnds[abbreviationIndex];
         }
 
-        authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
+        authorLastFirstAnds[abbreviationIndex] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
                                                    .collect(Collectors.joining(" and "));
-        return authorLastFirstAnds[abbrInt];
+        return authorLastFirstAnds[abbreviationIndex];
     }
 
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
-        int abbrInt = abbreviate ? 0 : 1;
+        int abbreviationIndex = abbreviate ? 0 : 1;
         // Check if we've computed this before:
-        if (authorsLastFirstFirstLast[abbrInt] != null) {
-            return authorsLastFirstFirstLast[abbrInt];
+        if (authorsLastFirstFirstLast[abbreviationIndex] != null) {
+            return authorsLastFirstFirstLast[abbreviationIndex];
         }
 
         StringBuilder result = new StringBuilder();
@@ -575,8 +575,8 @@ public class AuthorList {
             }
         }
 
-        authorsLastFirstFirstLast[abbrInt] = result.toString();
-        return authorsLastFirstFirstLast[abbrInt];
+        authorsLastFirstFirstLast[abbreviationIndex] = result.toString();
+        return authorsLastFirstFirstLast[abbreviationIndex];
     }
 
     /**
@@ -594,29 +594,29 @@ public class AuthorList {
      * Smith and P. Black Brown" </li>
      * </ul>
      *
-     * @param abbr        whether to abbreivate first names.
+     * @param abbreviate        whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
      * Oxford comma.</a>
      */
-    public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
+    public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
 
-        int abbrInt = abbr ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
+        int abbreviationIndex = abbreviate ? 0 : 1;
+        abbreviationIndex += oxfordComma ? 0 : 2;
 
         // Check if we've computed this before:
-        if (authorsFirstFirst[abbrInt] != null) {
-            return authorsFirstFirst[abbrInt];
+        if (authorsFirstFirst[abbreviationIndex] != null) {
+            return authorsFirstFirst[abbreviationIndex];
         }
 
         StringBuilder result = new StringBuilder();
         if (!isEmpty()) {
-            result.append(getAuthor(0).getFirstLast(abbr));
+            result.append(getAuthor(0).getFirstLast(abbreviate));
             int i = 1;
             while (i < (getNumberOfAuthors() - 1)) {
                 result.append(", ");
-                result.append(getAuthor(i).getFirstLast(abbr));
+                result.append(getAuthor(i).getFirstLast(abbreviate));
                 i++;
             }
             if ((getNumberOfAuthors() > 2) && oxfordComma) {
@@ -624,24 +624,24 @@ public class AuthorList {
             }
             if (getNumberOfAuthors() > 1) {
                 result.append(" and ");
-                result.append(getAuthor(i).getFirstLast(abbr));
+                result.append(getAuthor(i).getFirstLast(abbreviate));
             }
         }
-        authorsFirstFirst[abbrInt] = result.toString();
-        return authorsFirstFirst[abbrInt];
+        authorsFirstFirst[abbreviationIndex] = result.toString();
+        return authorsFirstFirst[abbreviationIndex];
     }
 
-    public String getAsFirstLastNamesLatexFree(boolean abbr, boolean oxfordComma) {
-        int abbrInt = abbr ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
+    public String getAsFirstLastNamesLatexFree(boolean abbreviate, boolean oxfordComma) {
+        int abbreviationIndex = abbreviate ? 0 : 1;
+        abbreviationIndex += oxfordComma ? 0 : 2;
 
         // Check if we've computed this before:
-        if (authorsFirstFirstLatexFree[abbrInt] != null) {
-            return authorsFirstFirstLatexFree[abbrInt];
+        if (authorsFirstFirstLatexFree[abbreviationIndex] != null) {
+            return authorsFirstFirstLatexFree[abbreviationIndex];
         }
 
-        authorsFirstFirstLatexFree[abbrInt] = LatexToUnicodeAdapter.format(getAsFirstLastNames(abbr, oxfordComma));
-        return authorsFirstFirstLatexFree[abbrInt];
+        authorsFirstFirstLatexFree[abbreviationIndex] = LatexToUnicodeAdapter.format(getAsFirstLastNames(abbreviate, oxfordComma));
+        return authorsFirstFirstLatexFree[abbreviationIndex];
     }
 
     /**
