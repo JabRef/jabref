@@ -22,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -97,6 +98,7 @@ import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.CustomizeKeyBindingAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
@@ -176,7 +178,7 @@ public class JabRefFrame extends BorderPane {
         this.mainStage = mainStage;
         this.dialogService = new JabRefDialogService(mainStage, this, prefs, themeLoader);
         this.stateManager = Globals.stateManager;
-        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager);
+        this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.executorService = JabRefExecutorService.INSTANCE;
@@ -513,7 +515,7 @@ public class JabRefFrame extends BorderPane {
 
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.setToolBarButton(pushToApplicationButton);
+        pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
         HBox rightSide = new HBox(
                 factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
@@ -835,7 +837,7 @@ public class JabRefFrame extends BorderPane {
         // PushToApplication
         final PushToApplicationAction pushToApplicationAction = pushToApplicationsManager.getPushToApplicationAction();
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
-        pushToApplicationsManager.setMenuItem(pushToApplicationMenuItem);
+        pushToApplicationsManager.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
@@ -1077,6 +1079,15 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
+    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
+        ContextMenu contextMenu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
+
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(panel.frame(), stateManager)));
+
+        return contextMenu;
+    }
+
     public void addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
         Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
@@ -1085,6 +1096,9 @@ public class JabRefFrame extends BorderPane {
             closeTab((BasePanel) newTab.getContent());
             event.consume();
         });
+
+        // add tab context menu
+        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs(), basePanel, stateManager));
 
         // update all tab titles
         updateAllTabTitles();

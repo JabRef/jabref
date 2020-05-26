@@ -10,7 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ## [Unreleased]
 
 ### Added
-
+- We added the Library properties to a context menu on the library tabs [#6485](https://github.com/JabRef/jabref/issues/6485)
 - We added a new field in the preferences in 'BibTeX key generator' for unwanted characters that can be user-specified. [#6295](https://github.com/JabRef/jabref/issues/6295)
 - We added support for searching ShortScience for an entry through the user's browser. [#6018](https://github.com/JabRef/jabref/pull/6018)
 - We updated EditionChecker to permit edition to start with a number. [#6144](https://github.com/JabRef/jabref/issues/6144)
@@ -63,6 +63,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where JabRef switched to discrete graphics under macOS [#5935](https://github.com/JabRef/jabref/issues/5935)
 - We fixed an issue where the Preferences entry preview will be unexpected modified leads to Value too long exception [#6198](https://github.com/JabRef/jabref/issues/6198)
 - We fixed an issue where custom jstyles for Open/LibreOffice would only be valid if a layout line for the entry type `default` was at the end of the layout section [#6303](https://github.com/JabRef/jabref/issues/6303)
+- We fixed an issue where a new entry is not shown in the library if a search is active [#6297](https://github.com/JabRef/jabref/issues/6297)
 - We fixed an issue where long directory names created from patterns could create an exception. [#3915](https://github.com/JabRef/jabref/issues/3915)
 - We fixed an issue where sort on numeric cases was broken. [#6349](https://github.com/JabRef/jabref/issues/6349)
 - We fixed an issue where year and month fields were not cleared when converting to biblatex [#6224](https://github.com/JabRef/jabref/issues/6224)

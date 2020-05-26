@@ -191,6 +191,14 @@ public interface PreferencesService {
     void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
+    // ExternalApplicationsPreferences
+    //*************************************************************************************************************
+
+    ExternalApplicationsPreferences getExternalApplicationsPreferences();
+
+    void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 
