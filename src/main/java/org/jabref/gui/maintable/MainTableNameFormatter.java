@@ -34,13 +34,13 @@ public class MainTableNameFormatter {
         if (namesAsIs) {
             return nameToFormat;
         } else if (namesNatbib) {
-            return AuthorList.fixAuthorNatbibLatexFree(nameToFormat);
+            return AuthorList.parse(nameToFormat).getAsNatbibLatexFree();
         } else if (namesLastOnly) {
-            return AuthorList.fixAuthorLastNameOnlyCommasLatexFree(nameToFormat, false);
+            return AuthorList.parse(nameToFormat).getAsLastNamesLatexFree(false);
         } else if (namesFf) {
-            return AuthorList.fixAuthorFirstNameFirstCommasLatexFree(nameToFormat, abbrAuthorNames, false);
+            return AuthorList.parse(nameToFormat).getAsFirstLastNamesLatexFree(abbrAuthorNames, false);
         } else {
-            return AuthorList.fixAuthorLastNameFirstCommasLatexFree(nameToFormat, abbrAuthorNames, false);
+            return AuthorList.parse(nameToFormat).getAsLastFirstNamesLatexFree(abbrAuthorNames, false);
         }
     }
 
