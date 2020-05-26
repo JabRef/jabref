@@ -234,15 +234,6 @@ public class AuthorList {
     }
 
     /**
-     * This is a convenience method for getAuthorsFirstFirstLatexFree()
-     *
-     * @see AuthorList#getAsFirstLastNames
-     */
-    public static String fixAuthorFirstNameFirstCommasLatexFree(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsFirstLastNamesLatexFree(abbr, oxfordComma);
-    }
-
-    /**
      * This is a convenience method for getAuthorsFirstFirstAnds()
      *
      * @see AuthorList#getAsFirstLastNamesWithAnd
@@ -258,15 +249,6 @@ public class AuthorList {
      */
     public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
         return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
-    }
-
-    /**
-     * This is a convenience method for getAuthorsLastFirstLatexFree()
-     *
-     * @see AuthorList#getAsLastFirstNames
-     */
-    public static String fixAuthorLastNameFirstCommasLatexFree(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsLastFirstNamesLatexFree(abbr, oxfordComma);
     }
 
     /**
@@ -297,15 +279,6 @@ public class AuthorList {
     }
 
     /**
-     * This is a convenience method for getAuthorsLastOnlyLatexFree()
-     *
-     * @see AuthorList#getAsLastNames
-     */
-    public static String fixAuthorLastNameOnlyCommasLatexFree(String authors, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsLastNamesLatexFree(oxfordComma);
-    }
-
-    /**
      * This is a convenience method for getAuthorsForAlphabetization()
      *
      * @see AuthorList#getForAlphabetization
@@ -321,15 +294,6 @@ public class AuthorList {
      */
     public static String fixAuthorNatbib(String authors) {
         return AuthorList.parse(authors).getAsNatbib();
-    }
-
-    /**
-     * This is a convenience method for getAuthorsNatbibLatexFree()
-     *
-     * @see AuthorList#getAsNatbib
-     */
-    public static String fixAuthorNatbibLatexFree(String authors) {
-        return AuthorList.parse(authors).getAsNatbibLatexFree();
     }
 
     /**
