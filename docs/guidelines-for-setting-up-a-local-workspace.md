@@ -170,9 +170,10 @@ Contributions to JabRef's source code need to have a code formatting that is con
    4. Check "Store relative to project location"
    5. Click "Next" and "Finish"
    6. Activate the CheckStyle configuration file by ticking it in the list
-   7. Ensure that CheckStyle version 8.31 (or higher) is selected
-   8. Save settings by clicking "OK"
-   9. Your configuration should now look like this:  
+   7. Ensure that the latest CheckStyle version is selected (8.32 or higher)
+   8. Set the "Scan Scope" to "Only Java sources (including tests)
+   9. Save settings by clicking "OK"
+   10. Your configuration should now look like this:  
       ![checkstyle settings](images/intellij-checkstyle-settings.png)
 
 #### Troubleshooting when using both IDEA and Eclipse

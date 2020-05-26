@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-public class BibtexKeyDuplicationChecker implements Checker {
+public class BibtexKeyDuplicationChecker implements EntryChecker {
 
     private final BibDatabase database;
 

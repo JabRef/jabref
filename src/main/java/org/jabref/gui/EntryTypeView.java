@@ -7,6 +7,7 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javax.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -34,12 +35,13 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- * Returns null if canceled.
+ *
+ * @return null if canceled
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
 
@@ -54,6 +56,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TitledPane bibTexTitlePane;
     @FXML private TitledPane ieeeTranTitlePane;
     @FXML private TitledPane customTitlePane;
+
+    @Inject StateManager stateManager;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
@@ -90,7 +94,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                 setEntryTypeForReturnAndClose(Optional.empty());
             }
         });
-
     }
 
     private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
@@ -150,7 +153,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             } else {
                 addEntriesToPane(customPane, customTypes);
             }
-
         } else {
             biblatexTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
@@ -188,6 +190,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private void setEntryTypeForReturnAndClose(Optional<BibEntryType> entryType) {
         type = entryType.map(BibEntryType::getType).orElse(null);
         viewModel.stopFetching();
+        this.stateManager.clearSearchQuery();
         this.close();
     }
 
@@ -304,5 +307,4 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         //CHECKSTYLE:ON
 
     }
-
 }

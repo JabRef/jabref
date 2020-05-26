@@ -7,8 +7,7 @@ import java.util.List;
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
- * A layout formatter that is the composite of the given Formatters executed in
- * order.
+ * A layout formatter that is the composite of the given Formatters executed in order.
  */
 public class CompositeFormat implements LayoutFormatter {
 
@@ -37,5 +36,4 @@ public class CompositeFormat implements LayoutFormatter {
         }
         return result;
     }
-
 }

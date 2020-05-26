@@ -42,5 +42,4 @@ public class RemotePreferences {
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
     }
-
 }

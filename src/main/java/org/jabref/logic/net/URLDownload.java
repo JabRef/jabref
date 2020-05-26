@@ -49,10 +49,12 @@ import org.slf4j.LoggerFactory;
  * URL download to a string.
  * <p>
  * Example:
+ * <code>
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.asString(ENCODING);
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
+ * </code>
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  */
@@ -86,10 +88,10 @@ public class URLDownload {
      * thrown: sun.security.validator.ValidatorException: PKIX path building failed:
      * sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested
      * target JM > 8u101 may trust the certificate by default according to http://stackoverflow.com/a/34111150/873661
-     *
+     * <p>
      * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
      * security-relevant information this is kind of OK (no, actually it is not...).
-     *
+     * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
      */
     public static void bypassSSLVerification() {
@@ -208,8 +210,7 @@ public class URLDownload {
     }
 
     /**
-     * Downloads the web resource to a String.
-     * Uses UTF-8 as encoding.
+     * Downloads the web resource to a String. Uses UTF-8 as encoding.
      *
      * @return the downloaded string
      */
@@ -253,8 +254,7 @@ public class URLDownload {
     public ProgressInputStream asInputStream() throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
 
-        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST))
-        {
+        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST)) {
             LOGGER.error("Response message {} returned for url {}", urlConnection.getResponseMessage(), urlConnection.getURL());
             return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
         }
@@ -311,7 +311,6 @@ public class URLDownload {
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(this.postData);
             }
-
         }
 
         if (connection instanceof HttpURLConnection) {
@@ -319,8 +318,8 @@ public class URLDownload {
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
                 if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("location");
                     // open the new connnection again
@@ -334,5 +333,4 @@ public class URLDownload {
 
         return connection;
     }
-
 }

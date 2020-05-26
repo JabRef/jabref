@@ -36,8 +36,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -61,7 +61,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     private long lastKeyPressTime;
     private String listSearchTerm;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     private class EditAction extends SimpleCommand {
 
@@ -102,7 +102,9 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Entry preview"); }
+    public String getTabName() {
+        return Localization.lang("Entry preview");
+    }
 
     public void initialize() {
         this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager);
@@ -182,9 +184,10 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView.
-     * The ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
-     * @param list The ListView currently focused
+     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+     *
+     * @param list       The ListView currently focused
      * @param keypressed The pressed character
      */
 
@@ -205,7 +208,9 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
             .findFirst().ifPresent(list::scrollTo);
     }
 
-    private void dragOver(DragEvent event) { viewModel.dragOver(event); }
+    private void dragOver(DragEvent event) {
+        viewModel.dragOver(event);
+    }
 
     private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
@@ -237,13 +242,23 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         event.consume();
     }
 
-    public void toRightButtonAction() { viewModel.addToChosen(); }
+    public void toRightButtonAction() {
+        viewModel.addToChosen();
+    }
 
-    public void toLeftButtonAction() { viewModel.removeFromChosen(); }
+    public void toLeftButtonAction() {
+        viewModel.removeFromChosen();
+    }
 
-    public void sortUpButtonAction() { viewModel.selectedInChosenUp(); }
+    public void sortUpButtonAction() {
+        viewModel.selectedInChosenUp();
+    }
 
-    public void sortDownButtonAction() { viewModel.selectedInChosenDown(); }
+    public void sortDownButtonAction() {
+        viewModel.selectedInChosenDown();
+    }
 
-    public void resetDefaultButtonAction() { viewModel.resetDefaultLayout(); }
+    public void resetDefaultButtonAction() {
+        viewModel.resetDefaultLayout();
+    }
 }

@@ -26,7 +26,7 @@ public class MetaDataSerializer {
      * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                                                             GlobalBibtexKeyPattern globalCiteKeyPattern) {
 
         // First write all meta data except groups
         Map<String, List<String>> stringyMetaData = new HashMap<>();
@@ -47,9 +47,8 @@ public class MetaDataSerializer {
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
 
-        for (ContentSelector selector: metaData.getContentSelectorList()) {
+        for (ContentSelector selector : metaData.getContentSelectorList()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
-
         }
 
         Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
@@ -64,7 +63,7 @@ public class MetaDataSerializer {
         for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
             StringBuilder value = new StringBuilder();
             value.append(OS.NEWLINE);
-            for (String line: entry.getValue()) {
+            for (String line : entry.getValue()) {
                 value.append(line.replaceAll(";", "\\\\;") + MetaData.SEPARATOR_STRING + OS.NEWLINE);
             }
             serializedMetaData.put(entry.getKey(), value.toString());
@@ -83,7 +82,7 @@ public class MetaDataSerializer {
                 // in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)
-                                || FieldFormatterCleanups.DISABLED.equals(dataItem))) {
+                        || FieldFormatterCleanups.DISABLED.equals(dataItem))) {
                     stringBuilder.append(OS.NEWLINE);
                 }
             }
@@ -127,5 +126,4 @@ public class MetaDataSerializer {
         }
         return stringBuilder.toString();
     }
-
 }

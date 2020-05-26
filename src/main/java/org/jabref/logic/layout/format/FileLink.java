@@ -62,9 +62,8 @@ public class FileLink implements ParamLayoutFormatter {
         }
 
         return link.findIn(dirs.stream().map(Path::of).collect(Collectors.toList()))
-                .map(path -> path.normalize().toString())
-                .orElse(link.getLink());
-
+                   .map(path -> path.normalize().toString())
+                   .orElse(link.getLink());
     }
 
     /**

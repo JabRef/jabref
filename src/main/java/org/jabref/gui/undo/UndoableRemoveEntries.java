@@ -80,5 +80,4 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
             LOGGER.warn("Problem to redo `remove entries`", ex);
         }
     }
-
 }

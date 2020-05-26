@@ -172,51 +172,93 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return restartWarning; }
+    public List<String> getRestartWarnings() {
+        return restartWarning;
+    }
 
     // General
 
-    public ListProperty<Language> languagesListProperty() { return this.languagesListProperty; }
+    public ListProperty<Language> languagesListProperty() {
+        return this.languagesListProperty;
+    }
 
-    public ObjectProperty<Language> selectedLanguageProperty() { return this.selectedLanguageProperty; }
+    public ObjectProperty<Language> selectedLanguageProperty() {
+        return this.selectedLanguageProperty;
+    }
 
-    public ListProperty<Charset> encodingsListProperty() { return this.encodingsListProperty; }
+    public ListProperty<Charset> encodingsListProperty() {
+        return this.encodingsListProperty;
+    }
 
-    public ObjectProperty<Charset> selectedEncodingProperty() { return this.selectedEncodingProperty; }
+    public ObjectProperty<Charset> selectedEncodingProperty() {
+        return this.selectedEncodingProperty;
+    }
 
-    public ListProperty<BibDatabaseMode> biblatexModeListProperty() { return this.bibliographyModeListProperty; }
+    public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
+        return this.bibliographyModeListProperty;
+    }
 
-    public ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty() { return this.selectedBiblatexModeProperty; }
+    public ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty() {
+        return this.selectedBiblatexModeProperty;
+    }
 
-    public BooleanProperty inspectionWarningDuplicateProperty() { return this.inspectionWarningDuplicateProperty; }
+    public BooleanProperty inspectionWarningDuplicateProperty() {
+        return this.inspectionWarningDuplicateProperty;
+    }
 
-    public BooleanProperty confirmDeleteProperty() { return this.confirmDeleteProperty; }
+    public BooleanProperty confirmDeleteProperty() {
+        return this.confirmDeleteProperty;
+    }
 
-    public BooleanProperty memoryStickModeProperty() { return this.memoryStickModeProperty; }
+    public BooleanProperty memoryStickModeProperty() {
+        return this.memoryStickModeProperty;
+    }
 
-    public BooleanProperty collectTelemetryProperty() { return this.collectTelemetryProperty; }
+    public BooleanProperty collectTelemetryProperty() {
+        return this.collectTelemetryProperty;
+    }
 
-    public BooleanProperty allowIntegerEditionProperty() { return this.allowIntegerEditionProperty; }
+    public BooleanProperty allowIntegerEditionProperty() {
+        return this.allowIntegerEditionProperty;
+    }
 
-    public BooleanProperty showAdvancedHintsProperty() { return this.showAdvancedHintsProperty; }
+    public BooleanProperty showAdvancedHintsProperty() {
+        return this.showAdvancedHintsProperty;
+    }
 
     // Entry owner
 
-    public BooleanProperty markOwnerProperty() { return this.markOwnerProperty; }
+    public BooleanProperty markOwnerProperty() {
+        return this.markOwnerProperty;
+    }
 
-    public StringProperty markOwnerNameProperty() { return this.markOwnerNameProperty; }
+    public StringProperty markOwnerNameProperty() {
+        return this.markOwnerNameProperty;
+    }
 
-    public BooleanProperty markOwnerOverwriteProperty() { return this.markOwnerOverwriteProperty; }
+    public BooleanProperty markOwnerOverwriteProperty() {
+        return this.markOwnerOverwriteProperty;
+    }
 
     // Time stamp
 
-    public BooleanProperty markTimestampProperty() { return this.markTimestampProperty; }
+    public BooleanProperty markTimestampProperty() {
+        return this.markTimestampProperty;
+    }
 
-    public StringProperty markTimeStampFormatProperty() { return this.markTimeStampFormatProperty; }
+    public StringProperty markTimeStampFormatProperty() {
+        return this.markTimeStampFormatProperty;
+    }
 
-    public BooleanProperty markTimeStampOverwriteProperty() { return this.markTimeStampOverwriteProperty; }
+    public BooleanProperty markTimeStampOverwriteProperty() {
+        return this.markTimeStampOverwriteProperty;
+    }
 
-    public StringProperty markTimeStampFieldNameProperty() { return this.markTimeStampFieldNameProperty; }
+    public StringProperty markTimeStampFieldNameProperty() {
+        return this.markTimeStampFieldNameProperty;
+    }
 
-    public BooleanProperty updateTimeStampProperty() { return this.updateTimeStampProperty; }
+    public BooleanProperty updateTimeStampProperty() {
+        return this.updateTimeStampProperty;
+    }
 }

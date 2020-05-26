@@ -22,8 +22,8 @@ import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         });
 
         maxPages.bindBidirectional(
-                EasyBind.monadic(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
+                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
 
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }

@@ -81,8 +81,8 @@ public class GroupTreeNodeViewModel {
 
     public void sortChildrenByName(boolean recursive) {
         getNode().sortChildren(
-                               (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
-                               recursive);
+                (node1, node2) -> node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),
+                recursive);
     }
 
     @Override
@@ -113,23 +113,23 @@ public class GroupTreeNodeViewModel {
 
     public boolean canMoveUp() {
         return (getNode().getPreviousSibling() != null)
-               && !(getNode().getGroup() instanceof AllEntriesGroup);
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveDown() {
         return (getNode().getNextSibling() != null)
-               && !(getNode().getGroup() instanceof AllEntriesGroup);
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveLeft() {
         return !(getNode().getGroup() instanceof AllEntriesGroup)
-               // TODO: Null!
-               && !(getNode().getParent().get().getGroup() instanceof AllEntriesGroup);
+                // TODO: Null!
+                && !(getNode().getParent().get().getGroup() instanceof AllEntriesGroup);
     }
 
     public boolean canMoveRight() {
         return (getNode().getPreviousSibling() != null)
-               && !(getNode().getGroup() instanceof AllEntriesGroup);
+                && !(getNode().getGroup() instanceof AllEntriesGroup);
     }
 
     public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
@@ -186,8 +186,10 @@ public class GroupTreeNodeViewModel {
         GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
         this.getNode().addChild(newNode);
 
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
-                                                                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
+        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
+                this,
+                new GroupTreeNodeViewModel(newNode),
+                UndoableAddOrRemoveGroup.ADD_NODE);
         undoManager.addEdit(undo);
     }
 

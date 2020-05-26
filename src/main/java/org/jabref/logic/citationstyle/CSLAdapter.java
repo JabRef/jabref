@@ -68,7 +68,7 @@ public class CSLAdapter {
         if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                  new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
+                    new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
             style = newStyle;
         }
 
@@ -118,16 +118,16 @@ public class CSLAdapter {
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
-                    .filter(entry -> entry.getCiteKeyOptional().orElse("").equals(id))
-                    .map(JabRefItemDataProvider::bibEntryToCSLItemData)
-                    .findFirst().orElse(null);
+                       .filter(entry -> entry.getCiteKeyOptional().orElse("").equals(id))
+                       .map(JabRefItemDataProvider::bibEntryToCSLItemData)
+                       .findFirst().orElse(null);
         }
 
         @Override
         public String[] getIds() {
             return data.stream()
-                    .map(entry -> entry.getCiteKeyOptional().orElse(""))
-                    .toArray(String[]::new);
+                       .map(entry -> entry.getCiteKeyOptional().orElse(""))
+                       .toArray(String[]::new);
         }
     }
 }

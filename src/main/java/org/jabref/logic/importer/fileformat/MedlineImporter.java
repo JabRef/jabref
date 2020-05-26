@@ -90,8 +90,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Importer for the Medline/Pubmed format.
  * <p>
- * check here for details on the format
- * https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
+ * check here for details on the format https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
  */
 public class MedlineImporter extends Importer implements Parser {
 
@@ -685,11 +684,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     /**
-     * Convert medline page ranges from short form to full form.
-     * Medline reports page ranges in a shorthand format.
-     * The last page is reported using only the digits which
-     * differ from the first page.
-     * i.e. 12345-51 refers to the actual range 12345-12351
+     * Convert medline page ranges from short form to full form. Medline reports page ranges in a shorthand format. The last page is reported using only the digits which differ from the first page. i.e. 12345-51 refers to the actual range 12345-12351
      */
     private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
@@ -711,7 +706,6 @@ public class MedlineImporter extends Importer implements Parser {
         try {
             return importDatabase(
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
-
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }

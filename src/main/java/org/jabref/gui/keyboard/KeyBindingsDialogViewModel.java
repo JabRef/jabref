@@ -1,6 +1,7 @@
 package org.jabref.gui.keyboard;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -18,7 +20,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
     private final PreferencesService preferences;
-    private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
+    private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private final DialogService dialogService;
 
@@ -29,7 +31,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         populateTable();
     }
 
-    public ObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
+    public OptionalObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
         return selectedKeyBinding;
     }
 
@@ -56,12 +58,13 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     }
 
     public void setNewBindingForCurrent(KeyEvent event) {
-        // first check if a valid entry is selected
-        if (selectedKeyBinding.isNull().get()) {
+        Optional<KeyBindingViewModel> selectedKeyBindingValue = selectedKeyBinding.getValue();
+        if (selectedKeyBindingValue.isEmpty()) {
             return;
         }
-        KeyBindingViewModel selectedEntry = selectedKeyBinding.get();
-        if ((selectedEntry == null) || (selectedEntry.isCategory())) {
+
+        KeyBindingViewModel selectedEntry = selectedKeyBindingValue.get();
+        if (selectedEntry.isCategory()) {
             return;
         }
 
@@ -85,10 +88,10 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
-                    if (response == resetButtonType) {
-                        keyBindingRepository.resetToDefault();
-                        populateTable();
-                    }
-                });
+            if (response == resetButtonType) {
+                keyBindingRepository.resetToDefault();
+                populateTable();
+            }
+        });
     }
 }

@@ -33,6 +33,7 @@ import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
@@ -148,6 +149,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
             return linkedFile.getLink();
         } else {
             return linkedFile.getDescription() + " (" + linkedFile.getLink() + ")";
+        }
+    }
+
+    public String getTruncatedDescriptionAndLink() {
+        if (StringUtil.isBlank(linkedFile.getDescription())) {
+            return ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER);
+        } else {
+            return ControlHelper.truncateString(linkedFile.getDescription(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER) + " (" +
+                    ControlHelper.truncateString(linkedFile.getLink(), -1, "...",
+                    ControlHelper.EllipsisPosition.CENTER) + ")";
         }
     }
 
@@ -417,6 +430,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 entry.addFile(0, newLinkedFile);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
+            downloadTask.titleProperty().set(Localization.lang("Downloading"));
+            downloadTask.messageProperty().set(
+                    Localization.lang("Fulltext for") + ": " + entry.getCiteKeyOptional().orElse(Localization.lang("New entry")));
+            downloadTask.showToUser(true);
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
             dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
@@ -470,5 +487,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         return linkedFile;
     }
 
-    public ValidationStatus fileExistsValidationStatus() { return fileExistsValidator.getValidationStatus(); }
+    public ValidationStatus fileExistsValidationStatus() {
+        return fileExistsValidator.getValidationStatus();
+    }
 }

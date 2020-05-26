@@ -30,7 +30,8 @@ import javafx.collections.ObservableList;
  * @param <T> the type of the class
  */
 // We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
-@SuppressWarnings("unchecked") public abstract class TreeNode<T extends TreeNode<T>> {
+@SuppressWarnings("unchecked")
+public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
      * Array of children, may be empty if this node has no children (but never null)
@@ -114,7 +115,7 @@ import javafx.collections.ObservableList;
      */
     public int getPositionInParent() {
         return getParent().orElseThrow(() -> new UnsupportedOperationException("Roots have no position in parent"))
-                .getIndexOfChild((T) this).get();
+                          .getIndexOfChild((T) this).get();
     }
 
     /**
@@ -597,6 +598,7 @@ import javafx.collections.ObservableList;
 
     /**
      * Helper method which notifies all subscribers about a change in the subtree and bubbles the event to all parents.
+     *
      * @param source the node which changed
      */
     protected void notifyAboutDescendantChange(T source) {
