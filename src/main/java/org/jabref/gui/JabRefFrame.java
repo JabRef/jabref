@@ -22,6 +22,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -97,6 +98,7 @@ import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.ManageJournalsAction;
 import org.jabref.gui.keyboard.CustomizeKeyBindingAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
@@ -1077,6 +1079,15 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
+    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
+        ContextMenu contextMenu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
+
+        contextMenu.getItems().add(factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(panel.frame(), stateManager)));
+
+        return contextMenu;
+    }
+
     public void addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
         Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
@@ -1085,6 +1096,9 @@ public class JabRefFrame extends BorderPane {
             closeTab((BasePanel) newTab.getContent());
             event.consume();
         });
+
+        // add tab context menu
+        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs(), basePanel, stateManager));
 
         // update all tab titles
         updateAllTabTitles();
