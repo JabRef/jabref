@@ -98,7 +98,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
         selectedEncodingProperty.setValue(initialGeneralPreferences.getDefaultEncoding());
 
-
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(initialGeneralPreferences.isConfirmDelete());
         allowIntegerEditionProperty.setValue(initialGeneralPreferences.isAllowIntegerEditionBibtex());
@@ -190,7 +189,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     public ObjectProperty<Charset> selectedEncodingProperty() {
         return this.selectedEncodingProperty;
     }
-
 
     public BooleanProperty inspectionWarningDuplicateProperty() {
         return this.inspectionWarningDuplicateProperty;

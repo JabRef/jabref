@@ -77,7 +77,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         defaultEncoding.itemsProperty().bind(viewModel.encodingsListProperty());
         defaultEncoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
 
-
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
