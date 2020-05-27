@@ -24,6 +24,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.GeneralPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -36,8 +37,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
     private final ListProperty<Charset> encodingsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>();
-    private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
 
     private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
@@ -99,8 +98,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));
         selectedEncodingProperty.setValue(initialGeneralPreferences.getDefaultEncoding());
 
-        bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
-        selectedBiblatexModeProperty.setValue(initialGeneralPreferences.getDefaultBibDatabaseMode());
 
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
         confirmDeleteProperty.setValue(initialGeneralPreferences.isConfirmDelete());
@@ -136,7 +133,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         preferencesService.storeGeneralPreferences(new GeneralPreferences(
                 selectedEncodingProperty.getValue(),
-                selectedBiblatexModeProperty.getValue(),
+                ((JabRefPreferences) preferencesService).getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 inspectionWarningDuplicateProperty.getValue(),
                 confirmDeleteProperty.getValue(),
                 allowIntegerEditionProperty.getValue(),
@@ -194,13 +191,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.selectedEncodingProperty;
     }
 
-    public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
-        return this.bibliographyModeListProperty;
-    }
-
-    public ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty() {
-        return this.selectedBiblatexModeProperty;
-    }
 
     public BooleanProperty inspectionWarningDuplicateProperty() {
         return this.inspectionWarningDuplicateProperty;
