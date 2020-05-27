@@ -134,14 +134,14 @@ private void openJabrefWebsite() {
 
 ### View - FXML
 
-The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
+The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](https://github.com/JonathanGiles/scenic-view) is very helpful in debugging styling issues.
 
 ## Resources
 
 * [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
 * [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
-* [usage of icon fonts with JavaFX](http://aalmiray.github.io/ikonli/#_javafx) or [jIconFont](https://github.com/jIconFont/jiconfont-google_material_design_icons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
-* [Undo manager](https://github.com/TomasMikula/UndoFX)
+* [jIconFont](http://jiconfont.github.io/googlematerialdesignicons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
+* [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
 * [Kubed](https://github.com/hudsonb/kubed): data visualization \(inspired by d3\)

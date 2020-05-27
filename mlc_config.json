@@ -5,6 +5,9 @@
         },
         {
             "pattern": "^http://purl\\.org/net/bibteXMP"
+        },
+        {
+            "pattern": "^http://localhost"
         }
     ]
 }

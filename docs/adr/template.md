@@ -1,6 +1,6 @@
 # \[short title of solved problem and solution\]
 
-* Status: \[proposed \| rejected \| accepted \| deprecated \| … \| superseded by [ADR-0005](https://github.com/JabRef/jabref/tree/8c07a88a823a84aebe987cdb717f318ed00a872d/docs/adr/0005-example.md)\]
+* Status: \[proposed \| rejected \| accepted \| deprecated \| … \| superseded by [ADR-0005](0005-fully-support-utf8-only-for-latex-files.md)\]
 * Deciders: \[list everyone involved in the decision\]
 * Date: \[YYYY-MM-DD when the decision was last updated\]
 
