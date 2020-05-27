@@ -42,6 +42,13 @@ jobs:
         with:
           args: CHANGELOG.md README.md docs/
           config: '.markdownlint.yml'
+      - name: Run markdown-link-check
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: 'mlc_config.json'
+          folder-path: 'docs/'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
