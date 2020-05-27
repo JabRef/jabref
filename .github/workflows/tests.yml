@@ -38,9 +38,9 @@ jobs:
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
-        uses: avto-dev/markdown-lint@v1
+        uses: koppor/markdown-lint@master
         with:
-          args: **/*.md
+          args: CHANGELOG.md README.md docs/
           config: '.markdownlint.yml'
   tests:
     name: Unit tests
