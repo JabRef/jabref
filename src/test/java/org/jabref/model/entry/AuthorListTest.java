@@ -35,10 +35,6 @@ public class AuthorListTest {
         return AuthorList.parse(MUHAMMAD_ALKHWARIZMI);
     }
 
-    private static AuthorList oneAuthorWithEscapedBrackets() {
-        return AuthorList.parse("{\\L{}}u\\}kas\\{z Mic\\}h\\{a\\l{}");
-    }
-
     private static AuthorList twoAuthorsWithLatex() {
         return AuthorList.parse(MUHAMMAD_ALKHWARIZMI + " and " + CORRADO_BOHM);
     }
@@ -51,10 +47,6 @@ public class AuthorListTest {
         return AuthorList.parse(BANU_MOSA);
     }
 
-    private static AuthorList oneInstituteWithEscapedBrackets() {
-        return AuthorList.parse("{{\\L{}}u\\}kas\\{z Mic\\}h\\{a\\l{}}");
-    }
-
     private static AuthorList oneInstitutionWithParanthesisAtStart() {
         return AuthorList.parse("{{\\L{}}ukasz Micha\\l{}}");
     }
@@ -65,18 +57,6 @@ public class AuthorListTest {
 
     private static AuthorList mixedAuthorAndInstituteWithLatex() {
         return AuthorList.parse(BANU_MOSA + " and " + CORRADO_BOHM);
-    }
-
-    @Test
-    public void parseFirstNameOneAuthorWithLatexAndEscapedBrackets() throws Exception {
-        assertEquals("Łu}kas{z",
-                oneAuthorWithEscapedBrackets().getAuthor(0).getFirst().orElse(null));
-    }
-
-    @Test
-    public void parseLastNameOneAuthorWithLatexAndEscapedBrackets() throws Exception {
-        assertEquals("Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAuthor(0).getLast().orElse(null));
     }
 
     @Test
@@ -175,18 +155,6 @@ public class AuthorListTest {
     public void getAsNatbibLatexFreeOneInstitutionWithParanthesisAtStart() {
         assertEquals("Łukasz Michał",
                 oneInstitutionWithParanthesisAtStart().getAsNatbibLatexFree());
-    }
-
-    @Test
-    public void getAsNatbibLatexFreeAuthorWithEscapedBrackets() {
-        assertEquals("Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsNatbibLatexFree());
-    }
-
-    @Test
-    public void getAsNatbibLatexFreeInstituteAuthorWithEscapedBrackets() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneInstituteWithEscapedBrackets().getAsNatbibLatexFree());
     }
 
     @Test
@@ -315,18 +283,6 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeAuthorWithEscapedBracketsAbbr() {
-        assertEquals("Ł. Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsFirstLastNamesLatexFree(true, false));
-    }
-
-    @Test
-    public void getAsFirstLastNamesLatexFreeInstituteAuthorWithEscapedBracketsAbbr() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneInstituteWithEscapedBrackets().getAsFirstLastNamesLatexFree(true, false));
-    }
-
-    @Test
     public void getAsFirstLastNamesLatexFreeEmptyAuthorStringForEmptyInput() {
         assertEquals("", emptyAuthor().getAsFirstLastNamesLatexFree(false, false));
     }
@@ -377,18 +333,6 @@ public class AuthorListTest {
     public void getAsFirstLastNamesLatexFreeOneInstitutionWithParanthesisAtStart() {
         assertEquals("Łukasz Michał",
                 oneInstitutionWithParanthesisAtStart().getAsFirstLastNamesLatexFree(false, false));
-    }
-
-    @Test
-    public void getAsFirstLastNamesLatexFreeAuthorWithEscapedBrackets() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsFirstLastNamesLatexFree(false, false));
-    }
-
-    @Test
-    public void getAsFirstLastNamesLatexFreeInstituteAuthorWithEscapedBrackets() {
-        assertEquals("Łukasz Mic}h{ał",
-                oneInstituteWithEscapedBrackets().getAsFirstLastNamesLatexFree(false, false));
     }
 
     @Test
@@ -531,18 +475,6 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsLastFirstNamesLatexFreeAuthorWithEscapedBracketsAbbr() {
-        assertEquals("Mic}h{ał, Ł.",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(true, false));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeInstituteAuthorWithEscapedBracketsAbbr() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(true, false));
-    }
-
-    @Test
     public void getAsLastFirstNamesLatexFreeEmptyAuthorStringForEmptyInput() {
         assertEquals("", emptyAuthor().getAsLastFirstNamesLatexFree(false, false));
     }
@@ -593,18 +525,6 @@ public class AuthorListTest {
     public void getAsLastFirstNamesLatexFreeOneInstitutionWithParanthesisAtStart() {
         assertEquals("Łukasz Michał",
                 oneInstitutionWithParanthesisAtStart().getAsLastFirstNamesLatexFree(false, false));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeAuthorWithEscapedBrackets() {
-        assertEquals("Mic}h{ał, Łu}kas{z",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(false, false));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeInstituteAuthorWithEscapedBrackets() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(false, false));
     }
 
     @Test
@@ -661,18 +581,6 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsLastFirstNamesLatexFreeAuthorWithEscapedBracketsAbbrOxfordComma() {
-        assertEquals("Mic}h{ał, Ł.",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(true, true));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeInstituteAuthorWithEscapedBracketsAbbrOxfordComma() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(true, true));
-    }
-
-    @Test
     public void getAsLastFirstNamesLatexFreeEmptyAuthorStringForEmptyInputOxfordComma() {
         assertEquals("", emptyAuthor().getAsLastFirstNamesLatexFree(false, true));
     }
@@ -723,18 +631,6 @@ public class AuthorListTest {
     public void getAsLastFirstNamesLatexFreeOneInstitutionWithParanthesisAtStartOxfordComma() {
         assertEquals("Łukasz Michał",
                 oneInstitutionWithParanthesisAtStart().getAsLastFirstNamesLatexFree(false, true));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeAuthorWithEscapedBracketsOxfordComma() {
-        assertEquals("Mic}h{ał, Łu}kas{z",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(false, true));
-    }
-
-    @Test
-    public void getAsLastFirstNamesLatexFreeInstituteAuthorWithEscapedBracketsOxfordComma() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsLastFirstNamesLatexFree(false, true));
     }
 
     @Test
@@ -863,18 +759,6 @@ public class AuthorListTest {
     public void getAsLastNamesLatexFreeOneInstitutionWithParanthesisAtStart() {
         assertEquals("Łukasz Michał",
                 oneInstitutionWithParanthesisAtStart().getAsLastNamesLatexFree(false));
-    }
-
-    @Test
-    public void getAsLastNamesLatexFreeAuthorWithEscapedBrackets() {
-        assertEquals("Mic}h{ał",
-                oneAuthorWithEscapedBrackets().getAsLastNamesLatexFree(false));
-    }
-
-    @Test
-    public void getAsLastNamesLatexFreeInstituteAuthorWithEscapedBrackets() {
-        assertEquals("Łu}kas{z Mic}h{ał",
-                oneInstituteWithEscapedBrackets().getAsLastNamesLatexFree(false));
     }
 
     @Test
