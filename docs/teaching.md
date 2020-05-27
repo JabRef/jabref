@@ -126,9 +126,9 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 
   > When students worked earlier and more often, they produced projects that:
   >
-  >   - were more correct,
-  >   - were completed earlier,
-  >   - took no more or less time to complete
+  > - were more correct,
+  > - were completed earlier,
+  > - took no more or less time to complete
 
 ## References
 
