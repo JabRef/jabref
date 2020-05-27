@@ -1,6 +1,6 @@
 # jpackage
 
-JabRef uses [jpackage](https://jdk.java.net/jpackage/) to build binary distributions for Windows, Linux, and Mac OS X.
+JabRef uses [jpackage](https://openjdk.java.net/jeps/343) to build binary distributions for Windows, Linux, and Mac OS X.
 
 ## Build Windows binaries locally
 

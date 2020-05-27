@@ -30,6 +30,7 @@ Principles:
             Localization.lang("Something went wrong...", ioe);
     }
     ```
+
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -45,7 +46,7 @@ To show error message two different ways are usually used in JabRef:
 * showing an error dialog
 * updating the status bar at the bottom of the main window
 
-_TODO: Usage of status bar and Swing Dialogs_
+_*TODO: Usage of status bar and Swing Dialogs*_
 
 ## Using the EventSystem
 
@@ -138,7 +139,7 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
 
 ## Using Localization correctly
 
-_\(More information about this topic from the translator side is provided under this link:_ [_Translating JabRef Interface_](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) _about the JabRef interface and_ [_Translating JabRef Help_](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) _about the JabRef help files\)_
+More information about this topic from the translator side is provided at [Translating JabRef Interface](https://docs.jabref.org/faqcontributing/how-to-translate-the-ui).
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
@@ -179,7 +180,7 @@ The tests check whether translation strings appear correctly in the resource bun
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test.
 
-Example: [PageNumbersFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/net/sf/jabref/logic/formatter/bibtexfields/PageNumbersFormatter.java)
+Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
 
 ## Drag and Drop
 
