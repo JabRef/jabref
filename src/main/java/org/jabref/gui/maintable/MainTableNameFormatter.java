@@ -43,28 +43,4 @@ public class MainTableNameFormatter {
             return AuthorList.parse(nameToFormat).getAsLastFirstNamesLatexFree(abbrAuthorNames, false);
         }
     }
-
-    /**
-     * Format a name field for the table, according to user preferences.
-     *
-     * @param nameToFormat The contents of the name field.
-     * @return The formatted name field.
-     */
-    public String formatName(final String nameToFormat) {
-        if (nameToFormat == null) {
-            return null;
-        }
-
-        if (namesAsIs) {
-            return nameToFormat;
-        } else if (namesNatbib) {
-            return AuthorList.fixAuthorNatbib(nameToFormat);
-        } else if (namesLastOnly) {
-            return AuthorList.fixAuthorLastNameOnlyCommas(nameToFormat, false);
-        } else if (namesFf) {
-            return AuthorList.fixAuthorFirstNameFirstCommas(nameToFormat, abbrAuthorNames, false);
-        } else {
-            return AuthorList.fixAuthorLastNameFirstCommas(nameToFormat, abbrAuthorNames, false);
-        }
-    }
 }
