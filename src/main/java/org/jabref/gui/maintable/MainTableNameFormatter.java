@@ -30,17 +30,18 @@ public class MainTableNameFormatter {
         if (nameToFormat == null) {
             return null;
         }
+        AuthorList authors = AuthorList.parse(nameToFormat);
 
         if (namesAsIs) {
             return nameToFormat;
         } else if (namesNatbib) {
-            return AuthorList.parse(nameToFormat).getAsNatbibLatexFree();
+            return authors.getAsNatbibLatexFree();
         } else if (namesLastOnly) {
-            return AuthorList.parse(nameToFormat).getAsLastNamesLatexFree(false);
+            return authors.getAsLastNamesLatexFree(false);
         } else if (namesFf) {
-            return AuthorList.parse(nameToFormat).getAsFirstLastNamesLatexFree(abbrAuthorNames, false);
+            return authors.getAsFirstLastNamesLatexFree(abbrAuthorNames, false);
         } else {
-            return AuthorList.parse(nameToFormat).getAsLastFirstNamesLatexFree(abbrAuthorNames, false);
+            return authors.getAsLastFirstNamesLatexFree(abbrAuthorNames, false);
         }
     }
 }
