@@ -37,13 +37,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
-      - name: Run markdown-link-check
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
-        with:
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-          config-file: 'mlc_config.json'
-          folder-path: 'docs/'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
