@@ -40,10 +40,7 @@ jobs:
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
-          args:
-            - 'docs/'
-            - 'CHANGELOG.md'
-            - 'README.md'
+          args: docs/ CHANGELOG.md README.md
           config: '.markdownlint.yml'
   tests:
     name: Unit tests
