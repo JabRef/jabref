@@ -13,7 +13,7 @@ public class LocalizationParserTest {
     @Test
     public void testKeyParsingCode() {
         assertLocalizationKeyParsing("Localization.lang(\"one per line\")", "one\\ per\\ line");
-        assertLocalizationKeyParsing("Localization.lang(\n            \"Copy \\\\cite{BibTeX key}\")", "Copy\\ \\cite{BibTeX\\ key}");
+        assertLocalizationKeyParsing("Localization.lang(\n            \"Copy \\\\cite{citation key}\")", "Copy\\ \\cite{citation\\ key}");
         assertLocalizationKeyParsing("Localization.lang(\"two per line\") Localization.lang(\"two per line\")", Arrays.asList("two\\ per\\ line", "two\\ per\\ line"));
         assertLocalizationKeyParsing("Localization.lang(\"multi \" + \n\"line\")", "multi\\ line");
         assertLocalizationKeyParsing("Localization.lang(\"one per line with var\", var)", "one\\ per\\ line\\ with\\ var");

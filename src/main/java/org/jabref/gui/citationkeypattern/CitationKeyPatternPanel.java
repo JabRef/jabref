@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexkeypattern;
+package org.jabref.gui.citationkeypattern;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +17,14 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-public class BibtexKeyPatternPanel extends Pane {
+public class CitationKeyPatternPanel extends Pane {
 
     // default pattern
     protected final TextField defaultPat = new TextField();
@@ -34,14 +34,14 @@ public class BibtexKeyPatternPanel extends Pane {
     private final BasePanel panel;
     private final GridPane gridPane = new GridPane();
 
-    public BibtexKeyPatternPanel(BasePanel panel) {
+    public CitationKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         buildGUI();
     }
 
-    private static void setValue(TextField tf, EntryType fieldName, AbstractBibtexKeyPattern keyPattern) {
+    private static void setValue(TextField tf, EntryType fieldName, AbstractCitationKeyPattern keyPattern) {
         if (keyPattern.isDefaultValue(fieldName)) {
             tf.setText("");
         } else {
@@ -117,8 +117,8 @@ public class BibtexKeyPatternPanel extends Pane {
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }
 
-    public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
-        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getGlobalBibtexKeyPattern());
+    public DatabaseCitationKeyPattern getKeyPatternAsDatabaseKeyPattern() {
+        DatabaseCitationKeyPattern res = new DatabaseCitationKeyPattern(Globals.prefs.getGlobalCitationKeyPattern());
         fillPatternUsingPanelData(res);
         return res;
     }
@@ -126,12 +126,12 @@ public class BibtexKeyPatternPanel extends Pane {
     /**
      * fill the given LabelPattern by values generated from the text fields
      */
-    private void fillPatternUsingPanelData(AbstractBibtexKeyPattern keypatterns) {
+    private void fillPatternUsingPanelData(AbstractCitationKeyPattern keypatterns) {
         // each entry type
         for (Map.Entry<EntryType, TextField> entry : textFields.entrySet()) {
             String text = entry.getValue().getText();
             if (!text.trim().isEmpty()) {
-                keypatterns.addBibtexKeyPattern(entry.getKey(), text);
+                keypatterns.addCitationKeyPattern(entry.getKey(), text);
             }
         }
 
@@ -145,9 +145,9 @@ public class BibtexKeyPatternPanel extends Pane {
     /**
      * Fills the current values to the text fields
      *
-     * @param keyPattern the BibtexKeyPattern to use as initial value
+     * @param keyPattern the CitationKeyPattern to use as initial value
      */
-    public void setValues(AbstractBibtexKeyPattern keyPattern) {
+    public void setValues(AbstractCitationKeyPattern keyPattern) {
         for (Map.Entry<EntryType, TextField> entry : textFields.entrySet()) {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }

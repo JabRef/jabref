@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexkeypattern;
+package org.jabref.gui.citationkeypattern;
 
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -6,11 +6,11 @@ import org.jabref.gui.actions.SimpleCommand;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-public class BibtexKeyPatternAction extends SimpleCommand {
+public class CitationKeyPatternAction extends SimpleCommand {
 
     private final JabRefFrame frame;
 
-    public BibtexKeyPatternAction(JabRefFrame frame, StateManager stateManager) {
+    public CitationKeyPatternAction(JabRefFrame frame, StateManager stateManager) {
         this.frame = frame;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -18,6 +18,6 @@ public class BibtexKeyPatternAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new BibtexKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
+        new CitationKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
     }
 }

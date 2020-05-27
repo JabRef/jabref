@@ -10,16 +10,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-public class BibtexKeyPatternPanelViewModel {
+public class CitationKeyPatternPanelViewModel {
 
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
-    public static Comparator<BibtexKeyPatternPanelItemModel> defaultOnTopComparator = (o1, o2) -> {
+    public static Comparator<CitationKeyPatternPanelItemModel> defaultOnTopComparator = (o1, o2) -> {
         String itemOneName = o1.getEntryType().getName();
         String itemTwoName = o2.getEntryType().getName();
 
@@ -34,13 +34,13 @@ public class BibtexKeyPatternPanelViewModel {
         return 0;
     };
 
-    private final ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<BibtexKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
-    private final AbstractBibtexKeyPattern initialKeyPattern;
+    private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
+    private final AbstractCitationKeyPattern initialKeyPattern;
     private final Collection<BibEntryType> bibEntryTypeList;
     private final JabRefPreferences preferences;
 
-    public BibtexKeyPatternPanelViewModel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractBibtexKeyPattern initialKeyPattern) {
+    public CitationKeyPatternPanelViewModel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
         this.preferences = preferences;
         this.bibEntryTypeList = entryTypeList;
         this.initialKeyPattern = initialKeyPattern;
@@ -54,7 +54,7 @@ public class BibtexKeyPatternPanelViewModel {
             defaultPattern = initialKeyPattern.getDefaultValue().get(0);
         }
 
-        defaultItemProperty.setValue(new BibtexKeyPatternPanelItemModel(new DefaultEntryType(), defaultPattern));
+        defaultItemProperty.setValue(new CitationKeyPatternPanelItemModel(new DefaultEntryType(), defaultPattern));
         patternListProperty.setValue(FXCollections.observableArrayList());
         patternListProperty.add(defaultItemProperty.getValue());
 
@@ -67,11 +67,11 @@ public class BibtexKeyPatternPanelViewModel {
                             } else {
                                 pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
                             }
-                            patternListProperty.add(new BibtexKeyPatternPanelItemModel(entryType, pattern));
+                            patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
                         });
     }
 
-    public void setItemToDefaultPattern(BibtexKeyPatternPanelItemModel item) {
+    public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
         item.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
     }
 
@@ -80,11 +80,11 @@ public class BibtexKeyPatternPanelViewModel {
         defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
     }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
         return defaultItemProperty;
     }
 

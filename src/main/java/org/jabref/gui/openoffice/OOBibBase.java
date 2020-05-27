@@ -399,7 +399,7 @@ class OOBibBase {
      *
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
-     * @return A list of those referenced BibTeX keys that could not be resolved.
+     * @return A list of those referenced citation keys that could not be resolved.
      * @throws UndefinedCharacterFormatException
      * @throws NoSuchElementException
      * @throws IllegalArgumentException
@@ -494,7 +494,7 @@ class OOBibBase {
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
+                        LOGGER.info("Citation key not found: '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
                         throw new BibEntryNotFoundException(names.get(i), Localization
                                 .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
@@ -503,7 +503,7 @@ class OOBibBase {
 
                 String[] normCitMarker = new String[keys.length];
                 String citationMarker;
-                if (style.isBibtexKeyCiteMarkers()) {
+                if (style.isCitationKeyCiteMarkers()) {
                     StringBuilder sb = new StringBuilder();
                     normCitMarkers[i] = new String[keys.length];
                     for (int j = 0; j < keys.length; j++) {
@@ -583,7 +583,7 @@ class OOBibBase {
         }
 
         uniquefiers.clear();
-        if (!style.isBibtexKeyCiteMarkers() && !style.isNumberEntries()) {
+        if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // See if there are duplicate citations marks referring to different entries. If so, we need to
             // use uniquefiers:
             Map<String, List<String>> refKeys = new HashMap<>();
@@ -911,7 +911,7 @@ class OOBibBase {
                             newList.put(origEntry.get(), database);
                         }
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + key + "'");
+                        LOGGER.info("Citation key not found: '" + key + "'");
                         LOGGER.info("Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(key), null);
                     }

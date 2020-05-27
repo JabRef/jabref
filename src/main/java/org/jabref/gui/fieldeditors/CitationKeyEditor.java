@@ -19,16 +19,23 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class BibtexKeyEditor extends HBox implements FieldEditorFX {
+public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
     private final JabRefPreferences preferences;
-    @FXML private BibtexKeyEditorViewModel viewModel;
+    @FXML private CitationKeyEditorViewModel viewModel;
     @FXML private Button generateCiteKeyButton;
     @FXML private EditorTextField textField;
 
-    public BibtexKeyEditor(Field field, JabRefPreferences preferences, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, BibDatabaseContext databaseContext, UndoManager undoManager, DialogService dialogService) {
+    public CitationKeyEditor(Field field,
+                             JabRefPreferences preferences,
+                             SuggestionProvider<?> suggestionProvider,
+                             FieldCheckers fieldCheckers,
+                             BibDatabaseContext databaseContext,
+                             UndoManager undoManager,
+                             DialogService dialogService) {
+
         this.preferences = preferences;
-        this.viewModel = new BibtexKeyEditorViewModel(
+        this.viewModel = new CitationKeyEditorViewModel(
                 field,
                 suggestionProvider,
                 fieldCheckers,
@@ -46,7 +53,7 @@ public class BibtexKeyEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
-    public BibtexKeyEditorViewModel getViewModel() {
+    public CitationKeyEditorViewModel getViewModel() {
         return viewModel;
     }
 

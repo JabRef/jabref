@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CiteKeyBasedFileFinderTest {
+class CitationKeyBasedFileFinderTest {
 
     private BibEntry entry;
     private Path rootDir;
@@ -62,7 +62,7 @@ class CiteKeyBasedFileFinderTest {
     void findAssociatedFilesInSubDirectories() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Arrays.asList(graphicsDir, pdfsDir);
-        FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
         List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
@@ -72,7 +72,7 @@ class CiteKeyBasedFileFinderTest {
     @Test
     void findAssociatedFilesIgnoresFilesStartingWithKeyButContinueWithText() throws Exception {
         Files.createFile(pdfsDir.resolve("HipKro03a - Hello second paper.pdf"));
-        FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
         List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
@@ -82,7 +82,7 @@ class CiteKeyBasedFileFinderTest {
     @Test
     void findAssociatedFilesFindsFilesStartingWithKey() throws Exception {
         Path secondPdfFile = Files.createFile(pdfsDir.resolve("HipKro03_Hello second paper.pdf"));
-        FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        FileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
         List<Path> results = fileFinder.findAssociatedFiles(entry, Collections.singletonList(pdfsDir), Collections.singletonList("pdf"));
 
@@ -93,7 +93,7 @@ class CiteKeyBasedFileFinderTest {
     void findAssociatedFilesInNonExistingDirectoryFindsNothing() throws Exception {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
-        CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        CitationKeyBasedFileFinder fileFinder = new CitationKeyBasedFileFinder(false);
 
         List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 

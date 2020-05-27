@@ -22,7 +22,7 @@ class MakeLabelWithoutDatabaseTest {
 
     @Test
     void makeLabelForFileSearch() {
-        String label = BibtexKeyGenerator.generateKey(entry, "auth");
+        String label = CitationKeyGenerator.generateKey(entry, "auth");
         assertEquals("Doe", label);
     }
 
@@ -33,7 +33,7 @@ class MakeLabelWithoutDatabaseTest {
         localEntry.setField(StandardField.YEAR, "2016");
         localEntry.setField(StandardField.TITLE, "An awesome paper on JabRef");
 
-        String label = BibtexKeyGenerator.generateKey(localEntry, "auth");
+        String label = CitationKeyGenerator.generateKey(localEntry, "auth");
         assertEquals("Doe", label);
     }
 }

@@ -10,11 +10,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-public class BibtexKeyDuplicationChecker implements EntryChecker {
+public class CitationKeyDuplicationChecker implements EntryChecker {
 
     private final BibDatabase database;
 
-    public BibtexKeyDuplicationChecker(BibDatabase database) {
+    public CitationKeyDuplicationChecker(BibDatabase database) {
         this.database = Objects.requireNonNull(database);
     }
 
@@ -28,7 +28,7 @@ public class BibtexKeyDuplicationChecker implements EntryChecker {
         boolean isDuplicate = database.isDuplicateCiteKeyExisting(citeKey.get());
         if (isDuplicate) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("Duplicate BibTeX key"), entry, StandardField.KEY));
+                    new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));
         }
         return Collections.emptyList();
     }

@@ -14,28 +14,28 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemModel> {
+public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelItemModel> {
 
-    @FXML public TableColumn<BibtexKeyPatternPanelItemModel, EntryType> entryTypeColumn;
-    @FXML public TableColumn<BibtexKeyPatternPanelItemModel, String> patternColumn;
-    @FXML public TableColumn<BibtexKeyPatternPanelItemModel, EntryType> actionsColumn;
+    @FXML public TableColumn<CitationKeyPatternPanelItemModel, EntryType> entryTypeColumn;
+    @FXML public TableColumn<CitationKeyPatternPanelItemModel, String> patternColumn;
+    @FXML public TableColumn<CitationKeyPatternPanelItemModel, EntryType> actionsColumn;
 
-    private BibtexKeyPatternPanelViewModel viewModel;
+    private CitationKeyPatternPanelViewModel viewModel;
 
     private long lastKeyPressTime;
     private String tableSearchTerm;
 
-    public BibtexKeyPatternPanel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractBibtexKeyPattern keyPattern) {
+    public CitationKeyPatternPanel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
         super();
 
-        viewModel = new BibtexKeyPatternPanelViewModel(preferences, entryTypeList, keyPattern);
+        viewModel = new CitationKeyPatternPanelViewModel(preferences, entryTypeList, keyPattern);
 
         ViewLoader.view(this)
                   .root(this)
@@ -49,11 +49,11 @@ public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemMo
         entryTypeColumn.setSortable(true);
         entryTypeColumn.setReorderable(false);
         entryTypeColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<BibtexKeyPatternPanelItemModel, EntryType>()
+        new ValueTableCellFactory<CitationKeyPatternPanelItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
         this.setOnSort(event ->
-                viewModel.patternListProperty().sort(BibtexKeyPatternPanelViewModel.defaultOnTopComparator));
+                viewModel.patternListProperty().sort(CitationKeyPatternPanelViewModel.defaultOnTopComparator));
 
         patternColumn.setSortable(true);
         patternColumn.setReorderable(false);
@@ -61,13 +61,13 @@ public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemMo
         patternColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<BibtexKeyPatternPanelItemModel, String> event) ->
+                (TableColumn.CellEditEvent<CitationKeyPatternPanelItemModel, String> event) ->
                         event.getRowValue().setPattern(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<BibtexKeyPatternPanelItemModel, EntryType>()
+        new ValueTableCellFactory<CitationKeyPatternPanelItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
                         String.format(Localization.lang("Reset %s to default value"), entryType.getDisplayName()))
@@ -88,11 +88,11 @@ public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemMo
         viewModel.resetAll();
     }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
         return viewModel.defaultKeyPatternProperty();
     }
 
@@ -113,15 +113,15 @@ public class BibtexKeyPatternPanel extends TableView<BibtexKeyPatternPanelItemMo
             .findFirst().ifPresent(this::scrollTo);
     }
 
-    private static class HighlightTableRow extends TableRow<BibtexKeyPatternPanelItemModel> {
+    private static class HighlightTableRow extends TableRow<CitationKeyPatternPanelItemModel> {
         @Override
-        public void updateItem(BibtexKeyPatternPanelItemModel item, boolean empty) {
+        public void updateItem(CitationKeyPatternPanelItemModel item, boolean empty) {
             super.updateItem(item, empty);
             if (item == null || item.getEntryType() == null) {
                 setStyle("");
             } else if (isSelected()) {
                 setStyle("-fx-background-color: -fx-selection-bar");
-            } else if (item.getEntryType().getName().equals(BibtexKeyPatternPanelViewModel.ENTRY_TYPE_DEFAULT_NAME)) {
+            } else if (item.getEntryType().getName().equals(CitationKeyPatternPanelViewModel.ENTRY_TYPE_DEFAULT_NAME)) {
                 setStyle("-fx-background-color: -fx-default-button");
             } else {
                 setStyle("");

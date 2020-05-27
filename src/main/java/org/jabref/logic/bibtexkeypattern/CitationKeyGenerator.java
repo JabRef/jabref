@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -22,29 +22,29 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the utility class of the LabelPattern package.
  */
-public class BibtexKeyGenerator extends BracketedPattern {
+public class CitationKeyGenerator extends BracketedPattern {
     /*
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^+";
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexKeyGenerator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
-    private final AbstractBibtexKeyPattern citeKeyPattern;
+    private final AbstractCitationKeyPattern citeKeyPattern;
     private final BibDatabase database;
-    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
-    public BibtexKeyGenerator(BibDatabaseContext bibDatabaseContext, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern()),
+    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+        this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
                 bibDatabaseContext.getDatabase(),
-                bibtexKeyPatternPreferences);
+                citationKeyPatternPreferences);
     }
 
-    public BibtexKeyGenerator(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+    public CitationKeyGenerator(AbstractCitationKeyPattern citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
-        this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
+        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
     }
 
     @Deprecated
@@ -54,24 +54,24 @@ public class BibtexKeyGenerator extends BracketedPattern {
 
     @Deprecated
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
+        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
         keyPattern.setDefaultValue("[" + pattern + "]");
-        BibtexKeyPatternPreferences patternPreferences = new BibtexKeyPatternPreferences(
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
                 false,
-                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
                 "",
                 "",
                 DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
                 ',');
 
-        return new BibtexKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
+        return new CitationKeyGenerator(keyPattern, database, patternPreferences).generateKey(entry);
     }
 
     /**
-     * Computes an appendix to a BibTeX key that could make it unique. We use
+     * Computes an appendix to a citation key that could make it unique. We use
      * a-z for numbers 0-25, and then aa-az, ba-bz, etc.
      *
      * @param number The appendix number.
@@ -124,7 +124,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
+                    Character delimiter = citationKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
                     String label = expandBrackets(pattern, delimiter, entry, database);
                     // apply modifier if present
@@ -132,7 +132,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
                         label = applyModifiers(label, parts, 1);
                     }
                     // Remove all illegal characters from the label.
-                    label = cleanKey(label, bibtexKeyPatternPreferences.getUnwantedCharacters());
+                    label = cleanKey(label, citationKeyPatternPreferences.getUnwantedCharacters());
                     stringBuilder.append(label);
                 } else {
                     stringBuilder.append(typeListEntry);
@@ -145,9 +145,9 @@ public class BibtexKeyGenerator extends BracketedPattern {
         key = stringBuilder.toString();
 
         // Remove Regular Expressions while generating Keys
-        String regex = bibtexKeyPatternPreferences.getKeyPatternRegex();
+        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = bibtexKeyPatternPreferences.getKeyPatternReplacement();
+            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
             key = key.replaceAll(regex, replacement);
         }
 
@@ -158,11 +158,11 @@ public class BibtexKeyGenerator extends BracketedPattern {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = bibtexKeyPatternPreferences.getKeySuffix()
-                == BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
+        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
 
-        boolean firstLetterA = bibtexKeyPatternPreferences.getKeySuffix()
-                == BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+        boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
 
         String newKey;
         if (!alwaysAddLetter && (occurrences == 0)) {
@@ -189,7 +189,7 @@ public class BibtexKeyGenerator extends BracketedPattern {
     }
 
     /**
-     * Generates a BibTeX key for the given entry, and sets the key.
+     * Generates a citation key for the given entry, and sets the key.
      *
      * @param entry the entry to generate the key for
      * @return the change to the key (or an empty optional if the key was not changed)

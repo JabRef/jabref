@@ -1,8 +1,8 @@
 package org.jabref.logic.bibtexkeypattern;
 
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 
-public class BibtexKeyPatternPreferences {
+public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {
         ALWAYS,         // CiteKeyA, CiteKeyB, CiteKeyC ...
@@ -17,18 +17,18 @@ public class BibtexKeyPatternPreferences {
     private final String keyPatternRegex;
     private final String keyPatternReplacement;
     private final String unwantedCharacters;
-    private final GlobalBibtexKeyPattern keyPattern;
+    private final GlobalCitationKeyPattern keyPattern;
     private final Character keywordDelimiter;
 
-    public BibtexKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
-                                       boolean shouldWarnBeforeOverwriteCiteKey,
-                                       boolean shouldGenerateCiteKeysBeforeSaving,
-                                       KeySuffix keySuffix,
-                                       String keyPatternRegex,
-                                       String keyPatternReplacement,
-                                       String unwantedCharacters,
-                                       GlobalBibtexKeyPattern keyPattern,
-                                       Character keywordDelimiter) {
+    public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
+                                         boolean shouldWarnBeforeOverwriteCiteKey,
+                                         boolean shouldGenerateCiteKeysBeforeSaving,
+                                         KeySuffix keySuffix,
+                                         String keyPatternRegex,
+                                         String keyPatternReplacement,
+                                         String unwantedCharacters,
+                                         GlobalCitationKeyPattern keyPattern,
+                                         Character keywordDelimiter) {
 
         this.shouldAvoidOverwriteCiteKey = shouldAvoidOverwriteCiteKey;
         this.shouldWarnBeforeOverwriteCiteKey = shouldWarnBeforeOverwriteCiteKey;
@@ -69,7 +69,7 @@ public class BibtexKeyPatternPreferences {
         return unwantedCharacters;
     }
 
-    public GlobalBibtexKeyPattern getKeyPattern() {
+    public GlobalCitationKeyPattern getKeyPattern() {
         return keyPattern;
     }
 

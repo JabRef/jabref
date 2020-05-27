@@ -90,13 +90,13 @@ public class PushToApplicationAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        // If required, check that all entries have BibTeX keys defined:
-        if (application.requiresBibtexKeys()) {
+        // If required, check that all entries have citation keys defined:
+        if (application.requiresCitationKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
                 if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
                     dialogService.showErrorDialogAndWait(
                             application.getApplicationName(),
-                            Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
+                            Localization.lang("This operation requires all selected entries to have citation keys defined."));
 
                     return;
                 }

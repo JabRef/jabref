@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BibtexKeyCheckerTest {
+public class CitationKeyCheckerTest {
 
-    private final BibtexKeyChecker checker = new BibtexKeyChecker();
+    private final CitationKeyChecker checker = new CitationKeyChecker();
     private final BibEntry entry = new BibEntry();
 
     @Test

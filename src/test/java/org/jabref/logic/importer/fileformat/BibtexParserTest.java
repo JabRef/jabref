@@ -16,9 +16,9 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
@@ -296,7 +296,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesBibtexKeyWithSpecialCharacters() throws IOException {
+    void parseRecognizesCitationKeyWithSpecialCharacters() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{te_st:with-special(characters),author={Ed von Test}}"));
 
@@ -618,7 +618,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseNotWarnsAboutEntryWithoutBibtexKey() throws IOException {
+    void parseNotWarnsAboutEntryWithoutCitationKey() throws IOException {
         BibEntry expected = new BibEntry();
         expected.setField(StandardField.AUTHOR, "Ed von Test");
         expected.setType(StandardEntryType.Article);
@@ -1347,11 +1347,11 @@ class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        GlobalBibtexKeyPattern pattern = mock(GlobalBibtexKeyPattern.class);
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
+        GlobalCitationKeyPattern pattern = mock(GlobalCitationKeyPattern.class);
+        AbstractCitationKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
+        AbstractCitationKeyPattern expectedPattern = new DatabaseCitationKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
-        expectedPattern.addBibtexKeyPattern(StandardEntryType.Article, "articleTest");
+        expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 
         assertEquals(expectedPattern, bibtexKeyPattern);
     }

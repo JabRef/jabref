@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexkeypattern;
+package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 
@@ -11,12 +11,12 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.bibtexkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class GenerateBibtexKeyAction extends SimpleCommand {
+public class GenerateCitationKeyAction extends SimpleCommand {
 
     private final JabRefFrame frame;
     private final DialogService dialogService;
@@ -25,7 +25,7 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
     private List<BibEntry> entries;
     private boolean isCanceled;
 
-    public GenerateBibtexKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -38,11 +38,11 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
         entries = stateManager.getSelectedEntries();
 
         if (entries.isEmpty()) {
-            dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate BibTeX keys"),
+            dialogService.showWarningDialogAndWait(Localization.lang("Autogenerate citation keys"),
                     Localization.lang("First select the entries you want keys to be generated for."));
             return;
         }
-        dialogService.notify(formatOutputMessage(Localization.lang("Generating BibTeX key for"), entries.size()));
+        dialogService.notify(formatOutputMessage(Localization.lang("Generating citation key for"), entries.size()));
 
         checkOverwriteKeysChosen();
 
@@ -88,8 +88,9 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
 
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             // generate the new cite keys for each entry
-            final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(databaseContext, Globals.prefs.getBibtexKeyPatternPreferences());
+            final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
+            CitationKeyGenerator keyGenerator =
+                    new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
             for (BibEntry entry : entries) {
                 keyGenerator.generateAndSetKey(entry)
                             .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
@@ -102,7 +103,7 @@ public class GenerateBibtexKeyAction extends SimpleCommand {
             }
 
             frame.getCurrentBasePanel().markBaseChanged();
-            dialogService.notify(formatOutputMessage(Localization.lang("Generated BibTeX key for"), entries.size()));
+            dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
         });
     }
 

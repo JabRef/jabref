@@ -14,13 +14,13 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelItemModel;
-import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanelViewModel;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
+import org.jabref.logic.bibtexkeypattern.CitationKeyPatternPreferences;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.preferences.PreferencesService;
 
-public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
+public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
     private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
@@ -34,33 +34,33 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
-    private final ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
-            new BibtexKeyPatternPanelItemModel(new BibtexKeyPatternPanelViewModel.DefaultEntryType(), ""));
+    private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+            new CitationKeyPatternPanelItemModel(new CitationKeyPatternPanelViewModel.DefaultEntryType(), ""));
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final BibtexKeyPatternPreferences initialBibtexKeyPatternPreferences;
+    private final CitationKeyPatternPreferences initialCitationKeyPatternPreferences;
 
-    public BibtexKeyPatternTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public CitationKeyPatternTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialBibtexKeyPatternPreferences = preferences.getBibtexKeyPatternPreferences();
+        this.initialCitationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
     }
 
     @Override
     public void setValues() {
-        overwriteAllowProperty.setValue(!initialBibtexKeyPatternPreferences.shouldAvoidOverwriteCiteKey());
-        overwriteWarningProperty.setValue(initialBibtexKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
-        generateOnSaveProperty.setValue(initialBibtexKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
+        overwriteAllowProperty.setValue(!initialCitationKeyPatternPreferences.shouldAvoidOverwriteCiteKey());
+        overwriteWarningProperty.setValue(initialCitationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());
+        generateOnSaveProperty.setValue(initialCitationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());
 
-        if (initialBibtexKeyPatternPreferences.getKeySuffix()
-                == BibtexKeyPatternPreferences.KeySuffix.ALWAYS) {
+        if (initialCitationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.ALWAYS) {
             letterAlwaysAddProperty.setValue(true);
             letterStartAProperty.setValue(false);
             letterStartBProperty.setValue(false);
-        } else if (initialBibtexKeyPatternPreferences.getKeySuffix()
-                == BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
+        } else if (initialCitationKeyPatternPreferences.getKeySuffix()
+                == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
             letterAlwaysAddProperty.setValue(false);
             letterStartAProperty.setValue(true);
             letterStartBProperty.setValue(false);
@@ -70,20 +70,20 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             letterStartBProperty.setValue(true);
         }
 
-        keyPatternRegexProperty.setValue(initialBibtexKeyPatternPreferences.getKeyPatternRegex());
-        keyPatternReplacementProperty.setValue(initialBibtexKeyPatternPreferences.getKeyPatternReplacement());
-        unwantedCharactersProperty.setValue(initialBibtexKeyPatternPreferences.getUnwantedCharacters());
+        keyPatternRegexProperty.setValue(initialCitationKeyPatternPreferences.getKeyPatternRegex());
+        keyPatternReplacementProperty.setValue(initialCitationKeyPatternPreferences.getKeyPatternReplacement());
+        unwantedCharactersProperty.setValue(initialCitationKeyPatternPreferences.getUnwantedCharacters());
     }
 
     @Override
     public void storeSettings() {
-        GlobalBibtexKeyPattern newKeyPattern =
-                new GlobalBibtexKeyPattern(initialBibtexKeyPatternPreferences.getKeyPattern().getDefaultValue());
+        GlobalCitationKeyPattern newKeyPattern =
+                new GlobalCitationKeyPattern(initialCitationKeyPatternPreferences.getKeyPattern().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
             if (!item.getEntryType().getName().equals("default")) {
                 if (!patternString.trim().isEmpty()) {
-                    newKeyPattern.addBibtexKeyPattern(item.getEntryType(), patternString);
+                    newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);
                 }
             }
         });
@@ -94,15 +94,15 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());
         }
 
-        BibtexKeyPatternPreferences.KeySuffix keySuffix = BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
+        CitationKeyPatternPreferences.KeySuffix keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
 
         if (letterStartAProperty.getValue()) {
-            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         } else if (letterStartBProperty.getValue()) {
-            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
         }
 
-        preferences.storeBibtexKeyPatternPreferences(new BibtexKeyPatternPreferences(
+        preferences.storeCitationKeyPatternPreferences(new CitationKeyPatternPreferences(
                 !overwriteAllowProperty.getValue(),
                 overwriteWarningProperty.getValue(),
                 generateOnSaveProperty.getValue(),
@@ -111,7 +111,7 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
                 keyPatternReplacementProperty.getValue(),
                 unwantedCharactersProperty.getValue(),
                 newKeyPattern,
-                initialBibtexKeyPatternPreferences.getKeywordDelimiter()));
+                initialCitationKeyPatternPreferences.getKeywordDelimiter()));
     }
 
     @Override
@@ -156,11 +156,11 @@ public class BibtexKeyPatternTabViewModel implements PreferenceTabViewModel {
         return keyPatternReplacementProperty;
     }
 
-    public ListProperty<BibtexKeyPatternPanelItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<BibtexKeyPatternPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternPanelItemModel> defaultKeyPatternProperty() {
         return defaultKeyPatternProperty;
     }
 

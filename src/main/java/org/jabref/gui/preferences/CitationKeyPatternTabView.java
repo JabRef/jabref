@@ -10,7 +10,7 @@ import javafx.scene.layout.HBox;
 import org.jabref.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.commonfxcontrols.BibtexKeyPatternPanel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -18,7 +18,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKeyPatternTabViewModel> implements PreferencesTab {
+public class CitationKeyPatternTabView extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
     @FXML public CheckBox overwriteAllow;
     @FXML public CheckBox overwriteWarning;
@@ -32,14 +32,14 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
     @FXML public HBox keyPatternContainer;
     @FXML public Button keyPatternHelp;
 
-    private final BibtexKeyPatternPanel bibtexKeyPatternTable;
+    private final CitationKeyPatternPanel bibtexKeyPatternTable;
 
-    public BibtexKeyPatternTabView(JabRefPreferences preferences) {
+    public CitationKeyPatternTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
-        bibtexKeyPatternTable = new BibtexKeyPatternPanel(preferences,
+        bibtexKeyPatternTable = new CitationKeyPatternPanel(preferences,
                 Globals.entryTypesManager.getAllTypes(preferences.getDefaultBibDatabaseMode()),
-                preferences.getGlobalBibtexKeyPattern());
+                preferences.getGlobalCitationKeyPattern());
 
         ViewLoader.view(this)
                   .root(this)
@@ -48,11 +48,11 @@ public class BibtexKeyPatternTabView extends AbstractPreferenceTabView<BibtexKey
 
     @Override
     public String getTabName() {
-        return Localization.lang("BibTeX key generator");
+        return Localization.lang("Citation key generator");
     }
 
     public void initialize() {
-        this.viewModel = new BibtexKeyPatternTabViewModel(dialogService, preferences);
+        this.viewModel = new CitationKeyPatternTabViewModel(dialogService, preferences);
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());

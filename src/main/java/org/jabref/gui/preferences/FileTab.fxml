@@ -49,9 +49,9 @@
                     text="%When downloading files, or moving linked files to the file directory, prefer the BIB file location rather than the file directory set above"/>
         </tooltip>
     </CheckBox>
-    <RadioButton fx:id="autolinkFileStartsBibtex" text="%Autolink files with names starting with the BibTeX key"
+    <RadioButton fx:id="autolinkFileStartsBibtex" text="%Autolink files with names starting with the citation key"
                  toggleGroup="$autolinkToggleGroup"/>
-    <RadioButton fx:id="autolinkFileExactBibtex" text="%Autolink only files that match the BibTeX key"
+    <RadioButton fx:id="autolinkFileExactBibtex" text="%Autolink only files that match the citation key"
                  toggleGroup="$autolinkToggleGroup"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <RadioButton fx:id="autolinkUseRegex" text="%Use regular expression search"

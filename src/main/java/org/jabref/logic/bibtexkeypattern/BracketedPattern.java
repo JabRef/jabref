@@ -30,7 +30,7 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.bibtexkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 
 /**
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
@@ -852,7 +852,7 @@ public class BracketedPattern {
      */
     public static String authN(String authString, int num) {
         String fa = firstAuthor(authString);
-        fa = BibtexKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
+        fa = CitationKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
         if (num > fa.length()) {
             num = fa.length();
         }

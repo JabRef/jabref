@@ -13,21 +13,21 @@ import org.jabref.model.entry.types.EntryType;
 
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an
- * <code>ArrayList</code>). A parent BibtexKeyPattern can be set.
+ * <code>ArrayList</code>). A parent CitationKeyPattern can be set.
  */
-public abstract class AbstractBibtexKeyPattern {
+public abstract class AbstractCitationKeyPattern {
 
     protected List<String> defaultPattern = new ArrayList<>();
 
     protected Map<EntryType, List<String>> data = new HashMap<>();
 
-    public void addBibtexKeyPattern(EntryType type, String pattern) {
-        data.put(type, AbstractBibtexKeyPattern.split(pattern));
+    public void addCitationKeyPattern(EntryType type, String pattern) {
+        data.put(type, AbstractCitationKeyPattern.split(pattern));
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractBibtexKeyPattern{");
+        final StringBuilder sb = new StringBuilder("AbstractCitationKeyPattern{");
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -42,7 +42,7 @@ public abstract class AbstractBibtexKeyPattern {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        AbstractBibtexKeyPattern that = (AbstractBibtexKeyPattern) o;
+        AbstractCitationKeyPattern that = (AbstractCitationKeyPattern) o;
         return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
     }
 
@@ -52,9 +52,9 @@ public abstract class AbstractBibtexKeyPattern {
     }
 
     /**
-     * Gets an object for a desired key from this BibtexKeyPattern or one of it's
-     * parents (in the case of DatabaseBibtexKeyPattern). This method first tries to obtain the object from this
-     * BibtexKeyPattern via the <code>get</code> method of <code>Hashtable</code>.
+     * Gets an object for a desired key from this CitationKeyPattern or one of it's
+     * parents (in the case of DatabaseCitationKeyPattern). This method first tries to obtain the object from this
+     * CitationKeyPattern via the <code>get</code> method of <code>Hashtable</code>.
      * If this fails, we try the default.<br />
      * If that fails, we try the parent.<br />
      * If that fails, we return the DEFAULT_LABELPATTERN<br />
@@ -71,7 +71,7 @@ public abstract class AbstractBibtexKeyPattern {
             if (result == null || result.isEmpty()) {
                 // we are the "last" to ask
                 // we don't have anything left
-                return getLastLevelBibtexKeyPattern(entryType);
+                return getLastLevelCitationKeyPattern(entryType);
             }
         }
         return result;
@@ -125,7 +125,7 @@ public abstract class AbstractBibtexKeyPattern {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern = AbstractBibtexKeyPattern.split(bibtexKeyPattern);
+        this.defaultPattern = AbstractCitationKeyPattern.split(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {
@@ -136,5 +136,5 @@ public abstract class AbstractBibtexKeyPattern {
         return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public abstract List<String> getLastLevelBibtexKeyPattern(EntryType key);
+    public abstract List<String> getLastLevelCitationKeyPattern(EntryType key);
 }

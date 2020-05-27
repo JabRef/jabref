@@ -1,4 +1,4 @@
-package org.jabref.gui.bibtexkeypattern;
+package org.jabref.gui.citationkeypattern;
 
 import javafx.scene.control.ButtonType;
 
@@ -6,34 +6,34 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.metadata.MetaData;
 
-public class BibtexKeyPatternDialog extends BaseDialog<Void> {
+public class CitationKeyPatternDialog extends BaseDialog<Void> {
 
     private final MetaData metaData;
     private final BasePanel panel;
-    private final BibtexKeyPatternPanel bibtexKeyPatternPanel;
+    private final CitationKeyPatternPanel citationKeyPatternPanel;
 
-    public BibtexKeyPatternDialog(BasePanel panel) {
-        this.bibtexKeyPatternPanel = new BibtexKeyPatternPanel(panel);
+    public CitationKeyPatternDialog(BasePanel panel) {
+        this.citationKeyPatternPanel = new CitationKeyPatternPanel(panel);
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        AbstractBibtexKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getGlobalBibtexKeyPattern());
-        bibtexKeyPatternPanel.setValues(keyPattern);
+        AbstractCitationKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getGlobalCitationKeyPattern());
+        citationKeyPatternPanel.setValues(keyPattern);
         init();
     }
 
     private void init() {
 
-        this.setTitle(Localization.lang("BibTeX key patterns"));
+        this.setTitle(Localization.lang("Citation key patterns"));
 
-        this.getDialogPane().setContent(bibtexKeyPatternPanel.getPanel());
+        this.getDialogPane().setContent(citationKeyPatternPanel.getPanel());
         this.getDialogPane().getButtonTypes().addAll(ButtonType.APPLY, ButtonType.CANCEL);
 
         this.setResultConverter(button -> {
             if (button == ButtonType.APPLY) {
-                metaData.setCiteKeyPattern(bibtexKeyPatternPanel.getKeyPatternAsDatabaseBibtexKeyPattern());
+                metaData.setCiteKeyPattern(citationKeyPatternPanel.getKeyPatternAsDatabaseKeyPattern());
                 panel.markNonUndoableBaseChanged();
             }
 

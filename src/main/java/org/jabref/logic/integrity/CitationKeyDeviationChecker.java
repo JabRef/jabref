@@ -5,21 +5,21 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.bibtexkeypattern.CitationKeyGenerator;
+import org.jabref.logic.bibtexkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
-public class BibtexkeyDeviationChecker implements EntryChecker {
+public class CitationKeyDeviationChecker implements EntryChecker {
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
-    public BibtexkeyDeviationChecker(BibDatabaseContext bibDatabaseContext, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+    public CitationKeyDeviationChecker(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
-        this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
+        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
     }
 
     @Override
@@ -32,11 +32,11 @@ public class BibtexkeyDeviationChecker implements EntryChecker {
         String key = valuekey.get();
 
         // generate new key
-        String generatedKey = new BibtexKeyGenerator(bibDatabaseContext, bibtexKeyPatternPreferences).generateKey(entry);
+        String generatedKey = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences).generateKey(entry);
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("BibTeX key deviates from generated key"), entry, InternalField.KEY_FIELD));
+                    Localization.lang("Citation key deviates from generated key"), entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();

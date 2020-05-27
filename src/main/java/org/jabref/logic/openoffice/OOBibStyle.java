@@ -799,7 +799,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
     }
 
-    public boolean isBibtexKeyCiteMarkers() {
+    public boolean isCitationKeyCiteMarkers() {
         return (Boolean) citProperties.get(BIBTEX_KEY_CITATIONS);
     }
 

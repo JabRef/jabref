@@ -13,7 +13,7 @@ import org.jabref.model.strings.StringUtil;
 /**
  * Currently only checks the key if there is an author, year, and title present.
  */
-public class BibtexKeyChecker implements EntryChecker {
+public class CitationKeyChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
@@ -27,7 +27,7 @@ public class BibtexKeyChecker implements EntryChecker {
         if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
             String authorTitleYear = entry.getAuthorTitleYear(100);
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("empty BibTeX key") + ": " + authorTitleYear, entry, InternalField.KEY_FIELD));
+                    Localization.lang("empty citation key") + ": " + authorTitleYear, entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();
