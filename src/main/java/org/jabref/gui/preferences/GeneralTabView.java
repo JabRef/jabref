@@ -29,7 +29,7 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
-    @FXML private ComboBox<BibDatabaseMode> biblatexMode;
+//    @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
     @FXML private CheckBox allowIntegerEdition;
@@ -79,11 +79,11 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         defaultEncoding.itemsProperty().bind(viewModel.encodingsListProperty());
         defaultEncoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
 
-        new ViewModelListCellFactory<BibDatabaseMode>()
-                .withText(BibDatabaseMode::getFormattedName)
-                .install(biblatexMode);
-        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
-        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
+//        new ViewModelListCellFactory<BibDatabaseMode>()
+//                .withText(BibDatabaseMode::getFormattedName)
+//                .install(biblatexMode);
+//        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
+//        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
