@@ -68,15 +68,15 @@ public class AuthorListTest {
     }
 
     @Test
-    public void parseFirstNameOneAuthorWithLatexAndEscapedBrackets() {
-        Author author = oneAuthorWithEscapedBrackets().getAuthor(0);
-        assertEquals("Łu}kas{z", author.getFirst().orElse(null));
+    public void parseFirstNameOneAuthorWithLatexAndEscapedBrackets() throws Exception {
+        assertEquals("Łu}kas{z",
+                oneAuthorWithEscapedBrackets().getAuthor(0).getFirst().orElse(null));
     }
 
     @Test
-    public void parseLastNameOneAuthorWithLatexAndEscapedBrackets() {
-        Author author = oneAuthorWithEscapedBrackets().getAuthor(0);
-        assertEquals("Mic}h{ał", author.getLast().orElse(null));
+    public void parseLastNameOneAuthorWithLatexAndEscapedBrackets() throws Exception {
+        assertEquals("Mic}h{ał",
+                oneAuthorWithEscapedBrackets().getAuthor(0).getLast().orElse(null));
     }
 
     @Test
