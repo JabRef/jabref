@@ -107,7 +107,7 @@ public class LibraryPropertiesDialogViewModel {
         }
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();
-        //allow entrytype field as sort criterion
+        // allow entrytype field as sort criterion
         fieldNames.add(InternalField.TYPE_HEADER);
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
