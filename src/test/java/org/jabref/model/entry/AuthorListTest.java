@@ -60,36 +60,6 @@ public class AuthorListTest {
     }
 
     @Test
-    public void parseFirstNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
-        assertEquals("Mu{\\d{h}}ammad",
-                twoAuthorsWithLatex().getAuthor(0).getFirst().orElse(null));
-    }
-
-    @Test
-    public void parseFirstNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
-        assertEquals("Corrado",
-                twoAuthorsWithLatex().getAuthor(1).getFirst().orElse(null));
-    }
-
-    @Test
-    public void parseLastNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
-        assertEquals("al-Khw{\\={a}}rizm{\\={i}}",
-                twoAuthorsWithLatex().getAuthor(0).getLast().orElse(null));
-    }
-
-    @Test
-    public void parseLastNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
-        assertEquals("B{\\\"o}hm",
-                twoAuthorsWithLatex().getAuthor(1).getLast().orElse(null));
-    }
-
-    @Test
-    public void parseInstitutionAuthorWithLatexNames() throws Exception {
-        assertEquals("The Ban\\={u} M\\={u}s\\={a} brothers",
-                oneInstitutionWithLatex().getAuthor(0).getLast().orElse(null));
-    }
-
-    @Test
     public void testFixAuthorNatbib() {
         assertEquals("", AuthorList.fixAuthorNatbib(""));
         assertEquals("Smith", AuthorList.fixAuthorNatbib("John Smith"));
@@ -1133,6 +1103,36 @@ public class AuthorListTest {
     public void parseNameWithBraces() throws Exception {
         Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
         assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
+    }
+
+    @Test
+    public void parseFirstNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
+        assertEquals("Mu{\\d{h}}ammad",
+                twoAuthorsWithLatex().getAuthor(0).getFirst().orElse(null));
+    }
+
+    @Test
+    public void parseFirstNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
+        assertEquals("Corrado",
+                twoAuthorsWithLatex().getAuthor(1).getFirst().orElse(null));
+    }
+
+    @Test
+    public void parseLastNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
+        assertEquals("al-Khw{\\={a}}rizm{\\={i}}",
+                twoAuthorsWithLatex().getAuthor(0).getLast().orElse(null));
+    }
+
+    @Test
+    public void parseLastNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
+        assertEquals("B{\\\"o}hm",
+                twoAuthorsWithLatex().getAuthor(1).getLast().orElse(null));
+    }
+
+    @Test
+    public void parseInstitutionAuthorWithLatexNames() throws Exception {
+        assertEquals("The Ban\\={u} M\\={u}s\\={a} brothers",
+                oneInstitutionWithLatex().getAuthor(0).getLast().orElse(null));
     }
 
     /**
