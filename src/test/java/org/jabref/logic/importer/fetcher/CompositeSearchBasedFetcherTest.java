@@ -65,7 +65,7 @@ public class CompositeSearchBasedFetcherTest {
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                    Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum")));
+                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum")));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore the test should not fail
@@ -107,8 +107,17 @@ public class CompositeSearchBasedFetcherTest {
         // list.add(new MedlineFetcher());
 
         // Create different sized sets of fetchers to use in the composite fetcher.
-        for (int i = 1; i < list.size(); i++) {
-            fetcherParameters.add(new HashSet<>(list.subList(0, i)));
+        for (int i = 1; i < Math.pow(2, list.size()); i += 3) {
+            Set<SearchBasedFetcher> fetchers = new HashSet<>();
+            // Only shift i at maximum to its MSB to the right
+            for (int j = 0; Math.pow(2, j) <= i; j++) {
+                // Add fetcher j to the list if the j-th bit of i is 1
+                if ((i >> j) % 2 == 1) {
+                    fetchers.add(list.get(j));
+                }
+            }
+            System.out.println(fetchers);
+            fetcherParameters.add(fetchers);
         }
 
         return fetcherParameters.stream().map(Arguments::of);
