@@ -42,7 +42,9 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                 LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                 return Stream.empty();
             }
-        }).parallel().limit(maximumNumberOfReturnedResults).collect(Collectors.toList());
+        }).parallel()
+          .limit(maximumNumberOfReturnedResults)
+          .collect(Collectors.toList());
     }
 
     @Override
