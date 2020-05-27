@@ -107,7 +107,8 @@ public class CompositeSearchBasedFetcherTest {
         // list.add(new MedlineFetcher());
 
         // Create different sized sets of fetchers to use in the composite fetcher.
-        for (int i = 1; i < Math.pow(2, list.size()); i += 3) {
+        // Selected 273 to have differencing sets
+        for (int i = 1; i < Math.pow(2, list.size()); i += 273) {
             Set<SearchBasedFetcher> fetchers = new HashSet<>();
             // Only shift i at maximum to its MSB to the right
             for (int j = 0; Math.pow(2, j) <= i; j++) {
@@ -116,7 +117,6 @@ public class CompositeSearchBasedFetcherTest {
                     fetchers.add(list.get(j));
                 }
             }
-            System.out.println(fetchers);
             fetcherParameters.add(fetchers);
         }
 
