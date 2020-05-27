@@ -139,7 +139,7 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
 
 ## Using Localization correctly
 
-_\(More information about this topic from the translator side is provided under this link:_ [_Translating JabRef Interface_](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) _about the JabRef interface and_ [_Translating JabRef Help_](https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) _about the JabRef help files\)_
+More information about this topic from the translator side is provided at [Translating JabRef Interface](https://docs.jabref.org/faqcontributing/how-to-translate-the-ui).
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
