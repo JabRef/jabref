@@ -33,15 +33,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +56,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private ObservableList<BibEntry> entries;
     private PreferencesService preferences;
 
-    private Optional<BibEntry> internalDuplicate;
-    private Optional<BibEntry> datasetDuplicate;
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
@@ -98,16 +92,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return entries;
     }
 
-    /*public boolean hasDuplicate(BibEntry entry) {
+    public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent()
                 ||
                 new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
-    }*/
-    public boolean hasDuplicate(BibEntry entry) {
-
-        this.internalDuplicate = findInternalDuplicate(entry);
-        this.datasetDuplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
-        return this.internalDuplicate.isPresent() || this.datasetDuplicate.isPresent();
     }
 
     /**
@@ -122,21 +110,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             BackgroundTask.wrap(() -> entriesToImport.stream()
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
-                    StringBuffer duplicateInfo = new StringBuffer("There are possible duplicates (") ;
-                    if (this.datasetDuplicate.isPresent()){
-                        duplicateInfo.append("duplicate to the entry in the database whose Bibtexkey is : ");
-                        duplicateInfo.append(this.datasetDuplicate.get().getField(InternalField.KEY_FIELD).get());
-                    }
-                    else if (this.internalDuplicate.isPresent()){
-                        duplicateInfo.append("duplicate to the entry in the list of entries to be imported whose title is : ");
-                        duplicateInfo.append(this.internalDuplicate.get().getField(StandardField.TITLE).get());
-
-                    }
-                    duplicateInfo.append(") that haven't been resolved. Continue?");
-
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                            //Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
-                            Localization.lang(duplicateInfo.toString()),
+                            Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
                             Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
                             Localization.lang("Disable this confirmation dialog"),
