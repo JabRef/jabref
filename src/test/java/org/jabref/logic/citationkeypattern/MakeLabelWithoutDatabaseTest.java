@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtexkeypattern;
+package org.jabref.logic.citationkeypattern;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

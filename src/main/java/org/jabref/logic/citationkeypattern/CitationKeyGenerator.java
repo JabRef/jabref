@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtexkeypattern;
+package org.jabref.logic.citationkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;

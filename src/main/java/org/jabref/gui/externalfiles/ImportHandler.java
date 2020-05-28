@@ -13,7 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.logic.bibtexkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;

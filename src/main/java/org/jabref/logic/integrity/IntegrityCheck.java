@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.bibtexkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtexkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 

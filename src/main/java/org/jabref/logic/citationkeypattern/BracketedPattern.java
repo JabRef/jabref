@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtexkeypattern;
+package org.jabref.logic.citationkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.bibtexkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
+import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 
 /**
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
