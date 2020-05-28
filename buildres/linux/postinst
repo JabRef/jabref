@@ -26,7 +26,7 @@ case "$1" in
         # Trigger an auto-install of the browser addon for chrome/chromium browsers
         install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
         install -D -m0644 /opt/jabref/lib/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
-	DESKTOP_COMMANDS_INSTALL
+        DESKTOP_COMMANDS_INSTALL
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
