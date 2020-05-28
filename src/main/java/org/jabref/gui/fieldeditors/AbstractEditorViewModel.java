@@ -63,12 +63,13 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        String oldValue = entry.getField(field).orElse(null);
-                        if (!newValue.equals(oldValue)) {
-                            entry.setField(field, newValue);
-                            UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
-                            undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-                        }
+                        entry.getField(field).ifPresent(oldValue -> {
+                            if (!(newValue.trim()).equals(oldValue.trim())) {
+                                entry.setField(field, newValue);
+                                UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
+                                undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                            }
+                        });
                     }
                 });
     }
