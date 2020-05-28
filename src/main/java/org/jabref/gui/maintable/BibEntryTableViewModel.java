@@ -117,31 +117,30 @@ public class BibEntryTableViewModel {
         ObservableValue<String> value = fieldValues.get(fields);
         if (value != null) {
             return value;
-        } else {
-            ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
-            observables.add(nameFormatter);
+        }
 
-            value = Bindings.createStringBinding(() -> {
-                boolean isName = false;
+        ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
+        observables.add(nameFormatter);
 
-                Optional<String> content = Optional.empty();
-                for (Field field : fields) {
-                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+        value = Bindings.createStringBinding(() -> {
+            for (Field field : fields) {
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
+
+                    if (name.isPresent()) {
+                        return nameFormatter.formatNameLatexFree(name.get());
+                    }
+                } else {
+                    Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+
                     if (content.isPresent()) {
-                        isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                        break;
+                        return content.get();
                     }
                 }
-
-                String result = content.orElse(null);
-                if (isName) {
-                    return nameFormatter.getValue().formatName(result);
-                } else {
-                    return result;
-                }
-            }, observables.toArray(Observable[]::new));
-            fieldValues.put(fields, value);
-            return value;
-        }
+            }
+            return "";
+        }, observables.toArray(Observable[]::new));
+        fieldValues.put(fields, value);
+        return value;
     }
 }

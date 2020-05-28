@@ -12,12 +12,13 @@ public class MainTableNameFormatter {
     }
 
     /**
-     * Format a name field for the table, according to user preferences.
+     * Format a name field for the table, according to user preferences and with latex expressions translated if
+     * possible.
      *
      * @param nameToFormat The contents of the name field.
      * @return The formatted name field.
      */
-    public String formatName(final String nameToFormat) {
+    public String formatNameLatexFree(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;
         }
@@ -26,26 +27,26 @@ public class MainTableNameFormatter {
         MainTableNameFormatPreferences.DisplayStyle displayStyle = nameFormatPreferences.getDisplayStyle();
         MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
 
+        AuthorList authors = AuthorList.parse(nameToFormat);
+
         if (((displayStyle == MainTableNameFormatPreferences.DisplayStyle.FIRSTNAME_LASTNAME)
                 || (displayStyle == MainTableNameFormatPreferences.DisplayStyle.LASTNAME_FIRSTNAME))
                 && abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.LASTNAME_ONLY) {
-            return AuthorList.fixAuthorLastNameOnlyCommas(nameToFormat, false);
+            return authors.getAsLastNamesLatexFree(false);
         }
 
         switch (nameFormatPreferences.getDisplayStyle()) {
             case AS_IS:
                 return nameToFormat;
             case NATBIB:
-                return AuthorList.fixAuthorNatbib(nameToFormat);
+                return authors.getAsNatbibLatexFree();
             case FIRSTNAME_LASTNAME:
-                return AuthorList.fixAuthorFirstNameFirstCommas(
-                        nameToFormat,
+                return authors.getAsFirstLastNamesLatexFree(
                         abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
                         false);
             default:
             case LASTNAME_FIRSTNAME:
-                return AuthorList.fixAuthorLastNameFirstCommas(
-                        nameToFormat,
+                return authors.getAsLastFirstNamesLatexFree(
                         abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
                         false);
         }
