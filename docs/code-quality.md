@@ -8,7 +8,7 @@ We monitor the general source code quality at three places:
 
 We strongly recommend to read following two books on code quality:
 
-* [Java by Comparison](https://github.com/JabRef/jabref/tree/c81740b3818c7f9311a6d7ff063243e672c821b4/docs/java.by-comparison.com) is a book by three JabRef developers which focuses on code improvements close to single statements. It is fast to read and one gains much information from each recommendation discussed in the book.
+* [Java by Comparison](http://java.by-comparison.com) is a book by three JabRef developers which focuses on code improvements close to single statements. It is fast to read and one gains much information from each recommendation discussed in the book.
 * [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/) is the standard book for advanced Java programming. Did you know that `enum` is the [recommended way to enforce a singleton instance of a class](https://learning.oreilly.com/library/view/effective-java-3rd/9780134686097/ch2.xhtml#lev3)? Did you know that one should [refer to objects by their interfaces](https://learning.oreilly.com/library/view/effective-java-3rd/9780134686097/ch9.xhtml#lev64)?
 
 The principles we follow to ensure high code quality in JabRef is stated at our [Development Strategy](development-strategy.md).

@@ -42,7 +42,7 @@ This log lists the decisions for JabRef.
 * [ADR-0007](adr/0007-human-readable-changelog.md) - Provide a human-readable changelog
 * [ADR-0008](adr/0008-use-public-final-instead-of-getters.md) - Use public final instead of getters to offer access to immutable variables
 * [ADR-0009](adr/0009-use-plain-junit5-for-testing.md) - Use Plain JUnit5 for advanced test assertions
-* [ADR-0010](0010-use-h2-as-internal-database.md) - Use H2 as Internal SQL Database
+* [ADR-0010](adr/0010-use-h2-as-internal-database.md) - Use H2 as Internal SQL Database
 
 For new ADRs, please use [template.md](adr/template.md) as basis. More information on MADR is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/).
 
