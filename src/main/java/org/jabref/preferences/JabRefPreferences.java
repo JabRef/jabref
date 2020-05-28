@@ -219,8 +219,8 @@ public class JabRefPreferences implements PreferencesService {
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
-    public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
-    public static final String UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
+    public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
+    public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -390,7 +390,7 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
 
     /**
-     * Cache variable for <code>getGlobalBibtexKeyPattern</code>
+     * Cache variable for <code>getGlobalCitationKeyPattern</code>
      */
     private GlobalCitationKeyPattern globalCitationKeyPattern;
 
@@ -588,8 +588,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
-        defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
+        defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
+        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -1697,7 +1697,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUnwantedCharacters() {
-        return get(UNWANTED_BIBTEX_KEY_CHARACTERS);
+        return get(UNWANTED_CITATION_KEY_CHARACTERS);
     }
 
     @Override
@@ -1978,7 +1978,7 @@ public class JabRefPreferences implements PreferencesService {
      */
     @Override
     public void updateGlobalCitationKeyPattern() {
-        this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
+        this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
         Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
@@ -2004,9 +2004,9 @@ public class JabRefPreferences implements PreferencesService {
 
         if ((this.globalCitationKeyPattern.getDefaultValue() == null)
                 || this.globalCitationKeyPattern.getDefaultValue().isEmpty()) {
-            put(DEFAULT_BIBTEX_KEY_PATTERN, "");
+            put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
-            put(DEFAULT_BIBTEX_KEY_PATTERN, globalCitationKeyPattern.getDefaultValue().get(0));
+            put(DEFAULT_CITATION_KEY_PATTERN, globalCitationKeyPattern.getDefaultValue().get(0));
         }
 
         // Store overridden definitions to Preferences.
@@ -2051,7 +2051,7 @@ public class JabRefPreferences implements PreferencesService {
                 keySuffix,
                 get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT),
-                get(UNWANTED_BIBTEX_KEY_CHARACTERS),
+                get(UNWANTED_CITATION_KEY_CHARACTERS),
                 getGlobalCitationKeyPattern(),
                 getKeywordDelimiter());
     }
@@ -2080,7 +2080,7 @@ public class JabRefPreferences implements PreferencesService {
 
         put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
         put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
-        put(UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
+        put(UNWANTED_CITATION_KEY_CHARACTERS, preferences.getUnwantedCharacters());
 
         storeGlobalCitationKeyPattern(preferences.getKeyPattern());
     }
@@ -2117,9 +2117,9 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Creates the GlobalBibtexKeyPattern from cache
+     * Creates the GlobalCitationKeyPattern from cache
      *
-     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
+     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractKeyPattern
      */
     private List<MainTableColumnModel> createMainTableColumns() {
         if (this.mainTableColumns == null) {
@@ -2129,7 +2129,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Reloads the GlobalBibtexKeyPattern from scratch
+     * Reloads the GlobalCitationKeyPattern from scratch
      */
     @Override
     public void updateMainTableColumns() {

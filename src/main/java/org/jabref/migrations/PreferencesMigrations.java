@@ -187,11 +187,11 @@ public class PreferencesMigrations {
             Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
             // Migrate default pattern
-            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null) == null) {
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, null) == null) {
                 // Check whether old defaultLabelPattern is set
                 String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
                 if (oldDefault != null) {
-                    prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
+                    prefs.put(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, oldDefault);
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
             }
@@ -296,7 +296,7 @@ public class PreferencesMigrations {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+                prefs.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }

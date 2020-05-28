@@ -74,7 +74,7 @@ public class CitationKeyPatternPanel extends Pane {
         rowIndex++;
         Label defaultPattern = new Label(Localization.lang("Default pattern"));
         Button button = new Button("Default");
-        button.setOnAction(e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        button.setOnAction(e -> defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN)));
         gridPane.add(defaultPattern, 1, rowIndex);
         gridPane.add(defaultPat, 2, rowIndex);
         gridPane.add(button, 3, rowIndex);
@@ -84,7 +84,7 @@ public class CitationKeyPatternPanel extends Pane {
             Label label1 = new Label(type.getType().getDisplayName());
             TextField textField = new TextField();
             Button button1 = new Button("Default");
-            button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+            button1.setOnAction(e1 -> textField.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN)));
 
             gridPane.add(label1, 1 + (columnIndex * 3), rowIndex);
             gridPane.add(textField, 2 + (columnIndex * 3), rowIndex);
@@ -112,7 +112,7 @@ public class CitationKeyPatternPanel extends Pane {
             for (TextField field : textFields.values()) {
                 field.setText("");
             }
-            defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+            defaultPat.setText((String) Globals.prefs.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
         });
         gridPane.add(btnDefaultAll1, 2, rowIndex);
     }

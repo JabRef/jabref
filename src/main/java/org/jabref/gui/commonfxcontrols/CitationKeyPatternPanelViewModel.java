@@ -72,12 +72,12 @@ public class CitationKeyPatternPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
-        item.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        item.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
     }
 
     public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {
