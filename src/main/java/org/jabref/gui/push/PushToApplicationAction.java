@@ -31,8 +31,8 @@ public class PushToApplicationAction extends SimpleCommand {
 
     private PushToApplication application;
 
-    public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.application = Objects.requireNonNull(Globals.prefs.getActivePushToApplication(pushToApplicationsManager));
+    public PushToApplicationAction(PushToApplication application, StateManager stateManager, DialogService dialogService) {
+        this.application = application;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
@@ -74,7 +74,7 @@ public class PushToApplicationAction extends SimpleCommand {
         boolean first = true;
         for (BibEntry bes : entries) {
             citeKey = bes.getCiteKeyOptional();
-            if (!(citeKey.isPresent()) || citeKey.get().isEmpty()) {
+            if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
                 // Should never occur, because we made sure that all entries have keys
                 continue;
             }

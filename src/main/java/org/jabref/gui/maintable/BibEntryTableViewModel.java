@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
@@ -32,14 +34,14 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 public class BibEntryTableViewModel {
     private final BibEntry entry;
     private final BibDatabase database;
-    private final MainTableNameFormatter nameFormatter;
+    private final ObservableValue<MainTableNameFormatter> nameFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, MainTableNameFormatter nameFormatter) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, ObservableValue<MainTableNameFormatter> nameFormatter) {
         this.entry = entry;
         this.database = database.getDatabase();
         this.nameFormatter = nameFormatter;
@@ -115,28 +117,30 @@ public class BibEntryTableViewModel {
         ObservableValue<String> value = fieldValues.get(fields);
         if (value != null) {
             return value;
-        } else {
-            value = Bindings.createStringBinding(() -> {
-                boolean isName = false;
+        }
 
-                Optional<String> content = Optional.empty();
-                for (Field field : fields) {
-                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+        ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
+        observables.add(nameFormatter);
+
+        value = Bindings.createStringBinding(() -> {
+            for (Field field : fields) {
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+                    Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
+
+                    if (name.isPresent()) {
+                        return nameFormatter.getValue().formatNameLatexFree(name.get());
+                    }
+                } else {
+                    Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+
                     if (content.isPresent()) {
-                        isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                        break;
+                        return content.get();
                     }
                 }
-
-                String result = content.orElse(null);
-                if (isName) {
-                    return nameFormatter.formatName(result);
-                } else {
-                    return result;
-                }
-            }, entry.getObservables());
-            fieldValues.put(fields, value);
-            return value;
-        }
+            }
+            return "";
+        }, observables.toArray(Observable[]::new));
+        fieldValues.put(fields, value);
+        return value;
     }
 }

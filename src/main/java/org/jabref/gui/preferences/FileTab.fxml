@@ -43,7 +43,7 @@
         <TextField fx:id="mainFileDir" HBox.hgrow="ALWAYS"/>
         <Button onAction="#mainFileDirBrowse" text="%Browse"/>
     </HBox>
-    <CheckBox fx:id="useBibLocationAsPrimary" text="%Use the BIB file location as primary file directory">
+    <CheckBox fx:id="useBibLocationAsPrimary" text="%Search and store files relative to library file location">
         <tooltip>
             <Tooltip
                     text="%When downloading files, or moving linked files to the file directory, prefer the BIB file location rather than the file directory set above"/>

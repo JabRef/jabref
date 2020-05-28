@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This class tests the Integrity Checker as a whole.
@@ -177,8 +178,10 @@ class IntegrityCheckTest {
     }
 
     private void assertCorrect(BibDatabaseContext context) {
+        FilePreferences filePreferencesMock = mock(FilePreferences.class);
+        when(filePreferencesMock.isBibLocationAsPrimary()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
+                filePreferencesMock,
                 createCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
