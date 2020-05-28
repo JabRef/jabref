@@ -712,7 +712,7 @@ public class AuthorList {
         return authorsAlph;
     }
 
-    public void addAuthor(String first, String firstabbr, String von, String last, String jr) {
-        authors.add(new Author(first, firstabbr, von, last, jr));
+    public void addAuthor(String first, String firstNameAbbreviation, String von, String last, String jr) {
+        authors.add(new Author(first, firstNameAbbreviation, von, last, jr));
     }
 }
