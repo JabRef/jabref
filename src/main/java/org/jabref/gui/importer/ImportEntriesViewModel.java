@@ -62,7 +62,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private Optional<BibEntry> internalDuplicate;
     private Optional<BibEntry> datasetDuplicate;
-    private List<BibEntry> entriesToImport;
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
@@ -119,7 +118,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void importEntries(List<BibEntry> entriesToImport, boolean downloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
-        this.entriesToImport = entriesToImport;
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
             BackgroundTask.wrap(() -> entriesToImport.stream()
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
@@ -241,7 +239,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @return A possible duplicate, if any, or null if none were found.
      */
     private Optional<BibEntry> findInternalDuplicate(BibEntry entry) {
-        for (BibEntry othEntry : entriesToImport) {
+        for (BibEntry othEntry : entries) {
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
