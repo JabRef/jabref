@@ -22,6 +22,7 @@ import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public class AbstractEditorViewModel extends AbstractViewModel {
@@ -63,13 +64,15 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        entry.getField(field).ifPresent(oldValue -> {
-                            if (!(newValue.trim()).equals(oldValue.trim())) {
-                                entry.setField(field, newValue);
-                                UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
-                                undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-                            }
-                        });
+                        String oldValue = entry.getField(field).orElse(null);
+
+                        // Autosave and save action trigger the entry editor to reload the fields, so we have to
+                        // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
+                        if (!(newValue.trim()).equals(StringUtils.trim(oldValue))) {
+                            entry.setField(field, newValue);
+                            UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
+                            undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                        }
                     }
                 });
     }
