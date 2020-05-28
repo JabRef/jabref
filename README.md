@@ -1,5 +1,3 @@
-<https://www.host-not-found.test>
-
 # JabRef Bibliography Management
 
 JabRef is an open-source, cross-platform citation and reference management tool.
@@ -99,6 +97,8 @@ and then generate the Eclipse `gradlew eclipse`.
 For IntelliJ IDEA, just import the project via a Gradle Import by pointing at the `build.gradle`.
 
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
+
+Just a test for markdown-link-check: <https://www.host-not-found.test>
 
 [BibTeX]: https://www.ctan.org/pkg/bibtex
 [Biblatex]: https://www.ctan.org/pkg/biblatex
