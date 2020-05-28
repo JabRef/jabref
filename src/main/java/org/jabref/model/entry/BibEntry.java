@@ -15,8 +15,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -41,13 +39,14 @@ import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Represents a BibTex / BibLaTeX entry.
- *
+ * <p>
  * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCiteKey(String)} and {@link #withField(Field, String)}.
  */
 public class BibEntry implements Cloneable {
@@ -82,7 +81,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
-     *
+     * <p>
      * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
@@ -123,7 +122,6 @@ public class BibEntry implements Cloneable {
      * @param targetField field name of the BibEntry
      * @param targetEntry type of the BibEntry
      * @param sourceEntry type of the cross-referenced BibEntry
-     *
      * @return the mapped field or null if there is no valid mapping available
      */
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
@@ -299,7 +297,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
-     *
+     * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
@@ -376,8 +374,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an set containing the names of all fields that are
-     * set for this particular entry.
+     * Returns an set containing the names of all fields that are set for this particular entry.
      *
      * @return a set of existing field names
      */
@@ -464,11 +461,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Return the LaTeX-free contents of the given field or its alias an an Optional
-     *
+     * <p>
      * For details see also {@link #getFieldOrAlias(Field)}
      *
      * @param name the name of the field
-     * @return  the stored latex-free content of the field (or its alias)
+     * @return the stored latex-free content of the field (or its alias)
      */
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
         return genericGetFieldOrAlias(name, BibEntry::getLatexFreeField);
@@ -754,7 +751,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
-            Character keywordDelimiter) {
+                                                 Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
 
@@ -812,7 +809,7 @@ public class BibEntry implements Cloneable {
     }
 
     /*
-    * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
+     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
         return commentsBeforeEntry;
@@ -820,7 +817,7 @@ public class BibEntry implements Cloneable {
 
     public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
         return getField(field).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
-                .orElse(Collections.emptyList());
+                              .orElse(Collections.emptyList());
     }
 
     public Optional<FieldChange> setEntryLinkList(Field field, List<ParsedEntryLink> list) {
@@ -931,14 +928,14 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public ObjectBinding<String> getFieldBinding(Field field) {
+    public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return (ObjectBinding<String>) EasyBind.map(type, EntryType::getDisplayName);
-      }
-       return Bindings.valueAt(fields, field);
+            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
+        }
+        return EasyBind.valueAt(fields, field);
     }
 
-    public ObjectBinding<String> getCiteKeyBinding() {
+    public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
     }
 

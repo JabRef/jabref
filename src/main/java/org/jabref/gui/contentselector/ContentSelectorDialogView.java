@@ -20,7 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ContentSelectorDialogView extends BaseDialog<Void> {
 
@@ -51,8 +51,8 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
         this.basePanel = basePanel;
 
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> saveChangesAndClose());
     }

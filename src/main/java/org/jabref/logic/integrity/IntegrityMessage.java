@@ -6,9 +6,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public final class IntegrityMessage implements Cloneable {
-
     private final BibEntry entry;
-
     private final Field field;
     private final String message;
 

@@ -16,7 +16,7 @@
             <JabRefIconView glyph="OPEN_LINK"/>
         </graphic>
         <tooltip>
-            <Tooltip text="%Open" />
+            <Tooltip text="%Open"/>
         </tooltip>
     </Button>
     <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="icon-button"

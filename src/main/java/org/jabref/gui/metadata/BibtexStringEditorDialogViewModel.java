@@ -1,15 +1,12 @@
 package org.jabref.gui.metadata;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,12 +18,14 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
+    private static final String NEW_STRING_LABEL = "NewString"; // must not contain spaces
 
-    private final ListProperty<BibtexStringViewModel> allStrings = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<BibtexStringViewModel> selectedItemProperty = new SimpleObjectProperty<>();
+    private final ListProperty<BibtexStringEditorItemModel> stringsListProperty =
+            new SimpleListProperty<>(FXCollections.observableArrayList());
+
     private final BibDatabase bibDatabase;
     private final BooleanProperty validProperty = new SimpleBooleanProperty();
 
@@ -34,57 +33,68 @@ public class BibtexStringEditorDialogViewModel extends AbstractViewModel {
         this.bibDatabase = bibDatabase;
         addAllStringsFromDB();
 
-        ObservableList<ObservableValue<Boolean>> allValidProperty = EasyBind.map(allStringsProperty(), BibtexStringViewModel::combinedValidationValidProperty);
+        ObservableList<ObservableValue<Boolean>> allValidProperty =
+                EasyBind.map(stringsListProperty(), BibtexStringEditorItemModel::combinedValidationValidProperty);
         validProperty.bind(EasyBind.combine(allValidProperty, stream -> stream.allMatch(valid -> valid)));
     }
 
     private void addAllStringsFromDB() {
-
-        Set<BibtexStringViewModel> strings = bibDatabase.getStringValues()
-                                                        .stream()
-                                                        .sorted(new BibtexStringComparator(false))
-                                                        .map(this::convertFromBibTexString)
-                                                        .collect(Collectors.toSet());
-        allStrings.addAll(strings);
-    }
-
-    public ListProperty<BibtexStringViewModel> allStringsProperty() {
-        return this.allStrings;
+        stringsListProperty.addAll(bibDatabase.getStringValues().stream()
+                                              .sorted(new BibtexStringComparator(false))
+                                              .map(this::convertFromBibTexString)
+                                              .collect(Collectors.toSet()));
     }
 
     public void addNewString() {
-        allStrings.add(new BibtexStringViewModel("", ""));
+        BibtexStringEditorItemModel newItem;
+        if (labelAlreadyExists(NEW_STRING_LABEL).isPresent()) {
+            int i = 1;
+            while (labelAlreadyExists(NEW_STRING_LABEL + i).isPresent()) {
+                i++;
+            }
+            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL + i, "");
+        } else {
+            newItem = new BibtexStringEditorItemModel(NEW_STRING_LABEL, "");
+        }
+
+        stringsListProperty.add(newItem);
     }
 
-    public void removeString() {
-        BibtexStringViewModel toBeRemoved = selectedItemProperty.getValue();
-        allStrings.remove(toBeRemoved);
+    public void removeString(BibtexStringEditorItemModel item) {
+        stringsListProperty.remove(item);
     }
 
-    private BibtexStringViewModel convertFromBibTexString(BibtexString bibtexString) {
-        return new BibtexStringViewModel(bibtexString.getName(), bibtexString.getContent());
-    }
-
-    public ObjectProperty<BibtexStringViewModel> seletedItemProperty() {
-        return this.selectedItemProperty;
+    private BibtexStringEditorItemModel convertFromBibTexString(BibtexString bibtexString) {
+        return new BibtexStringEditorItemModel(bibtexString.getName(), bibtexString.getContent());
     }
 
     public void save() {
-        List<BibtexString> stringsToAdd = allStrings.stream().map(this::fromBibtexStringViewModel).collect(Collectors.toList());
-        bibDatabase.setStrings(stringsToAdd);
+        bibDatabase.setStrings(stringsListProperty.stream()
+                                                  .map(this::fromBibtexStringViewModel)
+                                                  .collect(Collectors.toList()));
     }
 
-    private BibtexString fromBibtexStringViewModel(BibtexStringViewModel viewModel) {
+    private BibtexString fromBibtexStringViewModel(BibtexStringEditorItemModel viewModel) {
         String label = viewModel.labelProperty().getValue();
         String content = viewModel.contentProperty().getValue();
         return new BibtexString(label, content);
     }
 
-    public BooleanProperty validProperty() {
-        return validProperty;
+    public Optional<BibtexStringEditorItemModel> labelAlreadyExists(String label) {
+        return stringsListProperty.stream()
+                                  .filter(item -> item.labelProperty().getValue().equals(label))
+                                  .findFirst();
     }
 
     public void openHelpPage() {
         HelpAction.openHelpPage(HelpFile.STRING_EDITOR);
+    }
+
+    public ListProperty<BibtexStringEditorItemModel> stringsListProperty() {
+        return stringsListProperty;
+    }
+
+    public BooleanProperty validProperty() {
+        return validProperty;
     }
 }

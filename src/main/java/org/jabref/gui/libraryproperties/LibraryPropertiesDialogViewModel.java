@@ -26,6 +26,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -106,6 +107,8 @@ public class LibraryPropertiesDialogViewModel {
         }
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();
+        // allow entrytype field as sort criterion
+        fieldNames.add(InternalField.TYPE_HEADER);
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
@@ -126,8 +129,8 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
             initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
-           cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
-           cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
+            cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
+            cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });
     }
 
@@ -314,7 +317,11 @@ public class LibraryPropertiesDialogViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return cleanupsProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+        return cleanupsProperty;
+    }
 }

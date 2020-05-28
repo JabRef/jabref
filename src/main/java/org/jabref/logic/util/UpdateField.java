@@ -20,9 +20,9 @@ public class UpdateField {
     /**
      * Updating a field will result in the entry being reformatted on save
      *
-     * @param be         BibEntry
-     * @param field      Field name
-     * @param newValue   New field value
+     * @param be       BibEntry
+     * @param field    Field name
+     * @param newValue New field value
      */
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue) {
         return updateField(be, field, newValue, false);
@@ -31,9 +31,9 @@ public class UpdateField {
     /**
      * Updating a non-displayable field does not result in the entry being reformatted on save
      *
-     * @param be         BibEntry
-     * @param field      Field name
-     * @param newValue   New field value
+     * @param be       BibEntry
+     * @param field    Field name
+     * @param newValue New field value
      */
     public static Optional<FieldChange> updateNonDisplayableField(BibEntry be, Field field, String newValue) {
         boolean changed = be.hasChanged();
@@ -45,10 +45,10 @@ public class UpdateField {
     /**
      * Undoable change of field value
      *
-     * @param be                          BibEntry
-     * @param field                       Field name
-     * @param newValue                    New field value
-     * @param nullFieldIfValueIsTheSame   If true the field value is removed when the current value is equals to newValue
+     * @param be                        BibEntry
+     * @param field                     Field name
+     * @param newValue                  New field value
+     * @param nullFieldIfValueIsTheSame If true the field value is removed when the current value is equals to newValue
      */
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue,
                                                     Boolean nullFieldIfValueIsTheSame) {

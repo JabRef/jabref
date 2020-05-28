@@ -7,7 +7,7 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 
 /**
  * Comparator for rankings.
- *
+ * <p>
  * Inverse comparison of ranking as rank5 is higher than rank1
  */
 public class RankingFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
@@ -33,5 +33,4 @@ public class RankingFieldComparator implements Comparator<Optional<SpecialFieldV
             }
         }
     }
-
 }

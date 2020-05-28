@@ -37,10 +37,13 @@ public class AutoCompletePreferences {
         return firstNameMode;
     }
 
-    public NameFormat getNameFormat() { return nameFormat; }
+    public NameFormat getNameFormat() {
+        return nameFormat;
+    }
 
     /**
      * Returns the list of fields for which autocomplete is enabled
+     *
      * @return List of field names
      */
     public Set<Field> getCompleteFields() {

@@ -164,7 +164,7 @@ class ModsExporter extends Exporter {
     }
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
-            ModsDefinition mods) {
+                                                    ModsDefinition mods) {
 
         relatedItem.getModsGroup().add(partDefinition);
         relatedItem.setAtType("host");

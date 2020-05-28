@@ -178,7 +178,7 @@ public class BibEntryTypesManager {
             customOrModifiedType.remove(type);
             customOrModifiedType.add(type);
         }
-        
+
         private void removeCustomOrModifiedEntryType(BibEntryType type) {
             customOrModifiedType.remove(type);
         }

@@ -56,7 +56,9 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     }
 
     @Override
-    public String getTabName() { return Localization.lang("File"); }
+    public String getTabName() {
+        return Localization.lang("File");
+    }
 
     public void initialize() {
         this.viewModel = new FileTabViewModel(dialogService, preferences);
@@ -94,5 +96,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
-    public void mainFileDirBrowse() { viewModel.mainFileDirBrowse(); }
+    public void mainFileDirBrowse() {
+        viewModel.mainFileDirBrowse();
+    }
 }

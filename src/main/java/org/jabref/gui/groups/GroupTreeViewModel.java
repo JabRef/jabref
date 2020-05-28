@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -31,7 +30,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -61,7 +60,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
         // Init
         refresh();
@@ -132,8 +131,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(newRoot);
             selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
-                            .collect(Collectors.toList()));
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                                .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(null);
         }
@@ -197,7 +196,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         keepPreviousAssignments,
                         removePreviousAssignments,
                         database.getEntries());
-                        // stateManager.getEntriesInCurrentDatabase());
+                // stateManager.getEntriesInCurrentDatabase());
 
                 // TODO: Add undo
                 // Store undo information.
@@ -250,7 +249,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             // panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
             groupNode.getParent()
-                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));

@@ -17,7 +17,8 @@ public class MergeReviewIntoCommentConfirmationDialog {
     }
 
     public boolean askUserForMerge(List<BibEntry> conflicts) {
-        String bibKeys = conflicts.stream()
+        String bibKeys = conflicts
+                .stream()
                 .map(BibEntry::getCiteKeyOptional)
                 .filter(Optional::isPresent)
                 .map(Optional::get)

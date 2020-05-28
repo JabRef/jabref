@@ -57,14 +57,14 @@ public class BibtexExtractorViewModel {
 
     public void startParsing() {
         BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
-                .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
-                .onSuccess(parsedEntries -> {
-                    dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
-                    importHandler.importEntries(parsedEntries);
-                    for (BibEntry bibEntry : parsedEntries) {
-                        trackNewEntry(bibEntry);
-                    }
-                }).executeWith(taskExecutor);
+                      .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
+                      .onSuccess(parsedEntries -> {
+                          dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
+                          importHandler.importEntries(parsedEntries);
+                          for (BibEntry bibEntry : parsedEntries) {
+                              trackNewEntry(bibEntry);
+                          }
+                      }).executeWith(taskExecutor);
     }
 
     private void trackNewEntry(BibEntry bibEntry) {

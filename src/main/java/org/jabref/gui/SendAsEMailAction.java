@@ -25,10 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Sends the selected entry as email - by Oliver Kopp
- *
+ * Sends the selected entry as email
+ * <p>
  * It uses the mailto:-mechanism
- *
+ * <p>
  * Microsoft Outlook does not support attachments via mailto
  * Therefore, the folder(s), where the file(s) belonging to the entry are stored,
  * are opened. This feature is disabled by default and can be switched on at

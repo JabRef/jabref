@@ -23,13 +23,11 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
-public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewModel> implements PreferencesTab {
+public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private Button remoteHelp;
-    @FXML private CheckBox useCaseKeeper;
-    @FXML private CheckBox useUnitFormatter;
 
     @FXML private CheckBox proxyUse;
     @FXML private Label proxyHostnameLabel;
@@ -48,7 +46,7 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AdvancedTabView(JabRefPreferences preferences) {
+    public NetworkTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -58,19 +56,16 @@ public class AdvancedTabView extends AbstractPreferenceTabView<AdvancedTabViewMo
 
     @Override
     public String getTabName() {
-        return Localization.lang("Advanced");
+        return Localization.lang("Network");
     }
 
     public void initialize() {
-        this.viewModel = new AdvancedTabViewModel(dialogService, preferences);
+        this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
         remoteLabel.setVisible(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
-
-        useCaseKeeper.selectedProperty().bindBidirectional(viewModel.useCaseKeeperProperty());
-        useUnitFormatter.selectedProperty().bindBidirectional(viewModel.useUnitFormatterProperty());
 
         proxyUse.selectedProperty().bindBidirectional(viewModel.proxyUseProperty());
         proxyHostnameLabel.disableProperty().bind(proxyUse.selectedProperty().not());

@@ -28,7 +28,7 @@ public class EntriesAddedEvent extends EntriesEvent {
 
     /**
      * @param bibEntries <code>List</code> of <code>BibEntry</code> objects which are being added.
-     * @param location Location affected by this event
+     * @param location   Location affected by this event
      */
     public EntriesAddedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
