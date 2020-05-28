@@ -128,7 +128,7 @@ public class BibEntryTableViewModel {
                     Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
 
                     if (name.isPresent()) {
-                        return nameFormatter.formatNameLatexFree(name.get());
+                        return nameFormatter.getValue().formatNameLatexFree(name.get());
                     }
                 } else {
                     Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, database);
