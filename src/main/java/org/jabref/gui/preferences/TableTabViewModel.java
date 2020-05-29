@@ -138,6 +138,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.OWNER.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, StandardField.GROUPS.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.KEY_FIELD.getName()),
+                new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.CITATION_COUNT.getName()),
                 new MainTableColumnModel(MainTableColumnModel.Type.NORMALFIELD, InternalField.TYPE_HEADER.getName())
         );
 
