@@ -26,6 +26,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -106,6 +107,8 @@ public class LibraryPropertiesDialogViewModel {
         }
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();
+        // allow entrytype field as sort criterion
+        fieldNames.add(InternalField.TYPE_HEADER);
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
