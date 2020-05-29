@@ -17,6 +17,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
@@ -112,8 +113,9 @@ class SaveDatabaseActionTest {
         when(savePreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
         GlobalBibtexKeyPattern emptyGlobalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern("");
-        when(savePreferences.getGlobalCiteKeyPattern()).thenReturn(emptyGlobalBibtexKeyPattern);
         when(metaData.getCiteKeyPattern(any(GlobalBibtexKeyPattern.class))).thenReturn(emptyGlobalBibtexKeyPattern);
+        when(savePreferences.getBibtexKeyPatternPreferences()).thenReturn(mock(BibtexKeyPatternPreferences.class));
+        when(savePreferences.getBibtexKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalBibtexKeyPattern);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(dbContext.getDatabase()).thenReturn(database);
@@ -144,7 +146,7 @@ class SaveDatabaseActionTest {
 
         assertEquals(database
                         .getEntries().stream()
-                        .map(entry -> entry.hasChanged()).filter(changed -> false).collect(Collectors.toList()),
+                        .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
                 Collections.emptyList());
     }
 

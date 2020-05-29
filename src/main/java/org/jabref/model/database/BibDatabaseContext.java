@@ -144,8 +144,6 @@ public class BibDatabaseContext {
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentPath);
-            } else {
-                fileDirs.add(parentPath);
             }
         });
 
