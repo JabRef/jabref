@@ -131,7 +131,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(newRoot);
             selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
                                 .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(null);
