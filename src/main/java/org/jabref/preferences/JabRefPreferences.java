@@ -47,6 +47,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
@@ -106,9 +108,6 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
-import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 
 public class JabRefPreferences implements PreferencesService {
 
@@ -1176,6 +1175,7 @@ public class JabRefPreferences implements PreferencesService {
                 getFieldContentParserPreferences());
     }
 
+    @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
@@ -1441,6 +1441,8 @@ public class JabRefPreferences implements PreferencesService {
 
     private SaveOrderConfig loadTableSaveOrder() {
         SaveOrderConfig config = new SaveOrderConfig();
+
+        updateMainTableColumns();
         List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
 
         sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
@@ -1928,15 +1930,18 @@ public class JabRefPreferences implements PreferencesService {
     // Network preferences
     //*************************************************************************************************************
 
+    @Override
     public RemotePreferences getRemotePreferences() {
         return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
     }
 
+    @Override
     public void storeRemotePreferences(RemotePreferences remotePreferences) {
         putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
+    @Override
     public ProxyPreferences getProxyPreferences() {
         Boolean useProxy = getBoolean(PROXY_USE);
         String hostname = get(PROXY_HOSTNAME);
@@ -1947,6 +1952,7 @@ public class JabRefPreferences implements PreferencesService {
         return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
     }
 
+    @Override
     public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
         putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
         put(PROXY_HOSTNAME, proxyPreferences.getHostname());
@@ -2089,6 +2095,7 @@ public class JabRefPreferences implements PreferencesService {
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
 
+    @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
         return new ExternalApplicationsPreferences(
                 get(EMAIL_SUBJECT),
@@ -2101,6 +2108,7 @@ public class JabRefPreferences implements PreferencesService {
                 get(FILE_BROWSER_COMMAND));
     }
 
+    @Override
     public void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences) {
         put(EMAIL_SUBJECT, preferences.getEmailSubject());
         putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, preferences.shouldAutoOpenEmailAttachmentsFolder());
@@ -2188,7 +2196,7 @@ public class JabRefPreferences implements PreferencesService {
     private void updateColumnSortOrder() {
         List<MainTableColumnModel> columnsOrdered = new ArrayList<>();
         getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
-                this.mainTableColumnSortOrder.stream().filter(column ->
+                mainTableColumns.stream().filter(column ->
                         column.getName().equals(columnName))
                                              .findFirst()
                                              .ifPresent(columnsOrdered::add));

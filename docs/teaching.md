@@ -5,7 +5,7 @@ When taking part in JabRef development, one will learn modern Java coding practi
 
 JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engienering skills will have increased. Our [development strategy](development-strategy.md) provides more details.
 
-We recommend to start early and constantly, since students wirking earlier and more often, produce projects that are more correct, completed earlier at the same overall invested time <sup id="a1">[1](#Ayaankazerouni)</sup>. 
+We recommend to start early and constantly, since students wirking earlier and more often, produce projects that are more correct, completed earlier at the same overall invested time <sup id="a1">[1](#Ayaankazerouni)</sup>.
 
 ## Notes for instructors
 
