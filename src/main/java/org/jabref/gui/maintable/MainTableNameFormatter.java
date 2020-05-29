@@ -33,7 +33,7 @@ public class MainTableNameFormatter {
         AuthorList authors = AuthorList.parse(nameToFormat);
 
         if (namesAsIs) {
-            return nameToFormat;
+            return authors.getAsUnformattedLatexFree();
         } else if (namesNatbib) {
             return authors.getAsNatbibLatexFree();
         } else if (namesLastOnly) {

@@ -139,6 +139,8 @@ public class AuthorList {
     private String authorsFirstFirstAnds;
     private String authorsAlph;
     private String authorsNatbibLatexFree;
+    private String authorsUnformatted;
+    private String authorsUnformattedLatexFree;
 
     /**
      * Creates a new list of authors.
@@ -170,6 +172,7 @@ public class AuthorList {
      */
     public static AuthorList parse(String authors) {
         Objects.requireNonNull(authors);
+        final String unformattedAuthors = authors;
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
@@ -219,6 +222,7 @@ public class AuthorList {
         if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();
             authorList = parser.parse(authors);
+            authorList.authorsUnformatted = unformattedAuthors;
             AUTHOR_CACHE.put(authors, authorList);
         }
         return authorList;
@@ -642,6 +646,15 @@ public class AuthorList {
 
         authorsFirstFirstLatexFree[abbreviationIndex] = LatexToUnicodeAdapter.format(getAsFirstLastNames(abbreviate, oxfordComma));
         return authorsFirstFirstLatexFree[abbreviationIndex];
+    }
+
+    public String getAsUnformattedLatexFree() {
+        if (authorsUnformattedLatexFree != null) {
+            return authorsUnformattedLatexFree;
+        }
+
+        authorsUnformattedLatexFree = LatexToUnicodeAdapter.format(authorsUnformatted);
+        return authorsUnformattedLatexFree;
     }
 
     /**
