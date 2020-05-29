@@ -37,6 +37,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Run markdown-lint
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: CHANGELOG.md README.md docs/
+          config: '.markdownlint.yml'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest

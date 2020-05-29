@@ -44,3 +44,4 @@ Chosen option: "Only translated strings in language file", because comes out bes
 
 * Related to [ADR-0001](0001-use-crowdin-for-translations.md).
 
+<!-- markdownlint-disable-file MD024 -->
