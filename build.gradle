@@ -387,7 +387,7 @@ run {
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
                 
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
+                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle',
                 
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
