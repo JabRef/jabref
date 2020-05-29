@@ -1079,11 +1079,18 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
+    private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(panel.frame(), stateManager)));
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
+                );
 
         return contextMenu;
     }
@@ -1098,7 +1105,7 @@ public class JabRefFrame extends BorderPane {
         });
 
         // add tab context menu
-        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs(), basePanel, stateManager));
+        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
 
         // update all tab titles
         updateAllTabTitles();
@@ -1313,6 +1320,31 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             closeTab(getCurrentBasePanel());
+        }
+    }
+
+    private class CloseOthersDatabaseAction extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            BasePanel currentBasePanel = getCurrentBasePanel();
+            for (Tab tab : tabbedPane.getTabs()){
+                BasePanel basePanel = getBasePanel(tab);
+                if (basePanel != currentBasePanel){
+                    closeTab(basePanel);
+                }
+            }
+        }
+    }
+
+    private class CloseAllDatabaseAction extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            for (Tab tab : tabbedPane.getTabs()){
+                BasePanel basePanel = getBasePanel(tab);
+                closeTab(basePanel);
+            }
         }
     }
 
