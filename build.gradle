@@ -50,11 +50,9 @@ application {
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-patchModules.config = [
-        "test=fastparse_2.12-1.0.0.jar",
-        "test2=fastparse-utils_2.12-1.0.0.jar",
-        "test3=sourcecode_2.12-0.1.4.jar"
-]
+modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
+modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
+modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
@@ -383,45 +381,41 @@ compileJava {
 
 run {
     // TODO: Remove access to internal api
-    jvmArgs '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
-            '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
-            '--add-opens', 'org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref',
-            '--add-opens', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            // Not sure why we need to restate the controlfx exports
-            // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
-            "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
-            "--add-exports", "javafx.web/com.sun.webkit=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
-            "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
-            "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
-            "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
-            "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix",
-            '--add-exports', 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle'
-
-    // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
-    // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
                 'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
+                
+                // Not sure why we need to restate the controlfx exports
+                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
+                'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.inputmap' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.event' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.collections' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.runtime': 'org.controlsfx.controls',
+                'javafx.web/com.sun.webkit' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls'
         ]
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref'
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                
+                'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
+                
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
+                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
+                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
+                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
         ]
     }
 }
