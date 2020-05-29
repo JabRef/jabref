@@ -21,11 +21,6 @@ plugins {
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
 }
-pluginRepositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
