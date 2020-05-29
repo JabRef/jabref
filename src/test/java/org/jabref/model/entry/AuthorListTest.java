@@ -128,6 +128,59 @@ public class AuthorListTest {
     }
 
     @Test
+    public void getAsUnformattedLatexFreeEmptyAuthorStringForEmptyInput() {
+        assertEquals("", emptyAuthor().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeCachesLatexFreeString() {
+        String cachedString = oneAuthorWithLatex().getAsUnformattedLatexFree();
+        assertSame(cachedString, oneAuthorWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeOneAuthorNameFromLatex() {
+        assertEquals("Muḥammad al-Khwārizmī",
+                oneAuthorWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeTwoAuthorNamesFromLatex() {
+        assertEquals("Muḥammad al-Khwārizmī and Corrado Böhm",
+                twoAuthorsWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeThreeAuthorsromLatex() {
+        assertEquals("Muḥammad al-Khwārizmī and Corrado Böhm and Kurt Gödel",
+                threeAuthorsWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeOneInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers",
+                oneInstitutionWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeTwoInsitutionNameFromLatex() {
+        assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
+                twoInstitutionsWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeUnicodeMixedAuthorsFromLatex() {
+        assertEquals("The Banū Mūsā brothers and Corrado Böhm",
+                mixedAuthorAndInstituteWithLatex().getAsUnformattedLatexFree());
+    }
+
+    @Test
+    public void getAsUnformattedLatexFreeOneInstitutionWithParanthesisAtStart() {
+        assertEquals("Łukasz Michał",
+                oneInstitutionWithParanthesisAtStart().getAsUnformattedLatexFree());
+    }
+
+    @Test
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
