@@ -5,15 +5,15 @@ import java.nio.charset.Charset;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class GeneralPreferences {
-        private final Charset defaultEncoding;
-        private final BibDatabaseMode defaultBibDatabaseMode;
+    private final Charset defaultEncoding;
+    private final BibDatabaseMode defaultBibDatabaseMode;
 
-        private final boolean warnAboutDuplicatesInInspection;
-        private final boolean confirmDelete;
-        private final boolean allowIntegerEditionBibtex;
-        private final boolean memoryStickMode;
-        private final boolean collectTelemetry;
-        private final boolean showAdvancedHints;
+    private final boolean warnAboutDuplicatesInInspection;
+    private final boolean confirmDelete;
+    private final boolean allowIntegerEditionBibtex;
+    private final boolean memoryStickMode;
+    private final boolean collectTelemetry;
+    private final boolean showAdvancedHints;
 
     public GeneralPreferences(Charset defaultEncoding,
                               BibDatabaseMode defaultBibDatabaseMode,

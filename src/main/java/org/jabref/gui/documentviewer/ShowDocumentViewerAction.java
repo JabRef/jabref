@@ -5,10 +5,12 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.preferences.PreferencesService;
 
+import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
+
 public class ShowDocumentViewerAction extends SimpleCommand {
 
     public ShowDocumentViewerAction(StateManager stateManager, PreferencesService preferences) {
-        this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences));
+        this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)));
     }
 
     @Override

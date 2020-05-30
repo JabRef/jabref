@@ -19,7 +19,7 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
         this.bibtexKeyPatternPanel = new BibtexKeyPatternPanel(panel);
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        AbstractBibtexKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getKeyPattern());
+        AbstractBibtexKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getGlobalBibtexKeyPattern());
         bibtexKeyPatternPanel.setValues(keyPattern);
         init();
     }
@@ -61,5 +61,4 @@ public class BibtexKeyPatternDialog extends BaseDialog<Void> {
      } */
 
     }
-
 }

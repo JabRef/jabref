@@ -62,7 +62,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Importer for the Endnote XML format.
- *
+ * <p>
  * Based on dtd scheme downloaded from Article #122577 in http://kbportal.thomson.com.
  */
 public class EndnoteXmlImporter extends Importer implements Parser {
@@ -119,8 +119,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (unmarshalledObject instanceof Xml) {
                 // Check whether we have an article set, an article, a book article or a book article set
                 Xml root = (Xml) unmarshalledObject;
-                List<BibEntry> bibEntries = root.getRecords()
-                        .getRecord()
+                List<BibEntry> bibEntries = root
+                        .getRecords().getRecord()
                         .stream()
                         .map(this::parseRecord)
                         .collect(Collectors.toList());
@@ -290,8 +290,8 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
     private String clean(String input) {
         return StringUtil.unifyLineBreaks(input, " ")
-                .trim()
-                .replaceAll(" +", " ");
+                         .trim()
+                         .replaceAll(" +", " ");
     }
 
     @Override

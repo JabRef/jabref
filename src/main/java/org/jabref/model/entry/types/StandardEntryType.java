@@ -38,8 +38,6 @@ public enum StandardEntryType implements EntryType {
     Software("Software"),
     Dataset("Dataset");
 
-
-
     private final String displayName;
 
     StandardEntryType(String displayName) {

@@ -7,13 +7,12 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 
-public class BibtexkeyDeviationChecker implements Checker {
+public class BibtexkeyDeviationChecker implements EntryChecker {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
@@ -26,7 +25,7 @@ public class BibtexkeyDeviationChecker implements Checker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> valuekey = entry.getCiteKeyOptional();
-        if (!valuekey.isPresent()) {
+        if (valuekey.isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -42,5 +41,4 @@ public class BibtexkeyDeviationChecker implements Checker {
 
         return Collections.emptyList();
     }
-
 }

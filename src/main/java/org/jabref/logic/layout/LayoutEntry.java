@@ -545,8 +545,7 @@ class LayoutEntry {
     }
 
     /**
-     * Return an array of LayoutFormatters found in the given formatterName
-     * string (in order of appearance).
+     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
      */
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
@@ -677,5 +676,7 @@ class LayoutEntry {
         return result;
     }
 
-    public String getText() { return text; }
+    public String getText() {
+        return text;
+    }
 }

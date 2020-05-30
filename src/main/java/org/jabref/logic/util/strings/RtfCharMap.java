@@ -265,5 +265,4 @@ public class RtfCharMap {
     public String get(String key) {
         return rtfMap.get(key);
     }
-
 }

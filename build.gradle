@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
     id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.18.0'
+    id 'org.beryx.jlink' version '2.19.0'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.0.0'
@@ -81,6 +81,7 @@ sourceSets {
 }
 
 repositories {
+    mavenLocal()
     jcenter()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
@@ -115,7 +116,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.65'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.65.01'
 
     implementation 'commons-cli:commons-cli:1.4'
 
@@ -129,7 +130,7 @@ dependencies {
     libreoffice 'org.libreoffice:unoil:6.4.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.7'
-    implementation 'info.debatty:java-string-similarity:1.2.1'
+    implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
@@ -158,7 +159,7 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'org.fxmisc.easybind:easybind:1.0.3'
+    implementation 'com.tobiasdiez:easybind:2.0.0-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
@@ -191,9 +192,9 @@ dependencies {
         exclude module: "log4j-core"
     }
 
-    implementation 'com.vladsch.flexmark:flexmark:0.61.24'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.61.24'
-    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.61.24'
+    implementation 'com.vladsch.flexmark:flexmark:0.62.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.0'
+    implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.0'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.78'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
@@ -204,9 +205,9 @@ dependencies {
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.3.3'
-    testImplementation 'org.xmlunit:xmlunit-core:2.6.4'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.6.4'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.13.1'
+    testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
@@ -543,7 +544,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    options = ['--strip-debug','--compress', '2', '--no-header-files', '--no-man-pages']
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     launcher {
         name = 'JabRef'
     }

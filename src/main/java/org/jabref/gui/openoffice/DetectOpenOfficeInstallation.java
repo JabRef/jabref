@@ -50,7 +50,6 @@ public class DetectOpenOfficeInstallation {
                 .withInitialDirectory(nativeDesktop.getApplicationDirectory())
                 .build();
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
-
     }
 
     private boolean autoDetectPaths() {
@@ -119,5 +118,4 @@ public class DetectOpenOfficeInstallation {
 
         return selectedPath;
     }
-
 }

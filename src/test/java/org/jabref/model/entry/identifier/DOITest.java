@@ -5,7 +5,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DOITest {
 
@@ -228,11 +230,16 @@ public class DOITest {
 
     @Test
     public void isShortDoiShouldReturnTrueWhenItIsShortDoi() {
-        assertEquals(true, new DOI("10/abcde").isShortDoi());
+        assertTrue(new DOI("10/abcde").isShortDoi());
     }
 
     @Test
     public void isShortDoiShouldReturnFalseWhenItIsDoi() {
-        assertEquals(false, new DOI("10.1006/jmbi.1998.2354").isShortDoi());
+        assertFalse(new DOI("10.1006/jmbi.1998.2354").isShortDoi());
+    }
+
+    @Test
+    public void equalsWorksFor2017Doi() {
+        assertTrue(new DOI("10.1109/cloud.2017.89").equals(new DOI("10.1109/CLOUD.2017.89")));
     }
 }

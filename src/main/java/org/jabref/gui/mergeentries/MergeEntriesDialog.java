@@ -19,7 +19,6 @@ public class MergeEntriesDialog extends BaseDialog<BibEntry> {
 
     /**
      * Sets up the dialog
-     *
      */
     private void init() {
         this.getDialogPane().setContent(mergeEntries);

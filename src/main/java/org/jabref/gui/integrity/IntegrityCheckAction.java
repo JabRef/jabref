@@ -53,6 +53,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 List<IntegrityMessage> result = new ArrayList<>();
 
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
+                result.addAll(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
@@ -77,7 +78,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),
                 Localization.lang("Checking integrity..."),
                 task);

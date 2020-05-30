@@ -57,3 +57,12 @@ parts:
       snapcraftctl build
       snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
+      rm $SNAPCRAFT_PART_INSTALL/bin/JabRef
+  jabref-launcher:
+    after:
+      - jabref
+    source: snap/local
+    source-type: local
+    plugin: dump
+    organize:
+      JabRef-launcher: bin/JabRef

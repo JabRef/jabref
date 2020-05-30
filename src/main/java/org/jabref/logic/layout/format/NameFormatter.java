@@ -120,7 +120,6 @@ public class NameFormatter implements LayoutFormatter {
             }
         }
         return sb.toString();
-
     }
 
     public String format(String toFormat, String inParameters) {

@@ -77,7 +77,5 @@ public class FileHistoryMenu extends Menu {
             return;
         }
         openDatabaseAction.openFile(file, true);
-
     }
-
 }

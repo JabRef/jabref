@@ -155,19 +155,19 @@
      */
     -fx-color: -fx-base;
 
-    -fx-hover-base: derive(-fx-base,30%);
+    -fx-hover-base: derive(-fx-base, 30%);
 
     /* A little darker than -fx-base and used as the -fx-color for the
      * "armed" pseudoclass state.
      *
      * TODO: should this be renamed to -fx-armed-base?
      */
-    -fx-pressed-base: derive(-fx-base,-6%);
+    -fx-pressed-base: derive(-fx-base, -6%);
 
     /* A little darker than -fx-color and used to draw boxes around objects such
      * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
      */
-    -fx-box-border: derive(-fx-color,-5%);
+    -fx-box-border: derive(-fx-color, -5%);
 
     /* Darker than -fx-background and used to draw boxes around text boxes and
      * password boxes.
@@ -178,7 +178,7 @@
      * needed on top of -fx-background. This is never a shadow in Modena but
      * keep -fx-shadow-highlight-color name to be compatible with Caspian.
      */
-    -fx-shadow-highlight-color: rgba(255,255,255,0.07) 70%;
+    -fx-shadow-highlight-color: rgba(255, 255, 255, 0.07) 70%;
 
     /* A gradient that goes from a little darker than -fx-color on the top to
      * even more darker than -fx-color on the bottom.  Typically is the second
@@ -186,16 +186,16 @@
      * a control. It is typically the same size as the control (i.e., insets
      * are 0).
      */
-    -fx-outer-border: derive(-fx-color,-5%);
+    -fx-outer-border: derive(-fx-color, -5%);
 
     /* A gradient that goes from a bit lighter than -fx-color on the top to
      * a little darker at the bottom.  Typically is the third color in the
      * -fx-background-color list as a thin highlight inside the outer border.
      * Insets are typically 1.
      */
-    -fx-inner-border: derive(-fx-color,65%);
-    -fx-inner-border-horizontal: derive(-fx-color,65%);
-    -fx-inner-border-bottomup: derive(-fx-color,65%);
+    -fx-inner-border: derive(-fx-color, 65%);
+    -fx-inner-border-horizontal: derive(-fx-color, 65%);
+    -fx-inner-border-bottomup: derive(-fx-color, 65%);
 
     /*-fx-inner-border: red;*/
     /*-fx-inner-border-horizontal: green;*/
@@ -205,9 +205,9 @@
      * a little darker than -fx-color at the bottom and is used to fill the
      * body of many controls such as buttons.
      */
-    -fx-body-color: derive(-fx-color,20%);
-    -fx-body-color-bottomup: derive(-fx-color,20%);
-    -fx-body-color-to-right: derive(-fx-color,20%);
+    -fx-body-color: derive(-fx-color, 20%);
+    -fx-body-color-bottomup: derive(-fx-color, 20%);
+    -fx-body-color-to-right: derive(-fx-color, 20%);
 
     /* The small thin light "shadow" for mark-like objects. Typically used in
      * conjunction with -fx-mark-color with an insets of 1 0 -1 0. */
@@ -234,7 +234,7 @@
     -fx-padding: inherit;
 
     /** Focus line for keyboard focus traversal on cell based controls */
-    -fx-cell-focus-inner-border: derive(-fx-selection-bar,30%);
+    -fx-cell-focus-inner-border: derive(-fx-selection-bar, 30%);
 
     -fx-focused-mark-color: -fx-focused-text-base-color;
 
@@ -387,6 +387,24 @@
     -fx-padding: -0.1em 0.5em 0.5em 0.5em;
 }
 
+.progress-indicator {
+    -fx-progress-color: -jr-theme;
+    -fx-border-width: 0px;
+    -fx-background-color: -jr-icon-background;
+}
+
+.progress-indicator:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.progress-indicatorToolbar {
+    -fx-padding: 0.5em;
+}
+
+.progress-indicatorToolbar .percentage {
+    -fx-fill:null;
+}
+
 .check-box {
     -fx-label-padding: 0.0em 0.0em 0.0em 0.75em;
     -fx-text-fill: -fx-text-background-color;
@@ -481,7 +499,7 @@
     -fx-border-width: 3 0 0 0;
 }
 
-.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label{
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .tab-label {
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
 }
@@ -611,6 +629,11 @@
     -fx-background-color: -jr-selected;
     -fx-table-cell-border-color: transparent;
     -fx-text-fill: -jr-black;
+}
+
+.table-cell:invalid,
+.list-cell:invalid {
+    -fx-background-color: -jr-warn;
 }
 
 .combo-box-base {
@@ -793,7 +816,7 @@
     -fx-padding: 0.3em 0.9em 0.3em 0.9em;
 }
 
-.sidePaneComponentHeader .glyph-icon{
+.sidePaneComponentHeader .glyph-icon {
     -fx-fill: -jr-sidepane-header-color;
     -fx-text-fill: -jr-sidepane-header-color;
     -fx-font-size: 16px;
@@ -943,7 +966,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-head-fg;
 }
 
-.table-cell, .table-cell  .glyph-icon{
+.table-cell, .table-cell .glyph-icon {
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-cell-size: 4.0em;
     -fx-text-fill: -fx-text-background-color;

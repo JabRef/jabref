@@ -82,7 +82,7 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
     private String getSubchainAsString(Character hierarchicalDelimiter) {
         return keyword +
                 getChild().map(child -> " " + hierarchicalDelimiter + " " + child.getSubchainAsString(hierarchicalDelimiter))
-                        .orElse("");
+                          .orElse("");
     }
 
     /**
@@ -111,7 +111,7 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
         return Stream.concat(
                 Stream.of(this),
                 OptionalUtil.toStream(getChild()).flatMap(child -> child.flatten().stream()))
-                .collect(Collectors.toSet());
+                     .collect(Collectors.toSet());
     }
 
     /**
@@ -120,7 +120,7 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      */
     public Set<String> getAllSubchainsAsString(Character hierarchicalDelimiter) {
         return flatten().stream()
-                .map(subchain -> subchain.getPathFromRootAsString(hierarchicalDelimiter))
-                .collect(Collectors.toSet());
+                        .map(subchain -> subchain.getPathFromRootAsString(hierarchicalDelimiter))
+                        .collect(Collectors.toSet());
     }
 }

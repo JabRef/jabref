@@ -20,7 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;
-    private BibEntry entryWijedasa, entryEndharti, bibEntryIchikawa, bibEntrySari;
+    private BibEntry entryWijedasa;
+    private BibEntry entryEndharti;
+    private BibEntry bibEntryIchikawa;
+    private BibEntry bibEntrySari;
 
     @BeforeEach
     public void setUp() throws InterruptedException {

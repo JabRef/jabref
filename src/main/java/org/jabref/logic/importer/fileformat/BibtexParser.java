@@ -258,8 +258,8 @@ public class BibtexParser implements Parser {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
             /* if we get an IO Exception here, than we have an unbracketed comment,
-            * which means that we should just return and the comment will be picked up as arbitrary text
-            *  by the parser
+             * which means that we should just return and the comment will be picked up as arbitrary text
+             *  by the parser
              */
             LOGGER.info("Found unbracketed comment");
             return;
@@ -298,7 +298,6 @@ public class BibtexParser implements Parser {
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
         }
-
     }
 
     private void parseBibtexString() throws IOException {
@@ -504,7 +503,6 @@ public class BibtexParser implements Parser {
     private String parsePreamble() throws IOException {
         skipWhitespace();
         return parseBracketedText();
-
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
@@ -661,59 +659,59 @@ public class BibtexParser implements Parser {
 
         // Restore if possible:
         switch (currentChar) {
-        case '=':
-            // Get entryfieldname, push it back and take rest as key
-            key = key.reverse();
+            case '=':
+                // Get entryfieldname, push it back and take rest as key
+                key = key.reverse();
 
-            boolean matchedAlpha = false;
-            for (int i = 0; i < key.length(); i++) {
-                currentChar = key.charAt(i);
+                boolean matchedAlpha = false;
+                for (int i = 0; i < key.length(); i++) {
+                    currentChar = key.charAt(i);
 
-                /// Skip spaces:
-                if (!matchedAlpha && (currentChar == ' ')) {
-                    continue;
-                }
-                matchedAlpha = true;
-
-                // Begin of entryfieldname (e.g. author) -> push back:
-                unread(currentChar);
-                if ((currentChar == ' ') || (currentChar == '\n')) {
-
-                    /*
-                     * found whitespaces, entryfieldname completed -> key in
-                     * keybuffer, skip whitespaces
-                     */
-                    StringBuilder newKey = new StringBuilder();
-                    for (int j = i; j < key.length(); j++) {
-                        currentChar = key.charAt(j);
-                        if (!Character.isWhitespace(currentChar)) {
-                            newKey.append(currentChar);
-                        }
+                    /// Skip spaces:
+                    if (!matchedAlpha && (currentChar == ' ')) {
+                        continue;
                     }
+                    matchedAlpha = true;
 
-                    // Finished, now reverse newKey and remove whitespaces:
-                    key = newKey.reverse();
-                    parserResult.addWarning(
-                            Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
+                    // Begin of entryfieldname (e.g. author) -> push back:
+                    unread(currentChar);
+                    if ((currentChar == ' ') || (currentChar == '\n')) {
+
+                        /*
+                         * found whitespaces, entryfieldname completed -> key in
+                         * keybuffer, skip whitespaces
+                         */
+                        StringBuilder newKey = new StringBuilder();
+                        for (int j = i; j < key.length(); j++) {
+                            currentChar = key.charAt(j);
+                            if (!Character.isWhitespace(currentChar)) {
+                                newKey.append(currentChar);
+                            }
+                        }
+
+                        // Finished, now reverse newKey and remove whitespaces:
+                        key = newKey.reverse();
+                        parserResult.addWarning(
+                                Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
+                    }
                 }
-            }
-            break;
+                break;
 
-        case ',':
-            parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
-            break;
+            case ',':
+                parserResult.addWarning(
+                        Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
+                break;
 
-        case '\n':
-            parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
-            break;
+            case '\n':
+                parserResult.addWarning(
+                        Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
+                break;
 
-        default:
+            default:
 
-            // No more lookahead, give up:
-            unreadBuffer(key);
-            return "";
+                // No more lookahead, give up:
+                unreadBuffer(key);
+                return "";
         }
 
         return removeWhitespaces(key).toString();
@@ -787,10 +785,8 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
                             + "allowed in bibtex keys.");
                 }
-
             }
         }
-
     }
 
     private String parseBracketedText() throws IOException {
@@ -825,7 +821,6 @@ public class BibtexParser implements Parser {
                 } else {
                     value.append(' ');
                 }
-
             } else {
                 value.append((char) character);
             }

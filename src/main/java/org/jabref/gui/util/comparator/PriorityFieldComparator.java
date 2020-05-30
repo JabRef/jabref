@@ -23,5 +23,4 @@ public class PriorityFieldComparator implements Comparator<Optional<SpecialField
             }
         }
     }
-
 }

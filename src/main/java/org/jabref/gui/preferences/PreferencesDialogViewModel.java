@@ -13,6 +13,7 @@ import org.jabref.JabRefException;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
@@ -21,6 +22,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
@@ -45,9 +47,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GeneralTabView(preferences),
                 new FileTabView(preferences),
                 new TableTabView(preferences),
-                new TableColumnsTabView(preferences),
                 new PreviewTabView(preferences),
-                new ExternalTabView(preferences, frame),
+                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
                 new BibtexKeyPatternTabView(preferences),
@@ -55,7 +56,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExportSortingTabView(preferences),
                 new NameFormatterTabView(preferences),
                 new XmpPrivacyTabView(preferences),
-                new AdvancedTabView(preferences),
+                new NetworkTabView(preferences),
                 new AppearanceTabView(preferences)
         );
     }
@@ -133,6 +134,11 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
      * Reloads the JabRefPreferences into the UI
      */
     private void updateAfterPreferenceChanges() {
+        // Reload internal preferences cache
+        preferences.updateEntryEditorTabList();
+        preferences.updateGlobalBibtexKeyPattern();
+        preferences.updateMainTableColumns();
+
         setValues();
 
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
@@ -140,7 +146,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
-        preferences.updateEntryEditorTabList();
+
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        PushToApplicationsManager manager = frame.getPushToApplicationsManager();
+        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
+
+        frame.getBasePanelList().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**
@@ -183,6 +194,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         frame.setupAllTables();
         frame.getGlobalSearchBar().updateHintVisibility();
         dialogService.notify(Localization.lang("Preferences recorded."));
+
+        updateAfterPreferenceChanges();
     }
 
     /**

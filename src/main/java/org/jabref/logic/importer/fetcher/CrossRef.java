@@ -34,7 +34,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 /**
  * A class for fetching DOIs from CrossRef
- *
+ * <p>
  * See https://github.com/CrossRef/rest-api-doc
  */
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {

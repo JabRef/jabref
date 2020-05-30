@@ -81,7 +81,6 @@ public class WriteXMPAction extends SimpleCommand {
                         Localization.lang("This operation requires one or more entries to be selected."));
                 shouldContinue = false;
                 return;
-
             } else {
                 boolean confirm = dialogService.showConfirmationDialogAndWait(
                         Localization.lang("Write XMP metadata"),
@@ -130,7 +129,7 @@ public class WriteXMPAction extends SimpleCommand {
                         try {
                             XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXMPPreferences());
                             Platform.runLater(
-                                              () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
+                                    () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
                             Platform.runLater(() -> {
@@ -153,15 +152,15 @@ public class WriteXMPAction extends SimpleCommand {
 
             if (optionsDialog.isCanceled()) {
                 Platform.runLater(
-                                  () -> optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
+                        () -> optionsDialog.getProgressArea().appendText("\n" + Localization.lang("Operation canceled.") + "\n"));
                 break;
             }
         }
         Platform.runLater(() -> {
             optionsDialog.getProgressArea()
                          .appendText("\n"
-                           + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
-                           .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
+                                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
+                                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
             optionsDialog.done();
         });
 
@@ -209,7 +208,6 @@ public class WriteXMPAction extends SimpleCommand {
             tmpPanel.add(cancelButton, 1, 1);
             tmpPanel.setGridLinesVisible(false);
             this.setResizable(false);
-
         }
 
         private void dispose() {

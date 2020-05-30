@@ -115,6 +115,10 @@ public class PreviewPanel extends VBox {
         }
     }
 
+    private void updateLayoutByPreferences(JabRefPreferences preferences) {
+        previewView.setLayout(preferences.getPreviewPreferences().getCurrentPreviewStyle());
+    }
+
     private void createKeyBindings() {
         previewView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
@@ -153,6 +157,7 @@ public class PreviewPanel extends VBox {
     }
 
     public void setEntry(BibEntry entry) {
+        updateLayoutByPreferences(preferences);
         this.entry = entry;
         previewView.setEntry(entry);
     }
@@ -170,7 +175,8 @@ public class PreviewPanel extends VBox {
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
+        PreviewPreferences previewPreferences = preferences
+                .getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
                 .build();

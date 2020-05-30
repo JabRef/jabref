@@ -62,17 +62,31 @@ public class FieldFormatterCleanupsPanelViewModel {
         cleanupsListProperty.remove(cleanup);
     }
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsListProperty() { return cleanupsListProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsListProperty() {
+        return cleanupsListProperty;
+    }
 
-    public ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty() { return selectedCleanupProperty; }
+    public ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty() {
+        return selectedCleanupProperty;
+    }
 
-    public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
+    public ListProperty<Field> availableFieldsProperty() {
+        return availableFieldsProperty;
+    }
 
-    public ObjectProperty<Field> selectedFieldProperty() { return selectedFieldProperty; }
+    public ObjectProperty<Field> selectedFieldProperty() {
+        return selectedFieldProperty;
+    }
 
-    public ListProperty<Formatter> availableFormattersProperty() { return availableFormattersProperty; }
+    public ListProperty<Formatter> availableFormattersProperty() {
+        return availableFormattersProperty;
+    }
 
-    public ObjectProperty<Formatter> selectedFormatterProperty() { return selectedFormatterProperty; }
+    public ObjectProperty<Formatter> selectedFormatterProperty() {
+        return selectedFormatterProperty;
+    }
 }
