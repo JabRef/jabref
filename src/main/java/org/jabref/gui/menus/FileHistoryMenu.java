@@ -34,16 +34,18 @@ public class FileHistoryMenu extends Menu {
         }
     }
 
+    /**
+     * This method is to use typed letters to access recent libraries in menu.
+     * @param keyEvent a KeyEvent.
+     * @return false if typed letter is invalid.
+     */
     public boolean openFileByKey(KeyEvent keyEvent) {
         if (keyEvent.getCharacter() == null) {
             return false;
         }
         char key = keyEvent.getCharacter().charAt(0);
-        if (!Character.isDigit(key)) {
-            return false;
-        }
-        int num = Integer.parseInt(String.valueOf(key));
-        if (num > history.getHistory().size()) {
+        int num = Character.getNumericValue(key);
+        if (num <= 0 || num > history.getHistory().size()) {
             return false;
         }
         this.openFile(history.getFileAt(Integer.parseInt(keyEvent.getCharacter()) - 1));
