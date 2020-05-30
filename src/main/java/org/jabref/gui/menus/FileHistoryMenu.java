@@ -37,7 +37,7 @@ public class FileHistoryMenu extends Menu {
     /**
      * This method is to use typed letters to access recent libraries in menu.
      * @param keyEvent a KeyEvent.
-     * @return false if typed letter is invalid.
+     * @return false if typed char is invalid or not a number.
      */
     public boolean openFileByKey(KeyEvent keyEvent) {
         if (keyEvent.getCharacter() == null) {
