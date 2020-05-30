@@ -173,7 +173,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
-    private PopOver progressViewPopOver; // Used to hide the existed pop over before a new pop over shows
+    private PopOver progressViewPopOver;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
