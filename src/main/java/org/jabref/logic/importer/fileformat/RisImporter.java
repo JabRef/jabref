@@ -316,6 +316,12 @@ public class RisImporter extends Importer {
         if (doi.startsWith("doi:")) {
             doi = doi.replaceAll("(?i)doi:", "").trim();
             hm.put(StandardField.DOI, doi);
+        } else {
+            String doiRegEx = "10\\.[0-9]{4,}(?:\\.[0-9]+)*/(?:(?![\"&'])\\S)+";
+            Pattern pattern = Pattern.compile(doiRegEx);
+            if (pattern.matcher(doi).matches()) {
+                hm.put(StandardField.DOI, doi);
+            }
         }
     }
 }
