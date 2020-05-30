@@ -170,7 +170,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
-    private PopOver existedProgressViewPopOver; // Used to hide the existed pop over before a new pop over shows
+    private PopOver progressViewPopOver; // Used to hide the existed pop over before a new pop over shows
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -988,15 +988,18 @@ public class JabRefFrame extends BorderPane {
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
-            PopOver progressViewPopOver = new PopOver(taskProgressView);
-            if (this.existedProgressViewPopOver == null) {
-                this.existedProgressViewPopOver = progressViewPopOver;
+            if (progressViewPopOver == null) {
+                progressViewPopOver = new PopOver(taskProgressView);
+                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            } else if (progressViewPopOver.isShowing()) {
+                progressViewPopOver.hide();
+            } else {
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
             }
-            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-            this.existedProgressViewPopOver.hide();
-            progressViewPopOver.show(indicator);
-            this.existedProgressViewPopOver = progressViewPopOver;
         });
 
         return new Group(indicator);
