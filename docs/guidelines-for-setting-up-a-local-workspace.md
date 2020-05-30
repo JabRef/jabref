@@ -59,7 +59,7 @@ It is strongly recommend that you have git installed.
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse (for advanced users)](https://eclipse.org/) \(`2020-03` or newer\).
 
-Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://github.com/JabRef/jabref/tree/be9c788de804c2bd9e3abaf76b082b6b2e82e66f/docs/www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/README.md) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
+Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
 ### Other Tooling
 
@@ -74,7 +74,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 1. Log into your GitHub account
 2. Go to [https://github.com/JabRef/jabref](https://github.com/JabRef/jabref)
 3. Create a fork by clicking at fork button on the right top corner
-4. A fork repository will be created under your account \([https://github.com/YOUR\_USERNAME/jabref](https://github.com/YOUR_USERNAME/jabref)\)
+4. A fork repository will be created under your account `https://github.com/YOUR\_USERNAME/jabref`.
 
 ### Clone your forked repository on your local machine
 

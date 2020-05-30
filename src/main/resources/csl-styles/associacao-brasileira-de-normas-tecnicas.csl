@@ -200,7 +200,7 @@ autores, exceto em arquivos do tipo 'artigo de jornal, artigo de revista, artigo
           <if variable="publisher-place">
             <text variable="publisher-place" suffix=": "/>
           </if>
-          <else-if type="entry-encyclopedia"></else-if>
+          <else-if type="entry-encyclopedia"/>
           <else>
             <text value="[s.l.] "/>
           </else>

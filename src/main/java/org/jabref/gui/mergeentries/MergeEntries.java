@@ -42,7 +42,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class MergeEntries extends BorderPane {
 

@@ -15,8 +15,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -41,7 +39,8 @@ import org.jabref.model.util.MultiKeyMap;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -929,14 +928,14 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public ObjectBinding<String> getFieldBinding(Field field) {
+    public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return (ObjectBinding<String>) EasyBind.map(type, EntryType::getDisplayName);
+            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
         }
-        return Bindings.valueAt(fields, field);
+        return EasyBind.valueAt(fields, field);
     }
 
-    public ObjectBinding<String> getCiteKeyBinding() {
+    public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
     }
 

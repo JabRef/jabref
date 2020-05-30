@@ -49,6 +49,13 @@ import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class is Preferences -> Entry Preview tab model
+ * <p>
+ *     {@link PreviewTabView} is the controller of Entry Preview tab
+ * </p>
+ * @see PreviewTabView
+ * */
 public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewTabViewModel.class);
@@ -60,13 +67,19 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty showAsExtraTab = new SimpleBooleanProperty(false);
     private final BooleanProperty selectedIsEditableProperty = new SimpleBooleanProperty(false);
     private final ObjectProperty<PreviewLayout> layoutProperty = new SimpleObjectProperty<>();
+    /*
+    * A local variable to store the preview text in \n format instead of _NEWLINE_
+    * */
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
+
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
+
+    private final Validator chosenListValidator;
+
     private final CustomLocalDragboard localDragboard;
-    private Validator chosenListValidator;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 

@@ -51,7 +51,7 @@ public class CopyFilesAction extends SimpleCommand {
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(path -> {
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(database, entries, path);
-            dialogService.showProgressDialogAndWait(
+            dialogService.showProgressDialog(
                     Localization.lang("Copy linked files to folder..."),
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);

@@ -34,8 +34,9 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * This class tests the Integrity Checker as a whole.
@@ -139,7 +140,7 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
-                .checkDatabase();
+                .check();
 
         assertEquals(clonedEntry, entry);
     }
@@ -172,16 +173,18 @@ class IntegrityCheckTest {
                 mock(FilePreferences.class),
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
-                .checkDatabase();
+                .check();
         assertNotEquals(Collections.emptyList(), messages);
     }
 
     private void assertCorrect(BibDatabaseContext context) {
+        FilePreferences filePreferencesMock = mock(FilePreferences.class);
+        when(filePreferencesMock.isBibLocationAsPrimary()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                mock(FilePreferences.class),
+                filePreferencesMock,
                 createBibtexKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
-        ).checkDatabase();
+        ).check();
         assertEquals(Collections.emptyList(), messages);
     }
 
@@ -190,21 +193,22 @@ class IntegrityCheckTest {
                                                              mock(FilePreferences.class),
                                                              createBibtexKeyPatternPreferences(),
                                                              JournalAbbreviationLoader.loadBuiltInRepository(),
-                                                             allowIntegerEdition).checkDatabase();
+                                                             allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 
     private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
         final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         return new BibtexKeyPatternPreferences(
-                "",
-                "",
                 false,
                 false,
+                false,
+                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                "",
+                "",
+                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                ',',
-                false,
-                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS);
+                ',');
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

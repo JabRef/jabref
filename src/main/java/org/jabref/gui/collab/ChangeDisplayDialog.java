@@ -21,7 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 class ChangeDisplayDialog extends BaseDialog<Boolean> {
 
@@ -63,7 +63,7 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         leftScroll.setFitToWidth(true);
 
         pane.getItems().addAll(leftScroll, infoPanel);
-        pane.setResizableWithParent(leftScroll, false);
+        SplitPane.setResizableWithParent(leftScroll, false);
 
         getDialogPane().setContent(pane);
 

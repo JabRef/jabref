@@ -7,9 +7,12 @@ import org.jabref.model.entry.field.Field;
 
 public interface Identifier {
 
-    Field getDefaultField();
-
+    /**
+     * Returns the identifier.
+     */
     String getNormalized();
+
+    Field getDefaultField();
 
     Optional<URI> getExternalURI();
 }

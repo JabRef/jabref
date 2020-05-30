@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -31,7 +30,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -61,7 +60,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
         // Init
         refresh();
