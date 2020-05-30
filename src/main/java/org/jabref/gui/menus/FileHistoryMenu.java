@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -31,6 +32,22 @@ public class FileHistoryMenu extends Menu {
         } else {
             setItems();
         }
+    }
+
+    public boolean openFileByKey(KeyEvent keyEvent) {
+        if (keyEvent.getCharacter() == null) {
+            return false;
+        }
+        char key = keyEvent.getCharacter().charAt(0);
+        if (!Character.isDigit(key)) {
+            return false;
+        }
+        int num = Integer.parseInt(String.valueOf(key));
+        if (num > history.getHistory().size()) {
+            return false;
+        }
+        this.openFile(history.getFileAt(Integer.parseInt(keyEvent.getCharacter()) - 1));
+        return true;
     }
 
     /**
