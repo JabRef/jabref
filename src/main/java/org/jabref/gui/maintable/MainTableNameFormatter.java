@@ -1,22 +1,14 @@
 package org.jabref.gui.maintable;
 
 import org.jabref.model.entry.AuthorList;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class MainTableNameFormatter {
 
-    private final boolean namesNatbib;
-    private final boolean namesLastOnly;
-    private final boolean namesAsIs;
-    private final boolean namesFf;
-    private final boolean abbrAuthorNames;
+    private final PreferencesService preferencesService;
 
-    MainTableNameFormatter(JabRefPreferences preferences) {
-        namesNatbib = preferences.getBoolean(JabRefPreferences.NAMES_NATBIB);
-        namesLastOnly = preferences.getBoolean(JabRefPreferences.NAMES_LAST_ONLY);
-        namesAsIs = preferences.getBoolean(JabRefPreferences.NAMES_AS_IS);
-        namesFf = preferences.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
-        abbrAuthorNames = preferences.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES);
+    MainTableNameFormatter(PreferencesService preferences) {
+        this.preferencesService = preferences;
     }
 
     /**
@@ -30,18 +22,33 @@ public class MainTableNameFormatter {
         if (nameToFormat == null) {
             return null;
         }
+
+        MainTableNameFormatPreferences nameFormatPreferences = preferencesService.getMainTableNameFormatPreferences();
+        MainTableNameFormatPreferences.DisplayStyle displayStyle = nameFormatPreferences.getDisplayStyle();
+        MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
+
         AuthorList authors = AuthorList.parse(nameToFormat);
 
-        if (namesAsIs) {
-            return nameToFormat;
-        } else if (namesNatbib) {
-            return authors.getAsNatbibLatexFree();
-        } else if (namesLastOnly) {
+        if (((displayStyle == MainTableNameFormatPreferences.DisplayStyle.FIRSTNAME_LASTNAME)
+                || (displayStyle == MainTableNameFormatPreferences.DisplayStyle.LASTNAME_FIRSTNAME))
+                && abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.LASTNAME_ONLY) {
             return authors.getAsLastNamesLatexFree(false);
-        } else if (namesFf) {
-            return authors.getAsFirstLastNamesLatexFree(abbrAuthorNames, false);
-        } else {
-            return authors.getAsLastFirstNamesLatexFree(abbrAuthorNames, false);
+        }
+
+        switch (nameFormatPreferences.getDisplayStyle()) {
+            case AS_IS:
+                return nameToFormat;
+            case NATBIB:
+                return authors.getAsNatbibLatexFree();
+            case FIRSTNAME_LASTNAME:
+                return authors.getAsFirstLastNamesLatexFree(
+                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        false);
+            default:
+            case LASTNAME_FIRSTNAME:
+                return authors.getAsLastFirstNamesLatexFree(
+                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        false);
         }
     }
 }
