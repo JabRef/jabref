@@ -254,7 +254,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                                 String connectionProblemText = Localization.lang("Problem with connection: ");
                                 String connectionSuccessText = Localization.lang("Connection Successful!");
                                 storeProxySettings();
-                                System.out.println(url.getText());
                                 URLDownload dl;
                                 try {
                                     dl = new URLDownload(url.getText());

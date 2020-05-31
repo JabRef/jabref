@@ -92,8 +92,6 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
-        checkConnectionButton.disableProperty().bind(proxyUse.selectedProperty().not());
-
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE), remoteHelp);
 
