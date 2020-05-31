@@ -107,7 +107,7 @@ public class WebSearchPaneViewModel {
                 dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
                         Localization.lang(exception.getMessage() + ". You have no rights to access resources"));
             }
-        }else{
+        } else {
             dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
                     Localization.lang(exception.getMessage()));
         }
