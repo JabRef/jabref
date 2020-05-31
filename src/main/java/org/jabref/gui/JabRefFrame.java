@@ -173,6 +173,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
+    private PopOver progressViewPopOver;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -982,11 +983,18 @@ public class JabRefFrame extends BorderPane {
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
-            PopOver progressViewPopOver = new PopOver(taskProgressView);
-            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-
-            progressViewPopOver.show(indicator);
+            if (progressViewPopOver == null) {
+                progressViewPopOver = new PopOver(taskProgressView);
+                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            } else if (progressViewPopOver.isShowing()) {
+                progressViewPopOver.hide();
+            } else {
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            }
         });
 
         return new Group(indicator);
