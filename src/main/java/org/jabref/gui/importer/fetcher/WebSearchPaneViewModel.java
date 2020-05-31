@@ -101,7 +101,7 @@ public class WebSearchPaneViewModel {
         dialog.showAndWait();
     }
 
-    void exceptionHandler(Exception exception) {
+    private void exceptionHandler(Exception exception) {
         if(exception.getClass().getName().equals("org.jabref.logic.importer.FetcherException")){
             if(exception.getMessage().equals("A network error occurred")){
                 dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
