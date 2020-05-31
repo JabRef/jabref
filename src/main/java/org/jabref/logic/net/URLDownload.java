@@ -38,11 +38,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import kong.unirest.UnirestException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,7 +178,7 @@ public class URLDownload {
         try {
             int statusCode = Unirest.head(source.toString()).asString().getStatus();
             return statusCode;
-        } catch (UnirestException e){
+        } catch (UnirestException e) {
             throw e;
         }
     }
