@@ -141,7 +141,6 @@ public class MetaData {
 
     public void setSaveActions(FieldFormatterCleanups saveActions) {
         this.saveActions = Objects.requireNonNull(saveActions);
-        postChange();
     }
 
     public Optional<BibDatabaseMode> getMode() {
