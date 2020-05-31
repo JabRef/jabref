@@ -65,9 +65,8 @@ public class RisImporterTest {
         testAddDoiMethod.setAccessible(true);
 
         testAddDoiMethod.invoke(ri, fields, doi);
-//        System.out.println(fields.get(StandardField.DOI));
         assertNotNull(fields.get(StandardField.DOI));
-        assertEquals("10.1589/jpts.28.186",fields.get(StandardField.DOI));
+        assertEquals("10.1589/jpts.28.186", fields.get(StandardField.DOI));
     }
 
     @Test
@@ -79,8 +78,7 @@ public class RisImporterTest {
         testAddDoiMethod.setAccessible(true);
 
         testAddDoiMethod.invoke(ri, fields, doi);
-//        System.out.println(fields.get(StandardField.DOI));
         assertNotNull(fields.get(StandardField.DOI));
-        assertEquals("10.1589/jpts.28.186",fields.get(StandardField.DOI));
+        assertEquals("10.1589/jpts.28.186", fields.get(StandardField.DOI));
     }
 }
