@@ -40,6 +40,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
+    @FXML private Button checkConnectionButton;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -91,6 +92,8 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_RELEASED, this::proxyPasswordMask);
         proxyPassword.getRight().addEventFilter(MouseEvent.MOUSE_EXITED, this::proxyPasswordMask);
 
+        checkConnectionButton.disableProperty().bind(proxyUse.selectedProperty().not());
+
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE), remoteHelp);
 
@@ -119,5 +122,10 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
         }
+    }
+
+    @FXML
+    void checkConnection() {
+        viewModel.checkConnection();
     }
 }

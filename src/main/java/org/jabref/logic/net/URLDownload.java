@@ -38,6 +38,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import kong.unirest.UnirestException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
@@ -169,6 +170,17 @@ public class URLDownload {
         }
 
         return "";
+    }
+
+    public int checkConnection() {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+        // Try to use HEAD request to avoid downloading the whole file
+        try {
+            int statusCode = Unirest.head(source.toString()).asString().getStatus();
+            return statusCode;
+        } catch (UnirestException e){
+            throw e;
+        }
     }
 
     public boolean isMimeType(String type) {
