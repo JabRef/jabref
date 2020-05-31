@@ -172,9 +172,13 @@ public class URLDownload {
         return "";
     }
 
+    /**
+     * Check the connection by using the HEAD request.
+     * UnirestException can be thrown for invalid request.
+     * @return the status code of the response
+     */
     public int checkConnection() {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
-        // Try to use HEAD request to avoid downloading the whole file
         try {
             int statusCode = Unirest.head(source.toString()).asString().getStatus();
             return statusCode;
