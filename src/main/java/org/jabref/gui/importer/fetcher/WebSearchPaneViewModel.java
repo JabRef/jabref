@@ -94,10 +94,22 @@ public class WebSearchPaneViewModel {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
                                                           .withInitialMessage(Localization.lang("Processing %0", getQuery()));
 
-        task.onFailure(dialogService::showErrorDialogAndWait);
+        task.onFailure(this::exceptionHandler);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
         dialog.setTitle(activeFetcher.getName());
         dialog.showAndWait();
+    }
+
+    void exceptionHandler(Exception exception) {
+        if(exception.getClass().getName().equals("org.jabref.logic.importer.FetcherException")){
+            if(exception.getMessage().equals("A network error occurred")){
+                dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
+                        Localization.lang(exception.getMessage()+". You have no rights to access resources"));
+            }
+        }else{
+            dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
+                    Localization.lang(exception.getMessage()));
+        }
     }
 }
