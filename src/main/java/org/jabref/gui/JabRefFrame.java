@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
@@ -59,6 +61,7 @@ import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -1088,8 +1091,8 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
                 factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()),
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
                 );
 
         return contextMenu;
@@ -1325,6 +1328,9 @@ public class JabRefFrame extends BorderPane {
 
     private class CloseOthersDatabaseAction extends SimpleCommand {
 
+        public CloseOthersDatabaseAction() {
+            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+        }
         @Override
         public void execute() {
             BasePanel currentBasePanel = getCurrentBasePanel();
@@ -1345,6 +1351,20 @@ public class JabRefFrame extends BorderPane {
                 BasePanel basePanel = getBasePanel(tab);
                 closeTab(basePanel);
             }
+        }
+    }
+
+    private class OpenDatabaseFolder extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(path);
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
+                }
+            });
         }
     }
 

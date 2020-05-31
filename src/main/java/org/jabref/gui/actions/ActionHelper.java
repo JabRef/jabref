@@ -9,6 +9,7 @@ import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
@@ -71,5 +72,9 @@ public class ActionHelper {
         }).orElse(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
+    }
+
+    public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {
+        return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
     }
 }
