@@ -102,10 +102,10 @@ public class WebSearchPaneViewModel {
     }
 
     private void exceptionHandler(Exception exception) {
-        if(exception.getClass().getName().equals("org.jabref.logic.importer.FetcherException")){
-            if(exception.getMessage().equals("A network error occurred")){
+        if (exception.getClass().getName().equals("org.jabref.logic.importer.FetcherException")) {
+            if (exception.getMessage().equals("A network error occurred")) {
                 dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
-                        Localization.lang(exception.getMessage()+". You have no rights to access resources"));
+                        Localization.lang(exception.getMessage() + ". You have no rights to access resources"));
             }
         }else{
             dialogService.showWarningDialogAndWait(Localization.lang("An error occurred"),
