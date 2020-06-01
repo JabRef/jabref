@@ -44,7 +44,7 @@
     <text variable="publisher" suffix=": "/>
   </macro>
   <macro name="container-title">
-    <text variable="container-title" vertical-align="baseline" form="short"/>
+    <text variable="container-title" vertical-align="baseline"/>
   </macro>
   <macro name="title">
     <choose>
@@ -75,13 +75,16 @@
   </macro>
   <citation collapse="citation-number">
     <sort>
-      <key variable="citation-number"/>
+      <key variable="author"/>
     </sort>
     <layout prefix="[" suffix="]" delimiter=", ">
       <text variable="citation-number"/>
     </layout>
   </citation>
   <bibliography et-al-min="5" et-al-use-first="3" delimiter-precedes-et-al="never" second-field-align="flush">
+    <sort>
+      <key variable="author"/>
+    </sort>
     <layout suffix=".">
       <text variable="citation-number" suffix=". "/>
       <choose>
