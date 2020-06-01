@@ -1331,12 +1331,13 @@ public class JabRefFrame extends BorderPane {
         public CloseOthersDatabaseAction() {
             this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
         }
+
         @Override
         public void execute() {
             BasePanel currentBasePanel = getCurrentBasePanel();
-            for (Tab tab : tabbedPane.getTabs()){
+            for (Tab tab : tabbedPane.getTabs()) {
                 BasePanel basePanel = getBasePanel(tab);
-                if (basePanel != currentBasePanel){
+                if (basePanel != currentBasePanel) {
                     closeTab(basePanel);
                 }
             }
@@ -1347,7 +1348,7 @@ public class JabRefFrame extends BorderPane {
 
         @Override
         public void execute() {
-            for (Tab tab : tabbedPane.getTabs()){
+            for (Tab tab : tabbedPane.getTabs()) {
                 BasePanel basePanel = getBasePanel(tab);
                 closeTab(basePanel);
             }
