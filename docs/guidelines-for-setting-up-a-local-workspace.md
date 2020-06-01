@@ -223,6 +223,8 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
         --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
         --patch-module org.jabref=build\resources\main
         ```
+   * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
+
 
 6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace:
     1. Help -&gt; Eclipse Marketplace... -&gt; Search tab

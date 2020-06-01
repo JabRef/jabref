@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
@@ -59,6 +61,7 @@ import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -173,6 +176,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
+    private PopOver progressViewPopOver;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -182,6 +186,13 @@ public class JabRefFrame extends BorderPane {
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.executorService = JabRefExecutorService.INSTANCE;
+        this.setOnKeyTyped(key -> {
+            if (this.fileHistory.isShowing()) {
+                if (this.fileHistory.openFileByKey(key)) {
+                    this.fileHistory.getParentMenu().hide();
+                }
+            }
+        });
     }
 
     private static BasePanel getBasePanel(Tab tab) {
@@ -982,11 +993,18 @@ public class JabRefFrame extends BorderPane {
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
-            PopOver progressViewPopOver = new PopOver(taskProgressView);
-            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-
-            progressViewPopOver.show(indicator);
+            if (progressViewPopOver == null) {
+                progressViewPopOver = new PopOver(taskProgressView);
+                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            } else if (progressViewPopOver.isShowing()) {
+                progressViewPopOver.hide();
+            } else {
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            }
         });
 
         return new Group(indicator);
@@ -1079,11 +1097,18 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
+    private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(panel.frame(), stateManager)));
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
+                );
 
         return contextMenu;
     }
@@ -1098,7 +1123,7 @@ public class JabRefFrame extends BorderPane {
         });
 
         // add tab context menu
-        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs(), basePanel, stateManager));
+        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
 
         // update all tab titles
         updateAllTabTitles();
@@ -1313,6 +1338,49 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             closeTab(getCurrentBasePanel());
+        }
+    }
+
+    private class CloseOthersDatabaseAction extends SimpleCommand {
+
+        public CloseOthersDatabaseAction() {
+            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+        }
+
+        @Override
+        public void execute() {
+            BasePanel currentBasePanel = getCurrentBasePanel();
+            for (Tab tab : tabbedPane.getTabs()) {
+                BasePanel basePanel = getBasePanel(tab);
+                if (basePanel != currentBasePanel) {
+                    closeTab(basePanel);
+                }
+            }
+        }
+    }
+
+    private class CloseAllDatabaseAction extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            for (Tab tab : tabbedPane.getTabs()) {
+                BasePanel basePanel = getBasePanel(tab);
+                closeTab(basePanel);
+            }
+        }
+    }
+
+    private class OpenDatabaseFolder extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(path);
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
+                }
+            });
         }
     }
 

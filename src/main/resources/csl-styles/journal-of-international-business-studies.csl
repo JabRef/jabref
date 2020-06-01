@@ -6,17 +6,20 @@
     <id>http://www.zotero.org/styles/journal-of-international-business-studies</id>
     <link href="http://www.zotero.org/styles/journal-of-international-business-studies" rel="self"/>
     <link href="http://www.zotero.org/styles/academy-of-management-review" rel="template"/>
-    <link href="http://www.palgrave-journals.com/jibs/style_guide.html#references" rel="documentation"/>
+    <link href="https://www.palgrave.com/gp/journal/41267/authors/presentation-formatting" rel="documentation"/>
     <author>
       <name>Philipp Zumstein</name>
       <uri>https://github.com/zuphilip</uri>
     </author>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <issn>0047-2506</issn>
     <eissn>1478-6990</eissn>
     <summary>Basically the only difference with Academy of Management Review is that the titles of books and journals should not be bold, only italicized.</summary>
-    <updated>2015-01-14T20:11:11+00:00</updated>
+    <updated>2020-05-21T08:58:02+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -70,16 +73,35 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
-        <text variable="URL"/>
-        <group prefix=", ">
-          <date variable="accessed">
-            <date-part name="month" suffix=" "/>
-            <date-part name="day" suffix=", "/>
-            <date-part name="year"/>
-          </date>
-        </group>
+      <if type="article-journal" match="any">
+        <choose>
+          <if match="none" variable="volume page">
+            <group delimiter=". " prefix=", ">
+              <group delimiter=" ">
+                <text value="advance online publication"/>
+                <date variable="issued">
+                  <date-part name="day" suffix=" "/>
+                  <date-part name="month"/>
+                </date>
+              </group>
+              <text variable="DOI" prefix="doi:"/>
+            </group>
+          </if>
+        </choose>
       </if>
+      <else>
+        <group delimiter=". " prefix=". ">
+          <text variable="URL"/>
+          <group delimiter=" ">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date variable="accessed">
+              <date-part name="day" suffix=" "/>
+              <date-part name="month" suffix=" "/>
+              <date-part name="year"/>
+            </date>
+          </group>
+        </group>
+      </else>
     </choose>
   </macro>
   <macro name="title">
@@ -92,7 +114,7 @@
         </group>
       </if>
       <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text variable="title" font-style="italic" font-weight="normal"/>
+        <text variable="title" text-case="title" font-style="italic" font-weight="normal"/>
       </else-if>
       <else>
         <text variable="title"/>
@@ -107,7 +129,7 @@
           <text variable="publisher"/>
         </group>
       </if>
-      <else-if type="article-journal article-magazine" match="none">
+      <else-if type="article-journal article-magazine article-newspaper" match="none">
         <text variable="genre" suffix=", "/>
         <group delimiter=": ">
           <text variable="publisher-place"/>
@@ -127,19 +149,9 @@
   <macro name="issued">
     <choose>
       <if variable="issued">
-        <group prefix=" " suffix=".">
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
-          <choose>
-            <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="none">
-              <date variable="issued">
-                <date-part prefix=", " name="month"/>
-                <date-part prefix=" " name="day"/>
-              </date>
-            </if>
-          </choose>
-        </group>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
       </if>
       <else>
         <text prefix=" " term="no date" suffix="." form="short"/>
@@ -173,7 +185,7 @@
   </macro>
   <macro name="locators">
     <choose>
-      <if type="article-journal article-magazine article-newspaper" match="any">
+      <if type="article-journal article-magazine" match="any">
         <group prefix=", " delimiter=": ">
           <group>
             <text variable="volume"/>
@@ -187,6 +199,12 @@
           <text macro="edition"/>
         </group>
         <text variable="page" prefix=": "/>
+      </else-if>
+      <else-if type="article-newspaper" match="any">
+        <date variable="issued">
+          <date-part prefix=", " name="month"/>
+          <date-part prefix=" " name="day"/>
+        </date>
       </else-if>
     </choose>
   </macro>
@@ -226,10 +244,10 @@
           </group>
         </group>
         <text macro="locators"/>
-        <group delimiter=", " prefix=". ">
+        <group delimiter=", ">
           <text macro="event"/>
           <text macro="access"/>
-          <text macro="publisher"/>
+          <text macro="publisher" prefix=". "/>
         </group>
       </group>
     </layout>
