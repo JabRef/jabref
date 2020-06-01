@@ -1195,6 +1195,15 @@ public class AuthorListTest {
         assertNotSame(uniqueAuthor, AuthorList.parse(uniqueAuthorName));
     }
 
+    @Test
+    public void parseGarbageCollectUnreachableInstitution() throws Exception {
+        final String uniqueInstitutionName = "{ADFILUHWERKNDS}";
+        // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
+        AuthorList uniqueInstitution = AuthorList.parse(new String(uniqueInstitutionName));
+        System.gc();
+        assertNotSame(uniqueInstitution, AuthorList.parse(uniqueInstitutionName));
+    }
+
     /**
      * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552).
      */
