@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -1175,6 +1176,45 @@ public class AuthorListTest {
     public void parseInstitutionAuthorWithLatexNames() throws Exception {
         assertEquals("The Ban\\={u} M\\={u}s\\={a} brothers",
                 AuthorList.parse("{The Ban\\={u} M\\={u}s\\={a} brothers}").getAuthor(0).getLast().orElse(null));
+    }
+
+    @Test
+    public void parseRetrieveCachedAuthorListAfterGarbageCollection() throws Exception {
+        // A String literal can always be reached
+        AuthorList author = AuthorList.parse("GFSDAGH JKGIIUREIUF");
+        System.gc();
+        assertSame(author, AuthorList.parse("GFSDAGH JKGIIUREIUF"));
+    }
+
+    @Test
+    public void parseGarbageCollectAuthorListForUnreachableKey() throws Exception {
+        final String uniqueAuthorName = "SUDHGFIULAER DSGJS";
+        // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
+        AuthorList uniqueAuthor = AuthorList.parse(new String(uniqueAuthorName));
+        System.gc();
+        assertNotSame(uniqueAuthor, AuthorList.parse(uniqueAuthorName));
+    }
+
+    /**
+     * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552).
+     */
+    @Test
+    public void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() throws Exception {
+        final String uniqueAuthorsNames = "LDGULIOEW ADLJAKNG, GRIUIJSG DFSLJAEF, ASDUYOIGF DSANN";
+        AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
+        System.gc();
+        assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
+    }
+
+    /**
+     * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552).
+     */
+    @Test
+    public void parseCacheAuthorsWithTwoOrMoreCommasAndWithoutSpaceInAllParts() throws Exception {
+        final String uniqueAuthorsNames = "SGFGASD, Jr, GKJSKEFI";
+        AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
+        System.gc();
+        assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
     }
 
     /**
