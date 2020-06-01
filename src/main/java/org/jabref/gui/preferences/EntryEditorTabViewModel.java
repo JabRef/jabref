@@ -111,9 +111,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         }
         if(initialAutoCompletePreferences.shouldAutoComplete()!=enableAutoCompleteProperty.getValue()){
             if(enableAutoCompleteProperty.getValue()){
-                restartWarnings.add(Localization.lang("Auto complete enable."));
+                restartWarnings.add(Localization.lang("Auto complete enabled."));
             }else{
-                restartWarnings.add(Localization.lang("Auto complete disable."));
+                restartWarnings.add(Localization.lang("Auto complete disabled."));
             }
         }
         preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
