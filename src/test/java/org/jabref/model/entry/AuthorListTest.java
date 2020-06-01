@@ -1180,10 +1180,10 @@ public class AuthorListTest {
 
     @Test
     public void parseRetrieveCachedAuthorListAfterGarbageCollection() throws Exception {
-        // A String literal can always be reached
-        AuthorList author = AuthorList.parse("GFSDAGH JKGIIUREIUF");
+        final String uniqueName = "GFSDAGH JKGIIUREIUF";
+        AuthorList author = AuthorList.parse(uniqueName);
         System.gc();
-        assertSame(author, AuthorList.parse("GFSDAGH JKGIIUREIUF"));
+        assertSame(author, AuthorList.parse(uniqueName));
     }
 
     @Test
