@@ -1,6 +1,8 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -9,6 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 public class AuthorListParser {
+
+    // Avoid partition where these values are contained
+    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
 
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
@@ -82,6 +87,50 @@ public class AuthorListParser {
     public AuthorList parse(String listOfNames) {
         Objects.requireNonNull(listOfNames);
 
+        // Handle case names in order lastname, firstname and separated by ","
+        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
+        final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(" AND ");
+        final boolean authorsContainOpeningBrace = listOfNames.contains("{");
+        final boolean authorsContainSemicolon = listOfNames.contains(";");
+        final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(",", "").length()) >= 2;
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
+            List<String> arrayNameList = Arrays.asList(listOfNames.split(","));
+
+            // Delete spaces for correct case identification
+            arrayNameList.replaceAll(String::trim);
+
+            // Looking for space between pre- and lastname
+            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" "))
+                                                   .count() == arrayNameList.size();
+
+            // We hit the comma name separator case
+            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
+            // If not, we check if spaces separate pre- and lastname
+            if (spaceInAllParts) {
+                listOfNames = listOfNames.replaceAll(",", " and");
+            } else {
+                // Looking for name affixes to avoid
+                // arrayNameList needs to reduce by the count off avoiding terms
+                // valuePartsCount holds the count of name parts without the avoided terms
+
+                int valuePartsCount = arrayNameList.size();
+                // Holds the index of each term which needs to be avoided
+                Collection<Integer> avoidIndex = new HashSet<>();
+
+                for (int i = 0; i < arrayNameList.size(); i++) {
+                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
+                        avoidIndex.add(i);
+                        valuePartsCount--;
+                    }
+                }
+
+                if ((valuePartsCount % 2) == 0) {
+                    // We hit the described special case with name affix like Jr
+                    listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();
+                }
+            }
+        }
+
         // initialization of parser
         original = listOfNames;
         tokenStart = 0;
@@ -93,6 +142,37 @@ public class AuthorListParser {
             getAuthor().ifPresent(authors::add);
         }
         return new AuthorList(authors);
+    }
+
+    /**
+     * Builds a new array of strings with stringbuilder.
+     * Regarding to the name affixes.
+     *
+     * @return New string with correct seperation
+     */
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+        int avoidedTimes = 0;
+        for (int i = 0; i < nameList.size(); i++) {
+            if (indexArray.contains(i)) {
+                // We hit a name affix
+                stringBuilder.append(nameList.get(i));
+                stringBuilder.append(',');
+                avoidedTimes++;
+            } else {
+                stringBuilder.append(nameList.get(i));
+                if (((i + avoidedTimes) % 2) == 0) {
+                    // Hit separation between last name and firstname --> comma has to be kept
+                    stringBuilder.append(',');
+                } else {
+                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
+                    // Will be treated correctly by AuthorList.parse(authors);
+                    stringBuilder.append(';');
+                }
+            }
+        }
+        return stringBuilder;
     }
 
     /**
