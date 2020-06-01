@@ -86,7 +86,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL" type="article-newspaper webpage speech">
+      <if variable="URL" type="article-newspaper webpage speech report">
         <group prefix=" " delimiter=", ">
           <date variable="accessed" prefix="viewed ">
             <date-part name="day" suffix=" "/>
