@@ -1,8 +1,6 @@
 package org.jabref.logic.xmp;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -19,7 +17,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.common.io.Resources;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.DublinCoreSchema;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,11 +114,8 @@ class XmpUtilReaderTest {
      * Tests an pdf file with metadata which has no description section.
      */
     @Test
-    void testGetXmpMetadataWithNoDescription() throws IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method = XmpUtilReader.class.getDeclaredMethod("getXmpMetadata", PDDocument.class);
-        method.setAccessible(true);
-        List<XMPMetadata> entries = (List<XMPMetadata>) method.invoke(XmpUtilReader.class, PDDocument.load(XmpUtilShared.class.getResource("no_description_metadata.pdf").openStream()));
-        method.setAccessible(false);
+    void testReadNoDescriptionMetadata() throws IOException, URISyntaxException {
+        List<BibEntry> entries = XmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
         assertEquals(Collections.emptyList(), entries);
     }
 }
