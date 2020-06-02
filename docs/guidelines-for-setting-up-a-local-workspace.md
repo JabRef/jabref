@@ -186,7 +186,7 @@ If you have configured Eclipse for the same project \(the required steps are des
 
 ### Setup for Eclipse
 
-Make sure your Eclipse installation us up to date, Eclipse 2020-03 or newer is required.
+Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer is required.
 For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
 
 1. Run `./gradlew run` to generate all resources and to check if JabRef runs.
@@ -223,8 +223,8 @@ For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.ecli
         --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle
         --patch-module org.jabref=build\resources\main
         ```
-   * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
 
+   * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
 
 6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace:
     1. Help -&gt; Eclipse Marketplace... -&gt; Search tab
@@ -263,4 +263,3 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 ### Problems with generated source files
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
-
