@@ -1180,15 +1180,15 @@ public class AuthorListTest {
 
     @Test
     public void parseRetrieveCachedAuthorListAfterGarbageCollection() throws Exception {
-        final String uniqueName = "GFSDAGH JKGIIUREIUF";
-        AuthorList author = AuthorList.parse(uniqueName);
+        final String uniqueAuthorName = "Osvaldo Iongi";
+        AuthorList author = AuthorList.parse(uniqueAuthorName);
         System.gc();
-        assertSame(author, AuthorList.parse(uniqueName));
+        assertSame(author, AuthorList.parse(uniqueAuthorName));
     }
 
     @Test
     public void parseGarbageCollectAuthorListForUnreachableKey() throws Exception {
-        final String uniqueAuthorName = "SUDHGFIULAER DSGJS";
+        final String uniqueAuthorName = "Fleur Hornbach";
         // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
         AuthorList uniqueAuthor = AuthorList.parse(new String(uniqueAuthorName));
         System.gc();
@@ -1197,7 +1197,7 @@ public class AuthorListTest {
 
     @Test
     public void parseGarbageCollectUnreachableInstitution() throws Exception {
-        final String uniqueInstitutionName = "{ADFILUHWERKNDS}";
+        final String uniqueInstitutionName = "{Unique LLC}";
         // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
         AuthorList uniqueInstitution = AuthorList.parse(new String(uniqueInstitutionName));
         System.gc();
@@ -1210,7 +1210,7 @@ public class AuthorListTest {
      */
     @Test
     public void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() throws Exception {
-        final String uniqueAuthorsNames = "LDGULIOEW ADLJAKNG, GRIUIJSG DFSLJAEF, ASDUYOIGF DSANN";
+        final String uniqueAuthorsNames = "Basil Dankworth, Gianna Birdwhistle, Cosmo Berrycloth";
         AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
         System.gc();
         assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
@@ -1221,7 +1221,7 @@ public class AuthorListTest {
      */
     @Test
     public void parseCacheAuthorsWithTwoOrMoreCommasAndWithoutSpaceInAllParts() throws Exception {
-        final String uniqueAuthorsNames = "SGFGASD, Jr, GKJSKEFI";
+        final String uniqueAuthorsNames = "Dankworth, Jr., Braelynn";
         AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
         System.gc();
         assertSame(uniqueAuthors, AuthorList.parse(uniqueAuthorsNames));
