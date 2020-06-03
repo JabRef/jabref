@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class AuthorListParameterTest {
+class AuthorListParserTest {
 
     private static Stream<Arguments> data() {
         return Stream.of(
