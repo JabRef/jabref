@@ -2,6 +2,7 @@ package org.jabref.model.entry;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,5 +30,12 @@ class AuthorListParserTest {
     void parseCorrectly(String authorsString, Author authorsParsed) {
         AuthorListParser parser = new AuthorListParser();
         assertEquals(new AuthorList(authorsParsed), parser.parse(authorsString));
+    }
+
+    @Test
+    public void parseAuthorWithFirstNameAbbreviationContainingUmlaut() {
+        assertEquals(new AuthorList(
+                new Author("{\\OE}rjan", "{\\OE}.", null, "Umlauts", null)),
+                new AuthorListParser().parse("{\\OE}rjan Umlauts"));
     }
 }
