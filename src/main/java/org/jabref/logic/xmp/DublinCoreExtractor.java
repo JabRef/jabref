@@ -242,7 +242,7 @@ public class DublinCoreExtractor {
         this.extractTitle();
         this.extractType();
 
-        //we pass a new BibEntry in the constructor which is never empty as it already consists of "@misc"
+        // we pass a new BibEntry in the constructor which is never empty as it already consists of "@misc"
         if (bibEntry.equals(new BibEntry())) {
             return Optional.empty();
         }
