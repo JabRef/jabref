@@ -26,13 +26,12 @@ public class AuthorListParser {
     // "-") comma)
 
     // Token types (returned by getToken procedure)
-    private static final int TOKEN_EOF = 0;
-
-    private static final int TOKEN_AND = 1;
-
-    private static final int TOKEN_COMMA = 2;
-
-    private static final int TOKEN_WORD = 3;
+    private enum Token {
+        EOF,
+        AND,
+        COMMA,
+        WORD
+    }
 
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = new HashSet<>();
@@ -191,20 +190,20 @@ public class AuthorListParser {
         // First step: collect tokens in 'tokens' Vector and calculate indices
         boolean continueLoop = true;
         while (continueLoop) {
-            int token = getToken();
+            Token token = getToken();
             switch (token) {
-                case TOKEN_EOF:
-                case TOKEN_AND:
+                case EOF:
+                case AND:
                     continueLoop = false;
                     break;
-                case TOKEN_COMMA:
+                case COMMA:
                     if (commaFirst < 0) {
                         commaFirst = tokens.size();
                     } else if (commaSecond < 0) {
                         commaSecond = tokens.size();
                     }
                     break;
-                case TOKEN_WORD:
+                case WORD:
                     tokens.add(original.substring(tokenStart, tokenEnd));
                     tokens.add(original.substring(tokenStart, tokenAbbrEnd));
                     tokens.add(tokenTerm);
@@ -409,7 +408,7 @@ public class AuthorListParser {
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
      * <CODE>token_case</CODE>.
      */
-    private int getToken() {
+    private Token getToken() {
         tokenStart = tokenEnd;
         while (tokenStart < original.length()) {
             char c = original.charAt(tokenStart);
@@ -420,16 +419,16 @@ public class AuthorListParser {
         }
         tokenEnd = tokenStart;
         if (tokenStart >= original.length()) {
-            return TOKEN_EOF;
+            return Token.EOF;
         }
         if (original.charAt(tokenStart) == ',') {
             tokenEnd++;
-            return TOKEN_COMMA;
+            return Token.COMMA;
         }
         // Semicolon is considered to separate names like "and"
         if (original.charAt(tokenStart) == ';') {
             tokenEnd++;
-            return TOKEN_AND;
+            return Token.AND;
         }
         tokenAbbrEnd = -1;
         tokenTerm = ' ';
@@ -485,9 +484,9 @@ public class AuthorListParser {
             tokenTerm = '-';
         }
         if ("and".equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {
-            return TOKEN_AND;
+            return Token.AND;
         } else {
-            return TOKEN_WORD;
+            return Token.WORD;
         }
     }
 }
