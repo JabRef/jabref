@@ -263,9 +263,21 @@ public class AuthorListTest {
     }
 
     @Test
+    public void getAsFirstLastNamesLatexFreeUnicodeTwoAuthorNamesFromLatexAbbreviateAndOxfordComma() {
+        assertEquals("M. al-Khwārizmī and C. Böhm",
+                TWO_AUTHORS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, true));
+    }
+
+    @Test
     public void getAsFirstLastNamesLatexFreeThreeUnicodeAuthorsFromLatexAbbreviate() {
         assertEquals("M. al-Khwārizmī, C. Böhm and K. Gödel",
                 THREE_AUTHORS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
+    }
+
+    @Test
+    public void getAsFirstLastNamesLatexFreeThreeUnicodeAuthorsFromLatexAbbreviateAndOxfordComma() {
+        assertEquals("M. al-Khwārizmī, C. Böhm, and K. Gödel",
+                THREE_AUTHORS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, true));
     }
 
     @Test
@@ -743,8 +755,18 @@ public class AuthorListTest {
     }
 
     @Test
+    public void getAsLastNamesLatexFreeUnicodeTwoAuthorNamesFromLatexUsingOxfordComma() {
+        assertEquals("al-Khwārizmī and Böhm", TWO_AUTHORS_WITH_LATEX.getAsLastNamesLatexFree(true));
+    }
+
+    @Test
     public void getAsLastNamesLatexFreeUnicodeThreeAuthorsFromLatex() {
         assertEquals("al-Khwārizmī, Böhm and Gödel", THREE_AUTHORS_WITH_LATEX.getAsLastNamesLatexFree(false));
+    }
+
+    @Test
+    public void getAsLastNamesLatexFreeUnicodeThreeAuthorsFromLatexUsingOxfordComma() {
+        assertEquals("al-Khwārizmī, Böhm, and Gödel", THREE_AUTHORS_WITH_LATEX.getAsLastNamesLatexFree(true));
     }
 
     @Test
