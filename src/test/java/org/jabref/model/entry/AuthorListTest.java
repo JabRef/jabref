@@ -240,53 +240,53 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeEmptyAuthorStringForEmptyInputAbbr() {
+    public void getAsFirstLastNamesLatexFreeEmptyAuthorStringForEmptyInputAbbreviate() {
         assertEquals("", EMPTY_AUTHOR.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeCachesLatexFreeStringAbbr() {
+    public void getAsFirstLastNamesLatexFreeCachesLatexFreeStringAbbreviate() {
         String cachedString = ONE_AUTHOR_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false);
         assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeUnicodeOneAuthorNameFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeUnicodeOneAuthorNameFromLatexAbbreviate() {
         assertEquals("M. al-Khwārizmī",
                 ONE_AUTHOR_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeUnicodeTwoAuthorNamesFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeUnicodeTwoAuthorNamesFromLatexAbbreviate() {
         assertEquals("M. al-Khwārizmī and C. Böhm",
                 TWO_AUTHORS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeThreeUnicodeAuthorsFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeThreeUnicodeAuthorsFromLatexAbbreviate() {
         assertEquals("M. al-Khwārizmī, C. Böhm and K. Gödel",
                 THREE_AUTHORS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeUnicodeOneInsitutionNameFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeUnicodeOneInsitutionNameFromLatexAbbreviate() {
         assertEquals("The Banū Mūsā brothers", ONE_INSTITUTION_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeUnicodeTwoInsitutionNameFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeUnicodeTwoInsitutionNameFromLatexAbbreviate() {
         assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
                 TWO_INSTITUTIONS_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeUnicodeMixedAuthorsFromLatexAbbr() {
+    public void getAsFirstLastNamesLatexFreeUnicodeMixedAuthorsFromLatexAbbreviate() {
         assertEquals("The Banū Mūsā brothers and C. Böhm",
                 MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX.getAsFirstLastNamesLatexFree(true, false));
     }
 
     @Test
-    public void getAsFirstLastNamesLatexFreeOneInstitutionWithParanthesisAtStartAbbr() {
+    public void getAsFirstLastNamesLatexFreeOneInstitutionWithParanthesisAtStartAbbreviate() {
         assertEquals("Łukasz Michał",
                 ONE_INSTITUTION_WITH_STARTING_PARANTHESIS.getAsFirstLastNamesLatexFree(true, false));
     }
@@ -743,7 +743,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsLastNamesLatexFreeUnicodeThreeUnicodeAuthorsFromLatex() {
+    public void getAsLastNamesLatexFreeUnicodeThreeAuthorsFromLatex() {
         assertEquals("al-Khwārizmī, Böhm and Gödel", THREE_AUTHORS_WITH_LATEX.getAsLastNamesLatexFree(false));
     }
 
