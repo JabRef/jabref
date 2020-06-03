@@ -109,10 +109,11 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         } else if (firstNameModeFullProperty.getValue()) {
             firstNameMode = AutoCompleteFirstNameMode.ONLY_FULL;
         }
-        if(initialAutoCompletePreferences.shouldAutoComplete()!=enableAutoCompleteProperty.getValue()){
-            if(enableAutoCompleteProperty.getValue()){
+
+        if (initialAutoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
+            if (enableAutoCompleteProperty.getValue()) {
                 restartWarnings.add(Localization.lang("Auto complete enable."));
-            }else{
+            } else {
                 restartWarnings.add(Localization.lang("Auto complete disable."));
             }
         }
