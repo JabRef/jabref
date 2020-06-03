@@ -380,8 +380,8 @@ public class AuthorListParser {
      * The type of the token is returned; if it is <CODE>Token.WORD</CODE>,
      * additional information is given in global variables <CODE>token_start</CODE>,
      * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
-     * and <CODE>token_case</CODE>; namely: <CODE>orig.substring(token_start,token_end)</CODE>
-     * is the text of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
+     * and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE>
+     * is the text of the token, <CODE>original.substring(token_start,token_abbr)</CODE>
      * is the token abbreviation, <CODE>token_term</CODE> contains token
      * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
      * if token is upper-case and <CODE>false</CODE> if token is lower-case.
