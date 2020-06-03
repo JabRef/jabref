@@ -51,7 +51,7 @@ public class AuthorListParser {
     private int tokenEnd;
     /**
      * end of token abbreviation (always: tokenStart < tokenAbbrEnd <= tokenEnd), only valid if getToken returns
-     * TOKEN_WORD
+     * Token.WORD
      */
     private int tokenAbbrEnd;
     /**
@@ -370,14 +370,14 @@ public class AuthorListParser {
     /**
      * Parses the next token.
      * <p>
-     * The string being parsed is stored in global variable <CODE>orig</CODE>,
+     * The string being parsed is stored in global variable <CODE>original</CODE>,
      * and position which parsing has to start from is stored in global variable
      * <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
      * to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>;
      * thus, subsequent invocations do not require any additional variable
      * settings.
      * <p>
-     * The type of the token is returned; if it is <CODE>TOKEN_WORD</CODE>,
+     * The type of the token is returned; if it is <CODE>Token.WORD</CODE>,
      * additional information is given in global variables <CODE>token_start</CODE>,
      * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
      * and <CODE>token_case</CODE>; namely: <CODE>orig.substring(token_start,token_end)</CODE>
@@ -386,9 +386,9 @@ public class AuthorListParser {
      * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
      * if token is upper-case and <CODE>false</CODE> if token is lower-case.
      *
-     * @return <CODE>TOKEN_EOF</CODE> -- no more tokens, <CODE>TOKEN_COMMA</CODE> --
-     * token is comma, <CODE>TOKEN_AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.) or a semicolon, <CODE>TOKEN_WORD</CODE> --
+     * @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> --
+     * token is comma, <CODE>Token.AND</CODE> -- token is the word
+     * "and" (or "And", or "aND", etc.) or a semicolon, <CODE>Token.WORD</CODE> --
      * token is a word; additional information is given in global
      * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
