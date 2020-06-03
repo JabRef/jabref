@@ -167,6 +167,13 @@ public class AuthorListTest {
     }
 
     @Test
+    public void parseAndGetAsUnformattedLatexFreeUnicodeThreeAuthorsromLatex() {
+        assertEquals("Muḥammad al-Khwārizmī, Corrado Böhm",
+                AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}}, Corrado B{\\\"o}hm")
+                          .getAsUnformattedLatexFree());
+    }
+
+    @Test
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
@@ -1265,5 +1272,40 @@ public class AuthorListTest {
 
         expected = new Author("José María", "J. M.", null, "Rodriguez Fernandez", null);
         assertEquals(new AuthorList(expected), AuthorList.parse("Rodriguez Fernandez, José María"));
+    }
+
+    @Test
+    public void equalsFalseWhenNotAuthorList() {
+        assertNotEquals(new AuthorList(new Author(null, null, null, null, null)),
+                new Author(null, null, null, null, null));
+    }
+
+    @Test
+    public void equalsTrueReflexive() {
+        AuthorList authorList = new AuthorList(new Author(null, null, null, null, null));
+        assertEquals(authorList, authorList);
+    }
+
+    @Test
+    public void equalsTrueSymmetry() {
+        AuthorList firstAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        AuthorList secondAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        assertEquals(firstAuthorList, secondAuthorList);
+        assertEquals(secondAuthorList, firstAuthorList);
+    }
+
+    @Test
+    public void equalsTrueTransitive() {
+        AuthorList firstAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        AuthorList secondAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        AuthorList thirdAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        assertEquals(firstAuthorList, secondAuthorList);
+        assertEquals(secondAuthorList, thirdAuthorList);
+        assertEquals(firstAuthorList, thirdAuthorList);
+    }
+
+    @Test
+    public void equalsFalseForNull() {
+        assertNotEquals(null, new AuthorList(new Author(null, null, null, null, null)));
     }
 }
