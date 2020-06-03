@@ -103,7 +103,7 @@ public class CitationKeyPatternPanel extends Pane {
         rowIndex++;
 
         ActionFactory factory = new ActionFactory(Globals.prefs.getKeyBindingRepository());
-        Button help = factory.createIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.BIBTEX_KEY_PATTERN));
+        Button help = factory.createIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN));
         gridPane.add(help, 1, rowIndex);
 
         Button btnDefaultAll1 = new Button(Localization.lang("Reset all"));

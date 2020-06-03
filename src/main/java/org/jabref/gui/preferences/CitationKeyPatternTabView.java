@@ -70,7 +70,7 @@ public class CitationKeyPatternTabView extends AbstractPreferenceTabView<Citatio
         keyPatternContainer.getChildren().add(bibtexKeyPatternTable);
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.BIBTEX_KEY_PATTERN), keyPatternHelp);
+        actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN), keyPatternHelp);
     }
 
     @Override
