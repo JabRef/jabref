@@ -13,7 +13,8 @@ import java.util.Set;
 public class AuthorListParser {
 
     // Avoid partition where these values are contained
-    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+    private final static Set<String> AVOID_TERMS_IN_LOWER_CASE = Set.of(
+            "jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
 
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
