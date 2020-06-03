@@ -1275,6 +1275,15 @@ public class AuthorListTest {
     }
 
     @Test
+    public void equalsFalseDifferentOrder() {
+        Author firstAuthor = new Author("A", null, null, null, null);
+        Author secondAuthor = new Author("B", null, null, null, null);
+        AuthorList firstAuthorList = new AuthorList(List.of(firstAuthor, secondAuthor));
+        AuthorList secondAuthorList = new AuthorList(List.of(secondAuthor, firstAuthor));
+        assertNotEquals(firstAuthorList, secondAuthorList);
+    }
+
+    @Test
     public void equalsFalseWhenNotAuthorList() {
         assertNotEquals(new AuthorList(new Author(null, null, null, null, null)),
                 new Author(null, null, null, null, null));
@@ -1302,6 +1311,15 @@ public class AuthorListTest {
         assertEquals(firstAuthorList, secondAuthorList);
         assertEquals(secondAuthorList, thirdAuthorList);
         assertEquals(firstAuthorList, thirdAuthorList);
+    }
+
+    @Test
+    public void equalsTrueConsistent() {
+        AuthorList firstAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        AuthorList secondAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        assertEquals(firstAuthorList, secondAuthorList);
+        assertEquals(firstAuthorList, secondAuthorList);
+        assertEquals(firstAuthorList, secondAuthorList);
     }
 
     @Test
