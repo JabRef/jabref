@@ -1206,6 +1206,7 @@ public class AuthorListTest {
 
     /**
      * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552).
+     * The test is incorrect BibTeX but is handled by the parser and common in practice.
      */
     @Test
     public void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() throws Exception {
