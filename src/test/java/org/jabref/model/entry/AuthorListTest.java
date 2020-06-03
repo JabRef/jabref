@@ -1326,4 +1326,17 @@ public class AuthorListTest {
     public void equalsFalseForNull() {
         assertNotEquals(null, new AuthorList(new Author(null, null, null, null, null)));
     }
+
+    @Test
+    public void hashCodeConsistent() {
+        AuthorList authorList = new AuthorList(new Author(null, null, null, null, null));
+        assertEquals(authorList.hashCode(), authorList.hashCode());
+    }
+
+    @Test
+    public void hashCodeNotConstant() {
+        AuthorList firstAuthorList = new AuthorList(new Author("A", null, null, null, null));
+        AuthorList secondAuthorList = new AuthorList(new Author("B", null, null, null, null));
+        assertNotEquals(firstAuthorList.hashCode(), secondAuthorList.hashCode());
+    }
 }
