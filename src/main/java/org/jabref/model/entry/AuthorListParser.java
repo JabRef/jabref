@@ -34,22 +34,8 @@ public class AuthorListParser {
     }
 
     // Constant HashSet containing names of TeX special characters
-    private static final Set<String> TEX_NAMES = new HashSet<>();
-
-    static {
-        TEX_NAMES.add("aa");
-        TEX_NAMES.add("ae");
-        TEX_NAMES.add("l");
-        TEX_NAMES.add("o");
-        TEX_NAMES.add("oe");
-        TEX_NAMES.add("i");
-        TEX_NAMES.add("AA");
-        TEX_NAMES.add("AE");
-        TEX_NAMES.add("L");
-        TEX_NAMES.add("O");
-        TEX_NAMES.add("OE");
-        TEX_NAMES.add("j");
-    }
+    private static final Set<String> TEX_NAMES = Set.of(
+            "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
 
     /**
      * the raw bibtex author/editor field
