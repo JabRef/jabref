@@ -1296,7 +1296,7 @@ public class AuthorListTest {
     }
 
     @Test
-    public void equalsTrueSymmetry() {
+    public void equalsTrueSymmetric() {
         AuthorList firstAuthorList = new AuthorList(new Author("A", null, null, null, null));
         AuthorList secondAuthorList = new AuthorList(new Author("A", null, null, null, null));
         assertEquals(firstAuthorList, secondAuthorList);
