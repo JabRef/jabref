@@ -581,10 +581,14 @@ public class AuthorList {
     /**
      * Compare this object with the given one.
      * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     * @return `true` iff the other object is an AuthorList, all Authors are in the same order, and all Authors field
+     * are equal on a string comparison.
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof AuthorList)) {
             return false;
         }
