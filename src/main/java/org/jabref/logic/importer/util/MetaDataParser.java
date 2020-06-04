@@ -7,9 +7,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ParseException;
@@ -49,7 +51,15 @@ public class MetaDataParser {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : data.entrySet()) {
+        // process GROUPSTREE and GROUPSTREE_LEGACY at the very end (otherwise it can happen that not all dependent data are set)
+        Stream<Map.Entry<String, String>> stream = data.entrySet().stream().filter(entry -> !entry.getKey().equals(MetaData.GROUPSTREE) && !entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
+        Stream<Map.Entry<String, String>> streamTail = data.entrySet().stream().filter(entry -> entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
+        stream = Stream.concat(stream, streamTail);
+
+        Iterator<Map.Entry<String, String>> it = stream.iterator();
+
+        while (it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
             List<String> value = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
@@ -82,21 +92,11 @@ public class MetaDataParser {
                 metaData.setDefaultFileDirectory(getSingleItem(value));
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+            } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
+                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), value);
-            }
-        }
-
-        // process GROUPSTREE and GROUPSTREE_LEGACY at the very end (otherwise it may happen that not all dependent data is set)
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            List<String> value = getAsList(entry.getValue());
-
-            switch (entry.getKey()) {
-                case MetaData.GROUPSTREE:
-                case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
-                    break;
             }
         }
 
