@@ -56,7 +56,7 @@ import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -91,7 +91,7 @@ import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -217,9 +217,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
 
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is org.jabref.gui.preferences.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
-    public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
-    public static final String UNWANTED_BIBTEX_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
+    // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
+    public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
+    public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
@@ -290,8 +290,8 @@ public class JabRefPreferences implements PreferencesService {
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
     public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
     public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
-    // Prefs node for BibtexKeyPatterns
-    public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
+    // Prefs node for CitationKeyPatterns
+    public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
@@ -389,9 +389,9 @@ public class JabRefPreferences implements PreferencesService {
     private final Preferences prefs;
 
     /**
-     * Cache variable for <code>getGlobalBibtexKeyPattern</code>
+     * Cache variable for <code>getGlobalCitationKeyPattern</code>
      */
-    private GlobalBibtexKeyPattern globalBibtexKeyPattern;
+    private GlobalCitationKeyPattern globalCitationKeyPattern;
 
     /**
      * Cache variable for getEntryEditorTabList
@@ -587,8 +587,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
-        defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_BIBTEX_KEY_CHARACTERS, "-`ʹ:!;?^+");
+        defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
+        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^+");
         defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, StandardField.URL.getName());
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -642,7 +642,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertDefaultCleanupPreset(defaults);
 
-        // use BibTeX key appended with filename as default pattern
+        // use citation key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
@@ -983,7 +983,7 @@ public class JabRefPreferences implements PreferencesService {
      */
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
-        clearKeyPatterns();
+        clearCitationKeyPatterns();
         prefs.clear();
         new SharedDatabasePreferences().clear();
     }
@@ -1192,7 +1192,7 @@ public class JabRefPreferences implements PreferencesService {
                 customImports,
                 getDefaultEncoding(),
                 getKeywordDelimiter(),
-                getBibtexKeyPatternPreferences(),
+                getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXMPPreferences(),
                 isKeywordSyncEnabled());
@@ -1217,7 +1217,7 @@ public class JabRefPreferences implements PreferencesService {
                 false,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                getBibtexKeyPatternPreferences());
+                getCitationKeyPatternPreferences());
     }
 
     public SavePreferences loadForSaveFromPreferences() {
@@ -1229,7 +1229,7 @@ public class JabRefPreferences implements PreferencesService {
                 true,
                 this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
-                getBibtexKeyPatternPreferences());
+                getCitationKeyPatternPreferences());
     }
 
     public ExporterFactory getExporterFactory(JournalAbbreviationRepository abbreviationRepository) {
@@ -1699,7 +1699,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUnwantedCharacters() {
-        return get(UNWANTED_BIBTEX_KEY_CHARACTERS);
+        return get(UNWANTED_CITATION_KEY_CHARACTERS);
     }
 
     @Override
@@ -1963,34 +1963,34 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // BibtexKeyPatternPreferences
+    // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
     /**
-     * Creates the GlobalBibtexKeyPattern from cache
+     * Creates the GlobalCitationKeyPattern from cache
      *
-     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
+     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractCitationKeyPattern
      */
     @Override
-    public GlobalBibtexKeyPattern getGlobalBibtexKeyPattern() {
-        if (this.globalBibtexKeyPattern == null) {
-            updateGlobalBibtexKeyPattern();
+    public GlobalCitationKeyPattern getGlobalCitationKeyPattern() {
+        if (this.globalCitationKeyPattern == null) {
+            updateGlobalCitationKeyPattern();
         }
-        return this.globalBibtexKeyPattern;
+        return this.globalCitationKeyPattern;
     }
 
     /**
-     * Reloads the GlobalBibtexKeyPattern from scratch to cache
+     * Reloads the GlobalCitationKeyPattern from scratch to cache
      */
     @Override
-    public void updateGlobalBibtexKeyPattern() {
-        this.globalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+    public void updateGlobalCitationKeyPattern() {
+        this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    this.globalBibtexKeyPattern.addBibtexKeyPattern(
+                    this.globalCitationKeyPattern.addCitationKeyPattern(
                             EntryTypeFactory.parse(key),
                             preferences.get(key, null));
                 }
@@ -2005,18 +2005,18 @@ public class JabRefPreferences implements PreferencesService {
      *
      * @param pattern the pattern to store
      */
-    public void storeGlobalBibtexKeyPattern(GlobalBibtexKeyPattern pattern) {
-        this.globalBibtexKeyPattern = pattern;
+    public void storeGlobalCitationKeyPattern(GlobalCitationKeyPattern pattern) {
+        this.globalCitationKeyPattern = pattern;
 
-        if ((this.globalBibtexKeyPattern.getDefaultValue() == null)
-                || this.globalBibtexKeyPattern.getDefaultValue().isEmpty()) {
-            put(DEFAULT_BIBTEX_KEY_PATTERN, "");
+        if ((this.globalCitationKeyPattern.getDefaultValue() == null)
+                || this.globalCitationKeyPattern.getDefaultValue().isEmpty()) {
+            put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
-            put(DEFAULT_BIBTEX_KEY_PATTERN, globalBibtexKeyPattern.getDefaultValue().get(0));
+            put(DEFAULT_CITATION_KEY_PATTERN, globalCitationKeyPattern.getDefaultValue().get(0));
         }
 
         // Store overridden definitions to Preferences.
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -2030,40 +2030,40 @@ public class JabRefPreferences implements PreferencesService {
             }
         }
 
-        updateGlobalBibtexKeyPattern();
+        updateGlobalCitationKeyPattern();
     }
 
-    private void clearKeyPatterns() throws BackingStoreException {
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+    private void clearCitationKeyPatterns() throws BackingStoreException {
+        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
-        updateGlobalBibtexKeyPattern();
+        updateGlobalCitationKeyPattern();
     }
 
     @Override
-    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        BibtexKeyPatternPreferences.KeySuffix keySuffix =
-                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        CitationKeyPatternPreferences.KeySuffix keySuffix =
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
 
         if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {
-            keySuffix = BibtexKeyPatternPreferences.KeySuffix.ALWAYS;
+            keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;
         } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {
-            keySuffix = BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
         }
 
-        return new BibtexKeyPatternPreferences(
+        return new CitationKeyPatternPreferences(
                 getBoolean(AVOID_OVERWRITING_KEY),
                 getBoolean(WARN_BEFORE_OVERWRITING_KEY),
                 getBoolean(GENERATE_KEYS_BEFORE_SAVING),
                 keySuffix,
                 get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT),
-                get(UNWANTED_BIBTEX_KEY_CHARACTERS),
-                getGlobalBibtexKeyPattern(),
+                get(UNWANTED_CITATION_KEY_CHARACTERS),
+                getGlobalCitationKeyPattern(),
                 getKeywordDelimiter());
     }
 
     @Override
-    public void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences) {
+    public void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences) {
         putBoolean(AVOID_OVERWRITING_KEY, preferences.shouldAvoidOverwriteCiteKey());
         putBoolean(WARN_BEFORE_OVERWRITING_KEY, preferences.shouldWarnBeforeOverwriteCiteKey());
         putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
@@ -2086,9 +2086,9 @@ public class JabRefPreferences implements PreferencesService {
 
         put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
         put(KEY_PATTERN_REPLACEMENT, preferences.getKeyPatternReplacement());
-        put(UNWANTED_BIBTEX_KEY_CHARACTERS, preferences.getUnwantedCharacters());
+        put(UNWANTED_CITATION_KEY_CHARACTERS, preferences.getUnwantedCharacters());
 
-        storeGlobalBibtexKeyPattern(preferences.getKeyPattern());
+        storeGlobalCitationKeyPattern(preferences.getKeyPattern());
     }
 
     //*************************************************************************************************************
@@ -2125,9 +2125,9 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     /**
-     * Creates the GlobalBibtexKeyPattern from cache
+     * Creates the GlobalCitationKeyPattern from cache
      *
-     * @return GlobalBibtexKeyPattern containing all keys without a parent AbstractKeyPattern
+     * @return GlobalCitationKeyPattern containing all keys without a parent AbstractKeyPattern
      */
     private List<MainTableColumnModel> createMainTableColumns() {
         if (this.mainTableColumns == null) {
@@ -2137,7 +2137,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Reloads the GlobalBibtexKeyPattern from scratch
+     * Reloads the GlobalCitationKeyPattern from scratch
      */
     @Override
     public void updateMainTableColumns() {

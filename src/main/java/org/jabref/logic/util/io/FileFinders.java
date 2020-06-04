@@ -8,7 +8,7 @@ public class FileFinders {
         if (autoLinkPreferences.isUseRegularExpression()) {
             return new RegExpBasedFileFinder(autoLinkPreferences.getRegularExpression(), autoLinkPreferences.getKeywordDelimiter());
         } else {
-            return new CiteKeyBasedFileFinder(autoLinkPreferences.isOnlyFindByExactCiteKey());
+            return new CitationKeyBasedFileFinder(autoLinkPreferences.isOnlyFindByExactCiteKey());
         }
     }
 }
