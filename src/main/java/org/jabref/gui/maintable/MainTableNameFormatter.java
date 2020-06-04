@@ -36,8 +36,6 @@ public class MainTableNameFormatter {
         }
 
         switch (nameFormatPreferences.getDisplayStyle()) {
-            case AS_IS:
-                return authors.getAsUnformattedLatexFree();
             case NATBIB:
                 return authors.getAsNatbibLatexFree();
             case FIRSTNAME_LASTNAME:
@@ -50,5 +48,9 @@ public class MainTableNameFormatter {
                         abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
                         false);
         }
+    }
+
+    public boolean needsFormatting() {
+        return preferencesService.getMainTableNameFormatPreferences().getDisplayStyle() != MainTableNameFormatPreferences.DisplayStyle.AS_IS;
     }
 }
