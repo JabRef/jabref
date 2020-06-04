@@ -55,49 +55,36 @@ public class MetaDataParser {
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
-                continue;
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name comes directly after "FILE_DIRECTORY-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
-                continue;
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
-                continue;
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + "Latex-")) {
                 // The user name comes directly after "FILE_DIRECTORYLatex-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 6);
                 Path path = Path.of(getSingleItem(value)).normalize();
                 metaData.setLatexFileDirectory(user, path);
-                continue;
-            }
-
-            switch (entry.getKey()) {
-                case MetaData.SAVE_ACTIONS:
-                    metaData.setSaveActions(Cleanups.parse(value));
-                    break;
-                case MetaData.DATABASE_TYPE:
-                    metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
-                    break;
-                case MetaData.KEYPATTERNDEFAULT:
-                    defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
-                    break;
-                case MetaData.PROTECTED_FLAG_META:
-                    if (Boolean.parseBoolean(getSingleItem(value))) {
-                        metaData.markAsProtected();
-                    } else {
-                        metaData.markAsNotProtected();
-                    }
-                    break;
-                case MetaData.FILE_DIRECTORY:
-                    metaData.setDefaultFileDirectory(getSingleItem(value));
-                    break;
-                case MetaData.SAVE_ORDER_CONFIG:
-                    metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
-                    break;
-                default:
-                    // Keep meta data items that we do not know in the file
-                    metaData.putUnknownMetaDataItem(entry.getKey(), value);
+            } else if (entry.getKey().equals(MetaData.SAVE_ACTIONS)) {
+                metaData.setSaveActions(Cleanups.parse(value));
+            } else if (entry.getKey().equals(MetaData.DATABASE_TYPE)) {
+                metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
+            } else if (entry.getKey().equals(MetaData.KEYPATTERNDEFAULT)) {
+                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
+            } else if (entry.getKey().equals(MetaData.PROTECTED_FLAG_META)) {
+                if (Boolean.parseBoolean(getSingleItem(value))) {
+                    metaData.markAsProtected();
+                } else {
+                    metaData.markAsNotProtected();
+                }
+            } else if (entry.getKey().equals(MetaData.FILE_DIRECTORY)) {
+                metaData.setDefaultFileDirectory(getSingleItem(value));
+            } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
+                metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+            } else {
+                // Keep meta data items that we do not know in the file
+                metaData.putUnknownMetaDataItem(entry.getKey(), value);
             }
         }
 
