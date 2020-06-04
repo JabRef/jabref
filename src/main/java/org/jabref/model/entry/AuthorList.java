@@ -167,13 +167,14 @@ public class AuthorList {
     public static AuthorList parse(final String authors) {
         Objects.requireNonNull(authors);
 
-        if (!AUTHOR_CACHE.containsKey(authors)) {
+        AuthorList authorList = AUTHOR_CACHE.get(authors);
+        if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();
-            AuthorList authorList = parser.parse(authors);
+            authorList = parser.parse(authors);
             authorList.authorsUnformatted = new String(authors);
             AUTHOR_CACHE.put(authors, authorList);
         }
-        return AUTHOR_CACHE.get(authors);
+        return authorList;
     }
 
     /**
