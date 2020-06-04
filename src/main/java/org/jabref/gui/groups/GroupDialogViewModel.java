@@ -220,6 +220,8 @@ public class GroupDialogViewModel {
                                                                       input -> {
                                                                           if (StringUtil.isNullOrEmpty(input)) {
                                                                               return false;
+                                                                                                                                   } else if (input.trim().length() == 0) {
+                                                                                                                                       return false;
                                                                           }
 
                                                                           return true;
