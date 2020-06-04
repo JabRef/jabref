@@ -73,10 +73,6 @@ public class MetaDataParser {
             }
 
             switch (entry.getKey()) {
-                case MetaData.GROUPSTREE:
-                case MetaData.GROUPSTREE_LEGACY:
-                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
-                    break;
                 case MetaData.SAVE_ACTIONS:
                     metaData.setSaveActions(Cleanups.parse(value));
                     break;
@@ -104,6 +100,19 @@ public class MetaDataParser {
                     metaData.putUnknownMetaDataItem(entry.getKey(), value);
             }
         }
+
+        // process GROUPSTREE and GROUPSTREE_LEGACY at the very end (otherwise it may happen that not all dependent data is set)
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            List<String> value = getAsList(entry.getValue());
+
+            switch (entry.getKey()) {
+                case MetaData.GROUPSTREE:
+                case MetaData.GROUPSTREE_LEGACY:
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
+                    break;
+            }
+        }
+
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
             metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
