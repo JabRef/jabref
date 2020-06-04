@@ -98,6 +98,7 @@ public class GroupDialogViewModel {
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
+    private Validator texGroupFilePathValidator;
     private final CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
@@ -208,12 +209,22 @@ public class GroupDialogViewModel {
                         Localization.lang("Invalid regular expression."))));
 
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
-                searchGroupSearchTermProperty,
-                input -> !StringUtil.isNullOrEmpty(input),
-                ValidationMessage.error(String.format("%s > %n %s",
-                        Localization.lang("Free search expression"),
-                        Localization.lang("Search term is empty.")
-                )));
+                                                                      searchGroupSearchTermProperty,
+                                                                      input -> !StringUtil.isNullOrEmpty(input),
+                                                                      ValidationMessage.error(String.format("%s > %n %s",
+                                                                                                            Localization.lang("Free search expression"),
+                                                                                                            Localization.lang("Search term is empty."))));
+
+        texGroupFilePathValidator = new FunctionBasedValidator<>(
+                                                                 texGroupFilePathProperty,
+                                                                      input -> {
+                                                                          if (StringUtil.isNullOrEmpty(input)) {
+                                                                              return false;
+                                                                          }
+
+                                                                          return true;
+                                                                      },
+                                                                      ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
         validator.addValidators(nameValidator, sameNameValidator);
 
@@ -230,6 +241,14 @@ public class GroupDialogViewModel {
                 validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
+            }
+        });
+
+        typeTexProperty.addListener((obs, _oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(texGroupFilePathValidator);
+            } else {
+                validator.removeValidators(texGroupFilePathValidator);
             }
         });
     }
@@ -437,6 +456,10 @@ public class GroupDialogViewModel {
 
     public ValidationStatus keywordSearchTermEmptyValidationStatus() {
         return keywordSearchTermEmptyValidator.getValidationStatus();
+    }
+
+    public ValidationStatus texGroupFilePathValidatonStatus() {
+        return texGroupFilePathValidator.getValidationStatus();
     }
 
     public StringProperty nameProperty() {
