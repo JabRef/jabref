@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -222,12 +223,11 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        Path path = preferencesService.getWorkingDir();
-                        File texFile = new File(path.toString(), input);
-                        Optional<String> fileExtension = FileUtil.getFileExtension(texFile.getPath());
+                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
+                        Optional<String> fileExtension = FileUtil.getFileExtension(input);
                         if (fileExtension.isEmpty() || !fileExtension.get().toLowerCase().equals("aux")) {
                             return false;
-                        } else if (!texFile.exists() || !texFile.isFile()) {
+                        } else if (!Files.isRegularFile(texFilePath)) {
                             return false;
                         }
                         return true;
