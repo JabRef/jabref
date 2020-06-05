@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ParseException;
@@ -53,9 +51,10 @@ public class MetaDataParser {
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
-        Stream<Map.Entry<String, String>> entrySetStream = data.entrySet().stream().sorted(groupsLast());
+        List<Map.Entry<String, String>> entryList = new ArrayList<>((data.entrySet()));
+        entryList.sort(groupsLast());
 
-        for (Map.Entry<String, String> entry : entrySetStream.collect(Collectors.toList())) {
+        for (Map.Entry<String, String> entry : entryList) {
             List<String> value = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
