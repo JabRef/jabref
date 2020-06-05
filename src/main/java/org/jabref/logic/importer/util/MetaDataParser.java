@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.cleanup.Cleanups;
@@ -56,10 +57,7 @@ public class MetaDataParser {
         Stream<Map.Entry<String, String>> entrySetStreamTail = data.entrySet().stream().filter(entry -> entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
         entrySetStream = Stream.concat(entrySetStream, entrySetStreamTail);
 
-        Iterator<Map.Entry<String, String>> entryIterator = entrySetStream.iterator();
-
-        while (entryIterator.hasNext()) {
-            Map.Entry<String, String> entry = entryIterator.next();
+        for (Map.Entry<String, String> entry : entrySetStream.collect(Collectors.toList())) {
             List<String> value = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
