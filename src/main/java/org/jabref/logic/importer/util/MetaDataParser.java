@@ -51,7 +51,7 @@ public class MetaDataParser {
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
-        List<Map.Entry<String, String>> entryList = new ArrayList<>((data.entrySet()));
+        List<Map.Entry<String, String>> entryList = new ArrayList<>(data.entrySet());
         entryList.sort(groupsLast());
 
         for (Map.Entry<String, String> entry : entryList) {
