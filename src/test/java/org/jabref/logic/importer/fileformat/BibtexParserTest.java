@@ -36,7 +36,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.model.groups.*;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.TexGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -1385,7 +1391,7 @@ class BibtexParserTest {
     }
 
     /**
-     * Checks that a TexGroup finally gets the required data
+     * Checks that a TexGroup finally gets the required data, after parsing the library.
      * @throws IOException
      * @throws ParseException
      */
@@ -1403,8 +1409,8 @@ class BibtexParserTest {
                      + InetAddress.getLocalHost().getHostName()
                      + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
            + "@Comment{jabref-meta: fileDirectoryLatex-"
-                     + System.getProperty("user.name")
-                     + "-" + InetAddress.getLocalHost().getHostName()
+                     + System.getProperty("user.name") + "-"
+                     + InetAddress.getLocalHost().getHostName()
                      + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
         ));
 
