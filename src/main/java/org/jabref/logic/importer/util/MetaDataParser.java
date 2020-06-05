@@ -6,8 +6,8 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,10 +52,8 @@ public class MetaDataParser {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
-        // process GROUPSTREE and GROUPSTREE_LEGACY at the very end (otherwise it can happen that not all dependent data are set)
-        Stream<Map.Entry<String, String>> entrySetStream = data.entrySet().stream().filter(entry -> !entry.getKey().equals(MetaData.GROUPSTREE) && !entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
-        Stream<Map.Entry<String, String>> entrySetStreamTail = data.entrySet().stream().filter(entry -> entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
-        entrySetStream = Stream.concat(entrySetStream, entrySetStreamTail);
+        // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
+        Stream<Map.Entry<String, String>> entrySetStream = data.entrySet().stream().sorted(groupsLast());
 
         for (Map.Entry<String, String> entry : entrySetStream.collect(Collectors.toList())) {
             List<String> value = getAsList(entry.getValue());
@@ -103,6 +101,11 @@ public class MetaDataParser {
         }
 
         return metaData;
+    }
+
+    private static Comparator<? super Map.Entry<String, String>> groupsLast() {
+        return (s1, s2) -> MetaData.GROUPSTREE.equals(s1.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s1.getKey()) ? 1 :
+                MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
     }
 
     /**
