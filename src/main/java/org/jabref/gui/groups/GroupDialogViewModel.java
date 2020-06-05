@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -209,24 +210,31 @@ public class GroupDialogViewModel {
                         Localization.lang("Invalid regular expression."))));
 
         searchSearchTermEmptyValidator = new FunctionBasedValidator<>(
-                                                                      searchGroupSearchTermProperty,
-                                                                      input -> !StringUtil.isNullOrEmpty(input),
-                                                                      ValidationMessage.error(String.format("%s > %n %s",
-                                                                                                            Localization.lang("Free search expression"),
-                                                                                                            Localization.lang("Search term is empty."))));
+                searchGroupSearchTermProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %n %s",
+                        Localization.lang("Free search expression"),
+                        Localization.lang("Search term is empty."))));
 
         texGroupFilePathValidator = new FunctionBasedValidator<>(
-                                                                 texGroupFilePathProperty,
-                                                                      input -> {
-                                                                          if (StringUtil.isNullOrEmpty(input)) {
-                                                                              return false;
-                                                                                                                                   } else if (input.trim().length() == 0) {
-                                                                                                                                       return false;
-                                                                          }
-
-                                                                          return true;
-                                                                      },
-                                                                      ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
+                texGroupFilePathProperty,
+                input -> {
+                    if (StringUtil.isNullOrEmpty(input)) {
+                        return false;
+                    } else if (input.trim().length() == 0) {
+                        return false;
+                    } else if ((input.length() < 4) || !input.substring(input.length() - 4).toLowerCase().equals(".aux")) {
+                        return false;
+                    } else {
+                        Path path = preferencesService.getWorkingDir();
+                        File texFile = new File(path.toString(), input);
+                        if (!texFile.exists() || !texFile.isFile()) {
+                            return false;
+                        }
+                        return true;
+                    }
+                },
+                ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
         validator.addValidators(nameValidator, sameNameValidator);
 
