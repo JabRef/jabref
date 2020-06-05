@@ -22,7 +22,6 @@ import javafx.event.Event;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
-import org.apache.logging.log4j.core.util.FileUtils;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.help.HelpAction;
@@ -225,8 +224,8 @@ public class GroupDialogViewModel {
                     } else {
                         Path path = preferencesService.getWorkingDir();
                         File texFile = new File(path.toString(), input);
-                        String fileExtension = FileUtils.getFileExtension(texFile);
-                        if (fileExtension == null || !fileExtension.toLowerCase().equals(".aux")) {
+                        Optional<String> fileExtension = FileUtil.getFileExtension(texFile.getPath());
+                        if (fileExtension.isEmpty() || !fileExtension.get().toLowerCase().equals("aux")) {
                             return false;
                         } else if (!texFile.exists() || !texFile.isFile()) {
                             return false;
