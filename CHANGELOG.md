@@ -83,7 +83,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where "null" appeared in generated BibTeX keys. [#6459](https://github.com/JabRef/jabref/issues/6459)
 - We fixed an issue where the authors' names were incorrectly displayed in the authors' column when they were bracketed. [#6465](https://github.com/JabRef/jabref/issues/6465) [#6459](https://github.com/JabRef/jabref/issues/6459)
 - We fixed an issue where importing certain unlinked files would result in an exception [#5815](https://github.com/JabRef/jabref/issues/5815)
-- We fixed an issue with creating a group of cited entries, which wrongly triggered that the library had been changed externally. [#6420](https://github.com/JabRef/jabref/issues/6420)
+- We fixed an issue with the creation of a group of cited entries which incorrectly showed the message that the library had been modified externally whenever saving the library. [#6420](https://github.com/JabRef/jabref/issues/6420)
 
 ### Removed
 

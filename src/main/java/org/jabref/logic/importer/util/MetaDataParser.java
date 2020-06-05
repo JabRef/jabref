@@ -52,14 +52,14 @@ public class MetaDataParser {
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process GROUPSTREE and GROUPSTREE_LEGACY at the very end (otherwise it can happen that not all dependent data are set)
-        Stream<Map.Entry<String, String>> stream = data.entrySet().stream().filter(entry -> !entry.getKey().equals(MetaData.GROUPSTREE) && !entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
-        Stream<Map.Entry<String, String>> streamTail = data.entrySet().stream().filter(entry -> entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
-        stream = Stream.concat(stream, streamTail);
+        Stream<Map.Entry<String, String>> entrySetStream = data.entrySet().stream().filter(entry -> !entry.getKey().equals(MetaData.GROUPSTREE) && !entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
+        Stream<Map.Entry<String, String>> entrySetStreamTail = data.entrySet().stream().filter(entry -> entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY));
+        entrySetStream = Stream.concat(entrySetStream, entrySetStreamTail);
 
-        Iterator<Map.Entry<String, String>> it = stream.iterator();
+        Iterator<Map.Entry<String, String>> entryIterator = entrySetStream.iterator();
 
-        while (it.hasNext()) {
-            Map.Entry<String, String> entry = it.next();
+        while (entryIterator.hasNext()) {
+            Map.Entry<String, String> entry = entryIterator.next();
             List<String> value = getAsList(entry.getValue());
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
