@@ -1392,17 +1392,19 @@ class BibtexParserTest {
     @Test
     void integrationTestTexGroup() throws IOException, ParseException {
         ParserResult result = parser.parse(new StringReader(
-                "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
-                 + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
-                 + "@Comment{jabref-meta: fileDirectory-" + System.getProperty("user.name") + "-"
-                        + InetAddress.getLocalHost().getHostName()
-                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
-                 + "@Comment{jabref-meta: fileDirectoryLatex-" + System.getProperty("user.name")
-                        + "-" + InetAddress.getLocalHost().getHostName()
-                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
-                 + "@comment{jabref-meta: grouping:" + OS.NEWLINE
+             "@comment{jabref-meta: grouping:" + OS.NEWLINE
                  + "0 AllEntriesGroup:;" + OS.NEWLINE
-                 + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;" + "}"));
+                 + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;"
+                 + "}" + OS.NEWLINE
+           + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory-" + System.getProperty("user.name") + "-"
+               + InetAddress.getLocalHost().getHostName()
+               + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectoryLatex-" + System.getProperty("user.name")
+               + "-" + InetAddress.getLocalHost().getHostName()
+               + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+        ));
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
