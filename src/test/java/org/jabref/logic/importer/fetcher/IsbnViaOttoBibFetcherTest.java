@@ -43,7 +43,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void testHelpPage() {
-        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
+        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

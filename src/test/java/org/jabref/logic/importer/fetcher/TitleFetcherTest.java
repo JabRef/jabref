@@ -44,7 +44,7 @@ public class TitleFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("import-using-publication-identifiers/titletobibtex", fetcher.getHelpPage().get().getPageName());
+        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

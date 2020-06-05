@@ -33,7 +33,7 @@ public class RfcFetcherTest {
         bibEntry.setField(StandardField.PUBLISHER, "RFC Editor");
         bibEntry.setField(StandardField.DOI, "10.17487/RFC1945");
         bibEntry.setField(StandardField.URL, "https://rfc-editor.org/rfc/rfc1945.txt");
-        bibEntry.setField(StandardField.AUTHOR, "Henrik Frystyk Nielsen and Roy T. Fielding and Tim Berners-Lee");
+        bibEntry.setField(StandardField.AUTHOR, "Henrik Nielsen and Roy T. Fielding and Tim Berners-Lee");
         bibEntry.setField(StandardField.TITLE, "{Hypertext Transfer Protocol -- HTTP/1.0}");
         bibEntry.setField(StandardField.PAGETOTAL, "60");
         bibEntry.setField(StandardField.YEAR, "1996");
@@ -49,7 +49,7 @@ public class RfcFetcherTest {
 
     @Test
     public void getHelpPageReturnsEqualHelpPage() {
-        assertEquals("import-using-publication-identifiers/rfctobibtex", fetcher.getHelpPage().get().getPageName());
+        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
