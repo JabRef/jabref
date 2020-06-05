@@ -219,9 +219,7 @@ public class GroupDialogViewModel {
         texGroupFilePathValidator = new FunctionBasedValidator<>(
                 texGroupFilePathProperty,
                 input -> {
-                    if (StringUtil.isNullOrEmpty(input)) {
-                        return false;
-                    } else if (input.trim().length() == 0) {
+                    if (StringUtil.isBlank(input)) {
                         return false;
                     } else if ((input.length() < 4) || !input.substring(input.length() - 4).toLowerCase().equals(".aux")) {
                         return false;
@@ -254,7 +252,7 @@ public class GroupDialogViewModel {
             }
         });
 
-        typeTexProperty.addListener((obs, _oldValue, isSelected) -> {
+        typeTexProperty.addListener((obs, oldValue, isSelected) -> {
             if (isSelected) {
                 validator.addValidators(texGroupFilePathValidator);
             } else {
