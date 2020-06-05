@@ -1401,7 +1401,7 @@ class BibtexParserTest {
            + "@Comment{jabref-meta: fileDirectory-"
                      + System.getProperty("user.name") + "-"
                      + InetAddress.getLocalHost().getHostName()
-               + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
            + "@Comment{jabref-meta: fileDirectoryLatex-"
                      + System.getProperty("user.name")
                      + "-" + InetAddress.getLocalHost().getHostName()
