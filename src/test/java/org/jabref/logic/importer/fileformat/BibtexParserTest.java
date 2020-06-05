@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,12 +36,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
-import org.jabref.model.groups.AllEntriesGroup;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.RegexKeywordGroup;
-import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.groups.*;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -1386,6 +1382,32 @@ class BibtexParserTest {
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+    }
+
+    /**
+     * Checks that a TexGroup finally gets the required data
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    void integrationTestTexGroup() throws IOException, ParseException {
+        ParserResult result = parser.parse(new StringReader(
+                "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
+                 + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                 + "@Comment{jabref-meta: fileDirectory-" + System.getProperty("user.name") + "-"
+                        + InetAddress.getLocalHost().getHostName()
+                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                 + "@Comment{jabref-meta: fileDirectoryLatex-" + System.getProperty("user.name")
+                        + "-" + InetAddress.getLocalHost().getHostName()
+                        + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+                 + "@comment{jabref-meta: grouping:" + OS.NEWLINE
+                 + "0 AllEntriesGroup:;" + OS.NEWLINE
+                 + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;" + "}"));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+
+        assertEquals("src/test/resources/org/jabref/model/groups/paper.aux",
+                ((TexGroup) root.getChildren().get(0).getGroup()).getFilePath().toString());
     }
 
     @Test
