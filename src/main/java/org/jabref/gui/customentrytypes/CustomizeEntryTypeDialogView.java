@@ -138,7 +138,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
 
-        //Here we would need to select the
+        // Here we would need to select the fields
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
                 fields.itemsProperty().unbindBidirectional(type.fields());

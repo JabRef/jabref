@@ -27,14 +27,12 @@ public class CustomEntryTypeViewModel {
         fields = new SimpleListProperty<>(FXCollections.observableArrayList(allFieldsForType));
 
         fields.addListener((ListChangeListener<? super FieldViewModel>) change -> {
-
             while (change.next()) {
                 if (change.wasRemoved()) {
                     fieldsToRemove.addAll(change.getAddedSubList());
                 }
             }
         });
-
     }
 
     public void addField(FieldViewModel field) {
@@ -51,7 +49,10 @@ public class CustomEntryTypeViewModel {
 
     public void removeField(FieldViewModel focusedItem) {
         this.fields.remove(focusedItem);
+    }
 
+    public List<FieldViewModel> getFieldsToRemove() {
+        return this.fieldsToRemove;
     }
 
 }
