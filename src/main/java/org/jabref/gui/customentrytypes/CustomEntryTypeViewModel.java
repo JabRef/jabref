@@ -1,5 +1,6 @@
 package org.jabref.gui.customentrytypes;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -10,15 +11,17 @@ import javafx.collections.FXCollections;
 
 import org.jabref.model.entry.BibEntryType;
 
-public class EntryTypeViewModel {
+public class CustomEntryTypeViewModel {
 
     private final ObjectProperty<BibEntryType> entryType = new SimpleObjectProperty<>();
-    private final ListProperty<FieldViewModel> fields = new SimpleListProperty<>(FXCollections.emptyObservableList());
+    private final ListProperty<FieldViewModel> fields;
 
-    public EntryTypeViewModel(BibEntryType entryType) {
+    public CustomEntryTypeViewModel(BibEntryType entryType) {
         this.entryType.set(entryType);
-        this.fields.setAll(entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList()));
 
+        List<FieldViewModel> types = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList());
+
+        fields = new SimpleListProperty<>(FXCollections.observableArrayList(types));
     }
 
     public ListProperty<FieldViewModel> fields() {

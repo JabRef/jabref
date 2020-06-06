@@ -32,12 +32,12 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
@@ -45,9 +45,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private final BibDatabaseMode mode;
     private final BibEntryTypesManager entryTypesManager;
 
-    @FXML private TableView<BibEntryType> entryTypes;
-    @FXML private TableColumn<BibEntryType, String> entryTypColumn;
-    @FXML private TableColumn<BibEntryType, String> entryTypeActionsColumn;
+    @FXML private TableView<CustomEntryTypeViewModel> entryTypes;
+    @FXML private TableColumn<CustomEntryTypeViewModel, String> entryTypColumn;
+    @FXML private TableColumn<CustomEntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
     @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
@@ -97,14 +97,14 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
         fields.setEditable(true);
-        entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
+        entryTypColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
         entryTypes.itemsProperty().bind(viewModel.entryTypes());
         entryTypes.getSelectionModel().selectFirst();
 
         entryTypeActionsColumn.setSortable(false);
         entryTypeActionsColumn.setReorderable(false);
-        entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getType().getDisplayName()));
-        new ValueTableCellFactory<BibEntryType, String>()
+        entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
+        new ValueTableCellFactory<CustomEntryTypeViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
                 .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
@@ -137,7 +137,13 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                 .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
-        fields.itemsProperty().bindBidirectional(viewModel.fieldsforTypesProperty());
+
+        //Here we would need to select the
+        EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
+            if (type != null) {
+                fields.itemsProperty().bindBidirectional(type.fields());
+            }
+        });
 
         new ViewModelTableRowFactory<FieldViewModel>()
                                                       .setOnDragDetected(this::handleOnDragDetected)
