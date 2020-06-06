@@ -311,11 +311,13 @@ public class RisImporter extends Importer {
         return new ParserResult(bibitems);
     }
 
-    private void addDoi(Map<Field, String> hm, String val) {
-        String doi = val.toLowerCase(Locale.ENGLISH);
-        if (doi.startsWith("doi:")) {
-            doi = doi.replaceAll("(?i)doi:", "").trim();
-            hm.put(StandardField.DOI, doi);
-        }
+  private void addDoi(Map<Field, String> hm, String val) {
+    String doi = val.toLowerCase(Locale.ENGLISH);
+    if (doi.startsWith("doi:")) {
+      doi = doi.replaceAll("(?i)doi:", "").trim();
+      hm.put(StandardField.DOI, doi);
+    } else {
+      hm.put(StandardField.DOI, doi);
     }
+  }
 }
