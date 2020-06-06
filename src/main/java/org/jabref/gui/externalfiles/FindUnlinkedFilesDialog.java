@@ -376,11 +376,15 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         List<Path> filesList = new ArrayList<>();
         for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
             CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
-            if (child.isLeaf() && child.isSelected()) {
-                Path nodeFile = child.getValue().path;
-                if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
-                    filesList.add(nodeFile);
+            if (child.isLeaf()) {
+                if (child.isSelected()) {
+                    Path nodeFile = child.getValue().path;
+                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
+                        filesList.add(nodeFile);
+                    }
                 }
+            } else {
+                filesList.addAll(getFileListFromNode(child));
             }
         }
         return filesList;

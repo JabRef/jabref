@@ -17,7 +17,7 @@ import javafx.concurrent.Worker;
 import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -166,7 +166,7 @@ public class EntryTypeViewModel {
                     }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                    new CitationKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
                     basePanel.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);

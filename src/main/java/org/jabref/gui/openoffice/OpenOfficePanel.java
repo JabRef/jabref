@@ -38,8 +38,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
@@ -201,7 +201,7 @@ public class OpenOfficePanel {
                 ooBase.rebuildBibTextSection(databases, style);
                 if (!unresolvedKeys.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
-                            Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
+                            Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
                                     unresolvedKeys.get(0)));
                 }
             } catch (UndefinedCharacterFormatException ex) {
@@ -217,8 +217,8 @@ public class OpenOfficePanel {
             } catch (BibEntryNotFoundException ex) {
                 LOGGER.debug("BibEntry not found", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"), Localization.lang(
-                        "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
-                        ex.getBibtexKey()));
+                        "Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
+                        ex.getCitationKey()));
             } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
                     CreationException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
@@ -295,7 +295,7 @@ public class OpenOfficePanel {
             if (!unresolvedKeys.isEmpty()) {
 
                 dialogService.showErrorDialogAndWait(Localization.lang("Unable to generate new library"),
-                        Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
+                        Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
                                 unresolvedKeys.get(0)));
             }
 
@@ -304,8 +304,8 @@ public class OpenOfficePanel {
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
-                    Localization.lang("Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
-                            ex.getBibtexKey()));
+                    Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
+                            ex.getCitationKey()));
         } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                 UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
                 CreationException e) {
@@ -504,10 +504,10 @@ public class OpenOfficePanel {
     }
 
     /**
-     * Check that all entries in the list have BibTeX keys, if not ask if they should be generated
+     * Check that all entries in the list have citation keys, if not ask if they should be generated
      *
      * @param entries A list of entries to be checked
-     * @return true if all entries have BibTeX keys, if it so may be after generating them
+     * @return true if all entries have citation keys, if it so may be after generating them
      */
     private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
         // Check if there are empty keys
@@ -527,19 +527,19 @@ public class OpenOfficePanel {
 
         // Ask if keys should be generated
         boolean citePressed = dialogService.showConfirmationDialogAndWait(Localization.lang("Cite"),
-                Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
+                Localization.lang("Cannot cite entries without citation keys. Generate keys now?"),
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
 
         BasePanel panel = frame.getCurrentBasePanel();
         if (citePressed && (panel != null)) {
             // Generate keys
-            BibtexKeyPatternPreferences prefs = jabRefPreferences.getBibtexKeyPatternPreferences();
+            CitationKeyPatternPreferences prefs = jabRefPreferences.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    new BibtexKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                    new CitationKeyGenerator(panel.getBibDatabaseContext(), prefs)
                             .generateAndSetKey(entry)
                             .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }

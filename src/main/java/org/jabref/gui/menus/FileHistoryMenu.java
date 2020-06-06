@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -31,6 +32,24 @@ public class FileHistoryMenu extends Menu {
         } else {
             setItems();
         }
+    }
+
+    /**
+     * This method is to use typed letters to access recent libraries in menu.
+     * @param keyEvent a KeyEvent.
+     * @return false if typed char is invalid or not a number.
+     */
+    public boolean openFileByKey(KeyEvent keyEvent) {
+        if (keyEvent.getCharacter() == null) {
+            return false;
+        }
+        char key = keyEvent.getCharacter().charAt(0);
+        int num = Character.getNumericValue(key);
+        if (num <= 0 || num > history.getHistory().size()) {
+            return false;
+        }
+        this.openFile(history.getFileAt(Integer.parseInt(keyEvent.getCharacter()) - 1));
+        return true;
     }
 
     /**

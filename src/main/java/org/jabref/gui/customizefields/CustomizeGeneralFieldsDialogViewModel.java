@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -58,7 +58,7 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = BibtexKeyGenerator.cleanKey(parts[1], preferences.getUnwantedCharacters());
+            String testString = CitationKeyGenerator.cleanKey(parts[1], preferences.getUnwantedCharacters());
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Error"),

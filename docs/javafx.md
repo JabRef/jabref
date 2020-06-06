@@ -7,7 +7,7 @@ JabRef's recommendations about JavaFX
 The goal of the MVVM architecture is to separate the state/behavior from the appearance of the ui. This is archived by dividing JabRef into different layers, each having a clear responsibility.
 
 * The _Model_ contains the business logic and data structures. These aspects are again encapsulated in the _logic_ and _model_ package, respectively.
-* The _View_ controls the appearance and structure of the UI. It is usually defined in a _FXML_ file. 
+* The _View_ controls the appearance and structure of the UI. It is usually defined in a _FXML_ file.
 * _View model_ converts the data from logic and model in a form that is easily usable in the gui. Thus it controls the state of the View. Moreover, the ViewModel contains all the logic needed to change the current state of the UI or perform an action. These actions are usually passed down to the _logic_ package, after some data validation. The important aspect is that the ViewModel contains all the ui-related logic but does _not_ have direct access to the controls defined in the View. Hence, the ViewModel can easily be tested by unit tests.
 * The _Controller_ initializes the view model and binds it to the view. In an ideal world all the binding would already be done directly in the FXML. But JavaFX's binding expressions are not yet powerful enough to accomplish this. It is important to keep in mind that the Controller should be as minimalistic as possible. Especially one should resist the temptation to validate inputs in the controller. The ViewModel should handle data validation! It is often convenient to load the FXML file directly from the controller.  
 
@@ -134,14 +134,14 @@ private void openJabrefWebsite() {
 
 ### View - FXML
 
-The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
+The view consists a FXML file `MyDialog.fxml` which defines the structure and the layout of the UI. Moreover, the FXML file may be accompanied by a style file that should have the same name as the FXML file but with a `css` ending, e.g., `MyDialog.css`. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](https://github.com/JonathanGiles/scenic-view) is very helpful in debugging styling issues.
 
 ## Resources
 
 * [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
 * [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
-* [usage of icon fonts with JavaFX](http://aalmiray.github.io/ikonli/#_javafx) or [jIconFont](https://github.com/jIconFont/jiconfont-google_material_design_icons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
-* [Undo manager](https://github.com/TomasMikula/UndoFX)
+* [jIconFont](http://jiconfont.github.io/googlematerialdesignicons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
+* [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
 * [Kubed](https://github.com/hudsonb/kubed): data visualization \(inspired by d3\)
