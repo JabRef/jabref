@@ -124,8 +124,7 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
         FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, selectedEntryTypes.getValue().entryType().get());
-        //typesWithFields.computeIfAbsent(selectedEntryTypes.getValue().entryType(), key -> FXCollections.observableArrayList()).add(model);
-        //allFieldsForType.add(model);
+        this.selectedEntryTypes.getValue().addField(model);
         newFieldToAddProperty().setValue(null);
     }
 
@@ -161,12 +160,12 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
-        //typesToRemove.add(focusedItem);
-        //typesWithFields.remove(focusedItem);
-        // allEntryTypes.remove(focusedItem);
+         entryTypesWithFields.remove(focusedItem);
     }
 
     public void removeField(FieldViewModel focusedItem) {
+        this.selectedEntryTypes.getValue().removeField(focusedItem);
+
         // typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> FXCollections.observableArrayList()).remove(focusedItem);
     }
 

@@ -13,7 +13,6 @@ import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.util.LinkedHashSetEqualsUtil;
 
 public class BibEntryType implements Comparable<BibEntryType> {
 
@@ -118,8 +117,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         }
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
-               LinkedHashSetEqualsUtil.linkedEquals(requiredFields, that.requiredFields)
-               && LinkedHashSetEqualsUtil.linkedEquals(fields, that.fields);
+               Objects.equals(requiredFields, that.requiredFields) &&
+               Objects.equals(fields, that.fields);
 
     }
 
