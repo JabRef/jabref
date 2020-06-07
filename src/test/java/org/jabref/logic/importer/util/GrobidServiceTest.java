@@ -19,7 +19,7 @@ public class GrobidServiceTest {
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService("http://grobid.cm.in.tum.de:8070");
+        grobidService = new GrobidService("http://grobid.jabref.org:8070");
     }
 
     @Test
