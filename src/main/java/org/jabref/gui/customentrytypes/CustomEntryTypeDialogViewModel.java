@@ -51,15 +51,13 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private final ListProperty<Field> fieldsForAdding;
+    private final ObservableList<Field> fieldsForAdding;
     private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypes = new SimpleObjectProperty<>();
     private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObservableList<BibEntryType> allEntryTypes;
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final List<BibEntryType> typesToRemove = new ArrayList<>();
-
     private final ListProperty<CustomEntryTypeViewModel> entryTypesWithFields = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final PreferencesService preferencesService;
@@ -77,8 +75,7 @@ public class CustomEntryTypeDialogViewModel {
         allTypes.addAll(entryTypesManager.getAllCustomTypes(mode));
 
         allEntryTypes = FXCollections.observableArrayList(allTypes);
-
-        fieldsForAdding = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()));
+        fieldsForAdding = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey()));
 
         for (BibEntryType entryType : allTypes) {
             CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
@@ -96,8 +93,12 @@ public class CustomEntryTypeDialogViewModel {
         return this.entryTypesWithFields;
     }
 
-    public ListProperty<Field> fields() {
+    public ObservableList<Field> fields() {
         return this.fieldsForAdding;
+    }
+
+    public ObservableList<FieldViewModel> fieldsForSelectedType() {
+        return this.selectedEntryTypes.getValue().fields();
     }
 
     public enum FieldType {
@@ -123,7 +124,7 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, selectedEntryTypes.getValue().entryType().get());
+        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
         this.selectedEntryTypes.getValue().addField(model);
         newFieldToAddProperty().setValue(null);
     }
@@ -131,6 +132,8 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
+        CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
+        this.entryTypesWithFields.add(viewModel);
         this.allEntryTypes.add(type);
         this.entryTypeToAdd.setValue("");
     }
@@ -160,20 +163,18 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
-         entryTypesWithFields.remove(focusedItem);
+        entryTypesWithFields.remove(focusedItem);
     }
 
     public void removeField(FieldViewModel focusedItem) {
         this.selectedEntryTypes.getValue().removeField(focusedItem);
-
-        // typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> FXCollections.observableArrayList()).remove(focusedItem);
     }
 
     public void apply() {
 
         for (var typeWithField : entryTypesWithFields) {
             BibEntryType type = typeWithField.entryType().getValue();
-            List<FieldViewModel> allFields = typeWithField.fields().getValue();
+            List<FieldViewModel> allFields = typeWithField.fields();
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
@@ -182,13 +183,9 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.addCustomOrModifiedType(newType, mode);
         }
 
-        for (var type : typesToRemove) {
-            entryTypesManager.removeCustomOrModifiedEntryType(type, mode);
-        }
         preferencesService.saveCustomEntryTypes();
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
-        entryTypesManager.addCustomOrModifiedTypes(
-                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                                                    preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
 }

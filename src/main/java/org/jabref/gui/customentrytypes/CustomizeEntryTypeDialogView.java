@@ -141,8 +141,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // Here we would need to select the fields
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
-                fields.itemsProperty().unbindBidirectional(type.fields());
-                fields.itemsProperty().bindBidirectional(type.fields());
+                fields.getItems().clear();
+                fields.setItems(viewModel.fieldsForSelectedType());
             }
         });
 

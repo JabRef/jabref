@@ -95,14 +95,26 @@ public class FieldFactory {
      */
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
-        
-        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size());
+
+        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
         publicAndInternalFields.addAll(allFields);
 
         return publicAndInternalFields;
+    }
+    /**
+     * Returns a  List with all standard fields and the bibtexkey field
+     */
+    public static Set<Field> getStandardFielsdsWithBibTexKey() {
+        EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
+
+        LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
+        standardFieldsWithBibtexKey.add(InternalField.KEY_FIELD);
+        standardFieldsWithBibtexKey.addAll(allFields);
+
+        return standardFieldsWithBibtexKey;
     }
 
     public static Set<Field> getBookNameFields() {
