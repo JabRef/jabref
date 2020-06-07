@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -58,7 +59,7 @@ public class CustomEntryTypeDialogViewModel {
     private final ObservableList<BibEntryType> allEntryTypes;
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final ListProperty<CustomEntryTypeViewModel> entryTypesWithFields = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<CustomEntryTypeViewModel> entryTypesWithFields = new SimpleListProperty<>(FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()}));
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
