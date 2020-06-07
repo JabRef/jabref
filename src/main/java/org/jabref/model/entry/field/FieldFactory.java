@@ -104,6 +104,7 @@ public class FieldFactory {
 
         return publicAndInternalFields;
     }
+
     /**
      * Returns a  List with all standard fields and the bibtexkey field
      */

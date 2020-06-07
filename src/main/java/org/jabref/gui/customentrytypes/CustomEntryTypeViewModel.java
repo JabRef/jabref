@@ -43,5 +43,4 @@ public class CustomEntryTypeViewModel {
         return "CustomEntryTypeViewModel [entryType=" + entryType + ", fields=" + fields + "]";
     }
 
-
 }
