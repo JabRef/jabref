@@ -4,11 +4,13 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.preferences.PreferencesService;
 
 public class MainTableNameFormatter {
-
-    private final PreferencesService preferencesService;
+    private final MainTableNameFormatPreferences.DisplayStyle displayStyle;
+    private final MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle;
 
     MainTableNameFormatter(PreferencesService preferences) {
-        this.preferencesService = preferences;
+        MainTableNameFormatPreferences nameFormatPreferences = preferences.getMainTableNameFormatPreferences();
+        this.displayStyle = nameFormatPreferences.getDisplayStyle();
+        this.abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
     }
 
     /**
@@ -23,10 +25,6 @@ public class MainTableNameFormatter {
             return null;
         }
 
-        MainTableNameFormatPreferences nameFormatPreferences = preferencesService.getMainTableNameFormatPreferences();
-        MainTableNameFormatPreferences.DisplayStyle displayStyle = nameFormatPreferences.getDisplayStyle();
-        MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
-
         AuthorList authors = AuthorList.parse(nameToFormat);
 
         if (((displayStyle == MainTableNameFormatPreferences.DisplayStyle.FIRSTNAME_LASTNAME)
@@ -35,7 +33,7 @@ public class MainTableNameFormatter {
             return authors.getAsLastNamesLatexFree(false);
         }
 
-        switch (nameFormatPreferences.getDisplayStyle()) {
+        switch (displayStyle) {
             case NATBIB:
                 return authors.getAsNatbibLatexFree();
             case FIRSTNAME_LASTNAME:
@@ -51,6 +49,6 @@ public class MainTableNameFormatter {
     }
 
     public boolean needsFormatting() {
-        return preferencesService.getMainTableNameFormatPreferences().getDisplayStyle() != MainTableNameFormatPreferences.DisplayStyle.AS_IS;
+        return displayStyle != MainTableNameFormatPreferences.DisplayStyle.AS_IS;
     }
 }
