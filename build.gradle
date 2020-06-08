@@ -276,6 +276,7 @@ processResources {
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
+                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 

@@ -22,6 +22,7 @@ public final class BuildInfo {
     public final String year;
     public final String azureInstrumentationKey;
     public final String springerNatureAPIKey;
+    public final String astrophysicsDataSystemAPIKey;
     public final String minRequiredJavaVersion;
     public final boolean allowJava9;
 
@@ -48,6 +49,7 @@ public final class BuildInfo {
         developers = properties.getProperty("developers", "");
         azureInstrumentationKey = properties.getProperty("azureInstrumentationKey", "");
         springerNatureAPIKey = properties.getProperty("springerNatureAPIKey", "");
+        astrophysicsDataSystemAPIKey = properties.getProperty("astrophysicsDataSystemAPIKey", "");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", ""));
     }
