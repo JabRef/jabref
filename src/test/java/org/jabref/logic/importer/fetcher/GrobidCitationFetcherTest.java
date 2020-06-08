@@ -44,7 +44,7 @@ public class GrobidCitationFetcherTest {
             .withField(StandardField.YEAR, "2007")
             .withField(StandardField.ADDRESS, "Oxford, England");
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
-    static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.Article).withCiteKey("-1")
+    static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.InBook).withCiteKey("-1")
             .withField(StandardField.AUTHOR, "Carr, I and Kidner, R")
             .withField(StandardField.BOOKTITLE, "Statutes and conventions on international trade law")
             .withField(StandardField.PUBLISHER, "Cavendish")

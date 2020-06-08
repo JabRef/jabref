@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
@@ -91,7 +90,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             JSONObject author = (JSONObject) authorPure;
             authors.add(author.optString("full_name"));
         });
-        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, String.join(" and ", authors));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
         entry.setField(StandardField.YEAR, jsonEntry.optString("publication_year"));
@@ -116,7 +115,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
+        entry.addFile(new LinkedFile("", Path.of(jsonEntry.optString("pdf_url")), "PDF"));
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
         entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
@@ -198,7 +197,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
         uriBuilder.addParameter("querytext", query);
