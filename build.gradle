@@ -163,7 +163,7 @@ dependencies {
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
-    implementation 'com.jfoenix:jfoenix:9.0.9'
+    implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.0.1'
 
     implementation 'org.jsoup:jsoup:1.13.1'
