@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -59,7 +58,7 @@ public class CustomEntryTypeDialogViewModel {
     private final ObservableList<BibEntryType> allEntryTypes;
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final ListProperty<CustomEntryTypeViewModel> entryTypesWithFields = new SimpleListProperty<>(FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()}));
+    private final ObservableList<CustomEntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
@@ -90,7 +89,7 @@ public class CustomEntryTypeDialogViewModel {
                                                       ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
-    public ListProperty<CustomEntryTypeViewModel> entryTypes() {
+    public ObservableList<CustomEntryTypeViewModel> entryTypes() {
         return this.entryTypesWithFields;
     }
 
