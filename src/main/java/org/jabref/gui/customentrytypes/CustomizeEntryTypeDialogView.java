@@ -23,9 +23,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RadioButtonCell;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -59,9 +61,12 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private Button addNewFieldButton;
 
     @Inject private PreferencesService preferencesService;
+    @Inject private StateManager stateManager;
 
     private CustomEntryTypeDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+    private  CustomLocalDragboard localDragboard;
+
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         this.mode = bibDatabaseContext.getMode();
@@ -81,6 +86,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
+        // As the state manager gets injected it's not avaiable in the constructor
+        this.localDragboard = stateManager.getLocalDragboard();
+
         viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
         setupTable();
 
@@ -123,7 +131,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         viewModel.selectedEntryTypeProperty().bind(entryTypes.getSelectionModel().selectedItemProperty());
         viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());
 
-        addNewField.setItems(viewModel.fields());
+        addNewField.setItems(viewModel.fieldsForAdding());
         addNewField.setConverter(viewModel.FIELD_STRING_CONVERTER);
 
         fieldTypeActionColumn.setSortable(false);
@@ -141,16 +149,16 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // Here we would need to select the fields
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
-                fields.getItems().clear();
-                fields.setItems(viewModel.fieldsForSelectedType());
+                var items = type.fields();
+                fields.setItems(items);
             }
         });
 
         new ViewModelTableRowFactory<FieldViewModel>()
-                                                      .setOnDragDetected(this::handleOnDragDetected)
-                                                      .setOnDragDropped(this::handleOnDragDropped)
-                                                      .setOnDragOver(this::handleOnDragOver)
-                                                      .install(fields);
+              .setOnDragDetected(this::handleOnDragDetected)
+              .setOnDragDropped(this::handleOnDragDropped)
+              .setOnDragOver(this::handleOnDragOver)
+              .install(fields);
 
     }
 
@@ -164,36 +172,35 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         // Start drag'n'drop
         row.startFullDrag();
 
-        Field field = fields.getSelectionModel().getSelectedItem().getField();
+        FieldViewModel field = fields.getSelectionModel().getSelectedItem();
 
         ClipboardContent content = new ClipboardContent();
         Dragboard dragboard = fields.startDragAndDrop(TransferMode.MOVE);
-        content.put(DragAndDropDataFormats.FIELD, field);
+        content.put(DragAndDropDataFormats.FIELD, "");
+        localDragboard.putValue(FieldViewModel.class, field);
         dragboard.setContent(content);
         event.consume();
     }
 
     private void handleOnDragDropped(TableRow<FieldViewModel> row, FieldViewModel originalItem, DragEvent event) {
         boolean success = false;
-        Dragboard dragboard = event.getDragboard();
 
         ObservableList<FieldViewModel> items = fields.itemsProperty().get();
 
-        if (dragboard.hasContent(DragAndDropDataFormats.FIELD)) {
+        if (localDragboard.hasType(FieldViewModel.class)) {
 
-            Field field = (Field) dragboard.getContent(DragAndDropDataFormats.FIELD);
-            FieldViewModel transferedItem = null;
+            FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
             int draggedIdx = 0;
             for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).getField().equals(field)) {
+                if (items.get(i).equals(field)) {
                     draggedIdx = i;
-                    transferedItem = items.get(i);
+                    field = items.get(i);
                     break;
                 }
             }
             int thisIdx = items.indexOf(originalItem);
             items.set(draggedIdx, originalItem);
-            items.set(thisIdx, transferedItem);
+            items.set(thisIdx, field);
             success = true;
         }
 

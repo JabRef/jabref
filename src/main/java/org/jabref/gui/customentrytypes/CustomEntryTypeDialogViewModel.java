@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -51,11 +50,10 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private final ObservableList<Field> fieldsForAdding;
-    private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypes = new SimpleObjectProperty<>();
+    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey());
+    private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
-    private final ObservableList<BibEntryType> allEntryTypes;
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
     private final ObservableList<CustomEntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
@@ -74,8 +72,6 @@ public class CustomEntryTypeDialogViewModel {
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
         allTypes.addAll(entryTypesManager.getAllCustomTypes(mode));
 
-        allEntryTypes = FXCollections.observableArrayList(allTypes);
-        fieldsForAdding = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey()));
 
         for (BibEntryType entryType : allTypes) {
             CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
@@ -93,13 +89,10 @@ public class CustomEntryTypeDialogViewModel {
         return this.entryTypesWithFields;
     }
 
-    public ObservableList<Field> fields() {
+    public ObservableList<Field> fieldsForAdding() {
         return this.fieldsForAdding;
     }
 
-    public ObservableList<FieldViewModel> fieldsForSelectedType() {
-        return this.selectedEntryTypes.getValue().fields();
-    }
 
     public enum FieldType {
 
@@ -125,7 +118,7 @@ public class CustomEntryTypeDialogViewModel {
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
         FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
-        this.selectedEntryTypes.getValue().addField(model);
+        this.selectedEntryType.getValue().addField(model);
         newFieldToAddProperty().setValue(null);
     }
 
@@ -134,12 +127,11 @@ public class CustomEntryTypeDialogViewModel {
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
         CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
         this.entryTypesWithFields.add(viewModel);
-        this.allEntryTypes.add(type);
         this.entryTypeToAdd.setValue("");
     }
 
     public ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypeProperty() {
-        return this.selectedEntryTypes;
+        return this.selectedEntryType;
     }
 
     public ObjectProperty<Field> selectedFieldToAddProperty() {
@@ -167,7 +159,7 @@ public class CustomEntryTypeDialogViewModel {
     }
 
     public void removeField(FieldViewModel focusedItem) {
-        this.selectedEntryTypes.getValue().removeField(focusedItem);
+        this.selectedEntryType.getValue().removeField(focusedItem);
     }
 
     public void apply() {

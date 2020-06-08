@@ -1,6 +1,7 @@
 package org.jabref.gui.customentrytypes;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ObjectProperty;
@@ -19,7 +20,24 @@ public class CustomEntryTypeViewModel {
         this.entryType.set(entryType);
 
         List<FieldViewModel> allFieldsForType = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority())).collect(Collectors.toList());
-        fields = FXCollections.observableArrayList(allFieldsForType);
+        fields = FXCollections.observableArrayList((allFieldsForType));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entryType, fields);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CustomEntryTypeViewModel)) {
+            return false;
+        }
+        CustomEntryTypeViewModel other = (CustomEntryTypeViewModel) obj;
+        return Objects.equals(entryType, other.entryType) && Objects.equals(fields, other.fields);
     }
 
     public void addField(FieldViewModel field) {
