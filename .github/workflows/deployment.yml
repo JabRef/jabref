@@ -18,6 +18,7 @@ on:
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
 
 jobs:
   build:

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -51,6 +53,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
 
@@ -197,7 +200,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", "86wnawtvtc986d3wtnqynm8c");
+        uriBuilder.addParameter("apikey", API_KEY);
         uriBuilder.addParameter("querytext", query);
 
         URLDownload.bypassSSLVerification();
