@@ -32,8 +32,8 @@ public class MainTableFieldValueFormatter {
      * @param database the BibDatabase of {@link BibEntryTableViewModel}.
      * @return The formatted name field.
      */
-    public String formatFieldValueLatexFree(final OrFields fields, final BibEntry entry,
-                                            final BibDatabase database) {
+    public String formatFieldsValuesLatexFree(final OrFields fields, final BibEntry entry,
+                                              final BibDatabase database) {
         for (Field field : fields) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                 Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
