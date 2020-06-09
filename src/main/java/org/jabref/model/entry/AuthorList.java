@@ -133,6 +133,8 @@ public class AuthorList {
     private String authorsFirstFirstAnds;
     private String authorsAlph;
     private String authorsNatbibLatexFree;
+    private String authorsUnformatted;
+    private String authorsUnformattedLatexFree;
 
     /**
      * Creates a new list of authors.
@@ -169,6 +171,7 @@ public class AuthorList {
         if (authorList == null) {
             AuthorListParser parser = new AuthorListParser();
             authorList = parser.parse(authors);
+            authorList.authorsUnformatted = new String(authors);
             AUTHOR_CACHE.put(authors, authorList);
         }
         return authorList;
@@ -561,6 +564,19 @@ public class AuthorList {
 
         authorsFirstFirstLatexFree[abbreviationIndex] = LatexToUnicodeAdapter.format(getAsFirstLastNames(abbreviate, oxfordComma));
         return authorsFirstFirstLatexFree[abbreviationIndex];
+    }
+
+    public String getAsUnformattedLatexFree() {
+        if (authorsUnformattedLatexFree != null) {
+            return authorsUnformattedLatexFree;
+        }
+
+        // The AuthorList was not created with the factory method
+        if (authorsUnformatted == null) {
+            authorsUnformatted = getAsFirstLastNamesWithAnd();
+        }
+        authorsUnformattedLatexFree = LatexToUnicodeAdapter.format(authorsUnformatted);
+        return authorsUnformattedLatexFree;
     }
 
     /**
