@@ -54,7 +54,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         xmpFilterListProperty.clear();
         List<Field> xmpFilters = preferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS)
-                .stream().map(FieldFactory::parseField).collect(Collectors.toList());
+                                            .stream().map(FieldFactory::parseField).collect(Collectors.toList());
         xmpFilterListProperty.addAll(xmpFilters);
 
         availableFieldsProperty.clear();
@@ -65,8 +65,8 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, xmpFilterEnabledProperty.getValue());
         preferences.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, xmpFilterListProperty.getValue().stream()
-                        .map(Field::getName)
-                        .collect(Collectors.toList()));
+                                                                                              .map(Field::getName)
+                                                                                              .collect(Collectors.toList()));
     }
 
     public void addField() {
@@ -100,14 +100,23 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty xmpFilterEnabledProperty() { return xmpFilterEnabledProperty; }
+    public BooleanProperty xmpFilterEnabledProperty() {
+        return xmpFilterEnabledProperty;
+    }
 
-    public ListProperty<Field> filterListProperty() { return xmpFilterListProperty; }
+    public ListProperty<Field> filterListProperty() {
+        return xmpFilterListProperty;
+    }
 
-    public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
+    public ListProperty<Field> availableFieldsProperty() {
+        return availableFieldsProperty;
+    }
 
-    public ObjectProperty<Field> addFieldNameProperty() { return addFieldProperty; }
-
+    public ObjectProperty<Field> addFieldNameProperty() {
+        return addFieldProperty;
+    }
 }

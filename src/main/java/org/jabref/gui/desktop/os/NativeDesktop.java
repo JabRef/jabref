@@ -9,7 +9,7 @@ public interface NativeDesktop {
     /**
      * Opens a file on an Operating System, using the given application.
      *
-     * @param filePath The filename.
+     * @param filePath    The filename.
      * @param application Link to the app that opens the file.
      * @throws IOException
      */

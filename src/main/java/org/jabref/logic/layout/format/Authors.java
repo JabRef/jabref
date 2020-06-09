@@ -62,16 +62,13 @@ public class Authors extends AbstractParamLayoutFormatter {
         Authors.LAST_SEPARATORS.add("amp");
         Authors.LAST_SEPARATORS.add("oxford");
         Authors.LAST_SEPARATORS.add("lastsep");
-
     }
 
-    private static final int
-    FIRST_FIRST = 0;
+    private static final int FIRST_FIRST = 0;
     private static final int LAST_FIRST = 1;
     private static final int LF_FF = 2;
 
-    private static final String
-    COMMA = ", ";
+    private static final String COMMA = ", ";
     private static final String AMP = " & ";
     private static final String COLON = ": ";
     private static final String SEMICOLON = "; ";
@@ -80,8 +77,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     private int flMode;
 
-    private boolean
-    abbreviate = true;
+    private boolean abbreviate = true;
     private boolean firstInitialOnly;
     private boolean middleInitial;
     private boolean lastNameOnly;
@@ -110,7 +106,6 @@ public class Authors extends AbstractParamLayoutFormatter {
             } else {
                 handleArgument(part, "");
             }
-
         }
     }
 
@@ -301,6 +296,5 @@ public class Authors extends AbstractParamLayoutFormatter {
         } else {
             sb.append(lastNameSB).append(lastFirstSeparator).append(firstNameResult);
         }
-
     }
 }

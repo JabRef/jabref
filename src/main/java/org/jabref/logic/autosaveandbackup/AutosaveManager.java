@@ -71,10 +71,10 @@ public class AutosaveManager {
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                .ifPresent(instance -> {
-                    instance.shutdown();
-                    runningInstances.remove(instance);
-                });
+                        .ifPresent(instance -> {
+                            instance.shutdown();
+                            runningInstances.remove(instance);
+                        });
     }
 
     public void registerListener(Object listener) {

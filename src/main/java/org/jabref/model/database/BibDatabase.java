@@ -75,7 +75,7 @@ public class BibDatabase {
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     *
+     * <p>
      * Returns a text with references resolved according to an optionally given database.
      */
     @Deprecated
@@ -149,7 +149,7 @@ public class BibDatabase {
     }
 
     /**
-     * Collects entries having the specified BibTeX key and returns these entries as list.
+     * Collects entries having the specified citation key and returns these entries as list.
      * The order of the entries is the order they appear in the database.
      *
      * @param key
@@ -527,7 +527,6 @@ public class BibDatabase {
                     piv = res.length();
                     break;
                 }
-
             }
             if (piv < (res.length() - 1)) {
                 newRes.append(res.substring(piv));
@@ -561,6 +560,7 @@ public class BibDatabase {
 
     /**
      * Unregisters an listener object.
+     *
      * @param listener listener (subscriber) to remove
      */
     public void unregisterListener(Object listener) {

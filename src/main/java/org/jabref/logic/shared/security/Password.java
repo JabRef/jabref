@@ -14,7 +14,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
- *   {@link Password} contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
+ * {@link Password} contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
  */
 public class Password {
 
@@ -25,7 +25,7 @@ public class Password {
 
     /**
      * @param phrase Phrase which should be encrypted or decrypted
-     * @param key Key which is used to improve symmetric encryption
+     * @param key    Key which is used to improve symmetric encryption
      */
     public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this(new String(phrase), key);
@@ -39,9 +39,9 @@ public class Password {
     }
 
     /**
-     *  Encrypts the set phrase/password with a symmetric encryption algorithm.
+     * Encrypts the set phrase/password with a symmetric encryption algorithm.
      *
-     *  @return Encrypted phrase/password
+     * @return Encrypted phrase/password
      */
     public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
@@ -49,9 +49,9 @@ public class Password {
     }
 
     /**
-     *  Decrypts the set phrase/password which was encrypted via {@link Password#encrypt()}.
+     * Decrypts the set phrase/password which was encrypted via {@link Password#encrypt()}.
      *
-     *  @return Decrypted phrase/password
+     * @return Decrypted phrase/password
      */
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);

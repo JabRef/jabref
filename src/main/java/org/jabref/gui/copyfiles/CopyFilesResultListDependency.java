@@ -5,7 +5,6 @@ import java.util.List;
 
 /**
  * This class is a wrapper class for the containing list as it is currently not possible to inject complex object types into FXML controller
- *
  */
 public class CopyFilesResultListDependency {
 
@@ -27,5 +26,4 @@ public class CopyFilesResultListDependency {
     public String toString() {
         return "CopyFilesResultListDependency [results=" + results + "]";
     }
-
 }

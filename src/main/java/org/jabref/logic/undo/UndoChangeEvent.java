@@ -2,7 +2,6 @@ package org.jabref.logic.undo;
 
 /**
  * Event sent when something is undone or redone
- *
  */
 public class UndoChangeEvent {
 
@@ -19,7 +18,6 @@ public class UndoChangeEvent {
     }
 
     /**
-     *
      * @return true if there is an action that can be undone
      */
     public boolean isCanUndo() {
@@ -27,7 +25,6 @@ public class UndoChangeEvent {
     }
 
     /**
-     *
      * @return A description of the action to be undone
      */
     public String getUndoDescription() {
@@ -35,7 +32,6 @@ public class UndoChangeEvent {
     }
 
     /**
-     *
      * @return true if there is an action that can be redone
      */
     public boolean isCanRedo() {
@@ -43,11 +39,9 @@ public class UndoChangeEvent {
     }
 
     /**
-    *
-    * @return A description of the action to be redone
-    */
+     * @return A description of the action to be redone
+     */
     public String getRedoDescription() {
         return redoDescription;
     }
-
 }

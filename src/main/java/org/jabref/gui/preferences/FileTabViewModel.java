@@ -141,53 +141,89 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(mainFileDirProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
+                     .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
     }
 
     // General
 
-    public BooleanProperty openLastStartupProperty() { return openLastStartupProperty; }
+    public BooleanProperty openLastStartupProperty() {
+        return openLastStartupProperty;
+    }
 
-    public StringProperty noWrapFilesProperty() { return noWrapFilesProperty; }
+    public StringProperty noWrapFilesProperty() {
+        return noWrapFilesProperty;
+    }
 
-    public BooleanProperty resolveStringsBibTexProperty() { return resolveStringsBibTexProperty; }
+    public BooleanProperty resolveStringsBibTexProperty() {
+        return resolveStringsBibTexProperty;
+    }
 
-    public BooleanProperty resolveStringsAllProperty() { return resolveStringsAllProperty; }
+    public BooleanProperty resolveStringsAllProperty() {
+        return resolveStringsAllProperty;
+    }
 
-    public StringProperty resolvStringsExceptProperty() { return resolveStringsExceptProperty; }
+    public StringProperty resolvStringsExceptProperty() {
+        return resolveStringsExceptProperty;
+    }
 
-    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() { return newLineSeparatorListProperty; }
+    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() {
+        return newLineSeparatorListProperty;
+    }
 
-    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() { return selectedNewLineSeparatorProperty; }
+    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() {
+        return selectedNewLineSeparatorProperty;
+    }
 
-    public BooleanProperty alwaysReformatBibProperty() { return alwaysReformatBibProperty; }
+    public BooleanProperty alwaysReformatBibProperty() {
+        return alwaysReformatBibProperty;
+    }
 
     // External file links
 
-    public StringProperty mainFileDirProperty() { return mainFileDirProperty; }
+    public StringProperty mainFileDirProperty() {
+        return mainFileDirProperty;
+    }
 
-    public BooleanProperty useBibLocationAsPrimaryProperty() { return useBibLocationAsPrimaryProperty; }
+    public BooleanProperty useBibLocationAsPrimaryProperty() {
+        return useBibLocationAsPrimaryProperty;
+    }
 
-    public BooleanProperty autolinkFileStartsBibtexProperty() { return autolinkFileStartsBibtexProperty; }
+    public BooleanProperty autolinkFileStartsBibtexProperty() {
+        return autolinkFileStartsBibtexProperty;
+    }
 
-    public BooleanProperty autolinkFileExactBibtexProperty() { return autolinkFileExactBibtexProperty; }
+    public BooleanProperty autolinkFileExactBibtexProperty() {
+        return autolinkFileExactBibtexProperty;
+    }
 
-    public BooleanProperty autolinkUseRegexProperty() { return autolinkUseRegexProperty; }
+    public BooleanProperty autolinkUseRegexProperty() {
+        return autolinkUseRegexProperty;
+    }
 
-    public StringProperty autolinkRegexKeyProperty() { return autolinkRegexKeyProperty; }
+    public StringProperty autolinkRegexKeyProperty() {
+        return autolinkRegexKeyProperty;
+    }
 
-    public BooleanProperty searchFilesOnOpenProperty() { return searchFilesOnOpenProperty; }
+    public BooleanProperty searchFilesOnOpenProperty() {
+        return searchFilesOnOpenProperty;
+    }
 
-    public BooleanProperty openBrowseOnCreateProperty() { return openBrowseOnCreateProperty; }
+    public BooleanProperty openBrowseOnCreateProperty() {
+        return openBrowseOnCreateProperty;
+    }
 
     // Autosave
 
-    public BooleanProperty autosaveLocalLibrariesProperty() { return autosaveLocalLibraries; }
+    public BooleanProperty autosaveLocalLibrariesProperty() {
+        return autosaveLocalLibraries;
+    }
 }
 

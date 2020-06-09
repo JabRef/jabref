@@ -16,7 +16,7 @@ import org.jabref.JabRefException;
 import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -206,8 +206,8 @@ public class ArgumentProcessor {
             }
         }
 
-        if (cli.isGenerateBibtexKeys()) {
-            regenerateBibtexKeys(loaded);
+        if (cli.isGenerateCitationKeys()) {
+            regenerateCitationKeys(loaded);
         }
 
         if (cli.isAutomaticallySetFileLinks()) {
@@ -266,7 +266,7 @@ public class ArgumentProcessor {
                     break;
                 default:
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                            .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                                                   .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
                     noGUINeeded = true;
                     return false;
             }
@@ -442,7 +442,7 @@ public class ArgumentProcessor {
                 try {
                     exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
-                                    .orElse(Globals.prefs.getDefaultEncoding()),
+                              .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
@@ -500,13 +500,13 @@ public class ArgumentProcessor {
         }
     }
 
-    private void regenerateBibtexKeys(List<ParserResult> loaded) {
+    private void regenerateCitationKeys(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
-            LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
+            LOGGER.info(Localization.lang("Regenerating citation keys according to metadata"));
 
-            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(parserResult.getDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
+            CitationKeyGenerator keyGenerator = new CitationKeyGenerator(parserResult.getDatabaseContext(), Globals.prefs.getCitationKeyPatternPreferences());
             for (BibEntry entry : database.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }
@@ -516,8 +516,7 @@ public class ArgumentProcessor {
     /**
      * Run an entry fetcher from the command line.
      *
-     * @param fetchCommand A string containing both the name of the fetcher to use and
-     *                     the search query, separated by a :
+     * @param fetchCommand A string containing both the name of the fetcher to use and the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {

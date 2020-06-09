@@ -23,5 +23,4 @@ public class FieldContentFormatterPreferences {
     public List<Field> getNonWrappableFields() {
         return nonWrappableFields;
     }
-
 }

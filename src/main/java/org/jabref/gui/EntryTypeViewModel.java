@@ -17,7 +17,7 @@ import javafx.concurrent.Worker;
 import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -71,7 +71,9 @@ public class EntryTypeViewModel {
         return selectedItemProperty;
     }
 
-    public ValidationStatus idFieldValidationStatus() { return idFieldValidator.getValidationStatus(); }
+    public ValidationStatus idFieldValidationStatus() {
+        return idFieldValidator.getValidationStatus();
+    }
 
     public StringProperty idTextProperty() {
         return idText;
@@ -101,7 +103,6 @@ public class EntryTypeViewModel {
     }
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
-
         private IdBasedFetcher fetcher = null;
         private String searchID = "";
 
@@ -118,7 +119,6 @@ public class EntryTypeViewModel {
             }
             return bibEntry;
         }
-
     }
 
     public void runFetcherWorker() {
@@ -139,7 +139,6 @@ public class EntryTypeViewModel {
             searchingProperty.set(false);
 
             fetcherWorker = new FetcherWorker();
-
         });
 
         fetcherWorker.setOnSucceeded(evt -> {
@@ -167,11 +166,10 @@ public class EntryTypeViewModel {
                     }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                    new CitationKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
                     basePanel.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);
-
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }
@@ -179,7 +177,6 @@ public class EntryTypeViewModel {
 
             focusAndSelectAllProperty.set(true);
             searchingProperty().setValue(false);
-
         });
     }
 }

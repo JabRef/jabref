@@ -109,7 +109,7 @@ public class CopyMoreAction extends SimpleCommand {
                                    .collect(Collectors.toList());
 
         if (keys.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have BibTeX keys."));
+            dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
             return;
         }
 
@@ -121,7 +121,7 @@ public class CopyMoreAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                     JabRefDialogService.shortenDialogMessage(copiedKeys)));
         } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));
         }
     }
@@ -136,7 +136,7 @@ public class CopyMoreAction extends SimpleCommand {
                                    .collect(Collectors.toList());
 
         if (keys.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have BibTeX keys."));
+            dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
             return;
         }
 
@@ -152,7 +152,7 @@ public class CopyMoreAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                     JabRefDialogService.shortenDialogMessage(copiedCiteCommand)));
         } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));
         }
     }
@@ -182,7 +182,7 @@ public class CopyMoreAction extends SimpleCommand {
         }
 
         if (entriesWithKeys == 0) {
-            dialogService.notify(Localization.lang("None of the selected entries have BibTeX keys."));
+            dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
             return;
         }
 
@@ -193,15 +193,15 @@ public class CopyMoreAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                     JabRefDialogService.shortenDialogMessage(keyAndTitle.toString())));
         } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Integer.toString(entries.size() - entriesWithKeys), Integer.toString(entries.size())));
         }
     }
 
     /**
-     * This method will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard. In case an
-     * entry doesn't have a BibTeX key it will not be copied. In case an entry doesn't have an url this will only copy
-     * the BibTeX key.
+     * This method will copy each selected entry's citation key as a hyperlink to its url to the clipboard. In case an
+     * entry doesn't have a citation key it will not be copied. In case an entry doesn't have an url this will only copy
+     * the citation key.
      */
     private void copyKeyAndLink() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
@@ -213,7 +213,7 @@ public class CopyMoreAction extends SimpleCommand {
                                                .collect(Collectors.toList());
 
         if (entriesWithKey.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have BibTeX keys."));
+            dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
             return;
         }
 
@@ -231,7 +231,7 @@ public class CopyMoreAction extends SimpleCommand {
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                     JabRefDialogService.shortenDialogMessage(keyAndLink.toString())));
         } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Long.toString(entries.size() - entriesWithKey.size()), Integer.toString(entries.size())));
         }
     }

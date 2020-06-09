@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
 
-public class FieldChecker implements IntegrityCheck.Checker {
+public class FieldChecker implements EntryChecker {
     protected final Field field;
     private final ValueChecker checker;
 
@@ -21,7 +21,7 @@ public class FieldChecker implements IntegrityCheck.Checker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> value = entry.getField(field);
-        if (!value.isPresent()) {
+        if (value.isEmpty()) {
             return Collections.emptyList();
         }
 

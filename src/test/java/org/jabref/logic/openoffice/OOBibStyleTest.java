@@ -44,7 +44,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
-        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
         assertFalse(style.isItalicCitations());
@@ -59,7 +59,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isInternalStyle());
-        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
         assertFalse(style.isItalicCitations());
@@ -72,7 +72,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         assertTrue(style.isValid());
-        assertFalse(style.isBibtexKeyCiteMarkers());
+        assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
         assertFalse(style.isItalicCitations());
@@ -509,8 +509,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testIsValidWithDefaultSectionAtTheStart() throws Exception
-    {
+    void testIsValidWithDefaultSectionAtTheStart() throws Exception {
         OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences);
         assertTrue(style.isValid());
     }

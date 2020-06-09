@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
@@ -50,8 +49,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +101,7 @@ public class BasePanel extends StackPane {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), Globals.prefs, Globals.stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
@@ -252,24 +251,24 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-                bibDatabaseContext.getDatabase().insertEntries(entries);
+            bibDatabaseContext.getDatabase().insertEntries(entries);
 
-                // Set owner and timestamp
-                for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry,
-                            true,
-                            true,
-                            Globals.prefs.getOwnerPreferences(),
-                            Globals.prefs.getTimestampPreferences());
-                }
-                // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+            // Set owner and timestamp
+            for (BibEntry entry : entries) {
+                UpdateField.setAutomaticFields(entry,
+                        true,
+                        true,
+                        Globals.prefs.getOwnerPreferences(),
+                        Globals.prefs.getTimestampPreferences());
+            }
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
-                markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(entries.get(0));
-                }
-                clearAndSelect(entries.get(0));
+            markBaseChanged(); // The database just changed.
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+                showAndEdit(entries.get(0));
+            }
+            clearAndSelect(entries.get(0));
         }
     }
 
@@ -372,9 +371,9 @@ public class BasePanel extends StackPane {
 
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                                              .flatMap(SplitPane.Divider::positionProperty)
-                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+        dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
+                                              .mapObservable(SplitPane.Divider::positionProperty)
+                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -575,10 +574,6 @@ public class BasePanel extends StackPane {
      * preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (position == null) {
-            return;
-        }
-
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }

@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * Keep track of changes made to the columns (reordering, resorting, resizing).
@@ -12,9 +12,9 @@ import org.jabref.preferences.JabRefPreferences;
 public class PersistenceVisualStateTable {
 
     private final MainTable mainTable;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public PersistenceVisualStateTable(final MainTable mainTable, JabRefPreferences preferences) {
+    public PersistenceVisualStateTable(final MainTable mainTable, PreferencesService preferences) {
         this.mainTable = mainTable;
         this.preferences = preferences;
 
@@ -35,11 +35,11 @@ public class PersistenceVisualStateTable {
     private void updateColumnPreferences() {
         preferences.storeColumnPreferences(new ColumnPreferences(
                 mainTable.getColumns().stream()
-                        .map(column -> ((MainTableColumn<?>) column).getModel())
-                        .collect(Collectors.toList()),
+                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                         .collect(Collectors.toList()),
                 mainTable.getSortOrder().stream()
-                        .map(column -> ((MainTableColumn<?>) column).getModel())
-                        .collect(Collectors.toList())
+                         .map(column -> ((MainTableColumn<?>) column).getModel())
+                         .collect(Collectors.toList())
         ));
     }
 }

@@ -4,5 +4,4 @@ package org.jabref.logic.remote.server;
 public interface MessageHandler {
 
     void handleCommandLineArguments(String[] message);
-
 }

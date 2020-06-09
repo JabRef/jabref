@@ -31,11 +31,10 @@ public class CopySingleFileAction {
 
     public void copyFile() {
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                                                                                                        .withInitialDirectory(Path.of(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
-                                                                                                        .build();
+                .withInitialDirectory(Path.of(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(this::copyFileToDestination);
-
     }
 
     private void copyFileToDestination(Path exportPath) {
@@ -53,6 +52,5 @@ public class CopySingleFileAction {
         } else {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not resolve the file %0", fileToExport.map(Path::getParent).map(Path::toString).orElse("")));
         }
-
     }
 }
