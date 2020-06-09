@@ -3,9 +3,12 @@ package org.jabref.gui.maintable;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.preferences.PreferencesService;
 
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
+import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
+
 public class MainTableNameFormatter {
-    private final MainTableNameFormatPreferences.DisplayStyle displayStyle;
-    private final MainTableNameFormatPreferences.AbbreviationStyle abbreviationStyle;
+    private final DisplayStyle displayStyle;
+    private final AbbreviationStyle abbreviationStyle;
 
     MainTableNameFormatter(PreferencesService preferences) {
         MainTableNameFormatPreferences nameFormatPreferences = preferences.getMainTableNameFormatPreferences();
@@ -27,9 +30,9 @@ public class MainTableNameFormatter {
 
         AuthorList authors = AuthorList.parse(nameToFormat);
 
-        if (((displayStyle == MainTableNameFormatPreferences.DisplayStyle.FIRSTNAME_LASTNAME)
-                || (displayStyle == MainTableNameFormatPreferences.DisplayStyle.LASTNAME_FIRSTNAME))
-                && abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.LASTNAME_ONLY) {
+        if (((displayStyle == DisplayStyle.FIRSTNAME_LASTNAME)
+                || (displayStyle == DisplayStyle.LASTNAME_FIRSTNAME))
+                && abbreviationStyle == AbbreviationStyle.LASTNAME_ONLY) {
             return authors.getAsLastNamesLatexFree(false);
         }
 
@@ -38,17 +41,17 @@ public class MainTableNameFormatter {
                 return authors.getAsNatbibLatexFree();
             case FIRSTNAME_LASTNAME:
                 return authors.getAsFirstLastNamesLatexFree(
-                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        abbreviationStyle == AbbreviationStyle.FULL,
                         false);
             default:
             case LASTNAME_FIRSTNAME:
                 return authors.getAsLastFirstNamesLatexFree(
-                        abbreviationStyle == MainTableNameFormatPreferences.AbbreviationStyle.FULL,
+                        abbreviationStyle == AbbreviationStyle.FULL,
                         false);
         }
     }
 
     public boolean needsFormatting() {
-        return displayStyle != MainTableNameFormatPreferences.DisplayStyle.AS_IS;
+        return displayStyle != DisplayStyle.AS_IS;
     }
 }
