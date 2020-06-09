@@ -124,8 +124,7 @@ public class BibEntryTableViewModel {
 
         value = Bindings.createStringBinding(() -> {
             for (Field field : fields) {
-                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)
-                        && nameFormatter.getValue().needsFormatting()) {
+                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
 
                     if (name.isPresent()) {

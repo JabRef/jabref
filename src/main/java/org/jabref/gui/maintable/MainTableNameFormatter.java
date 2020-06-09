@@ -36,22 +36,15 @@ public class MainTableNameFormatter {
             return authors.getAsLastNamesLatexFree(false);
         }
 
-        switch (displayStyle) {
-            case NATBIB:
-                return authors.getAsNatbibLatexFree();
-            case FIRSTNAME_LASTNAME:
-                return authors.getAsFirstLastNamesLatexFree(
-                        abbreviationStyle == AbbreviationStyle.FULL,
-                        false);
-            default:
-            case LASTNAME_FIRSTNAME:
-                return authors.getAsLastFirstNamesLatexFree(
-                        abbreviationStyle == AbbreviationStyle.FULL,
-                        false);
-        }
-    }
-
-    public boolean needsFormatting() {
-        return displayStyle != DisplayStyle.AS_IS;
+        return switch (displayStyle) {
+            case AS_IS -> authors.getAsUnformattedLatexFree();
+            case FIRSTNAME_LASTNAME -> authors.getAsFirstLastNamesLatexFree(
+                    abbreviationStyle == AbbreviationStyle.FULL,
+                    false);
+            case LASTNAME_FIRSTNAME -> authors.getAsLastFirstNamesLatexFree(
+                    abbreviationStyle == AbbreviationStyle.FULL,
+                    false);
+            case NATBIB -> authors.getAsNatbibLatexFree();
+        };
     }
 }
