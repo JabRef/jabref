@@ -29,11 +29,11 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final GroupViewMode groupViewMode;
-    private final ObjectProperty<MainTableNameFormatter> nameFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> nameFormatter;
     private final PreferencesService preferencesService;
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
-        this.nameFormatter = new SimpleObjectProperty<>(new MainTableNameFormatter(preferencesService));
+        this.nameFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService));
         this.preferencesService = preferencesService;
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
@@ -86,6 +86,6 @@ public class MainTableDataModel {
     }
 
     public void refresh() {
-        this.nameFormatter.setValue(new MainTableNameFormatter(preferencesService));
+        this.nameFormatter.setValue(new MainTableFieldValueFormatter(preferencesService));
     }
 }
