@@ -97,3 +97,55 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
 
 [JabRef]: https://www.jabref.org
+
+
+
+The Chinese version of the documentation
+
+
+JabRef 参考书目管理系统
+
+JabRef是一个开源，跨平台的引用和参考管理工具。
+
+JabRef可帮助您随时掌握文献资料，收集和整理资料，找到所需的论文并发现最新的研究成果。
+
+产品特点：
+JabRef是一个可在Windows，Linux和Mac OS X上运行的跨平台应用程序。它是免费的，并且正在积极开发中。 JabRef在您每一步的研究工作中都为您提供支持。
+
+收集：
+搜索许多在线的科学目录，例如CiteSeer，CrossRef，Google Scholar，IEEEXplore，INSPIRE-HEP，Medline PubMed，MathSciNet，Springer，arXiv和zbMATH
+超过15种参考格式的导入选项
+轻松检索和链接全文文章
+根据ISBN，DOI，PubMed-ID和arXiv-ID获取完整的书目信息
+从PDF提取元数据
+使用适用于Firefox，Chrome，Edge和Vivaldi的官方浏览器扩展程序，单击一下即可直接从浏览器导入新引用
+
+组织:
+将您的研究分组为分层集合，并根据关键字/标签，搜索词或您的手动分配来组织研究项目
+进阶搜寻和筛选功能
+通过与精选的在线目录（例如Google Scholar，Springer或MathSciNet）进行比较来完成和修正书目数据
+可定制的引证密钥生成器
+自定义并添加新的元数据字段或引用类型
+查找并合并重复项
+附加相关文档：开箱即用地支持20种不同类型的文档，可完全自定义和扩展
+根据可自定义的规则自动重命名和移动关联的文档
+跟踪您阅读的内容：排名，优先级，印刷内容，质量保证
+引用:
+支持本机BibTeX和Biblatex
+外部应用程序（例如Emacs，Kile，LyX，Texmaker，TeXstudio，Vim和WinEdt）的按需编写功能。
+使用数千种内置引用样式之一设置引用格式或创建样式
+支持Word和LibreOffice / OpenOffice以插入和格式化引文
+
+分享:
+许多内置的导出选项或创建您的导出格式
+库被保存为简单的文本文件，因此可以很容易地通过Dropbox与他人共享，并且版本控制友好
+团队合作：通过SQL数据库同步库的内容
+
+安装:
+可以在builds.jabref.org上获得新的开发版本。 最新的稳定版本可从FossHub获得。
+Windows：JabRef提供了一个安装程序，该安装程序还将JabRef的快捷方式添加到您的开始菜单。 另请参阅我们的Windows常见问题解答
+Linux：请参阅我们的安装指南。
+Mac OS X：请参阅我们的Mac OS X常见问题解答。
+
+
+
