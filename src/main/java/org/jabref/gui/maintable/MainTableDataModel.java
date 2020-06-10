@@ -26,20 +26,23 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class MainTableDataModel {
-    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final GroupViewMode groupViewMode;
-    private final ObjectProperty<MainTableFieldValueFormatter> nameFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final PreferencesService preferencesService;
+    private final BibDatabaseContext bibDatabaseContext;
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
-        this.nameFormatter = new SimpleObjectProperty<>(new MainTableFieldValueFormatter(preferencesService));
         this.preferencesService = preferencesService;
+        this.bibDatabaseContext = context;
+        this.fieldValueFormatter = new SimpleObjectProperty<>(
+                new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
-        entriesFiltered = new FilteredList<>(entriesViewModel);
+        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
         );
@@ -86,6 +89,6 @@ public class MainTableDataModel {
     }
 
     public void refresh() {
-        this.nameFormatter.setValue(new MainTableFieldValueFormatter(preferencesService));
+        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
     }
 }

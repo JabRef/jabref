@@ -14,7 +14,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
@@ -32,7 +31,6 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
-    private final BibDatabase database;
     private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
@@ -40,14 +38,13 @@ public class BibEntryTableViewModel {
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
-        this.database = database.getDatabase();
         this.fieldValueFormatter = fieldValueFormatter;
 
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
-        this.matchedGroups = createMatchedGroupsBinding(database, entry);
+        this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -122,7 +119,7 @@ public class BibEntryTableViewModel {
         observables.add(fieldValueFormatter);
 
         value = Bindings.createStringBinding(() ->
-                fieldValueFormatter.getValue().formatFieldsValuesLatexFree(fields, entry, database),
+                fieldValueFormatter.getValue().formatFieldsValuesLatexFree(fields, entry),
                 observables.toArray(Observable[]::new));
         fieldValues.put(fields, value);
         return value;

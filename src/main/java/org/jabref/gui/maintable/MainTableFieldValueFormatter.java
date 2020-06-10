@@ -3,6 +3,7 @@ package org.jabref.gui.maintable;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -16,11 +17,13 @@ import static org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplaySty
 public class MainTableFieldValueFormatter {
     private final DisplayStyle displayStyle;
     private final AbbreviationStyle abbreviationStyle;
+    private final BibDatabase bibDatabase;
 
-    MainTableFieldValueFormatter(PreferencesService preferences) {
+    MainTableFieldValueFormatter(PreferencesService preferences, BibDatabaseContext bibDatabaseContext) {
         MainTableNameFormatPreferences nameFormatPreferences = preferences.getMainTableNameFormatPreferences();
         this.displayStyle = nameFormatPreferences.getDisplayStyle();
         this.abbreviationStyle = nameFormatPreferences.getAbbreviationStyle();
+        this.bibDatabase = bibDatabaseContext.getDatabase();
     }
 
     /**
@@ -29,20 +32,18 @@ public class MainTableFieldValueFormatter {
      *
      * @param fields the fields argument of {@link BibEntryTableViewModel#getFields(OrFields)}.
      * @param entry the BibEntry of {@link BibEntryTableViewModel}.
-     * @param database the BibDatabase of {@link BibEntryTableViewModel}.
      * @return The formatted name field.
      */
-    public String formatFieldsValuesLatexFree(final OrFields fields, final BibEntry entry,
-                                              final BibDatabase database) {
+    public String formatFieldsValuesLatexFree(final OrFields fields, final BibEntry entry) {
         for (Field field : fields) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
-                Optional<String> name = entry.getResolvedFieldOrAlias(field, database);
+                Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 
                 if (name.isPresent()) {
                     return formatFieldWithAuthorValueLatexFree(name.get());
                 }
             } else {
-                Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, database);
+                Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, bibDatabase);
 
                 if (content.isPresent()) {
                     return content.get();
