@@ -94,7 +94,6 @@ public class CustomEntryTypeDialogViewModel {
         return this.fieldsForAdding;
     }
 
-
     public enum FieldType {
 
         REQUIRED(Localization.lang("Required")),

@@ -65,8 +65,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     private CustomEntryTypeDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
-    private  CustomLocalDragboard localDragboard;
-
+    private CustomLocalDragboard localDragboard;
 
     public CustomizeEntryTypeDialogView(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager) {
         this.mode = bibDatabaseContext.getMode();
@@ -159,8 +158,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
               .setOnDragDropped(this::handleOnDragDropped)
               .setOnDragOver(this::handleOnDragOver)
               .install(fields);
-
-    }
+}
 
     private void handleOnDragOver(FieldViewModel originalItem, DragEvent event) {
         if ((event.getGestureSource() != originalItem) && event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {
@@ -206,7 +204,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         event.setDropCompleted(success);
         event.consume();
-
     }
 
     @FXML
