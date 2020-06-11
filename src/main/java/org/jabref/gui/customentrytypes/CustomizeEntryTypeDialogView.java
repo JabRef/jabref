@@ -211,7 +211,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     @FXML
     void addEntryType() {
-        viewModel.addNewCustomEntryType();
+        CustomEntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
+        this.entryTypes.getSelectionModel().select(newlyAdded);
+        this.entryTypes.scrollTo(newlyAdded);
     }
 
     @FXML

@@ -57,6 +57,7 @@ public class CustomEntryTypeDialogViewModel {
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
     private final ObservableList<CustomEntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
+    private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
@@ -122,12 +123,14 @@ public class CustomEntryTypeDialogViewModel {
         newFieldToAddProperty().setValue(null);
     }
 
-    public void addNewCustomEntryType() {
+    public CustomEntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
         CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
+
+        return viewModel;
     }
 
     public ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypeProperty() {
@@ -156,6 +159,7 @@ public class CustomEntryTypeDialogViewModel {
 
     public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
         entryTypesWithFields.remove(focusedItem);
+        this.entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
     public void removeField(FieldViewModel focusedItem) {
@@ -173,6 +177,10 @@ public class CustomEntryTypeDialogViewModel {
 
             BibEntryType newType = new BibEntryType(type.getType(), otherFields, requiredFields);
             entryTypesManager.addCustomOrModifiedType(newType, mode);
+        }
+
+        for (var entryType: entryTypesToDelete) {
+            entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
         preferencesService.saveCustomEntryTypes();
