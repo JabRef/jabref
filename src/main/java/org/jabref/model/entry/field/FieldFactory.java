@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 public class FieldFactory {
@@ -47,7 +46,7 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .filter(StringUtil::isNotBlank)
+                     //.filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
                      .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
@@ -55,14 +54,14 @@ public class FieldFactory {
 
     public static Set<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                     .filter(StringUtil::isNotBlank)
+                     //.filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseOrFields)
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                     .filter(StringUtil::isNotBlank)
+                    // .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
                      .collect(Collectors.toCollection(LinkedHashSet::new));
     }

@@ -22,6 +22,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -557,8 +558,8 @@ class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -587,6 +588,7 @@ class BibEntryWriterTest {
         assertEquals(expected, actual);
     }
 
+    @Disabled("We don't have alphabetic serialization anylonger TODO")
     @Test
     void alphabeticSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
