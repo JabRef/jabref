@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -129,5 +130,26 @@ class BibEntryTypesManagerTest {
     void standardTypeIsStillAccessibleIfOverwritten(BibDatabaseMode mode) {
         entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
         assertFalse(entryTypesManager.isCustomType(overwrittenStandardType.getType(), mode));
+    }
+
+    @ParameterizedTest
+    @MethodSource("mode")
+    void testParsingEmptyOrFieldsReturnsEmpyCollections(BibDatabaseMode mode) {
+        String serialized = entryTypesManager.serialize(newCustomType);
+        Optional<BibEntryType> type = entryTypesManager.parse(serialized);
+        assertEquals(Collections.emptySet(), type.get().getRequiredFields());
+    }
+
+    @ParameterizedTest
+    @MethodSource("mode")
+    void testParsingEmptyOptionalFieldsFieldsReturnsEmpyCollections(BibDatabaseMode mode) {
+        newCustomType = new BibEntryType(
+                                         CUSTOM_TYPE,
+                                         Collections.emptySet(),
+                                         Collections.singleton(new OrFields(StandardField.AUTHOR)));
+
+        String serialized = entryTypesManager.serialize(newCustomType);
+        Optional<BibEntryType> type = entryTypesManager.parse(serialized);
+        assertEquals(Collections.emptySet(), type.get().getOptionalFields());
     }
 }
