@@ -170,7 +170,6 @@ public class CustomEntryTypeDialogViewModel {
                                                    preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
 
-
     public void apply() {
 
         for (var typeWithField : entryTypesWithFields) {
