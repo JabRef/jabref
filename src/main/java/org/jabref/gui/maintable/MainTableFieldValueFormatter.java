@@ -60,7 +60,7 @@ public class MainTableFieldValueFormatter {
      * @param nameToFormat The contents of the name field.
      * @return The formatted name field.
      */
-    public String formatFieldWithAuthorValueLatexFree(final String nameToFormat) {
+    private String formatFieldWithAuthorValueLatexFree(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;
         }
