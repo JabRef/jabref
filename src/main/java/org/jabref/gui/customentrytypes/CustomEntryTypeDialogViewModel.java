@@ -73,7 +73,6 @@ public class CustomEntryTypeDialogViewModel {
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
         allTypes.addAll(entryTypesManager.getAllCustomTypes(mode));
 
-
         for (BibEntryType entryType : allTypes) {
             CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
             this.entryTypesWithFields.add(viewModel);
