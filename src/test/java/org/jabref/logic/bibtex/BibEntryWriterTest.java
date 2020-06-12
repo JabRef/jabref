@@ -347,8 +347,8 @@ class BibEntryWriterTest {
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
