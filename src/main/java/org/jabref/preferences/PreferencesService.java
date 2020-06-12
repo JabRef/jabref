@@ -107,6 +107,8 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes();
 
+    void clearAllBibEntryTypes();
+
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
     CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository repository);

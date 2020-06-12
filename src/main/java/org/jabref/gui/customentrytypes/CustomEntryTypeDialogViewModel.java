@@ -164,6 +164,13 @@ public class CustomEntryTypeDialogViewModel {
         this.selectedEntryType.getValue().removeField(focusedItem);
     }
 
+    public void resetAllCustomEntryTypes() {
+        this.preferencesService.clearAllBibEntryTypes();
+        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+    }
+
+
     public void apply() {
 
         for (var typeWithField : entryTypesWithFields) {

@@ -22,11 +22,13 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RadioButtonCell;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -57,11 +59,14 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML private TableColumn<FieldViewModel, String> fieldTypeActionColumn;
     @FXML private ComboBox<Field> addNewField;
     @FXML private ButtonType applyButton;
+    @FXML private ButtonType resetButton;
     @FXML private Button addNewEntryTypeButton;
     @FXML private Button addNewFieldButton;
 
+
     @Inject private PreferencesService preferencesService;
     @Inject private StateManager stateManager;
+    @Inject private DialogService dialogService;
 
     private CustomEntryTypeDialogViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
@@ -81,11 +86,12 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
             }
             return null;
         });
+        ControlHelper.setAction(resetButton, getDialogPane(), event -> this.resetEntryTypes());
     }
 
     @FXML
     private void initialize() {
-        // As the state manager gets injected it's not avaiable in the constructor
+        // As the state manager gets injected it's not available in the constructor
         this.localDragboard = stateManager.getLocalDragboard();
 
         viewModel = new CustomEntryTypeDialogViewModel(mode, preferencesService, entryTypesManager);
@@ -216,5 +222,16 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     @FXML
     void addNewField() {
         viewModel.addNewField();
+    }
+
+    private void resetEntryTypes() {
+        boolean reset = dialogService.showConfirmationDialogAndWait(
+                                            Localization.lang("Reset entry types to defaults"),
+                                            Localization.lang("This will reset all entry types to their default values and remove all custom entry types"),
+                                            Localization.lang("Reset to default"));
+        if (reset) {
+            viewModel.resetAllCustomEntryTypes();
+        }
+
     }
 }

@@ -1041,15 +1041,21 @@ public class JabRefPreferences implements PreferencesService {
         return storedEntryTypes;
     }
 
-    private void clearAllBibEntryTypes() throws BackingStoreException {
+    @Override
+    public void clearAllBibEntryTypes() {
         for (BibDatabaseMode mode : BibDatabaseMode.values()) {
             clearBibEntryTypes(mode);
         }
     }
 
-    private void clearBibEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-        prefsNode.clear();
+    private void clearBibEntryTypes(BibDatabaseMode mode) {
+        try {
+            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+            prefsNode.clear();
+
+        } catch (BackingStoreException e) {
+            LOGGER.error("Resetting customized entry types failed.", e);
+        }
     }
 
     public Map<String, Object> getPreferences() {
