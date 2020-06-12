@@ -34,11 +34,6 @@ public class DiVATest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals(HelpFile.FETCHER_DIVA, HelpFile.FETCHER_DIVA);
-    }
-
-    @Test
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);

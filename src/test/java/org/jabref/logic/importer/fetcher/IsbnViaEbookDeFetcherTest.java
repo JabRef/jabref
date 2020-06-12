@@ -45,12 +45,6 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void testHelpPage() {
-        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
-    @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntry), fetchedEntry);

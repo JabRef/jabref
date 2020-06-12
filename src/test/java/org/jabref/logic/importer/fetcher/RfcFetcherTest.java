@@ -48,11 +48,6 @@ public class RfcFetcherTest {
     }
 
     @Test
-    public void getHelpPageReturnsEqualHelpPage() {
-        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void performSearchByIdFindsEntryWithRfcPrefix() throws Exception {
         assertEquals(Optional.of(bibEntry), fetcher.performSearchById("RFC1945"));
     }

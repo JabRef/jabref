@@ -50,11 +50,6 @@ class IsbnFetcherTest {
     }
 
     @Test
-    void testHelpPage() {
-        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntry), fetchedEntry);

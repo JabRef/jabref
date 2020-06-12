@@ -43,11 +43,6 @@ public class TitleFetcherTest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals("collect/add-entry-using-an-id", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void testPerformSearchKopp2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0");
         assertEquals(Optional.of(bibEntryBischof2009), fetchedEntry);
