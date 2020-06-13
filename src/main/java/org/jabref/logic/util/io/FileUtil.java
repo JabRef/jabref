@@ -284,7 +284,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(directoryNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
-            targetName = entry.getCiteKeyOptional().orElse("default");
+            return targetName;
         }
 
         // Removes illegal characters from directory name
