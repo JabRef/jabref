@@ -366,6 +366,7 @@ class FileUtilTest {
 
         assertEquals("PDF/1998/Åuthör/1234 - mytitle", FileUtil.createDirNameFromPattern(null, entry, fileDirPattern));
     }
+
     @Test
     void testGetLinkedDirNamePatterntEmpty() {
         // bibkey - title
