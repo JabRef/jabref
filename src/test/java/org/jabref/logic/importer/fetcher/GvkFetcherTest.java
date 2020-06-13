@@ -64,11 +64,6 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-online-bibliographic-database/gvk", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void simpleSearchQueryStringCorrect() {
         String query = "java jdk";
         String result = fetcher.getSearchQueryString(query);

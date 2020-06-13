@@ -23,7 +23,7 @@ public class GrobidCitationFetcherTest {
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCiteKey("-1")
-                .withField(StandardField.AUTHOR, "T Derwing and M Rossiter and M Munro")
+                .withField(StandardField.AUTHOR, "Derwing, T and Rossiter, M and Munro, M")
                 .withField(StandardField.TITLE, "Teaching native speakers to listen to foreign-accented speech")
                 .withField(StandardField.JOURNAL, "Journal of Multilingual and Multicultural Development")
                 .withField(StandardField.YEAR, "2002")
@@ -32,20 +32,20 @@ public class GrobidCitationFetcherTest {
                 .withField(StandardField.NUMBER, "4");
     static String example2 = "Thomas, H. K. (2004). Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation). University of Colorado, Boulder.";
     static BibEntry example2AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
-            .withField(StandardField.AUTHOR, "H Thomas")
+            .withField(StandardField.AUTHOR, "Thomas, H")
             .withField(StandardField.TITLE, "Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)")
             .withField(StandardField.YEAR, "2004")
             .withField(StandardField.ADDRESS, "Boulder");
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
     static BibEntry example3AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
-            .withField(StandardField.AUTHOR, "J Turk and P Graham and F Verhulst")
+            .withField(StandardField.AUTHOR, "Turk, J and Graham, P and Verhulst, F")
             .withField(StandardField.TITLE, "Child and adolescent psychiatry : A developmental approach")
             .withField(StandardField.PUBLISHER, "Oxford University Press")
             .withField(StandardField.YEAR, "2007")
             .withField(StandardField.ADDRESS, "Oxford, England");
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
-    static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.Article).withCiteKey("-1")
-            .withField(StandardField.AUTHOR, "I Carr and R Kidner")
+    static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.InBook).withCiteKey("-1")
+            .withField(StandardField.AUTHOR, "Carr, I and Kidner, R")
             .withField(StandardField.BOOKTITLE, "Statutes and conventions on international trade law")
             .withField(StandardField.PUBLISHER, "Cavendish")
             .withField(StandardField.YEAR, "2003")
