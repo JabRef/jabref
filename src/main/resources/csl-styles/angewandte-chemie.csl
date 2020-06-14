@@ -4,7 +4,7 @@
     <title>Angewandte Chemie International Edition</title>
     <id>http://www.zotero.org/styles/angewandte-chemie</id>
     <link href="http://www.zotero.org/styles/angewandte-chemie" rel="self"/>
-    <link href="http://www3.interscience.wiley.com/journal/26737/home/2002_guideline.html" rel="documentation"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/15213773/homepage/notice-to-authors" rel="documentation"/>
     <author>
       <name>Richard Karnesky</name>
       <email>karnesky+zotero@gmail.com</email>
@@ -21,7 +21,7 @@
     <eissn>1521-3773</eissn>
     <summary>A style for Wiley-VCH's journal "Angewandte Chemie International Edition"
 This style has many limits due to csl constraints, most notably the inability to include pages/page ranges for books, the wrong square brackets for two items cited together, and the lack of support for citing 1a)... b)...c)....</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-05-15T22:06:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -88,7 +88,7 @@ This style has many limits due to csl constraints, most notably the inability to
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography entry-spacing="0" second-field-align="flush" et-al-min="11" et-al-use-first="10">
+  <bibliography entry-spacing="0" second-field-align="flush">
     <layout suffix=".">
       <text variable="citation-number" prefix="[" suffix="]"/>
       <text macro="author" suffix=", "/>

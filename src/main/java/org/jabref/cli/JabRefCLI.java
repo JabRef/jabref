@@ -139,8 +139,8 @@ public class JabRefCLI {
         return cl.getOptionValue("exportMatches");
     }
 
-    public boolean isGenerateBibtexKeys() {
-        return cl.hasOption("generateBibtexKeys");
+    public boolean isGenerateCitationKeys() {
+        return cl.hasOption("generateCitationKeys");
     }
 
     public boolean isAutomaticallySetFileLinks() {
@@ -154,7 +154,7 @@ public class JabRefCLI {
         options.addOption("h", "help", false, Localization.lang("Display help on command line options"));
         options.addOption("n", "nogui", false, Localization.lang("No GUI. Only process command line options"));
         options.addOption("asfl", "automaticallySetFileLinks", false, Localization.lang("Automatically set file links"));
-        options.addOption("g", "generateBibtexKeys", false, Localization.lang("Regenerate all keys for the entries in a BibTeX file"));
+        options.addOption("g", "generateCitationKeys", false, Localization.lang("Regenerate all keys for the entries in a BibTeX file"));
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
         options.addOption("v", "version", false, Localization.lang("Display version"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));

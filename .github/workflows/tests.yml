@@ -9,6 +9,8 @@ on:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
 
 jobs:
   checkstyle:
@@ -38,7 +40,7 @@ jobs:
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
-        uses: koppor/markdown-lint@master
+        uses: avto-dev/markdown-lint@v1
         with:
           args: CHANGELOG.md README.md docs/
           config: '.markdownlint.yml'

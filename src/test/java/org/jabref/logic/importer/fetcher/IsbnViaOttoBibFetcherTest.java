@@ -42,12 +42,6 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void testHelpPage() {
-        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
-    @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
         bibEntry.setField(StandardField.ISBN, "0321356683");

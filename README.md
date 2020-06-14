@@ -3,12 +3,12 @@
 JabRef is an open-source, cross-platform citation and reference management tool.
 
 Stay on top of your literature: JabRef helps you to collect and organize sources, find the paper you need and discover the latest research.
-![main table](https://www.jabref.org/img/jabref-5-0-maintable.png)
+![main table](http://www.jabref.org/img/jabref-mainscreen.png)
 
 ## Features
 
-JabRef is a cross-platform application that works on Windows, Linux and Mac OS X. It is available free of charge and is actively developed.
-JabRef supports you in every step of your research work.
+JabRef is available free of charge and is actively developed.
+It supports you in every step of your research work.
 
 ### Collect
 
@@ -33,7 +33,7 @@ JabRef supports you in every step of your research work.
 
 ### Cite
 
-- Native [BibTeX] and [Biblatex] support
+- Native BibTeX and Biblatex support
 - Cite-as-you-write functionality for external applications such as Emacs, Kile, LyX, Texmaker, TeXstudio, Vim and WinEdt.
 - Format references in one of the many thousand built-in citation styles or create your style
 - Support for Word and LibreOffice/OpenOffice for inserting and formatting citations
@@ -47,11 +47,9 @@ JabRef supports you in every step of your research work.
 ## Installation
 
 Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
-The [latest stable release is available at FossHub](https://www.fosshub.com/JabRef.html).
+The [latest stable release is available at FossHub](https://downloads.jabref.org/).
 
-- Windows: JabRef offers an installer, which also adds a shortcut to JabRef to your start menu. Please also see our [Windows FAQ](https://docs.jabref.org/faq/faqwindows)
-- Linux: Please see our [Installation Guide](https://docs.jabref.org/general/installation).
-- Mac OS X: Please see our [Mac OS X FAQ](https://docs.jabref.org/faq/faqosx).
+Please see our [Installation Guide](https://docs.jabref.org/installation).
 
 ## Bug Reports, Suggestions, Other Feedback
 
@@ -98,10 +96,4 @@ For IntelliJ IDEA, just import the project via a Gradle Import by pointing at th
 
 `gradlew test` executes all tests. We use [Github Actions](https://github.com/JabRef/jabref/actions) for executing the tests after each commit. For developing, it is sufficient to locally only run the associated test for the classes you changed. Github will report any other failure.
 
-Just a test for markdown-link-check: <https://www.host-not-found.test>
-
-[BibTeX]: https://www.ctan.org/pkg/bibtex
-[Biblatex]: https://www.ctan.org/pkg/biblatex
-[install4j]: https://www.ej-technologies.com/products/install4j/overview.html
 [JabRef]: https://www.jabref.org
-[JavaFX]: https://en.wikipedia.org/wiki/JavaFX

@@ -91,7 +91,7 @@ public class FieldEditors {
         } else if (StandardField.KEYWORDS.equals(field)) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers, preferences);
         } else if (field == InternalField.KEY_FIELD) {
-            return new BibtexKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
+            return new CitationKeyEditor(field, preferences, suggestionProvider, fieldCheckers, databaseContext, undoManager, dialogService);
         } else {
             // default
             return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine);
