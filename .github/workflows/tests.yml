@@ -49,7 +49,7 @@ jobs:
       - name: Run markdown-link-check
         uses: koppor/github-action-markdown-link-check@patch-1
         with:
-          use-quiet-mode: 'yes'
+          use-quiet-mode: 'no'
           use-verbose-mode: 'yes'
           config-file: 'mlc_config.json'
           folder-path: '/docs'
