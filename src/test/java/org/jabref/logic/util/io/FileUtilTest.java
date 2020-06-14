@@ -368,7 +368,7 @@ class FileUtilTest {
     }
 
     @Test
-    void testGetLinkedDirNamePatterntEmpty() {
+    void testGetLinkedDirNamePatternEmpty() {
         // bibkey - title
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
