@@ -112,7 +112,7 @@ class MoveFilesCleanupTest {
     }
 
     @Test
-    void doesNotmMovesFileWithEmptyFileDirPattern() throws Exception {
+    void doesNotMoveFileWithEmptyFileDirPattern() throws Exception {
         when(filePreferences.getFileDirPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
