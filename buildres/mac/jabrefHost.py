@@ -15,10 +15,11 @@ import sys
 from pathlib import Path
 
 # We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
+# Note that the `which` command does not work as intended on MacOs, so the path must be hardcoded.
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
 if not JABREF_PATH.exists():
-    JABREF_PATH = shutil.which("jabref")
+    JABREF_PATH = Path( "/Applications/JabRef.app/Contents/MacOS/JabRef")
 
 if not JABREF_PATH.exists():
     logging.error("Could not determine JABREF_PATH")
@@ -84,7 +85,7 @@ except Exception as e:
 logging.info(str(message))
 
 if "status" in message and message["status"] == "validate":
-    cmd = [str(JABREF_PATH), "--version"]
+    cmd = [JABREF_PATH, "--version"]
     try:
         response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
