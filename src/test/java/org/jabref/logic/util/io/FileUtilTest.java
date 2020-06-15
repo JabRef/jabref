@@ -65,7 +65,6 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameDefaultFullTitle() {
-        // bibkey - title
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
