@@ -65,6 +65,7 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameDefaultFullTitle() {
+        // bibkey - title
         String fileNamePattern = "[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
@@ -368,7 +369,6 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedDirNamePatternEmpty() {
-        // bibkey - title
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
