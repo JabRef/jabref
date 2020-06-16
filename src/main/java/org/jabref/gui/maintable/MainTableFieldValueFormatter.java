@@ -36,7 +36,7 @@ public class MainTableFieldValueFormatter {
      */
     public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields) {
-            if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
+            if (field.getProperties().contains(FieldProperty.PERSON_NAMES) && displayStyle != DisplayStyle.AS_IS) {
                 Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 
                 if (name.isPresent()) {
