@@ -74,7 +74,7 @@ public class MainTableFieldValueFormatter {
         }
 
         return switch (displayStyle) {
-            case AS_IS -> authors.getAsUnformattedLatexFree();
+            default -> nameToFormat;
             case FIRSTNAME_LASTNAME -> authors.getAsFirstLastNamesLatexFree(
                     abbreviationStyle == AbbreviationStyle.FULL,
                     false);

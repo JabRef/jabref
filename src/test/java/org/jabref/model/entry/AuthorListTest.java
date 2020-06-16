@@ -114,66 +114,6 @@ public class AuthorListTest {
     }
 
     @Test
-    public void getAsUnformattedLatexFreeEmptyAuthorStringForEmptyInput() {
-        assertEquals("", EMPTY_AUTHOR.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeCachesLatexFreeString() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.getAsUnformattedLatexFree();
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeOneAuthorNameFromLatex() {
-        assertEquals("Muḥammad al-Khwārizmī",
-                ONE_AUTHOR_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeTwoAuthorNamesFromLatex() {
-        assertEquals("Muḥammad al-Khwārizmī and Corrado Böhm",
-                TWO_AUTHORS_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeThreeAuthorsromLatex() {
-        assertEquals("Muḥammad al-Khwārizmī and Corrado Böhm and Kurt Gödel",
-                THREE_AUTHORS_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeOneInsitutionNameFromLatex() {
-        assertEquals("The Banū Mūsā brothers",
-                ONE_INSTITUTION_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeTwoInsitutionNameFromLatex() {
-        assertEquals("The Banū Mūsā brothers and The Banū Mūsā brothers",
-                TWO_INSTITUTIONS_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeUnicodeMixedAuthorsFromLatex() {
-        assertEquals("The Banū Mūsā brothers and Corrado Böhm",
-                MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void getAsUnformattedLatexFreeOneInstitutionWithParanthesisAtStart() {
-        assertEquals("Łukasz Michał",
-                ONE_INSTITUTION_WITH_STARTING_PARANTHESIS.getAsUnformattedLatexFree());
-    }
-
-    @Test
-    public void parseAndGetAsUnformattedLatexFreeUnicodeThreeAuthorsromLatex() {
-        assertEquals("Muḥammad al-Khwārizmī, Corrado Böhm",
-                AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}}, Corrado B{\\\"o}hm")
-                          .getAsUnformattedLatexFree());
-    }
-
-    @Test
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
