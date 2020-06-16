@@ -1,6 +1,9 @@
 {
     "ignorePatterns": [
         {
+            "pattern": "^CONTRIBUTING\\.md"
+        },
+        {
             "pattern": "^https://dl\\.acm\\.org"
         },
         {
