@@ -26,6 +26,7 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class MainTableDataModel {
+    private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final GroupViewMode groupViewMode;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
@@ -42,7 +43,7 @@ public class MainTableDataModel {
         ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
                 new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
-        FilteredList<BibEntryTableViewModel> entriesFiltered = new FilteredList<>(entriesViewModel);
+        entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
                 EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
         );
