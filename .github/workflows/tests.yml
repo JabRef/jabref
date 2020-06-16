@@ -49,7 +49,7 @@ jobs:
       - name: Run markdown-link-check
         uses: gaurav-nelson/github-action-markdown-link-check@619e549
         with:
-          use-quiet-mode: 'no'
+          use-quiet-mode: 'yes'
           use-verbose-mode: 'no'
           config-file: 'mlc_config.json'
           folder-path: 'docs/'
