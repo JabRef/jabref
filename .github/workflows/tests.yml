@@ -42,7 +42,7 @@ jobs:
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
-          args: CHANGELOG.md README.md docs/
+          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
           config: '.markdownlint.yml'
       - name: Prepare markdown-link-check
         run: mkdir docs/ROOT && cp CHANGELOG.md README.md docs/ROOT

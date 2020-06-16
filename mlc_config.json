@@ -4,7 +4,10 @@
             "pattern": "^https://dl\\.acm\\.org"
         },
         {
-            "pattern": "^https://github.com"
+            "pattern": "^https://github\\.com"
+        },
+        {
+            "pattern": "^https://.*\\.jabref\\.org"
         },
         {
             "pattern": "^http://purl\\.org/net/bibteXMP"
