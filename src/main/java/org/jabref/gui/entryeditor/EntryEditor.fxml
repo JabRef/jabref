@@ -45,7 +45,7 @@
                     <JabRefIconView glyph="MAKE_KEY"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Generate BibTeX key"/>
+                    <Tooltip text="%Generate citation key"/>
                 </tooltip>
             </Button>
             <Button fx:id="fetcherButton" styleClass="icon-button,narrow">

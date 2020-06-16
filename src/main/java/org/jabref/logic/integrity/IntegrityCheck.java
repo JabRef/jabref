@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,7 +19,7 @@ public class IntegrityCheck {
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
                           FilePreferences filePreferences,
-                          BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+                          CitationKeyPatternPreferences citationKeyPatternPreferences,
                           JournalAbbreviationRepository journalAbbreviationRepository,
                           boolean allowIntegerEdition) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -30,13 +30,13 @@ public class IntegrityCheck {
                 allowIntegerEdition);
 
         entryCheckers = new ArrayList<>(List.of(
-                new BibtexKeyChecker(),
+                new CitationKeyChecker(),
                 new TypeChecker(),
                 new BibStringChecker(),
                 new HTMLCharacterChecker(),
                 new EntryLinkChecker(bibDatabaseContext.getDatabase()),
-                new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences),
-                new BibtexKeyDuplicationChecker(bibDatabaseContext.getDatabase())
+                new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
+                new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase())
         ));
 
         if (bibDatabaseContext.isBiblatexMode()) {

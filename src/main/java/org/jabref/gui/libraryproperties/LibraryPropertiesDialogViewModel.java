@@ -128,7 +128,6 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsDisableProperty().setValue(!value.isEnabled());
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
             cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
             cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });

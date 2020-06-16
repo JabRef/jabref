@@ -55,7 +55,7 @@ class INSPIREFetcherTest {
         article.setField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander");
         article.setField(StandardField.TITLE, "Top quark production at threshold with O(alpha-s**2) accuracy");
         article.setField(StandardField.DOI, "10.1016/S0550-3213(98)00348-4");
-        article.setField(StandardField.JOURNAL, "Nucl.\\ Phys.\\ B");
+        article.setField(StandardField.JOURNAL, "Nucl. Phys. B");
         article.setField(StandardField.PAGES, "59--72");
         article.setField(StandardField.VOLUME, "528");
         article.setField(StandardField.YEAR, "1998");

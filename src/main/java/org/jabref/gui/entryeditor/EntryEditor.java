@@ -29,7 +29,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeySingleAction;
+import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -212,7 +212,7 @@ public class EntryEditor extends BorderPane {
 
     @FXML
     void generateCiteKeyButton() {
-        GenerateBibtexKeySingleAction action = new GenerateBibtexKeySingleAction(getEntry(), databaseContext,
+        GenerateCitationKeySingleAction action = new GenerateCitationKeySingleAction(getEntry(), databaseContext,
                 dialogService, preferencesService, undoManager);
         action.execute();
     }

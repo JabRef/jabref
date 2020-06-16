@@ -40,7 +40,7 @@ class GroupTreeViewModelTest {
     @Test
     void rootGroupIsAllEntriesByDefault() throws Exception {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard()), groupTree.rootGroupProperty().getValue());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), mock(PreferencesService.class)), groupTree.rootGroupProperty().getValue());
     }
 
     @Test
@@ -49,7 +49,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
@@ -63,7 +63,7 @@ class GroupTreeViewModelTest {
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
