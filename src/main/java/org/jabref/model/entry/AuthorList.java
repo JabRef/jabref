@@ -566,7 +566,7 @@ public class AuthorList {
     /**
      * Compare this object with the given one.
      * <p>
-     * @return `true` iff the other object is an AuthorList, all Authors are in the same order, and all Authors field
+     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these authors are `String.equal`)
      * are equal on a string comparison.
      */
     @Override
