@@ -112,6 +112,19 @@ class MoveFilesCleanupTest {
     }
 
     @Test
+    void doesNotMoveFileWithEmptyFileDirPattern() throws Exception {
+        when(filePreferences.getFileDirPattern()).thenReturn("");
+        cleanup.cleanup(entry);
+
+        Path fileAfter = defaultFileFolder.resolve("test.pdf");
+        assertEquals(
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "test.pdf", ""))),
+                entry.getField(StandardField.FILE));
+        assertFalse(Files.exists(fileBefore));
+        assertTrue(Files.exists(fileAfter));
+    }
+
+    @Test
     void movesFileWithSubdirectoryPattern() throws Exception {
         when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
