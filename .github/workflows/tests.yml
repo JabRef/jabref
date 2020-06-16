@@ -47,7 +47,7 @@ jobs:
       - name: Prepare markdown-link-check
         run: mkdir docs/ROOT && cp CHANGELOG.md README.md docs/ROOT
       - name: Run markdown-link-check
-        uses: koppor/github-action-markdown-link-check@patch-1
+        uses: gaurav-nelson/github-action-markdown-link-check@c44c6ba
         with:
           use-quiet-mode: 'no'
           use-verbose-mode: 'yes'
