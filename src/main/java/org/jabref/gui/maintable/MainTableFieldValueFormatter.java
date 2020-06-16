@@ -34,13 +34,13 @@ public class MainTableFieldValueFormatter {
      * @param entry the BibEntry of {@link BibEntryTableViewModel}.
      * @return The formatted name field.
      */
-    public String formatFieldsValuesLatexFree(final OrFields fields, final BibEntry entry) {
+    public String formatFieldsValues(final OrFields fields, final BibEntry entry) {
         for (Field field : fields) {
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                 Optional<String> name = entry.getResolvedFieldOrAlias(field, bibDatabase);
 
                 if (name.isPresent()) {
-                    return formatFieldWithAuthorValueLatexFree(name.get());
+                    return formatFieldWithAuthorValue(name.get());
                 }
             } else {
                 Optional<String> content = entry.getResolvedFieldOrAliasLatexFree(field, bibDatabase);
@@ -60,7 +60,7 @@ public class MainTableFieldValueFormatter {
      * @param nameToFormat The contents of the name field.
      * @return The formatted name field.
      */
-    private String formatFieldWithAuthorValueLatexFree(final String nameToFormat) {
+    private String formatFieldWithAuthorValue(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;
         }

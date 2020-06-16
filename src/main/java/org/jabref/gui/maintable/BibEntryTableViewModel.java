@@ -119,7 +119,7 @@ public class BibEntryTableViewModel {
         observables.add(fieldValueFormatter);
 
         value = Bindings.createStringBinding(() ->
-                fieldValueFormatter.getValue().formatFieldsValuesLatexFree(fields, entry),
+                fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
                 observables.toArray(Observable[]::new));
         fieldValues.put(fields, value);
         return value;
