@@ -52,7 +52,7 @@ jobs:
           use-quiet-mode: 'no'
           use-verbose-mode: 'yes'
           config-file: 'mlc_config.json'
-          folder-path: '/docs'
+          folder-path: 'docs/'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
