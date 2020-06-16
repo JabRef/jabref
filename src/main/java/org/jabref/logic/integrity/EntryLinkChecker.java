@@ -28,7 +28,7 @@ public class EntryLinkChecker implements EntryChecker {
             Set<FieldProperty> properties = field.getKey().getProperties();
             if (properties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                 if (database.getEntryByKey(field.getValue()).isEmpty()) {
-                    result.add(new IntegrityMessage(Localization.lang("Referenced BibTeX key does not exist"), entry,
+                    result.add(new IntegrityMessage(Localization.lang("Referenced citation key does not exist"), entry,
                             field.getKey()));
                 }
             } else if (properties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
@@ -36,7 +36,7 @@ public class EntryLinkChecker implements EntryChecker {
                 for (String key : keys) {
                     if (database.getEntryByKey(key).isEmpty()) {
                         result.add(new IntegrityMessage(
-                                Localization.lang("Referenced BibTeX key does not exist") + ": " + key, entry,
+                                Localization.lang("Referenced citation key does not exist") + ": " + key, entry,
                                 field.getKey()));
                     }
                 }

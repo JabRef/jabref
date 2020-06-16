@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/american-physiological-society</id>
     <link href="http://www.zotero.org/styles/american-physiological-society" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://www.the-aps.org/mm/Publications/Info-For-Authors/Composition#references" rel="documentation"/>
+    <link href="https://journals.physiology.org/author-info.manuscript-composition#EXAMPLE%20REFERENCES" rel="documentation"/>
     <author>
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
@@ -19,10 +19,13 @@
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <summary>A style for many APS journals</summary>
-    <updated>2014-07-29T22:06:38+00:00</updated>
+    <updated>2020-05-21T09:18:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -190,25 +193,8 @@
               <text variable="volume"/>
               <text variable="page" prefix=": "/>
               <text macro="date" prefix=", " suffix="."/>
+              <text variable="DOI" prefix=" doi: "/>
             </if>
-            <else>
-              <choose>
-                <if variable="DOI">
-                  <text variable="container-title" suffix=" " form="short" font-style="italic"/>
-                  <group prefix="(" suffix=").">
-                    <date variable="issued">
-                      <date-part name="month" prefix=" " suffix=" "/>
-                      <date-part name="day" suffix=", "/>
-                      <date-part name="year"/>
-                    </date>
-                  </group>
-                  <text variable="DOI" prefix=" doi: "/>
-                </if>
-                <else>
-                  <text variable="container-title" suffix=". " form="short" font-style="italic"/>
-                </else>
-              </choose>
-            </else>
           </choose>
         </else-if>
         <else>

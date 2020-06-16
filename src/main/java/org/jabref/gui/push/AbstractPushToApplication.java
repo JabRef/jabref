@@ -107,7 +107,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public boolean requiresBibtexKeys() {
+    public boolean requiresCitationKeys() {
         return true;
     }
 

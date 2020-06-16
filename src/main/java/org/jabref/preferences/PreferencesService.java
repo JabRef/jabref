@@ -16,7 +16,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
@@ -34,7 +34,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
@@ -188,16 +188,16 @@ public interface PreferencesService {
     void storeProxyPreferences(ProxyPreferences proxyPreferences);
 
     //*************************************************************************************************************
-    // BibtexKeyPatternPreferences
+    // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    GlobalBibtexKeyPattern getGlobalBibtexKeyPattern();
+    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
 
-    void updateGlobalBibtexKeyPattern();
+    void updateGlobalCitationKeyPattern();
 
-    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
+    CitationKeyPatternPreferences getCitationKeyPatternPreferences();
 
-    void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
+    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences

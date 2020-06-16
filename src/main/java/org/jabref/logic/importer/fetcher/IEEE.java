@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,12 +16,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -51,6 +52,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
 
@@ -88,7 +90,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             JSONObject author = (JSONObject) authorPure;
             authors.add(author.optString("full_name"));
         });
-        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, String.join(" and ", authors));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
         entry.setField(StandardField.YEAR, jsonEntry.optString("publication_year"));
@@ -113,7 +115,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
+        entry.addFile(new LinkedFile("", Path.of(jsonEntry.optString("pdf_url")), "PDF"));
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
         entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
@@ -195,9 +197,9 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", "86wnawtvtc986d3wtnqynm8c");
+        uriBuilder.addParameter("apikey", API_KEY);
         uriBuilder.addParameter("querytext", query);
 
         URLDownload.bypassSSLVerification();

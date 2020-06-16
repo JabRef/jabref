@@ -51,7 +51,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
-                new BibtexKeyPatternTabView(preferences),
+                new CitationKeyPatternTabView(preferences),
                 new ImportTabView(preferences),
                 new ExportSortingTabView(preferences),
                 new NameFormatterTabView(preferences),
@@ -136,7 +136,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private void updateAfterPreferenceChanges() {
         // Reload internal preferences cache
         preferences.updateEntryEditorTabList();
-        preferences.updateGlobalBibtexKeyPattern();
+        preferences.updateGlobalCitationKeyPattern();
         preferences.updateMainTableColumns();
 
         setValues();

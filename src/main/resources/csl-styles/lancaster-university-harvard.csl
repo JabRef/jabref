@@ -427,8 +427,8 @@
         <text macro="author-short"/>
         <text macro="year"/>
         <group>
-          <label variable="page" form="short"/>
-          <text variable="page"/>
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
         </group>
       </group>
     </layout>
@@ -436,6 +436,7 @@
   <bibliography hanging-indent="false" et-al-min="3" et-al-use-first="1">
     <sort>
       <key macro="author"/>
+      <key variable="citation-number"/>
       <key variable="title"/>
     </sort>
     <layout>

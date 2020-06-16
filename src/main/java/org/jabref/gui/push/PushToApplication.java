@@ -32,11 +32,11 @@ public interface PushToApplication {
     void operationCompleted();
 
     /**
-     * Check whether this operation requires BibTeX keys to be set for the entries. If true is returned an error message
+     * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
      * will be displayed if keys are missing.
      *
-     * @return true if BibTeX keys are required for this operation.
+     * @return true if citation keys are required for this operation.
      */
-    boolean requiresBibtexKeys();
+    boolean requiresCitationKeys();
 
 }
