@@ -42,8 +42,17 @@ jobs:
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
-          args: CHANGELOG.md README.md docs/
+          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
           config: '.markdownlint.yml'
+      - name: Prepare markdown-link-check
+        run: mkdir docs/ROOT && cp CHANGELOG.md README.md docs/ROOT
+      - name: Run markdown-link-check
+        uses: gaurav-nelson/github-action-markdown-link-check@619e549
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'no'
+          config-file: 'mlc_config.json'
+          folder-path: 'docs/'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
