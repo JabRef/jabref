@@ -277,9 +277,9 @@
           <else-if type="chapter paper-conference entry-encyclopedia entry-dictionary" match="any">
             <text macro="title"/>
             <group delimiter=" ">
-              <text term="in" text-case="capitalize-first"/>
-              <text macro="book-details"/>
+              <text term="in"/>
               <text variable="container-title" font-style="italic"/>
+              <text macro="book-details"/>
             </group>
             <text variable="page"/>
           </else-if>

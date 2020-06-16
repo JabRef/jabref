@@ -61,7 +61,7 @@ public class DublinCoreExtractor {
     private void extractAuthor() {
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
+           bibEntry.setField(StandardField.AUTHOR, String.join(" and ", creators));
         }
     }
 
@@ -242,10 +242,10 @@ public class DublinCoreExtractor {
         this.extractTitle();
         this.extractType();
 
-        if (bibEntry.getType() == null) {
-            bibEntry.setType(BibEntry.DEFAULT_TYPE);
+        // we pass a new BibEntry in the constructor which is never empty as it already consists of "@misc"
+        if (bibEntry.getFieldMap().isEmpty()) {
+            return Optional.empty();
         }
-
         return Optional.of(bibEntry);
     }
 

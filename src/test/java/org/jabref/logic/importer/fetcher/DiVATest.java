@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,11 +30,6 @@ public class DiVATest {
     @Test
     public void testGetName() {
         assertEquals("DiVA", fetcher.getName());
-    }
-
-    @Test
-    public void testGetHelpPage() {
-        assertEquals(HelpFile.FETCHER_DIVA, HelpFile.FETCHER_DIVA);
     }
 
     @Test

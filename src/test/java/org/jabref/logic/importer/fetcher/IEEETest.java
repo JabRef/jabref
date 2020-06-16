@@ -11,7 +11,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -77,7 +76,6 @@ class IEEETest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is unreliable")
     void notFoundByURL() throws IOException {
         entry.setField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
 

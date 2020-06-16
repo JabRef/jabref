@@ -1,8 +1,13 @@
 # JabRef as Basis for Teaching Material
 
-JabRef can be used as a training object for software engineering.
+With JabRef students can level-up their coding and GitHub skills.
+When taking part in JabRef development, one will learn modern Java coding practices, how code reviews work and how to properly address reviewing feedback.
 
-As an instructor, please follow this checklist:
+JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engienering skills will have increased. Our [development strategy](development-strategy.md) provides more details.
+
+We recommend to start early and constantly, since students wirking earlier and more often, produce projects that are more correct, completed earlier at the same overall invested time <sup id="a1">[1](#Ayaankazerouni)</sup>.
+
+## Notes for instructors
 
 1. Be aware that JabRef is run by volunteers. This implies that the development team cannot ensure to provide feedback on code within hours.
 2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
@@ -17,7 +22,7 @@ For a near-to-perfect preparation and effect of the course, we ask you to get in
 
 It is also possible to just direct students to our [Contribution Guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#contributing-guide). The learning effect may be lower as the time of the students has to be spent to a) learn about JabRef and b) select an appropriate issue.
 
-Since a huge fraction of software costs is spend on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance<sup id="a1">[1](#LientzSwanson)</sup> is trained. When fixing bugs, corrective maintenance<sup>[1](#LientzSwanson)</sup> is trained.
+Since a huge fraction of software costs is spend on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance<sup id="a1"><a href="#LientzSwanson">1</a></sup> is trained. When fixing bugs, corrective maintenance<sup>[2](#LientzSwanson)</sup> is trained.
 
 ## Process for contributions
 
@@ -41,7 +46,7 @@ GitHub describes that in their page [Unterstanding the GitHub flow](https://guid
 
 ## Process for Java newcomers
 
-Newcomers are invited to follow the process described above.
+Newcomers contributing in the context of a university teaching experience are invited to follow the process described above.
 In case the capacity of the instructing university allows, we propose a three-step approach.
 First, the contributors prepare their contribution as usual.
 Then, they submit the pull request *to a separate repository*.
@@ -69,7 +74,7 @@ Course: Open Source Software Development
 
 Course [CS499 - Open Source Software Development](https://github.com/igorsteinmacher/CS499-OSS)
 
-- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project. 
+- Summary: Students experience the process of getting involved in an Open Source project by engaging with a real project. Their goal is to make a "substantial" contribution to a project.
 - Course offered in 2018
 
 ### German
@@ -120,17 +125,9 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 - Summary: Students are requested to contribute to an Open Source project to learn about the maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
 - Course offered from 2013 to 2016 with different names
 
-## Interesting Read for Students and Advisors
-
-- [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f) by [@ayaankazerouni](https://github.com/ayaankazerouni?tab=overview&from=2015-12-01&to=2015-12-31)  
-  > When students worked earlier and more often, they produced projects that:
-  >
-  > - were more correct,
-  > - were completed earlier,
-  > - took no more or less time to complete
-
 ## References
 
-<a id="LientzSwanson" href="#a1">1</a>: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
+<a id="Ayaankazerouni" href="#a1">1</a>: [@ayaankazerouni](https://github.com/ayaankazerouni): [Developing Procrastination Feedback for Student Software Developers](https://medium.com/@ayaankazerouni/developing-procrastination-feedback-for-student-software-developers-1652de60db7f)
+<a id="LientzSwanson" href="#a2">2</a>: Lientz B., Swanson E., 1980: Software Maintenance Management. Addison Wesley, Reading, MA.
 
 <!-- markdownlint-disable-file MD033 -->

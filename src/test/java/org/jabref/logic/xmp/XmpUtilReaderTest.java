@@ -109,4 +109,13 @@ class XmpUtilReaderTest {
 
         assertEquals(entryFromBibFile.get(), entries.get(0));
     }
+
+    /**
+     * Tests an pdf file with metadata which has no description section.
+     */
+    @Test
+    void testReadNoDescriptionMetadata() throws IOException, URISyntaxException {
+        List<BibEntry> entries = XmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
+        assertEquals(Collections.emptyList(), entries);
+    }
 }

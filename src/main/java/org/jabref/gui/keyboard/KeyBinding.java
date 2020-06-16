@@ -5,7 +5,7 @@ import org.jabref.logic.l10n.Localization;
 public enum KeyBinding {
 
     ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl+alt+A", KeyBindingCategory.TOOLS),
-    AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl+G", KeyBindingCategory.QUALITY),
+    AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "ctrl+G", KeyBindingCategory.QUALITY),
     ACCEPT("Accept", Localization.lang("Accept"), "ctrl+ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
     CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "ctrl+F8", KeyBindingCategory.QUALITY),
@@ -15,10 +15,10 @@ public enum KeyBinding {
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
-    COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl+K", KeyBindingCategory.EDIT),
-    COPY_BIBTEX_KEY("Copy BibTeX key", Localization.lang("Copy BibTeX key"), "ctrl+shift+K", KeyBindingCategory.EDIT),
-    COPY_BIBTEX_KEY_AND_TITLE("Copy BibTeX key and title", Localization.lang("Copy BibTeX key and title"), "ctrl+shift+alt+K", KeyBindingCategory.EDIT),
-    COPY_BIBTEX_KEY_AND_LINK("Copy BibTeX key and link", Localization.lang("Copy BibTeX key and link"), "ctrl+alt+K", KeyBindingCategory.EDIT),
+    COPY_CITE_CITATION_KEY("Copy \\cite{citation key}", Localization.lang("Copy \\cite{citation key}"), "ctrl+K", KeyBindingCategory.EDIT),
+    COPY_CITATION_KEY("Copy citation key", Localization.lang("Copy citation key"), "ctrl+shift+K", KeyBindingCategory.EDIT),
+    COPY_CITATION_KEY_AND_TITLE("Copy citation key and title", Localization.lang("Copy citation key and title"), "ctrl+shift+alt+K", KeyBindingCategory.EDIT),
+    COPY_CITATION_KEY_AND_LINK("Copy citation key and link", Localization.lang("Copy citation key and link"), "ctrl+alt+K", KeyBindingCategory.EDIT),
     COPY_PREVIEW("Copy preview", Localization.lang("Copy preview"), "ctrl+shift+C", KeyBindingCategory.VIEW),
     CUT("Cut", Localization.lang("Cut"), "ctrl+X", KeyBindingCategory.EDIT),
     // We have to put Entry Editor Previous before, because otherwise the decrease font size is found first
@@ -70,7 +70,7 @@ public enum KeyBinding {
     REDO("Redo", Localization.lang("Redo"), "ctrl+Y", KeyBindingCategory.EDIT),
     REFRESH_OO("Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl+alt+O", KeyBindingCategory.TOOLS),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl+R", KeyBindingCategory.SEARCH),
-    RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl+shift+D", KeyBindingCategory.BIBTEX),
+    RESOLVE_DUPLICATE_CITATION_KEYS("Resolve duplicate citation keys", Localization.lang("Resolve duplicate citation keys"), "ctrl+shift+D", KeyBindingCategory.BIBTEX),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl+alt+S", KeyBindingCategory.FILE),
     SAVE_DATABASE("Save library", Localization.lang("Save library"), "ctrl+S", KeyBindingCategory.FILE),
     SAVE_DATABASE_AS("Save library as ...", Localization.lang("Save library as..."), "ctrl+shift+S", KeyBindingCategory.FILE),

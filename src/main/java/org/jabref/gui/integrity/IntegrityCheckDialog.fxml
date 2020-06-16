@@ -14,13 +14,13 @@
         <VBox spacing="4.0">
             <TableView fx:id="messagesTable" prefHeight="550" prefWidth="700.0" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="keyColumn" prefWidth="150.0" text="%BibTeX key"/>
+                    <TableColumn fx:id="keyColumn" prefWidth="150.0" text="%Citation key"/>
                     <TableColumn fx:id="fieldColumn" prefWidth="110.0" text="%Field"/>
                     <TableColumn fx:id="messageColumn" prefWidth="400" text="%Message"/>
                 </columns>
             </TableView>
             <HBox maxHeight="30" spacing="4.0">
-                <MenuButton fx:id="keyFilterButton" prefHeight="30.0" maxHeight="30.0" text="%BibTeX key filters"/>
+                <MenuButton fx:id="keyFilterButton" prefHeight="30.0" maxHeight="30.0" text="%Citation key filters"/>
                 <MenuButton fx:id="fieldFilterButton" prefHeight="30.0" maxHeight="30.0" text="%Field filters"/>
                 <MenuButton fx:id="messageFilterButton" prefHeight="30.0" maxHeight="30.0" text="%Message filters"/>
                 <Button onAction="#clearFilters" text="%Clear filters"/>

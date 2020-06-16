@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtexkeypattern.BracketedPattern;
+import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -284,7 +284,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(directoryNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
-            targetName = entry.getCiteKeyOptional().orElse("default");
+            return targetName;
         }
 
         // Removes illegal characters from directory name
