@@ -146,8 +146,8 @@ public class Author {
 
     /**
      * Compare this object with the given one.
-     * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     *
+     * @return `true` iff the other object is an Author and all fields are `Objects.equals`.
      */
     @Override
     public boolean equals(Object other) {

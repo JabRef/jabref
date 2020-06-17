@@ -357,15 +357,25 @@ class FileUtilTest {
     @Test
     void testGetLinkedDirNameDefaultFullTitle() {
         // bibkey - title
-        String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
+        String fileDirPattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
         entry.setField(StandardField.YEAR, "1998");
         entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
 
-        assertEquals("PDF/1998/Åuthör/1234 - mytitle",
-                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("PDF/1998/Åuthör/1234 - mytitle", FileUtil.createDirNameFromPattern(null, entry, fileDirPattern));
+    }
+
+    @Test
+    void testGetLinkedDirNamePatternEmpty() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField(StandardField.TITLE, "mytitle");
+        entry.setField(StandardField.YEAR, "1998");
+        entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
+
+        assertEquals("", FileUtil.createDirNameFromPattern(null, entry, ""));
     }
 
     @Test

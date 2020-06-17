@@ -1,12 +1,8 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
@@ -123,8 +119,6 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
-    // Avoid partition where these values are contained
-    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
     private final String[] authorsFirstFirst = new String[4];
     private final String[] authorsFirstFirstLatexFree = new String[4];
@@ -157,7 +151,7 @@ public class AuthorList {
     }
 
     public AuthorList() {
-        this(new ArrayList<Author>());
+        this(new ArrayList<>());
     }
 
     /**
@@ -168,52 +162,8 @@ public class AuthorList {
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList parse(String authors) {
+    public static AuthorList parse(final String authors) {
         Objects.requireNonNull(authors);
-
-        // Handle case names in order lastname, firstname and separated by ","
-        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
-        final boolean authorsContainOpeningBrace = authors.contains("{");
-        final boolean authorsContainSemicolon = authors.contains(";");
-        final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
-        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
-            List<String> arrayNameList = Arrays.asList(authors.split(","));
-
-            // Delete spaces for correct case identification
-            arrayNameList.replaceAll(String::trim);
-
-            // Looking for space between pre- and lastname
-            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" ")).collect(Collectors
-                    .toList()).size() == arrayNameList.size();
-
-            // We hit the comma name separator case
-            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
-            // If not, we check if spaces separate pre- and lastname
-            if (spaceInAllParts) {
-                authors = authors.replaceAll(",", " and");
-            } else {
-                // Looking for name affixes to avoid
-                // arrayNameList needs to reduce by the count off avoiding terms
-                // valuePartsCount holds the count of name parts without the avoided terms
-
-                int valuePartsCount = arrayNameList.size();
-                // Holds the index of each term which needs to be avoided
-                Collection<Integer> avoidIndex = new HashSet<>();
-
-                for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
-                        avoidIndex.add(i);
-                        valuePartsCount--;
-                    }
-                }
-
-                if ((valuePartsCount % 2) == 0) {
-                    // We hit the described special case with name affix like Jr
-                    authors = buildWithAffix(avoidIndex, arrayNameList).toString();
-                }
-            }
-        }
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
@@ -294,37 +244,6 @@ public class AuthorList {
      */
     public static String fixAuthorNatbib(String authors) {
         return AuthorList.parse(authors).getAsNatbib();
-    }
-
-    /**
-     * Builds a new array of strings with stringbuilder.
-     * Regarding to the name affixes.
-     *
-     * @return New string with correct seperation
-     */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
-        int avoidedTimes = 0;
-        for (int i = 0; i < nameList.size(); i++) {
-            if (indexArray.contains(i)) {
-                // We hit a name affix
-                stringBuilder.append(nameList.get(i));
-                stringBuilder.append(',');
-                avoidedTimes++;
-            } else {
-                stringBuilder.append(nameList.get(i));
-                if (((i + avoidedTimes) % 2) == 0) {
-                    // Hit separation between last name and firstname --> comma has to be kept
-                    stringBuilder.append(',');
-                } else {
-                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
-                    // Will be treated correctly by AuthorList.parse(authors);
-                    stringBuilder.append(';');
-                }
-            }
-        }
-        return stringBuilder;
     }
 
     /**
@@ -647,10 +566,14 @@ public class AuthorList {
     /**
      * Compare this object with the given one.
      * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these
+     * authors' fields are `Objects.equals`)
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof AuthorList)) {
             return false;
         }
