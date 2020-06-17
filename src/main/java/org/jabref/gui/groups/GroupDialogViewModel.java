@@ -223,13 +223,12 @@ public class GroupDialogViewModel {
                         return false;
                     } else {
                         Path texFilePath = preferencesService.getWorkingDir().resolve(input);
-                        Optional<String> fileExtension = FileUtil.getFileExtension(input);
-                        if (fileExtension.isEmpty() || !fileExtension.get().toLowerCase().equals("aux")) {
-                            return false;
-                        } else if (!Files.isRegularFile(texFilePath)) {
+                        if (!Files.isRegularFile(texFilePath)) {
                             return false;
                         }
-                        return true;
+                        return FileUtil.getFileExtension(input)
+                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .orElse(false);
                     }
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));

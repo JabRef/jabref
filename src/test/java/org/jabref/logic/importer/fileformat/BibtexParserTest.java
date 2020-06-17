@@ -1392,11 +1392,9 @@ class BibtexParserTest {
 
     /**
      * Checks that a TexGroup finally gets the required data, after parsing the library.
-     * @throws IOException
-     * @throws ParseException
      */
     @Test
-    void integrationTestTexGroup() throws IOException, ParseException {
+    void integrationTestTexGroup() throws Exception {
         ParserResult result = parser.parse(new StringReader(
              "@comment{jabref-meta: grouping:" + OS.NEWLINE
                      + "0 AllEntriesGroup:;" + OS.NEWLINE
