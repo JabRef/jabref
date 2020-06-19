@@ -29,15 +29,19 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final GroupViewMode groupViewMode;
-    private final ObjectProperty<MainTableNameFormatter> nameFormatter;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final PreferencesService preferencesService;
+    private final BibDatabaseContext bibDatabaseContext;
 
     public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
-        this.nameFormatter = new SimpleObjectProperty<>(new MainTableNameFormatter(preferencesService));
         this.preferencesService = preferencesService;
+        this.bibDatabaseContext = context;
+        this.fieldValueFormatter = new SimpleObjectProperty<>(
+                new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
 
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
@@ -86,6 +90,6 @@ public class MainTableDataModel {
     }
 
     public void refresh() {
-        this.nameFormatter.setValue(new MainTableNameFormatter(preferencesService));
+        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
     }
 }
