@@ -150,7 +150,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
 
-        // Here we would need to select the fields
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
                 var items = type.fields();
@@ -172,9 +171,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     }
 
     private void handleOnDragDetected(TableRow<FieldViewModel> row, FieldViewModel fieldViewModel, MouseEvent event) {
-        // Start drag'n'drop
         row.startFullDrag();
-
         FieldViewModel field = fields.getSelectionModel().getSelectedItem();
 
         ClipboardContent content = new ClipboardContent();
@@ -191,7 +188,6 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         ObservableList<FieldViewModel> items = fields.itemsProperty().get();
 
         if (localDragboard.hasType(FieldViewModel.class)) {
-
             FieldViewModel field = localDragboard.getValue(FieldViewModel.class);
             int draggedIdx = 0;
             for (int i = 0; i < items.size(); i++) {
