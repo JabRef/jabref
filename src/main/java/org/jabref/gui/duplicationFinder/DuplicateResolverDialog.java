@@ -6,10 +6,12 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
+import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.DialogWindowState;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -95,10 +97,20 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
 
+        // Retrieves the previous window state and sets the new dialog window size and position to match it
+        DialogWindowState state = Globals.stateManager.getDuplicateResolverDialogWindowState();
+        if (!state.isNull()) {
+            this.getDialogPane().setPrefSize(state.getWidth(), state.getHeight());
+            this.setX(state.getX());
+            this.setY(state.getY());
+        }
+
         BorderPane borderPane = new BorderPane(me);
         borderPane.setBottom(options);
 
         this.setResultConverter(button -> {
+            // Updates the window state on button press
+            state.setAll(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth());
 
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;

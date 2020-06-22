@@ -43,6 +43,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the context menu of the column "Linked identifiers" of the main table, by truncating their texts, if they are too long. [#6499](https://github.com/JabRef/jabref/issues/6499)
 - We merged the main table tabs in the preferences dialog. [#6518](https://github.com/JabRef/jabref/pull/6518)
 - We changed the command line option 'generateBibtexKeys' to the more generic term 'generateCitationKeys' while the short option remains 'g'.[#6545](https://github.com/JabRef/jabref/pull/6545)
+- We improved the "Possible duplicate entries" window to remember its size and position throughout a session. [#6582](https://github.com/JabRef/jabref/issues/6582)
 
 ### Fixed
 
