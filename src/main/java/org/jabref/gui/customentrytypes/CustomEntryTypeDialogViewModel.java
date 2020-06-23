@@ -71,7 +71,6 @@ public class CustomEntryTypeDialogViewModel {
         this.entryTypesManager = entryTypesManager;
 
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
-        allTypes.addAll(entryTypesManager.getAllCustomTypes(mode));
 
         for (BibEntryType entryType : allTypes) {
             CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
@@ -187,7 +186,7 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
-        preferencesService.saveCustomEntryTypes();
+        preferencesService.saveCustomEntryTypes(entryTypesManager);
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
         entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                                                    preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));

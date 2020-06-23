@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1010,7 +1011,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public void storeBibEntryTypes(List<BibEntryType> BibEntryTypes, BibDatabaseMode bibDatabaseMode) {
+    public void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
         try {
@@ -1018,7 +1019,7 @@ public class JabRefPreferences implements PreferencesService {
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            BibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
+            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -1640,13 +1641,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void saveCustomEntryTypes() {
-        saveCustomEntryTypes(BibDatabaseMode.BIBTEX);
-        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX);
+    public void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
+        saveCustomEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
+        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
     }
 
-    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = new ArrayList<>(Globals.entryTypesManager.getAllTypes(bibDatabaseMode));
+    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
+        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
