@@ -8,12 +8,16 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Objects;
+import java.util.Optional;
 
+import org.jabref.JabRefException;
+import org.jabref.logic.layout.format.Default;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.jabref.model.util.WatchServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +33,14 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
+    private Optional<JabRefException> filesystemMonitorFailure;
 
     @Override
     public void run() {
         try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             this.watcher = watcher;
+            filesystemMonitorFailure = Optional.empty();
+
             while (true) {
                 WatchKey key;
                 try {
@@ -59,9 +66,15 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 }
                 Thread.yield();
             }
-        } catch (Throwable e) {
-            LOGGER.error("FileUpdateMonitor has been interrupted.", e);
+        } catch (IOException e) {
+            filesystemMonitorFailure = Optional.of(new WatchServiceUnavailableException(e.getMessage(),
+                    e.getLocalizedMessage(), e.getCause()));
+            LOGGER.warn(filesystemMonitorFailure.get().getLocalizedMessage(), e);
         }
+    }
+
+    public boolean active() {
+        return filesystemMonitorFailure.isEmpty();
     }
 
     private void notifyAboutChange(Path path) {
@@ -70,12 +83,12 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
-        Objects.requireNonNull(watcher, "You need to start the file monitor before watching files");
-
-        // We can't watch files directly, so monitor their parent directory for updates
-        Path directory = file.toAbsolutePath().getParent();
-        directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-        listeners.put(file, listener);
+        if (active()) {
+            // We can't watch files directly, so monitor their parent directory for updates
+            Path directory = file.toAbsolutePath().getParent();
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            listeners.put(file, listener);
+        }
     }
 
     @Override
