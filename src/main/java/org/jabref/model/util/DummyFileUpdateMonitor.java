@@ -19,7 +19,7 @@ public class DummyFileUpdateMonitor implements FileUpdateMonitor {
     }
 
     @Override
-    public boolean active() {
+    public boolean isActive() {
         return false;
     }
 }

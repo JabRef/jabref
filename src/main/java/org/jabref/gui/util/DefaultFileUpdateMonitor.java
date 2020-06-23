@@ -7,11 +7,9 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.JabRefException;
-import org.jabref.logic.layout.format.Default;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -73,7 +71,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         }
     }
 
-    public boolean active() {
+    public boolean isActive() {
         return filesystemMonitorFailure.isEmpty();
     }
 
@@ -83,7 +81,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
-        if (active()) {
+        if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();
             directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
