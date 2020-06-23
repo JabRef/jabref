@@ -1,8 +1,10 @@
 package org.jabref.model.entry;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
@@ -10,6 +12,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
@@ -152,4 +155,20 @@ class BibEntryTypesManagerTest {
         Optional<BibEntryType> type = entryTypesManager.parse(serialized);
         assertEquals(Collections.emptySet(), type.get().getOptionalFields());
     }
+
+    @ParameterizedTest
+    @MethodSource("mode")
+    void testsModifiyngArticle(BibDatabaseMode mode) {
+
+        overwrittenStandardType = new BibEntryType(
+                                                   StandardEntryType.Article,
+                                                   List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                                                          new BibField(new UnknownField("langid"), FieldPriority.IMPORTANT)),
+                                                   Collections.emptySet());
+
+        entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
+        assertEquals(Collections.emptyList(), entryTypesManager.getAllTypes(mode).stream().filter(t->t.getType().getName().equals("Article")).collect(Collectors.toList()));
+    }
+
+
 }
