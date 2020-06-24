@@ -313,8 +313,11 @@ public class GroupDialogViewModel {
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                            autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
+                            autoGroupKeywordsDelimiterProperty.getValue().isEmpty() ?
+                                    // Set default value for delimiters: ',' for base and '>' for hierarchical
+                                    ',' : autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
+                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty() ?
+                                    '>' : autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
                 } else {
                     resultingGroup = new AutomaticPersonsGroup(
                             groupName,
