@@ -163,7 +163,7 @@ public class JabRefFrame extends BorderPane {
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final ThemeLoader themeLoader = Globals.getThemeLoader();
-    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager, prefs);
 
     private final FileHistoryMenu fileHistory;
 

@@ -52,6 +52,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
+import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -215,6 +216,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
     public static final String FILE_BROWSER_COMMAND = "fileBrowserCommand";
     public static final String MAIN_FILE_DIRECTORY = "fileDirectory";
+
+    public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
+    public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
+    public static final String SEARCH_REG_EXP = "regExpSearch";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -427,7 +432,9 @@ public class JabRefPreferences implements PreferencesService {
         // like the SearchDisplayMode will never be translated.
         Localization.setLanguage(getLanguage());
 
-        SearchPreferences.putDefaults(defaults);
+        defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
+        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -1729,7 +1736,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
         setShouldCollectTelemetry(preferences.isCollectTelemetry());
-        putBoolean(SHOW_ADVANCED_HINTS, preferences.isShowAdvancedHints());
+        putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
 
     @Override
@@ -2340,5 +2347,28 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SPECIALFIELDSENABLED, specialFieldsPreferences.getSpecialFieldsEnabled());
         putBoolean(AUTOSYNCSPECIALFIELDSTOKEYWORDS, specialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
         putBoolean(SERIALIZESPECIALFIELDS, specialFieldsPreferences.getSerializeSpecialFields());
+    }
+
+    @Override
+    public SearchPreferences getSearchPreferences() {
+        SearchDisplayMode searchDisplayMode;
+        try {
+            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
+        } catch (IllegalArgumentException ex) {
+            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
+            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
+        }
+
+        return new SearchPreferences(
+                searchDisplayMode,
+                getBoolean(SEARCH_CASE_SENSITIVE),
+                getBoolean(SEARCH_REG_EXP));
+    }
+
+    @Override
+    public void storeSearchPreferences(SearchPreferences preferences) {
+        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
+        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
+        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
     }
 }

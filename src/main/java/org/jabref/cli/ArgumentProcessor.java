@@ -246,7 +246,7 @@ public class ArgumentProcessor {
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
-        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
+        SearchPreferences searchPreferences = Globals.prefs.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
