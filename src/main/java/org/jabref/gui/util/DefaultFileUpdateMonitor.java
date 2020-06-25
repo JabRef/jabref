@@ -12,10 +12,10 @@ import java.util.Optional;
 import org.jabref.JabRefException;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.WatchServiceUnavailableException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.jabref.model.util.WatchServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
