@@ -38,6 +38,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
@@ -81,6 +82,11 @@ public class URLDownload {
     public URLDownload(URL source) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
+
+        // mEDRA requires Accept header attribute with desired content type
+        if (source.toString().contains(Medra.API_URL)) {
+            this.addHeader("Accept", Medra.CONTENT_TYPE_JSON);
+        }
     }
 
     /**

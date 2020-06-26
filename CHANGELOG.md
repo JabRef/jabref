@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a new fetcher to enable users to search mEDRA DOIs [#6602](https://github.com/JabRef/jabref/issues/6602)
 - We added support for importing ris file and load DOI [#6530](https://github.com/JabRef/jabref/issues/6530)
 - We added the Library properties to a context menu on the library tabs [#6485](https://github.com/JabRef/jabref/issues/6485)
 - We added a new field in the preferences in 'BibTeX key generator' for unwanted characters that can be user-specified. [#6295](https://github.com/JabRef/jabref/issues/6295)
