@@ -38,6 +38,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  *   <li>active search</li>
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
+ *   <li>dialog window sizes/positions</li>
  * </ul>
  */
 public class StateManager {
@@ -53,12 +54,9 @@ public class StateManager {
     private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> {
         return new Observable[]{task.progressProperty(), task.runningProperty()};
     });
-
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
-
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
-
-    private final DialogWindowState duplicateResolverDialogWindowState = new DialogWindowState();
+    private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -151,7 +149,11 @@ public class StateManager {
         return tasksProgress;
     }
 
-    public DialogWindowState getDuplicateResolverDialogWindowState() {
-        return duplicateResolverDialogWindowState;
+    public DialogWindowState getDialogWindowState(String windowName) {
+        return dialogWindowStates.get(windowName);
+    }
+
+    public void setDialogWindowState(String windowName, DialogWindowState state) {
+        dialogWindowStates.put(windowName, state);
     }
 }

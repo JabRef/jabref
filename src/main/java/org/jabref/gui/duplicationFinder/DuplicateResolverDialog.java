@@ -6,7 +6,7 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.BorderPane;
 
-import org.jabref.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.mergeentries.MergeEntries;
@@ -20,6 +20,7 @@ import org.jabref.model.entry.BibEntry;
 public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult> {
 
     private final BibDatabaseContext database;
+    private final StateManager stateManager;
 
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
@@ -39,9 +40,10 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
     private MergeEntries me;
 
-    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database) {
+    public DuplicateResolverDialog(BibEntry one, BibEntry two, DuplicateResolverType type, BibDatabaseContext database, StateManager stateManager) {
         this.setTitle(Localization.lang("Possible duplicate entries"));
         this.database = database;
+        this.stateManager = stateManager;
         init(one, two, type);
     }
 
@@ -98,8 +100,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
-        DialogWindowState state = Globals.stateManager.getDuplicateResolverDialogWindowState();
-        if (!state.isNull()) {
+        DialogWindowState state = stateManager.getDialogWindowState("DUPLICATE_RESOLVER_DIALOG");
+        if (state != null) {
             this.getDialogPane().setPrefSize(state.getWidth(), state.getHeight());
             this.setX(state.getX());
             this.setY(state.getY());
@@ -110,7 +112,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         this.setResultConverter(button -> {
             // Updates the window state on button press
-            state.setAll(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth());
+            stateManager.setDialogWindowState("DUPLICATE_RESOLVER_DIALOG", new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
 
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;
