@@ -45,11 +45,11 @@ class BibEntryTypesManagerTest {
     void setUp() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
-                Collections.singleton(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
+                List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
                 Collections.emptySet());
         overwrittenStandardType = new BibEntryType(
                 StandardEntryType.Article,
-                Collections.singleton(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
+                List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT)),
                 Collections.emptySet());
         entryTypesManager = new BibEntryTypesManager();
     }
@@ -189,5 +189,24 @@ class BibEntryTypesManagerTest {
         Optional<BibEntryType> type = entryTypesManager.parse(serialized);
 
         assertEquals(Optional.of(overwrittenStandardType), type);
+    }
+
+    @ParameterizedTest
+    @MethodSource("mode")
+    void testsModifyingArticleWithParsingKeepsListOrder(BibDatabaseMode mode) {
+
+        overwrittenStandardType = new BibEntryType(
+                                                   StandardEntryType.Article,
+                                                   List.of(new BibField(StandardField.TITLE, FieldPriority.IMPORTANT),
+                                                           new BibField(StandardField.NUMBER, FieldPriority.IMPORTANT),
+                                                           new BibField(new UnknownField("langid"), FieldPriority.IMPORTANT),
+                                                           new BibField(StandardField.COMMENT, FieldPriority.IMPORTANT)),
+                                                   Collections.emptySet());
+
+        entryTypesManager.addCustomOrModifiedType(overwrittenStandardType, mode);
+        String serialized = entryTypesManager.serialize(overwrittenStandardType);
+        Optional<BibEntryType> type = entryTypesManager.parse(serialized);
+
+        assertEquals(overwrittenStandardType.getOptionalFields(), type.get().getOptionalFields());
     }
 }

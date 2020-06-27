@@ -36,7 +36,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * @return a List of optional field name Strings
      */
     public Set<BibField> getOptionalFields() {
-        return getAllFields().stream()
+        return getAllBibFields().stream()
                              .filter(field -> !isRequired(field.getField()))
                              .collect(Collectors.toCollection(LinkedHashSet::new));
     }
@@ -60,13 +60,19 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Returns all defined fields.
      */
-    public Set<BibField> getAllFields() {
+    public Set<BibField> getAllBibFields() {
         return Collections.unmodifiableSet(fields);
     }
 
-    public Set<BibField> getPrimaryOptionalFields() {
+    public Set<Field> getAllFields() {
+        return fields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+
+    public Set<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.IMPORTANT)
+                                  .map(BibField::getField)
                                   .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

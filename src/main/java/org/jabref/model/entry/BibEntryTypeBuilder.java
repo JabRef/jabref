@@ -18,6 +18,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import com.google.common.collect.Streams;
 
 public class BibEntryTypeBuilder {
+
     private EntryType type = StandardEntryType.Misc;
     private Set<BibField> fields = new LinkedHashSet<>();
     private Set<OrFields> requiredFields = new LinkedHashSet<>();
@@ -28,12 +29,12 @@ public class BibEntryTypeBuilder {
     }
 
     public BibEntryTypeBuilder withImportantFields(Set<BibField> newFields) {
-        return withImportantFields(newFields.stream().map(BibField::getField).collect(Collectors.toSet()));
+        return withImportantFields(newFields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
     public BibEntryTypeBuilder withImportantFields(Collection<Field> newFields) {
         this.fields = Streams.concat(fields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.IMPORTANT)))
-                             .collect(Collectors.toSet());
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
         return this;
     }
 
@@ -43,7 +44,7 @@ public class BibEntryTypeBuilder {
 
     public BibEntryTypeBuilder withDetailFields(Collection<Field> newFields) {
         this.fields = Streams.concat(fields.stream(), newFields.stream().map(field -> new BibField(field, FieldPriority.DETAIL)))
-                             .collect(Collectors.toSet());
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
         return this;
     }
 
