@@ -68,7 +68,6 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return fields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-
     public Set<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.IMPORTANT)
