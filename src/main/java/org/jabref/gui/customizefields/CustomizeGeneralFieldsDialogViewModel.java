@@ -58,8 +58,9 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
-            String testString = CitationKeyGenerator.cleanKey(parts[1], preferences.getUnwantedCharacters());
-            if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
+            String unwantedChars = "#{}()~,^&-\"'`ʹ\\";
+            String testString = CitationKeyGenerator.cleanKey(parts[1], unwantedChars);
+            if (!testString.equals(parts[1])) {
                 dialogService.showInformationDialogAndWait(
                         Localization.lang("Error"),
                         Localization.lang("Field names are not allowed to contain white spaces or certain characters (%0).",
