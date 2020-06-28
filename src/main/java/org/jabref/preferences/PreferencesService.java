@@ -108,7 +108,7 @@ public interface PreferencesService {
 
     void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager);
 
-    void clearAllBibEntryTypes();
+    void clearBibEntryTypes(BibDatabaseMode mode);
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 

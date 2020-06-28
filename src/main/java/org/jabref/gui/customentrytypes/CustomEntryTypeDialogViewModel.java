@@ -70,18 +70,25 @@ public class CustomEntryTypeDialogViewModel {
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
 
-        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
-
-        for (BibEntryType entryType : allTypes) {
-            CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
-            this.entryTypesWithFields.add(viewModel);
-        }
+        addAllTypes();
 
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
                                                       input -> (input != null) && !input.getDisplayName().isEmpty(),
                                                       ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
+    }
+
+    public void addAllTypes() {
+        if (this.entryTypesWithFields.size() > 0) {
+            this.entryTypesWithFields.clear();
+        }
+        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
+
+        for (BibEntryType entryType : allTypes) {
+            CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
+            this.entryTypesWithFields.add(viewModel);
+        }
     }
 
     public ObservableList<CustomEntryTypeViewModel> entryTypes() {
@@ -156,15 +163,16 @@ public class CustomEntryTypeDialogViewModel {
 
     public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
         entryTypesWithFields.remove(focusedItem);
-        this.entryTypesToDelete.add(focusedItem.entryType().getValue());
+        entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
     public void removeField(FieldViewModel focusedItem) {
-        this.selectedEntryType.getValue().removeField(focusedItem);
+       selectedEntryType.getValue().removeField(focusedItem);
     }
 
     public void resetAllCustomEntryTypes() {
-        this.preferencesService.clearAllBibEntryTypes();
+        entryTypesManager.clearAllCustomEntryTypes(mode);
+        preferencesService.clearBibEntryTypes(mode);
         entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                                                    preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
@@ -182,7 +190,7 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.addCustomOrModifiedType(newType, mode);
         }
 
-        for (var entryType: entryTypesToDelete) {
+        for (var entryType : entryTypesToDelete) {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 

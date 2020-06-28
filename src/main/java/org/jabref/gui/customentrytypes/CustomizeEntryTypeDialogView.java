@@ -28,6 +28,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.RadioButtonCell;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -85,7 +86,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
             }
             return null;
         });
-       // ControlHelper.setAction(resetButton, getDialogPane(), event -> this.resetEntryTypes());
+        ControlHelper.setAction(resetButton, getDialogPane(), event -> this.resetEntryTypes());
     }
 
     @FXML
@@ -226,6 +227,8 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
                                             Localization.lang("Reset to default"));
         if (reset) {
             viewModel.resetAllCustomEntryTypes();
+            viewModel.addAllTypes();
+            this.entryTypes.refresh();
         }
 
     }

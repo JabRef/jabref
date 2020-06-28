@@ -1042,17 +1042,19 @@ public class JabRefPreferences implements PreferencesService {
         return storedEntryTypes;
     }
 
-    @Override
     public void clearAllBibEntryTypes() {
         for (BibDatabaseMode mode : BibDatabaseMode.values()) {
             clearBibEntryTypes(mode);
         }
     }
 
-    private void clearBibEntryTypes(BibDatabaseMode mode) {
+    @Override
+    public void clearBibEntryTypes(BibDatabaseMode mode) {
         try {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
+            prefsNode.flush();
+
 
         } catch (BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
