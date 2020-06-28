@@ -12,6 +12,8 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JsonReader;
+import org.jabref.logic.importer.util.MediaTypes;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,7 +34,6 @@ import org.apache.http.client.utils.URIBuilder;
 public class Medra implements SearchBasedParserFetcher {
 
     public static final String API_URL = "https://data.medra.org";
-    public static final String CONTENT_TYPE_JSON = "application/vnd.citationstyles.csl+json";
 
     @Override
     public String getName() {
@@ -113,6 +114,13 @@ public class Medra implements SearchBasedParserFetcher {
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + query);
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URLDownload getUrlDownload(String query) throws MalformedURLException, FetcherException, URISyntaxException {
+        URLDownload download = new URLDownload(getURLForQuery(query));
+        download.addHeader("Accept", MediaTypes.APPLICATION_JSON);
+        return download;
     }
 
 }
