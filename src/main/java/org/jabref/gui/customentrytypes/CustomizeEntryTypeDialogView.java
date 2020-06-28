@@ -222,7 +222,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     private void resetEntryTypes() {
         boolean reset = dialogService.showConfirmationDialogAndWait(
-                                            Localization.lang("Reset entry types to defaults"),
+                                            Localization.lang("Reset entry types and fields to defaults"),
                                             Localization.lang("This will reset all entry types to their default values and remove all custom entry types"),
                                             Localization.lang("Reset to default"));
         if (reset) {
