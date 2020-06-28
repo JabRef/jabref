@@ -1054,8 +1054,6 @@ public class JabRefPreferences implements PreferencesService {
             Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
             prefsNode.clear();
             prefsNode.flush();
-
-
         } catch (BackingStoreException e) {
             LOGGER.error("Resetting customized entry types failed.", e);
         }
