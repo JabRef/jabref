@@ -149,11 +149,11 @@ public class StateManager {
         return tasksProgress;
     }
 
-    public DialogWindowState getDialogWindowState(String windowName) {
-        return dialogWindowStates.get(windowName);
+    public DialogWindowState getDialogWindowState(String className) {
+        return dialogWindowStates.get(className);
     }
 
-    public void setDialogWindowState(String windowName, DialogWindowState state) {
-        dialogWindowStates.put(windowName, state);
+    public void setDialogWindowState(String className, DialogWindowState state) {
+        dialogWindowStates.put(className, state);
     }
 }

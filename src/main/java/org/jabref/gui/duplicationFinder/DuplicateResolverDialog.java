@@ -100,7 +100,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
         this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel, help);
 
         // Retrieves the previous window state and sets the new dialog window size and position to match it
-        DialogWindowState state = stateManager.getDialogWindowState("DUPLICATE_RESOLVER_DIALOG");
+        DialogWindowState state = stateManager.getDialogWindowState(getClass().getSimpleName());
         if (state != null) {
             this.getDialogPane().setPrefSize(state.getWidth(), state.getHeight());
             this.setX(state.getX());
@@ -112,7 +112,7 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
 
         this.setResultConverter(button -> {
             // Updates the window state on button press
-            stateManager.setDialogWindowState("DUPLICATE_RESOLVER_DIALOG", new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
+            stateManager.setDialogWindowState(getClass().getSimpleName(), new DialogWindowState(this.getX(), this.getY(), this.getDialogPane().getHeight(), this.getDialogPane().getWidth()));
 
             if (button.equals(first)) {
                 return DuplicateResolverResult.KEEP_LEFT;
