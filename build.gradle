@@ -15,7 +15,7 @@ plugins {
     id 'me.champeau.gradle.jmh' version '0.5.0'
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.5.0'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.20.0'
 
     // nicer test outputs during running and completion
