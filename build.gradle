@@ -569,7 +569,6 @@ jlink {
         requires 'java.management'
         requires 'java.naming'
         requires 'java.security.sasl'
-        requires 'com.sun.xml.fastinfoset'
         requires 'jdk.security.jgss'
         requires 'java.logging'
         requires 'jdk.xml.dom'
