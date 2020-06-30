@@ -12,11 +12,11 @@
     // Make junit5 module visible
     org.jabref=org.junit.jupiter.params
 
---add-modules 		
-    //  Add junit5 module dependency 		
-    org.junit.platform.commons 		
---add-reads 		
-    // Make junit5 module visible 		
+--add-modules
+    //  Add junit5 module dependency
+    org.junit.platform.commons
+--add-reads
+    // Make junit5 module visible
     org.jabref=org.junit.platform.commons
 
 --add-opens
