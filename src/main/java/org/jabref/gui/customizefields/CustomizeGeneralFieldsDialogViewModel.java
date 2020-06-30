@@ -58,6 +58,9 @@ public class CustomizeGeneralFieldsDialogViewModel {
                 return;
             }
 
+            // Use literal string of unwanted characters specified below as opposed to exporting characters
+            // from preferences because the list of allowable characters in this particular differs
+            // i.e. ';' character is allowed in this window, but it's on the list of unwanted chars in preferences
             String unwantedChars = "#{}()~,^&-\"'`ʹ\\";
             String testString = CitationKeyGenerator.cleanKey(parts[1], unwantedChars);
             if (!testString.equals(parts[1])) {
