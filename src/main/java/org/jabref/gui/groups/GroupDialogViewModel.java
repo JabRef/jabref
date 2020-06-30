@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,6 +99,7 @@ public class GroupDialogViewModel {
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
+    private Validator texGroupFilePathValidator;
     private final CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
@@ -212,8 +214,24 @@ public class GroupDialogViewModel {
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %n %s",
                         Localization.lang("Free search expression"),
-                        Localization.lang("Search term is empty.")
-                )));
+                        Localization.lang("Search term is empty."))));
+
+        texGroupFilePathValidator = new FunctionBasedValidator<>(
+                texGroupFilePathProperty,
+                input -> {
+                    if (StringUtil.isBlank(input)) {
+                        return false;
+                    } else {
+                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
+                        if (!Files.isRegularFile(texFilePath)) {
+                            return false;
+                        }
+                        return FileUtil.getFileExtension(input)
+                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .orElse(false);
+                    }
+                },
+                ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
         validator.addValidators(nameValidator, sameNameValidator);
 
@@ -230,6 +248,14 @@ public class GroupDialogViewModel {
                 validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
+            }
+        });
+
+        typeTexProperty.addListener((obs, oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(texGroupFilePathValidator);
+            } else {
+                validator.removeValidators(texGroupFilePathValidator);
             }
         });
     }
@@ -437,6 +463,10 @@ public class GroupDialogViewModel {
 
     public ValidationStatus keywordSearchTermEmptyValidationStatus() {
         return keywordSearchTermEmptyValidator.getValidationStatus();
+    }
+
+    public ValidationStatus texGroupFilePathValidatonStatus() {
+        return texGroupFilePathValidator.getValidationStatus();
     }
 
     public StringProperty nameProperty() {

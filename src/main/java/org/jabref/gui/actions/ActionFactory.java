@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -66,7 +67,7 @@ public class ActionFactory {
                 Method getLabel = ContextMenuContent.MenuItemContainer.class.getDeclaredMethod("getLabel");
                 getLabel.setAccessible(true);
                 return (Label) getLabel.invoke(container);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InaccessibleObjectException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 LOGGER.warn("Could not get label of menu item", e);
             }
         }

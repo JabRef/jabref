@@ -3,7 +3,11 @@ adopt-info: jabref
 icon: snap/gui/jabref.png
 license: MIT
 summary: Bibliography manager
-description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+description: |
+  JabRef is an open source bibliography reference manager.
+  The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+  To access files in external media (i.e. usb drives) you must run:
+  `snap connect jabref:removable-media`
 
 grade: stable
 confinement: strict
