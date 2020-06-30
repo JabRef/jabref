@@ -583,6 +583,7 @@ jlink {
         requires 'java.sql'
         requires 'java.rmi'
         requires 'java.security.jgss'
+        requires 'jakarta.activation';
         requires 'com.oracle.truffle.regex'
         requires 'jdk.jsobject'
         requires 'jdk.management'
@@ -610,7 +611,7 @@ jlink {
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
-        uses 'javax.xml.bind.JAXBContextFactory'
+        provides 'javax.xml.bind.JAXBContextFactory' with 'com.sun.xml.bind.v2.JAXBContextFactory';
         provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
