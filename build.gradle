@@ -19,7 +19,7 @@ plugins {
     id 'org.beryx.jlink' version '2.20.0'
 
     // nicer test outputs during running and completion
-    id 'com.adarshr.test-logger' version '2.0.0'
+    id 'com.adarshr.test-logger' version '2.1.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -185,7 +185,7 @@ dependencies {
         exclude module: 'fastparse_2.12'
     }
 
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.6.1'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '2.4.1'
     implementation (group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '2.4.1') {
         exclude module: "log4j-core"
     }
@@ -560,6 +560,7 @@ jlink {
     // Execute ./gradlew suggestMergedModuleInfo and include the suggested directives here.
     mergedModule {
         requires 'java.xml'
+        requires 'java.xml.bind'
         requires 'com.sun.xml.txw2'
         requires 'java.desktop'
         requires 'org.objectweb.asm'
@@ -575,6 +576,7 @@ jlink {
         requires 'java.sql'
         requires 'java.rmi'
         requires 'java.security.jgss'
+        requires 'jakarta.activation';
         requires 'com.oracle.truffle.regex'
         requires 'jdk.jsobject'
         requires 'jdk.management'
@@ -602,7 +604,7 @@ jlink {
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
-        uses 'javax.xml.bind.JAXBContextFactory' nOPE
+        uses 'javax.xml.bind.JAXBContextFactory'
         provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
