@@ -1,10 +1,5 @@
 name: Automerge Pull Requests
-on:
-  pull_request:
-  check_suite:
-    types:
-      - completed
-  status: {}
+on: [pull_request]
 
 jobs:
   automerge:
@@ -12,8 +7,17 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
+      - name: 'Wait for status checks'
+        id: waitforstatuschecks
+        uses: "WyriHaximus/github-action-wait-for-status@v2"
+        with:
+          ignoreActions: automerge
+          checkInterval: 13
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
         uses: pascalgn/automerge-action@v0.8.4
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           MERGE_METHOD: "squash"
           MERGE_LABELS: ""
