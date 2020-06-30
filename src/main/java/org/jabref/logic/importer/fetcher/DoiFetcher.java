@@ -57,7 +57,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 Optional<BibEntry> fetchedEntry;
 
                 // mEDRA does not return a parsable bibtex string
-                if ("medra".equalsIgnoreCase(getAgency(doi.get()))) {
+                if (getAgency(doi.get()).isPresent() && "medra".equalsIgnoreCase(getAgency(doi.get()).get())) {
                     fetchedEntry = new Medra().performSearchById(identifier);
 
                 } else {
@@ -108,12 +108,13 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
      * @throws JSONException
      * @throws IOException
      */
-    public String getAgency(DOI doi) throws JSONException, IOException {
-        String agency = null;
+    public Optional<String> getAgency(DOI doi) throws JSONException, IOException {
+        Optional<String> agency = Optional.empty();
         URLDownload download = new URLDownload(DOI.AGENCY_RESOLVER + "/" + doi.getDOI());
         JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
+
         if (response != null) {
-            agency = response.optString("RA");
+            agency = Optional.ofNullable(response.optString("RA"));
         }
 
         return agency;

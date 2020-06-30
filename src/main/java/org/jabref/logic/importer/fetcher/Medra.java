@@ -62,9 +62,6 @@ public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
             BibEntry entry = new BibEntry();
             entry.setType(convertType(item.getString("type")));
             entry.setField(StandardField.TITLE, item.getString("title"));
-            entry.setField(StandardField.SUBTITLE,
-                           Optional.ofNullable(item.optJSONArray("subtitle"))
-                                   .map(array -> array.optString(0)).orElse(""));
             entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
             entry.setField(StandardField.YEAR,
                            Optional.ofNullable(item.optJSONObject("issued"))
@@ -76,6 +73,9 @@ public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.ISSN, item.optString("ISSN"));
             entry.setField(StandardField.JOURNAL, item.optString("container-title"));
+            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
+            entry.setField(StandardField.URL, item.optString("URL"));
+            entry.setField(StandardField.VOLUME, item.optString("volume"));
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("mEdRA API JSON format has changed", exception);
@@ -98,14 +98,23 @@ public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
 
         // input: list of {"literal":"A."}
         AuthorList authorsParsed = new AuthorList();
+        String name = "";
+
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
+            if (author.has("literal")) {
+                name = author.optString("literal", "");
+            } else {
+                name = author.optString("family", "") + " " + author.optString("given", "");
+            }
+
             authorsParsed.addAuthor(
-                                    author.optString("literal", ""),
+                                    name,
                                     "",
                                     "",
                                     "",
                                     "");
+
         }
         return authorsParsed.getAsFirstLastNamesWithAnd();
     }
