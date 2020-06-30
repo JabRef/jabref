@@ -25,6 +25,10 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
+
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String NAME = "DOI";
 
@@ -47,18 +51,28 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
+        String agency = "";
         try {
             if (doi.isPresent()) {
-                URL doiURL = new URL(doi.get().getURIAsASCIIString());
+                Optional<BibEntry> fetchedEntry;
 
-                // BibTeX data
-                URLDownload download = new URLDownload(doiURL);
-                download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
-                String bibtexString = download.asString();
+                // mEDRA does not return a parsable bibtex string
+                if ("medra".equalsIgnoreCase(getAgency(doi.get()))) {
+                    fetchedEntry = new Medra().performSearchById(identifier);
 
-                // BibTeX entry
-                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
-                fetchedEntry.ifPresent(this::doPostCleanup);
+                } else {
+                    URL doiURL = new URL(doi.get().getURIAsASCIIString());
+
+                    // BibTeX data
+                    URLDownload download = new URLDownload(doiURL);
+                    download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+                    String bibtexString = download.asString();
+
+                    // BibTeX entry
+                    fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                    fetchedEntry.ifPresent(this::doPostCleanup);
+                }
+
                 return fetchedEntry;
             } else {
                 throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
@@ -67,6 +81,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
+        } catch (JSONException e) {
+            throw new FetcherException("Could not retrieve Registration Agency", e);
         }
     }
 
@@ -83,5 +99,23 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Returns registration agency. Null if no agency is found.
+     *
+     * @param doi the doi to be searched
+     * @throws JSONException
+     * @throws IOException
+     */
+    public String getAgency(DOI doi) throws JSONException, IOException {
+        String agency = null;
+        URLDownload download = new URLDownload(DOI.AGENCY_RESOLVER + "/" + doi.getDOI());
+        JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
+        if (response != null) {
+            agency = response.optString("RA");
+        }
+
+        return agency;
     }
 }

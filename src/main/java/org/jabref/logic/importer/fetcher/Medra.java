@@ -1,5 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -8,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -31,7 +35,7 @@ import org.apache.http.client.utils.URIBuilder;
  * <p>
  * It requires "Accept" request Header attribute to be set to desired content-type.
  */
-public class Medra implements SearchBasedParserFetcher {
+public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
 
     public static final String API_URL = "https://data.medra.org";
 
@@ -71,6 +75,7 @@ public class Medra implements SearchBasedParserFetcher {
             entry.setField(StandardField.DOI, item.getString("DOI"));
             entry.setField(StandardField.PAGES, item.optString("page"));
             entry.setField(StandardField.ISSN, item.optString("ISSN"));
+            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
             return entry;
         } catch (JSONException exception) {
             throw new ParseException("mEdRA API JSON format has changed", exception);
@@ -106,8 +111,44 @@ public class Medra implements SearchBasedParserFetcher {
     }
 
     @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+
+        try (InputStream stream = getUrlDownload(identifier).asInputStream();
+             PushbackInputStream pushbackInputStream = new PushbackInputStream(stream)) {
+
+            List<BibEntry> fetchedEntries = new ArrayList<>();
+
+            // check if there is anything to read since mEDRA '404 not found' returns nothing
+            int readByte;
+            readByte = pushbackInputStream.read();
+            if (readByte != -1) {
+                pushbackInputStream.unread(readByte);
+                fetchedEntries = getParser().parseEntries(pushbackInputStream);
+            }
+
+            if (fetchedEntries.isEmpty()) {
+                return Optional.empty();
+            }
+
+            BibEntry entry = fetchedEntries.get(0);
+
+            // Post-cleanup
+            doPostCleanup(entry);
+
+            return Optional.of(entry);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource. It might be that there is an UnknownHostException (eutils.ncbi.nlm.nih.gov cannot be resolved).
+            throw new FetcherException("A network error occurred", e);
+        } catch (ParseException e) {
+            throw new FetcherException("An internal parser error occurred", e);
+        }
+    }
+
+    @Override
     public void doPostCleanup(BibEntry entry) {
-        SearchBasedParserFetcher.super.doPostCleanup(entry);
+        IdBasedParserFetcher.super.doPostCleanup(entry);
     }
 
     @Override
@@ -117,10 +158,16 @@ public class Medra implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URLDownload getUrlDownload(String query) throws MalformedURLException, FetcherException, URISyntaxException {
-        URLDownload download = new URLDownload(getURLForQuery(query));
+    public URLDownload getUrlDownload(String identifier) throws MalformedURLException, FetcherException, URISyntaxException {
+        URLDownload download = new URLDownload(getURLForID(identifier));
         download.addHeader("Accept", MediaTypes.APPLICATION_JSON);
         return download;
+    }
+
+    @Override
+    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
+        return uriBuilder.build().toURL();
     }
 
 }

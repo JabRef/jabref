@@ -102,7 +102,6 @@ public class WebFetchers {
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
-        set.add(new Medra());
         return set;
     }
 
@@ -123,6 +122,7 @@ public class WebFetchers {
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
+        set.add(new Medra());
         return set;
     }
 
