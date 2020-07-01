@@ -140,6 +140,7 @@ public class ActionFactory {
     }
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+        ActionUtils.unconfigureButton(button);
         ActionUtils.configureButton(
                 new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,
