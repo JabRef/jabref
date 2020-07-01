@@ -21,7 +21,7 @@ public interface FileUpdateMonitor {
 
     /**
      * Indicates whether or not the native system's file monitor has successfully started.
-     * @return True is process is running; false otherwise.
+     * @return true is process is running; false otherwise.
      */
     boolean isActive();
 }
