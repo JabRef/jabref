@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added default values for delimiters in Add Subgroup window [#6624](https://github.com/JabRef/jabref/issues/6624) 
+- We improved responsiveness of general fields specification dialog window. [#6643](https://github.com/JabRef/jabref/issues/6604)
 - We added support for importing ris file and load DOI [#6530](https://github.com/JabRef/jabref/issues/6530)
 - We added the Library properties to a context menu on the library tabs [#6485](https://github.com/JabRef/jabref/issues/6485)
 - We added a new field in the preferences in 'BibTeX key generator' for unwanted characters that can be user-specified. [#6295](https://github.com/JabRef/jabref/issues/6295)
@@ -44,6 +45,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the context menu of the column "Linked identifiers" of the main table, by truncating their texts, if they are too long. [#6499](https://github.com/JabRef/jabref/issues/6499)
 - We merged the main table tabs in the preferences dialog. [#6518](https://github.com/JabRef/jabref/pull/6518)
 - We changed the command line option 'generateBibtexKeys' to the more generic term 'generateCitationKeys' while the short option remains 'g'.[#6545](https://github.com/JabRef/jabref/pull/6545)
+- We improved the "Possible duplicate entries" window to remember its size and position throughout a session. [#6582](https://github.com/JabRef/jabref/issues/6582)
 
 ### Fixed
 
@@ -89,6 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where downloaded files would be moved to a directory named after the citationkey when no file directory pattern is specified [#6589](https://github.com/JabRef/jabref/issues/6589)
 - We fixed an issue with the creation of a group of cited entries which incorrectly showed the message that the library had been modified externally whenever saving the library. [#6420](https://github.com/JabRef/jabref/issues/6420)
 - We fixed an issue with the creation of a group of cited entries. Now the file path to an aux file gets validated. [#6585](https://github.com/JabRef/jabref/issues/6585)
+- We fixed an issue on Linux systems where the application would crash upon inotify failure. Now, the user is prompted with a warning, and given the choice to continue the session. [#6073](https://github.com/JabRef/jabref/issues/6073)
 
 ### Removed
 

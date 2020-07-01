@@ -1,4 +1,4 @@
-# JavaFX
+# Readings on JavaFX
 
 JabRef's recommendations about JavaFX
 

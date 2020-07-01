@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.customentrytypes.CustomEntryTypeDialogViewModel.FieldType;
-import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldPriority;
 
@@ -16,18 +15,16 @@ public class FieldViewModel {
     private final StringProperty fieldName = new SimpleStringProperty("");
     private final Field field;
     private final FieldPriority fieldPriority;
-    private BibEntryType entryType;
 
-    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority, BibEntryType entryType) {
+    public FieldViewModel(Field field, FieldType fieldType, FieldPriority fieldPriority) {
         this.field = field;
-        this.entryType = entryType;
         this.fieldName.setValue(field.getDisplayName());
         this.fieldType = new SimpleObjectProperty<>(fieldType);
         this.fieldPriority = fieldPriority;
     }
 
-    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority, BibEntryType entryType) {
-        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority, entryType);
+    public FieldViewModel(Field field, boolean required, FieldPriority fieldPriority) {
+        this(field, required ? FieldType.REQUIRED : FieldType.OPTIONAL, fieldPriority);
     }
 
     public ObjectProperty<FieldType> fieldType() {
@@ -40,10 +37,6 @@ public class FieldViewModel {
 
     public Field getField() {
         return this.field;
-    }
-
-    public BibEntryType getEntryType() {
-        return this.entryType;
     }
 
     public FieldPriority getFieldPriority() {
