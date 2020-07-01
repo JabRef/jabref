@@ -1,7 +1,6 @@
 package org.jabref.model.entry;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -11,7 +10,6 @@ import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
@@ -62,7 +60,6 @@ public class BibEntryTypesManager {
                 entryType.getOptionalFields()
                          .stream()
                          .map(BibField::getField)
-                         .sorted(Comparator.comparing(Field::getName))
                          .collect(Collectors.toList())));
         builder.append("]");
         return builder.toString();
@@ -117,6 +114,14 @@ public class BibEntryTypesManager {
             BIBLATEX.removeCustomOrModifiedEntryType(entryType);
         } else if (BibDatabaseMode.BIBTEX == mode) {
             BIBTEX.removeCustomOrModifiedEntryType(entryType);
+        }
+    }
+
+    public void clearAllCustomEntryTypes(BibDatabaseMode mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
+            BIBLATEX.clearAllCustomEntryTypes();
+        } else if (BibDatabaseMode.BIBTEX == mode) {
+            BIBTEX.clearAllCustomEntryTypes();
         }
     }
 
@@ -183,6 +188,10 @@ public class BibEntryTypesManager {
             customOrModifiedType.remove(type);
         }
 
+        private void clearAllCustomEntryTypes() {
+            customOrModifiedType.clear();
+        }
+
         public SortedSet<BibEntryType> getAllTypes() {
             SortedSet<BibEntryType> allTypes = new TreeSet<>(customOrModifiedType);
             allTypes.addAll(standardTypes);
@@ -191,7 +200,7 @@ public class BibEntryTypesManager {
 
         public boolean isCustomOrModifiedType(BibEntryType entryType) {
             return customOrModifiedType.stream()
-                                       .anyMatch(customizedType -> customizedType.getType().equals(entryType.getType()));
+                                       .anyMatch(customizedType -> customizedType.equals(entryType));
         }
     }
 }

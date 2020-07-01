@@ -2,7 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
 import java.util.Optional;
-import java.util.SortedSet;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -36,13 +36,13 @@ public class OptionalFields2Tab extends FieldsEditorTab {
     }
 
     @Override
-    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
+    protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
             return entryType.get().getSecondaryOptionalNotDeprecatedFields();
         } else {
             // Entry type unknown -> treat all fields as required
-            return Collections.emptySortedSet();
+            return Collections.emptySet();
         }
     }
 }
