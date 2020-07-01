@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="http://liinwww.ira.uka.de/bibliography/rss.xsl"?><rss version="2.0">
+    
+    <channel xmlns:dc="http://purl.org/dc/elements/1.1/">
+        
+        <title>CCSB: "The relationship of code churn and architectural violations in the open source software JabRef"</title>
+        <link>http://liinwww.ira.uka.de/bibliography/#search</link>
+        <description>Search results in The Collection of Computer Science Bibliographies for query: "The relationship of code churn and architectural violations in the open source software JabRef"</description>
+        <language>en</language>
+        <copyright>The data is available for noncommercial or private use only, harvesting is prohibited (the data may be obtained using other means and not this RSS feed).</copyright>
+        <webMaster>liinwwwa@ira.uka.de</webMaster>
+        <lastBuildDate>Mon,  09  Mar 2020 03:14:28 +0100</lastBuildDate>
+        <ttl>5760</ttl>
+        
+        <item>
+            <link>http://liinwww.ira.uka.de/searchbib/index?query=lgqcdpmrnlbbtgtqnxgpnddcrtxhcdxl&amp;results=bibtex&amp;mode=dup&amp;rss=1</link>
+            
+            <description>
+                <p>
+                    Author: Tobias Olsson, Morgan Ericsson, Anna Wingkvist; 
+                    <br/>
+                    Title: The relationship of code churn and architectural violations in the open source software JabRef; 
+                    <br/>
+                    Year: 2017; 
+                    <br/>
+                    Abstract available; 
+                    <br/>
+                    URLs available (possible fulltext access); 
+                    <br/>
+                    2 records for this title/author combination available.
+                </p>
+            </description>
+            
+            <dc:title>The relationship of code churn and architectural violations in the open source software JabRef</dc:title>
+            
+            <title>[2017] The relationship of code churn and architectural violations in the open source software JabRef (by: Tobias Olsson, Morgan Ericsson, Anna Wingkvist)</title>
+            
+            <dc:date>2017</dc:date>
+            
+            <dc:creator>Tobias Olsson, Morgan Ericsson, Anna Wingkvist</dc:creator>
+            
+        </item>
+        
+    </channel>
+</rss>
