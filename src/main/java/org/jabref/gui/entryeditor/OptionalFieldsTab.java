@@ -1,11 +1,8 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -22,7 +19,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -39,13 +35,13 @@ public class OptionalFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
+    protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            return entryType.get().getPrimaryOptionalFields().stream().map(BibField::getField).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
+            return entryType.get().getPrimaryOptionalFields();
         } else {
             // Entry type unknown -> treat all fields as required
-            return Collections.emptySortedSet();
+            return Collections.emptySet();
         }
     }
 }

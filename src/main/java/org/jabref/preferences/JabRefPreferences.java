@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1010,7 +1011,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public void storeBibEntryTypes(List<BibEntryType> BibEntryTypes, BibDatabaseMode bibDatabaseMode) {
+    public void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
         try {
@@ -1018,7 +1019,7 @@ public class JabRefPreferences implements PreferencesService {
             clearBibEntryTypes(bibDatabaseMode);
 
             // store current custom types
-            BibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
+            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
@@ -1041,41 +1042,54 @@ public class JabRefPreferences implements PreferencesService {
         return storedEntryTypes;
     }
 
-    private void clearAllBibEntryTypes() throws BackingStoreException {
+    public void clearAllBibEntryTypes() {
         for (BibDatabaseMode mode : BibDatabaseMode.values()) {
             clearBibEntryTypes(mode);
         }
     }
 
-    private void clearBibEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-        prefsNode.clear();
+    @Override
+    public void clearBibEntryTypes(BibDatabaseMode mode) {
+        try {
+            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+            prefsNode.clear();
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.error("Resetting customized entry types failed.", e);
+        }
     }
 
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
+
         try {
-            for (String key : this.prefs.keys()) {
-                Object value = getObject(key);
-                result.put(key, value);
-            }
+            addPrefsRecursively(this.prefs, result);
         } catch (BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
     }
 
-    private Object getObject(String key) {
+    private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
+        for (String key : prefs.keys()) {
+            result.put(key, getObject(prefs, key));
+        }
+        for (String child : prefs.childrenNames()) {
+            addPrefsRecursively(prefs.node(child), result);
+        }
+    }
+
+    private Object getObject(Preferences prefs, String key) {
         try {
-            return this.get(key);
+            return prefs.get(key, (String) defaults.get(key));
         } catch (ClassCastException e) {
             try {
-                return this.getBoolean(key);
+                return prefs.getBoolean(key, getBooleanDefault(key));
             } catch (ClassCastException e2) {
                 try {
-                    return this.getInt(key);
+                    return prefs.getInt(key, getIntDefault(key));
                 } catch (ClassCastException e3) {
-                    return this.getDouble(key);
+                    return prefs.getDouble(key, getDoubleDefault(key));
                 }
             }
         }
@@ -1104,6 +1118,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void exportPreferences(Path file) throws JabRefException {
+        LOGGER.debug("Exporting preferences ", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
@@ -1626,13 +1641,13 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void saveCustomEntryTypes() {
-        saveCustomEntryTypes(BibDatabaseMode.BIBTEX);
-        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX);
+    public void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
+        saveCustomEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
+        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
     }
 
-    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> customBiblatexBibTexTypes = new ArrayList<>(Globals.entryTypesManager.getAllTypes(bibDatabaseMode));
+    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
+        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }

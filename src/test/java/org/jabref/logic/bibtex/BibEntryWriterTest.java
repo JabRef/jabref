@@ -22,6 +22,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -63,8 +64,8 @@ class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
                 "  author  = {Foo Bar}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
 
@@ -125,8 +126,8 @@ class BibEntryWriterTest {
         // @formatter:off
         String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
                 "  editor  = {Foo Bar}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -155,8 +156,8 @@ class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@InBook{," + OS.NEWLINE +
                 "  author  = {Foo Thor}," + OS.NEWLINE +
                 "  editor  = {Edi Bar}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -259,8 +260,8 @@ class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author  = {BlaBla}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
@@ -272,8 +273,8 @@ class BibEntryWriterTest {
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
                 "  HowPublished             = {asdf}," + OS.NEWLINE +
                 "}";
         // @formatter:on
@@ -295,8 +296,8 @@ class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
                 "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -331,8 +332,8 @@ class BibEntryWriterTest {
         // @formatter:off
         String expectedNewEntry = OS.NEWLINE + "@InProceedings{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
                 "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
@@ -346,8 +347,8 @@ class BibEntryWriterTest {
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
@@ -488,8 +489,8 @@ class BibEntryWriterTest {
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
                 "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
@@ -557,8 +558,8 @@ class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -579,14 +580,15 @@ class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  author  = {John Doe}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);
     }
 
+    @Disabled("We don't have alphabetic serialization anylonger TODO")
     @Test
     void alphabeticSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
@@ -614,8 +616,8 @@ class BibEntryWriterTest {
                 "  date         = {2019-10-16}," + OS.NEWLINE +
                 "  journaltitle = {International Journal of Something}," + OS.NEWLINE +
                 "  title        = {Title}," + OS.NEWLINE +
-                "  note         = {some note}," + OS.NEWLINE +
                 "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
                 "  chapter      = {chapter}," + OS.NEWLINE +
                 "  year         = {2019}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
