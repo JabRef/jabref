@@ -309,15 +309,22 @@ public class GroupDialogViewModel {
                         searchGroupRegexProperty.getValue());
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
+                    // Set default value for delimiters: ',' for base and '>' for hierarchical
+                    char delimiter = ',';
+                    char hierarDelimiter = '>';
+                    // Modify values for delimiters if user provided customized values
+                    if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
+                        delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
+                    }
+                    if (!autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty()) {
+                        hierarDelimiter = autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0);
+                    }
                     resultingGroup = new AutomaticKeywordGroup(
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                            autoGroupKeywordsDelimiterProperty.getValue().isEmpty() ?
-                                    // Set default value for delimiters: ',' for base and '>' for hierarchical
-                                    ',' : autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty() ?
-                                    '>' : autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
+                            delimiter,
+                            hierarDelimiter);
                 } else {
                     resultingGroup = new AutomaticPersonsGroup(
                             groupName,
