@@ -14,7 +14,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.net.URLDownload;
@@ -23,10 +22,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.apache.http.client.utils.URIBuilder;
+
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
+
 
 /**
  * A class for fetching DOIs from Medra
@@ -35,7 +36,7 @@ import org.apache.http.client.utils.URIBuilder;
  * <p>
  * It requires "Accept" request Header attribute to be set to desired content-type.
  */
-public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
+public class Medra implements IdBasedParserFetcher {
 
     public static final String API_URL = "https://data.medra.org";
 
@@ -160,13 +161,6 @@ public class Medra implements SearchBasedParserFetcher, IdBasedParserFetcher {
         IdBasedParserFetcher.super.doPostCleanup(entry);
     }
 
-    @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + query);
-        return uriBuilder.build().toURL();
-    }
-
-    @Override
     public URLDownload getUrlDownload(String identifier) throws MalformedURLException, FetcherException, URISyntaxException {
         URLDownload download = new URLDownload(getURLForID(identifier));
         download.addHeader("Accept", MediaTypes.APPLICATION_JSON);

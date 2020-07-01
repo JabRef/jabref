@@ -22,8 +22,9 @@ public class DOI implements Identifier {
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
-    private static final URI RESOLVER = URI.create("https://doi.org");
     public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+    private static final URI RESOLVER = URI.create("https://doi.org");
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""

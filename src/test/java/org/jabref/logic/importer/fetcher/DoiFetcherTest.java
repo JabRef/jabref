@@ -23,6 +23,7 @@ public class DoiFetcherTest {
     private DoiFetcher fetcher;
     private BibEntry bibEntryBurd2011;
     private BibEntry bibEntryDecker2007;
+    private BibEntry bibEntryIannarelli2019;
 
     @BeforeEach
     public void setUp() {
@@ -48,6 +49,27 @@ public class DoiFetcherTest {
         bibEntryDecker2007.setField(StandardField.TITLE, "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies");
         bibEntryDecker2007.setField(StandardField.YEAR, "2007");
         bibEntryDecker2007.setField(StandardField.DOI, "10.1109/icws.2007.59");
+
+        // mEDRA BibEntry
+        bibEntryIannarelli2019 = new BibEntry();
+        bibEntryIannarelli2019.setType(StandardEntryType.Article);
+        bibEntryIannarelli2019.setField(StandardField.AUTHOR,
+                                        ""
+                                                              + "Iannarelli Riccardo  and "
+                                                              + "Novello Anna  and "
+                                                              + "Stricker Damien  and "
+                                                              + "Cisternino Marco  and "
+                                                              + "Gallizio Federico  and "
+                                                              + "Telib Haysam  and "
+                                                              + "Meyer Thierry ");
+        bibEntryIannarelli2019.setField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering");
+        bibEntryIannarelli2019.setField(StandardField.TITLE, "Safety in research institutions: how to better communicate the risks using numerical simulations");
+        bibEntryIannarelli2019.setField(StandardField.YEAR, "2019");
+        bibEntryIannarelli2019.setField(StandardField.DOI, "10.3303/CET1977146");
+        bibEntryIannarelli2019.setField(StandardField.JOURNAL, "Chemical Engineering Transactions");
+        bibEntryIannarelli2019.setField(StandardField.PAGES, "871-876");
+        bibEntryIannarelli2019.setField(StandardField.URL, "http://doi.org/10.3303/CET1977146");
+        bibEntryIannarelli2019.setField(StandardField.VOLUME, "77");
     }
 
     @Test
@@ -65,6 +87,12 @@ public class DoiFetcherTest {
     public void testPerformSearchDecker2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchIannarelli2019() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146");
+        assertEquals(Optional.of(bibEntryIannarelli2019), fetchedEntry);
     }
 
     @Test
