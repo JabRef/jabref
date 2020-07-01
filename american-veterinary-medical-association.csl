@@ -48,7 +48,7 @@
       <if type="article-newspaper" match="none">
         <choose>
           <if variable="URL">
-            <text value="Available at:" suffix=" "/>
+            <text term="available at" text-case="capitalize-first" suffix=": "/>
             <group delimiter=". ">
               <text variable="URL"/>
               <group>
@@ -119,20 +119,20 @@
           </group>
         </if>
         <else-if type="chapter paper-conference" match="any">
-          <group prefix=" ">
-            <text term="in" text-case="capitalize-first" suffix=": "/>
+          <group prefix=" " delimiter=" ">
+            <text term="in" text-case="capitalize-first" suffix=":"/>
             <text macro="editor"/>
-            <text variable="container-title" prefix=" " suffix="."/>
+            <text variable="container-title" suffix="." font-style="italic"/>
             <text variable="volume" prefix="Vol " suffix="."/>
-            <text macro="edition" prefix=" "/>
-            <text variable="collection-title" prefix=" " suffix="."/>
+            <text macro="edition"/>
+            <text variable="collection-title" suffix="."/>
             <group suffix=".">
-              <text macro="publisher" prefix=" "/>
-              <group suffix="." prefix="; ">
+              <text macro="publisher"/>
+              <group suffix="." prefix=", " delimiter=";">
                 <date variable="issued">
                   <date-part name="year"/>
                 </date>
-                <text variable="page" prefix=":"/>
+                <text variable="page"/>
               </group>
             </group>
           </group>
@@ -193,7 +193,7 @@
         <else>
           <text macro="editor" prefix=" " suffix="."/>
           <group prefix=" " suffix=".">
-            <text variable="container-title" form="short" strip-periods="true"/>
+            <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
             <group delimiter=";" prefix=" ">
               <date variable="issued">
                 <date-part name="year"/>

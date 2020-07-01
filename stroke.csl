@@ -4,7 +4,7 @@
     <title>Stroke</title>
     <id>http://www.zotero.org/styles/stroke</id>
     <link href="http://www.zotero.org/styles/stroke" rel="self"/>
-    <link href="http://stroke.ahajournals.org/content/general-preparation#References" rel="documentation"/>
+    <link href="https://www.ahajournals.org/str/manuscript-preparation" rel="documentation"/>
     <author>
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
@@ -25,11 +25,14 @@
       <name>Christian Rubbert</name>
       <email>christian.rubbert@med.uni-duesseldorf.de</email>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>0039-2499</issn>
     <eissn>1524-4628</eissn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-06-18T11:44:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -129,7 +132,7 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography second-field-align="flush" et-al-min="7" et-al-use-first="6">
+  <bibliography et-al-min="11" et-al-use-first="10" second-field-align="flush">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <text macro="author"/>
