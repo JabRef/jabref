@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Masaryk University, Faculty of Law</summary>
-    <updated>2020-05-25T10:00:00+00:00</updated>
+    <updated>2020-06-10T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -153,7 +153,7 @@
   </macro>
   <macro name="container">
     <choose>
-      <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
+      <if type="chapter entry entry-dictionary entry-encyclopedia webpage post-weblog" match="any">
         <choose>
           <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
             <text term="in" text-case="capitalize-first" suffix=": "/>
@@ -183,7 +183,7 @@
   </macro>
   <macro name="container-full">
     <choose>
-      <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
+      <if type="chapter entry entry-dictionary entry-encyclopedia webpage post-weblog" match="any">
         <choose>
           <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
             <text term="in" text-case="capitalize-first" suffix=": "/>
@@ -265,7 +265,7 @@
           </if>
         </choose>
       </if>
-      <else-if type="webpage" match="any">
+      <else-if type="webpage post-weblog" match="any">
         <date variable="issued">
           <date-part name="day" suffix=".&#160;"/>
           <date-part name="month" suffix=".&#160;" form="numeric"/>
@@ -309,12 +309,8 @@
   </macro>
   <macro name="medium">
     <choose>
-      <if variable="URL" match="any">
-        <choose>
-          <if type="webpage">
-            <text term="online" prefix="[" suffix="]"/>
-          </if>
-        </choose>
+      <if type="webpage post-weblog" match="any">
+        <text term="online" prefix="[" suffix="]"/>
       </if>
     </choose>
   </macro>
@@ -378,13 +374,13 @@
                 </else>
               </choose>
             </if>
-            <else-if type="article-magazine article-newspaper webpage" match="any">
+            <else-if type="article-magazine article-newspaper webpage post-weblog" match="any">
               <text macro="contributors-long" suffix=". "/>
               <choose>
                 <if type="article-magazine article-newspaper" match="any">
                   <text macro="title-long" suffix=". "/>
                 </if>
-                <else-if type="webpage" match="any">
+                <else-if type="webpage post-weblog" match="any">
                   <text macro="title-long" suffix=" "/>
                   <text macro="medium" suffix=". "/>
                 </else-if>
@@ -510,13 +506,13 @@
             </else>
           </choose>
         </if>
-        <else-if type="article-magazine article-newspaper webpage" match="any">
+        <else-if type="article-magazine article-newspaper webpage post-weblog" match="any">
           <text macro="contributors-full" suffix=". "/>
           <choose>
             <if type="article-magazine article-newspaper" match="any">
               <text macro="title-long" suffix=". "/>
             </if>
-            <else-if type="webpage">
+            <else-if type="webpage post-weblog" match="any">
               <text macro="title-long" suffix=" "/>
               <text macro="medium" suffix=". "/>
             </else-if>
