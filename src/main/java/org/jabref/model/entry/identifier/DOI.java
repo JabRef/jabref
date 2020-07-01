@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 public class DOI implements Identifier {
 
     public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
