@@ -9,7 +9,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 
-import com.microsoft.applicationinsights.core.dependencies.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URIBuilder;
 
 public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
     private static final String BASIC_SEARCH_URL = "http://liinwww.ira.uka.de/bibliography/rss?";

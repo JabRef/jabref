@@ -1,13 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
-
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
