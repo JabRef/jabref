@@ -22,12 +22,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.apache.http.client.utils.URIBuilder;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-
+import org.apache.http.client.utils.URIBuilder;
 
 /**
  * A class for fetching DOIs from Medra

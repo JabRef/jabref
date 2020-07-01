@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory;
  * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
+
+    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
-    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
     private static final URI RESOLVER = URI.create("https://doi.org");
 
     // Regex
