@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,13 +47,13 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
 
     private Document buildDocumentFromInputStream(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Reader reader = new InputStreamReader(inputStream, "UTF-8");
+        Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         InputSource is = new InputSource(reader);
         return dbuild.parse(is);
     }
 
     private List<Element> findItemElementsRecursively(NodeList nodeList) {
-        List<Element> itemNodes = new LinkedList();
+        LinkedList<Element> itemNodes = new LinkedList();
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node child = nodeList.item(i);
             if (child.getNodeName().equals("item")

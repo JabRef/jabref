@@ -8,7 +8,6 @@ import java.net.URL;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesParser;
 
 import com.microsoft.applicationinsights.core.dependencies.http.client.utils.URIBuilder;
 
