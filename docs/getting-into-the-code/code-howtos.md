@@ -30,7 +30,6 @@ Principles:
             Localization.lang("Something went wrong...", ioe);
     }
     ```
-
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -46,7 +45,7 @@ To show error message two different ways are usually used in JabRef:
 * showing an error dialog
 * updating the status bar at the bottom of the main window
 
-_*TODO: Usage of status bar and Swing Dialogs*_
+_TODO: Usage of status bar and Swing Dialogs_
 
 ## Using the EventSystem
 
@@ -171,7 +170,7 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under (src/test/org.jabref.logic.l10n)
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.l10n\)
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add tranlsations for other languages direclty in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)

@@ -1,4 +1,4 @@
-# JabRef's Development Strategy
+# JabRef's development strategy
 
 We aim to keep up to high-quality code standards and use code quality tools wherever possible.
 
@@ -10,7 +10,7 @@ To ensure high code-quality,
 * We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
 * We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/master/DEVELOPERS).
 
-Read on about our automated quality checks at [Code Quality](code-quality.md).
+Read on about our automated quality checks at [Code Quality](../advanced-reading/code-quality.md).
 
 ## Continuous integration
 
