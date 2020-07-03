@@ -311,7 +311,7 @@ public class GroupDialogViewModel {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
                     char delimiter = ',';
-                    char hierarDelimiter = '>';
+                    char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
                     // Modify values for delimiters if user provided customized values
                     if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
                         delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
