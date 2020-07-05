@@ -1,6 +1,5 @@
 package org.jabref.model.util;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
@@ -9,12 +8,17 @@ import java.nio.file.Path;
  */
 public class DummyFileUpdateMonitor implements FileUpdateMonitor {
     @Override
-    public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
+    public void addListenerForFile(Path file, FileUpdateListener listener) {
 
     }
 
     @Override
     public void removeListener(Path path, FileUpdateListener listener) {
 
+    }
+
+    @Override
+    public boolean isActive() {
+        return false;
     }
 }
