@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.jabref.Globals;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
@@ -102,7 +103,7 @@ public class WebFetchers {
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
-        set.add(new CollectionOfComputerScienceBibliographiesFetcher());
+        set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences, Globals.getFileUpdateMonitor()));
         return set;
     }
 

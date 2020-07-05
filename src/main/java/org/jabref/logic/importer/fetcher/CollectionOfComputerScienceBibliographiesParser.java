@@ -2,100 +2,66 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import org.jabref.model.util.FileUpdateMonitor;
 
 public class CollectionOfComputerScienceBibliographiesParser implements Parser {
+
+    final static Pattern REGEX_FOR_LINKS = Pattern.compile("<item>[\\s\\S]*?<link>([\\s\\S]*?)<\\/link>[\\s\\S]*?<\\/item>");
+    final static Pattern REGEX_FOR_BIBTEX = Pattern.compile("<pre class=\"bibtex\">([\\s\\S]*?)<\\/pre>");
+
+    final BibtexParser bibtexParser;
+    final HtmlToUnicodeFormatter htmlToUnicodeFormatter;
+
+    public CollectionOfComputerScienceBibliographiesParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
+        this.bibtexParser = new BibtexParser(importFormatPreferences, fileUpdateMonitor);
+        this.htmlToUnicodeFormatter = new HtmlToUnicodeFormatter();
+    }
+
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
-            Document document = buildDocumentFromInputStream(inputStream);
-            // uncomment to generate test case xml
-            // XMLUtil.printDocument(document);
+            List<String> links = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_LINKS);
+            String bibtexDataString = parseBibtexStringsFromLinks(links)
+                    .stream()
+                    .collect(Collectors.joining());
 
-            NodeList childNodes = document.getChildNodes();
-            List<Element> itemElements = findItemElementsRecursively(childNodes);
-            List<BibEntry> bibEntries = parseItemElements(itemElements);
-
-            // uncomment to generate test case bib files
-            // System.out.println(bibEntries);
-
-            return bibEntries;
-        } catch (ParserConfigurationException | SAXException | IOException exception) {
-            throw new ParseException(exception);
+            return bibtexParser.parseEntries(bibtexDataString);
+        } catch (IOException e) {
+            throw new ParseException(e);
         }
     }
 
-    private Document buildDocumentFromInputStream(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-        InputSource is = new InputSource(reader);
-        return dbuild.parse(is);
+    private List<String> matchRegexFromInputStreamHtml(InputStream inputStream, Pattern pattern) {
+        try (Scanner scanner = new Scanner(inputStream)) {
+            return scanner.findAll(pattern)
+                          .map(match -> htmlToUnicodeFormatter.format(match.group(1)))
+                          .collect(Collectors.toList());
+        }
     }
 
-    private List<Element> findItemElementsRecursively(NodeList nodeList) {
-        LinkedList<Element> itemNodes = new LinkedList();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node child = nodeList.item(i);
-            if (child.getNodeName().equals("item")
-                    && child.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) child;
-                itemNodes.add(element);
-            } else {
-                NodeList childNodes = child.getChildNodes();
-                List<Element> childItemNodes = findItemElementsRecursively(childNodes);
-                itemNodes.addAll(childItemNodes);
+    private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException {
+        List<String> bibtexStringsFromAllLinks = new ArrayList();
+        for (String link : links) {
+            try (InputStream inputStream = new URLDownload(link).asInputStream()) {
+                List<String> bibtexStringsFromLink = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_BIBTEX);
+                bibtexStringsFromAllLinks.addAll(bibtexStringsFromLink);
             }
         }
 
-        return itemNodes;
-    }
-
-    private List<BibEntry> parseItemElements(List<Element> itemElements) {
-        List<BibEntry> items = new LinkedList<>();
-        for (Element itemElement : itemElements) {
-            BibEntry bibEntry = parseItemElement(itemElement);
-            items.add(bibEntry);
-        }
-
-        return items;
-    }
-
-    private BibEntry parseItemElement(Element item) {
-        BibEntry bibEntry = new BibEntry();
-        setFieldFromTag(bibEntry, item, StandardField.TITLE, "dc:title");
-        setFieldFromTag(bibEntry, item, StandardField.AUTHOR, "dc:creator");
-        setFieldFromTag(bibEntry, item, StandardField.DATE, "dc:date");
-        setFieldFromTag(bibEntry, item, StandardField.URL, "link");
-        return bibEntry;
-    }
-
-    private void setFieldFromTag(BibEntry bibEntry, Element item, StandardField field, String tagName) {
-        Node element = item.getElementsByTagName(tagName).item(0);
-        if (element == null) {
-            return;
-        }
-
-        String value = element.getTextContent();
-        bibEntry.setField(field, value);
+        return bibtexStringsFromAllLinks;
     }
 }
+

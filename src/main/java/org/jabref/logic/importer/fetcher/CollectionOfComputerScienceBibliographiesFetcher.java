@@ -1,31 +1,39 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
 public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
+
     private static final String BASIC_SEARCH_URL = "http://liinwww.ira.uka.de/bibliography/rss?";
+
+    private final CollectionOfComputerScienceBibliographiesParser parser;
+
+    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
+        this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences, fileUpdateMonitor);
+    }
 
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        uriBuilder.addParameter("query", query);
-        uriBuilder.addParameter("sort", "score");
-        URI uri = uriBuilder.build();
-        return uri.toURL();
+        return new URIBuilder(BASIC_SEARCH_URL)
+            .addParameter("query", query)
+            .addParameter("sort", "score")
+            .build()
+            .toURL();
     }
 
     @Override
     public Parser getParser() {
-        return new CollectionOfComputerScienceBibliographiesParser();
+        return parser;
     }
 
     @Override

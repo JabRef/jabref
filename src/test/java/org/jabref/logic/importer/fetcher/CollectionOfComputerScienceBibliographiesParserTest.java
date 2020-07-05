@@ -6,13 +6,18 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class CollectionOfComputerScienceBibliographiesParserTest {
@@ -22,7 +27,7 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
     }
 
     @Test
-    public void parseEntriesReturnsOneBibEntryInListIfXmlHasOneResult() throws Exception {
+    public void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult() throws Exception {
         parseXmlAndCheckResults("collection_of_computer_science_bibliographies_single_result.xml", Collections.singletonList("collection_of_computer_science_bibliographies_single_result.bib"));
     }
 
@@ -32,8 +37,11 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
     }
 
     private void parseXmlAndCheckResults(String xmlName, List<String> resourceNames) throws Exception {
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+
         InputStream is = CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(xmlName);
-        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser();
+        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences, new DummyFileUpdateMonitor());
         List<BibEntry> entries = parser.parseEntries(is);
         assertNotNull(entries);
         assertEquals(resourceNames.size(), entries.size());
