@@ -34,6 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -309,12 +310,22 @@ public class GroupDialogViewModel {
                         searchGroupRegexProperty.getValue());
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
+                    // Set default value for delimiters: ',' for base and '>' for hierarchical
+                    char delimiter = ',';
+                    char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    // Modify values for delimiters if user provided customized values
+                    if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
+                        delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
+                    }
+                    if (!autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty()) {
+                        hierarDelimiter = autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0);
+                    }
                     resultingGroup = new AutomaticKeywordGroup(
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                            autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
+                            delimiter,
+                            hierarDelimiter);
                 } else {
                     resultingGroup = new AutomaticPersonsGroup(
                             groupName,
