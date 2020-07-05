@@ -10,7 +10,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,14 +24,12 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class CollectionOfComputerScienceBibliographiesFetcherTest {
     private CollectionOfComputerScienceBibliographiesFetcher fetcher;
-    private BibEntry bibEntry1;
-    private BibEntry bibEntry2;
 
     @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences, new DummyFileUpdateMonitor());
+        fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences);
     }
 
     @Test

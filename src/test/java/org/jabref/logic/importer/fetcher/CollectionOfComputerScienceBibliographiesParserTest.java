@@ -8,7 +8,6 @@ import java.util.List;
 import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
 
         InputStream is = CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(xmlName);
-        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
         List<BibEntry> entries = parser.parseEntries(is);
         assertNotNull(entries);
         assertEquals(resourceNames.size(), entries.size());

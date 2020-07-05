@@ -8,7 +8,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -18,8 +17,8 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
 
     private final CollectionOfComputerScienceBibliographiesParser parser;
 
-    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor) {
-        this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences, fileUpdateMonitor);
+    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences) {
+        this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
     }
 
     @Override
