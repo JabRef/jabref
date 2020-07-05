@@ -2,11 +2,9 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,19 +68,10 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         }
 
         try (InputStream stream = getUrlDownload(query).asInputStream()) {
-            List<BibEntry> fetchedEntries = new ArrayList<>();
+            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
-            // check if there is anything to read since mEDRA '404 not found' returns nothing
-            PushbackInputStream pushbackInputStream = new PushbackInputStream(stream);
-            int b;
-            b = pushbackInputStream.read();
-            if (b != -1) {
-                pushbackInputStream.unread(b);
-                fetchedEntries = getParser().parseEntries(pushbackInputStream);
-                // Post-cleanup
-                fetchedEntries.forEach(this::doPostCleanup);
-            }
-            pushbackInputStream.close();
+            // Post-cleanup
+            fetchedEntries.forEach(this::doPostCleanup);
 
             return fetchedEntries;
         } catch (URISyntaxException e) {

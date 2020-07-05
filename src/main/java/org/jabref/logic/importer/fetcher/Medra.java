@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -49,34 +51,30 @@ public class Medra implements IdBasedParserFetcher {
         return inputStream -> {
             JSONObject response = JsonReader.toJsonObject(inputStream);
 
-            List<BibEntry> entries = new ArrayList<>();
-            BibEntry entry = jsonItemToBibEntry(response);
-            entries.add(entry);
-
-            return entries;
+            return Collections.singletonList(jsonItemToBibEntry(response));
         };
     }
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
-            BibEntry entry = new BibEntry();
-            entry.setType(convertType(item.getString("type")));
-            entry.setField(StandardField.TITLE, item.getString("title"));
-            entry.setField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")));
-            entry.setField(StandardField.YEAR,
-                           Optional.ofNullable(item.optJSONObject("issued"))
-                                   .map(array -> array.optJSONArray("date-parts"))
-                                   .map(array -> array.optJSONArray(0))
-                                   .map(array -> array.optInt(0))
-                                   .map(year -> Integer.toString(year)).orElse(""));
-            entry.setField(StandardField.DOI, item.getString("DOI"));
-            entry.setField(StandardField.PAGES, item.optString("page"));
-            entry.setField(StandardField.ISSN, item.optString("ISSN"));
-            entry.setField(StandardField.JOURNAL, item.optString("container-title"));
-            entry.setField(StandardField.PUBLISHER, item.optString("publisher"));
-            entry.setField(StandardField.URL, item.optString("URL"));
-            entry.setField(StandardField.VOLUME, item.optString("volume"));
-            return entry;
+
+            return new BibEntry(convertType(item.getString("type")))
+                                                                    .withField(StandardField.TITLE, item.getString("title"))
+                                                                    .withField(StandardField.AUTHOR, toAuthors(item.optJSONArray("author")))
+                                                                    .withField(StandardField.YEAR,
+                                                                               Optional.ofNullable(item.optJSONObject("issued"))
+                                                                                       .map(array -> array.optJSONArray("date-parts"))
+                                                                                       .map(array -> array.optJSONArray(0))
+                                                                                       .map(array -> array.optInt(0))
+                                                                                       .map(year -> Integer.toString(year)).orElse(""))
+                                                                    .withField(StandardField.DOI, item.getString("DOI"))
+                                                                    .withField(StandardField.PAGES, item.optString("page"))
+                                                                    .withField(StandardField.ISSN, item.optString("ISSN"))
+                                                                    .withField(StandardField.JOURNAL, item.optString("container-title"))
+                                                                    .withField(StandardField.PUBLISHER, item.optString("publisher"))
+                                                                    .withField(StandardField.URL, item.optString("URL"))
+                                                                    .withField(StandardField.VOLUME, item.optString("volume"));
+
         } catch (JSONException exception) {
             throw new ParseException("mEdRA API JSON format has changed", exception);
         }
@@ -102,11 +100,7 @@ public class Medra implements IdBasedParserFetcher {
 
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
-            if (author.has("literal")) {
-                name = author.optString("literal", "");
-            } else {
-                name = author.optString("family", "") + " " + author.optString("given", "");
-            }
+            name = author.optString("literal", "") + " " + author.optString("family", "") + " " + author.optString("given", "");
 
             authorsParsed.addAuthor(
                                     name,
@@ -121,13 +115,16 @@ public class Medra implements IdBasedParserFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
 
         try (InputStream stream = getUrlDownload(identifier).asInputStream();
              PushbackInputStream pushbackInputStream = new PushbackInputStream(stream)) {
 
             List<BibEntry> fetchedEntries = new ArrayList<>();
 
-            // check if there is anything to read since mEDRA '404 not found' returns nothing
+            // check if there is anything to read
             int readByte;
             readByte = pushbackInputStream.read();
             if (readByte != -1) {
@@ -148,7 +145,8 @@ public class Medra implements IdBasedParserFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource. It might be that there is an UnknownHostException (eutils.ncbi.nlm.nih.gov cannot be resolved).
+            // For some DOIs we get 500 error. mEDRA team explained this is due to DOIs recently moved from other agency but no yet fully registered.
+            // They say these should return 204 code and they will fix the misconfiguration
             throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
@@ -162,7 +160,7 @@ public class Medra implements IdBasedParserFetcher {
 
     public URLDownload getUrlDownload(String identifier) throws MalformedURLException, FetcherException, URISyntaxException {
         URLDownload download = new URLDownload(getURLForID(identifier));
-        download.addHeader("Accept", MediaTypes.APPLICATION_JSON);
+        download.addHeader("Accept", MediaTypes.CITATIONSTYLES_JSON);
         return download;
     }
 

@@ -51,25 +51,24 @@ public class DoiFetcherTest {
         bibEntryDecker2007.setField(StandardField.DOI, "10.1109/icws.2007.59");
 
         // mEDRA BibEntry
-        bibEntryIannarelli2019 = new BibEntry();
-        bibEntryIannarelli2019.setType(StandardEntryType.Article);
-        bibEntryIannarelli2019.setField(StandardField.AUTHOR,
-                                        ""
-                                                              + "Iannarelli Riccardo  and "
-                                                              + "Novello Anna  and "
-                                                              + "Stricker Damien  and "
-                                                              + "Cisternino Marco  and "
-                                                              + "Gallizio Federico  and "
-                                                              + "Telib Haysam  and "
-                                                              + "Meyer Thierry ");
-        bibEntryIannarelli2019.setField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering");
-        bibEntryIannarelli2019.setField(StandardField.TITLE, "Safety in research institutions: how to better communicate the risks using numerical simulations");
-        bibEntryIannarelli2019.setField(StandardField.YEAR, "2019");
-        bibEntryIannarelli2019.setField(StandardField.DOI, "10.3303/CET1977146");
-        bibEntryIannarelli2019.setField(StandardField.JOURNAL, "Chemical Engineering Transactions");
-        bibEntryIannarelli2019.setField(StandardField.PAGES, "871-876");
-        bibEntryIannarelli2019.setField(StandardField.URL, "http://doi.org/10.3303/CET1977146");
-        bibEntryIannarelli2019.setField(StandardField.VOLUME, "77");
+        bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
+                                                                        .withField(StandardField.AUTHOR,
+                                                                                   ""
+                                                                                                         + "Iannarelli Riccardo  and "
+                                                                                                         + "Novello Anna  and "
+                                                                                                         + "Stricker Damien  and "
+                                                                                                         + "Cisternino Marco  and "
+                                                                                                         + "Gallizio Federico  and "
+                                                                                                         + "Telib Haysam  and "
+                                                                                                         + "Meyer Thierry ")
+                                                                        .withField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering")
+                                                                        .withField(StandardField.TITLE, "Safety in research institutions: how to better communicate the risks using numerical simulations")
+                                                                        .withField(StandardField.YEAR, "2019")
+                                                                        .withField(StandardField.DOI, "10.3303/CET1977146")
+                                                                        .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
+                                                                        .withField(StandardField.PAGES, "871-876")
+                                                                        .withField(StandardField.URL, "http://doi.org/10.3303/CET1977146")
+                                                                        .withField(StandardField.VOLUME, "77");
     }
 
     @Test

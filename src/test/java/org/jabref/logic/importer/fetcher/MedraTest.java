@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MedraTest {
 
@@ -85,8 +84,14 @@ public class MedraTest {
     }
 
     @Test
-    public void testPerformSearchEmptyDOI() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
+    public void testPerformSearchEmptyDOI() throws FetcherException {
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+    }
+
+    @Test
+    public void testPerformSearchValidReturnNothingDOI() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/j.bjoms.2007.08.004");
+        assertEquals(Optional.empty(), fetchedEntry);
     }
 
 }
