@@ -119,7 +119,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(prefs, basePanel, dialogService);
+        viewModel = new EntryTypeViewModel(prefs, basePanel, dialogService, stateManager);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());

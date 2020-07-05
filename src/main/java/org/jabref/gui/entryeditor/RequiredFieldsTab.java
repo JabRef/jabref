@@ -1,9 +1,8 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -26,6 +25,7 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.preferences.JabRefPreferences;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
+
     private final BibEntryTypesManager entryTypesManager;
 
     public RequiredFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
@@ -38,9 +38,9 @@ public class RequiredFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
+    protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
-        SortedSet<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
+        Set<Field> fields = new LinkedHashSet<>();
         if (entryType.isPresent()) {
             for (OrFields orFields : entryType.get().getRequiredFields()) {
                 fields.addAll(orFields);
