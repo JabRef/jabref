@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
-- We added default values for delimiters in Add Subgroup window [#6624](https://github.com/JabRef/jabref/issues/6624) 
+- We added default values for delimiters in Add Subgroup window [#6624](https://github.com/JabRef/jabref/issues/6624)
 - We improved responsiveness of general fields specification dialog window. [#6643](https://github.com/JabRef/jabref/issues/6604)
 - We added support for importing ris file and load DOI [#6530](https://github.com/JabRef/jabref/issues/6530)
 - We added the Library properties to a context menu on the library tabs [#6485](https://github.com/JabRef/jabref/issues/6485)
