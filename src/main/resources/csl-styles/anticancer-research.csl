@@ -2,6 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Anticancer Research</title>
+    <title-short>AR</title-short>
     <id>http://www.zotero.org/styles/anticancer-research</id>
     <link href="http://www.zotero.org/styles/anticancer-research" rel="self"/>
     <link href="http://www.zotero.org/styles/avian-diseases" rel="template"/>
@@ -13,7 +14,7 @@
     <category field="medicine"/>
     <issn>0250-7005</issn>
     <eissn>1791-7530</eissn>
-    <updated>2014-10-15T19:37:07+00:00</updated>
+    <updated>2020-05-28T08:23:14+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -48,10 +49,16 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="webpage post-weblog" match="any">
+      <if type="webpage post-weblog post" match="any">
         <text variable="URL" prefix="Available from: "/>
         <date variable="accessed" form="text" prefix=" [last accessed " suffix="]"/>
       </if>
+      <else-if type="article-journal" match="any">
+        <group delimiter=". ">
+          <text variable="PMID" prefix="PMID: "/>
+          <text variable="DOI" prefix="DOI: "/>
+        </group>
+      </else-if>
     </choose>
   </macro>
   <citation collapse="citation-number">

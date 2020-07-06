@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -26,7 +26,7 @@ public class MetaDataSerializer {
      * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-                                                             GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                                                             GlobalCitationKeyPattern globalCiteKeyPattern) {
 
         // First write all meta data except groups
         Map<String, List<String>> stringyMetaData = new HashMap<>();
@@ -96,20 +96,20 @@ public class MetaDataSerializer {
         return serializedMetaData;
     }
 
-    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPattern globalCitationKeyPattern) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
-        for (EntryType key : citeKeyPattern.getAllKeys()) {
-            if (!citeKeyPattern.isDefaultValue(key)) {
+        AbstractCitationKeyPattern citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        for (EntryType key : citationKeyPattern.getAllKeys()) {
+            if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(citeKeyPattern.getValue(key).get(0));
+                data.add(citationKeyPattern.getValue(key).get(0));
                 String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if ((citeKeyPattern.getDefaultValue() != null) && !citeKeyPattern.getDefaultValue().isEmpty()) {
+        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
-            data.add(citeKeyPattern.getDefaultValue().get(0));
+            data.add(citationKeyPattern.getDefaultValue().get(0));
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
         }
         return stringyPattern;

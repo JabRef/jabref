@@ -56,11 +56,6 @@ public class DoiFetcherTest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-publication-identifiers/doitobibtex", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void testPerformSearchBurd2011() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517");
         assertEquals(Optional.of(bibEntryBurd2011), fetchedEntry);

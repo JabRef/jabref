@@ -63,7 +63,7 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="webpage">
+      <if type="webpage post-weblog">
         <!-- adds "[Electronic resource]" or Russian equivalent after the title-->
         <text variable="title" suffix=" "/>
         <text term="online" text-case="sentence" prefix="[" suffix="]"/>
@@ -151,9 +151,9 @@
     </group>
   </macro>
   <macro name="access">
-    <!-- only for webpages -->
+    <!-- only for webpages and post-weblogs -->
     <choose>
-      <if type="webpage">
+      <if type="webpage post-weblog">
         <choose>
           <if variable="URL">
             <text variable="URL" prefix="URL: "/>

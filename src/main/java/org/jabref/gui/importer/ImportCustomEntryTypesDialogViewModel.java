@@ -47,11 +47,11 @@ public class ImportCustomEntryTypesDialogViewModel {
     public void importBibEntryTypes(List<BibEntryType> checkedUnknownEntryTypes, List<BibEntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.saveCustomEntryTypes();
+            preferencesService.saveCustomEntryTypes(Globals.entryTypesManager);
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.saveCustomEntryTypes();
+            preferencesService.saveCustomEntryTypes(Globals.entryTypesManager);
         }
     }
 }

@@ -15,8 +15,6 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +40,7 @@ import org.jabref.model.util.MultiKeyMap;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -297,7 +296,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the citation key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
      * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
@@ -315,7 +314,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * Sets the cite key AKA citation key AKA BibTeX key. Note: This is <emph>not</emph> the internal Id of this entry.
-     * The internal Id is always present, whereas the BibTeX key might not be present.
+     * The internal Id is always present, whereas the citation key might not be present.
      *
      * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
      */
@@ -929,14 +928,14 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public ObjectBinding<String> getFieldBinding(Field field) {
+    public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return (ObjectBinding<String>) EasyBind.map(type, EntryType::getDisplayName);
+            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
         }
-        return Bindings.valueAt(fields, field);
+        return EasyBind.valueAt(fields, field);
     }
 
-    public ObjectBinding<String> getCiteKeyBinding() {
+    public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
     }
 

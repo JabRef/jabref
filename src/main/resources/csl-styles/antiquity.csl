@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="chicago" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="symbol" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" page-range-format="chicago" demote-non-dropping-particle="never" default-locale="en-GB">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Antiquity</title>
     <id>http://www.zotero.org/styles/antiquity</id>
@@ -9,10 +10,13 @@
     <author>
       <name>Sebastian Karcher</name>
     </author>
+    <contributor>
+      <name>Víctor Jiménez Jáimez</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
     <issn>0003-598X</issn>
-    <updated>2014-03-02T18:37:55+00:00</updated>
+    <updated>2020-06-03T06:44:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -40,11 +44,11 @@
         <text macro="container-prefix" suffix=" " prefix=", "/>
         <group delimiter=", ">
           <names variable="container-author" delimiter=", ">
-            <name initialize-with="." and="symbol" delimiter=", "/>
+            <name and="symbol" initialize-with="."/>
             <label form="short" prefix=" (" suffix=")" plural="never"/>
           </names>
           <names variable="editor translator" delimiter=", ">
-            <name initialize-with="." and="symbol" delimiter=", "/>
+            <name and="symbol" initialize-with="."/>
             <label form="short" prefix=" (" suffix=")" plural="never"/>
           </names>
         </group>
@@ -72,7 +76,7 @@
   <macro name="contributors">
     <group delimiter=". ">
       <names variable="author">
-        <name initialize-with="." and="symbol" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="never" suffix=".">
+        <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="first">
           <name-part name="family" font-variant="small-caps"/>
         </name>
         <label form="short" prefix=" (" suffix=")" plural="never"/>
@@ -85,9 +89,22 @@
       <text macro="recipient"/>
     </group>
   </macro>
+  <macro name="contributors-count">
+    <group delimiter=". ">
+      <names variable="author">
+        <name form="count"/>
+        <substitute>
+          <names variable="editor"/>
+          <names variable="translator"/>
+          <text macro="title"/>
+        </substitute>
+      </names>
+      <text macro="recipient"/>
+    </group>
+  </macro>
   <macro name="contributors-short">
     <names variable="author">
-      <name initialize-with="." form="short" and="symbol" delimiter=", "/>
+      <name form="short" and="symbol" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" initialize-with="." name-as-sort-order="all"/>
       <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
@@ -159,8 +176,11 @@
       <else-if type="bill book graphic legal_case legislation motion_picture song" match="any">
         <text variable="title" font-style="italic"/>
       </else-if>
-      <else>
+      <else-if type="chapter" match="any">
         <text variable="title"/>
+      </else-if>
+      <else>
+        <text variable="title" suffix="."/>
       </else>
     </choose>
   </macro>
@@ -371,7 +391,6 @@
         </group>
       </else>
     </choose>
-    <!--This is for computer programs only. Localization new to 1.0.1, so may be missing in many locales-->
     <group delimiter=" " prefix=" (" suffix=")">
       <text term="version"/>
       <text variable="version"/>
@@ -404,7 +423,11 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name">
+  <citation name-form="short" and="symbol" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="3" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" name-as-sort-order="all" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year-suffix">
+    <sort>
+      <key variable="issued"/>
+      <key variable="author"/>
+    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=": ">
         <group delimiter=" ">
@@ -415,18 +438,18 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" et-al-min="99" et-al-use-first="20" subsequent-author-substitute="&#8212;" entry-spacing="0">
+  <bibliography and="symbol" delimiter-precedes-et-al="never" delimiter-precedes-last="never" et-al-min="10" et-al-use-first="1" et-al-subsequent-min="10" et-al-subsequent-use-first="1" subsequent-author-substitute="&#8212;" entry-spacing="0" hanging-indent="true">
     <sort>
-      <key macro="contributors"/>
+      <key macro="contributors" names-min="1" names-use-first="1"/>
+      <key macro="contributors-count" names-min="3" names-use-first="3"/>
+      <key macro="contributors" names-min="3" names-use-first="1"/>
       <key variable="issued"/>
     </sort>
     <layout suffix=".">
-      <group delimiter=" ">
+      <group delimiter=". ">
         <text macro="contributors"/>
-        <group delimiter=". ">
-          <text macro="date"/>
-          <text macro="title"/>
-        </group>
+        <text macro="date"/>
+        <text macro="title"/>
       </group>
       <text macro="description"/>
       <text macro="secondary-contributors" prefix=". "/>
@@ -435,10 +458,11 @@
       <text macro="edition"/>
       <text macro="locators-chapter"/>
       <text macro="locators"/>
-      <text macro="collection-title" prefix=". "/>
+      <text macro="collection-title" prefix=" (" suffix=")"/>
       <text macro="issue"/>
       <text macro="locators-article"/>
       <text macro="access" prefix=". "/>
+      <text variable="DOI" prefix=". https://doi.org/"/>
     </layout>
   </bibliography>
 </style>

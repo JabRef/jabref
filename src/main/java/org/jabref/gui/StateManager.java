@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
@@ -20,12 +18,16 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.OptionalUtil;
+
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -36,6 +38,7 @@ import org.jabref.model.util.OptionalUtil;
  *   <li>active search</li>
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
+ *   <li>dialog window sizes/positions</li>
  * </ul>
  */
 public class StateManager {
@@ -48,17 +51,12 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(taskProperty -> {
-        return new Observable[] {taskProperty.progressProperty(), taskProperty.runningProperty()};
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> {
+        return new Observable[]{task.progressProperty(), task.runningProperty()};
     });
-
-    private BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(
-            () -> backgroundTasks.stream().anyMatch(Task::isRunning), backgroundTasks
-    );
-
-    private DoubleBinding tasksProgress = Bindings.createDoubleBinding(
-            () -> backgroundTasks.stream().filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1), backgroundTasks
-    );
+    private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
+    private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -143,11 +141,19 @@ public class StateManager {
         this.backgroundTasks.add(0, backgroundTask);
     }
 
-    public BooleanBinding getAnyTaskRunning() {
+    public EasyBinding<Boolean> getAnyTaskRunning() {
         return anyTaskRunning;
     }
 
-    public DoubleBinding getTasksProgress() {
+    public EasyBinding<Double> getTasksProgress() {
         return tasksProgress;
+    }
+
+    public DialogWindowState getDialogWindowState(String className) {
+        return dialogWindowStates.get(className);
+    }
+
+    public void setDialogWindowState(String className, DialogWindowState state) {
+        dialogWindowStates.put(className, state);
     }
 }

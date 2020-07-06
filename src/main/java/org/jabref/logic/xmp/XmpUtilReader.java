@@ -104,7 +104,7 @@ public class XmpUtilReader {
      * <p/>
      *
      *
-     * @return empty Optional if no metadata has been found
+     * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
      */
     private static List<XMPMetadata> getXmpMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -119,6 +119,10 @@ public class XmpUtilReader {
 
         int startDescriptionSection = xmp.indexOf(START_TAG);
         int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
+
+        if (startDescriptionSection < 0 || startDescriptionSection > endDescriptionSection || endDescriptionSection == END_TAG.length() - 1) {
+            return metaList;
+        }
 
         // XML header for the xmpDomParser
         String start = xmp.substring(0, startDescriptionSection);

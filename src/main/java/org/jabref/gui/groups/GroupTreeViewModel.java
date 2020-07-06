@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -61,7 +60,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
 
         // Init
         refresh();
@@ -126,13 +125,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard));
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));
 
             rootGroup.setValue(newRoot);
             selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
-                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard))
+                                .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
                                 .collect(Collectors.toList()));
         } else {
             rootGroup.setValue(null);
