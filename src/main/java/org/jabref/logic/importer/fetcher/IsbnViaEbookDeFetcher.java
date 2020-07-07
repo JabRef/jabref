@@ -30,7 +30,7 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
         URIBuilder uriBuilder = new URIBuilder(BASE_URL);
         uriBuilder.addParameter("isbn", identifier);

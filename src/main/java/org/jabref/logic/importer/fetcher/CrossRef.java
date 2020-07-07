@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,7 +75,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
         return uriBuilder.build().toURL();
     }
@@ -82,63 +83,32 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public Parser getParser() {
         return inputStream -> {
-            JSONObject response = JsonReader.toJsonObject(inputStream).getJSONObject("message");
+            JSONObject response = JsonReader.toJsonObject(inputStream);
+            if (response.isEmpty()) {
+                return Collections.emptyList();
+            }
 
-            List<BibEntry> entries = new ArrayList<>();
-            if (response.has("items")) {
-                // Response contains a list
-                JSONArray items = response.getJSONArray("items");
-                for (int i = 0; i < items.length(); i++) {
-                    JSONObject item = items.getJSONObject(i);
-                    BibEntry entry = jsonItemToBibEntry(item);
-                    entries.add(entry);
-                }
-            } else {
+            response = response.getJSONObject("message");
+            if (response.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            if (!response.has("items")) {
                 // Singleton response
                 BibEntry entry = jsonItemToBibEntry(response);
+                return Collections.singletonList(entry);
+            }
+
+            // Response contains a list
+            JSONArray items = response.getJSONArray("items");
+            List<BibEntry> entries = new ArrayList<>(items.length());
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                BibEntry entry = jsonItemToBibEntry(item);
                 entries.add(entry);
             }
-
             return entries;
         };
-    }
-
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        if (StringUtil.isBlank(identifier)) {
-            return Optional.empty();
-        }
-
-        try (InputStream stream = new URLDownload(getURLForID(identifier)).asInputStream();
-             PushbackInputStream pushbackInputStream = new PushbackInputStream(stream)) {
-
-            List<BibEntry> fetchedEntries = new ArrayList<>();
-
-            // check if there is anything to read
-            int readByte;
-            readByte = pushbackInputStream.read();
-            if (readByte != -1) {
-                pushbackInputStream.unread(readByte);
-                fetchedEntries = getParser().parseEntries(pushbackInputStream);
-            }
-
-            if (fetchedEntries.isEmpty()) {
-                return Optional.empty();
-            }
-
-            BibEntry entry = fetchedEntries.get(0);
-
-            // Post-cleanup
-            doPostCleanup(entry);
-
-            return Optional.of(entry);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
-        } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
-        }
     }
 
     @Override

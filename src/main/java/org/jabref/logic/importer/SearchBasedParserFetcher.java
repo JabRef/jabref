@@ -43,6 +43,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {
@@ -50,14 +51,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     /**
-     * Gets the {@link URLDownload} object for downloading content. Overwrite, if you need to send additional headers for the download
+     * Gets the {@link URLDownload} object for downloading content. Overwrite, if you need to send additional headers for the download. It uses {@link #getURLForQuery(String)} as default.
      *
      * @param query The search query
-     * @throws MalformedURLException
-     * @throws FetcherException
-     * @throws URISyntaxException
      */
-    default URLDownload getUrlDownload(String query) throws MalformedURLException, FetcherException, URISyntaxException {
+    default URLDownload getUrlDownloadForQuery(String query) throws MalformedURLException, FetcherException, URISyntaxException {
         return new URLDownload(getURLForQuery(query));
     }
 
@@ -67,7 +65,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try (InputStream stream = getUrlDownload(query).asInputStream()) {
+        try (InputStream stream = getUrlDownloadForQuery(query).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
