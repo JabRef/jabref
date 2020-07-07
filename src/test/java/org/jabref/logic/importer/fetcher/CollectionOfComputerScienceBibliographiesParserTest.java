@@ -45,7 +45,7 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
         assertNotNull(entries);
         assertEquals(resourceNames.size(), entries.size());
         for (int i = 0; i < resourceNames.size(); i++) {
-            BibEntryAssert.assertEquals(GvkParserTest.class, resourceNames.get(i), entries.get(i));
+            BibEntryAssert.assertEquals(CollectionOfComputerScienceBibliographiesParserTest.class, resourceNames.get(i), entries.get(i));
         }
     }
 }
