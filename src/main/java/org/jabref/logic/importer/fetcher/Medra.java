@@ -106,8 +106,8 @@ public class Medra implements IdBasedParserFetcher {
     }
 
     @Override
-    public URLDownload getUrlDownloadForIdentifier(String identifier) throws MalformedURLException, FetcherException, URISyntaxException {
-        URLDownload download = new URLDownload(getUrlForIdentifier(identifier));
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload download = new URLDownload(url);
         download.addHeader("Accept", MediaTypes.CITATIONSTYLES_JSON);
         return download;
     }

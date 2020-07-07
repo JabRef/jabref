@@ -34,13 +34,6 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
     URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
-     * Constructs an URL-Download for the given identifier. As default, it uses {@link #getUrlForIdentifier(String)} to obtain the URL
-     */
-    default URLDownload getUrlDownloadForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        return new URLDownload(getUrlForIdentifier(identifier));
-    }
-
-    /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
      */
     Parser getParser();
@@ -68,7 +61,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.empty();
         }
 
-        try (InputStream stream = getUrlDownloadForIdentifier(identifier).asInputStream()) {
+        try (InputStream stream = getUrlDownload(getUrlForIdentifier(identifier)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {
