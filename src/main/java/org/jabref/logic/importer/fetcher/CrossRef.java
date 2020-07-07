@@ -1,8 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -21,7 +18,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JsonReader;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.AuthorList;
@@ -30,7 +26,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import kong.unirest.json.JSONArray;
