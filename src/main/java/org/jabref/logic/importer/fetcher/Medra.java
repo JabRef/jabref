@@ -1,14 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PushbackInputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
@@ -23,12 +18,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
-import org.apache.http.client.utils.URIBuilder;
 
 /**
  * A class for fetching DOIs from Medra
@@ -50,7 +43,9 @@ public class Medra implements IdBasedParserFetcher {
     public Parser getParser() {
         return inputStream -> {
             JSONObject response = JsonReader.toJsonObject(inputStream);
-
+            if (response.isEmpty()) {
+                return Collections.emptyList();
+            }
             return Collections.singletonList(jsonItemToBibEntry(response));
         };
     }
@@ -100,74 +95,26 @@ public class Medra implements IdBasedParserFetcher {
 
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
-            name = author.optString("literal", "") + " " + author.optString("family", "") + " " + author.optString("given", "");
-
-            authorsParsed.addAuthor(
-                                    name,
-                                    "",
-                                    "",
-                                    "",
-                                    "");
-
+            if (author.has("literal")) {
+                // quickly route through the literal string
+                authorsParsed.addAuthor(author.getString("literal"), "", "", "", "");
+            } else {
+                authorsParsed.addAuthor(author.optString("given", ""), "", "", author.optString("family", ""), "");
+            }
         }
         return authorsParsed.getAsFirstLastNamesWithAnd();
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        if (StringUtil.isBlank(identifier)) {
-            return Optional.empty();
-        }
-
-        try (InputStream stream = getUrlDownload(identifier).asInputStream();
-             PushbackInputStream pushbackInputStream = new PushbackInputStream(stream)) {
-
-            List<BibEntry> fetchedEntries = new ArrayList<>();
-
-            // check if there is anything to read
-            int readByte;
-            readByte = pushbackInputStream.read();
-            if (readByte != -1) {
-                pushbackInputStream.unread(readByte);
-                fetchedEntries = getParser().parseEntries(pushbackInputStream);
-            }
-
-            if (fetchedEntries.isEmpty()) {
-                return Optional.empty();
-            }
-
-            BibEntry entry = fetchedEntries.get(0);
-
-            // Post-cleanup
-            doPostCleanup(entry);
-
-            return Optional.of(entry);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            // For some DOIs we get 500 error. mEDRA team explained this is due to DOIs recently moved from other agency but no yet fully registered.
-            // They say these should return 204 code and they will fix the misconfiguration
-            throw new FetcherException("A network error occurred", e);
-        } catch (ParseException e) {
-            throw new FetcherException("An internal parser error occurred", e);
-        }
-    }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-        IdBasedParserFetcher.super.doPostCleanup(entry);
-    }
-
-    public URLDownload getUrlDownload(String identifier) throws MalformedURLException, FetcherException, URISyntaxException {
-        URLDownload download = new URLDownload(getURLForID(identifier));
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload download = new URLDownload(url);
         download.addHeader("Accept", MediaTypes.CITATIONSTYLES_JSON);
         return download;
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
-        return uriBuilder.build().toURL();
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+        return new URL(API_URL + "/" + identifier);
     }
 
 }

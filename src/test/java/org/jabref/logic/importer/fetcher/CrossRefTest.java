@@ -140,7 +140,9 @@ public class CrossRefTest {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
-    // test added to reveal fetching error on crossref performSearchById -- caldarola
+    /**
+     * reveal fetching error on crossref performSearchById
+     */
     @Test
     public void testPerformSearchValidReturnNothingDOI() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById("10.1392/BC1.0"));
