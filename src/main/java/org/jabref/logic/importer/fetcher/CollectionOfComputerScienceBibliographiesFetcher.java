@@ -4,10 +4,17 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
+import org.jabref.logic.formatter.bibtexfields.RemoveTabsFormatter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -38,5 +45,13 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     @Override
     public String getName() {
         return "Collection of Computer Science Bibliographies";
+    }
+
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveTabsFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveRedundantSpacesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
     }
 }

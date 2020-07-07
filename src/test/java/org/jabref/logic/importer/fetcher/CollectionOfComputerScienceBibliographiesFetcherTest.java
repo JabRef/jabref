@@ -69,28 +69,28 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(new UnknownField("identifier"), "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000426556400034")
                 .withField(new UnknownField("subject"), "Software Architecture; Code Churn; Open Source; Architecrual Erosion; Technical Debt; Software Engineering; Programvaruteknik")
                 .withField(new UnknownField("relation"), "ACM International Conference Proceeding Series; ECSA '17~Proceedings of the 11th European Conference on Software Architecture : Companion Proceedings, p. 152-158")
-                .withField(StandardField.ABSTRACT, "The open source application JabRef has existed since\r\n" +
-                        "\t\t 2003. In 2015, the developers decided to make an\r\n" +
-                        "\t\t architectural refactoring as continued development was\r\n" +
-                        "\t\t deemed too demanding. The developers also introduced\r\n" +
-                        "\t\t Static Architecture Conformance Checking (SACC) to\r\n" +
-                        "\t\t prevent violations to the intended architecture.\r\n" +
-                        "\t\t Measurements mined from source code repositories such\r\n" +
-                        "\t\t as code churn and code ownership has been linked to\r\n" +
-                        "\t\t several problems, for example fault proneness, security\r\n" +
-                        "\t\t vulnerabilities, code smells, and degraded\r\n" +
-                        "\t\t maintainability. The root cause of such problems can be\r\n" +
-                        "\t\t architectural. To determine the impact of the\r\n" +
-                        "\t\t refactoring of JabRef, we measure the code churn and\r\n" +
-                        "\t\t code ownership before and after the refactoring and\r\n" +
-                        "\t\t find that large files with violations had a\r\n" +
-                        "\t\t significantly higher code churn than large files\r\n" +
-                        "\t\t without violations before the refactoring. After the\r\n" +
-                        "\t\t refactoring, the files that had violations show a more\r\n" +
-                        "\t\t normal code churn. We find no such effect on code\r\n" +
-                        "\t\t ownership. We conclude that files that contain\r\n" +
-                        "\t\t violations detectable by SACC methods are connected to\r\n" +
-                        "\t\t higher than normal code churn.")
+                .withField(StandardField.ABSTRACT, "The open source application JabRef has existed since" +
+                        " 2003. In 2015, the developers decided to make an" +
+                        " architectural refactoring as continued development was" +
+                        " deemed too demanding. The developers also introduced" +
+                        " Static Architecture Conformance Checking (SACC) to" +
+                        " prevent violations to the intended architecture." +
+                        " Measurements mined from source code repositories such" +
+                        " as code churn and code ownership has been linked to" +
+                        " several problems, for example fault proneness, security" +
+                        " vulnerabilities, code smells, and degraded" +
+                        " maintainability. The root cause of such problems can be" +
+                        " architectural. To determine the impact of the" +
+                        " refactoring of JabRef, we measure the code churn and" +
+                        " code ownership before and after the refactoring and" +
+                        " find that large files with violations had a" +
+                        " significantly higher code churn than large files" +
+                        " without violations before the refactoring. After the" +
+                        " refactoring, the files that had violations show a more" +
+                        " normal code churn. We find no such effect on code" +
+                        " ownership. We conclude that files that contain" +
+                        " violations detectable by SACC methods are connected to" +
+                        " higher than normal code churn.")
                 .withField(StandardField.TYPE, "info:eu-repo/semantics/conferenceObject")
                 .withField(new UnknownField("description"), "Information and Software Qualtiy")
                 .withField(StandardField.PAGES, "152--158")
@@ -104,6 +104,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                 .withField(StandardField.YEAR, "2017");
 
+        // Checking entries in the set as the query is generic and returns a changing result set
         assertTrue(searchResult.contains(firstBibEntry));
         assertTrue(searchResult.contains(secondBibEntry));
     }
