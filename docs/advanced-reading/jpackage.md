@@ -6,6 +6,7 @@ For Gradle, we use the [Badass JLink Plugin](https://badass-jlink-plugin.beryx.o
 ## Build Windows binaries locally
 
 Preparation: Install [WiX Toolset](https://wixtoolset.org/)
+
    1. Open administrative shell
    2. Use [Chocolatey](https://chocolatey.org/) to install it: `choco install wixtoolset`
 
