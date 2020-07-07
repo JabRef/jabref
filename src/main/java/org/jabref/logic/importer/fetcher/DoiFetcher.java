@@ -14,6 +14,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
@@ -69,7 +70,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
 
                 // BibTeX data
-                URLDownload download = new URLDownload(doiURL);
+                URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
                 String bibtexString = download.asString();
 
@@ -108,24 +109,20 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     /**
      * Returns registration agency. Optional.empty() if no agency is found.
      *
-     * @param doi the doi to be searched
+     * @param doi the DOI to be searched
      */
     public Optional<String> getAgency(DOI doi) throws IOException {
         Optional<String> agency = Optional.empty();
-
         try {
-            URLDownload download = new URLDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));
+            URLDownload download = getUrlDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));
             JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
-
             if (response != null) {
                 agency = Optional.ofNullable(response.optString("RA"));
             }
-
         } catch (JSONException e) {
             LOGGER.error("Cannot parse agency fetcher repsonse to JSON");
             return Optional.empty();
         }
-
 
         return agency;
     }
