@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.20.0'
+    id 'org.beryx.jlink' version '2.21.0'
 
     // nicer test outputs during running and completion
     id 'com.adarshr.test-logger' version '2.1.0'
@@ -165,7 +165,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.8.00'
+    implementation 'com.konghq:unirest-java:3.8.06'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
