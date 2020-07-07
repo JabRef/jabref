@@ -9,13 +9,13 @@ import org.jabref.model.cleanup.Formatter;
 /**
  * Replaces any tab with a space
  */
-public class RemoveTabsFormatter extends Formatter {
+public class ReplaceTabsBySpaceFormater extends Formatter {
 
     private static final Pattern TAB = Pattern.compile("\t+");
 
     @Override
     public String getName() {
-        return Localization.lang("Remove tabs");
+        return Localization.lang("Replace tabs with space");
     }
 
     @Override
@@ -26,13 +26,12 @@ public class RemoveTabsFormatter extends Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-
         return TAB.matcher(value).replaceAll(" ");
     }
 
     @Override
     public String getDescription() {
-        return Localization.lang("Removes tabs in the field content.");
+        return Localization.lang("Replace tabs with space in the field content.");
     }
 
     @Override

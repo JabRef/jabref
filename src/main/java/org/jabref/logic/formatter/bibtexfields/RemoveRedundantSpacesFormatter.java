@@ -26,7 +26,6 @@ public class RemoveRedundantSpacesFormatter extends Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-
         return MULTIPLE_SPACES.matcher(value).replaceAll(" ");
     }
 

@@ -7,7 +7,7 @@ import java.net.URL;
 import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
-import org.jabref.logic.formatter.bibtexfields.RemoveTabsFormatter;
+import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
@@ -50,7 +50,7 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     @Override
     public void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
-        new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveTabsFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(StandardField.ABSTRACT, new ReplaceTabsBySpaceFormater()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveRedundantSpacesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
     }
