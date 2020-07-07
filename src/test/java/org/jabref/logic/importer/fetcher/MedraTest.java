@@ -61,7 +61,7 @@ public class MedraTest {
                 Arguments.of("10.1400/115378",
                         Optional.of(
                                 new BibEntry(StandardEntryType.Article)
-                                        .withField(StandardField.AUTHOR, "Cisternino Paola ")
+                                        .withField(StandardField.AUTHOR, "Paola Cisternino")
                                         .withField(StandardField.PUBLISHER, "Edizioni Otto Novecento")
                                         .withField(StandardField.TITLE, "Diagramma semantico dei lemmi : casa, parola, silenzio e attesa in È fatto giorno e Margherite e rosolacci di Rocco Scotellaro")
                                         .withField(StandardField.ISSN, "0391-2639")

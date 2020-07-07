@@ -95,15 +95,12 @@ public class Medra implements IdBasedParserFetcher {
 
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
-            name = author.optString("literal", "") + " " + author.optString("family", "") + " " + author.optString("given", "");
-
-            authorsParsed.addAuthor(
-                                    name,
-                                    "",
-                                    "",
-                                    "",
-                                    "");
-
+            if (author.has("literal")) {
+                // quickly route through the literal string
+                authorsParsed.addAuthor(author.getString("literal"), "", "", "", "");
+            } else {
+                authorsParsed.addAuthor(author.optString("given", ""), "", "", author.optString("family", ""), "");
+            }
         }
         return authorsParsed.getAsFirstLastNamesWithAnd();
     }
