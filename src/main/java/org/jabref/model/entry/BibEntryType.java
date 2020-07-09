@@ -2,10 +2,9 @@ package org.jabref.model.entry;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.field.BibField;
@@ -18,13 +17,13 @@ import org.jabref.model.entry.types.EntryType;
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
-    private final SortedSet<OrFields> requiredFields;
-    private final SortedSet<BibField> fields;
+    private final LinkedHashSet<OrFields> requiredFields;
+    private final LinkedHashSet<BibField> fields;
 
     public BibEntryType(EntryType type, Collection<BibField> fields, Collection<OrFields> requiredFields) {
         this.type = Objects.requireNonNull(type);
-        this.requiredFields = new TreeSet<>(requiredFields);
-        this.fields = new TreeSet<>(fields);
+        this.requiredFields = new LinkedHashSet<>(requiredFields);
+        this.fields = new LinkedHashSet<>(fields);
     }
 
     public EntryType getType() {
@@ -36,10 +35,10 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * @return a List of optional field name Strings
      */
-    public SortedSet<BibField> getOptionalFields() {
-        return getAllFields().stream()
+    public Set<BibField> getOptionalFields() {
+        return getAllBibFields().stream()
                              .filter(field -> !isRequired(field.getField()))
-                             .collect(Collectors.toCollection(TreeSet::new));
+                             .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public boolean isRequired(Field field) {
@@ -54,33 +53,37 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * @return a List of required field name Strings
      */
-    public SortedSet<OrFields> getRequiredFields() {
-        return Collections.unmodifiableSortedSet(requiredFields);
+    public Set<OrFields> getRequiredFields() {
+        return Collections.unmodifiableSet(requiredFields);
     }
 
     /**
      * Returns all defined fields.
      */
-    public SortedSet<BibField> getAllFields() {
-        return Collections.unmodifiableSortedSet(fields);
+    public Set<BibField> getAllBibFields() {
+        return Collections.unmodifiableSet(fields);
     }
 
-    public SortedSet<BibField> getPrimaryOptionalFields() {
+    public Set<Field> getAllFields() {
+        return fields.stream().map(BibField::getField).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public Set<Field> getPrimaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.IMPORTANT)
-                                  .collect(Collectors.toCollection(TreeSet::new));
+                                  .map(BibField::getField)
+                                  .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SortedSet<Field> getSecondaryOptionalFields() {
+    public Set<Field> getSecondaryOptionalFields() {
         return getOptionalFields().stream()
                                   .filter(field -> field.getPriority() == FieldPriority.DETAIL)
                                   .map(BibField::getField)
-                                  .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
+                                  .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    public SortedSet<Field> getDeprecatedFields() {
-        SortedSet<Field> deprecatedFields = new TreeSet<>(Comparator.comparing(Field::getName));
-        deprecatedFields.addAll(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+    public Set<Field> getDeprecatedFields() {
+        Set<Field> deprecatedFields = new LinkedHashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
         deprecatedFields.add(StandardField.YEAR);
         deprecatedFields.add(StandardField.MONTH);
 
@@ -89,9 +92,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return deprecatedFields;
     }
 
-    public SortedSet<Field> getSecondaryOptionalNotDeprecatedFields() {
-        SortedSet<Field> optionalFieldsNotPrimaryOrDeprecated = new TreeSet<>(Comparator.comparing(Field::getName));
-        optionalFieldsNotPrimaryOrDeprecated.addAll(getSecondaryOptionalFields());
+    public Set<Field> getSecondaryOptionalNotDeprecatedFields() {
+        Set<Field> optionalFieldsNotPrimaryOrDeprecated = new LinkedHashSet<>(getSecondaryOptionalFields());
         optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
         return optionalFieldsNotPrimaryOrDeprecated;
     }
@@ -99,8 +101,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
     /**
      * Get list of all optional fields of this entry and their aliases.
      */
-    private SortedSet<Field> getOptionalFieldsAndAliases() {
-        SortedSet<Field> optionalFieldsAndAliases = new TreeSet<>(Comparator.comparing(Field::getName));
+    private Set<Field> getOptionalFieldsAndAliases() {
+        Set<Field> optionalFieldsAndAliases = new LinkedHashSet<>(getOptionalFields().size());
         for (BibField field : getOptionalFields()) {
             optionalFieldsAndAliases.add(field.getField());
             if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field.getField())) {
@@ -115,13 +117,14 @@ public class BibEntryType implements Comparable<BibEntryType> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         BibEntryType that = (BibEntryType) o;
         return type.equals(that.type) &&
-                requiredFields.equals(that.requiredFields) &&
-                fields.equals(that.fields);
+               Objects.equals(requiredFields, that.requiredFields) &&
+               Objects.equals(fields, that.fields);
+
     }
 
     @Override
@@ -132,10 +135,10 @@ public class BibEntryType implements Comparable<BibEntryType> {
     @Override
     public String toString() {
         return "BibEntryType{" +
-                "type=" + type +
-                ", requiredFields=" + requiredFields +
-                ", fields=" + fields +
-                '}';
+               "type=" + type +
+               ", requiredFields=" + requiredFields +
+               ", fields=" + fields +
+               '}';
     }
 
     @Override

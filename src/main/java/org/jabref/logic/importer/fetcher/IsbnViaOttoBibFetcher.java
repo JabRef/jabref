@@ -39,7 +39,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
      * @return null, because the identifier is passed using form data. This method is not used.
      */
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         return null;
     }
 

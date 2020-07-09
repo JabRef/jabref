@@ -25,8 +25,14 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
+import kong.unirest.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String NAME = "DOI";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
     private final ImportFormatPreferences preferences;
 
@@ -47,18 +53,27 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
+
         try {
             if (doi.isPresent()) {
+                Optional<BibEntry> fetchedEntry;
+
+                // mEDRA does not return a parsable bibtex string
+                if (doi.get().getAgency().isPresent() && "medra".equalsIgnoreCase(doi.get().getAgency().get())) {
+                    return new Medra().performSearchById(identifier);
+                }
+
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
 
                 // BibTeX data
-                URLDownload download = new URLDownload(doiURL);
+                URLDownload download = getUrlDownload(doiURL);
                 download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
                 String bibtexString = download.asString();
 
                 // BibTeX entry
-                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
+
                 return fetchedEntry;
             } else {
                 throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
@@ -67,6 +82,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
+        } catch (JSONException e) {
+            throw new FetcherException("Could not retrieve Registration Agency", e);
         }
     }
 
@@ -84,4 +101,5 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
             return Collections.emptyList();
         }
     }
+
 }
