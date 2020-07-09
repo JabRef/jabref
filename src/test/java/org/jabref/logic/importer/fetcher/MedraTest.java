@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MedraTest {
 
-    private Medra fetcher = new Medra();
+    private final Medra fetcher = new Medra();
 
     private static Stream<Arguments> getDoiBibEntryPairs() {
         return Stream.of(
@@ -35,7 +35,6 @@ public class MedraTest {
                                         .withField(StandardField.ISSN, "2031-8952")
                                         .withField(StandardField.JOURNAL, "Tijdschrift voor Filosofie")
                                         .withField(StandardField.PAGES, "625-629")
-                                        .withField(StandardField.URL, "http://doi.org/10.2143/TVF.80.3.3285690")
                         )),
 
                 Arguments.of("10.3303/CET1977146",
@@ -56,7 +55,6 @@ public class MedraTest {
                                         .withField(StandardField.DOI, "10.3303/CET1977146")
                                         .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
                                         .withField(StandardField.PAGES, "871-876")
-                                        .withField(StandardField.URL, "http://doi.org/10.3303/CET1977146")
                                         .withField(StandardField.VOLUME, "77"))),
                 Arguments.of("10.1400/115378",
                         Optional.of(
@@ -68,7 +66,6 @@ public class MedraTest {
                                         .withField(StandardField.YEAR, "1999")
                                         .withField(StandardField.DOI, "10.1400/115378")
                                         .withField(StandardField.JOURNAL, "Otto/Novecento : rivista quadrimestrale di critica e storia letteraria")
-                                        .withField(StandardField.URL, "http://doi.org/10.1400/115378")
                         ))
         );
     }
@@ -89,6 +86,5 @@ public class MedraTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
         assertEquals(expected, fetchedEntry);
     }
-
 
 }

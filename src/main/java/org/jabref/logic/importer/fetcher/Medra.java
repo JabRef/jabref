@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -115,6 +116,11 @@ public class Medra implements IdBasedParserFetcher {
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         return new URL(API_URL + "/" + identifier);
+    }
+
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        new DoiCleanup().cleanup(entry);
     }
 
 }

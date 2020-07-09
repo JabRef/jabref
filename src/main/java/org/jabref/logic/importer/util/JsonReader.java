@@ -6,7 +6,6 @@ import java.io.InputStream;
 import org.jabref.logic.importer.ParseException;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
@@ -22,7 +21,7 @@ public class JsonReader {
      */
     public static JSONObject toJsonObject(InputStream inputStream) throws ParseException {
         try {
-            String inputStr = new String(ByteStreams.toByteArray(inputStream), Charsets.UTF_8);
+            String inputStr = new String((inputStream.readAllBytes()), Charsets.UTF_8);
             // Fallback: in case an empty stream was passed, return an empty JSON object
             if (inputStr.isBlank()) {
                 return new JSONObject();
