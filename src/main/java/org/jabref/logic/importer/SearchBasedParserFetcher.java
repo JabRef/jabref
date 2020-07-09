@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
