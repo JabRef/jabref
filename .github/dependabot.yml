@@ -17,3 +17,9 @@ updates:
   - dependency-name: de.jensd:fontawesomefx-materialdesignfont
     versions:
     - "> 1.7.22-4" # Strange versioning format
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: weekly
+  labels:
+  - "type: dependencies"

@@ -13,6 +13,9 @@
             "pattern": "^https://.*\\.jabref\\.org"
         },
         {
+            "pattern": "^https://sourcespy\\.com/.*"
+        },
+        {
             "pattern": "^http://purl\\.org/net/bibteXMP"
         },
         {
