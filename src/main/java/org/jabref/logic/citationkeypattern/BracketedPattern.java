@@ -14,12 +14,14 @@ import java.util.StringTokenizer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -855,21 +857,13 @@ public class BracketedPattern {
      */
     public static String authEtal(String authorField, String delim,
                                   String append) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
+        List<Author> authors = AuthorList.parse(authorField).getAuthors();
 
-        String[] tokens = fixedAuthorField.split("\\s*\\band\\b\\s*");
-        if (tokens.length == 0) {
-            return "";
+        if (authors.size() > 2) {
+            return authors.get(0).getLast().orElse("") + append;
+        } else {
+            return authors.stream().map(Author::getLast).flatMap(Optional::stream).collect(Collectors.joining(delim));
         }
-        StringBuilder author = new StringBuilder();
-        author.append((tokens[0].split(","))[0]);
-        if (tokens.length == 2) {
-            author.append(delim).append((tokens[1].split(","))[0]);
-        } else if (tokens.length > 2) {
-            author.append(append);
-        }
-
-        return author.toString();
     }
 
     /**
