@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.logic.formatter.bibtexfields.NormalizeNewlinesFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -56,6 +57,9 @@ public class FieldFormatterCleanup implements CleanupJob {
 
         // Run formatter
         String newValue = formatter.format(oldValue);
+        if (formatter instanceof NormalizeNewlinesFormatter) {
+            newValue = oldValue;
+        }
 
         if (oldValue.equals(newValue)) {
             return Collections.emptyList();

@@ -14,6 +14,7 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -64,8 +65,8 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        String oldValue = entry.getField(field).orElse(null);
-
+                        // Controlsfx uses hardcoded \n for multiline fields, but JabRef stores them in OS Newlines format
+                        String oldValue = entry.getField(field).map(value -> value.replace(OS.NEWLINE, "\n")).orElse(null);
                         // Autosave and save action trigger the entry editor to reload the fields, so we have to
                         // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
                         if (!(newValue.trim()).equals(StringUtils.trim(oldValue))) {
