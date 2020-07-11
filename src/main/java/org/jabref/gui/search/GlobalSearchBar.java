@@ -36,7 +36,6 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
 import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
@@ -48,7 +47,6 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -229,15 +227,6 @@ public class GlobalSearchBar extends HBox {
 
             performSearch();
         });
-    }
-
-    public void endSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel != null) {
-            searchField.setText("");
-            MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-            mainTable.requestFocus();
-        }
     }
 
     /**
