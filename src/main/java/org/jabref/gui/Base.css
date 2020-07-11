@@ -356,6 +356,8 @@
     -fx-padding: 0.5em;
 }
 
+.toggle-button:hover,
+.toggle-button:selected:hover,
 .icon-buttonNoSpaceBottom:hover,
 .icon-buttonNoSpaceTop:hover,
 .icon-button:hover {
@@ -374,8 +376,9 @@
     -fx-fill: white;
 }
 
-.toggle-button:selected.icon-button:selected {
-    -fx-background-color: transparent;
+.toggle-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: -jr-selected;
     -fx-fill: -jr-selected;
 }
 
