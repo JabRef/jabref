@@ -51,8 +51,8 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(StandardField.URL, new UrlChecker());
         fieldCheckers.put(StandardField.YEAR, new YearChecker());
-        fieldCheckers.put(StandardField.KEY, new ValidBibtexKeyChecker());
-        fieldCheckers.put(InternalField.KEY_FIELD, new ValidBibtexKeyChecker());
+        fieldCheckers.put(StandardField.KEY, new ValidCitationKeyChecker());
+        fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker());
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(StandardField.DATE, new DateChecker());

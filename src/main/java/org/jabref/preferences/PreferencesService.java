@@ -8,10 +8,15 @@ import java.util.Set;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences;
+import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
@@ -29,9 +34,10 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -100,7 +106,9 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveCustomEntryTypes();
+    void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager);
+
+    void clearBibEntryTypes(BibDatabaseMode mode);
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
@@ -146,6 +154,10 @@ public interface PreferencesService {
     // ToDo: GroupPreferences
     //*************************************************************************************************************
 
+    GroupViewMode getGroupViewMode();
+
+    void setGroupViewMode(GroupViewMode mode);
+
     boolean getDisplayGroupCount();
 
     //*************************************************************************************************************
@@ -179,16 +191,16 @@ public interface PreferencesService {
     void storeProxyPreferences(ProxyPreferences proxyPreferences);
 
     //*************************************************************************************************************
-    // BibtexKeyPatternPreferences
+    // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
-    GlobalBibtexKeyPattern getGlobalBibtexKeyPattern();
+    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
 
-    void updateGlobalBibtexKeyPattern();
+    void updateGlobalCitationKeyPattern();
 
-    BibtexKeyPatternPreferences getBibtexKeyPatternPreferences();
+    CitationKeyPatternPreferences getCitationKeyPatternPreferences();
 
-    void storeBibtexKeyPatternPreferences(BibtexKeyPatternPreferences preferences);
+    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
 
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
@@ -199,10 +211,33 @@ public interface PreferencesService {
     void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
 
     //*************************************************************************************************************
+    // MainTablePreferences
+    //*************************************************************************************************************
+
+    void updateMainTableColumns();
+
+    ColumnPreferences getColumnPreferences();
+
+    void storeColumnPreferences(ColumnPreferences columnPreferences);
+
+    MainTablePreferences getMainTablePreferences();
+
+    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
+
+    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
+
+    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 
     AutoCompletePreferences getAutoCompletePreferences();
 
     void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
+
+    SpecialFieldsPreferences getSpecialFieldsPreferences();
+
+    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
+
 }

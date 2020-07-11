@@ -2,6 +2,7 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Antioxidants &amp; Redox Signaling</title>
+    <title-short>ARS</title-short>
     <id>http://www.zotero.org/styles/antioxidants-and-redox-signaling</id>
     <link href="http://www.zotero.org/styles/antioxidants-and-redox-signaling" rel="self"/>
     <link href="http://www.zotero.org/styles/spandidos-publications" rel="template"/>
@@ -83,11 +84,11 @@
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=".">
         <text macro="author"/>
-        <text macro="title" font-style="normal"/>
+        <text macro="title"/>
       </group>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group delimiter=", ">
+          <group delimiter=", " prefix=" ">
             <group suffix=".">
               <text macro="edition" prefix=" "/>
               <text macro="editor" prefix=" (" suffix=")"/>
@@ -119,7 +120,7 @@
             </group>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="webpage post-weblog post" match="any">
           <group delimiter=". " prefix=" ">
             <text variable="container-title"/>
             <text variable="URL"/>

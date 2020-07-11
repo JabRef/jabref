@@ -296,7 +296,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the citation key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
      * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
@@ -314,7 +314,7 @@ public class BibEntry implements Cloneable {
 
     /**
      * Sets the cite key AKA citation key AKA BibTeX key. Note: This is <emph>not</emph> the internal Id of this entry.
-     * The internal Id is always present, whereas the BibTeX key might not be present.
+     * The internal Id is always present, whereas the citation key might not be present.
      *
      * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
      */

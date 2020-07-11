@@ -1,16 +1,22 @@
 package org.jabref.model.entry.identifier;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +25,14 @@ import org.slf4j.LoggerFactory;
  * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
+
+    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
     private static final URI RESOLVER = URI.create("https://doi.org");
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -238,7 +248,7 @@ public class DOI implements Identifier {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         DOI other = (DOI) o;
@@ -248,5 +258,24 @@ public class DOI implements Identifier {
     @Override
     public int hashCode() {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
+    }
+
+    /**
+     * Returns registration agency. Optional.empty() if no agency is found.
+     */
+    public Optional<String> getAgency() throws IOException {
+        Optional<String> agency = Optional.empty();
+        try {
+            URLDownload download = new URLDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi));
+            JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
+            if (response != null) {
+                agency = Optional.ofNullable(response.optString("RA"));
+            }
+        } catch (JSONException e) {
+            LOGGER.error("Cannot parse agency fetcher repsonse to JSON");
+            return Optional.empty();
+        }
+
+        return agency;
     }
 }

@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Set;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 
@@ -13,18 +13,18 @@ public class ImportFormatPreferences {
     private final Set<CustomImporter> customImportList;
     private final Charset encoding;
     private final Character keywordSeparator;
-    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
     private final XmpPreferences xmpPreferences;
     private final boolean keywordSyncEnabled;
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
-                                   BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+                                   CitationKeyPatternPreferences citationKeyPatternPreferences,
                                    FieldContentFormatterPreferences fieldContentFormatterPreferences, XmpPreferences xmpPreferences, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
-        this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
         this.xmpPreferences = xmpPreferences;
         this.keywordSyncEnabled = keywordSyncEnabled;
@@ -46,8 +46,8 @@ public class ImportFormatPreferences {
         return keywordSeparator;
     }
 
-    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return bibtexKeyPatternPreferences;
+    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        return citationKeyPatternPreferences;
     }
 
     public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
@@ -55,7 +55,7 @@ public class ImportFormatPreferences {
     }
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
-        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
+        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, citationKeyPatternPreferences,
                 fieldContentFormatterPreferences, xmpPreferences, keywordSyncEnabled);
     }
 
