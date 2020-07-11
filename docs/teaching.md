@@ -4,7 +4,7 @@ With JabRef students can level-up their coding and GitHub skills. When taking pa
 
 JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engienering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
 
-We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time.
+We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time [1](teaching.md#Ayaankazerouni).
 
 ## Notes for instructors
 
