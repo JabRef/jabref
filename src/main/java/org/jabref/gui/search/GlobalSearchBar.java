@@ -8,6 +8,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -124,6 +125,14 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
         // searchModeButton = new Button();
         initSearchModifierButtons();
+
+        BooleanBinding focusBinding = searchField.focusedProperty()
+                                                 .or(regularExpressionButton.focusedProperty()
+                                                 .or(caseSensitiveButton.focusedProperty()));
+        regularExpressionButton.visibleProperty().unbind();
+        regularExpressionButton.visibleProperty().bind(focusBinding);
+        caseSensitiveButton.visibleProperty().unbind();
+        caseSensitiveButton.visibleProperty().bind(focusBinding);
 
         StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
         modifierButtons.setAlignment(Pos.CENTER);
