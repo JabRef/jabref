@@ -158,7 +158,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
-        throws FetcherException {
+            throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
 
