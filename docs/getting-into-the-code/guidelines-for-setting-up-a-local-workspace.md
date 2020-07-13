@@ -4,7 +4,7 @@ This guide explains how to set up your environment for development of JabRef. It
 
 ```text
 The most important step is to configure your IDE.
-In case you know how to install JDK14 and to fork JabRef's code,
+In case you know how to install JDK14 with JavaFX support and to fork JabRef's code,
         please scroll down to the IDE setup.
 ```
 
@@ -18,9 +18,11 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 14
 
-A working Java 14 installation is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java (Develoment Kit) 14 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-Download the JDK from [https://jdk.java.net/](https://jdk.java.net/). On Windows, you can execute `choco install openjdk` \(requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)\).
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. We recommend to setup the full Liberica JDK including JavaFX. You can get it from <https://bell-sw.com/pages/downloads/?version=java-14&package=jdk-full>. On Windows, you can execute `choco install libericajdkfull` \(requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)\).
+
+Alternatively, you can download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download download the "jmods" JavaFX 14 zip archive from <https://gluonhq.com/products/javafx/> and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-14.0.1\jmods`.
 
 ### GitHub Account
 
