@@ -244,9 +244,9 @@ public class BracketedPattern {
                 String authString;
                 if (database != null) {
                     authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
-                                      .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                                      .map(BracketedPattern::normalize).orElse("");
                 } else {
-                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, null).orElse("");
                 }
 
                 if (val.startsWith("pure")) {
