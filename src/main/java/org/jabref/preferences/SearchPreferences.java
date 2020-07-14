@@ -26,38 +26,15 @@ public class SearchPreferences {
         return isRegularExpression;
     }
 
-    public Builder getBuilder() {
-        return new Builder(this);
+    public SearchPreferences withSearchDisplayMode(SearchDisplayMode newSearchDisplayMode) {
+        return new SearchPreferences(newSearchDisplayMode, isCaseSensitive, isRegularExpression);
     }
 
-    public static class Builder {
-        private SearchDisplayMode searchDisplayMode;
-        private boolean isCaseSensitive;
-        private boolean isRegularExpression;
+    public SearchPreferences withCaseSensitive(boolean newCaseSensitive) {
+        return new SearchPreferences(searchDisplayMode, newCaseSensitive, isRegularExpression);
+    }
 
-        public Builder(SearchPreferences initialPreferences) {
-            this.searchDisplayMode = initialPreferences.searchDisplayMode;
-            this.isCaseSensitive = initialPreferences.isCaseSensitive;
-            this.isRegularExpression = initialPreferences.isRegularExpression;
-        }
-
-        public Builder withSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
-            this.searchDisplayMode = searchDisplayMode;
-            return this;
-        }
-
-        public Builder withCaseSensitive(boolean isCaseSensitive) {
-            this.isCaseSensitive = isCaseSensitive;
-            return this;
-        }
-
-        public Builder withRegularExpression(boolean regularExpression) {
-            this.isRegularExpression = regularExpression;
-            return this;
-        }
-
-        public SearchPreferences build() {
-            return new SearchPreferences(searchDisplayMode, isCaseSensitive, isRegularExpression);
-        }
+    public SearchPreferences withRegularExpression(boolean newRegularExpression) {
+        return new SearchPreferences(searchDisplayMode, isCaseSensitive, newRegularExpression);
     }
 }

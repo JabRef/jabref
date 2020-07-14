@@ -128,7 +128,7 @@ public class GlobalSearchBar extends HBox {
 
         BooleanBinding focusBinding = searchField.focusedProperty()
                                                  .or(regularExpressionButton.focusedProperty()
-                                                 .or(caseSensitiveButton.focusedProperty()));
+                                                                            .or(caseSensitiveButton.focusedProperty()));
         regularExpressionButton.visibleProperty().unbind();
         regularExpressionButton.visibleProperty().bind(focusBinding);
         caseSensitiveButton.visibleProperty().unbind();
@@ -185,9 +185,7 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton.managedProperty().bind(searchField.editableProperty());
         regularExpressionButton.visibleProperty().bind(searchField.editableProperty());
         regularExpressionButton.setOnAction(event -> {
-            searchPreferences = searchPreferences.getBuilder()
-                                                 .withRegularExpression(regularExpressionButton.isSelected())
-                                                 .build();
+            searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
@@ -203,9 +201,7 @@ public class GlobalSearchBar extends HBox {
         caseSensitiveButton.managedProperty().bind(searchField.editableProperty());
         caseSensitiveButton.visibleProperty().bind(searchField.editableProperty());
         caseSensitiveButton.setOnAction(event -> {
-            searchPreferences = searchPreferences.getBuilder()
-                                                 .withCaseSensitive(caseSensitiveButton.isSelected())
-                                                 .build();
+            searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
@@ -218,9 +214,7 @@ public class GlobalSearchBar extends HBox {
             int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
             searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
 
-            searchPreferences = searchPreferences.getBuilder()
-                                                 .withSearchDisplayMode(searchDisplayMode)
-                                                 .build();
+            searchPreferences = searchPreferences..withSearchDisplayMode(searchDisplayMode);
             preferencesService.storeSearchPreferences(searchPreferences);
 
             searchModeButton.setText(searchDisplayMode.getDisplayName());
