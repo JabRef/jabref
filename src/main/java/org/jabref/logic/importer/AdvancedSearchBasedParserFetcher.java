@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.jabref.logic.importer.fetcher.AdvancedSearchConfig;
+import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 
@@ -12,17 +12,17 @@ import org.jabref.model.entry.BibEntry;
  * This interface allows SearchBasedParserFetcher fetchers to test their corresponding
  * library APIs for their advanced search options, e.g. search in the "title" field.
  */
-public interface AdvancedFetcher extends SearchBasedParserFetcher {
+public interface AdvancedSearchBasedParserFetcher extends SearchBasedParserFetcher {
 
     /**
      * This method is used to send queries with advanced URL parameters.
      * This method is necessary as the performSearch method does not support certain URL parameters that are used for
      * fielded search, such as a title, author, or year parameter.
      *
-     * @param advancedSearchConfig the search config defining all fielded search parameters
+     * @param complexSearchQuery the search query defining all fielded search parameters
      */
-    default List<BibEntry> performAdvancedSearch(AdvancedSearchConfig advancedSearchConfig) throws FetcherException {
-        try (InputStream stream = getAdvancedURLDownload(advancedSearchConfig).asInputStream()) {
+    default List<BibEntry> performComplexSearchQuery(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        try (InputStream stream = getComplexQueryURLDownload(complexSearchQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
@@ -34,5 +34,5 @@ public interface AdvancedFetcher extends SearchBasedParserFetcher {
         }
     }
 
-    URLDownload getAdvancedURLDownload(AdvancedSearchConfig advancedSearchConfig);
+    URLDownload getComplexQueryURLDownload(ComplexSearchQuery complexSearchQuery);
 }

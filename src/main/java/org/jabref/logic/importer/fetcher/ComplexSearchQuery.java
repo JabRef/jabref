@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
 
-public class AdvancedSearchConfig {
+public class ComplexSearchQuery {
     private final String defaultField;
     private final String author;
     private final String title;
@@ -13,7 +13,7 @@ public class AdvancedSearchConfig {
     private final Integer toYear;
     private final String journal;
 
-    private AdvancedSearchConfig(String defaultField, String author, String title, Integer fromYear, Integer toYear, String journal) {
+    private ComplexSearchQuery(String defaultField, String author, String title, Integer fromYear, Integer toYear, String journal) {
         this.defaultField = defaultField;
         this.author = author;
         this.title = title;
@@ -111,11 +111,11 @@ public class AdvancedSearchConfig {
          * @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
          *                               See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
          */
-        public AdvancedSearchConfig build() throws IllegalStateException {
+        public ComplexSearchQuery build() throws IllegalStateException {
             if (textSearchFieldsAreEmpty()) {
                 throw new IllegalStateException("At least one text field has to be set");
             }
-            return new AdvancedSearchConfig(defaultField, author, title, fromYear, toYear, journal);
+            return new ComplexSearchQuery(defaultField, author, title, fromYear, toYear, journal);
         }
 
         private boolean textSearchFieldsAreEmpty() {

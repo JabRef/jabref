@@ -127,11 +127,11 @@ class IEEETest {
     @Test
     void getAdvancedURLDownload() {
         String expectedURLEncoding = "https://ieeexploreapi.ieee.org/api/v1/search/articles?apikey=s6kcbenkaxdu55c8k8983pw9&author=%28Igor+Steinmacher+AND+Tayana+Uchoa+Conte%29&article_title=%22Overcoming+Open+Source+Project+Entry+Barriers%22";
-        AdvancedSearchConfig.AdvancedSearchConfigBuilder builder = AdvancedSearchConfig.builder();
+        ComplexSearchQuery.AdvancedSearchConfigBuilder builder = ComplexSearchQuery.builder();
         builder.author("(Igor Steinmacher AND Tayana Uchoa Conte)");
         builder.title("\"Overcoming Open Source Project Entry Barriers\"");
 
-        String actualURLEncoding = fetcher.getAdvancedURLDownload(builder.build()).getSource().toString();
+        String actualURLEncoding = fetcher.getComplexQueryURLDownload(builder.build()).getSource().toString();
 
         assertEquals(expectedURLEncoding, actualURLEncoding);
     }

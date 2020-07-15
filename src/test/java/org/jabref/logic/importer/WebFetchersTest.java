@@ -80,7 +80,7 @@ class WebFetchersTest {
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
             // Remove interfaces
-            expected.remove(AdvancedFetcher.class);
+            expected.remove(AdvancedSearchBasedParserFetcher.class);
             expected.remove(SearchBasedParserFetcher.class);
 
             // Remove ACM, because it doesn't work currently
