@@ -190,14 +190,14 @@
   </locale>
   <locale xml:lang="la">
     <terms>
-      <term name="letter"></term>
+      <term name="letter"/>
       <term name="letter" form="short">epistula</term>
     </terms>
   </locale>
   <locale xml:lang="lt">
     <terms>
       <term name="letter">communicationis personalis</term>
-      <term name="letter" form="short"></term>
+      <term name="letter" form="short"/>
     </terms>
   </locale>
   <locale xml:lang="lv">
