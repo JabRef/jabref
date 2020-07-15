@@ -121,7 +121,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
      * @return URL which points to a search URL for given identifier
      */
     @Override
-    public URL getURLForID(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
+    public URL getUrlForIdentifier(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
@@ -227,7 +227,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         }
 
         try {
-            List<String> bibcodes = fetchBibcodes(getURLForID(identifier));
+            List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
             List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
 
             if (fetchedEntries.isEmpty()) {

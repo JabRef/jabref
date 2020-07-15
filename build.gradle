@@ -19,6 +19,7 @@ plugins {
     id 'org.beryx.jlink' version '2.21.0'
 
     // nicer test outputs during running and completion
+    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.0'
 }
 
@@ -114,7 +115,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.65.01'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.66'
 
     implementation 'commons-cli:commons-cli:1.4'
 
