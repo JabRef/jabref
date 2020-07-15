@@ -14,5 +14,5 @@ MD026:
   punctuation: ".,;:!"
 
 MD033:
-  # we have <a> tags with ids
-  allowed_elements: ['a']
+  # we have <a> tags with ids and superscript
+  allowed_elements: ['a', 'sup']

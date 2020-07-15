@@ -25,7 +25,9 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
+import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
+import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +61,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 Optional<BibEntry> fetchedEntry;
 
                 // mEDRA does not return a parsable bibtex string
-                if (doi.get().getAgency().isPresent() && "medra".equalsIgnoreCase(doi.get().getAgency().get())) {
+                if (getAgency(doi.get()).isPresent() && "medra".equalsIgnoreCase(getAgency(doi.get()).get())) {
                     return new Medra().performSearchById(identifier);
                 }
 
@@ -100,6 +102,27 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Returns registration agency. Optional.empty() if no agency is found.
+     *
+     * @param doi the DOI to be searched
+     */
+    public Optional<String> getAgency(DOI doi) throws IOException {
+        Optional<String> agency = Optional.empty();
+        try {
+            URLDownload download = getUrlDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi.getDOI()));
+            JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
+            if (response != null) {
+                agency = Optional.ofNullable(response.optString("RA"));
+            }
+        } catch (JSONException e) {
+            LOGGER.error("Cannot parse agency fetcher repsonse to JSON");
+            return Optional.empty();
+        }
+
+        return agency;
     }
 
 }

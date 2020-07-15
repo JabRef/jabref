@@ -79,6 +79,8 @@ class WebFetchersTest {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(SearchBasedFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
+            // Remove interfaces
+            expected.remove(AdvancedFetcher.class);
             expected.remove(SearchBasedParserFetcher.class);
 
             // Remove ACM, because it doesn't work currently
