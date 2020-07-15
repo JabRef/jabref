@@ -131,7 +131,7 @@ class IEEETest {
         builder.author("(Igor Steinmacher AND Tayana Uchoa Conte)");
         builder.title("\"Overcoming Open Source Project Entry Barriers\"");
 
-        String actualURLEncoding = fetcher.getComplexQueryURLDownload(builder.build()).getSource().toString();
+        String actualURLEncoding = fetcher.getComplexQueryURL(builder.build()).getSource().toString();
 
         assertEquals(expectedURLEncoding, actualURLEncoding);
     }

@@ -231,8 +231,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher, Advanced
     }
 
     @Override
-    public URLDownload getComplexQueryURLDownload(ComplexSearchQuery complexSearchQuery) {
-        URLDownload urlDownload;
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) {
         try {
             URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
             uriBuilder.addParameter("apikey", API_KEY);
@@ -244,11 +243,10 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher, Advanced
             complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
 
             URLDownload.bypassSSLVerification();
-            urlDownload = new URLDownload(uriBuilder.build().toURL());
+            return uriBuilder.build().toURL();
         } catch (URISyntaxException | MalformedURLException ex) {
             LOGGER.error("Error creating URL.", ex);
             throw new IllegalStateException("Error during creation of URL.", ex);
         }
-        return urlDownload;
     }
 }

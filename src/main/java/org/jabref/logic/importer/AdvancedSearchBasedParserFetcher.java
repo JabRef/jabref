@@ -2,10 +2,10 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -22,7 +22,7 @@ public interface AdvancedSearchBasedParserFetcher extends SearchBasedParserFetch
      * @param complexSearchQuery the search query defining all fielded search parameters
      */
     default List<BibEntry> performComplexSearchQuery(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        try (InputStream stream = getComplexQueryURLDownload(complexSearchQuery).asInputStream()) {
+        try (InputStream stream = getUrlDownload(getComplexQueryURL(complexSearchQuery)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
@@ -34,5 +34,5 @@ public interface AdvancedSearchBasedParserFetcher extends SearchBasedParserFetch
         }
     }
 
-    URLDownload getComplexQueryURLDownload(ComplexSearchQuery complexSearchQuery);
+    URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery);
 }
