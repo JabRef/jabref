@@ -132,7 +132,6 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Test
     @Override
     public void supportsJournalSearch() throws Exception {
-
         List<BibEntry> result = fetcher.performSearch("journalid:392");
         List<String> resultEntriesJournals = result.stream()
                                                    .map(bibEntry -> bibEntry.getField(StandardField.JOURNAL))
@@ -175,7 +174,6 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Test
     @Override
     public void supportsBooleanANDSearch() throws Exception {
-
         List<BibEntry> resultJustByAuthor = fetcher.performSearch("name:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch("name:\"Redmiles, David\" AND journal:Computer Supported Cooperative Work");
 
