@@ -231,22 +231,17 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher, Advanced
     }
 
     @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) {
-        try {
-            URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-            uriBuilder.addParameter("apikey", API_KEY);
-            complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
-            complexSearchQuery.getAuthor().ifPresent(author -> uriBuilder.addParameter("author", author));
-            complexSearchQuery.getTitle().ifPresent(articleTitle -> uriBuilder.addParameter("article_title", articleTitle));
-            complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
-            complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
-            complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", API_KEY);
+        complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
+        complexSearchQuery.getAuthor().ifPresent(author -> uriBuilder.addParameter("author", author));
+        complexSearchQuery.getTitle().ifPresent(articleTitle -> uriBuilder.addParameter("article_title", articleTitle));
+        complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
+        complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
+        complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
 
-            URLDownload.bypassSSLVerification();
+        URLDownload.bypassSSLVerification();
             return uriBuilder.build().toURL();
-        } catch (URISyntaxException | MalformedURLException ex) {
-            LOGGER.error("Error creating URL.", ex);
-            throw new IllegalStateException("Error during creation of URL.", ex);
-        }
     }
 }

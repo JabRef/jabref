@@ -2,6 +2,8 @@ package org.jabref.logic.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -26,6 +28,8 @@ public interface AdvancedSearchBasedParserFetcher extends SearchBasedParserFetch
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
             throw new FetcherException("A network error occurred", e);
@@ -34,5 +38,5 @@ public interface AdvancedSearchBasedParserFetcher extends SearchBasedParserFetch
         }
     }
 
-    URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery);
+    URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException;
 }
