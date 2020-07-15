@@ -30,7 +30,7 @@
     </terms>
   </locale>
   <macro name="editor-translator-verb-period">
-    <names variable="editor translator" delimiter=" ">
+    <names variable="editor translator" delimiter=". ">
       <label form="verb" text-case="capitalize-first" suffix=" "/>
       <name and="text" delimiter=", "/>
     </names>
@@ -481,7 +481,7 @@
       <text macro="point-locators"/>
     </group>
   </macro>
-  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-year-suffix="true" disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name" collapse="year" after-collapse-delimiter="; ">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">

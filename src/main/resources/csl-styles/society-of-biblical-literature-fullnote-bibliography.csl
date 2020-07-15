@@ -48,7 +48,7 @@
     </names>
   </macro>
   <macro name="editor-translator-verb-period">
-    <names variable="editor translator" delimiter=" ">
+    <names variable="editor translator" delimiter=". ">
       <label form="verb" text-case="capitalize-first" suffix=" "/>
       <name and="text" delimiter=", "/>
     </names>
