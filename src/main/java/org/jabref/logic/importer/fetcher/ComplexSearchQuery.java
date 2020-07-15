@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.model.strings.StringUtil;
 
 public class ComplexSearchQuery {
+    // Field for non-fielded search
     private final String defaultField;
     private final String author;
     private final String title;
