@@ -123,7 +123,7 @@
           <group delimiter=" ">
             <text term="issue" form="short"/>
             <text variable="number"/>
-        </group>
+          </group>
         </group>
       </if>
       <else-if type="bill book graphic legislation motion_picture report song" match="any">
