@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
@@ -138,11 +139,14 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
                                                    .filter(Optional::isPresent)
                                                    .map(Optional::get)
                                                    .collect(Collectors.toList());
+        Set<String> distinctJournalsFromResult = resultEntriesJournals.stream()
+                                                                      .distinct()
+                                                                      .collect(Collectors.toSet());
 
         // Ensure no entries without a journal field were returned
         assertEquals(result.size(), resultEntriesJournals.size());
-        resultEntriesJournals.forEach(journal -> journal.equals("Clinical Research in Cardiology"));
-        System.out.println(result);
+        Assertions.assertEquals(Collections.singleton("Clinical Research in Cardiology"), distinctJournalsFromResult);
+        // resultEntriesJournals.forEach(journal -> journal.equals("Clinical Research in Cardiology"));
     }
 
     @Test
