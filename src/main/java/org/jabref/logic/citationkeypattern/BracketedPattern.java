@@ -29,6 +29,7 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -267,6 +268,9 @@ public class BracketedPattern {
                     }
                 }
 
+                String unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
+                AuthorList authorList = createAuthorList(unparsedAuthors);
+
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 switch (val) {
@@ -418,6 +422,32 @@ public class BracketedPattern {
             LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
         }
+    }
+
+    private static AuthorList createAuthorList(String unparsedAuthors) {
+        AuthorList authorList = new AuthorList();
+        for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
+            if (isInstitution(author)) {
+                String institutionKey = author.getLast()
+                                              .map(LatexToUnicodeAdapter::format)
+                                              .map(BracketedPattern::generateInstitutionKey)
+                                              .orElse(null);
+                authorList.addAuthor(null, null, null, institutionKey, null);
+            }
+            authorList.addAuthor(
+                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getLast().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
+            );
+        }
+        return authorList;
+    }
+
+    private static boolean isInstitution(Author author) {
+        return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
+                && author.getVon().isEmpty() && author.getLast().isPresent();
     }
 
     /**
