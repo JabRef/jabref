@@ -240,4 +240,7 @@ public interface PreferencesService {
 
     void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
 
+    SearchPreferences getSearchPreferences();
+
+    void storeSearchPreferences(SearchPreferences preferences);
 }
