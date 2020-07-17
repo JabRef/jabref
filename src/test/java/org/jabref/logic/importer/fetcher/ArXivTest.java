@@ -8,19 +8,18 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -222,18 +221,14 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 
-    @Test
     @Override
-    public void supportsAuthorSearch() throws Exception {
-        List<BibEntry> results = fetcher.performSearch("au:\"Tobias Diez\"");
-        assertFalse(results.isEmpty());
-        results.forEach(bibEntry -> {
+    public SearchBasedFetcher getFetcher() {
+        return fetcher;
+    }
 
-            String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
-
-            // The co-authors differ, thus we check for the author present at all papers
-            Assertions.assertTrue(author.contains("Tobias Diez"));
-        });
+    @Override
+    public List<String> getTestAuthors() {
+        return List.of("\"Tobias Diez\"");
     }
 
     @Disabled("Is not supported by the current API")
@@ -249,22 +244,12 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
 
     }
 
-    @Test
     @Override
-    public void supportsJournalSearch() throws Exception {
-        List<BibEntry> results = fetcher.performSearch("jr: \"Journal of Geometry and Physics (2013)\"");
-        assertFalse(results.isEmpty());
-        results.forEach(bibEntry -> {
-            String journalTitle = bibEntry.getField(StandardField.JOURNALTITLE).orElse("");
-            // Throw away year and following information
-            journalTitle = journalTitle.replaceFirst(" \\(\\d\\d\\d\\d\\).*", "");
-            // Just check whether the returned entries contain the queried journal as journal title.
-            assertEquals("Journal of Geometry and Physics", journalTitle);
-        });
+    public String getTestJournal() {
+        return "\"Journal of Geometry and Physics (2013)\"";
     }
 
     @Test
-    @Override
     public void supportsPhraseSearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Büscher and Angel L. Diez and Gerhard Gompper and Jens Elgeti")
@@ -288,7 +273,6 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    @Override
     public void supportsBooleanANDSearch() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Büscher and Angel L. Diez and Gerhard Gompper and Jens Elgeti")

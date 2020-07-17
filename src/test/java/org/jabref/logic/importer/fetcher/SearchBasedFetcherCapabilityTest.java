@@ -1,6 +1,20 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Defines the set of capability tests that each tests a given search capability, e.g. author based search.
@@ -14,35 +28,88 @@ interface SearchBasedFetcherCapabilityTest {
      * Test whether the library API supports author field search.
      */
     @Test
-    void supportsAuthorSearch() throws Exception;
+    default void supportsAuthorSearch() throws Exception {
+        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
+        getTestAuthors().forEach(builder::author);
+
+        List<BibEntry> results = getFetcher().performComplexSearch(builder.build());
+
+        assertFalse(results.isEmpty());
+        System.out.println(results);
+        results.forEach(bibEntry -> {
+            String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
+
+            // The co-authors differ, thus we check for the author present at all papers
+            getTestAuthors().forEach(expectedAuthor -> Assertions.assertTrue(author.contains(expectedAuthor.replace("\"", ""))));
+        });
+    }
 
     /**
      * Test whether the library API supports year field search.
      */
     @Test
-    void supportsYearSearch() throws Exception;
+    default void supportsYearSearch() throws Exception {
+        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
+        builder.singleYear(getTestYear());
+
+        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<String> differentYearsInResult = result.stream()
+                                                    .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
+                                                    .filter(Optional::isPresent)
+                                                    .map(Optional::get)
+                                                    .distinct()
+                                                    .collect(Collectors.toList());
+
+        assertFalse(result.isEmpty());
+        assertEquals(Collections.singletonList(getTestYear().toString()), differentYearsInResult);
+    }
 
     /**
      * Test whether the library API supports year range search.
      */
     @Test
-    void supportsYearRangeSearch() throws Exception;
+    default void supportsYearRangeSearch() throws Exception {
+        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
+        List<String> yearsInYearRange = List.of("2018", "2019", "2020");
+        builder.fromYearAndToYear(2018, 2020);
+
+        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<String> differentYearsInResult = result.stream()
+                                                    .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
+                                                    .filter(Optional::isPresent)
+                                                    .map(Optional::get)
+                                                    .distinct()
+                                                    .collect(Collectors.toList());
+        assertFalse(result.isEmpty());
+        assertTrue(yearsInYearRange.containsAll(differentYearsInResult));
+    }
 
     /**
      * Test whether the library API supports journal based search.
      */
     @Test
-    void supportsJournalSearch() throws Exception;
+    default void supportsJournalSearch() throws Exception {
+        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
+        builder.journal(getTestJournal());
+        List<BibEntry> results = getFetcher().performComplexSearch(builder.build());
 
-    /**
-     * Test whether the library API supports phrase search.
-     */
-    @Test
-    void supportsPhraseSearch() throws Exception;
+        assertFalse(results.isEmpty());
+        results.forEach(bibEntry -> {
+            String journal = bibEntry.getField(StandardField.JOURNALTITLE).orElse("");
+            if (!journal.contains(getTestJournal().replace("\"", ""))) {
+                System.out.println(results);
+            }
+            assertTrue(journal.contains(getTestJournal().replace("\"", "")));
+        });
+    }
 
-    /**
-     * Test whether the library API supports boolean AND connection in queries.
-     */
-    @Test
-    void supportsBooleanANDSearch() throws Exception;
+    SearchBasedFetcher getFetcher();
+
+    List<String> getTestAuthors();
+
+    String getTestJournal();
+
+    default Integer getTestYear() {
+        return 2016;
+    }
 }
