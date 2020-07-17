@@ -1,22 +1,16 @@
 package org.jabref.model.entry.identifier;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,22 +254,4 @@ public class DOI implements Identifier {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
 
-    /**
-     * Returns registration agency. Optional.empty() if no agency is found.
-     */
-    public Optional<String> getAgency() throws IOException {
-        Optional<String> agency = Optional.empty();
-        try {
-            URLDownload download = new URLDownload(new URL(DOI.AGENCY_RESOLVER + "/" + doi));
-            JSONObject response = new JSONArray(download.asString()).getJSONObject(0);
-            if (response != null) {
-                agency = Optional.ofNullable(response.optString("RA"));
-            }
-        } catch (JSONException e) {
-            LOGGER.error("Cannot parse agency fetcher repsonse to JSON");
-            return Optional.empty();
-        }
-
-        return agency;
-    }
 }

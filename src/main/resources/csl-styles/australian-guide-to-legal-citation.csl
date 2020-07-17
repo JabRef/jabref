@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Support for the development of the CSL style was provided by the Faculty of Law, University of Technology Sydney. The AGLC is published by the University of Melbourne Faculty of Law.</summary>
-    <updated>2018-09-03T17:14:48+00:00</updated>
+    <updated>2020-07-09T03:49:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -398,17 +398,14 @@
           </choose>
           <choose>
             <if type="article-newspaper">
-              <group delimiter=" ">
+              <group delimiter=", ">
+                <text variable="publisher-place"/>
                 <choose>
                   <if variable="URL">
                     <text term="online"/>
-                    <text term="at"/>
                   </if>
                 </choose>
-                <group delimiter=", ">
-                  <text variable="publisher-place"/>
-                  <text macro="issued-full"/>
-                </group>
+                <text macro="issued-full"/>
               </group>
             </if>
             <else-if type="legislation bill" match="any">
