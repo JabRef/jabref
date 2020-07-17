@@ -269,34 +269,24 @@ public class BracketedPattern {
 
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
-                if ("auth".equals(val)) {
-                    return firstAuthor(authString);
-                } else if ("authForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(authString);
-                } else if ("authFirstFull".equals(val)) {
-                    return firstAuthorVonAndLast(authString);
-                } else if ("authors".equals(val)) {
-                    return allAuthors(authString);
-                } else if ("authorsAlpha".equals(val)) {
-                    return authorsAlpha(authString);
-                } else if ("authorLast".equals(val)) {
-                    // Last author's last name
-                    return lastAuthor(authString);
-                } else if ("authorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(authString);
-                } else if ("authorIni".equals(val)) {
-                    return oneAuthorPlusIni(authString);
-                } else if (val.matches("authIni[\\d]+")) {
+                switch (val) {
+                    case "auth": return firstAuthor(authString);
+                    case "authForeIni": return firstAuthorForenameInitials(authString);
+                    case "authFirstFull": return firstAuthorVonAndLast(authString);
+                    case "authors": return allAuthors(authString);
+                    case "authorsAlpha": return authorsAlpha(authString);
+                    case "authorLast": return lastAuthor(authString);
+                    case "authorLastForeIni": return lastAuthorForenameInitials(authString);
+                    case "authorIni": return oneAuthorPlusIni(authString);
+                    case "auth.auth.ea": return authAuthEa(authString);
+                    case "auth.etal": return  authEtal(authString, ".", ".etal");
+                    case "authEtAl": return authEtal(authString, "", "EtAl");
+                    case "authshort": return authshort(authString);
+                }
+
+                if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
                     return authIniN(authString, num);
-                } else if ("auth.auth.ea".equals(val)) {
-                    return authAuthEa(authString);
-                } else if ("auth.etal".equals(val)) {
-                    return authEtal(authString, ".", ".etal");
-                } else if ("authEtAl".equals(val)) {
-                    return authEtal(authString, "", "EtAl");
-                } else if ("authshort".equals(val)) {
-                    return authshort(authString);
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
                     return authNofMth(authString, Integer.parseInt(nums[0]),
@@ -315,20 +305,24 @@ public class BracketedPattern {
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
-                if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    // Last author's last name
-                } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if (val.matches("edtrIni[\\d]+")) {
+                switch (val) {
+                    case "edtr":
+                        return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "edtrForeIni":
+                        return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "editors":
+                        return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "editorLast":
+                        return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("")); // Last author's last name
+                    case "editorLastForeIni":
+                        return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "editorIni":
+                        return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "edtr.edtr.ea": return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "edtrshort": return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                }
+
+                if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
                     return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
@@ -336,10 +330,6 @@ public class BracketedPattern {
                     return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
-                } else if ("edtr.edtr.ea".equals(val)) {
-                    return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("edtrshort".equals(val)) {
-                    return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                 } else if (val.matches("edtr\\d+")) {
                     String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
