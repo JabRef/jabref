@@ -1005,7 +1005,7 @@ public class JabRefFrame extends BorderPane {
 
         indicator.setOnMouseClicked(event -> {
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 

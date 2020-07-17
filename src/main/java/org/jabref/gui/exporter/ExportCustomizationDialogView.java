@@ -55,7 +55,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
         viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, repository);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
-        EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
+        EasyBind.bindContent(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());
