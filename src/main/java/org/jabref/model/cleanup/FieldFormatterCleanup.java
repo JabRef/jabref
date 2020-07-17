@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.formatter.bibtexfields.NormalizeNewlinesFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
