@@ -31,6 +31,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -159,7 +160,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
         List<BibEntry> entryList = new LinkedList<>();
 
         if (query.isEmpty()) {

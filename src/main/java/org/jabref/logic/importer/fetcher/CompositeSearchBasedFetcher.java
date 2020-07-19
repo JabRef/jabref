@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -34,10 +35,10 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) {
         return fetchers.stream().flatMap(searchBasedFetcher -> {
             try {
-                return searchBasedFetcher.performSearch(query).stream();
+                return searchBasedFetcher.performSearch(query, ).stream();
             } catch (FetcherException e) {
                 LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                 return Stream.empty();

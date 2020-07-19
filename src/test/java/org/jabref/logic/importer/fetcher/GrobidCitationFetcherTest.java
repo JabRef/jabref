@@ -55,33 +55,33 @@ public class GrobidCitationFetcherTest {
 
     @Test
     public void grobidPerformSearchCorrectResultTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1, );
         assertEquals(List.of(example1AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example2);
+        entries = grobidCitationFetcher.performSearch(example2, );
         assertEquals(List.of(example2AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example3);
+        entries = grobidCitationFetcher.performSearch(example3, );
         assertEquals(List.of(example3AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example4);
+        entries = grobidCitationFetcher.performSearch(example4, );
         assertEquals(List.of(example4AsBibEntry), entries);
     }
 
     @Test
     public void grobidPerformSearchCorrectlySplitsStringTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4, );
         assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
     }
 
     @Test
     public void grobidPerformSearchWithEmptyStringsTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
+        List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ", );
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
     public void grobidPerformSearchWithInvalidDataTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput1);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput1, );
         assertEquals(Collections.emptyList(), entries);
-        entries = grobidCitationFetcher.performSearch(invalidInput2);
+        entries = grobidCitationFetcher.performSearch(invalidInput2, );
         assertEquals(Collections.emptyList(), entries);
     }
 

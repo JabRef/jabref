@@ -30,7 +30,7 @@ class CiteSeerTest {
                 .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory")
                 .withField(StandardField.DOI, "10.1.1.744.5780");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]", );
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
@@ -43,7 +43,7 @@ class CiteSeerTest {
                 .withField(StandardField.YEAR, "1993")
                 .withField(StandardField.JOURNALTITLE, "PSYCHOSOMATIC MEDICINE");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665", );
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

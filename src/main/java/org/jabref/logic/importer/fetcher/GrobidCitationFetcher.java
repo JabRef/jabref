@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.GrobidService;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -54,7 +55,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) {
         return Arrays
                 .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                 .map(String::trim)

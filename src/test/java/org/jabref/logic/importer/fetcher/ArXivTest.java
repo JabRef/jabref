@@ -135,13 +135,13 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Frechet\""));
+                fetcher.performSearch("ti:\"slice theorem for Frechet\"", ));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Fréchet\""));
+                fetcher.performSearch("ti:\"slice theorem for Fréchet\"", ));
     }
 
     @Test
@@ -262,8 +262,8 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("au:\"Tobias Diez\"");
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("au:Tobias Diez");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("au:\"Tobias Diez\"", );
+        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("au:Tobias Diez", );
         // Ensure that phrase search result is just a subset of the default search result
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
         resultWithOutPhraseSearch.removeAll(resultWithPhraseSearch);
@@ -285,7 +285,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"", );
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);

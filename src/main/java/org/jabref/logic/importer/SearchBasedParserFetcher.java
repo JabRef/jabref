@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -50,7 +51,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(String query) throws FetcherException {
+    default List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
         if (StringUtil.isBlank(query)) {
             return Collections.emptyList();
         }

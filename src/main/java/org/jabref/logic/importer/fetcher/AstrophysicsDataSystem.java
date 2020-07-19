@@ -30,6 +30,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -180,7 +181,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
 
         if (StringUtil.isBlank(query)) {
             return Collections.emptyList();

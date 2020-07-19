@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
  * Useful to complete an existing entry with fetched information.
  * May return multiple search hits.
  */
-public interface EntryBasedFetcher extends WebFetcher {
+public interface EntryBasedFetcher extends BibEntryFetcher {
 
     /**
      * Looks for hits which are matched by the given {@link BibEntry}.

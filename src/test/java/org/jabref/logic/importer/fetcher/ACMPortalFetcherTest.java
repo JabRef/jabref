@@ -51,7 +51,7 @@ class ACMPortalFetcherTest {
         expected.setField(StandardField.URL, "http://doi.acm.org/10.1145/3129790.3129810");
         expected.setField(StandardField.YEAR, "2017");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("jabref architectural churn");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("jabref architectural churn", );
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

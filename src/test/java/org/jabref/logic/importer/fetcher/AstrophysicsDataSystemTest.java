@@ -141,7 +141,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie", );
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 

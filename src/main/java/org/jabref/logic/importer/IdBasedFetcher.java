@@ -7,7 +7,7 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Searches web resources for bibliographic information based on an identifier.
  */
-public interface IdBasedFetcher extends WebFetcher {
+public interface IdBasedFetcher extends BibEntryFetcher {
 
     /**
      * Looks for bibliographic information associated to the given identifier.

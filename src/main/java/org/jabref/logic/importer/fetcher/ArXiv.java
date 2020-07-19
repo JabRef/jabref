@@ -25,6 +25,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -249,7 +250,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
         return searchForEntries(query).stream().map(
                 (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                       .collect(Collectors.toList());
@@ -271,7 +272,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
         complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
         String complexQueryString = String.join(" AND ", searchTerms);
-        return performSearch(complexQueryString);
+        return performSearch(complexQueryString, );
     }
 
     @Override
