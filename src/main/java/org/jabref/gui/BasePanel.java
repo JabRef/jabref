@@ -294,68 +294,6 @@ public class BasePanel extends StackPane {
                                                          .stream()
                                                          .findFirst()
                                                          .ifPresent(entryEditor::setEntry));
-
-        // TODO: Register these actions globally
-        /*
-        String clearSearch = "clearSearch";
-        mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
-        mainTable.getActionMap().put(clearSearch, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
-                switch (mode) {
-                    case SHOWING_NOTHING:
-                        frame.getGlobalSearchBar().endSearch();
-                        break;
-                    case SHOWING_PREVIEW:
-                        getPreviewPanel().close();
-                        break;
-                    case SHOWING_EDITOR:
-                    case WILL_SHOW_EDITOR:
-                        entryEditorClosing(getEntryEditor());
-                        break;
-                    default:
-                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
-                        break;
-                }
-            }
-        });
-
-        mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.CUT);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not cut", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.COPY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.PASTE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not paste", ex);
-                }
-            }
-        });
-        */
     }
 
     public void setupMainPanel() {
