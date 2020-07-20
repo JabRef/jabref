@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - snapcraft
-  #schedule:
-  # run on each day
-  # - cron: "33 4 * * *"
+  schedule:
+   # run on each day
+  - cron: "33 4 * * *"
 
 jobs:
   build:
