@@ -141,7 +141,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.ABSTRACT, new RemoveNewlinesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
@@ -161,10 +161,16 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
              .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
+        EntryBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
+    }
+
+    @Override
+    public List<BibEntry> performSearch(BibEntry entry, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
 
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
             return Collections.emptyList();
@@ -172,7 +178,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
-            return performSearchByIds(bibcodes);
+            return performSearchByIds(bibcodes, targetBibEntryFormat);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
@@ -181,7 +187,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
 
         if (StringUtil.isBlank(query)) {
             return Collections.emptyList();
@@ -189,7 +195,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForQuery(query));
-            return performSearchByIds(bibcodes);
+            return performSearchByIds(bibcodes, targetBibEntryFormat);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
@@ -222,14 +228,14 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
 
         try {
             List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
-            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
+            List<BibEntry> fetchedEntries = performSearchByIds(bibcodes, targetBibEntryFormat);
 
             if (fetchedEntries.isEmpty()) {
                 return Optional.empty();
@@ -251,7 +257,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
      * @param identifiers bibcodes for which bibentries ahould be fetched
      * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
      */
-    private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
+    private List<BibEntry> performSearchByIds(Collection<String> identifiers, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -271,7 +277,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
                     return Collections.emptyList();
                 }
                 // Post-cleanup
-                fetchedEntries.forEach(this::doPostCleanup);
+                fetchedEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
                 return fetchedEntries;
             } catch (JSONException e) {

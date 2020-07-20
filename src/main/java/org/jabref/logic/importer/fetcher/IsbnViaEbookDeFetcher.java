@@ -9,6 +9,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -38,7 +39,7 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         // We MUST NOT clean the URL. this is the deal with ebook.de
         // DO NOT add following code:
         // new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
@@ -48,5 +49,11 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
                 entry.setField(StandardField.PAGETOTAL, pages.replaceAll("[\\D]", "")));
         new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        super.doPostCleanup(entry, targetBibEntryFormat);
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

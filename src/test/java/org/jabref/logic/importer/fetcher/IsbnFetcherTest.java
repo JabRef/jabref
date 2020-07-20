@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -86,7 +87,7 @@ class IsbnFetcherTest {
     void searchByEntryWithISBNSuccessful() throws FetcherException {
         BibEntry input = new BibEntry().withField(StandardField.ISBN, "0134685997");
 
-        List<BibEntry> fetchedEntry = fetcher.performSearch(input);
+        List<BibEntry> fetchedEntry = fetcher.performSearch(input, BibDatabaseMode.BIBTEX);
         assertEquals(Collections.singletonList(bibEntry), fetchedEntry);
     }
 

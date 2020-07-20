@@ -35,10 +35,13 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) {
         return fetchers.stream().flatMap(searchBasedFetcher -> {
             try {
-                return searchBasedFetcher.performSearch(query, ).stream();
+                List<BibEntry> fetchedEntries = searchBasedFetcher.performSearch(query, targetBibEntryFormat);
+                // Delegate clean up to fetchers
+                fetchedEntries.forEach(bibEntry -> searchBasedFetcher.doPostCleanup(bibEntry, targetBibEntryFormat));
+                return fetchedEntries.stream();
             } catch (FetcherException e) {
                 LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                 return Stream.empty();
@@ -56,5 +59,11 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.empty();
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        // This method is irrelevant, as the clean up has to be delegated to the fetchers composing this composite instance.
+        return BibDatabaseMode.BIBTEX;
     }
 }

@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -32,26 +31,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      */
     Parser getParser();
 
-    /**
-     * Performs a cleanup of the fetched entry.
-     *
-     * Only systematic errors of the fetcher should be corrected here
-     * (i.e. if information is consistently contained in the wrong field or the wrong format)
-     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
-     *
-     * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
-     *
-     * By default, no cleanup is done.
-     *
-     * @param entry the entry to be cleaned-up
-     */
-    default void doPostCleanup(BibEntry entry) {
-        // Do nothing by default
-    }
-
     @Override
-    default List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
+    default List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         if (StringUtil.isBlank(query)) {
             return Collections.emptyList();
         }
@@ -60,7 +41,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
-            fetchedEntries.forEach(this::doPostCleanup);
+            fetchedEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
             return fetchedEntries;
         } catch (URISyntaxException e) {
@@ -81,10 +62,10 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * @param complexSearchQuery the search query defining all fielded search parameters
      */
     @Override
-    default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         try (InputStream stream = getUrlDownload(getComplexQueryURL(complexSearchQuery)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
-            fetchedEntries.forEach(this::doPostCleanup);
+            fetchedEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
             return fetchedEntries;
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);

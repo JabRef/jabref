@@ -68,7 +68,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
         entry.setField(StandardField.YEAR, "2013");
         entry.setField(StandardField.PAGES, "41--44");
 
-        List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models", );
+        List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models", finder.getBibFormatOfFetchedEntries());
 
         assertEquals(Collections.singletonList(entry), foundEntries);
     }
@@ -76,7 +76,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void findManyEntries() throws FetcherException {
-        List<BibEntry> foundEntries = finder.performSearch("random test string", );
+        List<BibEntry> foundEntries = finder.performSearch("random test string", finder.getBibFormatOfFetchedEntries());
 
         assertEquals(20, foundEntries.size());
     }

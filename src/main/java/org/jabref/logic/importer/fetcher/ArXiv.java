@@ -250,10 +250,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
-        return searchForEntries(query).stream().map(
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+        List<BibEntry> fetchedEntries = searchForEntries(query).stream().map(
                 (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                       .collect(Collectors.toList());
+        fetchedEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
+        return fetchedEntries;
     }
 
     /**
@@ -263,7 +265,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
      * @return A list of entries matching the complex query
      */
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery, BibDatabaseMode targetFormat) throws FetcherException {
         List<String> searchTerms = new ArrayList<>();
         complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("au:" + author)));
         complexSearchQuery.getTitlePhrases().ifPresent(title -> searchTerms.add("ti:" + title));
@@ -272,13 +274,15 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
         complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
         String complexQueryString = String.join(" AND ", searchTerms);
-        return performSearch(complexQueryString, );
+        return performSearch(complexQueryString, targetFormat);
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier)
+    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetFormat) throws FetcherException {
+        Optional<BibEntry> entry = searchForEntryById(identifier)
                 .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry, targetFormat));
+        return entry;
     }
 
     @Override
@@ -293,6 +297,11 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public String getIdentifierName() {
         return "ArXiv";
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBLATEX;
     }
 
     private static class ArXivEntry {

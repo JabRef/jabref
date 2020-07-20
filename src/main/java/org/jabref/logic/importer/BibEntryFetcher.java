@@ -22,15 +22,15 @@ public interface BibEntryFetcher extends WebFetcher {
      *
      * If this method is overwritten, you either have to ensure that you convert
      * the entries into the correct format, or call this method in the overwritten
-     * method using BibEntryFetcher.super.doPostCLeanup(...) .
+     * method using ParentInterface.super.doPostCleanup(...)
      *
      * @param entry the entry to be cleaned-up
-     * @param targetFormat the format the entry should be converted to
+     * @param targetBibEntryFormat the format the entry should be converted to
      */
-    default void doPostCleanup(BibEntry entry, BibDatabaseMode targetFormat) {
-        if (targetFormat == BibDatabaseMode.BIBTEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBLATEX) {
+    default void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
+        if (targetBibEntryFormat == BibDatabaseMode.BIBTEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBLATEX) {
             new ConvertToBibtexCleanup().cleanup(entry);
-        } else if (targetFormat == BibDatabaseMode.BIBLATEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBTEX) {
+        } else if (targetBibEntryFormat == BibDatabaseMode.BIBLATEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBTEX) {
             new ConvertToBiblatexCleanup().cleanup(entry);
         }
     }

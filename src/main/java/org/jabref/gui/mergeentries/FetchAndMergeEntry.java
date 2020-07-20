@@ -62,7 +62,7 @@ public class FetchAndMergeEntry {
             if (fieldContent.isPresent()) {
                 Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs.getImportFormatPreferences());
                 if (fetcher.isPresent()) {
-                    BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
+                    BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get(), panel.getBibDatabaseContext().getMode()))
                                   .onSuccess(fetchedEntry -> {
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
@@ -144,7 +144,7 @@ public class FetchAndMergeEntry {
     }
 
     public void fetchAndMerge(BibEntry entry, EntryBasedFetcher fetcher) {
-        BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
+        BackgroundTask.wrap(() -> fetcher.performSearch(entry, panel.getBibDatabaseContext().getMode()).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);

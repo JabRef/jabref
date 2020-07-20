@@ -150,17 +150,23 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         new FieldFormatterCleanup(new UnknownField("journal-abbreviation"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("status"), new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(new UnknownField("copyright"), new ClearFormatter()).cleanup(entry);
 
         new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+        SearchBasedFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
+    }
+
+    @Override
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         List<BibEntry> entryList = new LinkedList<>();
 
         if (query.isEmpty()) {
@@ -181,7 +187,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             }
 
             // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
-            entryList = fetchMedline(idList);
+            entryList = fetchMedline(idList, targetBibEntryFormat);
 
             return entryList;
         }
@@ -204,7 +210,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
      * @param ids A list of IDs to search for.
      * @return Will return an empty list on error.
      */
-    private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
+    private List<BibEntry> fetchMedline(List<String> ids, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         try {
             // Separate the IDs with a comma to search multiple entries
             URL fetchURL = getUrlForIdentifier(String.join(",", ids));
@@ -215,7 +221,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 LOGGER.warn(result.getErrorMessage());
             }
             List<BibEntry> resultList = result.getDatabase().getEntries();
-            resultList.forEach(this::doPostCleanup);
+            resultList.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
             return resultList;
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Error while generating fetch URL",

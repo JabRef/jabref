@@ -16,6 +16,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.GvkParser;
+import org.jabref.model.database.BibDatabaseMode;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -85,5 +86,10 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     @Override
     public Parser getParser() {
         return new GvkParser();
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

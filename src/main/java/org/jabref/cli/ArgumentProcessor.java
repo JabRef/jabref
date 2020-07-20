@@ -520,8 +520,9 @@ public class ArgumentProcessor {
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
-        if ((fetchCommand == null) || !fetchCommand.contains(":")) {
-            System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
+        if ((fetchCommand == null) || !fetchCommand.contains(":") ||
+                !(fetchCommand.toLowerCase().endsWith(":bibtex") || fetchCommand.toLowerCase().endsWith(":biblatex"))) {
+            System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>:<bib entry format>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
             return Optional.empty();
         }
@@ -529,6 +530,7 @@ public class ArgumentProcessor {
         String[] split = fetchCommand.split(":");
         String engine = split[0];
         String query = split[1];
+        String bibFormat = split[2].toLowerCase();
 
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
@@ -545,7 +547,9 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
             System.out.print(Localization.lang("Please wait..."));
             try {
-                List<BibEntry> matches = selectedFetcher.get().performSearch(query, );
+                // Here we use BibLaTeX si
+                List<BibEntry> matches = selectedFetcher.get().performSearch(query,
+                        bibFormat.equals("bibtex") ? BibDatabaseMode.BIBTEX : BibDatabaseMode.BIBLATEX);
                 if (matches.isEmpty()) {
                     System.out.println("\r" + Localization.lang("No results found."));
                     return Optional.empty();

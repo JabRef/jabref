@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -41,7 +42,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(StandardField.PRIMARYCLASS, "math-ph");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field", );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 
@@ -59,7 +60,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.EPRINT, "hep-ph/9802379")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("hep-ph/9802379", );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("hep-ph/9802379", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Collections.singletonList(article), fetchedEntries);
     }
 }

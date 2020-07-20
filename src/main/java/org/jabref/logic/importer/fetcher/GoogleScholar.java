@@ -129,7 +129,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) throws FetcherException {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -145,6 +145,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
+            foundEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
             return foundEntries;
         } catch (URISyntaxException e) {
@@ -163,7 +164,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -185,6 +186,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
+            foundEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
             return foundEntries;
         } catch (URISyntaxException e) {
@@ -257,5 +259,10 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         } catch (IOException e) {
             throw new FetcherException("Cookie configuration for Google Scholar failed.", e);
         }
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

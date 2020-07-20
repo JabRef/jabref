@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -44,7 +45,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
@@ -64,6 +65,12 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
+        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
         return entry;
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

@@ -55,7 +55,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode databaseMode) {
+    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) {
         return Arrays
                 .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                 .map(String::trim)
@@ -70,5 +70,10 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public String getName() {
         return "GROBID";
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

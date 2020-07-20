@@ -22,6 +22,7 @@ import org.jabref.logic.importer.fileformat.CoinsParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -73,7 +74,7 @@ public class CiteSeer implements SearchBasedParserFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         // CiteSeer escapes some characters in a way that is not recognized by the normal html to unicode formatter
         // We, of course, also want to convert these special characters
         Formatter extendedHtmlFormatter = new HtmlToUnicodeFormatter() {
@@ -92,5 +93,11 @@ public class CiteSeer implements SearchBasedParserFetcher {
 
         // Many titles in the CiteSeer database have all-capital titles, for convenience we convert them to title case
         new FieldFormatterCleanup(StandardField.TITLE, new TitleCaseFormatter()).cleanup(entry);
+        SearchBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

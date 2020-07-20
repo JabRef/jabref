@@ -19,6 +19,7 @@ import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -59,7 +60,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         DoiCleanup doiCleaner = new DoiCleanup();
         doiCleaner.cleanup(entry);
 
@@ -70,6 +71,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
                         new FieldFormatterCleanup(StandardField.URL, new LayoutFormatterBasedFormatter(new RemoveLatexCommandsFormatter()))
                 ));
         cleanups.applySaveActions(entry);
+        SearchBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 
     @Override
@@ -80,5 +82,10 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_DBLP);
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
     }
 }

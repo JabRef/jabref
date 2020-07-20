@@ -14,6 +14,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -119,8 +120,13 @@ public class Medra implements IdBasedParserFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry) {
+    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         new DoiCleanup().cleanup(entry);
+        IdBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBTEX;
+    }
 }

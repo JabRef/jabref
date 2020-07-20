@@ -22,6 +22,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -250,5 +251,10 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         URLDownload.bypassSSLVerification();
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public BibDatabaseMode getBibFormatOfFetchedEntries() {
+        return BibDatabaseMode.BIBLATEX;
     }
 }

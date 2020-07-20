@@ -41,7 +41,7 @@ public class CompositeSearchBasedFetcherTest {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
-        List<BibEntry> result = fetcher.performSearch("quantum", );
+        List<BibEntry> result = fetcher.performSearch("quantum", fetcher.getBibFormatOfFetchedEntries());
 
         Assertions.assertEquals(result, Collections.EMPTY_LIST);
     }
@@ -51,7 +51,7 @@ public class CompositeSearchBasedFetcherTest {
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> queryResult = compositeFetcher.performSearch("", );
+        List<BibEntry> queryResult = compositeFetcher.performSearch("", compositeFetcher.getBibFormatOfFetchedEntries());
 
         Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
     }
@@ -62,10 +62,10 @@ public class CompositeSearchBasedFetcherTest {
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum", );
+        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum", compositeFetcher.getBibFormatOfFetchedEntries());
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum", )));
+                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum", fetcher.getBibFormatOfFetchedEntries())));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore the test should not fail

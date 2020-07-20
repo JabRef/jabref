@@ -45,7 +45,7 @@ class DOAJFetcherTest {
         expected.setField(StandardField.YEAR, "2018");
         expected.setField(StandardField.ABSTRACT, "The paper presents an approach to combine multiple existing information retrieval (IR) techniques to support change impact analysis, which seeks to identify the possible outcomes of a change or determine the necessary modifications for affecting a desired change. The approach integrates a bag-of-words based IR technique, where each class or method is abstracted as a set of words, and a neural network based IR technique to derive conceptual couplings from the source code of a software system. We report rigorous empirical assessments of the changes of three open source systems: jEdit, muCommander, and JabRef. The impact sets obtained are evaluated at the method level of granularity, and the results show that our integrated approach provides statistically significant improvements in accuracy across several cut points relative to the accuracies provided by the individual methods employed independently. Improvements in F-score values of up to 7.3%, 10.9%, and 17.3% are obtained over a baseline technique for jEdit, muCommander, and JabRef, respectively.");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef impact", );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef impact", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
@@ -65,7 +65,7 @@ class DOAJFetcherTest {
 
     @Test
     public void searchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch("", ));
+        assertEquals(Collections.emptyList(), fetcher.performSearch("", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test

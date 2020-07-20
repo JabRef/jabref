@@ -18,6 +18,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
@@ -29,6 +30,7 @@ public class BibtexExtractorViewModel {
     private GrobidCitationFetcher currentCitationfetcher;
     private TaskExecutor taskExecutor;
     private ImportHandler importHandler;
+    private BibDatabaseMode bibEntryFormat;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
@@ -41,6 +43,7 @@ public class BibtexExtractorViewModel {
         this.dialogService = dialogService;
         currentCitationfetcher = new GrobidCitationFetcher(jabRefPreferences.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
+        this.bibEntryFormat = bibdatabaseContext.getMode();
         this.importHandler = new ImportHandler(
                 dialogService,
                 bibdatabaseContext,
@@ -56,7 +59,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue(), ))
+        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue(), bibEntryFormat))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onSuccess(parsedEntries -> {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
