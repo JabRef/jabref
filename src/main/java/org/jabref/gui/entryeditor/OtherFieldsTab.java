@@ -1,12 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -62,11 +60,11 @@ public class OtherFieldsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected SortedSet<Field> determineFieldsToShow(BibEntry entry) {
+    protected Set<Field> determineFieldsToShow(BibEntry entry) {
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), databaseContext.getMode());
         if (entryType.isPresent()) {
-            Set<Field> allKnownFields = entryType.get().getAllFields().stream().map(BibField::getField).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
-            SortedSet<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Field::getName))));
+            Set<Field> allKnownFields = entryType.get().getAllFields();
+            Set<Field> otherFields = entry.getFields().stream().filter(field -> !allKnownFields.contains(field)).collect(Collectors.toCollection(LinkedHashSet::new));
 
             otherFields.removeAll(entryType.get().getDeprecatedFields());
             otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
@@ -75,7 +73,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
             return otherFields;
         } else {
             // Entry type unknown -> treat all fields as required
-            return Collections.emptySortedSet();
+            return Collections.emptySet();
         }
     }
 }

@@ -49,11 +49,13 @@ public class EntryTypeViewModel {
     private final BasePanel basePanel;
     private final DialogService dialogService;
     private final Validator idFieldValidator;
+    private final StateManager stateManager;
 
-    public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService) {
+    public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService, StateManager stateManager) {
         this.basePanel = basePanel;
         this.prefs = preferences;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
         idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
@@ -147,7 +149,7 @@ public class EntryTypeViewModel {
                 final BibEntry entry = result.get();
                 Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(basePanel.getDatabase(), entry, basePanel.getBibDatabaseContext().getMode());
                 if ((duplicate.isPresent())) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext());
+                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext(), stateManager);
                     switch (dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:
                             basePanel.getDatabase().removeEntry(duplicate.get());

@@ -1,7 +1,19 @@
 {
     "ignorePatterns": [
         {
+            "pattern": "^CONTRIBUTING\\.md"
+        },
+        {
             "pattern": "^https://dl\\.acm\\.org"
+        },
+        {
+            "pattern": "^https://github\\.com"
+        },
+        {
+            "pattern": "^https://.*\\.jabref\\.org"
+        },
+        {
+            "pattern": "^https://sourcespy\\.com/.*"
         },
         {
             "pattern": "^http://purl\\.org/net/bibteXMP"
