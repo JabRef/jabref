@@ -41,10 +41,8 @@ jobs:
     name: Create installer and portable version for ${{ matrix.displayName }}
 
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v2
       - name: Fetch all history for all tags and branches
-        run: git fetch --prune --unshallow
+        uses: actions/checkout@v2
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.3
         with:
