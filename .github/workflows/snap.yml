@@ -34,7 +34,7 @@ jobs:
         id: snapcraft
       - name: Build snap (2) Upload snap
         if: ${{ steps.checksecrets.outputs.secretspresent }}
-      - uses: snapcore/action-publish@v1
+        uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
           snap: ${{ steps.snapcraft.outputs.snap }}
