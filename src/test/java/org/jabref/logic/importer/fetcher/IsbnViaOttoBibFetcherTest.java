@@ -43,7 +43,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683", fetcher.getBibFormatOfFetchedEntries());
         bibEntry.setField(StandardField.ISBN, "0321356683");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
@@ -51,7 +51,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780321356680");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780321356680", fetcher.getBibFormatOfFetchedEntries());
         bibEntry.setField(StandardField.ISBN, "9780321356680");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
@@ -69,7 +69,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField(StandardField.ISBN, "9783662565094");
         bibEntry.setField(StandardField.YEAR, "2018");
 
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-3-662-56509-4");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-3-662-56509-4", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -85,7 +85,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField(StandardField.AUTHOR, "Denis, ");
         bibEntry.setField(StandardField.ISBN, "9782819502746");
 
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-2-8195-02746");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-2-8195-02746", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntry), fetchedEntry);
 
     }

@@ -30,8 +30,10 @@ public interface BibEntryFetcher extends WebFetcher {
     default void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         if (targetBibEntryFormat == BibDatabaseMode.BIBTEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBLATEX) {
             new ConvertToBibtexCleanup().cleanup(entry);
+            System.out.println("Convert entry to BibTeX");
         } else if (targetBibEntryFormat == BibDatabaseMode.BIBLATEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBTEX) {
             new ConvertToBiblatexCleanup().cleanup(entry);
+            System.out.println("Convert entry to BibLaTeX");
         }
     }
 

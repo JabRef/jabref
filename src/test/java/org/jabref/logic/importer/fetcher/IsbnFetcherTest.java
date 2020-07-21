@@ -52,35 +52,35 @@ class IsbnFetcherTest {
 
     @Test
     void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void searchByIdReturnsEmptyWithEmptyISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
     void searchByIdThrowsExceptionForShortInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     void searchByIdThrowsExceptionForLongInvalidISB() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     void searchByIdThrowsExceptionForInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
@@ -97,7 +97,7 @@ class IsbnFetcherTest {
      */
     @Test
     void searchForIsbnAvailableAtOttoBibButNonOnEbookDe() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155", fetcher.getBibFormatOfFetchedEntries());
         assertNotEquals(Optional.empty(), fetchedEntry);
     }
 }

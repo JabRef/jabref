@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -48,7 +49,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
     @Test
     public void performSearchReturnsMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("jabref", );
+        List<BibEntry> searchResult = fetcher.performSearch("jabref", fetcher.getBibFormatOfFetchedEntries());
 
         BibEntry firstBibEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withCiteKey("conf/ecsa/OlssonEW17")
@@ -104,6 +105,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                 .withField(StandardField.YEAR, "2017");
 
+        System.out.println(searchResult);
         // Checking entries in the set as the query is generic and returns a changing result set
         assertTrue(searchResult.contains(firstBibEntry));
         assertTrue(searchResult.contains(secondBibEntry));
@@ -111,7 +113,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
     @Test
     public void performSearchReturnsEmptyListForEmptySearch() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performSearch("", );
+        List<BibEntry> searchResult = fetcher.performSearch("", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Collections.emptyList(), searchResult);
     }
 }

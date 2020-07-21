@@ -141,7 +141,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie", );
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie", fetcher.getBibFormatOfFetchedEntries());
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
@@ -151,51 +151,51 @@ public class AstrophysicsDataSystemTest {
         searchEntry.setField(StandardField.TITLE, "slice theorem");
         searchEntry.setField(StandardField.AUTHOR, "Diez");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry, fetcher.getBibFormatOfFetchedEntries());
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(diezSliceTheoremEntry, fetchedEntries.get(0));
     }
 
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10", fetcher.getBibFormatOfFetchedEntries());
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByIdEmptyDOI() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("this.doi.will.fail"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("this.doi.will.fail", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160", fetcher.getBibFormatOfFetchedEntries());
         fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByXiongSunEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByIngersollPollardEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchByLuceyPaulEntry() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }
 }

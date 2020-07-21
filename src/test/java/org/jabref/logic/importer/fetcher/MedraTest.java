@@ -77,13 +77,13 @@ public class MedraTest {
 
     @Test
     public void testPerformSearchEmptyDOI() throws FetcherException {
-        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @ParameterizedTest
     @MethodSource("getDoiBibEntryPairs")
     public void testDoiBibEntryPairs(String identifier, Optional<BibEntry> expected) throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier);
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(identifier, fetcher.getBibFormatOfFetchedEntries());
         assertEquals(expected, fetchedEntry);
     }
 

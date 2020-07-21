@@ -78,35 +78,35 @@ public class DoiFetcherTest {
 
     @Test
     public void testPerformSearchBurd2011() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntryBurd2011), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchDecker2007() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchIannarelli2019() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntryIannarelli2019), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchEmptyDOI() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void testPerformSearchInvalidDOI() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F"));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("10.1002/9781118257517F", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void testPerformSearchNonTrimmedDOI() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("http s://doi.org/ 10.1109 /ICWS .2007.59 ");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("http s://doi.org/ 10.1109 /ICWS .2007.59 ", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
     }
 }

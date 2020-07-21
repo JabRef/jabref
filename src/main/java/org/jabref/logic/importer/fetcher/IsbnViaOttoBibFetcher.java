@@ -71,6 +71,6 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
     @Override
     public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
+        return BibDatabaseMode.BIBLATEX;
     }
 }

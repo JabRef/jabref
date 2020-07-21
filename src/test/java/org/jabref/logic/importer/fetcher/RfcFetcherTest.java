@@ -49,26 +49,26 @@ public class RfcFetcherTest {
 
     @Test
     public void performSearchByIdFindsEntryWithRfcPrefix() throws Exception {
-        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("RFC1945"));
+        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("RFC1945", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void performSearchByIdFindsEntryWithoutRfcPrefix() throws Exception {
-        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("1945"));
+        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("1945", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithoutIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithValidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("RFC9999"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("RFC9999", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
     public void performSearchByIdFindsNothingWithInvalidIdentifier() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("banana"));
+        assertEquals(Optional.empty(), fetcher.performSearchById("banana", fetcher.getBibFormatOfFetchedEntries()));
     }
 }

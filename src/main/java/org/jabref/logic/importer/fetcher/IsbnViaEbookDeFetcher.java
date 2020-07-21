@@ -54,6 +54,6 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
 
     @Override
     public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
+        return BibDatabaseMode.BIBLATEX;
     }
 }

@@ -49,7 +49,7 @@ public class DiVATest {
         entry.setField(StandardField.ABSTRACT, "Lower bounds for problems related to realizing multiplication by constants with shifts, adders, and subtracters are presented. These lower bounds are straightforwardly calculated and have applications in proving the optimality of solutions obtained by heuristics. ");
         entry.setField(StandardField.DOI, "10.1109/TCSII.2007.903212");
 
-        assertEquals(Optional.of(entry), fetcher.performSearchById("diva2:260746"));
+        assertEquals(Optional.of(entry), fetcher.performSearchById("diva2:260746", fetcher.getBibFormatOfFetchedEntries()));
     }
 
     @Test
@@ -64,6 +64,6 @@ public class DiVATest {
 
     @Test
     public void testEmptyId() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById(""));
+        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
     }
 }

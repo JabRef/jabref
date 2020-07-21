@@ -3,6 +3,8 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -43,7 +45,7 @@ class CiteSeerTest {
                 .withField(StandardField.YEAR, "1993")
                 .withField(StandardField.JOURNAL, "PSYCHOSOMATIC MEDICINE");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665", BibDatabaseMode.BIBTEX);
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

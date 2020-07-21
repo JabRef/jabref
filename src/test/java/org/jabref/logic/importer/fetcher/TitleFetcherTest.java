@@ -44,19 +44,19 @@ public class TitleFetcherTest {
 
     @Test
     public void testPerformSearchKopp2007() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("BPELscript: A simplified script syntax for WS-BPEL 2.0", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.of(bibEntryBischof2009), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchEmptyTitle() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
     public void testPerformSearchInvalidTitle() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("An unknown title where noi DOI can be determined", fetcher.getBibFormatOfFetchedEntries());
         assertEquals(Optional.empty(), fetchedEntry);
     }
 }

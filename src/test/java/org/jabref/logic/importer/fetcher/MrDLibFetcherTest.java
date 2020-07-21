@@ -28,7 +28,7 @@ public class MrDLibFetcherTest {
     public void testPerformSearch() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.TITLE, "lernen");
-        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
+        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry, fetcher.getBibFormatOfFetchedEntries());
         assertFalse(bibEntrys.isEmpty());
     }
 
@@ -49,7 +49,7 @@ public class MrDLibFetcherTest {
         bibEntry.setField(StandardField.URL, "http://doi.acm.org/10.1145/1124772.1124838");
         bibEntry.setField(StandardField.YEAR, "2006");
 
-        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
+        List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry, fetcher.getBibFormatOfFetchedEntries());
         assertFalse(bibEntrys.isEmpty());
     }
 

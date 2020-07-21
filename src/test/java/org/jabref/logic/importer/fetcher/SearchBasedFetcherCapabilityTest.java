@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -32,10 +33,9 @@ interface SearchBasedFetcherCapabilityTest {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         getTestAuthors().forEach(builder::author);
 
-        List<BibEntry> results = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> results = getFetcher().performComplexSearch(builder.build(), BibDatabaseMode.BIBTEX);
 
         assertFalse(results.isEmpty());
-        System.out.println(results);
         results.forEach(bibEntry -> {
             String author = bibEntry.getField(StandardField.AUTHOR).orElse("");
 
@@ -52,7 +52,7 @@ interface SearchBasedFetcherCapabilityTest {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         builder.singleYear(getTestYear());
 
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performComplexSearch(builder.build(), BibDatabaseMode.BIBTEX);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -73,7 +73,7 @@ interface SearchBasedFetcherCapabilityTest {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
         builder.fromYearAndToYear(2018, 2020);
 
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performComplexSearch(builder.build(), BibDatabaseMode.BIBTEX);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -91,7 +91,7 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsJournalSearch() throws Exception {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         builder.journal(getTestJournal());
-        List<BibEntry> results = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> results = getFetcher().performComplexSearch(builder.build(), BibDatabaseMode.BIBTEX);
 
         assertFalse(results.isEmpty());
         results.forEach(bibEntry -> {

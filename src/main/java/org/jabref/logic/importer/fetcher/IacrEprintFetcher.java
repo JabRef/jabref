@@ -206,6 +206,6 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     @Override
     public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
+        return BibDatabaseMode.BIBLATEX;
     }
 }
