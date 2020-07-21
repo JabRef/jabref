@@ -65,7 +65,7 @@ public class CompositeSearchBasedFetcherTest {
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum", compositeFetcher.getBibFormatOfFetchedEntries());
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum", fetcher.getBibFormatOfFetchedEntries())));
+                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum", compositeFetcher.getBibFormatOfFetchedEntries())));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore the test should not fail

@@ -28,6 +28,7 @@ public interface BibEntryFetcher extends WebFetcher {
      * @param targetBibEntryFormat the format the entry should be converted to
      */
     default void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
+        System.out.println(entry);
         if (targetBibEntryFormat == BibDatabaseMode.BIBTEX && getBibFormatOfFetchedEntries() == BibDatabaseMode.BIBLATEX) {
             new ConvertToBibtexCleanup().cleanup(entry);
             System.out.println("Convert entry to BibTeX");

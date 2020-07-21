@@ -57,6 +57,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             }
 
             BibEntry entry = fetchedEntries.get(0);
+            System.out.println("Retrieved entry:");
 
             // Post-cleanup
             doPostCleanup(entry, targetBibEntryFormat);

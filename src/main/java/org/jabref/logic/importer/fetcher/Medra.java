@@ -122,6 +122,8 @@ public class Medra implements IdBasedParserFetcher {
     @Override
     public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
         new DoiCleanup().cleanup(entry);
+        System.out.println("Post doi cleanup");
+        System.out.println(entry);
         IdBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 

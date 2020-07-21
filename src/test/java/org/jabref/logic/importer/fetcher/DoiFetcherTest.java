@@ -67,7 +67,6 @@ public class DoiFetcherTest {
                                                                         .withField(StandardField.DOI, "10.3303/CET1977146")
                                                                         .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
                                                                         .withField(StandardField.PAGES, "871-876")
-                                                                        .withField(StandardField.URL, "http://doi.org/10.3303/CET1977146")
                                                                         .withField(StandardField.VOLUME, "77");
     }
 

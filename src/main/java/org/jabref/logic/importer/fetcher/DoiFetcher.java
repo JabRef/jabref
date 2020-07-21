@@ -56,7 +56,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     @Override
     public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
-
         try {
             if (doi.isPresent()) {
                 Optional<BibEntry> fetchedEntry;
