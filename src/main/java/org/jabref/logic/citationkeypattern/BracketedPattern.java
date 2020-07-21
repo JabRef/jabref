@@ -242,13 +242,7 @@ public class BracketedPattern {
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
                 // result the author
-                String authString;
-                if (database != null) {
-                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
-                                      .map(BracketedPattern::normalize).orElse("");
-                } else {
-                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, null).orElse("");
-                }
+                String unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
 
                 if (val.startsWith("pure")) {
                     // "pure" is used in the context of authors to resolve to authors only and not fallback to editors
@@ -256,51 +250,43 @@ public class BracketedPattern {
                     // Thus, remove the "pure" prefix so the remaining code in this section functions correctly
                     //
                     val = val.substring(4);
-                } else {
+                } else if (unparsedAuthors.isEmpty()) {
                     // special feature: A pattern starting with "auth" falls back to the editor
-                    if (authString.isEmpty()) {
-                        if (database != null) {
-                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database)
-                                              .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
-                        } else {
-                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
-                        }
-                    }
+                    unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                 }
 
-                String unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                 AuthorList authorList = createAuthorList(unparsedAuthors);
 
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 switch (val) {
-                    case "auth": return firstAuthor(authString);
-                    case "authForeIni": return firstAuthorForenameInitials(authString);
-                    case "authFirstFull": return firstAuthorVonAndLast(authString);
-                    case "authors": return allAuthors(authString);
-                    case "authorsAlpha": return authorsAlpha(authString);
-                    case "authorLast": return lastAuthor(authString);
-                    case "authorLastForeIni": return lastAuthorForenameInitials(authString);
-                    case "authorIni": return oneAuthorPlusIni(authString);
-                    case "auth.auth.ea": return authAuthEa(authString);
-                    case "auth.etal": return  authEtal(authString, ".", ".etal");
-                    case "authEtAl": return authEtal(authString, "", "EtAl");
-                    case "authshort": return authshort(authString);
+                    case "auth": return firstAuthor(authorList);
+                    case "authForeIni": return firstAuthorForenameInitials(authorList);
+                    case "authFirstFull": return firstAuthorVonAndLast(authorList);
+                    case "authors": return allAuthors(authorList);
+                    case "authorsAlpha": return authorsAlpha(authorList);
+                    case "authorLast": return lastAuthor(authorList);
+                    case "authorLastForeIni": return lastAuthorForenameInitials(authorList);
+                    case "authorIni": return oneAuthorPlusIni(authorList);
+                    case "auth.auth.ea": return authAuthEa(authorList);
+                    case "auth.etal": return authEtal(authorList, ".", ".etal");
+                    case "authEtAl": return authEtal(authorList, "", "EtAl");
+                    case "authshort": return authshort(authorList);
                 }
 
                 if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(authString, num);
+                    return authIniN(authorList, num);
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authNofMth(authString, Integer.parseInt(nums[0]),
+                    return authNofMth(authorList, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
                 } else if (val.matches("auth\\d+")) {
                     // authN. First N chars of the first author's last name.
                     int num = Integer.parseInt(val.substring(4));
-                    return authN(authString, num);
+                    return authN(authorList, num);
                 } else if (val.matches("authors\\d+")) {
-                    return nAuthors(authString, Integer.parseInt(val.substring(7)));
+                    return nAuthors(authorList, Integer.parseInt(val.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
@@ -309,33 +295,30 @@ public class BracketedPattern {
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
+                String unparsedEditors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
+                AuthorList editorList = createAuthorList(unparsedEditors);
+
                 switch (val) {
-                    case "edtr":
-                        return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "edtrForeIni":
-                        return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "editors":
-                        return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "editorLast":
-                        return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("")); // Last author's last name
-                    case "editorLastForeIni":
-                        return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "editorIni":
-                        return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "edtr.edtr.ea": return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    case "edtrshort": return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    case "edtr": return firstAuthor(editorList);
+                    case "edtrForeIni": return firstAuthorForenameInitials(editorList);
+                    case "editors": return allAuthors(editorList);
+                    case "editorLast": return lastAuthor(editorList); // Last author's last name
+                    case "editorLastForeIni": return lastAuthorForenameInitials(editorList);
+                    case "editorIni": return oneAuthorPlusIni(editorList);
+                    case "edtr.edtr.ea": return authAuthEa(editorList);
+                    case "edtrshort": return authshort(editorList);
                 }
 
                 if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
+                    return authIniN(editorList, num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
+                    return authNofMth(editorList,
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                 } else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
+                    String fa = firstAuthor(editorList);
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
@@ -647,12 +630,10 @@ public class BracketedPattern {
     /**
      * Gets the last name of the first author/editor
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
      */
-    public static String firstAuthor(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
+    protected static String firstAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -662,12 +643,11 @@ public class BracketedPattern {
     /**
      * Gets the first name initials of the first author/editor
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
      * @throws NullPointerException if authorField == null
      */
-    public static String firstAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
+    public static String firstAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -677,12 +657,10 @@ public class BracketedPattern {
     /**
      * Gets the von part and the last name of the first author/editor No spaces are returned
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
      */
-    public static String firstAuthorVonAndLast(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
+    public static String firstAuthorVonAndLast(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -696,29 +674,23 @@ public class BracketedPattern {
     /**
      * Gets the last name of the last author/editor
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
-    public static String lastAuthor(String authorField) {
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
-        if (tokens.length > 0) {
-            String[] lastAuthor = tokens[tokens.length - 1].split(",");
-            return lastAuthor[0];
-        } else {
-            // if author is empty
+    public static String lastAuthor(AuthorList authorList) {
+        if (authorList.isEmpty()) {
             return "";
         }
+        return authorList.getAuthors().get(authorList.getNumberOfAuthors() - 1).getLast().orElse("");
     }
 
     /**
      * Gets the forename initials of the last author/editor
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
      */
-    public static String lastAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
+    public static String lastAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -729,40 +701,35 @@ public class BracketedPattern {
     /**
      * Gets the last name of all authors/editors
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the sur name of all authors/editors
      */
-    public static String allAuthors(String authorField) {
+    public static String allAuthors(AuthorList authorList) {
         // Quick hack to use NAuthors to avoid code duplication
-        return nAuthors(authorField, Integer.MAX_VALUE);
+        return nAuthors(authorList, Integer.MAX_VALUE);
     }
 
     /**
      * Returns the authors according to the BibTeX-alpha-Style
      *
-     * @param authorField string containing the value of the author field
-     * @return the initials of all authornames
+     * @param authorList an {@link AuthorList}
+     * @return the initials of all authors' names
      */
-    public static String authorsAlpha(String authorField) {
-        String authors = "";
+    public static String authorsAlpha(AuthorList authorList) {
+        StringBuilder authors = new StringBuilder();
 
-        String fixedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
+        String[] tokens = authorList.getAuthors().stream().map(Author::getLastOnly).toArray(String[]::new);
 
-        // drop the "and" before the last author
-        // -> makes processing easier
-        fixedAuthors = fixedAuthors.replace(" and ", ", ");
-
-        String[] tokens = fixedAuthors.split(",");
         int max = tokens.length > 4 ? 3 : tokens.length;
         if (max == 1) {
             String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").trim().split(" ");
             // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
             for (int j = 0; j < (firstAuthor.length - 1); j++) {
-                authors = authors.concat(firstAuthor[j].substring(0, 1));
+                authors.append(firstAuthor[j].substring(0, 1));
             }
             // append last part of last name completely
-            authors = authors.concat(firstAuthor[firstAuthor.length - 1].substring(0,
-                    Math.min(3, firstAuthor[firstAuthor.length - 1].length())));
+            authors.append(firstAuthor[firstAuthor.length - 1], 0,
+                    Math.min(3, firstAuthor[firstAuthor.length - 1].length()));
         } else {
             for (int i = 0; i < max; i++) {
                 // replace all whitespaces by " "
@@ -770,36 +737,30 @@ public class BracketedPattern {
                 String[] curAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
                 for (String aCurAuthor : curAuthor) {
                     // use first character of each part of lastname
-                    authors = authors.concat(aCurAuthor.substring(0, 1));
+                    authors.append(aCurAuthor, 0, 1);
                 }
             }
             if (tokens.length > 4) {
-                authors = authors.concat("+");
+                authors.append("+");
             }
         }
-        return authors;
+        return authors.toString();
     }
 
     /**
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @param n           the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
-    public static String nAuthors(String authorField, int n) {
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
-        int i = 0;
-        StringBuilder authorSB = new StringBuilder();
-        while ((tokens.length > i) && (i < n)) {
-            String lastName = tokens[i].replaceAll(",\\s+.*", "");
-            authorSB.append(lastName);
-            i++;
-        }
-        if (tokens.length > n) {
-            authorSB.append("EtAl");
-        }
-        return authorSB.toString();
+    public static String nAuthors(AuthorList authorList, int n) {
+        String lastNames = authorList.getAuthors().stream()
+                                     .limit(n)
+                                     .map(Author::getLast).flatMap(Optional::stream)
+                                     .collect(Collectors.joining());
+
+        return authorList.getAuthors().size() <= n ? lastNames : lastNames + "EtAl";
     }
 
     /**
@@ -807,24 +768,22 @@ public class BracketedPattern {
      * author/editor, and appends the last name initial of the
      * remaining authors/editors.
      * Maximum 5 characters
-     * @param authorField a <code>String</code>
+     * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    public static String oneAuthorPlusIni(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if (tokens.length == 0) {
+    public static String oneAuthorPlusIni(AuthorList authorList) {
+        String[] authors = authorList.getAuthors().stream()
+                                    .map(Author::getLast).flatMap(Optional::stream)
+                                    .toArray(String[]::new);
+        if (authorList.isEmpty()) {
             return "";
         }
 
-        String firstAuthor = tokens[0].split(",")[0];
         StringBuilder authorSB = new StringBuilder();
-        authorSB.append(firstAuthor, 0, Math.min(CHARS_OF_FIRST, firstAuthor.length()));
-        int i = 1;
-        while (tokens.length > i) {
+        authorSB.append(authors[0], 0, Math.min(CHARS_OF_FIRST, authors[0].length()));
+        for (int i = 1; i < authors.length; i++) {
             // convert lastname, firstname to firstname lastname
-            authorSB.append(tokens[i].charAt(0));
-            i++;
+            authorSB.append(authors[i].charAt(0));
         }
         return authorSB.toString();
     }
@@ -837,20 +796,20 @@ public class BracketedPattern {
      * Newton.Maxwell.ea
      * Newton.Maxwell
      */
-    public static String authAuthEa(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if (tokens.length == 0) {
+    public static String authAuthEa(AuthorList authorList) {
+        String[] tokens = authorList.getAuthors().stream()
+                                    .map(Author::getLast).flatMap(Optional::stream)
+                                    .toArray(String[]::new);
+        if (authorList.isEmpty()) {
             return "";
         }
 
         StringBuilder author = new StringBuilder();
         // append first author
-        author.append((tokens[0].split(","))[0]);
+        author.append(tokens[0]);
         if (tokens.length >= 2) {
             // append second author
-            author.append('.').append((tokens[1].split(","))[0]);
+            author.append('.').append(tokens[1]);
         }
         if (tokens.length > 2) {
             // append ".ea" if more than 2 authors
@@ -875,9 +834,9 @@ public class BracketedPattern {
      *
      * Note that [authEtAl] equals [authors2]
      */
-    public static String authEtal(String authorField, String delim,
+    public static String authEtal(AuthorList authorList, String delim,
                                   String append) {
-        List<Author> authors = AuthorList.parse(authorField).getAuthors();
+        List<Author> authors = authorList.getAuthors();
 
         if (authors.size() > 2) {
             return authors.get(0).getLast().orElse("") + append;
@@ -890,29 +849,23 @@ public class BracketedPattern {
      * The first N characters of the Mth author/editor.
      * M starts counting from 1
      */
-    public static String authNofMth(String authorField, int n, int m) {
+    public static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
         int mminusone = m - 1;
 
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if ((tokens.length <= mminusone) || (n < 0) || (mminusone < 0)) {
+        if ((authorList.getNumberOfAuthors() <= mminusone) || (n < 0) || (mminusone < 0)) {
             return "";
         }
-        String lastName = (tokens[mminusone].split(","))[0];
-        if (lastName.length() <= n) {
-            return lastName;
-        } else {
-            return lastName.substring(0, n);
-        }
+
+        String lastName = authorList.getAuthor(mminusone).getLast().orElse("");
+        return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 
     /**
      * First N chars of the first author's last name.
      */
-    public static String authN(String authString, int num) {
-        String fa = firstAuthor(authString);
+    public static String authN(AuthorList authorList, int num) {
+        String fa = firstAuthor(authorList);
         fa = CitationKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
         if (num > fa.length()) {
             num = fa.length();
@@ -944,20 +897,17 @@ public class BracketedPattern {
      *
      *   Newton
      */
-    public static String authshort(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
+    public static String authshort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
-        String[] tokens = fixedAuthorField.split("\\band\\b");
-        int i = 0;
+        final int numberOfAuthors = authorList.getNumberOfAuthors();
 
-        if (tokens.length == 1) {
-            author.append(authNofMth(fixedAuthorField, fixedAuthorField.length(), 1));
-        } else if (tokens.length >= 2) {
-            while ((tokens.length > i) && (i < 3)) {
-                author.append(authNofMth(fixedAuthorField, 1, i + 1));
-                i++;
+        if (numberOfAuthors == 1) {
+            author.append(authorList.getAuthor(0).getLast().orElse(""));
+        } else if (numberOfAuthors >= 2) {
+            for (int i = 0; i < numberOfAuthors && i < 3; i++) {
+                author.append(authNofMth(authorList, 1, i + 1));
             }
-            if (tokens.length > 3) {
+            if (numberOfAuthors > 3) {
                 author.append('+');
             }
         }
@@ -985,39 +935,28 @@ public class BracketedPattern {
      *
      * authIni4 gives: a) NMEB, b) NeME, c) NeMa, d) Newt
      *
-     * @param authorField
+     * @param authorList
      *            The authors to format.
      *
      * @param n
      *            The maximum number of characters this string will be long. A
      *            negative number or zero will lead to "" be returned.
-     *
-     * @throws NullPointerException
-     *             if authorField is null and n > 0
      */
-    public static String authIniN(String authorField, int n) {
-
-        if (n <= 0) {
+    public static String authIniN(AuthorList authorList, int n) {
+        if (n <= 0 || authorList.isEmpty()) {
             return "";
         }
 
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuilder author = new StringBuilder();
-        String[] tokens = fixedAuthorField.split("\\band\\b");
+        final int numberOfAuthors = authorList.getNumberOfAuthors();
 
-        if (tokens.length == 0) {
-            return author.toString();
-        }
-
-        int i = 0;
-        int charsAll = n / tokens.length;
-        while (tokens.length > i) {
-            if (i < (n % tokens.length)) {
-                author.append(authNofMth(fixedAuthorField, charsAll + 1, i + 1));
+        int charsAll = n / numberOfAuthors;
+        for (int i = 0; i < numberOfAuthors; i++) {
+            if (i < (n % numberOfAuthors)) {
+                author.append(authNofMth(authorList, charsAll + 1, i + 1));
             } else {
-                author.append(authNofMth(fixedAuthorField, charsAll, i + 1));
+                author.append(authNofMth(authorList, charsAll, i + 1));
             }
-            i++;
         }
 
         if (author.length() <= n) {
