@@ -266,7 +266,7 @@ public class BracketedPattern {
                     case "authorsAlpha": return authorsAlpha(authorList);
                     case "authorLast": return lastAuthor(authorList);
                     case "authorLastForeIni": return lastAuthorForenameInitials(authorList);
-                    case "authorIni": return oneAuthorPlusIni(authorList);
+                    case "authorIni": return oneAuthorPlusInitials(authorList);
                     case "auth.auth.ea": return authAuthEa(authorList);
                     case "auth.etal": return authEtal(authorList, ".", ".etal");
                     case "authEtAl": return authEtal(authorList, "", "EtAl");
@@ -303,7 +303,7 @@ public class BracketedPattern {
                     case "editors": return allAuthors(editorList);
                     case "editorLast": return lastAuthor(editorList); // Last author's last name
                     case "editorLastForeIni": return lastAuthorForenameInitials(editorList);
-                    case "editorIni": return oneAuthorPlusIni(editorList);
+                    case "editorIni": return oneAuthorPlusInitials(editorList);
                     case "edtr.edtr.ea": return authAuthEa(editorList);
                     case "edtrshort": return authshort(editorList);
                 }
@@ -406,6 +406,12 @@ public class BracketedPattern {
         }
     }
 
+    /**
+     * Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
+     * Afterward, any institutions are formatted into an institution key.
+     * @param unparsedAuthors a string representation of authors or editors
+     * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
+     */
     private static AuthorList createAuthorList(String unparsedAuthors) {
         AuthorList authorList = new AuthorList();
         for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
@@ -426,6 +432,11 @@ public class BracketedPattern {
         return authorList;
     }
 
+    /**
+     * Checks if an author is an institution by verifying that only the last name is present.
+     * @param author the checked author
+     * @return true if only the last name is present
+     */
     private static boolean isInstitution(Author author) {
         return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
                 && author.getVon().isEmpty() && author.getLast().isPresent();
@@ -632,10 +643,9 @@ public class BracketedPattern {
      * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
      */
     protected static String firstAuthor(AuthorList authorList) {
-        if (authorList.isEmpty()) {
-            return "";
-        }
-        return authorList.getAuthor(0).getLast().orElse("");
+        return authorList.getAuthors().stream()
+                         .findFirst()
+                         .flatMap(Author::getLast).orElse("");
     }
 
     /**
@@ -643,17 +653,17 @@ public class BracketedPattern {
      *
      * @param authorList an {@link AuthorList}
      * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
      */
     public static String firstAuthorForenameInitials(AuthorList authorList) {
-        if (authorList.isEmpty()) {
-            return "";
-        }
-        return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
+        return authorList.getAuthors().stream()
+                         .findFirst()
+                         .flatMap(Author::getFirstAbbr)
+                         .map(s -> s.substring(0, 1))
+                         .orElse("");
     }
 
     /**
-     * Gets the von part and the last name of the first author/editor No spaces are returned
+     * Gets the von part and the last name of the first author/editor. No spaces are returned.
      *
      * @param authorList an {@link AuthorList}
      * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
@@ -662,11 +672,9 @@ public class BracketedPattern {
         if (authorList.isEmpty()) {
             return "";
         }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        authorList.getAuthor(0).getVon().ifPresent(vonAuthor -> stringBuilder.append(vonAuthor.replaceAll(" ", "")));
-        authorList.getAuthor(0).getLast().ifPresent(stringBuilder::append);
-        return stringBuilder.toString();
+        Author firstAuthor = authorList.getAuthor(0);
+        return (firstAuthor.getVon().orElse("") + firstAuthor.getLast().orElse(""))
+                .replaceAll(" ", "");
     }
 
     /**
@@ -703,8 +711,7 @@ public class BracketedPattern {
      * @return the sur name of all authors/editors
      */
     public static String allAuthors(AuthorList authorList) {
-        // Quick hack to use NAuthors to avoid code duplication
-        return nAuthors(authorList, Integer.MAX_VALUE);
+        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "");
     }
 
     /**
@@ -746,6 +753,23 @@ public class BracketedPattern {
     }
 
     /**
+     * Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
+     * `maxAuthors`, replace all excess authors with `suffix`.
+     * @param authorList the list of authors
+     * @param maxAuthors the maximum number of authors in the string
+     * @param delimiter delimiter separating the last names of the authors
+     * @param suffix to replace excess authors with
+     * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
+     * `maxAuthors` replaced with `suffix`
+     */
+    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, String suffix) {
+        suffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
+        return authorList.getAuthors().stream()
+                         .map(Author::getLast).flatMap(Optional::stream)
+                         .limit(maxAuthors).collect(Collectors.joining(delimiter, "", suffix));
+    }
+
+    /**
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      *
      * @param authorList an {@link AuthorList}
@@ -753,12 +777,7 @@ public class BracketedPattern {
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     public static String nAuthors(AuthorList authorList, int n) {
-        String lastNames = authorList.getAuthors().stream()
-                                     .limit(n)
-                                     .map(Author::getLast).flatMap(Optional::stream)
-                                     .collect(Collectors.joining());
-
-        return authorList.getAuthors().size() <= n ? lastNames : lastNames + "EtAl";
+        return joinAuthorsOnLastName(authorList, n, "", "EtAl");
     }
 
     /**
@@ -769,19 +788,16 @@ public class BracketedPattern {
      * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    public static String oneAuthorPlusIni(AuthorList authorList) {
-        String[] authors = authorList.getAuthors().stream()
-                                    .map(Author::getLast).flatMap(Optional::stream)
-                                    .toArray(String[]::new);
+    public static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
 
         StringBuilder authorSB = new StringBuilder();
-        authorSB.append(authors[0], 0, Math.min(CHARS_OF_FIRST, authors[0].length()));
-        for (int i = 1; i < authors.length; i++) {
-            // convert lastname, firstname to firstname lastname
-            authorSB.append(authors[i].charAt(0));
+        // authNofMth start index at 1 instead of 0
+        authorSB.append(authNofMth(authorList, CHARS_OF_FIRST, 1));
+        for (int i = 2; i <= authorList.getNumberOfAuthors(); i++) {
+            authorSB.append(authNofMth(authorList, 1, i));
         }
         return authorSB.toString();
     }
@@ -795,26 +811,7 @@ public class BracketedPattern {
      * Newton.Maxwell
      */
     public static String authAuthEa(AuthorList authorList) {
-        String[] tokens = authorList.getAuthors().stream()
-                                    .map(Author::getLast).flatMap(Optional::stream)
-                                    .toArray(String[]::new);
-        if (authorList.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder author = new StringBuilder();
-        // append first author
-        author.append(tokens[0]);
-        if (tokens.length >= 2) {
-            // append second author
-            author.append('.').append(tokens[1]);
-        }
-        if (tokens.length > 2) {
-            // append ".ea" if more than 2 authors
-            author.append(".ea");
-        }
-
-        return author.toString();
+        return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
     }
 
     /**
@@ -834,17 +831,15 @@ public class BracketedPattern {
      */
     public static String authEtal(AuthorList authorList, String delim,
                                   String append) {
-        List<Author> authors = authorList.getAuthors();
-
-        if (authors.size() > 2) {
-            return authors.get(0).getLast().orElse("") + append;
+        if (authorList.getNumberOfAuthors() <= 2) {
+            return joinAuthorsOnLastName(authorList, 2, delim, "");
         } else {
-            return authors.stream().map(Author::getLast).flatMap(Optional::stream).collect(Collectors.joining(delim));
+            return authorList.getAuthor(0).getLast().orElse("") + append;
         }
     }
 
     /**
-     * The first N characters of the Mth author/editor.
+     * The first N characters of the Mth author's or editor's last name.
      * M starts counting from 1
      */
     public static String authNofMth(AuthorList authorList, int n, int m) {
