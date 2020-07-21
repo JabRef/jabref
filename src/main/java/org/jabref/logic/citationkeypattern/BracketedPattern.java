@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -408,18 +409,17 @@ public class BracketedPattern {
     private static AuthorList createAuthorList(String unparsedAuthors) {
         AuthorList authorList = new AuthorList();
         for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
-            if (isInstitution(author)) {
-                String institutionKey = author.getLast()
-                                              .map(LatexToUnicodeAdapter::format)
-                                              .map(BracketedPattern::generateInstitutionKey)
-                                              .orElse(null);
-                authorList.addAuthor(null, null, null, institutionKey, null);
-            }
+            // If the author is an institution, use an institution key instead of the full name
+            String lastName = author.getLast()
+                                    .map(LatexToUnicodeAdapter::format)
+                                    .map(isInstitution(author) ?
+                                            BracketedPattern::generateInstitutionKey : Function.identity())
+                                    .orElse(null);
             authorList.addAuthor(
                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
                     author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
                     author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getLast().map(LatexToUnicodeAdapter::format).orElse(null),
+                    lastName,
                     author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
             );
         }
