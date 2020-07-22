@@ -10,8 +10,10 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.JabRefPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -28,6 +30,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
+    private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -60,15 +63,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
         fontSizeProperty.setValue(String.valueOf(preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
 
-        switch (preferences.get(JabRefPreferences.FX_THEME)) {
-            case ThemeLoader.DARK_CSS:
-                themeLightProperty.setValue(false);
-                themeDarkProperty.setValue(true);
-                break;
-            case ThemeLoader.MAIN_CSS:
-            default:
-                themeLightProperty.setValue(true);
-                themeDarkProperty.setValue(false);
+        String currentTheme = preferences.get(JabRefPreferences.FX_THEME);
+
+        if (ThemeLoader.DARK_CSS.equals(currentTheme)) {
+            themeLightProperty.setValue(false);
+            themeDarkProperty.setValue(true);
+            themeCustomProperty.setValue(false);
+        } else if (ThemeLoader.MAIN_CSS.equals(currentTheme) || currentTheme.isBlank()) {
+            themeLightProperty.setValue(true);
+            themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(false);
+        } else {
+            themeLightProperty.setValue(false);
+            themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(true);
         }
     }
 
@@ -91,6 +99,9 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
+        } else if (themeCustomProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.getCustomCss())) {
+            restartWarnings.add(Localization.lang("Theme changed to a custom theme."));
+            preferences.put(JabRefPreferences.FX_THEME, preferences.getPathToCustomTheme());
         }
     }
 
@@ -127,5 +138,28 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty themeDarkProperty() {
         return themeDarkProperty;
+    }
+
+    public BooleanProperty customThemeProperty() {
+        return themeCustomProperty;
+    }
+
+    public void importCSSFile() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.CSS)
+                .withDefaultExtension(StandardFileType.CSS)
+                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
+
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
+
+            preferences.setPathToCustomTheme(file.toAbsolutePath().toString());
+
+            dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
+                    Localization.lang("You must restart JabRef for this to come into effect."));
+        });
+    }
+
+    public void openExportThemeDialog() {
+        new ExportThemeDialog(dialogService, preferences).showAndWait();
     }
 }

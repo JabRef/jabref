@@ -20,6 +20,7 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
     @FXML public Spinner<Integer> fontSize;
     @FXML public RadioButton themeLight;
     @FXML public RadioButton themeDark;
+    @FXML public RadioButton customTheme;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -49,8 +50,17 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
+        customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
+
+        customTheme.setDisable(preferences.getPathToCustomTheme().isBlank());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize));
     }
+
+    @FXML
+    void importTheme() { viewModel.importCSSFile();}
+
+    @FXML
+    void exportTheme() { viewModel.openExportThemeDialog();}
 }
