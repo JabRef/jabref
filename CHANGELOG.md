@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new fetcher to enable users to search all available E-Libraries simultaneously. [koppor#369](https://github.com/koppor/jabref/issues/369)
 - We added the field "entrytype" to the export sort criteria [#6531](https://github.com/JabRef/jabref/pull/6531)
 - We added the possibility to change the display order of the fields in the entry editor. The order can now be configured using drag and drop in the "Customize entry types" dialog [#6152](https://github.com/JabRef/jabref/pull/6152)
+- We made it possible to customise the look of JabRef by importing custom CSS files. We also made it possible to export both the standard _Light_ and _Dark_ themes as well as imported themes.[#5790](https://github.com/JabRef/jabref/issues/5790)
 
 ### Changed
 
@@ -120,7 +121,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
 - We added possibility to enable/disable items quantity in groups. [#6042](https://github.com/JabRef/jabref/issues/6042)
 - We reimplemented and improved the dialog "Customize entry types" [#4719](https://github.com/JabRef/jabref/issues/4719)
-- We made it possible to customise the look of JabRef by importing custom CSS files. We also made it possible to export both the standard _Light_ and _Dark_ themes as well as imported themes. [#5790](https://github.com/JabRef/jabref/issues/5790)
 
 ### Fixed
 
