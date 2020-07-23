@@ -52,15 +52,17 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
 
-        customTheme.setDisable(preferences.getPathToCustomTheme().isBlank());
-
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize));
     }
 
     @FXML
-    void importTheme() { viewModel.importCSSFile();}
+    void importTheme() {
+        viewModel.importCSSFile();
+    }
 
     @FXML
-    void exportTheme() { viewModel.openExportThemeDialog();}
+    void exportTheme() {
+        viewModel.openExportThemeDialog();
+    }
 }

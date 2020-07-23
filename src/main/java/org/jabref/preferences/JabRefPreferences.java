@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.InetAddress;
-import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +38,6 @@ import javafx.scene.paint.Color;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -378,8 +376,6 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
-    private static final String PATH_TO_CUSTOM_THEME = "pathToCustomTheme";
-
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -708,7 +704,6 @@ public class JabRefPreferences implements PreferencesService {
 
         // set default theme
         defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
-        defaults.put(JabRefPreferences.PATH_TO_CUSTOM_THEME, "");
 
         setLanguageDependentDefaultValues();
     }
@@ -1130,7 +1125,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void exportPreferences(Path file) throws JabRefException {
-        LOGGER.debug("Exporting preferences ", file.toAbsolutePath());
+        LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
@@ -1156,25 +1151,6 @@ public class JabRefPreferences implements PreferencesService {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
                     ex);
         }
-    }
-
-    public void exportTheme(Path targetFile, String theme) throws JabRefException {
-        try (OutputStream os = Files.newOutputStream(targetFile)) {
-            if (theme.equals(ThemeLoader.MAIN_CSS) || theme.equals(ThemeLoader.DARK_CSS)) {
-                Path path = new File(JabRefFrame.class.getResource(theme).toURI()).toPath();
-                writeThemeToFile(path, os);
-            } else {
-                Path path = new File(theme).toPath();
-                writeThemeToFile(path, os);
-            }
-        } catch (IOException | URISyntaxException ex) {
-            throw new JabRefException("Could not export theme", Localization.lang("Could not export theme"),
-                    ex);
-        }
-    }
-
-    private void writeThemeToFile(Path path, OutputStream os) throws IOException {
-        Files.copy(path, os);
     }
 
     /**

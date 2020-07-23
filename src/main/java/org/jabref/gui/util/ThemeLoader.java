@@ -38,7 +38,6 @@ public class ThemeLoader {
 
     public static final String MAIN_CSS = "Base.css";
     public static final String DARK_CSS = "Dark.css";
-    private static String CUSTOM_CSS = "";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
     private final Optional<URL> additionalCssToLoad;
@@ -68,7 +67,6 @@ public class ThemeLoader {
             } else {
                 try {
                     cssResource = Optional.of(new File(cssPreferences).toURI().toURL());
-                    setCustomCss(cssPreferences);
                 } catch (MalformedURLException e) {
                     LOGGER.warn("Cannot load css {}", cssPreferences);
                 }
@@ -119,13 +117,5 @@ public class ThemeLoader {
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.error("Could not watch css file for changes {}", cssFile, e);
         }
-    }
-
-    public static String getCustomCss() {
-        return CUSTOM_CSS;
-    }
-
-    public static void setCustomCss(String customCss) {
-        CUSTOM_CSS = customCss;
     }
 }

@@ -2,11 +2,11 @@ package org.jabref.gui.preferences;
 
 import javafx.beans.property.SimpleStringProperty;
 
-public class Theme {
+public class AppearanceThemeModel {
     private SimpleStringProperty name;
     private SimpleStringProperty path;
 
-    public Theme(String name, String path) {
+    public AppearanceThemeModel(String name, String path) {
         this.name = new SimpleStringProperty(name);
         this.path = new SimpleStringProperty(path);
     }

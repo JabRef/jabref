@@ -1,5 +1,12 @@
 package org.jabref.gui.preferences;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,8 +17,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 
-import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
@@ -27,15 +34,12 @@ public class ExportThemeDialog extends BaseDialog<Void> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportThemeDialog.class);
 
-    @FXML
-    private TableView<Theme> table;
-    @FXML
-    private TableColumn<Theme, String> columnName;
-    @FXML
-    private TableColumn<Theme, String> columnPath;
+    @FXML private TableView<AppearanceThemeModel> table;
+    @FXML private TableColumn<AppearanceThemeModel, String> columnName;
+    @FXML private TableColumn<AppearanceThemeModel, String> columnPath;
 
-    private JabRefPreferences preferences;
-    private DialogService dialogService;
+    private final JabRefPreferences preferences;
+    private final DialogService dialogService;
 
     public ExportThemeDialog(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -54,34 +58,35 @@ public class ExportThemeDialog extends BaseDialog<Void> {
         columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         columnPath.setCellValueFactory(new PropertyValueFactory<>("path"));
 
-        ObservableList<Theme> data =
-                FXCollections.observableArrayList(new Theme("Light theme", ThemeLoader.MAIN_CSS), new Theme("Dark theme", ThemeLoader.DARK_CSS));
+        ObservableList<AppearanceThemeModel> data =
+                FXCollections.observableArrayList(new AppearanceThemeModel("Light theme", ThemeLoader.MAIN_CSS), new AppearanceThemeModel("Dark theme", ThemeLoader.DARK_CSS));
 
-        if (!(ThemeLoader.getCustomCss().isBlank())) {
-            data.add(new Theme("Custom theme", ThemeLoader.getCustomCss()));
+        String customTheme = preferences.getTheme();
+        if (!(customTheme.equals(ThemeLoader.MAIN_CSS) || customTheme.equals(ThemeLoader.DARK_CSS))) {
+            data.add(new AppearanceThemeModel("Custom theme", customTheme));
         }
 
         table.setItems(data);
 
         table.setOnKeyPressed(event -> {
-            TablePosition tablePosition;
+            TablePosition<?, ?> tablePosition;
             if (event.getCode().equals(KeyCode.ENTER)) {
                 tablePosition = table.getFocusModel().getFocusedCell();
                 final int row = tablePosition.getRow();
-                ObservableList<Theme> list = table.getItems();
-                Theme theme = list.get(row);
-                exportCSSFile(theme.getPath());
+                ObservableList<AppearanceThemeModel> list = table.getItems();
+                AppearanceThemeModel appearanceThemeModel = list.get(row);
+                exportCSSFile(appearanceThemeModel.getPath());
             }
         });
 
         table.setRowFactory(tv -> {
-            TableRow<Theme> row = new TableRow<>();
+            TableRow<AppearanceThemeModel> row = new TableRow<>();
             row.setOnMouseClicked(event -> handleSelectedRowEvent(row));
             return row;
         });
     }
 
-    private void handleSelectedRowEvent(TableRow<Theme> row) {
+    private void handleSelectedRowEvent(TableRow<AppearanceThemeModel> row) {
         if (!row.isEmpty()) {
             exportCSSFile(row.getItem().getPath());
         }
@@ -96,9 +101,15 @@ public class ExportThemeDialog extends BaseDialog<Void> {
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(exportFile -> {
-                         try {
-                             preferences.exportTheme(exportFile.getFileName(), theme);
-                         } catch (JabRefException ex) {
+                         try (OutputStream os = Files.newOutputStream(exportFile.getFileName())) {
+                             if (theme.equals(ThemeLoader.MAIN_CSS) || theme.equals(ThemeLoader.DARK_CSS)) {
+                                 Path path = new File(JabRefFrame.class.getResource(theme).toURI()).toPath();
+                                 Files.copy(path, os);
+                             } else {
+                                 Path path = new File(theme).toPath();
+                                 Files.copy(path, os);
+                             }
+                         } catch (IOException | URISyntaxException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export theme"), ex);
                          }

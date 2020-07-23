@@ -35,9 +35,9 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    private Validator fontSizeValidator;
+    private final Validator fontSizeValidator;
 
-    private List<String> restartWarnings = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
 
     public AppearanceTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -82,6 +82,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        // ToDo: compare initial and new settings
         if (preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE) != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
             preferences.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE, fontOverrideProperty.getValue());
@@ -93,15 +94,15 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
         }
 
-        if (themeLightProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.MAIN_CSS)) {
+        if (themeLightProperty.getValue() && !preferences.getTheme().equals(ThemeLoader.MAIN_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
-        } else if (themeDarkProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.DARK_CSS)) {
+        } else if (themeDarkProperty.getValue() && !preferences.getTheme().equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
-        } else if (themeCustomProperty.getValue() && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.getCustomCss())) {
+        } else if (themeCustomProperty.getValue()) { // && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.getCustomCss())) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme."));
-            preferences.put(JabRefPreferences.FX_THEME, preferences.getPathToCustomTheme());
+            preferences.put(JabRefPreferences.FX_THEME, preferences.getTheme());
         }
     }
 
@@ -151,11 +152,8 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-
-            preferences.setPathToCustomTheme(file.toAbsolutePath().toString());
-
-            dialogService.showWarningDialogAndWait(Localization.lang("Import CSS"),
-                    Localization.lang("You must restart JabRef for this to come into effect."));
+            preferences.put(JabRefPreferences.FX_THEME, file.toAbsolutePath().toString());
+            restartWarnings.add(Localization.lang("You must restart JabRef for this to come into effect."));
         });
     }
 
