@@ -670,12 +670,8 @@ public class BracketedPattern {
      * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
      */
     public static String firstAuthorVonAndLast(AuthorList authorList) {
-        if (authorList.isEmpty()) {
-            return "";
-        }
-        Author firstAuthor = authorList.getAuthor(0);
-        return (firstAuthor.getVon().orElse("") + firstAuthor.getLast().orElse(""))
-                .replaceAll(" ", "");
+        return authorList.isEmpty() ? "" :
+                authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
     }
 
     /**
