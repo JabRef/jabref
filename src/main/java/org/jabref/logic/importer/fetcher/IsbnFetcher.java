@@ -55,7 +55,6 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
             bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier, targetBibEntryFormat);
         }
-        System.out.println(bibEntry.get());
         bibEntry.ifPresent(entry -> doPostCleanup(entry, targetBibEntryFormat));
 
         return bibEntry;

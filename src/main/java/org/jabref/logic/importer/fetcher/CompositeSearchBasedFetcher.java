@@ -46,9 +46,10 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
             }
         }).limit(maximumNumberOfReturnedResults)
           .collect(Collectors.toList());
-        // Convert all entries into one format, for now BibTeX
+        // All entries have to be converted into one format, this is necessary for the format conversion
         ConvertToBibtexCleanup converter = new ConvertToBibtexCleanup();
         result.forEach(converter::cleanup);
+        result.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
         return result;
     }
 
