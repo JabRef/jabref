@@ -9,7 +9,7 @@ jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Prepare markdown-link-check
         run: mkdir docs/ROOT && cp CHANGELOG.md README.md docs/ROOT
       - uses: gaurav-nelson/github-action-markdown-link-check@v1
