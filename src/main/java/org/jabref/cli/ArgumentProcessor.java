@@ -547,7 +547,6 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
             System.out.print(Localization.lang("Please wait..."));
             try {
-                // Here we use BibLaTeX si
                 List<BibEntry> matches = selectedFetcher.get().performSearch(query,
                         bibFormat.equals("bibtex") ? BibDatabaseMode.BIBTEX : BibDatabaseMode.BIBLATEX);
                 if (matches.isEmpty()) {
