@@ -75,6 +75,7 @@ import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
+import org.jabref.gui.exporter.GlobalSaveManager;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
 import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -122,7 +123,6 @@ import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ThemeLoader;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.IdFetcher;
@@ -177,6 +177,7 @@ public class JabRefFrame extends BorderPane {
     private TabPane tabbedPane;
     private SidePane sidePane;
     private PopOver progressViewPopOver;
+
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -420,7 +421,7 @@ public class JabRefFrame extends BorderPane {
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
                     stateManager
             );
-            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
+            if (!(shouldClose.isPresent() && (shouldClose.get() == ButtonType.YES))) {
                 return false;
             }
         }
@@ -441,7 +442,7 @@ public class JabRefFrame extends BorderPane {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
-            AutosaveManager.shutdown(context);
+            GlobalSaveManager.shutdown(context);
             BackupManager.shutdown(context);
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
@@ -1152,9 +1153,9 @@ public class JabRefFrame extends BorderPane {
         basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
+        GlobalSaveManager autosaver=  GlobalSaveManager.start(context);
 
         if (readyForAutosave(context)) {
-            AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUiManager(basePanel));
         }
 
@@ -1259,6 +1260,7 @@ public class JabRefFrame extends BorderPane {
             // The user wants to save.
             try {
                 SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
+
                 if (saveAction.save()) {
                     return true;
                 }
@@ -1296,7 +1298,8 @@ public class JabRefFrame extends BorderPane {
         } else {
             removeTab(panel);
         }
-        AutosaveManager.shutdown(context);
+
+        GlobalSaveManager.shutdown(context);
         BackupManager.shutdown(context);
     }
 

@@ -20,7 +20,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -59,7 +58,7 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+   public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
@@ -112,7 +111,7 @@ public class SaveDatabaseAction {
         if (databasePath.isPresent()) {
             final Path oldFile = databasePath.get();
             context.setDatabasePath(oldFile);
-            AutosaveManager.shutdown(context);
+            GlobalSaveManager.shutdown(context);
             BackupManager.shutdown(context);
         }
 
@@ -134,7 +133,7 @@ public class SaveDatabaseAction {
             // Reinstall AutosaveManager and BackupManager for the new file name
             panel.resetChangeMonitorAndChangePane();
             if (readyForAutosave(context)) {
-                AutosaveManager autosaver = AutosaveManager.start(context);
+                GlobalSaveManager autosaver = GlobalSaveManager.start(context);
                 autosaver.registerListener(new AutosaveUiManager(panel));
             }
             if (readyForBackup(context)) {
