@@ -1,4 +1,4 @@
-# Where to translate the abstract queries
+# How to provide fetchers with import format
 
 ## Context and Problem Statement
 

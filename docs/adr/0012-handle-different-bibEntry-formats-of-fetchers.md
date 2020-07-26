@@ -55,5 +55,6 @@ because the fetcher does not need to concern itself with the differences between
 
 * Good, because fetchers do not have to think about conversion (Separation of concers)
 * Good, because no other code that currently relies on fetchers has to do the conversion
+* Good, because this layer can be used for any kind of import to handle all conversion steps (not only format)
 * Bad, because this requires a lot of code changes
 * Bad, because this has to be tested extensively
