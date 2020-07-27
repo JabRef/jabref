@@ -13,7 +13,7 @@ plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.0'
-    id 'com.github.ben-manes.versions' version '0.28.0'
+    id 'com.github.ben-manes.versions' version '0.29.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.21.0'
