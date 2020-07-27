@@ -2,10 +2,10 @@
 
 ## Context and Problem Statement
 
-Most fetchers (except IDFetchers) in JabRef return BibEntries when fetching entries from their API.
+All fetchers (except IDFetchers) in JabRef return BibEntries when fetching entries from their API.
 Some fetchers directly receive BibTeX entries from their API, the other fetchers receive their entries in some kind of exchange format such as JSON or XML and then parse this into BibEntries.
 Currently all fetchers either return BibEntries in BibTeX or BibLaTeX format.
-This can lead to importing BibEntries of one format in a database of the other format. 
+This can lead to importing BibEntries of one format in a database of the other format.
 How can this inconsistency between fetchers, and their used formats be addressed?
 
 ## Considered Options
@@ -17,14 +17,11 @@ How can this inconsistency between fetchers, and their used formats be addressed
 
 ## Decision Outcome
 
-Chosen option: "Pass fetchers the format, they have to call a conversion method if necessary", 
+Chosen option: "Pass fetchers the format, they have to call a conversion method if necessary",
 because the fetcher does not need to concern itself with the differences between the formats, and the conversion code already exists.
-
-### Positive Consequences
-
-* Good, because less code has to be written than with option #2
-* Good, because code is already tested
-* Good, because keeps all conversion code centralized (code reuse)
+This makes the implementation straightforward, and less time intensive than the layer approach.
+The layer approach will be the better option for the future as it composes all steps required during importing, not only format conversion of fetched entries.
+[As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
 
 ## Pros and Cons of the Options
 
@@ -55,6 +52,7 @@ because the fetcher does not need to concern itself with the differences between
 
 * Good, because fetchers do not have to think about conversion (Separation of concers)
 * Good, because no other code that currently relies on fetchers has to do the conversion
-* Good, because this layer can be used for any kind of import to handle all conversion steps (not only format)
+* Good, because this layer can be used for any kind of import to handle all conversion steps (not only format). [As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
+* Good, because this layer can easily be extended if the import procedure changes
 * Bad, because this requires a lot of code changes
 * Bad, because this has to be tested extensively
