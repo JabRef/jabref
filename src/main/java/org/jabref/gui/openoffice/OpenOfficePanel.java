@@ -272,7 +272,6 @@ public class OpenOfficePanel {
         flow.setVgap(4);
         flow.setHgap(4);
         flow.setPrefWrapLength(200);
-        
         flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
         flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
         flow.getChildren().addAll(manageCitations, exportCitations, settingsB);
