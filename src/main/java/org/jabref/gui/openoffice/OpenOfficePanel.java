@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
 import javafx.geometry.Side;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -25,6 +26,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.FlowPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -264,19 +266,19 @@ public class OpenOfficePanel {
         HBox hbox = new HBox();
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
         hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
-
-        VBox row1 = new VBox();
-        VBox row2 = new VBox();
-        VBox row3 = new VBox();
-        row1.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
-        row2.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
-        row3.getChildren().addAll(manageCitations, exportCitations, settingsB);
-        HBox hbox1 = new HBox();
-        hbox1.getChildren().addAll(row1, row2, row3);
-        hbox1.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
+        
+        FlowPane flow = new FlowPane();
+        flow.setPadding(new Insets(5, 5, 5, 5));
+        flow.setVgap(4);
+        flow.setHgap(4);
+        flow.setPrefWrapLength(200);
+        
+        flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
+        flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge);
+        flow.getChildren().addAll(manageCitations, exportCitations, settingsB);
 
         vbox.setFillWidth(true);
-        vbox.getChildren().addAll(hbox, hbox1);
+        vbox.getChildren().addAll(hbox, flow);
     }
 
     private void exportEntries() {
