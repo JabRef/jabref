@@ -11,8 +11,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.concurrent.Task;
-import javafx.geometry.Side;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -23,10 +23,10 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.FlowPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
