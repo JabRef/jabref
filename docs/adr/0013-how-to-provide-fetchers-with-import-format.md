@@ -2,9 +2,9 @@
 
 ## Context and Problem Statement
 
-Fetchers import BibEntries either as BibTeX or BibLaTeX. 
+Fetchers import BibEntries either as BibTeX or BibLaTeX.
 To keep databases formatted homogenous, fetchers have to return the requested format.
-How should we provide the fetchers with the format information? 
+How should we provide the fetchers with the format information?
 
 ## Considered Options
 
@@ -15,12 +15,6 @@ How should we provide the fetchers with the format information?
 
 Chosen option: "Pass fetchers the format, for each request", 
 because this way less state has to be managed by the fetcher, and less code has to be written.
-
-### Positive Consequences
-
-* Good, because code to acquire a fetcher instance does not have to be changed
-* Good, because programmer has to state the requested format explicitly (conversion becomes more explicit)
-* Good, because keeps less state in fetcher
 
 ## Pros and Cons of the Options
 
