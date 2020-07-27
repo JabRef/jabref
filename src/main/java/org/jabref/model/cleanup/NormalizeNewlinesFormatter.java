@@ -2,7 +2,6 @@ package org.jabref.model.cleanup;
 
 import java.util.Objects;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.util.OS;
 
 /**
@@ -12,7 +11,7 @@ public class NormalizeNewlinesFormatter extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang("Normalize newline characters");
+        return "Normalize newline characters";
     }
 
     @Override
