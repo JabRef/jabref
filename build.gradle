@@ -717,13 +717,6 @@ if (OperatingSystem.current().isLinux()) {
     }
 }
 
-// Delete unnecessary folder in application image
-// TODO: Remove this workaround as soon as https://github.com/beryx/badass-jlink-plugin/issues/51 is fixed
-task deleteModsFolder(type: Delete) {
-    delete "$buildDir/distribution/JabRef/app/mods"
-}
-deleteModsFolder.shouldRunAfter jpackageImage
-
 jmh {
     warmupIterations = 5
     iterations = 10
