@@ -36,7 +36,7 @@ public class NormalizeNewlinesFormatter extends Formatter {
 
     @Override
     public String getDescription() {
-        return Localization.lang("Normalizes all newline characters in the field content.");
+        return "Normalizes all newline characters in the field content.";
     }
 
     @Override
