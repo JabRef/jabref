@@ -21,11 +21,11 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

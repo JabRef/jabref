@@ -1,10 +1,10 @@
 package org.jabref.logic.bibtex;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

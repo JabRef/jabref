@@ -17,9 +17,9 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 

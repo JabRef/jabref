@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -16,6 +15,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 public class MetaDataSerializer {
 

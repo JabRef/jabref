@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 
 import com.google.common.base.Throwables;
 import org.apache.logging.log4j.core.LogEvent;

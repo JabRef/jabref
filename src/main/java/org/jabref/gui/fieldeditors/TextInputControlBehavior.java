@@ -23,7 +23,7 @@ import javafx.stage.Screen;
 import javafx.stage.Window;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 
 import com.sun.javafx.scene.control.Properties;
 

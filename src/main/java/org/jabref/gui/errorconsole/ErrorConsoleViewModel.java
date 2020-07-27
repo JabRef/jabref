@@ -20,7 +20,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.apache.http.client.utils.URIBuilder;

@@ -5,10 +5,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted

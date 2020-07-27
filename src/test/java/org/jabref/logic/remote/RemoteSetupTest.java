@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.remote.server.MessageHandler;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.BeforeEach;

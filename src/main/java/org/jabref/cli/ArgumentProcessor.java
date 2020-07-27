@@ -41,13 +41,13 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;

@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.TypedBibEntry;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -23,6 +22,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 public class BibEntryWriter {
 

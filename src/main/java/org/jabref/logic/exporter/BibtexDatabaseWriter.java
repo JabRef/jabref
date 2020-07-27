@@ -8,7 +8,6 @@ import java.util.Map;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -18,6 +17,7 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 public class BibtexDatabaseWriter extends BibDatabaseWriter {
 

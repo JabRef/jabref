@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;

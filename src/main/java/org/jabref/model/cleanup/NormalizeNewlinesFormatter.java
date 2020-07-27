@@ -3,7 +3,7 @@ package org.jabref.model.cleanup;
 import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 
 /**
  * Trim all whitespace characters (defined in java) in the string.

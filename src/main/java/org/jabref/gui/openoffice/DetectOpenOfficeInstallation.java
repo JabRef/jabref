@@ -12,9 +12,9 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 /**

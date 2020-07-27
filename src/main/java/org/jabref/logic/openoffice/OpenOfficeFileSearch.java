@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.util.OS;
 
 public class OpenOfficeFileSearch {
     /**

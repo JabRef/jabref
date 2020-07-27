@@ -18,7 +18,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XmpUtilReader;
@@ -29,6 +28,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;

@@ -1,4 +1,4 @@
-package org.jabref.logic.util;
+package org.jabref.model.util;
 
 import java.util.Locale;
 
@@ -6,6 +6,7 @@ import java.util.Locale;
  * Operating system (OS) detection
  */
 public class OS {
+
     // File separator obtained from system
     public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 

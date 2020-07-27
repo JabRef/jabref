@@ -1,8 +1,8 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.util.OS;
 
 public class RisAuthors implements ParamLayoutFormatter {
 

@@ -21,9 +21,9 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.JavaVersion;
-import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.cli.ParseException;

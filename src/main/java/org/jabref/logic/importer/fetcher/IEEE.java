@@ -22,12 +22,12 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.util.OS;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;

@@ -25,9 +25,9 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;

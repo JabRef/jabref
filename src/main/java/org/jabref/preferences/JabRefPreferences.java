@@ -88,7 +88,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -107,6 +106,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

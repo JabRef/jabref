@@ -16,7 +16,6 @@ import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.OS;
 import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
@@ -46,6 +45,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.model.util.OS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

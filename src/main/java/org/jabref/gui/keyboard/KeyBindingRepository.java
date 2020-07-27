@@ -14,7 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

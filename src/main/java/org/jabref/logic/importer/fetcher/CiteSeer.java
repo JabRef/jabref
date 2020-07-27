@@ -19,12 +19,12 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.CoinsParser;
-import org.jabref.logic.util.OS;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.util.OS;
 
 import org.apache.http.client.utils.URIBuilder;
 

@@ -6,9 +6,9 @@ import java.util.List;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;

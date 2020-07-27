@@ -9,7 +9,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.util.OS;
+import org.jabref.model.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 public class ManualConnectDialogViewModel {
