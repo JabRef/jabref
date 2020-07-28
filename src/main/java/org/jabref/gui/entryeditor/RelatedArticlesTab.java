@@ -24,7 +24,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
@@ -65,7 +64,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
                 Globals.BUILD_INFO.version);
         BackgroundTask
-                .wrap(() -> fetcher.performSearch(entry, BibDatabaseMode.BIBLATEX))
+                .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
                     progress.setVisible(false);

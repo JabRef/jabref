@@ -11,7 +11,6 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -53,10 +52,5 @@ public class RfcFetcher implements IdBasedParserFetcher {
     @Override
     public Parser getParser() {
         return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 }

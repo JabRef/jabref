@@ -23,7 +23,6 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -57,7 +56,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         String identifierWithoutLettersAndSpaces = WITHOUT_LETTERS_SPACE.matcher(identifier).replaceAll(" ").trim();
 
         if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
@@ -68,7 +67,6 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
         if (entry.isPresent()) {
             setAdditionalFields(entry.get(), identifierWithoutLettersAndSpaces);
-            doPostCleanup(entry.get(), targetBibEntryFormat);
         }
 
         return entry;
@@ -202,10 +200,5 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     @Override
     public String getName() {
         return NAME;
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBLATEX;
     }
 }

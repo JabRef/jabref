@@ -16,7 +16,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.Month;
@@ -199,10 +198,5 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
 
             return entries;
         };
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 }

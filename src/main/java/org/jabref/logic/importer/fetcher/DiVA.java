@@ -11,7 +11,6 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -55,10 +54,5 @@ public class DiVA implements IdBasedParserFetcher {
 
     public boolean isValidId(String identifier) {
         return identifier.startsWith("diva2:");
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 }

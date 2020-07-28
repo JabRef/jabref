@@ -22,7 +22,6 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -129,7 +128,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public List<BibEntry> performSearch(String query) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -145,7 +144,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
-            foundEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
             return foundEntries;
         } catch (URISyntaxException e) {
@@ -164,7 +162,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -186,7 +184,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
-            foundEntries.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
 
             return foundEntries;
         } catch (URISyntaxException e) {
@@ -259,10 +256,5 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         } catch (IOException e) {
             throw new FetcherException("Cookie configuration for Google Scholar failed.", e);
         }
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 }

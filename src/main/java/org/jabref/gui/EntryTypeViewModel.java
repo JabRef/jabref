@@ -117,7 +117,7 @@ public class EntryTypeViewModel {
             fetcher = selectedItemProperty().getValue();
             searchID = idText.getValue();
             if (!searchID.isEmpty()) {
-                bibEntry = fetcher.performSearchById(searchID, basePanel.getBibDatabaseContext().getMode());
+                bibEntry = fetcher.performSearchById(searchID);
             }
             return bibEntry;
         }

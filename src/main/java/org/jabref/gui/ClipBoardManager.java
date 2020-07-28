@@ -204,7 +204,7 @@ public class ClipBoardManager {
     private List<BibEntry> fetchByDOI(DOI doi, BibDatabaseMode targetBibEntryFormat) {
         LOGGER.info("Found DOI in clipboard");
         try {
-            Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.getDOI(), targetBibEntryFormat);
+            Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.getDOI());
             return OptionalUtil.toList(entry);
         } catch (FetcherException ex) {
             LOGGER.error("Error while fetching", ex);

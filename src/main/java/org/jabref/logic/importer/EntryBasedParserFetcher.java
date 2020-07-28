@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -33,14 +33,14 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     Parser getParser();
 
     @Override
-    default List<BibEntry> performSearch(BibEntry entry, BibDatabaseMode targetFormat) throws FetcherException {
+    default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
         try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
-            fetchedEntries.forEach(fetchedEntry -> this.doPostCleanup(fetchedEntry, targetFormat));
+            fetchedEntries.forEach(this::doPostCleanup);
 
             return fetchedEntries;
         } catch (URISyntaxException e) {
@@ -51,5 +51,22 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
+    }
+
+    /**
+     * Performs a cleanup of the fetched entry.
+     *
+     * Only systematic errors of the fetcher should be corrected here
+     * (i.e. if information is consistently contained in the wrong field or the wrong format)
+     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
+     *
+     * Try to reuse existing {@link Formatter} for the cleanup. For example,
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     *
+     * By default, no cleanup is done.
+     * @param entry the entry to be cleaned-up
+     */
+    default void doPostCleanup(BibEntry entry) {
+        // Do nothing by default
     }
 }

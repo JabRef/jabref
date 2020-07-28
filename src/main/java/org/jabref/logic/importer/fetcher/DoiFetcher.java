@@ -19,7 +19,6 @@ import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -54,7 +53,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<DOI> doi = DOI.parse(identifier);
         try {
             if (doi.isPresent()) {
@@ -62,7 +61,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
                 // mEDRA does not return a parsable bibtex string
                 if (getAgency(doi.get()).isPresent() && "medra".equalsIgnoreCase(getAgency(doi.get()).get())) {
-                    return new Medra().performSearchById(identifier, targetBibEntryFormat);
+                    return new Medra().performSearchById(identifier);
                 }
 
                 URL doiURL = new URL(doi.get().getURIAsASCIIString());
@@ -74,7 +73,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
                 // BibTeX entry
                 fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
-                fetchedEntry.ifPresent(entry -> doPostCleanup(entry, targetBibEntryFormat));
+                fetchedEntry.ifPresent(this::doPostCleanup);
 
                 return fetchedEntry;
             } else {
@@ -89,22 +88,16 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
     }
 
-    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
+    public void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
-        EntryBasedFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
     }
 
     @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
-    }
-
-    @Override
-    public List<BibEntry> performSearch(BibEntry entry, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> doi = entry.getField(StandardField.DOI);
         if (doi.isPresent()) {
-            return OptionalUtil.toList(performSearchById(doi.get(), targetBibEntryFormat));
+            return OptionalUtil.toList(performSearchById(doi.get()));
         } else {
             return Collections.emptyList();
         }

@@ -10,7 +10,6 @@ import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -36,20 +35,19 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query, BibDatabaseMode targetBibEntryFormat) {
+    public List<BibEntry> performSearch(String query) {
         List<BibEntry> result = fetchers.parallelStream().flatMap(searchBasedFetcher -> {
             try {
-              return searchBasedFetcher.performSearch(query, targetBibEntryFormat).stream();
+                return searchBasedFetcher.performSearch(query).stream();
             } catch (FetcherException e) {
                 LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                 return Stream.empty();
             }
         }).limit(maximumNumberOfReturnedResults)
-          .collect(Collectors.toList());
+                                        .collect(Collectors.toList());
         // All entries have to be converted into one format, this is necessary for the format conversion
         ConvertToBibtexCleanup converter = new ConvertToBibtexCleanup();
         result.forEach(converter::cleanup);
-        result.forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
         return result;
     }
 
@@ -61,11 +59,5 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.empty();
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        // This method is irrelevant, as the clean up has to be delegated to the fetchers composing this composite instance.
-        return BibDatabaseMode.BIBTEX;
     }
 }

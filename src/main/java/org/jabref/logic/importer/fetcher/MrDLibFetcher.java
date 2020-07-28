@@ -16,7 +16,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
@@ -51,7 +50,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getLatexFreeField(StandardField.TITLE);
         if (title.isPresent()) {
             String response = makeServerRequest(title.get());
@@ -73,7 +72,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                 LOGGER.error(e.getMessage(), e);
                 throw new FetcherException("JSON Parser IOException.");
             }
-            parserResult.getDatabase().getEntries().forEach(bibEntry -> doPostCleanup(bibEntry, targetBibEntryFormat));
             return parserResult.getDatabase().getEntries();
         } else {
             // without a title there is no reason to ask MrDLib
@@ -146,10 +144,5 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             LOGGER.error(e.getMessage(), e);
         }
         return "";
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 }

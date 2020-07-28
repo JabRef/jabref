@@ -16,7 +16,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -62,18 +61,12 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
+    public void doPostCleanup(BibEntry entry) {
         // Remove strange "SLACcitation" field
         new FieldFormatterCleanup(new UnknownField("SLACcitation"), new ClearFormatter()).cleanup(entry);
 
         // Remove braces around content of "title" field
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
-        SearchBasedParserFetcher.super.doPostCleanup(entry, targetBibEntryFormat);
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
     }
 
     @Override

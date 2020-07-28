@@ -83,7 +83,7 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdWithValidId1() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("Report 2017/1118 ", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("Report 2017/1118 ");
         assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(abram2017), fetchedEntry);
@@ -91,7 +91,7 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdWithValidId2() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("iacr ePrint 2016/119", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("iacr ePrint 2016/119");
         assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(beierle2016), fetchedEntry);
@@ -99,7 +99,7 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdWithValidIdAndNonAsciiChars() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("some random 2017/1095 stuff around the id", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("some random 2017/1095 stuff around the id");
         assertFalse(fetchedEntry.get().getField(StandardField.ABSTRACT).get().isEmpty());
         fetchedEntry.get().setField(StandardField.ABSTRACT, "dummy");
         assertEquals(Optional.of(delgado2017), fetchedEntry);
@@ -107,27 +107,27 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdWithEmptyIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById(""));
     }
 
     @Test
     public void searchByIdWithInvalidReportNumberFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/1", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/1"));
     }
 
     @Test
     public void searchByIdWithInvalidYearFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("16/115", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("16/115"));
     }
 
     @Test
     public void searchByIdWithInvalidIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("asdf", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("asdf"));
     }
 
     @Test
     public void searchForNonexistentIdFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/6425", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("2016/6425"));
     }
 
     @Test
@@ -137,12 +137,12 @@ public class IacrEprintFetcherTest {
 
     @Test
     public void searchByIdForWithdrawnPaperFails() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("1998/016", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("1998/016"));
     }
 
     @Test
     public void searchByIdWithOldHtmlFormatAndCheckDate() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("1997/006", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("1997/006");
         assertEquals(Optional.of("1997-05-04"), fetchedEntry.get().getField(StandardField.DATE));
     }
 
@@ -151,7 +151,7 @@ public class IacrEprintFetcherTest {
     @MethodSource("allNonWithdrawnIdsWithOldHtmlFormat")
     @Disabled("Takes a lot of time - should only be called manually")
     public void searchByIdWithOldHtmlFormatWithoutDateCheck(String id) throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id, fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById(id);
         assertTrue(fetchedEntry.isPresent(), "Expected to get an entry for id " + id);
         assertNotEquals(Optional.empty(), fetchedEntry.get().getField(StandardField.DATE), "Expected non empty date field, entry is\n" + fetchedEntry.toString());
         assertTrue(fetchedEntry.get().getField(StandardField.DATE).get().length() == 10, "Expected yyyy-MM-dd date format, entry is\n" + fetchedEntry.toString());

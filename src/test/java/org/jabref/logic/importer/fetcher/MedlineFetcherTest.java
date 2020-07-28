@@ -135,7 +135,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testSearchByIDWijedasa() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
         assertTrue(fetchedEntry.isPresent());
 
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
@@ -144,7 +144,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testSearchByIDEndharti() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
         assertTrue(fetchedEntry.isPresent());
 
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
@@ -153,7 +153,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testSearchByIDIchikawa() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
         assertTrue(fetchedEntry.isPresent());
 
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
@@ -162,7 +162,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testSearchByIDSari() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
         assertTrue(fetchedEntry.isPresent());
 
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
@@ -171,7 +171,7 @@ public class MedlineFetcherTest {
 
     @Test
     public void testMultipleEntries() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch("java", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> entryList = fetcher.performSearch("java");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
@@ -179,17 +179,17 @@ public class MedlineFetcherTest {
 
     @Test
     public void testInvalidSearchTerm() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
 
     @Test
     public void testEmptyEntryList() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
         assertEquals(Collections.emptyList(), entryList);
     }
 
     @Test
     public void testEmptyInput() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch("", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 }

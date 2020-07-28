@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -52,42 +51,42 @@ class IsbnFetcherTest {
 
     @Test
     void searchByIdSuccessfulWithShortISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     void searchByIdReturnsEmptyWithEmptyISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
     void searchByIdThrowsExceptionForShortInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123456789"));
     }
 
     @Test
     void searchByIdThrowsExceptionForLongInvalidISB() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("012345678910"));
     }
 
     @Test
     void searchByIdThrowsExceptionForInvalidISBN() {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
     }
 
     @Test
     void searchByEntryWithISBNSuccessful() throws FetcherException {
         BibEntry input = new BibEntry().withField(StandardField.ISBN, "0134685997");
 
-        List<BibEntry> fetchedEntry = fetcher.performSearch(input, BibDatabaseMode.BIBTEX);
+        List<BibEntry> fetchedEntry = fetcher.performSearch(input);
         assertEquals(Collections.singletonList(bibEntry), fetchedEntry);
     }
 
@@ -97,7 +96,7 @@ class IsbnFetcherTest {
      */
     @Test
     void searchForIsbnAvailableAtOttoBibButNonOnEbookDe() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155", fetcher.getBibFormatOfFetchedEntries());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
         assertNotEquals(Optional.empty(), fetchedEntry);
     }
 }

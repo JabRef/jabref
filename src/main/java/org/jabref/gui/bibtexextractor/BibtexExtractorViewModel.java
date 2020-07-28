@@ -59,7 +59,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue(), bibEntryFormat))
+        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onSuccess(parsedEntries -> {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));

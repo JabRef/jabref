@@ -135,13 +135,13 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Frechet\"", fetcher.getBibFormatOfFetchedEntries()));
+                fetcher.performSearch("ti:\"slice theorem for Frechet\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Fréchet\"", fetcher.getBibFormatOfFetchedEntries()));
+                fetcher.performSearch("ti:\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -159,39 +159,39 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.DOI, "10.1140/epjc/s2003-01326-x")
                 .withField(StandardField.JOURNALTITLE, "Eur.Phys.J.C31:17-29,2003");
 
-        assertEquals(Optional.of(expected), fetcher.performSearchById("hep-ex/0307015", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(expected), fetcher.performSearchById("hep-ex/0307015"));
     }
 
     @Test
     void searchEntryByIdWith4DigitsAndVersion() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249v1", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249v1"));
     }
 
     @Test
     void searchEntryByIdWith4Digits() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249"));
     }
 
     @Test
     void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv:1405.2249", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv:1405.2249"));
     }
 
     @Test
     void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv : 1405. 2249", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv : 1405. 2249"));
     }
 
     @Test
     void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
-                fetcher.performSearchById("1503.06747", fetcher.getBibFormatOfFetchedEntries()).flatMap(entry -> entry.getField(StandardField.TITLE)));
+                fetcher.performSearchById("1503.06747").flatMap(entry -> entry.getField(StandardField.TITLE)));
     }
 
     @Test
     void searchWithMalformedIdThrowsException() throws Exception {
-        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345", fetcher.getBibFormatOfFetchedEntries()));
+        assertThrows(FetcherException.class, () -> fetcher.performSearchById("123412345"));
     }
 
     @Test
@@ -203,22 +203,22 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
 
     @Test
     void searchEmptyId() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
     void searchWithHttpUrl() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("http://arxiv.org/abs/1405.2249", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("http://arxiv.org/abs/1405.2249"));
     }
 
     @Test
     void searchWithHttpsUrl() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https://arxiv.org/abs/1405.2249", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https://arxiv.org/abs/1405.2249"));
     }
 
     @Test
     void searchWithHttpsUrlNotTrimmed() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 ", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 
     @Override
@@ -262,8 +262,8 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("au:\"Tobias Diez\"", fetcher.getBibFormatOfFetchedEntries());
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("au:Tobias Diez", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("au:\"Tobias Diez\"");
+        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("au:Tobias Diez");
         // Ensure that phrase search result is just a subset of the default search result
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
         resultWithOutPhraseSearch.removeAll(resultWithPhraseSearch);
@@ -285,7 +285,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);

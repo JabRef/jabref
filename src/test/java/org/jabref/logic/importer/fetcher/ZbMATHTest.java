@@ -50,7 +50,7 @@ class ZbMATHTest {
     @Test
     @DisabledOnCIServer("CI server has no subscription to zbMath and thus gets 401 response")
     void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }
 }

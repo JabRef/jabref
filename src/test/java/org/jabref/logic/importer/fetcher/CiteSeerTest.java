@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -31,7 +30,7 @@ class CiteSeerTest {
                 .withField(StandardField.TITLE, "Rigorous Derivation from Landau-de Gennes Theory to Eericksen-leslie Theory")
                 .withField(StandardField.DOI, "10.1.1.744.5780");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> fetchedEntries = fetcher.performSearch("title:Ericksen-Leslie AND venue:q AND ncites:[10 TO 15000]");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
@@ -44,7 +43,7 @@ class CiteSeerTest {
                 .withField(StandardField.YEAR, "1993")
                 .withField(StandardField.JOURNAL, "PSYCHOSOMATIC MEDICINE");
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665", BibDatabaseMode.BIBTEX);
+        List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665");
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 }

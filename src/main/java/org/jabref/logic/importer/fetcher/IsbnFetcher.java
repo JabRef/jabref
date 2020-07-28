@@ -9,7 +9,6 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -41,38 +40,31 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
-        Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier, targetBibEntryFormat);
+        Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
 
         // nothing found at ebook.de: try ottobib
         if (!bibEntry.isPresent()) {
             LOGGER.debug("No entry found at ebook.de; trying ottobib");
             IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
-            bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier, targetBibEntryFormat);
+            bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
         }
-        bibEntry.ifPresent(entry -> doPostCleanup(entry, targetBibEntryFormat));
 
         return bibEntry;
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry, BibDatabaseMode targetFormat) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Optional<String> isbn = entry.getField(StandardField.ISBN);
         if (isbn.isPresent()) {
-            return OptionalUtil.toList(performSearchById(isbn.get(), targetFormat));
+            return OptionalUtil.toList(performSearchById(isbn.get()));
         } else {
             return Collections.emptyList();
         }
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        // Since this
-        return BibDatabaseMode.BIBLATEX;
     }
 }

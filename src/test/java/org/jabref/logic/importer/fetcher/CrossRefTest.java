@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -101,12 +100,12 @@ public class CrossRefTest {
 
     @Test
     public void findByDOI() throws Exception {
-        assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20"));
     }
 
     @Test
     public void findByAuthors() throws Exception {
-        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede", BibDatabaseMode.BIBTEX).stream().findFirst());
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede").stream().findFirst());
     }
 
     @Test
@@ -115,7 +114,7 @@ public class CrossRefTest {
         entry.setField(StandardField.TITLE, "Service Interaction Patterns");
         entry.setField(StandardField.AUTHOR, "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
         entry.setField(StandardField.YEAR, "2005");
-        assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry, fetcher.getBibFormatOfFetchedEntries()).stream().findFirst());
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
     }
 
     @Test
@@ -128,17 +127,17 @@ public class CrossRefTest {
         entry.setField(StandardField.VOLUME, "42");
         entry.setField(StandardField.YEAR, "1999");
 
-        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
 
     @Test
     public void performSearchByEmptyId() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
     public void performSearchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch("", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
     /**
@@ -146,6 +145,6 @@ public class CrossRefTest {
      */
     @Test
     public void testPerformSearchValidReturnNothingDOI() throws FetcherException {
-        assertEquals(Optional.empty(), fetcher.performSearchById("10.1392/BC1.0", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById("10.1392/BC1.0"));
     }
 }

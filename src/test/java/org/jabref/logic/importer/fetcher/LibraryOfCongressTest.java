@@ -44,16 +44,16 @@ public class LibraryOfCongressTest {
         expected.setField(StandardField.TITLE, "Developing high quality data models");
         expected.setField(StandardField.YEAR, "2011");
 
-        assertEquals(Optional.of(expected), fetcher.performSearchById("2010045158", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.of(expected), fetcher.performSearchById("2010045158"));
     }
 
     @Test
     public void performSearchByEmptyId() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
     public void performSearchByInvalidId() throws Exception {
-        assertEquals(Optional.empty(), fetcher.performSearchById("xxx", fetcher.getBibFormatOfFetchedEntries()));
+        assertEquals(Optional.empty(), fetcher.performSearchById("xxx"));
     }
 }

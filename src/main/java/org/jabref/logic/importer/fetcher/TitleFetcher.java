@@ -7,7 +7,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -31,7 +30,7 @@ public class TitleFetcher implements IdBasedFetcher {
     }
 
     @Override
-    public Optional<BibEntry> performSearchById(String identifier, BibDatabaseMode targetBibEntryFormat) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, identifier);
         Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
@@ -41,11 +40,6 @@ public class TitleFetcher implements IdBasedFetcher {
 
         DoiFetcher doiFetcher = new DoiFetcher(this.preferences);
 
-        return doiFetcher.performSearchById(doi.get().getDOI(), targetBibEntryFormat);
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBTEX;
+        return doiFetcher.performSearchById(doi.get().getDOI());
     }
 }

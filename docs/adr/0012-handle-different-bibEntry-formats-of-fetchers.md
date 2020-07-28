@@ -17,17 +17,24 @@ How can this inconsistency between fetchers, and their used formats be addressed
 
 ## Decision Outcome
 
-Chosen option: "Pass fetchers the format, they have to call a conversion method if necessary",
-because the fetcher does not need to concern itself with the differences between the formats, and the conversion code already exists.
-This makes the implementation straightforward, and less time intensive than the layer approach.
-The layer approach will be the better option for the future as it composes all steps required during importing, not only format conversion of fetched entries.
+Chosen option: "Introduce a new layer between fetchers and caller, such as a FetcherHandler, that manages the conversion",
+because it can compose all steps required during importing, not only format conversion of fetched entries.
 [As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
 
 ## Pros and Cons of the Options
 
+### Introduce a new layer between fetchers and caller, such as a FetcherHandler, that manages the conversion
+
+* Good, because fetchers do not have to think about conversion (Separation of concers)
+* Good, because no other code that currently relies on fetchers has to do the conversion
+* Good, because this layer can be used for any kind of import to handle all conversion steps (not only format). [As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
+* Good, because this layer can easily be extended if the import procedure changes
+* Bad, because this requires a lot of code changes
+* Bad, because this has to be tested extensively
+
 ### Pass fetchers the format, they have to call a conversion method if necessary
 
-* Good, because less code has to be written than with option #2
+* Good, because less code has to be written than with option "Pass fetchers the format, they have to create entries accordingly"
 * Good, because code is already tested
 * Good, because keeps all conversion code centralized (code reuse)
 * Bad, because fetcher first creates the BibEntry in a possibly "wrong" format, this can easily lead to bugs due to e.g. code changes
@@ -47,12 +54,3 @@ The layer approach will be the better option for the future as it composes all s
 * Good, because fetcher only has to fetch and does not need to know anything about the formats
 * Bad, because programmers might assume that a certain format is used, e.g. the preferenced format (which would not work as the databases that imports the entries does not have to conform to the preferenced format)
 * Bad, because at every place where fetchers are used and the format matters, conversion has to be used, creating more dependencies
-
-### Introduce a new layer between fetchers and caller, such as a FetcherHandler, that manages the conversion
-
-* Good, because fetchers do not have to think about conversion (Separation of concers)
-* Good, because no other code that currently relies on fetchers has to do the conversion
-* Good, because this layer can be used for any kind of import to handle all conversion steps (not only format). [As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
-* Good, because this layer can easily be extended if the import procedure changes
-* Bad, because this requires a lot of code changes
-* Bad, because this has to be tested extensively

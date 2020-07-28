@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -15,6 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
@@ -41,7 +44,7 @@ public class CompositeSearchBasedFetcherTest {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
-        List<BibEntry> result = fetcher.performSearch("quantum", fetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> result = fetcher.performSearch("quantum");
 
         Assertions.assertEquals(result, Collections.EMPTY_LIST);
     }
@@ -51,7 +54,7 @@ public class CompositeSearchBasedFetcherTest {
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> queryResult = compositeFetcher.performSearch("", compositeFetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
         Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
     }
@@ -62,10 +65,12 @@ public class CompositeSearchBasedFetcherTest {
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum", compositeFetcher.getBibFormatOfFetchedEntries());
+        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum", compositeFetcher.getBibFormatOfFetchedEntries())));
+                List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
+                fetcherResult.forEach(entry -> new ConvertToBibtexCleanup().cleanup(entry));
+                Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore the test should not fail

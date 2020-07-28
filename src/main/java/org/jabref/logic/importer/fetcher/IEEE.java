@@ -22,7 +22,6 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
@@ -238,7 +237,8 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
         complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
-        complexSearchQuery.getAuthors().ifPresent(authors -> uriBuilder.addParameter("author", String.join(" AND ", authors)));
+        complexSearchQuery.getAuthors().ifPresent(authors ->
+                authors.forEach(author -> uriBuilder.addParameter("author", author)));
         complexSearchQuery.getTitlePhrases().ifPresent(articleTitlePhrases ->
                 uriBuilder.addParameter("article_title", String.join(" AND ", articleTitlePhrases)));
         complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
@@ -250,11 +250,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         });
 
         URLDownload.bypassSSLVerification();
+        System.out.println(uriBuilder.build().toURL());
         return uriBuilder.build().toURL();
-    }
-
-    @Override
-    public BibDatabaseMode getBibFormatOfFetchedEntries() {
-        return BibDatabaseMode.BIBLATEX;
     }
 }
