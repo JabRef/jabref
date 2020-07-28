@@ -238,7 +238,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         uriBuilder.addParameter("apikey", API_KEY);
         complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
         complexSearchQuery.getAuthors().ifPresent(authors ->
-                authors.forEach(author -> uriBuilder.addParameter("author", author)));
+                uriBuilder.addParameter("author", String.join(" AND ", authors)));
         complexSearchQuery.getTitlePhrases().ifPresent(articleTitlePhrases ->
                 uriBuilder.addParameter("article_title", String.join(" AND ", articleTitlePhrases)));
         complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
