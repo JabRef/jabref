@@ -12,7 +12,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
     1. Fork the JabRef into your GitHub account.
     2. Clone your forked repository on your local machine.
 2. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-3. Do your work on the **new branch - not the master branch.** Refer to our [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) if you have questions about your implementation.
+3. Do your work on the **new branch - not the master branch.** Refer to our [code howtos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
 4. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
 5. In case your pull request is not yet complete or not yet ready for review, consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
 
@@ -119,7 +119,7 @@ Add the above snippet to the English translation file located at `src/main/resou
 
 You can also directly run the specific test in your IDE.
 The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
-Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
+Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
 
 ## Create a pull request
 
