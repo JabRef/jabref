@@ -427,7 +427,22 @@ public class LinkedFileViewModel extends AbstractViewModel {
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
                 LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
-                entry.addFile(0, newLinkedFile);
+
+                var linkedFiles = entry.getFiles();
+                // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
+                Optional<Integer> oldFileIndex = Optional.empty();
+                for (int i = 0; i < linkedFiles.size(); i++) {
+                    LinkedFile file = linkedFiles.get(i);
+                    if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+                        oldFileIndex = Optional.of(i);
+                    }
+                }
+                if (oldFileIndex.isPresent()) {
+                    linkedFiles.set(oldFileIndex.get(), newLinkedFile);
+                } else {
+                    linkedFiles.add(0, newLinkedFile);
+                }
+                entry.setFiles(linkedFiles);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             downloadTask.titleProperty().set(Localization.lang("Downloading"));
