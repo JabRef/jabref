@@ -50,7 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the command line option 'generateBibtexKeys' to the more generic term 'generateCitationKeys' while the short option remains 'g'.[#6545](https://github.com/JabRef/jabref/pull/6545)
 - We improved the "Possible duplicate entries" window to remember its size and position throughout a session. [#6582](https://github.com/JabRef/jabref/issues/6582)
 - We divided the toolbar into small parts, so if the application window is to small, only a part of the toolbar is moved into the chevron popup. [#6682](https://github.com/JabRef/jabref/pull/6682)
-- we change the layout for some of the buttons on the side panel to a flow layout to ensure button text are always visible, specially on resizing. [#6639](https://github.com/JabRef/jabref/issues/6639)
+- We changed the layout for of the buttons in the Open Office side panel to ensure that the button text is always visible, specially when resizing. [#6639](https://github.com/JabRef/jabref/issues/6639)
 
 ### Fixed
 
