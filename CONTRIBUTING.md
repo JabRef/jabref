@@ -8,7 +8,7 @@ In case you are an instructor and want to use JabRef as software engineering exa
 
 We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below. If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://guides.github.com/introduction/flow/index.html) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
-1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
+1. Get the JabRef code on your local machine. Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
     1. Fork the JabRef into your GitHub account.
     2. Clone your forked repository on your local machine.
 2. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
@@ -71,7 +71,7 @@ In case you do not have time to add a test case, we nevertheless ask you to at l
 
 ### When adding a library
 
-Please try to use a version available at jCenter and add it to `build.gradle`.
+Please try to use a version available at JCenter and add it to `build.gradle`.
 In any case, describe the library at [external-libraries.txt](external-libraries.txt).
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
 Also add a txt file stating the license in `libraries/`.
