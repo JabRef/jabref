@@ -5,13 +5,13 @@ chmod a+rX "INSTALL_LOCATION"
 chmod +r "APP_LOCATION/"*.jar
 # Trigger an auto-install of the browser addon for chrome/chromium browsers
 # First create the necessary path, then copy the autoinstall file.
-mkdir /Library/Application Support/Google/Chrome/External Extensions/
+mkdir /Library/Application\ Support/Google/Chrome/External Extensions/
 cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/bifehkofibaamoeaopjglfkddgkijdlh.json /Library/Application\ Support/Google/Chrome/External\ Extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
 # Install the native-messaging host script for firefox/chrome/chromium
-mkdir /Library/Application Support/Mozilla/NativeMessagingHosts/
-cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/firefox/org.jabref.jabref.json /Library/Application Support/Mozilla/NativeMessagingHosts/org.jabref.jabref.json
-mkdir /Library/Application Support/Chromium/NativeMessagingHosts/
-cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Application Support/Chromium/NativeMessagingHosts/org.jabref.jabref.json
+mkdir /Library/Application\ Support/Mozilla/NativeMessagingHosts/
+cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/firefox/org.jabref.jabref.json /Library/Application\ Support/Mozilla/NativeMessagingHosts/org.jabref.jabref.json
+mkdir /Library/Application\ Support/Chromium/NativeMessagingHosts/
+cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Application\ Support/Chromium/NativeMessagingHosts/org.jabref.jabref.json
 mkdir /Library/Google/Chrome/NativeMessagingHosts/
 cp /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Google/Chrome/NativeMessagingHosts/org.jabref.jabref.json
 
