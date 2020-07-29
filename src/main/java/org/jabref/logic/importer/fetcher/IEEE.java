@@ -250,7 +250,6 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         });
 
         URLDownload.bypassSSLVerification();
-        System.out.println(uriBuilder.build().toURL());
         return uriBuilder.build().toURL();
     }
 }
