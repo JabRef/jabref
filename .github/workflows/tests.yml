@@ -231,7 +231,7 @@ jobs:
         with:
           # full checkout needed for authors generation
           fetch-depth: 0
-      - name: "No new AUTHORS"
+      - name: "Check AUTHORS"
         id: authors_check
         shell: bash
         run: |
@@ -243,11 +243,11 @@ jobs:
             echo "No authors added"
             exit 0
           fi
-          message="When merged, this pull request will introduce additions in the [AUTHORS file](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits). In case you want to appear differently, please [adjust your name in your git configuration](https://docs.github.com/en/github/using-git/setting-your-username-in-git).%0A%0A\`\`\`%0A${added//$'\n'/'%0A'}%0A\`\`\`%0A"
+          message="When merged, this pull request proposes to manually add the following to the [AUTHORS file](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits). In case you want to raise a different proposal, please [adjust your name in your git configuration](https://docs.github.com/en/github/using-git/setting-your-username-in-git).%0A%0A\`\`\`%0A${added//$'\n'/'%0A'}%0A\`\`\`%0A"
           echo "::set-output name=message::$message"
           echo "::set-output name=newauthor::true"
           echo "New authors found"
-      - name: comment PR
+      - name: Comment PR
         uses: unsplash/comment-on-pr@master
         if: steps.authors_check.outputs.newauthor == 'true'
         env:
