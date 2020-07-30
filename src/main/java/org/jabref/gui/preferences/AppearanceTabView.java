@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
@@ -21,6 +22,7 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
     @FXML public RadioButton themeLight;
     @FXML public RadioButton themeDark;
     @FXML public RadioButton customTheme;
+    @FXML public TextField customThemePath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -51,6 +53,7 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
         customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
+        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize));

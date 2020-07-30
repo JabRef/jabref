@@ -14,7 +14,8 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.AppearancePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -31,17 +32,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeDarkProperty = new SimpleBooleanProperty();
     private final BooleanProperty themeCustomProperty = new SimpleBooleanProperty();
+    private final StringProperty customPathToThemeProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
+    private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public AppearanceTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialAppearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -60,11 +64,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        fontOverrideProperty.setValue(preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE));
-        fontSizeProperty.setValue(String.valueOf(preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE)));
+        fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
-        String currentTheme = preferences.get(JabRefPreferences.FX_THEME);
-
+        String currentTheme = initialAppearancePreferences.getPathToTheme();
         if (ThemeLoader.DARK_CSS.equals(currentTheme)) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
@@ -77,33 +80,37 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
+            customPathToThemeProperty.setValue(initialAppearancePreferences.getPathToTheme());
         }
     }
 
     @Override
     public void storeSettings() {
-        // ToDo: compare initial and new settings
-        if (preferences.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE) != fontOverrideProperty.getValue()) {
+        if (initialAppearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
-            preferences.putBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONT_SIZE, fontOverrideProperty.getValue());
         }
 
         int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (preferences.getInt(JabRefPreferences.MAIN_FONT_SIZE) != newFontSize) {
+        if (initialAppearancePreferences.getMainFontSize() != newFontSize) {
             restartWarnings.add(Localization.lang("Override font size"));
-            preferences.putInt(JabRefPreferences.MAIN_FONT_SIZE, newFontSize);
         }
 
-        if (themeLightProperty.getValue() && !preferences.getTheme().equals(ThemeLoader.MAIN_CSS)) {
+        String newPathToTheme = initialAppearancePreferences.getPathToTheme();
+        if (themeLightProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.MAIN_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
-            preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
-        } else if (themeDarkProperty.getValue() && !preferences.getTheme().equals(ThemeLoader.DARK_CSS)) {
+            newPathToTheme = ThemeLoader.MAIN_CSS;
+        } else if (themeDarkProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
-            preferences.put(JabRefPreferences.FX_THEME, ThemeLoader.DARK_CSS);
-        } else if (themeCustomProperty.getValue()) { // && !preferences.get(JabRefPreferences.FX_THEME).equals(ThemeLoader.getCustomCss())) {
+            newPathToTheme = ThemeLoader.DARK_CSS;
+        } else if (themeCustomProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(customPathToThemeProperty().getValue())) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme."));
-            preferences.put(JabRefPreferences.FX_THEME, preferences.getTheme());
+            newPathToTheme = customPathToThemeProperty.getValue();
         }
+
+        preferences.storeAppearancePreference(new AppearancePreferences(
+                fontOverrideProperty.getValue(),
+                newFontSize,
+                newPathToTheme));
     }
 
     public ValidationStatus fontSizeValidationStatus() {
@@ -145,6 +152,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         return themeCustomProperty;
     }
 
+    public StringProperty customPathToThemeProperty() {
+        return customPathToThemeProperty;
+    }
+
     public void importCSSFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
@@ -152,7 +163,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-            preferences.put(JabRefPreferences.FX_THEME, file.toAbsolutePath().toString());
+            customPathToThemeProperty.setValue(file.toAbsolutePath().toString());
             restartWarnings.add(Localization.lang("You must restart JabRef for this to come into effect."));
         });
     }

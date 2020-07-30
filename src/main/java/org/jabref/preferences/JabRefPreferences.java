@@ -819,11 +819,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    @Override
-    public String getTheme() {
-        return get(FX_THEME);
-    }
-
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
@@ -1563,6 +1558,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
+    @Override
     public String setLastPreferencesExportPath() {
         return get(PREFS_EXPORT_PATH);
     }
@@ -2308,6 +2304,30 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    @Override
+    public String getTheme() {
+        return get(FX_THEME);
+    }
+
+    @Override
+    public AppearancePreferences getAppearancePreferences() {
+        return new AppearancePreferences(
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                get(FX_THEME));
+    }
+
+    @Override
+    public void storeAppearancePreference(AppearancePreferences preferences) {
+        putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
+        putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
+        put(FX_THEME, preferences.getPathToTheme());
     }
 
     //*************************************************************************************************************

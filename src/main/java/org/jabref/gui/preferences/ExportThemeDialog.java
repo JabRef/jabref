@@ -24,7 +24,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.slf4j.Logger;
@@ -38,10 +38,10 @@ public class ExportThemeDialog extends BaseDialog<Void> {
     @FXML private TableColumn<AppearanceThemeModel, String> columnName;
     @FXML private TableColumn<AppearanceThemeModel, String> columnPath;
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public ExportThemeDialog(DialogService dialogService, JabRefPreferences preferences) {
+    public ExportThemeDialog(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
@@ -50,7 +50,7 @@ public class ExportThemeDialog extends BaseDialog<Void> {
                 .load()
                 .setAsDialogPane(this);
 
-        this.setTitle(Localization.lang("Export Theme"));
+        this.setTitle(Localization.lang("Export theme"));
     }
 
     @FXML
@@ -101,7 +101,7 @@ public class ExportThemeDialog extends BaseDialog<Void> {
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(exportFile -> {
-                         try (OutputStream os = Files.newOutputStream(exportFile.getFileName())) {
+                         try (OutputStream os = Files.newOutputStream(exportFile)) {
                              if (theme.equals(ThemeLoader.MAIN_CSS) || theme.equals(ThemeLoader.DARK_CSS)) {
                                  Path path = new File(JabRefFrame.class.getResource(theme).toURI()).toPath();
                                  Files.copy(path, os);

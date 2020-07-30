@@ -70,6 +70,8 @@ public interface PreferencesService {
 
     void setWorkingDir(Path dir);
 
+    String setLastPreferencesExportPath();
+
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
@@ -95,8 +97,6 @@ public interface PreferencesService {
     Charset getDefaultEncoding();
 
     String getUser();
-
-    String getTheme();
 
     SaveOrderConfig loadExportSaveOrder();
 
@@ -227,6 +227,16 @@ public interface PreferencesService {
     MainTableNameFormatPreferences getMainTableNameFormatPreferences();
 
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    String getTheme();
+
+    AppearancePreferences getAppearancePreferences();
+
+    void storeAppearancePreference(AppearancePreferences preferences);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences
