@@ -7,21 +7,22 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.preferences.PreferencesService;
@@ -45,28 +46,28 @@ public class ExportThemeDialog extends BaseDialog<Void> {
         this.dialogService = dialogService;
         this.preferences = preferences;
 
-        ViewLoader
-                .view(this)
-                .load()
-                .setAsDialogPane(this);
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
 
         this.setTitle(Localization.lang("Export theme"));
     }
 
     @FXML
     public void initialize() {
-        columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        columnPath.setCellValueFactory(new PropertyValueFactory<>("path"));
+        columnName.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getName()));
+        columnPath.setCellValueFactory(data -> new ReadOnlyObjectWrapper<>(data.getValue().getPath()));
 
-        ObservableList<AppearanceThemeModel> data =
-                FXCollections.observableArrayList(new AppearanceThemeModel("Light theme", ThemeLoader.MAIN_CSS), new AppearanceThemeModel("Dark theme", ThemeLoader.DARK_CSS));
+        ObservableList<AppearanceThemeModel> themesList = FXCollections.observableArrayList(
+                new AppearanceThemeModel(Localization.lang("Light theme"), ThemeLoader.MAIN_CSS),
+                new AppearanceThemeModel(Localization.lang("Dark theme"), ThemeLoader.DARK_CSS));
 
         String customTheme = preferences.getTheme();
         if (!(customTheme.equals(ThemeLoader.MAIN_CSS) || customTheme.equals(ThemeLoader.DARK_CSS))) {
-            data.add(new AppearanceThemeModel("Custom theme", customTheme));
+            themesList.add(new AppearanceThemeModel(Localization.lang("Custom theme"), customTheme));
         }
 
-        table.setItems(data);
+        table.setItems(themesList);
 
         table.setOnKeyPressed(event -> {
             TablePosition<?, ?> tablePosition;
@@ -79,17 +80,13 @@ public class ExportThemeDialog extends BaseDialog<Void> {
             }
         });
 
-        table.setRowFactory(tv -> {
-            TableRow<AppearanceThemeModel> row = new TableRow<>();
-            row.setOnMouseClicked(event -> handleSelectedRowEvent(row));
-            return row;
-        });
-    }
-
-    private void handleSelectedRowEvent(TableRow<AppearanceThemeModel> row) {
-        if (!row.isEmpty()) {
-            exportCSSFile(row.getItem().getPath());
-        }
+        new ViewModelTableRowFactory<AppearanceThemeModel>()
+                .withOnMouseClickedEvent((theme, event) -> {
+                    if (theme != null && event.getButton().equals(MouseButton.PRIMARY)) {
+                        exportCSSFile(theme.getPath());
+                    }
+                })
+                .install(table);
     }
 
     private void exportCSSFile(String theme) {
