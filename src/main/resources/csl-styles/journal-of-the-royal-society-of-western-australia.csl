@@ -202,6 +202,7 @@
   <bibliography name-delimiter=", " and="symbol" et-al-min="11" et-al-use-first="7" hanging-indent="true">
     <sort>
       <key macro="author"/>
+      <key macro="year"/>
       <key variable="title"/>
     </sort>
     <layout>
