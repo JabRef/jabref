@@ -356,6 +356,8 @@
     -fx-padding: 0.5em;
 }
 
+.toggle-button:hover,
+.toggle-button:selected:hover,
 .icon-buttonNoSpaceBottom:hover,
 .icon-buttonNoSpaceTop:hover,
 .icon-button:hover {
@@ -374,8 +376,9 @@
     -fx-fill: white;
 }
 
-.toggle-button:selected.icon-button:selected {
-    -fx-background-color: transparent;
+.toggle-button:selected {
+    -fx-background-color: -jr-icon-background-active;
+    -fx-text-fill: -jr-selected;
     -fx-fill: -jr-selected;
 }
 
@@ -909,11 +912,33 @@
     -fx-fill: -jr-search-text;
 }
 
+/* magnifier glass */
 .mainToolbar .search-field .glyph-icon {
     -fx-fill: -jr-search-text;
     -fx-text-fill: -jr-search-text;
 }
 
+/* search modifier buttons */
+.mainToolbar .search-field .toggle-button:selected {
+    -fx-background-color: transparent;
+}
+
+.mainToolbar .search-field .toggle-button:hover,
+.mainToolbar .search-field .toggle-button:selected:hover {
+    -fx-background-color: -jr-icon-background-active;
+}
+
+.mainToolbar .search-field .toggle-button .glyph-icon {
+    -fx-fill: derive(-jr-search-text, 80%);
+    -fx-text-fill: derive(-jr-search-text, 80%);
+}
+
+.mainToolbar .search-field .toggle-button:selected .glyph-icon {
+    -fx-fill: -jr-search-text;
+    -fx-text-fill: -jr-search-text;
+}
+
+/* search text */
 .mainToolbar .search-field .label {
     -fx-padding: 0em 1.8em 0em 0em;
 }
@@ -966,7 +991,8 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-head-fg;
 }
 
-.table-cell, .table-cell .glyph-icon {
+.table-cell,
+.table-cell .glyph-icon {
     -fx-padding: 0.5em 1em 0.5em 1em;
     -fx-cell-size: 4.0em;
     -fx-text-fill: -fx-text-background-color;
@@ -979,11 +1005,10 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .mainToolbar .context-menu .glyph-icon:hover {
-    -fx-fill: -jr-theme-active;
-    -fx-text-fill: -jr-theme-active;
+    -fx-fill: -jr-menu-forground-active;
+    -fx-text-fill: -jr-menu-forground-active;
     -fx-background-color: -jr-icon-background-active; /* TODO: This has no effect */
 }
-
 
 /* This is awful, but I don't know a better way*/
 .mainToolbar .context-menu * {

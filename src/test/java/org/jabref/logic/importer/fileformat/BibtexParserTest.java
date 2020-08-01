@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,9 +17,9 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
@@ -40,6 +41,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -296,7 +298,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesBibtexKeyWithSpecialCharacters() throws IOException {
+    void parseRecognizesCitationKeyWithSpecialCharacters() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{te_st:with-special(characters),author={Ed von Test}}"));
 
@@ -618,7 +620,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseNotWarnsAboutEntryWithoutBibtexKey() throws IOException {
+    void parseNotWarnsAboutEntryWithoutCitationKey() throws IOException {
         BibEntry expected = new BibEntry();
         expected.setField(StandardField.AUTHOR, "Ed von Test");
         expected.setType(StandardEntryType.Article);
@@ -1347,11 +1349,11 @@ class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        GlobalBibtexKeyPattern pattern = mock(GlobalBibtexKeyPattern.class);
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
+        GlobalCitationKeyPattern pattern = mock(GlobalCitationKeyPattern.class);
+        AbstractCitationKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
+        AbstractCitationKeyPattern expectedPattern = new DatabaseCitationKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
-        expectedPattern.addBibtexKeyPattern(StandardEntryType.Article, "articleTest");
+        expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 
         assertEquals(expectedPattern, bibtexKeyPattern);
     }
@@ -1386,6 +1388,34 @@ class BibtexParserTest {
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+    }
+
+    /**
+     * Checks that a TexGroup finally gets the required data, after parsing the library.
+     */
+    @Test
+    void integrationTestTexGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader(
+             "@comment{jabref-meta: grouping:" + OS.NEWLINE
+                     + "0 AllEntriesGroup:;" + OS.NEWLINE
+                     + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;"
+                     + "}" + OS.NEWLINE
+           + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory-"
+                     + System.getProperty("user.name") + "-"
+                     + InetAddress.getLocalHost().getHostName()
+                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectoryLatex-"
+                     + System.getProperty("user.name") + "-"
+                     + InetAddress.getLocalHost().getHostName()
+                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+        ));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+
+        assertEquals("src/test/resources/org/jabref/model/groups/paper.aux",
+                ((TexGroup) root.getChildren().get(0).getGroup()).getFilePath().toString());
     }
 
     @Test

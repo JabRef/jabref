@@ -19,9 +19,9 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
@@ -176,7 +176,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeMetadata() throws Exception {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(mock(GlobalBibtexKeyPattern.class));
+        DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
 
@@ -189,7 +189,7 @@ class BibtexDatabaseWriterTest {
     @Test
     void writeMetadataAndEncoding() throws Exception {
         when(preferences.getEncoding()).thenReturn(StandardCharsets.US_ASCII);
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(mock(GlobalBibtexKeyPattern.class));
+        DatabaseCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
 
@@ -286,7 +286,7 @@ class BibtexDatabaseWriterTest {
                         "@Customizedtype{," + OS.NEWLINE + "}" + OS.NEWLINE + OS.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE + OS.NEWLINE
-                        + "@Comment{jabref-entrytype: customizedtype: req[author;date;title] opt[month;publisher;year]}" + OS.NEWLINE,
+                        + "@Comment{jabref-entrytype: customizedtype: req[title;author;date] opt[year;month;publisher]}" + OS.NEWLINE,
                 stringWriter.toString());
     }
 
@@ -510,9 +510,9 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeCustomKeyPattern() throws Exception {
-        AbstractBibtexKeyPattern pattern = new DatabaseBibtexKeyPattern(mock(GlobalBibtexKeyPattern.class));
+        AbstractCitationKeyPattern pattern = new DatabaseCitationKeyPattern(mock(GlobalCitationKeyPattern.class));
         pattern.setDefaultValue("test");
-        pattern.addBibtexKeyPattern(StandardEntryType.Article, "articleTest");
+        pattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
         metaData.setCiteKeyPattern(pattern);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -730,8 +730,8 @@ class BibtexDatabaseWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  author  = {Test}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  note    = {some note}," + OS.NEWLINE +
                 "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE +
                 "" + OS.NEWLINE +
                 "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());

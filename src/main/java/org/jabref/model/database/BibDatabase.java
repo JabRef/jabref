@@ -149,7 +149,7 @@ public class BibDatabase {
     }
 
     /**
-     * Collects entries having the specified BibTeX key and returns these entries as list.
+     * Collects entries having the specified citation key and returns these entries as list.
      * The order of the entries is the order they appear in the database.
      *
      * @param key

@@ -76,7 +76,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
     private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
     private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
-    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
+    private static final String CITATION_KEY_CITATIONS = "BibTeXKeyCitations";
     private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
     private static final String BOLD_CITATIONS = "BoldCitations";
@@ -184,7 +184,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
         citProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
         citProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
-        citProperties.put(BIBTEX_KEY_CITATIONS, Boolean.FALSE);
+        citProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE);
         citProperties.put(ITALIC_ET_AL, Boolean.FALSE);
         citProperties.put(OXFORD_COMMA, "");
     }
@@ -799,8 +799,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
     }
 
-    public boolean isBibtexKeyCiteMarkers() {
-        return (Boolean) citProperties.get(BIBTEX_KEY_CITATIONS);
+    public boolean isCitationKeyCiteMarkers() {
+        return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
     }
 
     /**

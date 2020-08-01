@@ -1,13 +1,12 @@
 package org.jabref.logic.importer.util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.ParseException;
 
+import com.google.common.base.Charsets;
+import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 
 /**
@@ -15,25 +14,21 @@ import kong.unirest.json.JSONObject;
  */
 public class JsonReader {
 
-    public static JSONObject toJsonObject(InputStreamReader input) throws ParseException {
-        BufferedReader streamReader = new BufferedReader(input);
-        StringBuilder responseStrBuilder = new StringBuilder();
-
+    /**
+     * Converts the given input stream into a {@link JSONObject}.
+     *
+     * @return A {@link JSONObject}. An empty JSON object is returned in the case an empty stream is passed.
+     */
+    public static JSONObject toJsonObject(InputStream inputStream) throws ParseException {
         try {
-            String inputStr;
-            while ((inputStr = streamReader.readLine()) != null) {
-                responseStrBuilder.append(inputStr);
+            String inputStr = new String((inputStream.readAllBytes()), Charsets.UTF_8);
+            // Fallback: in case an empty stream was passed, return an empty JSON object
+            if (inputStr.isBlank()) {
+                return new JSONObject();
             }
-            if (responseStrBuilder.toString().isBlank()) {
-                throw new ParseException("Empty input!");
-            }
-            return new JSONObject(responseStrBuilder.toString());
-        } catch (IOException e) {
+            return new JSONObject(inputStr);
+        } catch (IOException | JSONException e) {
             throw new ParseException(e);
         }
-    }
-
-    public static JSONObject toJsonObject(InputStream input) throws ParseException {
-        return toJsonObject(new InputStreamReader(input, StandardCharsets.UTF_8));
     }
 }

@@ -5,12 +5,14 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-import org.jabref.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.search.SearchQuery;
@@ -19,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -26,24 +29,31 @@ public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
     private final GroupViewMode groupViewMode;
+    private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
+    private final PreferencesService preferencesService;
+    private final BibDatabaseContext bibDatabaseContext;
 
-    public MainTableDataModel(BibDatabaseContext context) {
+    public MainTableDataModel(BibDatabaseContext context, PreferencesService preferencesService, StateManager stateManager) {
+        this.preferencesService = preferencesService;
+        this.bibDatabaseContext = context;
+        this.fieldValueFormatter = new SimpleObjectProperty<>(
+                new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
+
         ObservableList<BibEntry> allEntries = BindingsHelper.forUI(context.getDatabase().getEntries());
-
-        MainTableNameFormatter nameFormatter = new MainTableNameFormatter(Globals.prefs);
-        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry -> new BibEntryTableViewModel(entry, context, nameFormatter));
+        ObservableList<BibEntryTableViewModel> entriesViewModel = EasyBind.mapBacked(allEntries, entry ->
+                new BibEntryTableViewModel(entry, bibDatabaseContext, fieldValueFormatter));
 
         entriesFiltered = new FilteredList<>(entriesViewModel);
         entriesFiltered.predicateProperty().bind(
-                EasyBind.combine(Globals.stateManager.activeGroupProperty(), Globals.stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
+                EasyBind.combine(stateManager.activeGroupProperty(), stateManager.activeSearchQueryProperty(), (groups, query) -> entry -> isMatched(groups, query, entry))
         );
 
         IntegerProperty resultSize = new SimpleIntegerProperty();
         resultSize.bind(Bindings.size(entriesFiltered));
-        Globals.stateManager.setActiveSearchResultSize(context, resultSize);
+        stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
-        groupViewMode = Globals.prefs.getGroupViewMode();
+        groupViewMode = preferencesService.getGroupViewMode();
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
@@ -77,5 +87,9 @@ public class MainTableDataModel {
 
     public SortedList<BibEntryTableViewModel> getEntriesFilteredAndSorted() {
         return entriesSorted;
+    }
+
+    public void refresh() {
+        this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(preferencesService, bibDatabaseContext));
     }
 }

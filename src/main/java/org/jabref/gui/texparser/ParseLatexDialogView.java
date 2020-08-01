@@ -76,7 +76,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
         EasyBind.subscribe(fileTreeView.rootProperty(), root -> {
             ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
             root.setExpanded(true);
-            EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
+            EasyBind.bindContent(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
         });
 
         latexDirectoryField.textProperty().bindBidirectional(viewModel.latexFileDirectoryProperty());

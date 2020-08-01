@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,8 +40,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -48,17 +49,19 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.auximport.NewSubLibraryAction;
 import org.jabref.gui.bibtexextractor.ExtractBibtexAction;
-import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternAction;
-import org.jabref.gui.bibtexkeypattern.GenerateBibtexKeyAction;
+import org.jabref.gui.citationkeypattern.CitationKeyPatternAction;
+import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
 import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
@@ -160,7 +163,7 @@ public class JabRefFrame extends BorderPane {
     private final SplitPane splitPane = new SplitPane();
     private final JabRefPreferences prefs = Globals.prefs;
     private final ThemeLoader themeLoader = Globals.getThemeLoader();
-    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager);
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager, prefs);
 
     private final FileHistoryMenu fileHistory;
 
@@ -173,6 +176,7 @@ public class JabRefFrame extends BorderPane {
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
+    private PopOver progressViewPopOver;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -182,6 +186,13 @@ public class JabRefFrame extends BorderPane {
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
         this.executorService = JabRefExecutorService.INSTANCE;
+        this.setOnKeyTyped(key -> {
+            if (this.fileHistory.isShowing()) {
+                if (this.fileHistory.openFileByKey(key)) {
+                    this.fileHistory.getParentMenu().hide();
+                }
+            }
+        });
     }
 
     private static BasePanel getBasePanel(Tab tab) {
@@ -491,64 +502,80 @@ public class JabRefFrame extends BorderPane {
     }
 
     private Node createToolbar() {
-        Pane leftSpacer = new Pane();
-        leftSpacer.setMinWidth(50);
-        HBox.setHgrow(leftSpacer, Priority.SOMETIMES);
-        Pane rightSpacer = new Pane();
-        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
+        final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+        final Region leftSpacer = new Region();
+        final Region rightSpacer = new Region();
 
-        Button newLibrary;
-        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        final Button newLibrary;
+        if (Globals.prefs.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX) {
             newLibrary = factory.createIconButton(StandardActions.NEW_LIBRARY_BIBLATEX, new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX));
         } else {
             newLibrary = factory.createIconButton(StandardActions.NEW_LIBRARY_BIBTEX, new NewDatabaseAction(this, BibDatabaseMode.BIBTEX));
         }
 
-        HBox leftSide = new HBox(
-                newLibrary,
-                factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
-                factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager)),
-                leftSpacer
-        );
-
         final PushToApplicationAction pushToApplicationAction = getPushToApplicationsManager().getPushToApplicationAction();
         final Button pushToApplicationButton = factory.createIconButton(pushToApplicationAction.getActionInformation(), pushToApplicationAction);
         pushToApplicationsManager.registerReconfigurable(pushToApplicationButton);
 
-        HBox rightSide = new HBox(
-                factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
-                factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
-                factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
-                factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager)),
-                new Separator(Orientation.VERTICAL),
-                factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
-                factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
-                factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
-                factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
-                factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager)),
-                new Separator(Orientation.VERTICAL),
-                pushToApplicationButton,
-                factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
-                factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, prefs, dialogService, stateManager)),
-                new Separator(Orientation.VERTICAL),
-                factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
-                factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
-                factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org")),
-                new Separator(Orientation.VERTICAL),
-                createTaskIndicator()
-        );
-
-        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
-
         ToolBar toolBar = new ToolBar(
-                leftSide,
+
+                new HBox(newLibrary,
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
+                        factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager))),
+
+                leftSpacer,
 
                 globalSearchBar,
 
                 rightSpacer,
-                rightSide);
+
+                new HBox(
+                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(this, StandardEntryType.Article, dialogService, Globals.prefs, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(this, dialogService, Globals.prefs, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new ExtractBibtexAction(stateManager)),
+                        factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, this, stateManager))
+                ),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.UNDO, new UndoRedoAction(StandardActions.UNDO, this, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.REDO, new UndoRedoAction(StandardActions.REDO, this, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CUT, new EditAction(StandardActions.CUT, this, stateManager)),
+                        factory.createIconButton(StandardActions.COPY, new EditAction(StandardActions.COPY, this, stateManager)),
+                        factory.createIconButton(StandardActions.PASTE, new EditAction(StandardActions.PASTE, this, stateManager))
+                ),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        pushToApplicationButton,
+                        factory.createIconButton(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(this, dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CLEANUP_ENTRIES, new CleanupAction(this, prefs, dialogService, stateManager))
+                ),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        factory.createIconButton(StandardActions.OPEN_GITHUB, new OpenBrowserAction("https://github.com/JabRef/jabref")),
+                        factory.createIconButton(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction("https://www.facebook.com/JabRef/")),
+                        factory.createIconButton(StandardActions.OPEN_TWITTER, new OpenBrowserAction("https://twitter.com/jabref_org"))
+                ),
+
+                new Separator(Orientation.VERTICAL),
+
+                new HBox(
+                        createTaskIndicator()
+                )
+        );
+
+        leftSpacer.setPrefWidth(50);
+        leftSpacer.setMinWidth(Region.USE_PREF_SIZE);
+        leftSpacer.setMaxWidth(Region.USE_PREF_SIZE);
+        HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
+        HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
+
         toolBar.getStyleClass().add("mainToolbar");
 
         return toolBar;
@@ -763,7 +790,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(this, stateManager)),
-                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateBibtexKeyAction(this, dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(this, dialogService, stateManager)),
 
                 new SeparatorMenuItem(),
 
@@ -796,7 +823,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
                 factory.createMenuItem(StandardActions.EDIT_PREAMBLE, new PreambleEditor(stateManager, undoManager, this.getDialogService())),
                 factory.createMenuItem(StandardActions.EDIT_STRINGS, new BibtexStringEditorAction(stateManager)),
-                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new BibtexKeyPatternAction(this, stateManager))
+                factory.createMenuItem(StandardActions.MANAGE_CITE_KEY_PATTERNS, new CitationKeyPatternAction(this, stateManager))
         );
 
         quality.getItems().addAll(
@@ -978,15 +1005,22 @@ public class JabRefFrame extends BorderPane {
 
         indicator.setOnMouseClicked(event -> {
             TaskProgressView<Task<?>> taskProgressView = new TaskProgressView<>();
-            EasyBind.listBind(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
+            EasyBind.bindContent(taskProgressView.getTasks(), stateManager.getBackgroundTasks());
             taskProgressView.setRetainTasks(true);
             taskProgressView.setGraphicFactory(BackgroundTask::getIcon);
 
-            PopOver progressViewPopOver = new PopOver(taskProgressView);
-            progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
-            progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
-
-            progressViewPopOver.show(indicator);
+            if (progressViewPopOver == null) {
+                progressViewPopOver = new PopOver(taskProgressView);
+                progressViewPopOver.setTitle(Localization.lang("Background Tasks"));
+                progressViewPopOver.setArrowLocation(PopOver.ArrowLocation.RIGHT_TOP);
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            } else if (progressViewPopOver.isShowing()) {
+                progressViewPopOver.hide();
+            } else {
+                progressViewPopOver.setContentNode(taskProgressView);
+                progressViewPopOver.show(indicator);
+            }
         });
 
         return new Group(indicator);
@@ -1079,11 +1113,18 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private static ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository, BasePanel panel, StateManager stateManager) {
+    private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory(keyBindingRepository);
 
-        contextMenu.getItems().add(factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(panel.frame(), stateManager)));
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
+                factory.createMenuItem(StandardActions.CLOSE_ALL_LIBRARIES, new CloseAllDatabaseAction()),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
+                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
+                );
 
         return contextMenu;
     }
@@ -1098,7 +1139,7 @@ public class JabRefFrame extends BorderPane {
         });
 
         // add tab context menu
-        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs(), basePanel, stateManager));
+        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
 
         // update all tab titles
         updateAllTabTitles();
@@ -1313,6 +1354,49 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             closeTab(getCurrentBasePanel());
+        }
+    }
+
+    private class CloseOthersDatabaseAction extends SimpleCommand {
+
+        public CloseOthersDatabaseAction() {
+            this.executable.bind(ActionHelper.isOpenMultiDatabase(tabbedPane));
+        }
+
+        @Override
+        public void execute() {
+            BasePanel currentBasePanel = getCurrentBasePanel();
+            for (Tab tab : tabbedPane.getTabs()) {
+                BasePanel basePanel = getBasePanel(tab);
+                if (basePanel != currentBasePanel) {
+                    closeTab(basePanel);
+                }
+            }
+        }
+    }
+
+    private class CloseAllDatabaseAction extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            for (Tab tab : tabbedPane.getTabs()) {
+                BasePanel basePanel = getBasePanel(tab);
+                closeTab(basePanel);
+            }
+        }
+    }
+
+    private class OpenDatabaseFolder extends SimpleCommand {
+
+        @Override
+        public void execute() {
+            stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
+                try {
+                    JabRefDesktop.openFolderAndSelectFile(path);
+                } catch (IOException e) {
+                    LOGGER.info("Could not open folder", e);
+                }
+            });
         }
     }
 

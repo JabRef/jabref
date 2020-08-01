@@ -12,7 +12,7 @@
     </author>
     <category citation-format="numeric"/>
     <category field="generic-base"/>
-    <summary>Russian GOST-2008 style. Book, report, webpage and article chapters edited. Note!!! In articles form of № = Issue (Volume).</summary>
+    <summary>Russian GOST-2008 style. Book, report, webpage, post-weblog and article chapters edited. Note!!! In articles form of № = Issue (Volume).</summary>
     <updated>2015-07-01T06:08:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
@@ -28,12 +28,12 @@
   <macro name="editor">
     <names variable="editor" delimiter=", " suffix=",">
       <label prefix=" " suffix=" "/>
-      <name initialize-with="."/>
+      <name initialize-with=". "/>
     </names>
   </macro>
   <macro name="author">
     <names variable="author" delimiter="," prefix=" / " suffix=",">
-      <name et-al-min="6" et-al-use-first="5" initialize-with="."/>
+      <name et-al-min="6" et-al-use-first="5" initialize-with=". "/>
       <label form="short" strip-periods="true"/>
     </names>
   </macro>
@@ -57,7 +57,7 @@
   <macro name="translator">
     <names variable="translator" delimiter="," suffix=",">
       <label prefix=" " suffix=" "/>
-      <name initialize-with="."/>
+      <name initialize-with=". "/>
     </names>
   </macro>
   <macro name="publisher">
@@ -81,7 +81,7 @@
   </macro>
   <macro name="author-first">
     <names variable="author">
-      <name delimiter-precedes-last="always" initialize-with="." name-as-sort-order="all" sort-separator=" "/>
+      <name delimiter-precedes-last="always" initialize-with=". " name-as-sort-order="all" sort-separator=" "/>
       <label form="short" strip-periods="true" prefix=" " suffix="."/>
     </names>
   </macro>
@@ -128,10 +128,10 @@
               <text macro="editor"/>
             </group>
             <text macro="publisher" prefix=" "/>
-            <text variable="page" prefix=" " suffix=" с."/>
+            <text variable="page" prefix="C. " suffix="."/>
           </group>
         </else-if>
-        <else-if type="webpage">
+        <else-if type="webpage post-weblog">
           <text macro="title"/>
           <text variable="container-title" prefix=" // "/>
           <text prefix=" " macro="access"/>
@@ -165,7 +165,7 @@
               <text variable="volume" prefix="Т. "/>
               <text variable="issue" prefix="№ "/>
             </group>
-            <text variable="page" suffix=" с."/>
+            <text variable="page" prefix="C. " suffix="."/>
           </group>
         </else>
       </choose>

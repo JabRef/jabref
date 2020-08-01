@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -7,18 +8,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -31,22 +31,20 @@ import com.tobiasdiez.easybind.optional.OptionalBinding;
 
 public class BibEntryTableViewModel {
     private final BibEntry entry;
-    private final BibDatabase database;
-    private final MainTableNameFormatter nameFormatter;
+    private final ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter;
     private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final ObservableValue<List<AbstractGroup>> matchedGroups;
 
-    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext database, MainTableNameFormatter nameFormatter) {
+    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
-        this.database = database.getDatabase();
-        this.nameFormatter = nameFormatter;
+        this.fieldValueFormatter = fieldValueFormatter;
 
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
-        this.matchedGroups = createMatchedGroupsBinding(database, entry);
+        this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -115,28 +113,15 @@ public class BibEntryTableViewModel {
         ObservableValue<String> value = fieldValues.get(fields);
         if (value != null) {
             return value;
-        } else {
-            value = Bindings.createStringBinding(() -> {
-                boolean isName = false;
-
-                Optional<String> content = Optional.empty();
-                for (Field field : fields) {
-                    content = entry.getResolvedFieldOrAliasLatexFree(field, database);
-                    if (content.isPresent()) {
-                        isName = field.getProperties().contains(FieldProperty.PERSON_NAMES);
-                        break;
-                    }
-                }
-
-                String result = content.orElse(null);
-                if (isName) {
-                    return nameFormatter.formatName(result);
-                } else {
-                    return result;
-                }
-            }, entry.getObservables());
-            fieldValues.put(fields, value);
-            return value;
         }
+
+        ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
+        observables.add(fieldValueFormatter);
+
+        value = Bindings.createStringBinding(() ->
+                fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
+                observables.toArray(Observable[]::new));
+        fieldValues.put(fields, value);
+        return value;
     }
 }

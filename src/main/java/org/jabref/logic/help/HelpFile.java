@@ -12,7 +12,7 @@ public enum HelpFile {
     STRING_EDITOR("setup/stringeditor"),
     GROUPS("finding-sorting-and-cleaning-entries/groups#groups-structure-creating-and-removing-groups"),
     SPECIAL_FIELDS("fields/specialfields"),
-    BIBTEX_KEY_PATTERN("setup/bibtexkeypatterns"),
+    CITATION_KEY_PATTERN("setup/bibtexkeypatterns"),
     OWNER("fields/owner"),
     TIMESTAMP("fields/timestamp"),
     CUSTOM_EXPORTS_NAME_FORMATTER("import-export/customexports#using-custom-name-formatters"),
