@@ -18,6 +18,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
@@ -29,6 +30,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -127,6 +129,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // TODO: Float marked entries
         // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
+        setupKeyBindings(keyBindingRepository);
+
         database.getDatabase().registerListener(this);
     }
 
@@ -193,6 +197,46 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public void cut() {
         copy();
         panel.delete(true);
+    }
+
+    private void setupKeyBindings(KeyBindingRepository keyBindings) {
+        this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                getSelectedEntries().stream()
+                                    .findFirst()
+                                    .ifPresent(panel::showAndEdit);
+                event.consume();
+                return;
+            }
+
+            Optional<KeyBinding> keyBinding = keyBindings.mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case SELECT_FIRST_ENTRY:
+                        clearAndSelectFirst();
+                        event.consume();
+                        break;
+                    case SELECT_LAST_ENTRY:
+                        clearAndSelectLast();
+                        event.consume();
+                        break;
+                    case PASTE:
+                        paste();
+                        event.consume();
+                        break;
+                    case COPY:
+                        copy();
+                        event.consume();
+                        break;
+                    case CUT:
+                        cut();
+                        event.consume();
+                        break;
+                    default:
+                        // Pass other keys to parent
+                }
+            }
+        });
     }
 
     public void clearAndSelectFirst() {
