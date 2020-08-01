@@ -126,7 +126,7 @@
           <text macro="autor-editor-note" suffix=", "/>
           <choose>
             <if match="none" position="first">
-              <group delimiter=" " prefix="(" suffix="), ">
+              <group delimiter=" " prefix="(" suffix=")">
                 <text value="o. Fn."/>
                 <text variable="first-reference-note-number"/>
               </group>
@@ -159,7 +159,7 @@
               <text macro="author-commentary" suffix=", "/>
               <choose>
                 <if match="none" position="first">
-                  <group delimiter=" " prefix="(" suffix="), ">
+                  <group delimiter=" " prefix="(" suffix=")">
                     <text value="o. Fn."/>
                     <text variable="first-reference-note-number"/>
                   </group>

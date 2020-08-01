@@ -19,10 +19,14 @@ import org.slf4j.LoggerFactory;
  * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
+
+    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
     private static final URI RESOLVER = URI.create("https://doi.org");
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -238,7 +242,7 @@ public class DOI implements Identifier {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         DOI other = (DOI) o;
@@ -249,4 +253,5 @@ public class DOI implements Identifier {
     public int hashCode() {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
+
 }

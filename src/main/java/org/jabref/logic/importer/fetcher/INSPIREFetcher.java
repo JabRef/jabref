@@ -54,8 +54,8 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URLDownload getUrlDownload(String query) throws MalformedURLException, FetcherException, URISyntaxException {
-        URLDownload download = new URLDownload(getURLForQuery(query));
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload download = new URLDownload(url);
         download.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
         return download;
     }

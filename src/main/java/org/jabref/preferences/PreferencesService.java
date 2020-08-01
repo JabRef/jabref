@@ -37,6 +37,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -105,7 +106,9 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveCustomEntryTypes();
+    void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager);
+
+    void clearBibEntryTypes(BibDatabaseMode mode);
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
@@ -236,4 +239,8 @@ public interface PreferencesService {
     SpecialFieldsPreferences getSpecialFieldsPreferences();
 
     void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
+
+    SearchPreferences getSearchPreferences();
+
+    void storeSearchPreferences(SearchPreferences preferences);
 }

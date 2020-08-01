@@ -13,9 +13,15 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Style based on the National Institute of Organisation Dynamics Australia Referencing Guide. Currently covers the most typical item types (books, chapters, webpages, articles in journals, magazines, newspapers (online and print), theses and reports. Doesn't cover legal citations and artworks.</summary>
-    <updated>2019-06-12T20:34:54+00:00</updated>
+    <updated>2020-06-22T08:25:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="en">
+    <terms>
+      <term name="retrieved">viewed</term>
+      <term name="edition" form="short">edn.</term>
+    </terms>
+  </locale>
   <macro name="container">
     <choose>
       <if type="chapter paper-conference" match="any">
@@ -78,10 +84,11 @@
     <choose>
       <if variable="URL">
         <group delimiter=" ">
-          <group prefix="Viewed " suffix=" " delimiter=", ">
+          <text term="retrieved" text-case="capitalize-first"/>
+          <group delimiter=", ">
             <date variable="accessed" delimiter=" ">
               <date-part name="day"/>
-              <date-part name="month" form="short" strip-periods="true"/>
+              <date-part name="month" strip-periods="true"/>
               <date-part name="year"/>
             </date>
             <text variable="URL"/>
@@ -108,8 +115,8 @@
         </choose>
         <text macro="edition" prefix=", "/>
       </else-if>
-      <else-if type="webpage">
-        <text variable="title" text-case="title"/>
+      <else-if type="webpage post post-weblog" match="any">
+        <text variable="title" text-case="title" font-style="italic"/>
       </else-if>
       <else>
         <text variable="title" quotes="true"/>
@@ -174,7 +181,7 @@
           <text variable="edition" suffix="."/>
         </else>
       </choose>
-      <text value="ed"/>
+      <label text-case="capitalize-first" variable="edition" form="short"/>
     </group>
   </macro>
   <macro name="locators">

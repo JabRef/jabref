@@ -59,7 +59,7 @@ public class ImportCustomizationDialog extends BaseDialog<Void> {
         viewModel = new ImportCustomizationDialogViewModel(preferences, dialogService);
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());
-        EasyBind.listBind(viewModel.selectedImportersProperty(), importerTable.getSelectionModel().getSelectedItems());
+        EasyBind.bindContent(viewModel.selectedImportersProperty(), importerTable.getSelectionModel().getSelectedItems());
         nameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getName()));
         classColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getClassName()));
         basePathColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getBasePath().toString()));

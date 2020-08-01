@@ -11,15 +11,16 @@ import org.jabref.build.xjc.XjcTask
 
 plugins {
     id 'application'
-    id "com.simonharrer.modernizer" version '1.8.0-1'
+    id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.0'
-    id 'com.github.ben-manes.versions' version '0.28.0'
-    id 'org.javamodularity.moduleplugin' version '1.5.0'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
-    id 'org.beryx.jlink' version '2.19.0'
+    id 'com.github.ben-manes.versions' version '0.29.0'
+    id 'org.javamodularity.moduleplugin' version '1.7.0'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.jlink' version '2.21.1'
 
     // nicer test outputs during running and completion
-    id 'com.adarshr.test-logger' version '2.0.0'
+    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
+    id 'com.adarshr.test-logger' version '2.1.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -50,11 +51,9 @@ application {
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
 // These should be removed, as well as the files in the lib folder, as soon as they have valid module names
-patchModules.config = [
-        "test=fastparse_2.12-1.0.0.jar",
-        "test2=fastparse-utils_2.12-1.0.0.jar",
-        "test3=sourcecode_2.12-0.1.4.jar"
-]
+modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
+modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
+modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
 // These are the Java version requirements we will check on each start of JabRef
 ext.minRequiredJavaVersion = "1.8.0_171"
@@ -106,9 +105,9 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.19'
-    implementation 'org.apache.pdfbox:fontbox:2.0.19'
-    implementation 'org.apache.pdfbox:xmpbox:2.0.19'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.20'
+    implementation 'org.apache.pdfbox:fontbox:2.0.20'
+    implementation 'org.apache.pdfbox:xmpbox:2.0.20'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
     implementation 'com.h2database:h2-mvstore:1.4.200'
@@ -116,7 +115,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.65.01'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.66'
 
     implementation 'commons-cli:commons-cli:1.4'
 
@@ -138,9 +137,9 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.0'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
 
-    implementation 'org.postgresql:postgresql:42.2.12'
+    implementation 'org.postgresql:postgresql:42.2.14'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -159,15 +158,15 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.0.0-SNAPSHOT'
+    implementation 'com.tobiasdiez:easybind:2.0.1-SNAPSHOT'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.0.1'
+    implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.7.02'
+    implementation 'com.konghq:unirest-java:3.8.06'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -196,15 +195,15 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.83'
+    testImplementation 'io.github.classgraph:classgraph:4.8.87'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.11'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.13'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.mockito:mockito-core:3.4.4'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
@@ -212,7 +211,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.33'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.35'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
     jython 'org.python:jython-standalone:2.7.2'
 }
@@ -276,6 +275,8 @@ processResources {
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
+                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),
+                "ieeeAPIKey": System.getenv('IEEEAPIKey'),
                 "minRequiredJavaVersion": minRequiredJavaVersion,
                 "allowJava9": allowJava9
 
@@ -383,45 +384,41 @@ compileJava {
 
 run {
     // TODO: Remove access to internal api
-    jvmArgs '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            '--add-exports', 'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref',
-            '--add-opens', 'javafx.controls/javafx.scene.control=org.jabref',
-            '--add-opens', 'org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref',
-            '--add-opens', 'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            // Not sure why we need to restate the controlfx exports
-            // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
-            "--add-exports", "javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
-            "--add-exports", "javafx.base/com.sun.javafx.runtime=org.controlsfx.controls",
-            "--add-exports", "javafx.web/com.sun.webkit=org.controlsfx.controls",
-            "--add-exports", "javafx.graphics/com.sun.javafx.css=org.controlsfx.controls",
-            "--add-opens", "javafx.controls/javafx.scene.control.skin=org.controlsfx.controls",
-            "--add-opens", "javafx.graphics/javafx.scene=org.controlsfx.controls",
-            "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
-            "--add-opens", "javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.binding=com.jfoenix",
-            "--add-opens", "javafx.graphics/com.sun.javafx.stage=com.jfoenix",
-            "--add-opens", "javafx.base/com.sun.javafx.event=com.jfoenix",
-            '--add-exports', 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle'
-
-    // TODO: The following code should have the same affect as the above one, but doesn't work for some reason
-    // https://github.com/java9-modularity/gradle-modules-plugin/issues/89
     moduleOptions {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
-                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle'
+                
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
+                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle',
+                
+                // Not sure why we need to restate the controlfx exports
+                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
+                'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.inputmap' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.event' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.collections' : 'org.controlsfx.controls',
+                'javafx.base/com.sun.javafx.runtime': 'org.controlsfx.controls',
+                'javafx.web/com.sun.webkit' : 'org.controlsfx.controls',
+                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls'
         ]
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref'
+                'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
+                'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
+                
+                'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
+                'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
+                
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
+                'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
+                'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
+                'javafx.base/com.sun.javafx.event' : 'com.jfoenix'
         ]
     }
 }
@@ -573,7 +570,6 @@ jlink {
         requires 'java.management'
         requires 'java.naming'
         requires 'java.security.sasl'
-        requires 'com.sun.xml.fastinfoset'
         requires 'jdk.security.jgss'
         requires 'java.logging'
         requires 'jdk.xml.dom'
@@ -720,13 +716,6 @@ if (OperatingSystem.current().isLinux()) {
         }
     }
 }
-
-// Delete unnecessary folder in application image
-// TODO: Remove this workaround as soon as https://github.com/beryx/badass-jlink-plugin/issues/51 is fixed
-task deleteModsFolder(type: Delete) {
-    delete "$buildDir/distribution/JabRef/app/mods"
-}
-deleteModsFolder.shouldRunAfter jpackageImage
 
 jmh {
     warmupIterations = 5
