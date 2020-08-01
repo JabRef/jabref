@@ -6,13 +6,14 @@
     <link href="http://www.zotero.org/styles/lancaster-university-harvard" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-imperial-college-london" rel="template"/>
     <link href="http://lancaster.libguides.com/harvard/" rel="documentation"/>
+    <link href="https://lancaster.libguides.com/ld.php?content_id=32483134" rel="documentation"/>
     <author>
       <name>Andy Hartland</name>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The Harvard author-date style - adapted for Lancaster University</summary>
-    <updated>2020-01-19T19:35:00+00:00</updated>
+    <updated>2020-07-22T08:41:45+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="accessed">
@@ -436,7 +437,7 @@
   <bibliography hanging-indent="false" et-al-min="3" et-al-use-first="1">
     <sort>
       <key macro="author"/>
-      <key variable="citation-number"/>
+      <key macro="year"/>
       <key variable="title"/>
     </sort>
     <layout>
