@@ -160,11 +160,11 @@ public class ClipBoardManager {
         setPrimaryClipboardContent(content);
     }
 
-    public List<BibEntry> extractData(BibDatabaseMode targetBibEntryFormat) {
+    public List<BibEntry> extractData() {
         Object entries = clipboard.getContent(DragAndDropDataFormats.ENTRIES);
 
         if (entries == null) {
-            return handleStringData(clipboard.getString(), targetBibEntryFormat);
+            return handleStringData(clipboard.getString());
         }
         return handleBibTeXData((String) entries);
     }
@@ -179,14 +179,14 @@ public class ClipBoardManager {
         }
     }
 
-    private List<BibEntry> handleStringData(String data, BibDatabaseMode targetBibEntryFormat) {
+    private List<BibEntry> handleStringData(String data) {
         if (data == null || data.isEmpty()) {
             return Collections.emptyList();
         }
 
         Optional<DOI> doi = DOI.parse(data);
         if (doi.isPresent()) {
-            return fetchByDOI(doi.get(), targetBibEntryFormat);
+            return fetchByDOI(doi.get());
         }
 
         return tryImportFormats(data);
@@ -201,7 +201,7 @@ public class ClipBoardManager {
         }
     }
 
-    private List<BibEntry> fetchByDOI(DOI doi, BibDatabaseMode targetBibEntryFormat) {
+    private List<BibEntry> fetchByDOI(DOI doi) {
         LOGGER.info("Found DOI in clipboard");
         try {
             Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.getDOI());
