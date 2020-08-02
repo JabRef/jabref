@@ -250,10 +250,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        List<BibEntry> fetchedEntries = searchForEntries(query).stream().map(
+        return searchForEntries(query).stream().map(
                 (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                               .collect(Collectors.toList());
-        return fetchedEntries;
+                                      .collect(Collectors.toList());
     }
 
     /**
@@ -277,9 +276,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<BibEntry> entry = searchForEntryById(identifier)
+        return searchForEntryById(identifier)
                 .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
-        return entry;
     }
 
     @Override

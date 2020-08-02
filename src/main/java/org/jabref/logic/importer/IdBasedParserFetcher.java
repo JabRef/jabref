@@ -74,6 +74,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             }
 
             BibEntry entry = fetchedEntries.get(0);
+
             // Post-cleanup
             doPostCleanup(entry);
 
