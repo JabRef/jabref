@@ -18,7 +18,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
@@ -30,7 +29,6 @@ public class BibtexExtractorViewModel {
     private GrobidCitationFetcher currentCitationfetcher;
     private TaskExecutor taskExecutor;
     private ImportHandler importHandler;
-    private BibDatabaseMode bibEntryFormat;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
@@ -43,7 +41,6 @@ public class BibtexExtractorViewModel {
         this.dialogService = dialogService;
         currentCitationfetcher = new GrobidCitationFetcher(jabRefPreferences.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
-        this.bibEntryFormat = bibdatabaseContext.getMode();
         this.importHandler = new ImportHandler(
                 dialogService,
                 bibdatabaseContext,
