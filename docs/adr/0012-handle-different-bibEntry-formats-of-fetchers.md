@@ -1,4 +1,4 @@
-# Handle different bibentry formats of fetchers
+# Handle different bibentry formats of fetchers by adding a layer
 
 ## Context and Problem Statement
 
