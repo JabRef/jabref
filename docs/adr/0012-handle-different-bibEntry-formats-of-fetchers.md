@@ -1,10 +1,10 @@
-# Where to translate the abstract queries
+# Handle different bibentry formats of fetchers
 
 ## Context and Problem Statement
 
 All fetchers (except IDFetchers) in JabRef return BibEntries when fetching entries from their API.
 Some fetchers directly receive BibTeX entries from their API, the other fetchers receive their entries in some kind of exchange format such as JSON or XML and then parse this into BibEntries.
-Currently all fetchers either return BibEntries in BibTeX or BibLaTeX format.
+Currently, all fetchers either return BibEntries in BibTeX or BibLaTeX format.
 This can lead to importing BibEntries of one format in a database of the other format.
 How can this inconsistency between fetchers, and their used formats be addressed?
 
@@ -25,7 +25,7 @@ because it can compose all steps required during importing, not only format conv
 
 ### Introduce a new layer between fetchers and caller, such as a FetcherHandler, that manages the conversion
 
-* Good, because fetchers do not have to think about conversion (Separation of concers)
+* Good, because fetchers do not have to think about conversion (Separation of concerns)
 * Good, because no other code that currently relies on fetchers has to do the conversion
 * Good, because this layer can be used for any kind of import to handle all conversion steps (not only format). [As described here (comment)](https://github.com/JabRef/jabref/pull/6687)
 * Good, because this layer can easily be extended if the import procedure changes
@@ -42,8 +42,8 @@ because it can compose all steps required during importing, not only format conv
 
 ### Pass fetchers the format, they have to create entries accordingly
 
-* Good, because fetchers already handle BibEntry creation (in their format of choice). This is part of his responsibility
-* Good, because fetchers only create BibEntries of the "correct" format. At no point there exists the chance of the wrong format being passed on due to e.g. code changes
+* Good, because fetchers already handle BibEntry creation (in their format of choice). This is part of his responsibility.
+* Good, because fetchers only create BibEntries of the "correct" format. At no point there exists the chance of the wrong format being passed on due to e.g. code changes.
 * Good, because the conversion does not have to take place
 * Bad, because fetcher has to "know" all differences of the formats -> clutters the code.
 * Bad, because this code has to be tested. Conversion already exists.
@@ -52,5 +52,5 @@ because it can compose all steps required during importing, not only format conv
 
 * Good, because fetcher code does not have to change
 * Good, because fetcher only has to fetch and does not need to know anything about the formats
-* Bad, because programmers might assume that a certain format is used, e.g. the preferenced format (which would not work as the databases that imports the entries does not have to conform to the preferenced format)
-* Bad, because at every place where fetchers are used and the format matters, conversion has to be used, creating more dependencies
+* Bad, because programmers might assume that a certain format is used, e.g. the preferred format (which would not work as the databases that imports the entries does not have to conform to the preferred format)
+* Bad, because at every place where fetchers are used, and the format matters, conversion has to be used, creating more dependencies
