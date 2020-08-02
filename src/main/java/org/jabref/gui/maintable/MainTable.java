@@ -253,7 +253,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste() {
         // Find entries in clipboard
-        List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData(database.getMode());
+        List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
         panel.insertEntries(entriesToAdd);
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
