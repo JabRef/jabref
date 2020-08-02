@@ -37,6 +37,24 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      */
     Parser getParser();
 
+    /**
+     * Performs a cleanup of the fetched entry.
+     *
+     * Only systematic errors of the fetcher should be corrected here
+     * (i.e. if information is consistently contained in the wrong field or the wrong format)
+     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
+     *
+     * Try to reuse existing {@link Formatter} for the cleanup. For example,
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     *
+     * By default, no cleanup is done.
+     *
+     * @param entry the entry to be cleaned-up
+     */
+    default void doPostCleanup(BibEntry entry) {
+        // Do nothing by default
+    }
+
     @Override
     default Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if (StringUtil.isBlank(identifier)) {
@@ -68,22 +86,5 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
-    }
-
-    /**
-     * Performs a cleanup of the fetched entry.
-     *
-     * Only systematic errors of the fetcher should be corrected here
-     * (i.e. if information is consistently contained in the wrong field or the wrong format)
-     * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
-     *
-     * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
-     *
-     * By default, no cleanup is done.
-     * @param entry the entry to be cleaned-up
-     */
-    default void doPostCleanup(BibEntry entry) {
-        // Do nothing by default
     }
 }

@@ -9,10 +9,16 @@ import org.jabref.model.entry.BibEntry;
 
 public class ImportCleanup {
 
+    private final BibDatabaseMode targetBibEntryFormat;
+
+    public ImportCleanup(BibDatabaseMode targetBibEntryFormat) {
+        this.targetBibEntryFormat = targetBibEntryFormat;
+    }
+
     /**
      * Performs a format conversion of the given entry into the targeted format.
      */
-    public void doPostCleanup(BibEntry entry, BibDatabaseMode targetBibEntryFormat) {
+    public void doPostCleanup(BibEntry entry) {
         if (targetBibEntryFormat == BibDatabaseMode.BIBTEX) {
             new ConvertToBibtexCleanup().cleanup(entry);
         } else if (targetBibEntryFormat == BibDatabaseMode.BIBLATEX) {
@@ -23,7 +29,7 @@ public class ImportCleanup {
     /**
      * Performs a format conversion of the given entry collection into the targeted format.
      */
-    public void doPostCleanup(Collection<BibEntry> entries, BibDatabaseMode targetBibEntryFormat) {
-        entries.parallelStream().forEach(entry -> doPostCleanup(entry, targetBibEntryFormat));
+    public void doPostCleanup(Collection<BibEntry> entries) {
+        entries.parallelStream().forEach(entry -> doPostCleanup(entry));
     }
 }

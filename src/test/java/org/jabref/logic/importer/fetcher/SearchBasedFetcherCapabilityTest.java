@@ -35,7 +35,7 @@ interface SearchBasedFetcherCapabilityTest {
         getTestAuthors().forEach(builder::author);
 
         List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
-        new ImportCleanup().doPostCleanup(result, BibDatabaseMode.BIBTEX);
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
@@ -55,7 +55,7 @@ interface SearchBasedFetcherCapabilityTest {
         builder.singleYear(getTestYear());
 
         List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
-        new ImportCleanup().doPostCleanup(result, BibDatabaseMode.BIBTEX);
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -77,7 +77,7 @@ interface SearchBasedFetcherCapabilityTest {
         builder.fromYearAndToYear(2018, 2020);
 
         List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
-        new ImportCleanup().doPostCleanup(result, BibDatabaseMode.BIBTEX);
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
                                                     .filter(Optional::isPresent)
@@ -96,7 +96,7 @@ interface SearchBasedFetcherCapabilityTest {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         builder.journal(getTestJournal());
         List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
-        new ImportCleanup().doPostCleanup(result, BibDatabaseMode.BIBTEX);
+        new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
