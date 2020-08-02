@@ -165,6 +165,22 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(constructComplexQueryString(complexSearchQuery));
+    }
+
+    private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("name:" + author)));
+        complexSearchQuery.getTitlePhrases().ifPresent(titlePhrases -> titlePhrases.forEach(title -> searchTerms.add("title:" + title)));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
+        // Since Springer API does not support year range search we ignore formYear and toYear.
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("year:" + year.toString()));
+        complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
+        return String.join(" AND ", searchTerms);
+    }
+
+    @Override
     public Parser getParser() {
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
