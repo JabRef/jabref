@@ -59,7 +59,6 @@ public class CiteSeer implements SearchBasedParserFetcher {
         // So we extract the data string from the <span class="Z3988" title="<data>"></span> tags and pass the content to the COinS parser
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
-            System.out.println(response);
             List<BibEntry> entries = new ArrayList<>();
             CoinsParser parser = new CoinsParser();
             Pattern pattern = Pattern.compile("<span class=\"Z3988\" title=\"(.*)\"></span>");

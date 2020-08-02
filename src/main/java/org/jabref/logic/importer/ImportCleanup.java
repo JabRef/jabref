@@ -17,13 +17,16 @@ public class ImportCleanup {
 
     /**
      * Performs a format conversion of the given entry into the targeted format.
+     *
+     * @return Returns the cleaned up bibentry to enable usage of doPostCleanup in streams.
      */
-    public void doPostCleanup(BibEntry entry) {
+    public BibEntry doPostCleanup(BibEntry entry) {
         if (targetBibEntryFormat == BibDatabaseMode.BIBTEX) {
             new ConvertToBibtexCleanup().cleanup(entry);
         } else if (targetBibEntryFormat == BibDatabaseMode.BIBLATEX) {
             new ConvertToBiblatexCleanup().cleanup(entry);
         }
+        return entry;
     }
 
     /**

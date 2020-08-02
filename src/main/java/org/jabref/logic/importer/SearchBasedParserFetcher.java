@@ -23,6 +23,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
 
     /**
      * Constructs a URL based on the query.
+     *
+     * @param query the search query
      */
     URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException;
 

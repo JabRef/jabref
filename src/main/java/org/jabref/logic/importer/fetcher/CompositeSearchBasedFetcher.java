@@ -6,10 +6,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.ConvertToBibtexCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -36,7 +37,9 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) {
-        List<BibEntry> result = fetchers.parallelStream().flatMap(searchBasedFetcher -> {
+        ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
+        // All entries have to be converted into one format, this is necessary for the format conversion
+        return fetchers.parallelStream().flatMap(searchBasedFetcher -> {
             try {
                 return searchBasedFetcher.performSearch(query).stream();
             } catch (FetcherException e) {
@@ -44,11 +47,8 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                 return Stream.empty();
             }
         }).limit(maximumNumberOfReturnedResults)
-                                        .collect(Collectors.toList());
-        // All entries have to be converted into one format, this is necessary for the format conversion
-        ConvertToBibtexCleanup converter = new ConvertToBibtexCleanup();
-        result.forEach(converter::cleanup);
-        return result;
+                       .map(cleanup::doPostCleanup)
+                       .collect(Collectors.toList());
     }
 
     @Override

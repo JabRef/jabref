@@ -88,7 +88,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
     }
 
-    public void doPostCleanup(BibEntry entry) {
+    void doPostCleanup(BibEntry entry) {
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
