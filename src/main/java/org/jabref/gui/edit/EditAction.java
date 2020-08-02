@@ -45,7 +45,7 @@ public class EditAction extends SimpleCommand {
                         textInput.cut();
                         break;
                     case PASTE:
-                        // handled by FX in TextInputControl#paste
+                        textInput.paste();
                         break;
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
@@ -53,26 +53,6 @@ public class EditAction extends SimpleCommand {
                         break;
                     default:
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
-                }
-            } else {
-                // Not sure what is selected -> copy/paste/cut selected entries
-
-                // ToDo: Should be handled by BibDatabaseContext instead of BasePanel
-                switch (action) {
-                    case COPY:
-                        frame.getCurrentBasePanel().copy();
-                        break;
-                    case CUT:
-                        frame.getCurrentBasePanel().cut();
-                        break;
-                    case PASTE:
-                        frame.getCurrentBasePanel().paste();
-                        break;
-                    case DELETE_ENTRY:
-                        frame.getCurrentBasePanel().delete(false);
-                        break;
-                    default:
-                        throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
                 }
             }
         });

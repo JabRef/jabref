@@ -223,3 +223,35 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
+  checkauthors:
+    name: "Validate AUTHORS"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # full checkout needed for authors generation
+          fetch-depth: 0
+      - name: "Check AUTHORS"
+        id: authors_check
+        shell: bash
+        run: |
+          ./scripts/generate-authors.sh
+          set +o pipefail
+          added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
+          if [ -z "$added" ]; then
+            echo "::set-output name=newauthor::false"
+            echo "No authors added"
+            exit 0
+          fi
+          message="When merged, this pull request proposes to manually add the following to the [AUTHORS file](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits). In case you want to raise a different proposal, please comment here (we will adapt our `.mailmap` file then) or [adjust your name in your git configuration](https://docs.github.com/en/github/using-git/setting-your-username-in-git). You will have to [rewrite your git history](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History) and use `git commit --author="John Doe <john@doe.org>"` for each changed commit.%0A%0A\`\`\`%0A${added//$'\n'/'%0A'}%0A\`\`\`%0A"
+          echo "::set-output name=message::$message"
+          echo "::set-output name=newauthor::true"
+          echo "New authors found"
+      - name: Comment PR
+        uses: unsplash/comment-on-pr@master
+        if: steps.authors_check.outputs.newauthor == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: "${{ steps.authors_check.outputs.message }}"
+          check_for_duplicate_msg: true
