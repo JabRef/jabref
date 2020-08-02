@@ -143,11 +143,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      */
 
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
-        if (keyEvent.getCharacter() == null || sortedColumn == null) {
+        if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
         }
 
-        if (System.currentTimeMillis() - lastKeyPressTime < 700) {
+        if ((System.currentTimeMillis() - lastKeyPressTime) < 700) {
             columnSearchTerm += keyEvent.getCharacter().toLowerCase();
         } else {
             columnSearchTerm = keyEvent.getCharacter().toLowerCase();
