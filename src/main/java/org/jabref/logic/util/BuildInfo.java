@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
 
 public final class BuildInfo {
@@ -48,11 +49,22 @@ public final class BuildInfo {
         authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
-        azureInstrumentationKey = properties.getProperty("azureInstrumentationKey", "");
-        springerNatureAPIKey = properties.getProperty("springerNatureAPIKey", "");
-        astrophysicsDataSystemAPIKey = properties.getProperty("astrophysicsDataSystemAPIKey", "");
-        ieeeAPIKey = properties.getProperty("ieeeAPIKey", "");
+        azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "AzureInstrumentationKey");
+        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "SpringerNatureAPIKey");
+        astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "AstrophysicsDataSystemAPIKey");
+        ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "IEEEAPIKey");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
-        allowJava9 = "true".equals(properties.getProperty("allowJava9", ""));
+        allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
+    }
+
+    private static String getValue(Properties properties, String key, String environmentVariableName) {
+        String result = Optional.ofNullable(properties.getProperty(key))
+                                // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gralde
+                                .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
+                                .orElse("");
+        if (!result.equals("")) {
+            return result;
+        }
+        return Optional.ofNullable(System.getenv(environmentVariableName)).orElse("");
     }
 }
