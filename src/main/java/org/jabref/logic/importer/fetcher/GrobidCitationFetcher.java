@@ -55,7 +55,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) {
-        List<BibEntry> result = Arrays
+        return Arrays
                 .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                 .map(String::trim)
                 .filter(str -> !str.isBlank())
@@ -64,7 +64,6 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
                 .map(reference -> parseBibToBibEntry(reference))
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList());
-        return result;
     }
 
     @Override
