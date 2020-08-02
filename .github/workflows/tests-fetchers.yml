@@ -22,7 +22,7 @@ on:
     - cron: '2 3 * * 3'
 
 env:
-  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
 

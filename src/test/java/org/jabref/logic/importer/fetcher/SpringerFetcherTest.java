@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.json.JSONObject;
@@ -26,7 +25,6 @@ class SpringerFetcherTest {
         fetcher = new SpringerFetcher();
     }
 
-    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article);
@@ -49,7 +47,6 @@ class SpringerFetcherTest {
         assertEquals(Collections.singletonList(expected), fetchedEntries);
     }
 
-    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void testSpringerJSONToBibtex() {
         String jsonString = "{\r\n" + "            \"identifier\":\"doi:10.1007/BF01201962\",\r\n"
@@ -73,7 +70,6 @@ class SpringerFetcherTest {
         assertEquals(Optional.of("1992-09-01"), bibEntry.getField(StandardField.DATE));
     }
 
-    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     void searchByEmptyQueryFindsNothing() throws Exception {
         assertEquals(Collections.emptyList(), fetcher.performSearch(""));
