@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 chown root:wheel "INSTALL_LOCATION"
 chmod a+rX "INSTALL_LOCATION"
