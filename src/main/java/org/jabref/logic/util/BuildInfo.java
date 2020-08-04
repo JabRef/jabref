@@ -49,15 +49,15 @@ public final class BuildInfo {
         authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
-        azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "AzureInstrumentationKey");
-        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "SpringerNatureAPIKey");
-        astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "AstrophysicsDataSystemAPIKey");
-        ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "IEEEAPIKey");
+        azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "");
+        springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
+        astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "AstrophysicsDataSystemAPIKey", "");
+        ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
     }
 
-    private static String getValue(Properties properties, String key, String environmentVariableName) {
+    private static String getValue(Properties properties, String key, String defaultValue) {
         String result = Optional.ofNullable(properties.getProperty(key))
                                 // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gralde
                                 .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
@@ -65,6 +65,6 @@ public final class BuildInfo {
         if (!result.equals("")) {
             return result;
         }
-        return Optional.ofNullable(System.getenv(environmentVariableName)).orElse("");
+        return defaultValue;
     }
 }
