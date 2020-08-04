@@ -14,9 +14,11 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ThemeLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -39,6 +41,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
+    private final Validator customPathToThemeValidator;
 
     private final List<String> restartWarnings = new ArrayList<>();
 
@@ -60,6 +63,14 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Appearance"),
                         Localization.lang("Font settings"),
                         Localization.lang("You must enter an integer value higher than 8."))));
+
+        customPathToThemeValidator = new FunctionBasedValidator<>(
+                customPathToThemeProperty,
+                input -> !StringUtil.isNullOrEmpty(input),
+                ValidationMessage.error(String.format("%s > %s %n %n %s",
+                        Localization.lang("Appearance"),
+                        Localization.lang("Visual theme"),
+                        Localization.lang("Please specify a css theme file."))));
     }
 
     @Override
@@ -96,14 +107,19 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         }
 
         String newPathToTheme = initialAppearancePreferences.getPathToTheme();
-        if (themeLightProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.MAIN_CSS)) {
+        if (themeLightProperty.getValue()
+                && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.MAIN_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
             newPathToTheme = ThemeLoader.MAIN_CSS;
-        } else if (themeDarkProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.DARK_CSS)) {
+        } else if (themeDarkProperty.getValue()
+                && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.DARK_CSS)) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             newPathToTheme = ThemeLoader.DARK_CSS;
-        } else if (themeCustomProperty.getValue() && !initialAppearancePreferences.getPathToTheme().equals(customPathToThemeProperty().getValue())) {
-            restartWarnings.add(Localization.lang("Theme changed to a custom theme."));
+        } else if (themeCustomProperty.getValue()
+                && !customPathToThemeProperty.getValue().isBlank()
+                && !initialAppearancePreferences.getPathToTheme().equals(customPathToThemeProperty.getValue())) {
+            restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
+                    + customPathToThemeProperty().getValue());
             newPathToTheme = customPathToThemeProperty.getValue();
         }
 
@@ -117,10 +133,25 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         return fontSizeValidator.getValidationStatus();
     }
 
+    public ValidationStatus customPathToThemeValidationStatus() {
+        return customPathToThemeValidator.getValidationStatus();
+    }
+
     @Override
     public boolean validateSettings() {
-        if (fontOverrideProperty.getValue() && !fontSizeValidator.getValidationStatus().isValid()) {
-            fontSizeValidator.getValidationStatus().getHighestMessage().ifPresent(message ->
+        CompositeValidator validator = new CompositeValidator();
+
+        if (fontOverrideProperty.getValue()) {
+            validator.addValidators(fontSizeValidator);
+        }
+
+        if (themeCustomProperty.getValue()) {
+            validator.addValidators(customPathToThemeValidator);
+        }
+
+        ValidationStatus validationStatus = validator.getValidationStatus();
+        if (!validationStatus.isValid()) {
+            validationStatus.getHighestMessage().ifPresent(message ->
                     dialogService.showErrorDialogAndWait(message.getMessage()));
             return false;
         }
@@ -162,13 +193,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 .withDefaultExtension(StandardFileType.CSS)
                 .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-            customPathToThemeProperty.setValue(file.toAbsolutePath().toString());
-            restartWarnings.add(Localization.lang("You must restart JabRef for this to come into effect."));
-        });
-    }
-
-    public void openExportThemeDialog() {
-        new ExportThemeDialog(dialogService, preferences).showAndWait();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
+                customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));
     }
 }

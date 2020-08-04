@@ -48,10 +48,4 @@
             </tooltip>
         </Button>
     </HBox>
-
-    <Button maxWidth="Infinity" onAction="#exportTheme" text="%Export theme">
-        <tooltip>
-            <Tooltip text="%Export theme as CSS" />
-        </tooltip>
-    </Button>
 </fx:root>
