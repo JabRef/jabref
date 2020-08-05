@@ -717,6 +717,16 @@ if (OperatingSystem.current().isLinux()) {
     }
 }
 
+if (OperatingSystem.current().isMacOsX()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/mac") {
+                include "native-messaging-host/**", "jabrefHost.py"
+            }
+            into "$buildDir/distribution/JabRef.app/Contents/Resources"
+        }
+    }
+}
 jmh {
     warmupIterations = 5
     iterations = 10
