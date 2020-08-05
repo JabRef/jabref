@@ -59,7 +59,7 @@ public final class BuildInfo {
 
     private static String getValue(Properties properties, String key, String defaultValue) {
         String result = Optional.ofNullable(properties.getProperty(key))
-                                // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gralde
+                                // workaround unprocessed build.properties file --> just remove the reference to some variable used in build.gradle
                                 .map(value -> value.replaceAll("\\$\\{.*\\}", ""))
                                 .orElse("");
         if (!result.equals("")) {
