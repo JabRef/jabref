@@ -62,7 +62,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
-
     public MainTable(MainTableDataModel model, JabRefFrame frame,
                      BasePanel panel, BibDatabaseContext database,
                      MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
@@ -222,13 +221,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         clearAndSelectLast();
                         event.consume();
                         break;
-                    case PASTE: {
-                        if (!OS.OS_X) { //ugly hack, prevents duplicate entries on pasting. Side effect: Prevents pasting using cmd+v on an empty library
+                    case PASTE:
+                        if (!OS.OS_X) { // ugly hack, prevents duplicate entries on pasting. Side effect: Prevents pasting using cmd+v on an empty library
                             paste();
                             event.consume();
                             break;
                         }
-                    }
                     case COPY:
                         copy();
                         event.consume();
