@@ -31,7 +31,6 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1072,52 +1071,6 @@ public class BracketedPattern {
         return parts;
     }
 
-    private static String normalize(String content) {
-        List<String> tokens = new ArrayList<>();
-        int b = 0;
-        StringBuilder and = new StringBuilder();
-        StringBuilder token = new StringBuilder();
-        for (int p = 0; p < content.length(); p++) {
-            if (b == 0) {
-                String andString = and.toString(); // Avoid lots of calls
-                if (((andString.isEmpty()) && (content.charAt(p) == ' '))
-                        || (" ".equals(andString) && (content.charAt(p) == 'a'))
-                        || (" a".equals(andString) && (content.charAt(p) == 'n'))
-                        || (" an".equals(andString) && (content.charAt(p) == 'd'))) {
-                    and.append(content.charAt(p));
-                } else if (" and".equals(and.toString()) && (content.charAt(p) == ' ')) {
-                    and = new StringBuilder();
-                    tokens.add(token.toString().trim());
-                    token = new StringBuilder();
-                } else {
-                    if (content.charAt(p) == '{') {
-                        b++;
-                    }
-                    if (content.charAt(p) == '}') {
-                        b--;
-                    }
-                    token.append(and);
-                    and = new StringBuilder();
-                    token.append(content.charAt(p));
-                }
-            } else {
-                token.append(content.charAt(p));
-            }
-        }
-        tokens.add(token.toString());
-        StringBuilder normalized = new StringBuilder();
-
-        for (int i = 0; i < tokens.size(); i++) {
-            if (i > 0) {
-                normalized.append(" and ");
-            }
-
-            normalized.append(isInstitution(tokens.get(i)) ? generateInstitutionKey(tokens.get(i)) : removeDiacritics(
-                    tokens.get(i)));
-        }
-        return normalized.toString();
-    }
-
     /**
      * Will remove diacritics from the content.
      *
@@ -1159,27 +1112,6 @@ public class BracketedPattern {
                 "{\\\"$1}").replaceAll(
                 "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
                 "{$1$2}");
-    }
-
-    /**
-     * Check if a value is institution.
-     *
-     * This is usable for distinguishing between persons and institutions in
-     * the author or editor fields.
-     *
-     * A person:
-     *   - "John Doe"
-     *   - "Doe, John"
-     *
-     * An institution:
-     *   - "{The Big Company or Institution Inc.}"
-     *   - "{The Big Company or Institution Inc. (BCI)}"
-     *
-     * @param author Author or editor.
-     * @return True if the author or editor is an institution.
-     */
-    private static boolean isInstitution(String author) {
-        return StringUtil.isInCurlyBrackets(author);
     }
 
     /**
