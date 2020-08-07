@@ -612,7 +612,7 @@ public class BibEntry implements Cloneable {
         if (StandardEntryType.Misc.equals(type.getValue())) {
             clone.changed = true;
         }
-
+        clone.parsedSerialization = new String(parsedSerialization);
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
