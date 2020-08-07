@@ -267,4 +267,12 @@ class BracketedPatternTest {
         assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
     }
+
+    @Test
+    void expandBracketsWithAuthorStartingWithBrackets() {
+        // Issue https://github.com/JabRef/jabref/issues/3920
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Patrik {\\v{S}}pan{\\v{e}}l and Kseniya Dryahina and David Smith");
+        assertEquals("ŠpanělEtAl", BracketedPattern.expandBrackets("[authEtAl:latex_to_unicode]", null, bibEntry, null));
+    }
 }
