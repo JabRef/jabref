@@ -355,7 +355,8 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's type.
+     * Sets this entry's type and sets the changed flag to true <br>
+     * If the new entry type equals the old entry type no changed flag is set.
      */
     public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
         Objects.requireNonNull(newType);
@@ -603,10 +604,15 @@ public class BibEntry implements Cloneable {
     /**
      * Returns a clone of this entry. Useful for copying.
      * This will set a new ID for the cloned entry to be able to distinguish both copies.
+     * Ensures that the changed flag is set when the entry type equals the default entry type Misc
      */
     @Override
     public Object clone() {
         BibEntry clone = new BibEntry(type.getValue());
+        if (StandardEntryType.Misc.equals(type.getValue())) {
+            clone.changed = true;
+        }
+
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }

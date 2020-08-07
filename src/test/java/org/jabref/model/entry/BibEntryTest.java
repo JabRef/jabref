@@ -98,6 +98,13 @@ class BibEntryTest {
     }
 
     @Test
+    void clonedBibEntryWithMiscTypeHasChangedFlagSet() throws Exception {
+        BibEntry entryClone = (BibEntry) entry.clone();
+        assertTrue(entryClone.hasChanged());
+
+    }
+
+    @Test
     void setAndGetAreConsistentForMonth() throws Exception {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of("may"), entry.getField(StandardField.MONTH));
