@@ -24,18 +24,22 @@ import static org.mockito.Mockito.mock;
 
 class CitationKeyGeneratorTest {
 
+    private static final BibEntry AUTHOR_EMPTY = createABibEntryAuthor("");
+
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = "Isaac Newton";
-    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = "Isaac Newton and James Maxwell";
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor("Isaac Newton");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2 = createABibEntryAuthor("Isaac Newton and James Maxwell");
     private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = "Isaac Newton and James Maxwell and Albert Einstein";
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor("Isaac Newton and James Maxwell and Albert Einstein");
 
-    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1 = "Wil van der Aalst";
-    private static final String AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2 = "Wil van der Aalst and Tammo van Lessen";
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1 = createABibEntryAuthor("Wil van der Aalst");
+    private static final BibEntry AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2 = createABibEntryAuthor("Wil van der Aalst and Tammo van Lessen");
 
-    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1 = "I. Newton";
-    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2 = "I. Newton and J. Maxwell";
-    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3 = "I. Newton and J. Maxwell and A. Einstein";
-    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr";
-    private static final String AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5 = "I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown";
+    private static final BibEntry AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1 = createABibEntryAuthor("I. Newton");
+    private static final BibEntry AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2 = createABibEntryAuthor("I. Newton and J. Maxwell");
+    private static final BibEntry AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3 = createABibEntryAuthor("I. Newton and J. Maxwell and A. Einstein");
+    private static final BibEntry AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4 = createABibEntryAuthor("I. Newton and J. Maxwell and A. Einstein and N. Bohr");
+    private static final BibEntry AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5 = createABibEntryAuthor("I. Newton and J. Maxwell and A. Einstein and N. Bohr and Harry Unknown");
 
     private static final String TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH = "application migration effort in the cloud - the case of cloud platforms";
     private static final String TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON = "{BPEL} conformance in open source engines: the case of static analysis";
@@ -46,12 +50,32 @@ class CitationKeyGeneratorTest {
     private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD = "Towards Choreography-based Process Distribution in the Cloud";
     private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
 
+    private static final String AUTHSHORT = "[authshort]";
+    private static final String AUTHNOFMTH = "[auth%d_%d]";
+    private static final String AUTHFOREINI = "[authForeIni]";
+    private static final String AUTHFIRSTFULL = "[authFirstFull]";
+    private static final String AUTHORS = "[authors]";
+    private static final String AUTHORSALPHA = "[authorsAlpha]";
+    private static final String AUTHORLAST = "[authorLast]";
+    private static final String AUTHORLASTFOREINI = "[authorLastForeIni]";
+    private static final String AUTHORINI = "[authorIni]";
+    private static final String AUTHORN = "[authors%d]";
+    private static final String AUTHETAL = "[authEtAl]";
+    private static final String AUTH_ETAL = "[auth.etal]";
+    private static final String AUTHAUTHEA = "[auth.auth.ea]";
+
     private static ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    }
+
+    private static BibEntry createABibEntryAuthor(String author) {
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, author);
+        return bibEntry;
     }
 
     static String generateKey(BibEntry entry, String pattern) {
@@ -333,18 +357,13 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testFirstAuthor() {
-        assertEquals("Newton", CitationKeyGenerator.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
-        assertEquals("Newton", CitationKeyGenerator.firstAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[auth]"));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[auth]"));
 
         // https://sourceforge.net/forum/message.php?msg_id=4498555
-        assertEquals("K{\\\"o}ning", CitationKeyGenerator.firstAuthor("K{\\\"o}ning"));
+        assertEquals("Koening", generateKey(createABibEntryAuthor("K{\\\"o}ning"), "[auth]"));
 
-        assertEquals("", CitationKeyGenerator.firstAuthor(""));
-    }
-
-    @Test
-    void testFirstAuthorNull() {
-        assertThrows(NullPointerException.class, () -> CitationKeyGenerator.firstAuthor(null));
+        assertEquals("", generateKey(createABibEntryAuthor(""), "[auth]"));
     }
 
     @Test
@@ -471,29 +490,23 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testAuthIniN() {
-        assertEquals("NMEB", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 4));
-        assertEquals("NMEB", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 4));
-        assertEquals("NeME", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 4));
-        assertEquals("NeMa", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 4));
-        assertEquals("Newt", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 4));
-        assertEquals("", "");
+        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "[authIni4]"));
+        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "[authIni4]"));
+        assertEquals("NeME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "[authIni4]"));
+        assertEquals("NeMa", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "[authIni4]"));
+        assertEquals("Newt", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni4]"));
+        assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni4]"));
 
-        assertEquals("N", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
-        assertEquals("", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 0));
-        assertEquals("", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, -1));
+        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni1]"));
+        assertEquals("", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni0]"));
 
-        assertEquals("Newton", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 6));
-        assertEquals("Newton", CitationKeyGenerator.authIniN(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 7));
-    }
-
-    @Test
-    void testAuthIniNNull() {
-        assertThrows(NullPointerException.class, () -> CitationKeyGenerator.authIniN(null, 3));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni6]"));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "[authIni7]"));
     }
 
     @Test
     void testAuthIniNEmptyReturnsEmpty() {
-        assertEquals("", CitationKeyGenerator.authIniN("", 1));
+        assertEquals("", generateKey(AUTHOR_EMPTY, "authIni1"));
     }
 
     /**
@@ -501,16 +514,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void authAuthEa() {
-        assertEquals("Newton", CitationKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
-        assertEquals("Newton.Maxwell",
-                CitationKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
-        assertEquals("Newton.Maxwell.ea",
-                CitationKeyGenerator.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHAUTHEA));
+        assertEquals("Newton.Maxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHAUTHEA));
+        assertEquals("Newton.Maxwell.ea", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHAUTHEA));
     }
 
     @Test
     void testAuthEaEmptyReturnsEmpty() {
-        assertEquals("", CitationKeyGenerator.authAuthEa(""));
+        assertEquals("", generateKey(AUTHOR_EMPTY, AUTHAUTHEA));
     }
 
     /**
@@ -521,20 +532,12 @@ class CitationKeyGeneratorTest {
         // tests taken from the comments
 
         // [auth.etal]
-        String delim = ".";
-        String append = ".etal";
-        assertEquals("Newton.etal",
-                CitationKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
-        assertEquals("Newton.Maxwell",
-                CitationKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
+        assertEquals("Newton.etal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTH_ETAL));
+        assertEquals("Newton.Maxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTH_ETAL));
 
         // [authEtAl]
-        delim = "";
-        append = "EtAl";
-        assertEquals("NewtonEtAl",
-                CitationKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, delim, append));
-        assertEquals("NewtonMaxwell",
-                CitationKeyGenerator.authEtal(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, delim, append));
+        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3, AUTHETAL));
+        assertEquals("NewtonMaxwell", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHETAL));
     }
 
     /**
@@ -543,15 +546,15 @@ class CitationKeyGeneratorTest {
     @Test
     void testAuthShort() {
         // tests taken from the comments
-        assertEquals("NME+", CitationKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("NME", CitationKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("NM", CitationKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("Newton", CitationKeyGenerator.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHSHORT));
+        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHSHORT));
+        assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHSHORT));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHSHORT));
     }
 
     @Test
     void testAuthShortEmptyReturnsEmpty() {
-        assertEquals("", CitationKeyGenerator.authshort(""));
+        assertEquals("", generateKey(AUTHOR_EMPTY, AUTHSHORT));
     }
 
     /**
@@ -559,27 +562,16 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void authNM() {
-        assertEquals("N", CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1, 1));
-        assertEquals("Max",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3, 2));
-        assertEquals("New",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3, 1));
-        assertEquals("Bo",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 2, 4));
-        assertEquals("Bohr",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, 6, 4));
+        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, String.format(AUTHNOFMTH, 1, 1)));
+        assertEquals("Max", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, String.format(AUTHNOFMTH, 3, 2)));
+        assertEquals("New", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, String.format(AUTHNOFMTH, 3, 1)));
+        assertEquals("Bo", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, String.format(AUTHNOFMTH, 2, 4)));
+        assertEquals("Bohr", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, String.format(AUTHNOFMTH, 6, 4)));
 
-        assertEquals("Aal",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, 3, 1));
-        assertEquals("Less",
-                CitationKeyGenerator.authNofMth(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, 4, 2));
+        assertEquals("Aal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, String.format(AUTHNOFMTH, 3, 1)));
+        assertEquals("Less", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, String.format(AUTHNOFMTH, 4, 2)));
 
-        assertEquals("", CitationKeyGenerator.authNofMth("", 2, 4));
-    }
-
-    @Test
-    void authNMThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> CitationKeyGenerator.authNofMth(null, 2, 4));
+        assertEquals("", generateKey(AUTHOR_EMPTY, String.format(AUTHNOFMTH, 2, 4)));
     }
 
     /**
@@ -587,14 +579,10 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void firstAuthorForenameInitials() {
-        assertEquals("I", CitationKeyGenerator
-                .firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("I", CitationKeyGenerator
-                .firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("I",
-                CitationKeyGenerator.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
-        assertEquals("I",
-                CitationKeyGenerator.firstAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHFOREINI));
+        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHFOREINI));
+        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHFOREINI));
+        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHFOREINI));
     }
 
     /**
@@ -602,18 +590,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void firstAuthorVonAndLast() {
-        assertEquals("vanderAalst", CitationKeyGenerator
-                .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("vanderAalst", CitationKeyGenerator
-                .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+        assertEquals("vanderAalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHFIRSTFULL));
+        assertEquals("vanderAalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHFIRSTFULL));
     }
 
     @Test
     void firstAuthorVonAndLastNoVonInName() {
-        assertEquals("Newton",
-                CitationKeyGenerator.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
-        assertEquals("Newton",
-                CitationKeyGenerator.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1, AUTHFIRSTFULL));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2, AUTHFIRSTFULL));
     }
 
     /**
@@ -621,11 +605,9 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void testAllAuthors() {
-        assertEquals("Newton", CitationKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("NewtonMaxwell",
-                CitationKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("NewtonMaxwellEinstein",
-                CitationKeyGenerator.allAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORS));
+        assertEquals("NewtonMaxwell", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORS));
+        assertEquals("NewtonMaxwellEinstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORS));
     }
 
     /**
@@ -633,16 +615,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void authorsAlpha() {
-        assertEquals("New", CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("NM", CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("NME", CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("NMEB", CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("NME+", CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("New", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORSALPHA));
+        assertEquals("NM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORSALPHA));
+        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORSALPHA));
+        assertEquals("NMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORSALPHA));
+        assertEquals("NME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORSALPHA));
 
-        assertEquals("vdAal",
-                CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("vdAvL",
-                CitationKeyGenerator.authorsAlpha(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+        assertEquals("vdAal", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORSALPHA));
+        assertEquals("vdAvL", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORSALPHA));
     }
 
     /**
@@ -650,17 +630,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void lastAuthor() {
-        assertEquals("Newton", CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("Maxwell", CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("Einstein",
-                CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("Bohr", CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("Unknown", CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORLAST));
+        assertEquals("Maxwell", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORLAST));
+        assertEquals("Einstein", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORLAST));
+        assertEquals("Bohr", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORLAST));
+        assertEquals("Unknown", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORLAST));
 
-        assertEquals("Aalst",
-                CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("Lessen",
-                CitationKeyGenerator.lastAuthor(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+        assertEquals("Aalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORLAST));
+        assertEquals("Lessen", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORLAST));
     }
 
     /**
@@ -668,21 +645,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void lastAuthorForenameInitials() {
-        assertEquals("I",
-                CitationKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("J",
-                CitationKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("A",
-                CitationKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("N",
-                CitationKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("H",
-                CitationKeyGenerator.lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("I", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORLASTFOREINI));
+        assertEquals("J", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORLASTFOREINI));
+        assertEquals("A", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORLASTFOREINI));
+        assertEquals("N", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORLASTFOREINI));
+        assertEquals("H", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORLASTFOREINI));
 
-        assertEquals("W", CitationKeyGenerator
-                .lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("T", CitationKeyGenerator
-                .lastAuthorForenameInitials(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+        assertEquals("W", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORLASTFOREINI));
+        assertEquals("T", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORLASTFOREINI));
     }
 
     /**
@@ -690,21 +660,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void oneAuthorPlusIni() {
-        assertEquals("Newto",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
-        assertEquals("NewtoM",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
-        assertEquals("NewtoME",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
-        assertEquals("NewtoMEB",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4));
-        assertEquals("NewtoMEBU",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5));
+        assertEquals("Newto", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORINI));
+        assertEquals("NewtoM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORINI));
+        assertEquals("NewtoME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORINI));
+        assertEquals("NewtoMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORINI));
+        assertEquals("NewtoMEBU", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORINI));
 
-        assertEquals("Aalst",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
-        assertEquals("AalstL",
-                CitationKeyGenerator.oneAuthorPlusIni(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+        assertEquals("Aalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORINI));
+        assertEquals("AalstL", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORINI));
     }
 
     /**
@@ -712,18 +675,15 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void testNAuthors1() {
-        assertEquals("Newton", CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 1));
-        assertEquals("NewtonEtAl",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 1));
-        assertEquals("NewtonEtAl",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
-        assertEquals("NewtonEtAl",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
+        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, String.format(AUTHORN, 1)));
+        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, String.format(AUTHORN, 1)));
+        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, String.format(AUTHORN, 1)));
+        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, String.format(AUTHORN, 1)));
     }
 
     @Test
     void testNAuthors1EmptyReturnEmpty() {
-        assertEquals("", CitationKeyGenerator.nAuthors("", 1));
+        assertEquals("", generateKey(AUTHOR_EMPTY, String.format(AUTHORN, 1)));
     }
 
     /**
@@ -731,13 +691,14 @@ class CitationKeyGeneratorTest {
      */
     @Test
     void testNAuthors3() {
-        assertEquals("Newton", CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, 3));
+        assertEquals("Newton",
+                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, String.format(AUTHORN, 3)));
         assertEquals("NewtonMaxwell",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, 3));
+                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, String.format(AUTHORN, 3)));
         assertEquals("NewtonMaxwellEinstein",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 3));
+                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, String.format(AUTHORN, 3)));
         assertEquals("NewtonMaxwellEinsteinEtAl",
-                CitationKeyGenerator.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 3));
+                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, String.format(AUTHORN, 3)));
     }
 
     @Test

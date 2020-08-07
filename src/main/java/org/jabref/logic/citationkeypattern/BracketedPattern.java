@@ -643,7 +643,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
      */
-    protected static String firstAuthor(AuthorList authorList) {
+    private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
                          .flatMap(Author::getLast).orElse("");
@@ -655,7 +655,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
      */
-    public static String firstAuthorForenameInitials(AuthorList authorList) {
+    private static String firstAuthorForenameInitials(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
                          .flatMap(Author::getFirstAbbr)
@@ -669,7 +669,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
      */
-    public static String firstAuthorVonAndLast(AuthorList authorList) {
+    private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
                 authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
     }
@@ -680,7 +680,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
-    public static String lastAuthor(AuthorList authorList) {
+    private static String lastAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -693,7 +693,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
      */
-    public static String lastAuthorForenameInitials(AuthorList authorList) {
+    private static String lastAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -707,7 +707,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the sur name of all authors/editors
      */
-    public static String allAuthors(AuthorList authorList) {
+    private static String allAuthors(AuthorList authorList) {
         return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "");
     }
 
@@ -717,7 +717,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the initials of all authors' names
      */
-    public static String authorsAlpha(AuthorList authorList) {
+    private static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
         int maxAuthors = authorList.getNumberOfAuthors() > MAX_ALPHA_AUTHORS ? 3 : authorList.getNumberOfAuthors();
 
@@ -775,7 +775,7 @@ public class BracketedPattern {
      * @param n           the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
-    public static String nAuthors(AuthorList authorList, int n) {
+    private static String nAuthors(AuthorList authorList, int n) {
         return joinAuthorsOnLastName(authorList, n, "", "EtAl");
     }
 
@@ -787,7 +787,7 @@ public class BracketedPattern {
      * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    public static String oneAuthorPlusInitials(AuthorList authorList) {
+    private static String oneAuthorPlusInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -809,7 +809,7 @@ public class BracketedPattern {
      * Newton.Maxwell.ea
      * Newton.Maxwell
      */
-    public static String authAuthEa(AuthorList authorList) {
+    private static String authAuthEa(AuthorList authorList) {
         return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
     }
 
@@ -828,7 +828,7 @@ public class BracketedPattern {
      *
      * Note that [authEtAl] equals [authors2]
      */
-    public static String authEtal(AuthorList authorList, String delim,
+    private static String authEtal(AuthorList authorList, String delim,
                                   String append) {
         if (authorList.getNumberOfAuthors() <= 2) {
             return joinAuthorsOnLastName(authorList, 2, delim, "");
@@ -841,7 +841,7 @@ public class BracketedPattern {
      * The first N characters of the Mth author's or editor's last name.
      * M starts counting from 1
      */
-    public static String authNofMth(AuthorList authorList, int n, int m) {
+    private static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
         int mminusone = m - 1;
 
@@ -856,7 +856,7 @@ public class BracketedPattern {
     /**
      * First N chars of the first author's last name.
      */
-    public static String authN(AuthorList authorList, int num) {
+    private static String authN(AuthorList authorList, int num) {
         String fa = firstAuthor(authorList);
         fa = CitationKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
         if (num > fa.length()) {
@@ -889,7 +889,7 @@ public class BracketedPattern {
      *
      *   Newton
      */
-    public static String authshort(AuthorList authorList) {
+    private static String authshort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
         final int numberOfAuthors = authorList.getNumberOfAuthors();
 
@@ -934,7 +934,7 @@ public class BracketedPattern {
      *            The maximum number of characters this string will be long. A
      *            negative number or zero will lead to "" be returned.
      */
-    public static String authIniN(AuthorList authorList, int n) {
+    private static String authIniN(AuthorList authorList, int n) {
         if (n <= 0 || authorList.isEmpty()) {
             return "";
         }
