@@ -7,12 +7,18 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.maintable.MainTable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
  * Globals.focusListener, and we call the action stored under the relevant name in its action map.
  */
 public class EditAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     private final JabRefFrame frame;
     private final StandardActions action;
@@ -45,7 +51,7 @@ public class EditAction extends SimpleCommand {
                         textInput.cut();
                         break;
                     case PASTE:
-                        // handled by FX in TextInputControl#paste
+                        textInput.paste();
                         break;
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
@@ -54,7 +60,10 @@ public class EditAction extends SimpleCommand {
                     default:
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
-            } else {
+
+            } else if (focusOwner instanceof MainTable) {
+
+                LOGGER.debug("I am a Maintable in Edit action");
                 // Not sure what is selected -> copy/paste/cut selected entries
 
                 // ToDo: Should be handled by BibDatabaseContext instead of BasePanel
