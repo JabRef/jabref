@@ -43,7 +43,6 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
 
-
     public FromAuxDialog(JabRefFrame frame) {
         basePanel = frame.getCurrentBasePanel();
         this.setTitle(Localization.lang("AUX file import"));
