@@ -30,6 +30,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -457,6 +458,10 @@ public class BibEntry implements Cloneable {
 
     public Optional<DOI> getDOI() {
         return getField(StandardField.DOI).flatMap(DOI::parse);
+    }
+
+    public Optional<ISBN> getISBN() {
+        return getField(StandardField.ISBN).flatMap(ISBN::parse);
     }
 
     /**

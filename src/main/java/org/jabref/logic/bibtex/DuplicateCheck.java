@@ -303,6 +303,15 @@ public class DuplicateCheck {
             return true;
         }
 
+        // check DOI
+        if (one.getDOI().isPresent() && two.getDOI().isPresent() && one.getDOI().get().isCompareNotExact(two.getDOI().get())) {
+            return true;
+        }
+        // check ISBN
+        if (one.getISBN().isPresent() && two.getISBN().isPresent() && one.getISBN().get().equals(two.getISBN().get())) {
+            return true;
+        }
+
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
