@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a new fetcher to enable users to search all available E-Libraries simultaneously. [koppor#369](https://github.com/koppor/jabref/issues/369)
 - We added the field "entrytype" to the export sort criteria [#6531](https://github.com/JabRef/jabref/pull/6531)
 - We added the possibility to change the display order of the fields in the entry editor. The order can now be configured using drag and drop in the "Customize entry types" dialog [#6152](https://github.com/JabRef/jabref/pull/6152)
+- We added native support for biblatex-software [#6574](https://github.com/JabRef/jabref/issues/6574)
 
 ### Changed
 
