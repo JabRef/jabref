@@ -19,6 +19,7 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
 
 jobs:
   build:
@@ -63,6 +64,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: setup OSX Keychain
+        uses: apple-actions/import-codesign-certs@v1
+        with: 
+         p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
+         p12-password: ${{ secrets.OSX_CERT_PWD }}
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer

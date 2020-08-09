@@ -689,7 +689,10 @@ jlink {
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
-                    '--resource-dir', "${projectDir}/buildres/mac"
+                    '--resource-dir', "${projectDir}/buildres/mac",
+                    '--mac-sign',
+                    '--mac-package-signing-prefix', "org.jabref",
+                    '--mac-signing-key-user-name', "Tobias Diez (W2PU6LW5U5)"
             ]
         }
     }
