@@ -64,11 +64,12 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: setup OSX Keychain
+      - name: setup OSX Keychain on OSX only
         uses: apple-actions/import-codesign-certs@v1
         with: 
          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
          p12-password: ${{ secrets.OSX_CERT_PWD }}
+        if: matrix.os == 'macos-latest'
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
