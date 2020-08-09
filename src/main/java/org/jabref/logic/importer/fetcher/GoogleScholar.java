@@ -161,6 +161,56 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         }
     }
 
+    @Override
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        try {
+            obtainAndModifyCookie();
+            List<BibEntry> foundEntries = new ArrayList<>(10);
+
+            URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
+            uriBuilder.addParameter("hl", "en");
+            uriBuilder.addParameter("btnG", "Search");
+            uriBuilder.addParameter("q", constructComplexQueryString(complexSearchQuery));
+            complexSearchQuery.getFromYear().ifPresent(year -> uriBuilder.addParameter("as_ylo", year.toString()));
+            complexSearchQuery.getToYear().ifPresent(year -> uriBuilder.addParameter("as_yhi", year.toString()));
+            complexSearchQuery.getSingleYear().ifPresent(year -> {
+                uriBuilder.addParameter("as_ylo", year.toString());
+                uriBuilder.addParameter("as_yhi", year.toString());
+            });
+
+            addHitsFromQuery(foundEntries, uriBuilder.toString());
+
+            if (foundEntries.size() == 10) {
+                uriBuilder.addParameter("start", "10");
+                addHitsFromQuery(foundEntries, uriBuilder.toString());
+            }
+
+            return foundEntries;
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Error while fetching from " + getName(), e);
+        } catch (IOException e) {
+            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                throw new FetcherException("Fetching from Google Scholar failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                throw new FetcherException("Error while fetching from " + getName(), e);
+            }
+        }
+    }
+
+    private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
+        complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("author:" + author)));
+        complexSearchQuery.getTitlePhrases().ifPresent(phrases -> searchTerms.add("allintitle:" + String.join(" ", phrases)));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("source:" + journal));
+        // API automatically ANDs the terms
+        return String.join(" ", searchTerms);
+    }
+
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
         String content = new URLDownload(queryURL).asString();
 

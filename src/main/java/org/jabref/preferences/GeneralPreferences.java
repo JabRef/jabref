@@ -61,7 +61,7 @@ public class GeneralPreferences {
         return collectTelemetry;
     }
 
-    public boolean isShowAdvancedHints() {
+    public boolean shouldShowAdvancedHints() {
         return showAdvancedHints;
     }
 }

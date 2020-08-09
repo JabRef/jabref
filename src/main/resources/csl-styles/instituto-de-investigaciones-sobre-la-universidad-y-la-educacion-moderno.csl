@@ -377,7 +377,7 @@
           <group>
             <text macro="title" strip-periods="false" quotes="true" prefix=" "/>
             <choose>
-              <if variable="container-title" match="none"></if>
+              <if variable="container-title" match="none"/>
             </choose>
           </group>
           <group prefix=", " delimiter=", ">
@@ -390,7 +390,7 @@
             <text macro="locators"/>
           </group>
           <choose>
-            <if variable="container-title"></if>
+            <if variable="container-title"/>
           </choose>
           <group prefix=", " delimiter=", ">
             <text macro="editor"/>
