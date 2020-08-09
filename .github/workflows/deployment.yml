@@ -69,6 +69,7 @@ jobs:
         with:
          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
          p12-password: ${{ secrets.OSX_CERT_PWD }}
+         keychain-password: jabref
         if: matrix.os == 'macos-latest'
       - name: setup OSX Keychain on OSX only for app id cert
         uses: apple-actions/import-codesign-certs@v1
@@ -76,6 +77,7 @@ jobs:
          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
          p12-password: ${{ secrets.OSX_CERT_PWD }}
          create-keychain: false
+         keychain-password: jabref
         if: matrix.os == 'macos-latest'
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
