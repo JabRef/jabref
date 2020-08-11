@@ -235,9 +235,9 @@ public class DOI implements Identifier {
     }
 
     public boolean isCompareNotExact(DOI o2) {
-         String s1 = this.doi.replaceAll("[^\\w]", "");
-         String s2 = o2.doi.replaceAll("[^\\w]", "");
-         return s1.equalsIgnoreCase(s2);
+        String s1 = this.doi.replaceAll("[^\\w]", "");
+        String s2 = o2.doi.replaceAll("[^\\w]", "");
+        return s1.equalsIgnoreCase(s2);
     }
 
     /**

@@ -170,6 +170,7 @@ public class DuplicateCheckTest {
 
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
+
     @Test
     public void twoEntriesWithSameISBNButDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.ISBN, "0-123456-47-9");
