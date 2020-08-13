@@ -1550,14 +1550,6 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
-    public Optional<Integer> getFontSize() {
-        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
-            return Optional.of(getInt(MAIN_FONT_SIZE));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     @Override
     public String setLastPreferencesExportPath() {
         return get(PREFS_EXPORT_PATH);

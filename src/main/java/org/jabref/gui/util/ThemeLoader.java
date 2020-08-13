@@ -1,6 +1,5 @@
 package org.jabref.gui.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,7 +14,8 @@ import javafx.scene.Scene;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.AppearancePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,32 +43,20 @@ public class ThemeLoader {
     private final Optional<URL> additionalCssToLoad;
     private final FileUpdateMonitor fileUpdateMonitor;
 
-    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, JabRefPreferences jabRefPreferences) {
+    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
 
-        String cssVmArgument = System.getProperty("jabref.theme.css");
-        String cssPreferences = jabRefPreferences.get(JabRefPreferences.FX_THEME);
+        String theme = preferences.getTheme();
 
-        if (StringUtil.isNotBlank(cssVmArgument)) {
-            // First priority: VM argument
-            LOGGER.info("Using css from VM option: {}", cssVmArgument);
-            URL cssVmUrl = null;
-            try {
-                cssVmUrl = Path.of(cssVmArgument).toUri().toURL();
-            } catch (MalformedURLException e) {
-                LOGGER.warn("Cannot load css " + cssVmArgument, e);
-            }
-            additionalCssToLoad = Optional.ofNullable(cssVmUrl);
-        } else if (StringUtil.isNotBlank(cssPreferences) && !MAIN_CSS.equalsIgnoreCase(cssPreferences)) {
-            // Otherwise load css from preference
+        if (StringUtil.isNotBlank(theme) && !MAIN_CSS.equalsIgnoreCase(theme)) {
             Optional<URL> cssResource = Optional.empty();
-            if (DARK_CSS.equals(cssPreferences)) {
-                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(cssPreferences));
+            if (DARK_CSS.equals(theme)) {
+                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(theme));
             } else {
                 try {
-                    cssResource = Optional.of(new File(cssPreferences).toURI().toURL());
+                    cssResource = Optional.of(Path.of(theme).toUri().toURL());
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("Cannot load css {}", cssPreferences);
+                    LOGGER.warn("Cannot load css {}", theme);
                 }
             }
 
@@ -77,7 +65,7 @@ public class ThemeLoader {
                 additionalCssToLoad = cssResource;
             } else {
                 additionalCssToLoad = Optional.empty();
-                LOGGER.warn("Cannot load css {}", cssPreferences);
+                LOGGER.warn("Cannot load css {}", theme);
             }
         } else {
             additionalCssToLoad = Optional.empty();
@@ -88,11 +76,15 @@ public class ThemeLoader {
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
      */
-    public void installCss(Scene scene, JabRefPreferences preferences) {
+    public void installCss(Scene scene, PreferencesService preferences) {
+        AppearancePreferences appearancePreferences = preferences.getAppearancePreferences();
+
         addAndWatchForChanges(scene, JabRefFrame.class.getResource(MAIN_CSS), 0);
         additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, 1));
 
-        preferences.getFontSize().ifPresent(size -> scene.getRoot().setStyle("-fx-font-size: " + size + "pt;"));
+        if (appearancePreferences.shouldOverrideDefaultFontSize()) {
+            scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
+        }
     }
 
     private void addAndWatchForChanges(Scene scene, URL cssFile, int index) {
