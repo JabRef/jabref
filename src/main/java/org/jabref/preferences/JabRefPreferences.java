@@ -55,7 +55,7 @@ import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -703,7 +703,7 @@ public class JabRefPreferences implements PreferencesService {
                         + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+        defaults.put(JabRefPreferences.FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
@@ -2303,8 +2303,16 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
-    public String getTheme() {
-        return get(FX_THEME);
+    public Theme getTheme() {
+        String theme = get(FX_THEME);
+        if (theme.isBlank() || theme.equalsIgnoreCase(Theme.BASE_CSS)) {
+            return Theme.LIGHT;
+        } else if (theme.equalsIgnoreCase(Theme.DARK.getPath().getFileName().toString())) {
+            return Theme.DARK;
+        } else {
+            Theme.setCustomPath(Path.of(theme));
+            return Theme.CUSTOM;
+        }
     }
 
     @Override
@@ -2312,14 +2320,14 @@ public class JabRefPreferences implements PreferencesService {
         return new AppearancePreferences(
                 getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
                 getInt(MAIN_FONT_SIZE),
-                get(FX_THEME));
+                getTheme());
     }
 
     @Override
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getPathToTheme());
+        put(FX_THEME, preferences.getTheme().getPath().toString());
     }
 
     //*************************************************************************************************************

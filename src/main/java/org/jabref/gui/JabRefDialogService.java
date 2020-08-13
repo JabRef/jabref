@@ -38,7 +38,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -69,21 +69,19 @@ public class JabRefDialogService implements DialogService {
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
     private static JabRefPreferences preferences;
-    private static ThemeLoader themeLoader;
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane, JabRefPreferences preferences, ThemeLoader themeLoader) {
+    public JabRefDialogService(Window mainWindow, Pane mainPane, JabRefPreferences preferences) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
         JabRefDialogService.preferences = preferences;
-        JabRefDialogService.themeLoader = themeLoader;
     }
 
     private static FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
-        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
+        Theme.installCss(alert.getDialogPane().getScene(), preferences);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -116,7 +114,7 @@ public class JabRefDialogService implements DialogService {
 
         // Reset the dialog graphic using the default style
         alert.getDialogPane().setGraphic(graphic);
-        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
+        Theme.installCss(alert.getDialogPane().getScene(), preferences);
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
@@ -139,7 +137,7 @@ public class JabRefDialogService implements DialogService {
         choiceDialog.setHeaderText(title);
         choiceDialog.setTitle(title);
         choiceDialog.setContentText(content);
-        themeLoader.installCss(choiceDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(choiceDialog.getDialogPane().getScene(), preferences);
         return choiceDialog.showAndWait();
     }
 
@@ -148,7 +146,7 @@ public class JabRefDialogService implements DialogService {
         TextInputDialog inputDialog = new TextInputDialog();
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
-        themeLoader.installCss(inputDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(inputDialog.getDialogPane().getScene(), preferences);
         return inputDialog.showAndWait();
     }
 
@@ -157,7 +155,7 @@ public class JabRefDialogService implements DialogService {
         TextInputDialog inputDialog = new TextInputDialog(defaultValue);
         inputDialog.setHeaderText(title);
         inputDialog.setContentText(content);
-        themeLoader.installCss(inputDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(inputDialog.getDialogPane().getScene(), preferences);
         return inputDialog.showAndWait();
     }
 
@@ -184,7 +182,7 @@ public class JabRefDialogService implements DialogService {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.getDialogPane().setMaxWidth(mainWindow.getWidth() / 2);
         exceptionDialog.setHeaderText(message);
-        themeLoader.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
         exceptionDialog.showAndWait();
     }
 
@@ -193,7 +191,7 @@ public class JabRefDialogService implements DialogService {
         ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
         exceptionDialog.setHeaderText(title);
         exceptionDialog.setContentText(content);
-        themeLoader.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(exceptionDialog.getDialogPane().getScene(), preferences);
         exceptionDialog.showAndWait();
     }
 
@@ -262,7 +260,7 @@ public class JabRefDialogService implements DialogService {
         alert.getButtonTypes().setAll(buttonTypes);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
-        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
+        Theme.installCss(alert.getDialogPane().getScene(), preferences);
         return alert.showAndWait();
     }
 
@@ -287,7 +285,7 @@ public class JabRefDialogService implements DialogService {
             task.cancel();
             progressDialog.close();
         });
-        themeLoader.installCss(progressDialog.getDialogPane().getScene(), preferences);
+        Theme.installCss(progressDialog.getDialogPane().getScene(), preferences);
         progressDialog.show();
     }
 
@@ -310,7 +308,7 @@ public class JabRefDialogService implements DialogService {
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.CANCEL);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.setResizable(true);
-        themeLoader.installCss(alert.getDialogPane().getScene(), preferences);
+        Theme.installCss(alert.getDialogPane().getScene(), preferences);
 
         stateManager.getAnyTaskRunning().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
@@ -319,7 +317,7 @@ public class JabRefDialogService implements DialogService {
             }
         });
 
-        Dialog<ButtonType> dialog = () -> alert.showAndWait();
+        Dialog<ButtonType> dialog = alert::showAndWait;
 
         return showCustomDialogAndWait(dialog);
     }

@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
@@ -78,20 +79,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
-        String currentTheme = initialAppearancePreferences.getPathToTheme();
-        if (ThemeLoader.DARK_CSS.equals(currentTheme)) {
-            themeLightProperty.setValue(false);
-            themeDarkProperty.setValue(true);
-            themeCustomProperty.setValue(false);
-        } else if (ThemeLoader.MAIN_CSS.equals(currentTheme) || currentTheme.isBlank()) {
+        Theme currentTheme = initialAppearancePreferences.getTheme();
+        if (currentTheme == Theme.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
+            themeCustomProperty.setValue(false);
+        } else if (currentTheme == Theme.DARK) {
+            themeLightProperty.setValue(false);
+            themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);
         } else {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(initialAppearancePreferences.getPathToTheme());
+            customPathToThemeProperty.setValue(currentTheme.getPath().toString());
         }
     }
 
@@ -106,27 +107,27 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Override font size"));
         }
 
-        String newPathToTheme = initialAppearancePreferences.getPathToTheme();
-        if (themeLightProperty.getValue()
-                && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.MAIN_CSS)) {
+        Theme newTheme = initialAppearancePreferences.getTheme();
+        if (themeLightProperty.getValue() && initialAppearancePreferences.getTheme() != Theme.LIGHT) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
-            newPathToTheme = ThemeLoader.MAIN_CSS;
-        } else if (themeDarkProperty.getValue()
-                && !initialAppearancePreferences.getPathToTheme().equals(ThemeLoader.DARK_CSS)) {
+            newTheme = Theme.LIGHT;
+        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getTheme() != Theme.DARK) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
-            newPathToTheme = ThemeLoader.DARK_CSS;
-        } else if (themeCustomProperty.getValue()
-                && !customPathToThemeProperty.getValue().isBlank()
-                && !initialAppearancePreferences.getPathToTheme().equals(customPathToThemeProperty.getValue())) {
+            newTheme = Theme.DARK;
+        } else if (themeCustomProperty.getValue() &&
+                (!initialAppearancePreferences.getTheme().getPath().toString()
+                                              .equalsIgnoreCase(customPathToThemeProperty.getValue())
+                        || initialAppearancePreferences.getTheme() != Theme.CUSTOM)) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
                     + customPathToThemeProperty().getValue());
-            newPathToTheme = customPathToThemeProperty.getValue();
+            newTheme = Theme.CUSTOM;
+            Theme.setCustomPath(Path.of(customPathToThemeProperty.getValue()));
         }
 
         preferences.storeAppearancePreference(new AppearancePreferences(
                 fontOverrideProperty.getValue(),
                 newFontSize,
-                newPathToTheme));
+                newTheme));
     }
 
     public ValidationStatus fontSizeValidationStatus() {

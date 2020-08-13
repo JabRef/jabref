@@ -12,7 +12,6 @@ import java.util.Optional;
 import javafx.scene.Scene;
 
 import org.jabref.gui.JabRefFrame;
-import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -22,64 +21,68 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Installs the style file and provides live reloading.
- * <p>
- * The live reloading has to be turned on by setting the <code>-Djabref.theme.css</code> property.
- * There two possible modes:
- * (1) When only <code>-Djabref.theme.css</code> is specified, then the standard <code>Base.css</code> that is found will be watched
- * and on changes in that file, the style-sheet will be reloaded and changes are immediately visible.
- * (2) When a path to a css file is passed to <code>-Djabref.theme.css</code>, then the given style is loaded in addition to the base css file.
- * Changes in the specified css file lead to an immediate redraw of the interface.
- * <p>
- * When working from an IDE, this usually means that the <code>Base.css</code> is located in the build folder.
- * To use the css-file that is located in the sources directly, the full path can be given as value for the "VM option":
- * <code>-Djabref.theme.css="/path/to/src/Base.css"</code>
+ * JabRef provides two inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme is basically
+ * the base.css theme. Every other theme is loaded as an addition to base.css.
  */
-public class ThemeLoader {
+public enum Theme {
+    LIGHT("Light", ""),
+    DARK("Dark", "Dark.css"),
+    CUSTOM("Custom", "");
 
-    public static final String MAIN_CSS = "Base.css";
-    public static final String DARK_CSS = "Dark.css";
+    public static final String BASE_CSS = "Base.css";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeLoader.class);
-    private final Optional<URL> additionalCssToLoad;
-    private final FileUpdateMonitor fileUpdateMonitor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 
-    public ThemeLoader(FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences) {
-        this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+    private static Optional<URL> additionalCssToLoad = Optional.empty(); // default: Light theme
+    private static FileUpdateMonitor fileUpdateMonitor;
 
-        String theme = preferences.getTheme();
+    private String name;
+    private Path additionalCssPath;
 
-        if (StringUtil.isNotBlank(theme) && !MAIN_CSS.equalsIgnoreCase(theme)) {
+    Theme(String name, String path) {
+        this.name = name;
+        this.additionalCssPath = Path.of(path);
+    }
+
+    public static void initialize(FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences) {
+        Theme.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+
+        Theme theme = preferences.getTheme();
+
+        if (theme != LIGHT) {
             Optional<URL> cssResource = Optional.empty();
-            if (DARK_CSS.equals(theme)) {
-                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(theme));
-            } else {
+            if (theme == DARK) {
+                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(theme.getPath().toString()));
+            } else if (theme == Theme.CUSTOM) {
                 try {
-                    cssResource = Optional.of(Path.of(theme).toUri().toURL());
+                    cssResource = Optional.of(theme.getPath().toUri().toURL());
                 } catch (MalformedURLException e) {
-                    LOGGER.warn("Cannot load css {}", theme);
+                    // do nothing
                 }
             }
 
             if (cssResource.isPresent()) {
-                LOGGER.debug("Using css {}", cssResource);
                 additionalCssToLoad = cssResource;
+                LOGGER.debug("Using css {}", cssResource);
             } else {
                 additionalCssToLoad = Optional.empty();
                 LOGGER.warn("Cannot load css {}", theme);
             }
-        } else {
-            additionalCssToLoad = Optional.empty();
         }
+    }
+
+    public static void setCustomPath(Path path) {
+        CUSTOM.additionalCssPath = path;
     }
 
     /**
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
      */
-    public void installCss(Scene scene, PreferencesService preferences) {
+    public static void installCss(Scene scene, PreferencesService preferences) {
         AppearancePreferences appearancePreferences = preferences.getAppearancePreferences();
 
-        addAndWatchForChanges(scene, JabRefFrame.class.getResource(MAIN_CSS), 0);
+        addAndWatchForChanges(scene, JabRefFrame.class.getResource(BASE_CSS), 0);
         additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, 1));
 
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
@@ -87,7 +90,7 @@ public class ThemeLoader {
         }
     }
 
-    private void addAndWatchForChanges(Scene scene, URL cssFile, int index) {
+    private static void addAndWatchForChanges(Scene scene, URL cssFile, int index) {
         scene.getStylesheets().add(index, cssFile.toExternalForm());
 
         try {
@@ -109,5 +112,13 @@ public class ThemeLoader {
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
             LOGGER.error("Could not watch css file for changes {}", cssFile, e);
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Path getPath() {
+        return additionalCssPath;
     }
 }

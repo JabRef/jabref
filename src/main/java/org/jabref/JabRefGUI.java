@@ -19,6 +19,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -48,6 +49,9 @@ public class JabRefGUI {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
         this.correctedWindowPos = false;
+
+        Theme.initialize(Globals.getFileUpdateMonitor(), Globals.prefs);
+
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
@@ -86,7 +90,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeLoader().installCss(scene, Globals.prefs);
+        Theme.installCss(scene, Globals.prefs);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);

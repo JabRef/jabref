@@ -8,7 +8,7 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -30,7 +30,8 @@ public class StyleTesterMain extends Application {
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
         Scene scene = new Scene(view.getContent());
-        new ThemeLoader(fileUpdateMonitor, JabRefPreferences.getInstance()).installCss(scene, JabRefPreferences.getInstance());
+        Theme.initialize(fileUpdateMonitor, JabRefPreferences.getInstance());
+        Theme.installCss(scene, JabRefPreferences.getInstance());
         stage.setScene(scene);
         stage.show();
     }
