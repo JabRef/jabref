@@ -252,7 +252,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
-    private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -358,6 +357,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
+    private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
