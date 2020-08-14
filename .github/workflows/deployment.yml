@@ -64,14 +64,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: setup OSX Keychain on OSX only
+      - name: Setup OSX Keychain on OSX only
         uses: apple-actions/import-codesign-certs@v1
         with:
          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
          p12-password: ${{ secrets.OSX_CERT_PWD }}
          keychain-password: jabref
         if: matrix.os == 'macos-latest'
-      - name: setup OSX Keychain on OSX only for app id cert
+      - name: Setup OSX Keychain on OSX only for app id cert
         uses: apple-actions/import-codesign-certs@v1
         with:
          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
