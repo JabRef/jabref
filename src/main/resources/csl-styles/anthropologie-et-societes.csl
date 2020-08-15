@@ -8,13 +8,12 @@
     <link href="http://www.anthropologie-societes.ant.ulaval.ca/regles-de-publication/normes-editoriales" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="biology"/>
     <issn>0702-8997</issn>
     <eissn>1703-7921</eissn>
-    <updated>2018-09-05T13:51:00+00:00</updated>
+    <updated>2020-07-31T08:06:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -115,14 +114,15 @@
   <macro name="year-date">
     <choose>
       <if variable="issued">
-        <group>
+        <group delimiter=" ">
           <date variable="issued">
             <date-part name="year"/>
           </date>
+          <date date-parts="year" form="text" variable="original-date" prefix="[" suffix="]"/>
         </group>
       </if>
       <else>
-        <text term="no date" form="short" suffix=")"/>
+        <text term="no date" form="short"/>
       </else>
     </choose>
   </macro>
@@ -167,24 +167,24 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="99" et-al-use-first="98" hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;">
+  <bibliography hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>
       <key variable="title"/>
     </sort>
     <layout suffix=".">
-      <text macro="author" text-case="uppercase" strip-periods="false" font-variant="normal" suffix=", "/>
-      <date variable="issued" suffix=",">
-        <date-part name="year"/>
-      </date>
+      <text macro="author" text-case="uppercase" strip-periods="false" suffix=", "/>
+      <text macro="year-date"/>
       <choose>
         <if type="book" match="any">
           <text macro="legal_case"/>
-          <group delimiter=", " prefix=" ">
-            <text macro="title"/>
-            <text macro="edition"/>
-            <text macro="editor"/>
+          <group delimiter=". ">
+            <group delimiter=", " prefix=" ">
+              <text macro="title"/>
+              <text macro="edition"/>
+              <text macro="editor"/>
+            </group>
             <text macro="publisher"/>
           </group>
         </if>
