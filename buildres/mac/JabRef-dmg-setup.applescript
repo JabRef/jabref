@@ -15,7 +15,6 @@ tell application "Finder"
 	set arrangement of theViewOptions to not arranged
 	set icon size of theViewOptions to 128
 	
-	-- doesnt work
 	set background picture of theViewOptions to POSIX file "DEPLOY_BG_FILE"
 	
 	-- Create alias for install location
@@ -25,7 +24,7 @@ tell application "Finder"
 	repeat with theFile in allTheFiles
 		set theFilePath to POSIX path of theFile
 		if theFilePath is "DEPLOY_INSTALL_LOCATION" then
-			-- Position install locations
+			-- Position install location
 			set position of item theFile of theWindow to {430, 170}
 		else
 			-- Position application or runtime
