@@ -666,7 +666,6 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
             ]
             installerOptions = [
-                    '--type', 'dmg',
                     '--verbose',
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
