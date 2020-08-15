@@ -24,12 +24,12 @@ tell application "Finder"
 	set allTheFiles to the name of every item of theWindow
 	repeat with theFile in allTheFiles
 		set theFilePath to POSIX path of theFile
-		if theFilePath is "/Applications" then
+		if theFilePath is "DEPLOY_INSTALL_LOCATION" then
 			-- Position install location
 			set position of item theFile of theWindow to {400, 170}
 		else
 			-- Position application or runtime
-			set position of item theFile of theWindow to {120, 130}
+			set position of item theFile of theWindow to {120, 170}
 		end if
 	end repeat
 	

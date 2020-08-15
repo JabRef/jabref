@@ -3,7 +3,7 @@
 ## DMG Setup scpt
 
 Only modify the `JabRef-dmg-setup.applescript` in the OS X Script Editor. Afterwards copy over the file and rename it to `JabRef-dmg-setup.scpt`.
-Normally the `scpt` file is a binary compiled variant and the `.applescript` but jpackage does not like it in binary format.
+Normally the `scpt` file is a binary compiled variant and the `.applescript` the uncompiled format but jpackage expects the sctp in uncompiled format
 
 ## Generate iconsets
 
