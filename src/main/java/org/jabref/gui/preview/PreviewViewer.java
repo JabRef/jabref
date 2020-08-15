@@ -117,10 +117,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setTheme(Theme theme) {
-        if (theme == Theme.DARK) {
+        if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
             // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
-            URL url = JabRefFrame.class.getResource(Theme.DARK.getPath().getFileName().toString());
+            URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 

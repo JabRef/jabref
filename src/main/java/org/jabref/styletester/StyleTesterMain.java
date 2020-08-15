@@ -8,7 +8,6 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
-import org.jabref.gui.util.Theme;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -23,6 +22,7 @@ public class StyleTesterMain extends Application {
     @Override
     public void start(Stage stage) throws JabRefException {
         StyleTesterView view = new StyleTesterView();
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
 
         IconTheme.loadFonts();
 
@@ -30,8 +30,7 @@ public class StyleTesterMain extends Application {
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
         Scene scene = new Scene(view.getContent());
-        Theme.initialize(fileUpdateMonitor, JabRefPreferences.getInstance());
-        Theme.installCss(scene, JabRefPreferences.getInstance());
+        preferences.getTheme().installCss(scene, fileUpdateMonitor);
         stage.setScene(scene);
         stage.show();
     }

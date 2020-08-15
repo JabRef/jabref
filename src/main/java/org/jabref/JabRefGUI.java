@@ -50,8 +50,6 @@ public class JabRefGUI {
         this.isBlank = isBlank;
         this.correctedWindowPos = false;
 
-        Theme.initialize(Globals.getFileUpdateMonitor(), Globals.prefs);
-
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
@@ -90,7 +88,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Theme.installCss(scene, Globals.prefs);
+        Globals.prefs.getTheme().installCss(scene);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);

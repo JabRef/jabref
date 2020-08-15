@@ -235,6 +235,8 @@ public interface PreferencesService {
 
     Theme getTheme();
 
+    void updateTheme();
+
     AppearancePreferences getAppearancePreferences();
 
     void storeAppearancePreference(AppearancePreferences preferences);

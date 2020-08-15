@@ -5,13 +5,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.scene.Scene;
 
+import org.jabref.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
@@ -24,73 +26,84 @@ import org.slf4j.LoggerFactory;
  * JabRef provides two inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme is basically
  * the base.css theme. Every other theme is loaded as an addition to base.css.
  */
-public enum Theme {
-    LIGHT("Light", ""),
-    DARK("Dark", "Dark.css"),
-    CUSTOM("Custom", "");
+public class Theme {
+    public enum Type {
+        LIGHT, DARK, CUSTOM
+    }
 
     public static final String BASE_CSS = "Base.css";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 
-    private static Optional<URL> additionalCssToLoad = Optional.empty(); // default: Light theme
-    private static FileUpdateMonitor fileUpdateMonitor;
+    private final Type type;
+    private final Path pathToCss;
+    private final Optional<URL> additionalCssToLoad;
+    private final PreferencesService preferencesService;
 
-    private String name;
-    private Path additionalCssPath;
+    public Theme(String path, PreferencesService preferencesService) {
+        this.pathToCss = Path.of(path);
+        this.preferencesService = preferencesService;
 
-    Theme(String name, String path) {
-        this.name = name;
-        this.additionalCssPath = Path.of(path);
-    }
-
-    public static void initialize(FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences) {
-        Theme.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
-
-        Theme theme = preferences.getTheme();
-
-        if (theme != LIGHT) {
-            Optional<URL> cssResource = Optional.empty();
-            if (theme == DARK) {
-                cssResource = Optional.ofNullable(JabRefFrame.class.getResource(theme.getPath().toString()));
-            } else if (theme == Theme.CUSTOM) {
-                try {
-                    cssResource = Optional.of(theme.getPath().toUri().toURL());
-                } catch (MalformedURLException e) {
-                    // do nothing
+        if (StringUtil.isBlank(path) || BASE_CSS.equalsIgnoreCase(path)) {
+            // Light theme
+            this.type = Type.LIGHT;
+            this.additionalCssToLoad = Optional.empty();
+        } else {
+            Optional<URL> cssResource = Optional.ofNullable(JabRefFrame.class.getResource(path));
+            if (cssResource.isPresent()) {
+                // Embedded dark theme
+                this.type = Type.DARK;
+            } else {
+                // Custom theme
+                this.type = Type.CUSTOM;
+                if (Files.exists(pathToCss)) {
+                    try {
+                        cssResource = Optional.of(pathToCss.toUri().toURL());
+                    } catch (MalformedURLException e) {
+                        cssResource = Optional.empty();
+                    }
                 }
             }
 
             if (cssResource.isPresent()) {
                 additionalCssToLoad = cssResource;
-                LOGGER.debug("Using css {}", cssResource);
+                LOGGER.debug("Using css {}", path);
             } else {
                 additionalCssToLoad = Optional.empty();
-                LOGGER.warn("Cannot load css {}", theme);
+                LOGGER.warn("Cannot load css {}", path);
             }
         }
-    }
-
-    public static void setCustomPath(Path path) {
-        CUSTOM.additionalCssPath = path;
     }
 
     /**
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
      */
-    public static void installCss(Scene scene, PreferencesService preferences) {
-        AppearancePreferences appearancePreferences = preferences.getAppearancePreferences();
+    public void installCss(Scene scene, FileUpdateMonitor fileUpdateMonitor) {
+        AppearancePreferences appearancePreferences = preferencesService.getAppearancePreferences();
 
-        addAndWatchForChanges(scene, JabRefFrame.class.getResource(BASE_CSS), 0);
-        additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, 1));
+        addAndWatchForChanges(scene, JabRefFrame.class.getResource(BASE_CSS), fileUpdateMonitor, 0);
+        additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, fileUpdateMonitor, 1));
 
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
         }
     }
 
-    private static void addAndWatchForChanges(Scene scene, URL cssFile, int index) {
+    /**
+     * StyleTester does not create a Globals object, so we need to wrap this method so the style tester can provide
+     * its own fileUpdateMonitor, but the main codebase is not spammed.
+     *
+     * Deprecated, since the globals class is.
+     *
+     * @param scene the scene the css should be applied to.
+     */
+    @Deprecated
+    public void installCss(Scene scene) {
+        installCss(scene, Globals.getFileUpdateMonitor());
+    }
+
+    private void addAndWatchForChanges(Scene scene, URL cssFile, FileUpdateMonitor fileUpdateMonitor, int index) {
         scene.getStylesheets().add(index, cssFile.toExternalForm());
 
         try {
@@ -114,11 +127,11 @@ public enum Theme {
         }
     }
 
-    public String getName() {
-        return name;
+    public Type getType() {
+        return type;
     }
 
     public Path getPath() {
-        return additionalCssPath;
+        return pathToCss;
     }
 }

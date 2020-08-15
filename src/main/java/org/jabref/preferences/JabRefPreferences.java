@@ -414,6 +414,11 @@ public class JabRefPreferences implements PreferencesService {
      */
     private List<MainTableColumnModel> mainTableColumnSortOrder;
 
+    /**
+     * Cache variable for getTheme
+     */
+    private Theme globalTheme;
+
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
         try {
@@ -2304,15 +2309,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public Theme getTheme() {
-        String theme = get(FX_THEME);
-        if (theme.isBlank() || theme.equalsIgnoreCase(Theme.BASE_CSS)) {
-            return Theme.LIGHT;
-        } else if (theme.equalsIgnoreCase(Theme.DARK.getPath().getFileName().toString())) {
-            return Theme.DARK;
-        } else {
-            Theme.setCustomPath(Path.of(theme));
-            return Theme.CUSTOM;
+        if (globalTheme == null) {
+            updateTheme();
         }
+        return globalTheme;
+    }
+
+    @Override
+    public void updateTheme() {
+        this.globalTheme = new Theme(get(FX_THEME), this);
     }
 
     @Override
