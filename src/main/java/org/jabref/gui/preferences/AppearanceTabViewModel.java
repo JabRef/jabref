@@ -26,10 +26,10 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
-    private static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
-
     public static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
+
+    private static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();

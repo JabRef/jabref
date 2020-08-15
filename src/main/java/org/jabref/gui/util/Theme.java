@@ -94,7 +94,7 @@ public class Theme {
      * StyleTester does not create a Globals object, so we need to wrap this method so the style tester can provide
      * its own fileUpdateMonitor, but the main codebase is not spammed.
      *
-     * Deprecated, since the globals class is.
+     * @deprecated Remove as soon {@link org.jabref.Globals} refactored.
      *
      * @param scene the scene the css should be applied to.
      */
