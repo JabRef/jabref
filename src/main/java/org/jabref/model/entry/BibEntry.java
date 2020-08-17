@@ -72,12 +72,22 @@ public class BibEntry implements Cloneable {
     private final MultiKeyMap<StandardField, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>(StandardField.class);
 
     private final EventBus eventBus = new EventBus();
+
     private String id;
+
     private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(DEFAULT_TYPE);
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
-    private String parsedSerialization = "";
+
+    /**
+     * The part before the start of the entry
+     */
     private String commentsBeforeEntry = "";
+
+    /**
+     * Stores the text "rendering" of the entry as read by the BibTeX reader. Includes comments.
+     */
+    private String parsedSerialization = "";
 
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
@@ -604,16 +614,14 @@ public class BibEntry implements Cloneable {
     /**
      * Returns a clone of this entry. Useful for copying.
      * This will set a new ID for the cloned entry to be able to distinguish both copies.
-     * Ensures that the changed flag is set when the entry type equals the default entry type Misc
      */
     @Override
     public Object clone() {
         BibEntry clone = new BibEntry(type.getValue());
-        if (StandardEntryType.Misc.equals(type.getValue())) {
-            clone.changed = true;
-        }
-        clone.parsedSerialization = new String(parsedSerialization);
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
+        clone.commentsBeforeEntry = new String(commentsBeforeEntry);
+        clone.parsedSerialization = new String(parsedSerialization);
+        clone.changed = changed;
         return clone;
     }
 
