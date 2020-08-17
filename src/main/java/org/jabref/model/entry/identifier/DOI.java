@@ -234,6 +234,9 @@ public class DOI implements Identifier {
         return doi;
     }
 
+    /**
+     * Compare DOI not fully exact. For example  10.1109/cloud.2017.89 equals /cloud.2017.\_89
+     */
     public boolean isCompareNotExact(DOI o2) {
         String s1 = this.doi.replaceAll("[^\\w]", "");
         String s2 = o2.doi.replaceAll("[^\\w]", "");
