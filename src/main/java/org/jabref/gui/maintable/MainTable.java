@@ -39,6 +39,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -145,11 +146,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      */
 
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
-        if (keyEvent.getCharacter() == null || sortedColumn == null) {
+        if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
         }
 
-        if (System.currentTimeMillis() - lastKeyPressTime < 700) {
+        if ((System.currentTimeMillis() - lastKeyPressTime) < 700) {
             columnSearchTerm += keyEvent.getCharacter().toLowerCase();
         } else {
             columnSearchTerm = keyEvent.getCharacter().toLowerCase();
@@ -223,9 +224,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        paste();
-                        event.consume();
-                        break;
+                        if (!OS.OS_X) { // ugly hack, prevents duplicate entries on pasting. Side effect: Prevents pasting using cmd+v on an empty library
+                            paste();
+                            event.consume();
+                            break;
+                        }
                     case COPY:
                         copy();
                         event.consume();
@@ -260,6 +263,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }
+
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

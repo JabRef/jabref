@@ -41,7 +41,7 @@ class CiteSeerTest {
                 .withField(StandardField.TITLE, "Coping Theory and Research: Past Present and Future")
                 .withField(StandardField.DOI, "10.1.1.115.9665")
                 .withField(StandardField.YEAR, "1993")
-                .withField(StandardField.JOURNALTITLE, "PSYCHOSOMATIC MEDICINE");
+                .withField(StandardField.JOURNAL, "PSYCHOSOMATIC MEDICINE");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("doi:10.1.1.115.9665");
         assertEquals(Collections.singletonList(expected), fetchedEntries);

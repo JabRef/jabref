@@ -13,6 +13,7 @@ jobs:
   publish:
     name: Refresh Citation Style Language Files
     runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
