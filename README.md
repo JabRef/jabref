@@ -1,11 +1,5 @@
 **Please read on at https://github.com/JabRef/jabref/blob/master/README.md#jabref-bibliography-management**
 
-```diff
-- Please open new issues at https://github.com/jabref/jabref/issues.
+This repository is used by @koppor to make his ideas transparent. He collects the issues here to avoid flooding the "official" issue tracker. - Refined issues will be migrated to the official issue tracker.
 
-+ We will move all opened issues from here to there.
-+ Thereby, we will review each issue if it is still valid.
-+ If no, we will just close it.
-+ If yes, we will refine it so that a contributor can work on it.
-```
-
+Additionally, the status of [JabRef in Debian](https://github.com/koppor/jabref/blob/main/jabref-in-debian.md) is tracked here.
