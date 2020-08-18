@@ -32,6 +32,8 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.maintable.columns.MainTableColumnFactory;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -86,7 +88,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 Globals.stateManager);
         localDragboard = Globals.stateManager.getLocalDragboard();
 
-        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
+        this.getColumns().addAll(new MainTableColumnFactory(database, Globals.prefs, externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
