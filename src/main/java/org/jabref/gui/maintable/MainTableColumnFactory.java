@@ -184,22 +184,19 @@ class MainTableColumnFactory {
             container.setMinWidth(10);
             container.setAlignment(Pos.CENTER_LEFT);
             container.setPadding(new Insets(0, 2, 0, 2));
-            Set<Color> colorSet = new HashSet<>();
-            for (Color groupColor : groupColors) {
-                if (!colorSet.contains(groupColor)) {
-                    Rectangle groupRectangle = new Rectangle();
-                    groupRectangle.getStyleClass().add("groupColumnBackground");
-                    groupRectangle.setWidth(3);
-                    groupRectangle.setHeight(18);
-                    groupRectangle.setFill(groupColor);
-                    groupRectangle.setStrokeWidth(1);
 
-                    container.getChildren().add(groupRectangle);
-                    colorSet.add(groupColor);
-                }
-            }
+            groupColors.stream().distinct().forEach(groupColor -> {
+                Rectangle groupRectangle = new Rectangle();
+                groupRectangle.getStyleClass().add("groupColumnBackground");
+                groupRectangle.setWidth(3);
+                groupRectangle.setHeight(18);
+                groupRectangle.setFill(groupColor);
+                groupRectangle.setStrokeWidth(1);
+                container.getChildren().add(groupRectangle);
+            });
 
             String matchedGroupsString = matchedGroups.stream()
+                                                      .distinct()
                                                       .map(AbstractGroup::getName)
                                                       .collect(Collectors.joining(", "));
             Tooltip tooltip = new Tooltip(Localization.lang("Entry is contained in the following groups:") + "\n" + matchedGroupsString);

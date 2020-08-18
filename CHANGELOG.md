@@ -97,6 +97,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with the creation of a group of cited entries. Now the file path to an aux file gets validated. [#6585](https://github.com/JabRef/jabref/issues/6585)
 - We fixed an issue on Linux systems where the application would crash upon inotify failure. Now, the user is prompted with a warning, and given the choice to continue the session. [#6073](https://github.com/JabRef/jabref/issues/6073)
 - We moved the search modifier buttons into the search bar, as they were not accessible, if autocompletion was disabled. [#6625](https://github.com/JabRef/jabref/issues/6625)
+- We fixed an issue about duplicated group color indicators [#6175](https://github.com/JabRef/jabref/issues/6175)
 
 ### Removed
 
@@ -153,7 +154,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the blue and red text colors in the Merge entries dialog were not quite visible [#6334](https://github.com/JabRef/jabref/issues/6334)
 - We fixed an issue where underscore character was removed from the file name in the Recent Libraries list in File menu [#6383](https://github.com/JabRef/jabref/issues/6383)
 - We fixed an issue where few keyboard shortcuts regarding new entries were missing [#6403](https://github.com/JabRef/jabref/issues/6403)
-- We fixed an issue where merge identical group colors and let UI only display identical color once [#6175](https://github.com/JabRef/jabref/issues/6175)
+
 ### Removed
 
 - Ampersands are no longer escaped by default in the `bib` file. If you want to keep the current behaviour, you can use the new "Escape Ampersands" formatter as a save action. [#5869](https://github.com/JabRef/jabref/issues/5869)
