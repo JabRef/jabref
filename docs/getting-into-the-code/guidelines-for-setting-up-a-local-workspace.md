@@ -175,17 +175,16 @@ Contributions to JabRef's source code need to have a code formatting that is con
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
-* Go to **File \| Settings \| Checkstyle \| Configuration File**
+* Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
   2. For the description provide "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Check "Store relative to project location"
-  5. Click "Next" and "Finish"
-  6. Activate the CheckStyle configuration file by ticking it in the list
-  7. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
-  8. Set the "Scan Scope" to "Only Java sources \(including tests\)
-  9. Save settings by clicking "OK"
-  10. Your configuration should now look like this:  
+  4. Click "Next" and "Finish"
+  5. Activate the CheckStyle configuration file by ticking it in the list
+  6. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
+  7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+  8. Save settings by clicking "OK"
+  9. Your configuration should now look like this:  
 
       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
 
