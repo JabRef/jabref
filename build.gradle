@@ -139,7 +139,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
 
-    implementation 'org.postgresql:postgresql:42.2.14'
+    implementation 'org.postgresql:postgresql:42.2.15'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -158,7 +158,7 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.0.1-SNAPSHOT'
+    implementation 'com.tobiasdiez:easybind:2.1.0'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
@@ -203,7 +203,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.14'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.4.6'
+    testImplementation 'org.mockito:mockito-core:3.5.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
