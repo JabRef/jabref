@@ -13,7 +13,7 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+          if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo ::set-output name=secretspresent::false
           else
             echo ::set-output name=secretspresent::true
