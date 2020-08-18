@@ -38,7 +38,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final EntryEditorPreferences initialEntryEditorPreferences;
     private final AutoCompletePreferences initialAutoCompletePreferences;
 
-    private List<String> restartWarnings = new ArrayList<>();
+    private final List<String> restartWarnings = new ArrayList<>();
 
     public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
@@ -112,11 +112,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
         if (initialAutoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
             if (enableAutoCompleteProperty.getValue()) {
-                restartWarnings.add(Localization.lang("Auto complete enable."));
+                restartWarnings.add(Localization.lang("Auto complete enabled."));
             } else {
-                restartWarnings.add(Localization.lang("Auto complete disable."));
+                restartWarnings.add(Localization.lang("Auto complete disabled."));
             }
         }
+
         preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
                 enableAutoCompleteProperty.getValue(),
                 firstNameMode,
