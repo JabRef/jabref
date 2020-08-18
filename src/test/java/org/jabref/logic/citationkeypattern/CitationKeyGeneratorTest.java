@@ -1094,4 +1094,20 @@ class CitationKeyGeneratorTest {
 
         assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
+
+    @Test
+    void generateKeyCorrectKeyLengthWithTruncateModifierAndUnicode() {
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Gödel, Kurt");
+
+        assertEquals(2, generateKey(bibEntry, "[auth:truncate2").length());
+    }
+
+    @Test
+    void generateKeyCorrectKeyLengthWithAuthNofMthAndUnicode() {
+        BibEntry bibEntry = new BibEntry();
+        bibEntry.setField(StandardField.AUTHOR, "Gödel, Kurt");
+
+        assertEquals(4, generateKey(bibEntry, "[auth4_1]").length());
+    }
 }
