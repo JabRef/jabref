@@ -2,6 +2,8 @@ package org.jabref.gui.auximport;
 
 import java.nio.file.Path;
 
+import javax.inject.Inject;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -9,12 +11,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -24,7 +23,7 @@ import org.jabref.model.auxparser.AuxParser;
 import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -33,20 +32,19 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class FromAuxDialog extends BaseDialog<Void> {
 
-    private final DialogService dialogService;
     private final BasePanel basePanel;
     @FXML private ButtonType generateButtonType;
     private final Button generateButton;
     @FXML private TextField auxFileField;
     @FXML private ListView<String> notFoundList;
-
-    private AuxParserResult auxParserResult;
     @FXML private TextArea statusInfos;
+    private AuxParserResult auxParserResult;
+
+    @Inject private PreferencesService preferences;
+    @Inject private DialogService dialogService;
 
     public FromAuxDialog(JabRefFrame frame) {
         basePanel = frame.getCurrentBasePanel();
-        dialogService = frame.getDialogService();
-
         this.setTitle(Localization.lang("AUX file import"));
 
         ViewLoader.view(this)
@@ -58,8 +56,8 @@ public class FromAuxDialog extends BaseDialog<Void> {
         generateButton.defaultButtonProperty().bind(generateButton.disableProperty().not());
         setResultConverter(button -> {
             if (button == generateButtonType) {
-                BasePanel bp = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), new BibDatabaseContext(auxParserResult.getGeneratedBibDatabase()), ExternalFileTypes.getInstance());
-                frame.addTab(bp, true);
+                BibDatabaseContext context = new BibDatabaseContext(auxParserResult.getGeneratedBibDatabase());
+                frame.addTab(context, true);
             }
             return null;
         });
@@ -93,9 +91,9 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @FXML
     private void browseButtonClicked() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.AUX)
-                .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                                                                                               .addExtensionFilter(StandardFileType.AUX)
+                                                                                               .withDefaultExtension(StandardFileType.AUX)
+                                                                                               .withInitialDirectory(preferences.getWorkingDir()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
 }
