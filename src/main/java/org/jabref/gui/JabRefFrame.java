@@ -420,7 +420,7 @@ public class JabRefFrame extends BorderPane {
                     Localization.lang("Waiting for background tasks to finish. Quit anyway?"),
                     stateManager
             );
-            if (!(shouldClose.isPresent() && shouldClose.get() == ButtonType.YES)) {
+            if (!(shouldClose.isPresent() && (shouldClose.get() == ButtonType.YES))) {
                 return false;
             }
         }
