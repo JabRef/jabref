@@ -1,7 +1,12 @@
-package org.jabref.gui.maintable;
+package org.jabref.gui.maintable.columns;
 
 import javafx.beans.value.ObservableValue;
 
+import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.comparator.NumericFieldComparator;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
 
 /**
@@ -11,12 +16,18 @@ public class FieldColumn extends MainTableColumn<String> {
 
     private final OrFields fields;
 
-    public FieldColumn(MainTableColumnModel model, OrFields fields) {
+    public FieldColumn(MainTableColumnModel model) {
         super(model);
-        this.fields = fields;
+        this.fields = FieldFactory.parseOrFields(model.getQualifier());
 
         setText(getDisplayName());
         setCellValueFactory(param -> getFieldValue(param.getValue()));
+
+        new ValueTableCellFactory<BibEntryTableViewModel, String>()
+                .withText(text -> text)
+                .install(this);
+        this.setComparator(new NumericFieldComparator());
+        this.setSortable(true);
     }
 
     /**

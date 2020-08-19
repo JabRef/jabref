@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
 
@@ -36,6 +37,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences initialEntryEditorPreferences;
     private final AutoCompletePreferences initialAutoCompletePreferences;
+
+    private final List<String> restartWarnings = new ArrayList<>();
 
     public EntryEditorTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
@@ -107,6 +110,14 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
             firstNameMode = AutoCompleteFirstNameMode.ONLY_FULL;
         }
 
+        if (initialAutoCompletePreferences.shouldAutoComplete() != enableAutoCompleteProperty.getValue()) {
+            if (enableAutoCompleteProperty.getValue()) {
+                restartWarnings.add(Localization.lang("Auto complete enabled."));
+            } else {
+                restartWarnings.add(Localization.lang("Auto complete disabled."));
+            }
+        }
+
         preferencesService.storeAutoCompletePreferences(new AutoCompletePreferences(
                 enableAutoCompleteProperty.getValue(),
                 firstNameMode,
@@ -122,7 +133,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public List<String> getRestartWarnings() {
-        return new ArrayList<>();
+        return restartWarnings;
     }
 
     public BooleanProperty openOnNewEntryProperty() {
