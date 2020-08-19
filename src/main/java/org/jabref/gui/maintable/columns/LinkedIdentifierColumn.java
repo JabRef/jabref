@@ -14,6 +14,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.CellFactory;
 import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -22,6 +23,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+/**
+ * A clickable icons column for DOIs, URLs, URIs and EPrints.
+ */
 public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> {
 
     private final BibDatabaseContext database;

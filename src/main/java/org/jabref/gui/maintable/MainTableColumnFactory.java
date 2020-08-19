@@ -1,4 +1,4 @@
-package org.jabref.gui.maintable.columns;
+package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +24,11 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.maintable.BibEntryTableViewModel;
-import org.jabref.gui.maintable.CellFactory;
-import org.jabref.gui.maintable.ColumnPreferences;
-import org.jabref.gui.maintable.MainTableColumnModel;
+import org.jabref.gui.maintable.columns.FieldColumn;
+import org.jabref.gui.maintable.columns.FileColumn;
+import org.jabref.gui.maintable.columns.LinkedIdentifierColumn;
+import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.maintable.columns.SpecialFieldColumn;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -117,7 +118,7 @@ public class MainTableColumnFactory {
         return columns;
     }
 
-    static void setExactWidth(TableColumn<?, ?> column, double width) {
+    public static void setExactWidth(TableColumn<?, ?> column, double width) {
         column.setMinWidth(width);
         column.setPrefWidth(width);
         column.setMaxWidth(width);
@@ -198,7 +199,7 @@ public class MainTableColumnFactory {
      * Creates a text column to display any standard field.
      */
     private TableColumn<BibEntryTableViewModel, ?> createFieldColumn(MainTableColumnModel columnModel) {
-        return new FieldColumn(columnModel, FieldFactory.parseOrFields(columnModel.getQualifier()));
+        return new FieldColumn(columnModel);
     }
 
     /**
@@ -209,15 +210,15 @@ public class MainTableColumnFactory {
     }
 
     /**
-     * A column that displays a SpecialField
+     * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
         return new SpecialFieldColumn(columnModel, undoManager);
     }
 
     /**
-     * Creates a column for all the linked files. Instead of creating a column for a single file type, like {@code
-     * createExtraFileColumn} does, this creates one single column collecting all file links.
+     * Creates a column for all the linked files. Instead of creating a column for a single file type, like {@link
+     * MainTableColumnFactory::createExtraFileColumn} does, this creates one single column collecting all file links.
      */
     private TableColumn<BibEntryTableViewModel, List<LinkedFile>> createFilesColumn(MainTableColumnModel columnModel) {
         return new FileColumn(columnModel,

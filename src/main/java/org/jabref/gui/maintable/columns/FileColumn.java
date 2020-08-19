@@ -18,6 +18,7 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnFactory;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
