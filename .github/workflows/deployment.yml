@@ -93,11 +93,11 @@ jobs:
          jpackage --type pkg --dest build/distribution --name JabRef --app-version 100.0.0--app-image /build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version 100.0.0 --file-associations buildres/mac/bibtexAssociations.properties --resource-dir /buildres/mac
          codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements myapp.entitlements -vvvv --deep JabRef-100.0.0.dmg
          REQUEST_UUID=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file JabRef-100.0.0.dmg | grep RequestUUID | awk '{print $3}')
-        while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
+         while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
           echo "Verification in progress..."
           sleep 30
-        done
-        xcrun stapler staple JabRef-100.0.0.dmg
+         done
+         xcrun stapler staple JabRef-100.0.0.dmg
         shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
