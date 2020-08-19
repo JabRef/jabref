@@ -85,6 +85,7 @@ jobs:
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
+        if: matrix.os == 'macos-latest'
         run: |
          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" JabRef.app/Contents/MacOS/JabRef
@@ -96,7 +97,8 @@ jobs:
           echo "Verification in progress..."
           sleep 30
         done
-        if: matrix.os == 'macos-latest'
+        xcrun stapler staple JabRef-100.0.0.dmg
+        shell: bash
       - name: Package application image
         run: ${{ matrix.archivePortable }}
         shell: bash
