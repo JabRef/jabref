@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -67,18 +66,10 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
-            case "Books":
-                entry.setType(StandardEntryType.Book);
-                break;
-            case "Conferences":
-                entry.setType(StandardEntryType.InProceedings);
-                break;
-            case "Courses":
-                entry.setType(StandardEntryType.Misc);
-                break;
-            default:
-                entry.setType(StandardEntryType.Article);
-                break;
+            case "Books" -> entry.setType(StandardEntryType.Book);
+            case "Conferences" -> entry.setType(StandardEntryType.InProceedings);
+            case "Courses" -> entry.setType(StandardEntryType.Misc);
+            default -> entry.setType(StandardEntryType.Article);
         }
 
         entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
@@ -115,7 +106,11 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        entry.addFile(new LinkedFile("", Path.of(jsonEntry.optString("pdf_url")), "PDF"));
+        try {
+            entry.addFile(new LinkedFile(new URL(jsonEntry.optString("pdf_url")), "PDF"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("Fetched PDF URL String is malformed.");
+        }
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
         entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
@@ -235,5 +230,26 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", API_KEY);
+        complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
+        complexSearchQuery.getAuthors().ifPresent(authors ->
+                uriBuilder.addParameter("author", String.join(" AND ", authors)));
+        complexSearchQuery.getTitlePhrases().ifPresent(articleTitlePhrases ->
+                uriBuilder.addParameter("article_title", String.join(" AND ", articleTitlePhrases)));
+        complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
+        complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
+        complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
+        complexSearchQuery.getSingleYear().map(String::valueOf).ifPresent(year -> {
+            uriBuilder.addParameter("start_year", year);
+            uriBuilder.addParameter("end_year", year);
+        });
+
+        URLDownload.bypassSSLVerification();
+        return uriBuilder.build().toURL();
     }
 }

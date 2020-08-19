@@ -14,7 +14,7 @@
     <category field="biology"/>
     <issn>1050-7256</issn>
     <eissn>1557-9077</eissn>
-    <updated>2017-09-26T14:41:06+00:00</updated>
+    <updated>2020-07-21T14:41:51+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -117,6 +117,13 @@
           </group>
         </group>
       </if>
+      <else-if type="article-journal" match="any">
+        <choose>
+          <if match="none" variable="page volume">
+            <text variable="DOI" prefix=" https://doi.org/"/>
+          </if>
+        </choose>
+      </else-if>
     </choose>
   </macro>
   <citation collapse="citation-number">
@@ -127,7 +134,7 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography entry-spacing="1" line-spacing="2" second-field-align="flush">
+  <bibliography et-al-min="4" et-al-use-first="3" second-field-align="flush" line-spacing="2">
     <layout suffix=".">
       <text variable="citation-number" suffix=". "/>
       <text macro="author"/>

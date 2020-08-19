@@ -189,16 +189,6 @@ Contributions to JabRef's source code need to have a code formatting that is con
 
       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
 
-#### Troubleshooting when using both IDEA and Eclipse
-
-If you have configured Eclipse for the same project \(the required steps are described below\), then the additionally added file `Log4jPlugins.java` must be excluded from the compilation process, otherwise an error will occur during the compilation of the project:
-
-* **File \| Settings \| Build, Execution, Deployment \| Compiler \| Excludes** and add the following file to the
-
-  list \(\[+\]\), in order to exclude it:
-
-  * `src/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`
-
 ### Setup for Eclipse
 
 Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer is required. For Eclipse 2020-03 you need to install [jdk14 support](https://marketplace.eclipse.org/content/java-14-support-eclipse-2020-03-415)
@@ -208,12 +198,10 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
    * This step is only required once.
 2. Run `./gradlew eclipse`
    * **This must always be executed, when there are new upstream changes.**
-3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
-   * Usually, the folder `plugins` must be created for that.
-4. Open or import the existing project in Eclipse as Java project.
+3. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
-5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
+4. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
      ```text
@@ -239,8 +227,8 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
      ```
 
    * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
-6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
-7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
+5. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
+6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
 ## Final comments
 

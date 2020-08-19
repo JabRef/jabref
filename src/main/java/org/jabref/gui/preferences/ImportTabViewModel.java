@@ -3,15 +3,12 @@ package org.jabref.gui.preferences;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.DialogService;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
@@ -21,13 +18,10 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
-    private final BooleanProperty downloadLinkedFilesProperty = new SimpleBooleanProperty();
 
-    private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    public ImportTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
-        this.dialogService = dialogService;
+    public ImportTabViewModel(JabRefPreferences preferences) {
         this.preferences = preferences;
     }
 
@@ -35,14 +29,12 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         fileNamePatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         fileDirPatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
-        downloadLinkedFilesProperty.setValue(preferences.getBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES));
     }
 
     @Override
     public void storeSettings() {
         preferences.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePatternProperty.getValue());
         preferences.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, fileDirPatternProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, downloadLinkedFilesProperty.getValue());
     }
 
     @Override
@@ -65,9 +57,5 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty fileDirPatternProperty() {
         return fileDirPatternProperty;
-    }
-
-    public BooleanProperty downloadLinkedFilesProperty() {
-        return downloadLinkedFilesProperty;
     }
 }
