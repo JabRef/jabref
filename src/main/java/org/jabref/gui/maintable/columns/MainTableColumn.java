@@ -1,8 +1,10 @@
-package org.jabref.gui.maintable;
+package org.jabref.gui.maintable.columns;
 
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.maintable.BibEntryTableViewModel;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.util.BindingsHelper;
 
 public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
