@@ -30,6 +30,7 @@ import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.event.FocusChangedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -86,22 +87,22 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             }
         }
 
-    // /**
-    //  * Listening method. Updates an existing shared {@link BibEntry}.
-    //  *
-    //  * @param event {@link FieldChangedEvent} object
-    //  */
-    // @Subscribe
-    // public void listen(FieldChangedEvent event) {
+    /**
+     * Listening method. Updates an existing shared {@link BibEntry}.
+     *
+     * @param event {@link FieldChangedEvent} object
+     */
+    @Subscribe
+    public void listen(FieldChangedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-    //     if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
-    //         synchronizeLocalMetaData();
-    //         BibEntry bibEntry = event.getBibEntry();
-    //         synchronizeSharedEntry(bibEntry);
-    //         synchronizeLocalDatabase(); // Pull changes for the case that there were some
-    //     }
-    // }
+        if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
+            synchronizeLocalMetaData();
+            BibEntry bibEntry = event.getBibEntry();
+            synchronizeSharedEntry(bibEntry);
+            synchronizeLocalDatabase(); // Pull changes for the case that there were some
+        }
+    }
 
     /**
      * Listening method. Deletes the given list of {@link BibEntry} from shared database.
