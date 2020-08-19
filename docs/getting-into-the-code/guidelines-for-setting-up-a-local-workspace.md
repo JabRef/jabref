@@ -49,12 +49,7 @@ Examples:
 It is strongly recommend that you have git installed.
 
 * In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
-
-  Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a\) install git and b\) have linux commands such as `grep` available in your `PATH`.
-
-  For more advanced tooling, you may use [Fork - a fast and friendly git client for Mac and Windows](https://git-fork.com/): `choco install git-fork`.
-
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a\) install git and b\) have linux commands such as `grep` available in your `PATH`.
 * [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### IDE
@@ -98,7 +93,6 @@ IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal bu
 To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_
 
 * Navigate to **File \| Settings \| Plugins \| Installed** and check that you have
-
   the _Gradle_ and _Gradle Extension_ enabled.
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
@@ -110,9 +104,7 @@ After that, you can open `jabref/build.gradle` as a project. It is crucial that 
   location of a JDK 14.
 
 * Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
-
-  the Gradle JVM at the bottom.
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as the Gradle JVM at the bottom.
 
 To prepare IntelliJ's build system two additional steps are required
 
@@ -123,8 +115,7 @@ To prepare IntelliJ's build system two additional steps are required
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
   ```
 
-* Enable annotation processors by navigating to
-
+* Enable annotation processors by navigating to  
   **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
@@ -135,12 +126,10 @@ To have autoformat working properly in the context of line wrapping, "Wrap at ri
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
-* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to
-
+* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to  
   **View \| Tool Windows \| Gradle**.
 
 * In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
-
   with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
@@ -155,13 +144,11 @@ You should use IntelliJ IDEA's internal build system for compiling and running J
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
-* in **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and
+* In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 
-  "Test using" is set to "IntelliJ IDEA".
+* Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".  
 
-* Ignore the Gradle project "buildSrc":  
-
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
+   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
@@ -175,17 +162,16 @@ Contributions to JabRef's source code need to have a code formatting that is con
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
-* Go to **File \| Settings \| Checkstyle \| Configuration File**
+* Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
   1. Import the CheckStyle configuration file by clicking the \[+\] button
   2. For the description provide "JabRef"
   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Check "Store relative to project location"
-  5. Click "Next" and "Finish"
-  6. Activate the CheckStyle configuration file by ticking it in the list
-  7. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
-  8. Set the "Scan Scope" to "Only Java sources \(including tests\)
-  9. Save settings by clicking "OK"
-  10. Your configuration should now look like this:  
+  4. Click "Next" and "Finish"
+  5. Activate the CheckStyle configuration file by ticking it in the list
+  6. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
+  7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+  8. Save settings by clicking "OK"
+  9. Your configuration should now look like this:  
 
       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
 
