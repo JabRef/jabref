@@ -56,7 +56,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          // reason: https://bugs.openjdk.java.net/browse/JDK-8238184
+          # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
           java-version: 15-ea
       - name: Restore gradle cache
         uses: actions/cache@master
