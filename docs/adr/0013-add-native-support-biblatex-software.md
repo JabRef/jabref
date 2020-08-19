@@ -1,30 +1,27 @@
-# \[Added Native Support for BibLatex-Sotware\]
-
-* Status: Proposed
+# Add Native Support for BibLatex-Sotware
 * Deciders: Oliver Kopp
 
 Technical Story: [6574-Adding support for biblatex-software](https://github.com/JabRef/jabref/issues/6574)
 
 ## Context and Problem Statement
 
-JabRef does not right now have support for Biblatex-Software out of the box , users have to add custome entry type.
-With citing software becoming fairly comen , native support would be helpful.
+JabRef does not right now have support for Biblatex-Software out of the box, users have to add custome entry type.
+With citing software becoming fairly common , native support is helpful.
 
 
 ## Decision Drivers
 
-* The new entry types definitions should be added to the Select Entry Pane and be separated by a divider
 * None of the existing flows should be impacted
 
 ## Considered Options
 
-* Adding the new entry types to the existing biblatex types , but it conflicted with an already existing type(software)
-* Add a divider with label Biblatex-Software underwhich the new entries are listed : Native support for Biblatex-Software
+* Add the new entry types to the existing biblatex types
+* Add a divider with label Biblatex-Software under which the new entries are listed : Native support for Biblatex-Software
 * Support via customized entry types : A user can load a customized bib file
 
 ## Decision Outcome
 
-Chosen option: Yet to be decided.
+Chosen option: Add a new divider, because comes out best (see below).
 
 ### Positive Consequences
 
@@ -38,7 +35,7 @@ Chosen option: Yet to be decided.
 
 ### Adding the new entry types to the existing biblatex types
 
-* Good, since ther is no need for a new category in the add entry pane
+* Good, because there is no need for a new category in the add entry pane
 
 ### Add a divider with label Biblatex-Software with relevant types
 
@@ -46,4 +43,6 @@ Chosen option: Yet to be decided.
 
 ### Support via customized entry types
 
-*
+* Good, because no code needs to be changed
+* Bad, because documentation is needed
+* Bad, because the users are not guided through the UI, but have to do other steps.
