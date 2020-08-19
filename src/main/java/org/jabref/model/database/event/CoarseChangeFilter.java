@@ -31,8 +31,10 @@ public class CoarseChangeFilter {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
             boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getField());
+            // Only deltas of 1 registered by fieldChange
+            boolean isMajorChange = fieldChange.getDelta() >= 1;
 
-            if (fieldChange.getDelta() > 1 || isEditOnNewField) {
+            if (isEditOnNewField) {
                 lastFieldChanged = fieldChange.getField();
                 eventBus.post(event);
             }

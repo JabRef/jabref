@@ -85,6 +85,11 @@ public class EntryEditor extends BorderPane {
     private SourceTab sourceTab;
 
     /*
+    * Field that is focused at the moment
+    */
+    private Field isFocusedField;
+
+    /*
     * tabs to be showed in GUI
     * */
     @FXML private TabPane tabbed;
@@ -156,6 +161,8 @@ public class EntryEditor extends BorderPane {
             event.setDropCompleted(success);
             event.consume();
         });
+
+        this.isFocusedField = null;
     }
 
     /**
@@ -371,9 +378,16 @@ public class EntryEditor extends BorderPane {
                     FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
                     tabbed.getSelectionModel().select(tab);
                     fieldsEditorTab.requestFocus(field);
+                    this.isFocusedField = field;
+                    // Adopt focused Field from EntryEditor to BibEntry
+                    entry.setFocusedField(this.isFocusedField);
                 }
             }
         });
+    }
+
+    public Field getFocusedField() {
+        return this.isFocusedField;
     }
 
     public void nextPreviewStyle() {
@@ -383,4 +397,5 @@ public class EntryEditor extends BorderPane {
     public void previousPreviewStyle() {
         this.entryEditorTabs.forEach(EntryEditorTab::previousPreviewStyle);
     }
+
 }

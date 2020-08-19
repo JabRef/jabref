@@ -25,6 +25,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.event.FocusChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
@@ -85,6 +86,11 @@ public class BibEntry implements Cloneable {
      * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
+
+    /*
+    * Field that is focused by the BasePanel right now
+    */
+    private Field isFocusedField;
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
@@ -949,6 +955,19 @@ public class BibEntry implements Cloneable {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(index, file);
         return setFiles(linkedFiles);
+    }
+
+    public Field getFocusedField() {
+        return this.isFocusedField;
+    }
+
+    public void setFocusedField(Field isFocused, EntriesEventSource eventSource) {
+        this.isFocusedField = isFocused;
+        eventBus.post(new FocusChangedEvent(this, isFocused, eventSource));
+    }
+
+    public void setFocusedField(Field isFocused) {
+        this.setFocusedField(isFocused, EntriesEventSource.LOCAL);
     }
 
     public ObservableMap<Field, String> getFieldsObservable() {
