@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
 
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.preferences.PreferencesService;
 
 /**
