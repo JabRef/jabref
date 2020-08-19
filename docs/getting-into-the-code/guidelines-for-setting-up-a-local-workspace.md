@@ -159,7 +159,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   "Test using" is set to "IntelliJ IDEA".
 
-* Ignore the Gradle project "buildSrc":  
+* Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc.  
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
 
