@@ -56,7 +56,6 @@ jobs:
         with:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
           java-version: 15-ea
-          jdkFile: https://download.java.net/java/GA/jdk15/779bf45e88a44cbd9ea6621d33e33db1/36/GPL/openjdk-15_osx-x64_bin.tar.gz
       - name: Restore gradle cache
         uses: actions/cache@master
         with:
