@@ -24,7 +24,7 @@ env:
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
@@ -55,7 +55,7 @@ jobs:
         uses: joschi/setup-jdk@v2
         with:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
-          java-version: 15-ea
+          java-version: 15
       - name: Restore gradle cache
         uses: actions/cache@master
         with:
