@@ -685,7 +685,9 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
-            skipInstaller = true //Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
+            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
+            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            skipInstaller = true
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',
