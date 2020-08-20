@@ -52,7 +52,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: joschi/setup-jdk@v2
         with:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
           java-version: 15-ea
