@@ -98,6 +98,19 @@ class BibEntryTest {
     }
 
     @Test
+    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() throws Exception {
+        BibEntry entryClone = (BibEntry) entry.clone();
+        assertFalse(entryClone.hasChanged());
+    }
+
+    @Test
+    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() throws Exception {
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+        BibEntry entryClone = (BibEntry) entry.clone();
+        assertFalse(entryClone.hasChanged());
+    }
+
+    @Test
     void setAndGetAreConsistentForMonth() throws Exception {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of("may"), entry.getField(StandardField.MONTH));

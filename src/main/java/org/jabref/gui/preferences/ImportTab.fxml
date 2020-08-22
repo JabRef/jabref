@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
@@ -28,8 +27,7 @@
                   prefWidth="300" minWidth="300" maxWidth="300"/>
 
         <Label text="%File directory pattern" GridPane.rowIndex="1"/>
-        <TextField fx:id="fileDirPattern" GridPane.columnIndex="1" GridPane.rowIndex="1"
+        <TextField fx:id="fileDirectoryPattern" GridPane.columnIndex="1" GridPane.rowIndex="1"
                    prefWidth="300" minWidth="300" maxWidth="300"/>
-        <CheckBox fx:id="downloadLinkedFiles" text="%Download linked online files" GridPane.rowIndex="2"/>
     </GridPane>
 </fx:root>
