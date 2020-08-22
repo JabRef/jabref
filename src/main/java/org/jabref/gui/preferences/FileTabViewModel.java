@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
 
@@ -52,10 +53,12 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
+    private final AutoLinkPreferences initialAutoLinkPreferences;
 
     public FileTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialAutoLinkPreferences = preferences.getAutoLinkPreferences();
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirProperty,
@@ -86,16 +89,23 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
         mainFileDirProperty.setValue(preferences.getAsOptional(JabRefPreferences.MAIN_FILE_DIRECTORY).orElse(""));
         useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
-        if (preferences.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) { // Flipped around
-            autolinkUseRegexProperty.setValue(true);
-        } else if (preferences.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)) {
-            autolinkFileExactBibtexProperty.setValue(true);
-        } else {
-            autolinkFileStartsBibtexProperty.setValue(true);
+
+        // Autolink preferences
+        switch (initialAutoLinkPreferences.getCitationKeyDependency()) {
+            default:
+            case START:
+                autolinkFileStartsBibtexProperty.setValue(true);
+                break;
+            case EXACT:
+                autolinkFileExactBibtexProperty.setValue(true);
+                break;
+            case REGEX:
+                autolinkUseRegexProperty.setValue(true);
+                break;
         }
-        autolinkRegexKeyProperty.setValue(preferences.get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY));
-        searchFilesOnOpenProperty.setValue(preferences.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
-        openBrowseOnCreateProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
+        autolinkRegexKeyProperty.setValue(initialAutoLinkPreferences.getRegularExpression());
+        searchFilesOnOpenProperty.setValue(initialAutoLinkPreferences.shouldSearchFilesOnOpen());
+        openBrowseOnCreateProperty.setValue(initialAutoLinkPreferences.shouldOpenBrowseOnCreate());
 
         autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
@@ -111,19 +121,27 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAllProperty.getValue());
         preferences.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, resolveStringsExceptProperty.getValue().trim());
         resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        if (autolinkUseRegexProperty.getValue()) {
-            preferences.put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autolinkRegexKeyProperty.getValue());
-        }
         preferences.storeNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
 
         // EXTERNAL FILE LINKS
         preferences.put(JabRefPreferences.MAIN_FILE_DIRECTORY, mainFileDirProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, autolinkUseRegexProperty.getValue());
 
-        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
+        // Autolink preferences
+        AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
+        if (autolinkFileExactBibtexProperty.getValue()) {
+            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;
+        } else if (autolinkUseRegexProperty.getValue()) {
+            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
+        }
+
+        preferences.storeAutoLinkPreferences(new AutoLinkPreferences(
+                citationKeyDependency,
+                autolinkRegexKeyProperty.getValue(),
+                searchFilesOnOpenProperty.getValue(),
+                openBrowseOnCreateProperty.getValue(),
+                preferences.getKeywordDelimiter()));
 
         // Autosave
         preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());

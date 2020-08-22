@@ -1173,6 +1173,12 @@ public class JabRefPreferences implements PreferencesService {
                 && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    private FileLinkPreferences getFileLinkPreferences() {
+        return new FileLinkPreferences(
+                get(MAIN_FILE_DIRECTORY), // REALLY HERE?
+                fileDirForDatabase);
+    }
+
     @Override
     public LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository) {
         return new LayoutFormatterPreferences(
@@ -1417,15 +1423,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-    }
-
-    @Override
-    public AutoLinkPreferences getAutoLinkPreferences() {
-        return new AutoLinkPreferences(
-                getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
-                get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
-                getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
-                getKeywordDelimiter());
     }
 
     public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
@@ -2285,12 +2282,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(
-                get(MAIN_FILE_DIRECTORY),
-                fileDirForDatabase);
-    }
-
     @Override
     public Path getWorkingDir() {
         return Path.of(get(WORKING_DIRECTORY));
@@ -2319,6 +2310,49 @@ public class JabRefPreferences implements PreferencesService {
         put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
         put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
         putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
+    }
+
+    @Override
+    public AutoLinkPreferences getAutoLinkPreferences() {
+
+        AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
+                AutoLinkPreferences.CitationKeyDependency.START; // default
+        if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
+            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;
+        } else if (getBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
+            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;
+        }
+
+        return new AutoLinkPreferences(
+                citationKeyDependency,
+                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(RUN_AUTOMATIC_FILE_SEARCH),
+                getBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE),
+                getKeywordDelimiter());
+    }
+
+    @Override
+    public void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences) {
+        // Should be an enum
+        // Starts bibtex only omitted, as it is not being saved
+        switch (autoLinkPreferences.getCitationKeyDependency()) {
+            default:
+            case START:
+                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                break;
+            case EXACT:
+                putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
+                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
+                break;
+            case REGEX:
+                putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
+                putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
+                break;
+        }
+        put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autoLinkPreferences.getRegularExpression());
+        putBoolean(RUN_AUTOMATIC_FILE_SEARCH, autoLinkPreferences.shouldSearchFilesOnOpen());
+        putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, autoLinkPreferences.shouldOpenBrowseOnCreate());
     }
 
     //*************************************************************************************************************

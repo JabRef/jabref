@@ -71,8 +71,6 @@ public interface PreferencesService {
 
     XmpPreferences getXMPPreferences();
 
-    AutoLinkPreferences getAutoLinkPreferences();
-
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
@@ -248,6 +246,10 @@ public interface PreferencesService {
     void storeLastPreferencesExportPath(Path exportFile);
 
     String getLastPreferencesExportPath();
+
+    AutoLinkPreferences getAutoLinkPreferences();
+
+    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences
