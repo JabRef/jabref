@@ -188,6 +188,8 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
 4. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
+   * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
+    ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config.png)
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
      ```text
