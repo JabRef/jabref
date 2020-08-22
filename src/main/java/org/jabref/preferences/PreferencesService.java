@@ -33,6 +33,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
@@ -62,6 +63,10 @@ public interface PreferencesService {
 
     FieldWriterPreferences getFieldWriterPreferences();
 
+    FileHistory getFileHistory();
+
+    void storeFileHistory(FileHistory history);
+
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
     XmpPreferences getXMPPreferences();
@@ -88,7 +93,9 @@ public interface PreferencesService {
 
     boolean isKeywordSyncEnabled();
 
-    SavePreferences loadForExportFromPreferences();
+    SavePreferences getSavePreferencesForExport();
+
+    SavePreferences getSavePreferences();
 
     String getExportWorkingDirectory();
 

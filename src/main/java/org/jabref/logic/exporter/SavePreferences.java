@@ -8,6 +8,8 @@ import org.jabref.model.metadata.SaveOrderConfig;
 
 public class SavePreferences {
 
+    public enum DatabaseSaveType { ALL, PLAIN_BIBTEX }
+
     // Encoding written at the top of the .bib file.
     public static final String ENCODING_PREFIX = "Encoding: ";
 
@@ -62,15 +64,41 @@ public class SavePreferences {
                 citationKeyPatternPreferences);
     }
 
-    public Boolean takeMetadataSaveOrderInAccount() {
+    public boolean takeMetadataSaveOrderInAccount() {
         return takeMetadataSaveOrderInAccount;
+    }
+
+    public SavePreferences withTakeMetadataSaveOrderInAccount(boolean newTakeMetadataSaveOrderInAccount) {
+        return new SavePreferences(
+                this.saveInOriginalOrder,
+                this.saveOrder,
+                this.encoding,
+                this.makeBackup,
+                this.saveType,
+                newTakeMetadataSaveOrderInAccount,
+                this.reformatFile,
+                this.fieldWriterPreferences,
+                this.citationKeyPatternPreferences);
     }
 
     public SaveOrderConfig getSaveOrder() {
         return saveOrder;
     }
 
-    public boolean isSaveInOriginalOrder() {
+    public SavePreferences withSaveOrder(SaveOrderConfig newSaveOrder) {
+        return new SavePreferences(
+                this.saveInOriginalOrder,
+                newSaveOrder,
+                this.encoding,
+                this.makeBackup,
+                this.saveType,
+                this.takeMetadataSaveOrderInAccount,
+                this.reformatFile,
+                this.fieldWriterPreferences,
+                this.citationKeyPatternPreferences);
+    }
+
+    public boolean shouldSaveInOriginalOrder() {
         return saveInOriginalOrder;
     }
 
@@ -87,7 +115,7 @@ public class SavePreferences {
                 this.citationKeyPatternPreferences);
     }
 
-    public boolean makeBackup() {
+    public boolean shouldMakeBackup() {
         return makeBackup;
     }
 
@@ -143,7 +171,7 @@ public class SavePreferences {
                 this.citationKeyPatternPreferences);
     }
 
-    public Boolean isReformatFile() {
+    public boolean shouldReformatFile() {
         return reformatFile;
     }
 
@@ -166,10 +194,5 @@ public class SavePreferences {
 
     public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
         return citationKeyPatternPreferences;
-    }
-
-    public enum DatabaseSaveType {
-        ALL,
-        PLAIN_BIBTEX
     }
 }

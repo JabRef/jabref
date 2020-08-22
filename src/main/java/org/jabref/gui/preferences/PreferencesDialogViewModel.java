@@ -143,7 +143,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
+        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
 

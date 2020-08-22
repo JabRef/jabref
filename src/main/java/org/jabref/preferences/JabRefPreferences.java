@@ -64,7 +64,6 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -1125,7 +1124,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void exportPreferences(Path file) throws JabRefException {
-        LOGGER.debug("Exporting preferences ", file.toAbsolutePath());
+        LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
@@ -1168,107 +1167,10 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
-    public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
-    }
-
-    public void storeFileHistory(FileHistory history) {
-        if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory().stream().map(Path::toAbsolutePath).map(Path::toString).collect(Collectors.toList()));
-        }
-    }
-
-    @Override
-    public FilePreferences getFilePreferences() {
-        return new FilePreferences(
-                getUser(),
-                get(MAIN_FILE_DIRECTORY),
-                getBoolean(BIB_LOC_AS_PRIMARY_DIR),
-                get(IMPORT_FILENAMEPATTERN),
-                get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES));
-    }
-
-    @Override
-    public void storeFilePreferences(FilePreferences filePreferences) {
-        put(JabRefPreferences.MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
-        put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
-        put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
-        putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
-    }
-
-    @Override
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return new FieldWriterPreferences(
-                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
-                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
-    }
-
-    @Override
-    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
-        return new FieldContentFormatterPreferences(getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
-    }
-
     @Override
     public boolean isKeywordSyncEnabled() {
         return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
                 && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
-    }
-
-    @Override
-    public ImportFormatPreferences getImportFormatPreferences() {
-        return new ImportFormatPreferences(
-                customImports,
-                getDefaultEncoding(),
-                getKeywordDelimiter(),
-                getCitationKeyPatternPreferences(),
-                getFieldContentParserPreferences(),
-                getXMPPreferences(),
-                isKeywordSyncEnabled());
-    }
-
-    @Override
-    public SavePreferences loadForExportFromPreferences() {
-        Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
-        SaveOrderConfig saveOrder = null;
-        if (!saveInOriginalOrder) {
-            if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = this.loadExportSaveOrder();
-            } else {
-                saveOrder = this.loadTableSaveOrder();
-            }
-        }
-        return new SavePreferences(
-                saveInOriginalOrder,
-                saveOrder,
-                this.getDefaultEncoding(),
-                SavePreferences.DatabaseSaveType.ALL,
-                false,
-                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                this.getFieldWriterPreferences(),
-                getCitationKeyPatternPreferences());
-    }
-
-    public SavePreferences loadForSaveFromPreferences() {
-        return new SavePreferences(
-                false,
-                null,
-                this.getDefaultEncoding(),
-                SavePreferences.DatabaseSaveType.ALL,
-                true,
-                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                this.getFieldWriterPreferences(),
-                getCitationKeyPatternPreferences());
-    }
-
-    public ExporterFactory getExporterFactory(JournalAbbreviationRepository abbreviationRepository) {
-        List<TemplateExporter> customFormats = getCustomExportFormats(abbreviationRepository);
-        LayoutFormatterPreferences layoutPreferences = this.getLayoutFormatterPreferences(abbreviationRepository);
-        SavePreferences savePreferences = this.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = this.getXMPPreferences();
-        return ExporterFactory.create(customFormats, layoutPreferences, savePreferences, xmpPreferences);
     }
 
     @Override
@@ -1314,12 +1216,6 @@ public class JabRefPreferences implements PreferencesService {
 
     private NameFormatterPreferences getNameFormatterPreferences() {
         return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
-    }
-
-    private FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(
-                get(MAIN_FILE_DIRECTORY),
-                fileDirForDatabase);
     }
 
     public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
@@ -1546,16 +1442,6 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
-    @Override
-    public Path getWorkingDir() {
-        return Path.of(get(WORKING_DIRECTORY));
-    }
-
-    @Override
-    public void setWorkingDir(Path dir) {
-        put(WORKING_DIRECTORY, dir.toString());
-    }
-
     public void setPreviewStyle(String previewStyle) {
         put(PREVIEW_STYLE, previewStyle);
     }
@@ -1596,7 +1482,7 @@ public class JabRefPreferences implements PreferencesService {
         String filename;
         String extension;
         LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
-        SavePreferences savePreferences = loadForExportFromPreferences();
+        SavePreferences savePreferences = getSavePreferencesForExport();
         List<String> formatData;
         while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
             exporterName = formatData.get(EXPORTER_NAME_INDEX);
@@ -2317,6 +2203,115 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // File preferences
+    //*************************************************************************************************************
+
+    @Override
+    public ImportFormatPreferences getImportFormatPreferences() {
+        return new ImportFormatPreferences(
+                customImports,
+                getDefaultEncoding(),
+                getKeywordDelimiter(),
+                getCitationKeyPatternPreferences(),
+                getFieldContentParserPreferences(),
+                getXMPPreferences(),
+                isKeywordSyncEnabled());
+    }
+
+    @Override
+    public SavePreferences getSavePreferencesForExport() {
+        Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        SaveOrderConfig saveOrder = null;
+        if (!saveInOriginalOrder) {
+            if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+                saveOrder = this.loadExportSaveOrder();
+            } else {
+                saveOrder = this.loadTableSaveOrder();
+            }
+        }
+
+        return getSavePreferences()
+                .withSaveInOriginalOrder(saveInOriginalOrder)
+                .withSaveOrder(saveOrder)
+                .withTakeMetadataSaveOrderInAccount(false);
+    }
+
+    @Override
+    public SavePreferences getSavePreferences() {
+        return new SavePreferences(
+                false,
+                null,
+                this.getDefaultEncoding(),
+                SavePreferences.DatabaseSaveType.ALL,
+                true,
+                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getFieldWriterPreferences(),
+                getCitationKeyPatternPreferences());
+    }
+
+    @Override
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return new FieldWriterPreferences(
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getFieldContentParserPreferences());
+    }
+
+    @Override
+    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
+        return new FieldContentFormatterPreferences(
+                getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
+    }
+
+    @Override
+    public FileHistory getFileHistory() {
+        return new FileHistory(getStringList(RECENT_DATABASES).stream().map(Path::of).collect(Collectors.toList()));
+    }
+
+    @Override
+    public void storeFileHistory(FileHistory history) {
+        if (!history.isEmpty()) {
+            putStringList(RECENT_DATABASES, history.getHistory().stream().map(Path::toAbsolutePath).map(Path::toString).collect(Collectors.toList()));
+        }
+    }
+
+    private FileLinkPreferences getFileLinkPreferences() {
+        return new FileLinkPreferences(
+                get(MAIN_FILE_DIRECTORY),
+                fileDirForDatabase);
+    }
+
+    @Override
+    public Path getWorkingDir() {
+        return Path.of(get(WORKING_DIRECTORY));
+    }
+
+    @Override
+    public void setWorkingDir(Path dir) {
+        put(WORKING_DIRECTORY, dir.toString());
+    }
+
+    @Override
+    public FilePreferences getFilePreferences() {
+        return new FilePreferences(
+                getUser(),
+                get(MAIN_FILE_DIRECTORY),
+                getBoolean(BIB_LOC_AS_PRIMARY_DIR),
+                get(IMPORT_FILENAMEPATTERN),
+                get(IMPORT_FILEDIRPATTERN),
+                getBoolean(DOWNLOAD_LINKED_FILES));
+    }
+
+    @Override
+    public void storeFilePreferences(FilePreferences filePreferences) {
+        put(JabRefPreferences.MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
+        putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
+        put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
+        put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
+        putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
     }
 
     //*************************************************************************************************************
