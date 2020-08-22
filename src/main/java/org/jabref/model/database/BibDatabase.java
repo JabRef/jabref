@@ -61,13 +61,13 @@ public class BibDatabase {
     private String epilog = "";
     private String sharedDatabaseID;
 
-    public BibDatabase() {
-        this.registerListener(new KeyChangeListener(this));
-    }
-
     public BibDatabase(List<BibEntry> entries) {
         this();
         insertEntries(entries);
+    }
+
+    public BibDatabase() {
+        this.registerListener(new KeyChangeListener(this));
     }
 
     /**
