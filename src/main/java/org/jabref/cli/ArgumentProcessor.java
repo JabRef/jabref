@@ -495,7 +495,11 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
-            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(parserResult.getDatabaseContext(), Globals.prefs.getFilePreferences(), Globals.prefs.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                    parserResult.getDatabaseContext(),
+                    Globals.prefs.getFilePreferences(),
+                    Globals.prefs.getAutoLinkPreferences(),
+                    ExternalFileTypes.getInstance());
             util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
         }
     }

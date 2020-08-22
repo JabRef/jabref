@@ -238,6 +238,18 @@ public interface PreferencesService {
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
 
     //*************************************************************************************************************
+    // File preferences
+    //*************************************************************************************************************
+
+    NewLineSeparator getNewLineSeparator();
+
+    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
+
+    void storeLastPreferencesExportPath(Path exportFile);
+
+    String getLastPreferencesExportPath();
+
+    //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
 

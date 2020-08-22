@@ -1458,14 +1458,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public String setLastPreferencesExportPath() {
-        return get(PREFS_EXPORT_PATH);
-    }
-
-    public void setLastPreferencesExportPath(Path exportFile) {
-        put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
     public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
         put(ID_ENTRY_GENERATOR, fetcherName);
     }
@@ -1552,18 +1544,6 @@ public class JabRefPreferences implements PreferencesService {
         Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
-    }
-
-    public NewLineSeparator getNewLineSeparator() {
-        return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
-    }
-
-    public void setNewLineSeparator(NewLineSeparator newLineSeparator) {
-        String escapeChars = newLineSeparator.toString();
-        put(JabRefPreferences.NEWLINE, escapeChars);
-
-        // we also have to change Globals variable as globals is not a getter, but a constant
-        OS.NEWLINE = escapeChars;
     }
 
     //*************************************************************************************************************
@@ -2210,6 +2190,17 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
 
     @Override
+    public String getLastPreferencesExportPath() {
+        return get(PREFS_EXPORT_PATH);
+    }
+
+    @Override
+    public void storeLastPreferencesExportPath(Path exportFile) {
+        put(PREFS_EXPORT_PATH, exportFile.toString());
+    }
+
+    // ToDo: Can this be disbanded?
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
                 customImports,
@@ -2252,18 +2243,34 @@ public class JabRefPreferences implements PreferencesService {
                 getCitationKeyPatternPreferences());
     }
 
+
     @Override
-    public FieldWriterPreferences getFieldWriterPreferences() {
-        return new FieldWriterPreferences(
-                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
-                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
+    public NewLineSeparator getNewLineSeparator() {
+        return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
+    }
+
+    // ToDo: Can this be disbanded?
+    @Override
+    public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
+        String escapeChars = newLineSeparator.toString();
+        put(JabRefPreferences.NEWLINE, escapeChars);
+
+        // we also have to change Globals variable as globals is not a getter, but a constant
+        OS.NEWLINE = escapeChars;
     }
 
     @Override
     public FieldContentFormatterPreferences getFieldContentParserPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
+    }
+
+    @Override
+    public FieldWriterPreferences getFieldWriterPreferences() {
+        return new FieldWriterPreferences(
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
+                getFieldContentParserPreferences());
     }
 
     @Override

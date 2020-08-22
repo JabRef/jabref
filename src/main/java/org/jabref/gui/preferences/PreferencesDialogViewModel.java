@@ -69,7 +69,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
+                .withInitialDirectory(preferences.getLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
@@ -89,7 +89,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.setLastPreferencesExportPath())
+                .withInitialDirectory(preferences.getLastPreferencesExportPath())
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
@@ -97,7 +97,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                          try {
                              storeAllSettings();
                              preferences.exportPreferences(exportFile);
-                             preferences.setLastPreferencesExportPath(exportFile);
+                             preferences.storeLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);

@@ -102,6 +102,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+
+        // NO TITLE
         preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
         if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
@@ -112,16 +114,18 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         if (autolinkUseRegexProperty.getValue()) {
             preferences.put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autolinkRegexKeyProperty.getValue());
         }
-        preferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
+        preferences.storeNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
 
+        // EXTERNAL FILE LINKS
         preferences.put(JabRefPreferences.MAIN_FILE_DIRECTORY, mainFileDirProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
         preferences.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, autolinkUseRegexProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, autolinkFileExactBibtexProperty.getValue());
+
         preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
         preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
 
+        // Autosave
         preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
     }
 
