@@ -47,16 +47,22 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.4
         with:
-          versionSpec: '5.2.x'
+          versionSpec: "5.2.x"
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
-      - name: Set up JDK
+      - name: Set up Adotptopen JDK mac
         uses: joschi/setup-jdk@v2
         with:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
           java-version: 15
           release_type: ea
+        if: matrix.os == 'macos-latest'
+      - name: Set up JDK for linux and windows
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15-ea
+        if: matrix.os != 'macos-latest'
       - name: Restore gradle cache
         uses: actions/cache@master
         with:
@@ -173,4 +179,3 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-
