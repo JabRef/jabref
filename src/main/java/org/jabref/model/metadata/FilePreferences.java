@@ -12,7 +12,7 @@ public class FilePreferences {
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
-    private boolean shouldDownloadLinkedFiles;
+    private final boolean shouldDownloadLinkedFiles;
 
     public FilePreferences(String user,
                            String mainFileDirectory,
@@ -56,7 +56,13 @@ public class FilePreferences {
         return shouldDownloadLinkedFiles;
     }
 
-    public void setShouldDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
-        this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
+    public FilePreferences withShouldDownloadLinkedFiles(boolean newShouldDownloadLinkedFiles) {
+        return new FilePreferences(
+                this.user,
+                this.mainFileDirectory,
+                this.bibLocationAsPrimary,
+                this.fileNamePattern,
+                this.fileDirPattern,
+                newShouldDownloadLinkedFiles);
     }
 }
