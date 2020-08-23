@@ -4,15 +4,19 @@
     <title>Pensoft Journals</title>
     <id>http://www.zotero.org/styles/pensoft-journals</id>
     <link href="http://www.zotero.org/styles/pensoft-journals" rel="self"/>
-    <link href="http://www.zotero.org/styles/zookeys" rel="template"/>
+    <link href="http://www.zotero.org/styles/zootaxa" rel="template"/>
     <link href="https://zookeys.pensoft.net/about#CitationsandReferences" rel="documentation"/>
+    <author>
+      <name>Brian Stucky</name>
+      <email>stuckyb@colorado.edu</email>
+    </author>
     <author>
       <name>Teodor Georgiev</name>
       <email>t.georgiev@pensoft.net</email>
     </author>
     <category citation-format="author-date"/>
     <summary>The Pensoft Journals style</summary>
-    <updated>2015-11-07T07:40:10+00:00</updated>
+    <updated>2020-08-21T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">

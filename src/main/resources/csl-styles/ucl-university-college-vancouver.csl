@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" page-range-format="minimal" default-locale="en-US">
   <info>
-    <title>University College Lillebælt - Vancouver (English)</title>
-    <id>http://www.zotero.org/styles/university-college-lillebaelt-vancouver</id>
-    <link href="http://www.zotero.org/styles/university-college-lillebaelt-vancouver" rel="self"/>
-    <link href="http://esdhweb.ucl.dk/480836.Formm%C3%A6ssige%20krav%202014.pdf" rel="documentation"/>
+    <title>UCL University College - Vancouver (English)</title>
+    <id>http://www.zotero.org/styles/ucl-university-college-vancouver</id>
+    <link href="http://www.zotero.org/styles/ucl-university-college-vancouver" rel="self"/>
+    <link href="https://sites.google.com/ucl.dk/ucl-formelle-krav/vancouver" rel="documentation"/>
     <author>
       <name>Roald Erik Frøsig</name>
       <email>roaldfrosig@gmail.com</email>
     </author>
+     <contributor>
+      <name>Camilla K. Andresen</name>
+      <email>ckan1@ucl.dk</email>
+    </contributor>
     <category citation-format="numeric"/>
     <updated>2014-12-17T13:56:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
