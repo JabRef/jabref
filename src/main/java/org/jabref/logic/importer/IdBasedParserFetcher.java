@@ -48,6 +48,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {

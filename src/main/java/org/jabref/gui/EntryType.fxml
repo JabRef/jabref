@@ -26,6 +26,11 @@
                         <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
+                <TitledPane fx:id="biblatexSoftwareTitlePane" animated="false" collapsible="false" text="Biblatex-Software">
+                    <content>
+                        <FlowPane fx:id="biblatexSoftwarePane" prefHeight="200.0" prefWidth="200.0"/>
+                    </content>
+                </TitledPane>
                 <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
                     <content>
                         <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0"/>

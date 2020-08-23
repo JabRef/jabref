@@ -12,20 +12,20 @@ public class FilePreferences {
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
-    private final boolean downloadLinkedFiles;
+    private boolean shouldDownloadLinkedFiles;
 
     public FilePreferences(String user,
                            String mainFileDirectory,
                            boolean bibLocationAsPrimary,
                            String fileNamePattern,
                            String fileDirPattern,
-                           boolean downloadLinkedFiles) {
+                           boolean shouldDownloadLinkedFiles) {
         this.user = user;
         this.mainFileDirectory = mainFileDirectory;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
         this.fileNamePattern = fileNamePattern;
         this.fileDirPattern = fileDirPattern;
-        this.downloadLinkedFiles = downloadLinkedFiles;
+        this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
     }
 
     public String getUser() {
@@ -52,7 +52,11 @@ public class FilePreferences {
         return fileDirPattern;
     }
 
-    public boolean getDownloadLinkedFiles() {
-        return downloadLinkedFiles;
+    public boolean shouldDownloadLinkedFiles() {
+        return shouldDownloadLinkedFiles;
+    }
+
+    public void setShouldDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
+        this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
     }
 }

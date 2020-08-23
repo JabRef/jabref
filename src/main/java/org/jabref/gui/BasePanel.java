@@ -284,7 +284,14 @@ public class BasePanel extends StackPane {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, preferences.getKeyBindings());
+        mainTable = new MainTable(tableModel,
+                this,
+                bibDatabaseContext,
+                Globals.prefs,
+                dialogService,
+                Globals.stateManager,
+                externalFileTypes,
+                preferences.getKeyBindings());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));

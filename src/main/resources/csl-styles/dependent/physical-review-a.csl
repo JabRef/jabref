@@ -5,16 +5,19 @@
     <id>http://www.zotero.org/styles/physical-review-a</id>
     <link href="http://www.zotero.org/styles/physical-review-a" rel="self"/>
     <link href="http://www.zotero.org/styles/american-physics-society" rel="independent-parent"/>
-    <link href="http://authors.aps.org/STYLE/ms.html#citations" rel="documentation"/>
+    <link href="https://journals.aps.org/pra/authors#techformat" rel="documentation"/>
     <author>
       <name>Richard Karnesky</name>
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
     </author>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="physics"/>
-    <issn>1050-2947</issn>
-    <eissn>1094-1622</eissn>
+    <issn>2469-9926</issn>
+    <eissn>2469-9934</eissn>
     <summary>A style for APS's journal "Physical Review A"</summary>
     <updated>2012-09-27T22:06:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
