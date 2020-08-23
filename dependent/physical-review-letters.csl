@@ -5,12 +5,15 @@
     <id>http://www.zotero.org/styles/physical-review-letters</id>
     <link href="http://www.zotero.org/styles/physical-review-letters" rel="self"/>
     <link href="http://www.zotero.org/styles/american-physics-society" rel="independent-parent"/>
-    <link href="http://authors.aps.org/STYLE/ms.html#citations" rel="documentation"/>
+    <link href="https://journals.aps.org/prl/authors#techformat" rel="documentation"/>
     <author>
       <name>Richard Karnesky</name>
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
     </author>
+    <contributor>
+      <name>Brenton M. Wiernik</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="physics"/>
     <issn>0031-9007</issn>
