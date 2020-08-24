@@ -9,9 +9,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
+import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
@@ -39,16 +42,22 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try (InputStream stream = getUrlDownload(getURLForQuery(query)).asInputStream()) {
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForQuery(query);
+        } catch (URISyntaxException | MalformedURLException e) {
+            LoggerFactory.getLogger(this.getClass()).info("Search URL {} is malformed", query);
+            throw new FetcherException("Search URI is malformed", e);
+        }
+        try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
             fetchedEntries.forEach(this::doPostCleanup);
 
             return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
+            LoggerFactory.getLogger(this.getClass()).info("IOException at URL {}", urlForQuery.toString());
             // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
             throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
