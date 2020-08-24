@@ -203,7 +203,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.14'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.5.0'
+    testImplementation 'org.mockito:mockito-core:3.5.5'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
