@@ -128,7 +128,7 @@ public class CleanupPresetPanel extends VBox {
         activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
 
         return new CleanupPreset(activeJobs, new FieldFormatterCleanups(
-                !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
+                formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()));
     }
 }
