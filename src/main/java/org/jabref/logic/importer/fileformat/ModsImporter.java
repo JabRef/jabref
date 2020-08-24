@@ -398,7 +398,7 @@ public class ModsImporter extends Importer implements Parser {
 
                 case "dateIssued":
                     // The first 4 digits of dateIssued should be the year
-                    fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
+                    fields.put(StandardField.YEAR, date.getValue().replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));
                     break;
                 case "dateCreated":
                     // If there was no year in date issued, then take the year from date created
@@ -435,7 +435,9 @@ public class ModsImporter extends Importer implements Parser {
                 NamePartDefinition namePart = (NamePartDefinition) value;
                 String type = namePart.getAtType();
                 if ((type == null) && (namePart.getValue() != null)) {
-                    authors.add(namePart.getValue());
+                    String namePartValue = namePart.getValue();
+                    namePartValue = namePartValue.replaceAll(",$", "");
+                    authors.add(namePartValue);
                 } else if ("family".equals(type) && (namePart.getValue() != null)) {
                     // family should come first, so if family appears we can set the author then comes before
                     // we have to check if forename and family name are not empty in case it's the first author

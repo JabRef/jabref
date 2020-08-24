@@ -65,7 +65,6 @@ interface SearchBasedFetcherCapabilityTest {
                                                     .distinct()
                                                     .collect(Collectors.toList());
 
-        assertFalse(result.isEmpty());
         assertEquals(Collections.singletonList(getTestYear().toString()), differentYearsInResult);
     }
 
