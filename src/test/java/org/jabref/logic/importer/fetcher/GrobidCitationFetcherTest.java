@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -10,6 +11,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,16 +57,21 @@ public class GrobidCitationFetcherTest {
     static String invalidInput1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________";
     static String invalidInput2 = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
 
-    @Test
-    public void grobidPerformSearchCorrectResultTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1);
-        assertEquals(List.of(example1AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example2);
-        assertEquals(List.of(example2AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example3);
-        assertEquals(List.of(example3AsBibEntry), entries);
-        entries = grobidCitationFetcher.performSearch(example4);
-        assertEquals(List.of(example4AsBibEntry), entries);
+
+    public static Stream<Arguments> provideExamplesForCorrectResultTest() {
+        return Stream.of(
+                Arguments.of("example1", example1AsBibEntry, example1),
+                Arguments.of("example2", example2AsBibEntry, example2),
+                Arguments.of("example3", example3AsBibEntry, example3),
+                Arguments.of("example4", example4AsBibEntry, example4)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideExamplesForCorrectResultTest")
+    public void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
+        assertEquals(List.of(expectedBibEntry), entries);
     }
 
     @Test
