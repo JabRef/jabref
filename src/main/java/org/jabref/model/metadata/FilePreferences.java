@@ -7,6 +7,8 @@ import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
 
+    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
+
     private final String user;
     private final String mainFileDirectory;
     private final boolean bibLocationAsPrimary;

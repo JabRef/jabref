@@ -32,6 +32,9 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private ComboBox<NewLineSeparator> newLineSeparator;
     @FXML private CheckBox alwaysReformatBib;
 
+    @FXML private CheckBox autosaveLocalLibraries;
+    @FXML private Button autosaveLocalLibrariesHelp;
+
     @FXML private TextField mainFileDir;
     @FXML private CheckBox useBibLocationAsPrimary;
     @FXML private Button autolinkRegexHelp;
@@ -42,10 +45,10 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private CheckBox searchFilesOnOpen;
     @FXML private CheckBox openBrowseOnCreate;
 
-    @FXML private CheckBox autosaveLocalLibraries;
-    @FXML private Button autosaveLocalLibrariesHelp;
+    @FXML private ComboBox<String> fileNamePattern;
+    @FXML private TextField fileDirectoryPattern;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public FileTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -76,6 +79,8 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
+        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+
         mainFileDir.textProperty().bindBidirectional(viewModel.mainFileDirProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
@@ -85,8 +90,9 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
         searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
         openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
-
-        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
+        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
+        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
+        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);

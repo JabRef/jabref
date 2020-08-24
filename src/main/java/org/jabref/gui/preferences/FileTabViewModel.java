@@ -19,6 +19,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
 
@@ -38,6 +39,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
 
+    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
+
     private final StringProperty mainFileDirProperty = new SimpleStringProperty("");
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
@@ -46,8 +49,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
     private final BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
     private final BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
-
-    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
+    private final ListProperty<String> defaultFileNamePatternsProperty =
+            new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
+    private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
+    private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -87,6 +92,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
         alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
 
+        autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+
         mainFileDirProperty.setValue(preferences.getAsOptional(JabRefPreferences.MAIN_FILE_DIRECTORY).orElse(""));
         useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
 
@@ -107,14 +114,14 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
         searchFilesOnOpenProperty.setValue(preferences.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         openBrowseOnCreateProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
-
-        autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+        fileNamePatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+        fileDirPatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
     }
 
     @Override
     public void storeSettings() {
 
-        // NO TITLE
+        // -> Export preferences
         preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
         if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
@@ -125,9 +132,16 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
         preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
 
-        // EXTERNAL FILE LINKS
+        // Autosave
+        preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
+
+        // External files preferences / Attached files preferences / File preferences
         preferences.put(JabRefPreferences.MAIN_FILE_DIRECTORY, mainFileDirProperty.getValue());
         preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
+        preferences.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePatternProperty.getValue());
+        preferences.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, fileDirPatternProperty.getValue());
 
         // Autolink preferences
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
@@ -141,12 +155,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 citationKeyDependency,
                 autolinkRegexKeyProperty.getValue(),
                 preferences.getKeywordDelimiter()));
-
-        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
-
-        // Autosave
-        preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -210,6 +218,11 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return alwaysReformatBibProperty;
     }
 
+    // Autosave
+    public BooleanProperty autosaveLocalLibrariesProperty() {
+        return autosaveLocalLibraries;
+    }
+
     // External file links
 
     public StringProperty mainFileDirProperty() {
@@ -244,10 +257,16 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return openBrowseOnCreateProperty;
     }
 
-    // Autosave
+    public ListProperty<String> defaultFileNamePatternsProperty() {
+        return defaultFileNamePatternsProperty;
+    }
 
-    public BooleanProperty autosaveLocalLibrariesProperty() {
-        return autosaveLocalLibraries;
+    public StringProperty fileNamePatternProperty() {
+        return fileNamePatternProperty;
+    }
+
+    public StringProperty fileDirPatternProperty() {
+        return fileDirPatternProperty;
     }
 }
 
