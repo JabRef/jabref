@@ -74,12 +74,17 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      */
     @Override
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        try (InputStream stream = getUrlDownload(getComplexQueryURL(complexSearchQuery)).asInputStream()) {
+        URL complexQueryURL = null;
+        try {
+            complexQueryURL = getComplexQueryURL(complexSearchQuery);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
+        LoggerFactory.getLogger(this.getClass()).debug("Using query URL {}", complexQueryURL.toString());
+        try (InputStream stream = getUrlDownload(complexQueryURL).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
             throw new FetcherException("A network error occurred", e);
