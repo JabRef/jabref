@@ -56,7 +56,7 @@ public class FilePreferences {
         return fileNamePattern;
     }
 
-    public String getFileDirPattern() {
+    public String getFileDirectoryPattern() {
         return fileDirPattern;
     }
 

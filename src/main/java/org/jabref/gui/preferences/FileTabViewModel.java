@@ -41,7 +41,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final StringProperty mainFileDirProperty = new SimpleStringProperty("");
+    private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
@@ -52,23 +52,25 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<String> defaultFileNamePatternsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList(FilePreferences.DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
-    private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
+    private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
+    private final FilePreferences initialFilePreferences;
     private final AutoLinkPreferences initialAutoLinkPreferences;
 
     public FileTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialFilePreferences = preferences.getFilePreferences();
         this.initialAutoLinkPreferences = preferences.getAutoLinkPreferences();
 
         mainFileDirValidator = new FunctionBasedValidator<>(
-                mainFileDirProperty,
+                mainFileDirectoryProperty,
                 input -> {
-                    Path path = Path.of(mainFileDirProperty.getValue());
+                    Path path = Path.of(mainFileDirectoryProperty.getValue());
                     return (Files.exists(path) && Files.isDirectory(path));
                 },
                 ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
@@ -94,8 +96,13 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
         autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
 
-        mainFileDirProperty.setValue(preferences.getAsOptional(JabRefPreferences.MAIN_FILE_DIRECTORY).orElse(""));
-        useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
+        // External files preferences / Attached files preferences / File preferences
+        mainFileDirectoryProperty.setValue(initialFilePreferences.getFileDirectory().orElse(Path.of("")).toString());
+        useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.isBibLocationAsPrimary());
+        searchFilesOnOpenProperty.setValue(initialFilePreferences.shouldSearchFilesOnOpen());
+        openBrowseOnCreateProperty.setValue(initialFilePreferences.shouldOpenBrowseOnCreate());
+        fileNamePatternProperty.setValue(initialFilePreferences.getFileNamePattern());
+        fileDirectoryPatternProperty.setValue(initialFilePreferences.getFileDirectoryPattern());
 
         // Autolink preferences
         switch (initialAutoLinkPreferences.getCitationKeyDependency()) {
@@ -111,16 +118,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 break;
         }
         autolinkRegexKeyProperty.setValue(initialAutoLinkPreferences.getRegularExpression());
-
-        searchFilesOnOpenProperty.setValue(preferences.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
-        openBrowseOnCreateProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
-        fileNamePatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
-        fileDirPatternProperty.setValue(preferences.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
     }
 
     @Override
     public void storeSettings() {
-
         // -> Export preferences
         preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
         if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
@@ -136,12 +137,15 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
 
         // External files preferences / Attached files preferences / File preferences
-        preferences.put(JabRefPreferences.MAIN_FILE_DIRECTORY, mainFileDirProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
-        preferences.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePatternProperty.getValue());
-        preferences.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, fileDirPatternProperty.getValue());
+        preferences.storeFilePreferences(new FilePreferences(
+                initialFilePreferences.getUser(),
+                mainFileDirectoryProperty.getValue(),
+                useBibLocationAsPrimaryProperty.getValue(),
+                fileNamePatternProperty.getValue(),
+                fileDirectoryPatternProperty.getValue(),
+                initialFilePreferences.shouldDownloadLinkedFiles(), // set in ImportEntriesViewModel
+                searchFilesOnOpenProperty.getValue(),
+                openBrowseOnCreateProperty.getValue()));
 
         // Autolink preferences
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.START;
@@ -179,9 +183,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     public void mainFileDirBrowse() {
         DirectoryDialogConfiguration dirDialogConfiguration =
-                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(mainFileDirProperty.getValue())).build();
+                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(mainFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                     .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
+                     .ifPresent(f -> mainFileDirectoryProperty.setValue(f.toString()));
     }
 
     // General
@@ -225,8 +229,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     // External file links
 
-    public StringProperty mainFileDirProperty() {
-        return mainFileDirProperty;
+    public StringProperty mainFileDirectoryProperty() {
+        return mainFileDirectoryProperty;
     }
 
     public BooleanProperty useBibLocationAsPrimaryProperty() {
@@ -265,8 +269,8 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         return fileNamePatternProperty;
     }
 
-    public StringProperty fileDirPatternProperty() {
-        return fileDirPatternProperty;
+    public StringProperty fileDirectoryPatternProperty() {
+        return fileDirectoryPatternProperty;
     }
 }
 

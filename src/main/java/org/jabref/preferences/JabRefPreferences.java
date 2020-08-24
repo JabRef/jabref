@@ -2309,7 +2309,7 @@ public class JabRefPreferences implements PreferencesService {
         put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
         putBoolean(BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
         put(IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
-        put(IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
+        put(IMPORT_FILEDIRPATTERN, filePreferences.getFileDirectoryPattern());
         putBoolean(DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
         putBoolean(RUN_AUTOMATIC_FILE_SEARCH, filePreferences.shouldSearchFilesOnOpen());
         putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, filePreferences.shouldOpenBrowseOnCreate());

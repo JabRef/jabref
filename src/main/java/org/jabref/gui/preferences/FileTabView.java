@@ -35,7 +35,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    @FXML private TextField mainFileDir;
+    @FXML private TextField mainFileDirectory;
     @FXML private CheckBox useBibLocationAsPrimary;
     @FXML private Button autolinkRegexHelp;
     @FXML private RadioButton autolinkFileStartsBibtex;
@@ -81,7 +81,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
 
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
-        mainFileDir.textProperty().bindBidirectional(viewModel.mainFileDirProperty());
+        mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
@@ -92,14 +92,14 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
-        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
+        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
+        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));
     }
 
     public void mainFileDirBrowse() {

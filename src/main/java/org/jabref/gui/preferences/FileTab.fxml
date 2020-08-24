@@ -49,7 +49,7 @@
     <Label styleClass="sectionHeader" text="%External file links"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Main file directory"/>
-        <TextField fx:id="mainFileDir" HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="mainFileDirectory" HBox.hgrow="ALWAYS"/>
         <Button onAction="#mainFileDirBrowse" text="%Browse"/>
     </HBox>
     <CheckBox fx:id="useBibLocationAsPrimary" text="%Search and store files relative to library file location">
