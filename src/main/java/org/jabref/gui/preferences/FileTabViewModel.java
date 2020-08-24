@@ -104,8 +104,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 break;
         }
         autolinkRegexKeyProperty.setValue(initialAutoLinkPreferences.getRegularExpression());
-        searchFilesOnOpenProperty.setValue(initialAutoLinkPreferences.shouldSearchFilesOnOpen());
-        openBrowseOnCreateProperty.setValue(initialAutoLinkPreferences.shouldOpenBrowseOnCreate());
+
+        searchFilesOnOpenProperty.setValue(preferences.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
+        openBrowseOnCreateProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
 
         autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
@@ -139,9 +140,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeAutoLinkPreferences(new AutoLinkPreferences(
                 citationKeyDependency,
                 autolinkRegexKeyProperty.getValue(),
-                searchFilesOnOpenProperty.getValue(),
-                openBrowseOnCreateProperty.getValue(),
                 preferences.getKeywordDelimiter()));
+
+        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
+        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
 
         // Autosave
         preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());

@@ -13,19 +13,25 @@ public class FilePreferences {
     private final String fileNamePattern;
     private final String fileDirPattern;
     private final boolean shouldDownloadLinkedFiles;
+    private final boolean shouldSearchFilesOnOpen;
+    private final boolean shouldOpenBrowseOnCreate;
 
     public FilePreferences(String user,
                            String mainFileDirectory,
                            boolean bibLocationAsPrimary,
                            String fileNamePattern,
                            String fileDirPattern,
-                           boolean shouldDownloadLinkedFiles) {
+                           boolean shouldDownloadLinkedFiles,
+                           boolean shouldSearchFilesOnOpen,
+                           boolean shouldOpenBrowseOnCreate) {
         this.user = user;
         this.mainFileDirectory = mainFileDirectory;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
         this.fileNamePattern = fileNamePattern;
         this.fileDirPattern = fileDirPattern;
         this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
+        this.shouldSearchFilesOnOpen = shouldSearchFilesOnOpen;
+        this.shouldOpenBrowseOnCreate = shouldOpenBrowseOnCreate;
     }
 
     public String getUser() {
@@ -63,6 +69,16 @@ public class FilePreferences {
                 this.bibLocationAsPrimary,
                 this.fileNamePattern,
                 this.fileDirPattern,
-                newShouldDownloadLinkedFiles);
+                newShouldDownloadLinkedFiles,
+                this.shouldSearchFilesOnOpen,
+                this.shouldOpenBrowseOnCreate);
+    }
+
+    public boolean shouldSearchFilesOnOpen() {
+        return shouldSearchFilesOnOpen;
+    }
+
+    public boolean shouldOpenBrowseOnCreate() {
+        return shouldOpenBrowseOnCreate;
     }
 }

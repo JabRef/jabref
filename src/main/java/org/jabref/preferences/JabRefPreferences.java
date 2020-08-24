@@ -2300,21 +2300,24 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(BIB_LOC_AS_PRIMARY_DIR),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
-                getBoolean(DOWNLOAD_LINKED_FILES));
+                getBoolean(DOWNLOAD_LINKED_FILES),
+                getBoolean(RUN_AUTOMATIC_FILE_SEARCH),
+                getBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE));
     }
 
     @Override
     public void storeFilePreferences(FilePreferences filePreferences) {
-        put(JabRefPreferences.MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
-        put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
-        put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
-        putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
+        put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
+        putBoolean(BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
+        put(IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
+        put(IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
+        putBoolean(DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
+        putBoolean(RUN_AUTOMATIC_FILE_SEARCH, filePreferences.shouldSearchFilesOnOpen());
+        putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, filePreferences.shouldOpenBrowseOnCreate());
     }
 
     @Override
     public AutoLinkPreferences getAutoLinkPreferences() {
-
         AutoLinkPreferences.CitationKeyDependency citationKeyDependency =
                 AutoLinkPreferences.CitationKeyDependency.START; // default
         if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {
@@ -2326,14 +2329,11 @@ public class JabRefPreferences implements PreferencesService {
         return new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
-                getBoolean(RUN_AUTOMATIC_FILE_SEARCH),
-                getBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE),
                 getKeywordDelimiter());
     }
 
     @Override
     public void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences) {
-        // Should be an enum
         // Starts bibtex only omitted, as it is not being saved
         switch (autoLinkPreferences.getCitationKeyDependency()) {
             default:
@@ -2351,8 +2351,6 @@ public class JabRefPreferences implements PreferencesService {
                 break;
         }
         put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autoLinkPreferences.getRegularExpression());
-        putBoolean(RUN_AUTOMATIC_FILE_SEARCH, autoLinkPreferences.shouldSearchFilesOnOpen());
-        putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, autoLinkPreferences.shouldOpenBrowseOnCreate());
     }
 
     //*************************************************************************************************************
