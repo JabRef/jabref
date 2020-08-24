@@ -2,15 +2,19 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.google.gson.Gson;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
@@ -22,12 +26,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.NodeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect.
- * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
+ * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect. See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
@@ -62,22 +66,30 @@ public class ScienceDirect implements FulltextFetcher {
                         return Optional.of(new URL(link));
                     }
 
-                    // Retrieve PDF link (old page)
-                    // TODO: can possibly be removed
-                    Element link = html.getElementById("pdfLink");
+                    URL url = new URL(sciLink);
+                    String protocol = url.getProtocol();
+                    String authority = url.getAuthority();
 
-                    if (link != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (old page).");
-                        Optional<URL> pdfLink = Optional.of(new URL(link.attr("pdfurl")));
-                        return pdfLink;
-                    }
-                    // Retrieve PDF link (new page)
-                    // TODO: can possibly be removed
-                    String url = html.getElementsByClass("pdf-download-btn-link").attr("href");
-
-                    if (url != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (new page).");
-                        Optional<URL> pdfLink = Optional.of(new URL("http://www.sciencedirect.com" + url));
+                    Optional<String> fullLinkToPdf = html
+                            .getElementsByAttributeValue("type", "application/json")
+                            .stream()
+                            .flatMap(element -> element.getElementsByTag("script").stream())
+                            // get the text element
+                            .map(element -> element.childNode(0))
+                            .map(element -> element.toString())
+                            .map(text -> new JSONObject(text))
+                            .filter(json -> json.has("article"))
+                            .map(json -> json.getJSONObject("article"))
+                            .filter(json -> json.has("pdfDownload"))
+                            .map(json -> json.getJSONObject("pdfDownload"))
+                            .filter(json -> json.has("linkToPdf"))
+                            .map(json -> json.getString("linkToPdf"))
+                            .map(linkToPdf -> String.format("%s://%s%s", protocol, authority, linkToPdf))
+                            .findAny();
+                    if (fullLinkToPdf.isPresent()) {
+                        LOGGER.info("Fulltext PDF found at ScienceDirect.");
+                        // new URL may through "MalformedURLException", thus using "isPresent()" above and ".get()"
+                        Optional<URL> pdfLink = Optional.of(new URL(fullLinkToPdf.get()));
                         return pdfLink;
                     }
                 }
