@@ -51,10 +51,12 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws Exception {
-        ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
-        builder.singleYear(getTestYear());
+        ComplexSearchQuery complexSearchQuery = ComplexSearchQuery
+                .builder()
+                .singleYear(getTestYear())
+                .build();
 
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performComplexSearch(complexSearchQuery);
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
