@@ -2239,7 +2239,6 @@ public class JabRefPreferences implements PreferencesService {
                 getCitationKeyPatternPreferences());
     }
 
-
     @Override
     public NewLineSeparator getNewLineSeparator() {
         return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
