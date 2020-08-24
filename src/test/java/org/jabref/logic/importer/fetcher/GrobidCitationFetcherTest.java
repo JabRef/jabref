@@ -34,12 +34,14 @@ public class GrobidCitationFetcherTest {
                 .withField(StandardField.PAGES, "245--259")
                 .withField(StandardField.VOLUME, "23")
                 .withField(StandardField.NUMBER, "4");
+
     static String example2 = "Thomas, H. K. (2004). Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation). University of Colorado, Boulder.";
     static BibEntry example2AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
             .withField(StandardField.AUTHOR, "Thomas, H")
             .withField(StandardField.TITLE, "Training strategies for improving listeners' comprehension of foreign-accented speech (Doctoral dissertation)")
             .withField(StandardField.YEAR, "2004")
             .withField(StandardField.ADDRESS, "Boulder");
+
     static String example3 = "Turk, J., Graham, P., & Verhulst, F. (2007). Child and adolescent psychiatry : A developmental approach. Oxford, England: Oxford University Press.";
     static BibEntry example3AsBibEntry = new BibEntry(BibEntry.DEFAULT_TYPE).withCiteKey("-1")
             .withField(StandardField.AUTHOR, "Turk, J and Graham, P and Verhulst, F")
@@ -47,6 +49,7 @@ public class GrobidCitationFetcherTest {
             .withField(StandardField.PUBLISHER, "Oxford University Press")
             .withField(StandardField.YEAR, "2007")
             .withField(StandardField.ADDRESS, "Oxford, England");
+
     static String example4 = "Carr, I., & Kidner, R. (2003). Statutes and conventions on international trade law (4th ed.). London, England: Cavendish.";
     static BibEntry example4AsBibEntry = new BibEntry(StandardEntryType.InBook).withCiteKey("-1")
             .withField(StandardField.AUTHOR, "Carr, I and Kidner, R")
@@ -54,9 +57,6 @@ public class GrobidCitationFetcherTest {
             .withField(StandardField.PUBLISHER, "Cavendish")
             .withField(StandardField.YEAR, "2003")
             .withField(StandardField.ADDRESS, "London, England");
-    static String invalidInput1 = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________";
-    static String invalidInput2 = "¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°";
-
 
     public static Stream<Arguments> provideExamplesForCorrectResultTest() {
         return Stream.of(
@@ -64,6 +64,13 @@ public class GrobidCitationFetcherTest {
                 Arguments.of("example2", example2AsBibEntry, example2),
                 Arguments.of("example3", example3AsBibEntry, example3),
                 Arguments.of("example4", example4AsBibEntry, example4)
+        );
+    }
+
+    public static Stream<Arguments> provideInvalidInput() {
+        return Stream.of(
+                Arguments.of("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx________________________________"),
+                Arguments.of("¦@#¦@#¦@#¦@#¦@#¦@#¦@°#¦@¦°¦@°")
         );
     }
 
@@ -86,11 +93,10 @@ public class GrobidCitationFetcherTest {
         assertEquals(Collections.emptyList(), entries);
     }
 
-    @Test
-    public void grobidPerformSearchWithInvalidDataTest() {
-        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput1);
-        assertEquals(Collections.emptyList(), entries);
-        entries = grobidCitationFetcher.performSearch(invalidInput2);
+    @ParameterizedTest
+    @MethodSource("provideInvalidInput")
+    public void grobidPerformSearchWithInvalidDataTest(String invalidInput) {
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
         assertEquals(Collections.emptyList(), entries);
     }
 
