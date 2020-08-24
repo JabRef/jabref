@@ -128,7 +128,7 @@ public class CleanupPresetPanel extends VBox {
         activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);
 
         return new CleanupPreset(activeJobs, new FieldFormatterCleanups(
-                formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
+                !formatterCleanupsPanel.cleanupsDisableProperty().not().getValue(), //We have to use the not here as bindBidrectional can't be bound to a BooleanBinding
                 formatterCleanupsPanel.cleanupsProperty()));
     }
 }
