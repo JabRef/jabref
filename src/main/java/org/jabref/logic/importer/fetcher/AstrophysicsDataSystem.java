@@ -156,7 +156,9 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
              .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)
-             .map(abstractText -> abstractText.replace("<P />", "").trim())
+             .map(abstractText -> abstractText.replace("<P />", ""))
+             .map(abstractText -> abstractText.replace("\\textbackslash", ""))
+             .map(abstractText -> abstractText.trim())
              .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");

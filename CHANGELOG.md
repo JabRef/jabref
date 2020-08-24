@@ -104,6 +104,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue about duplicated group color indicators [#6175](https://github.com/JabRef/jabref/issues/6175)
 - We fixed an issue where entries with the entry type Misc from an imported aux file would not be saved correctly to the bib file on disk [#6405](https://github.com/JabRef/jabref/issues/6405)
 - We fixed an issue where percent sign ('%') was not formatted properly by the HTML formatter [#6753](https://github.com/JabRef/jabref/issues/6753)
+- We fixed an issue with the [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ads) fetcher where `\textbackslash` appeared at the end of the abstract.
+- We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. Fixes [#5860](https://github.com/JabRef/jabref/issues/5860)
 
 ### Removed
 
