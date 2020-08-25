@@ -86,14 +86,14 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
             try {
-                throw new FetcherException("A network error occurred while fetching from " + getURLForQuery(query), e);
+                throw new FetcherException("A network error occurred while fetching from " + getComplexQueryURL(complexSearchQuery), e);
             } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
                 // does not happen
                 throw new FetcherException("A network error occurred", e);
             }
         } catch (ParseException e) {
             try {
-                throw new FetcherException("An internal parser error occurred while fetching from " + getURLForQuery(query), e);
+                throw new FetcherException("An internal parser error occurred while fetching from " + getComplexQueryURL(complexSearchQuery), e);
             } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
                 // does not happen
                 throw new FetcherException("An internal parser error occurred", e);
