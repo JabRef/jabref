@@ -13,8 +13,6 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.slf4j.LoggerFactory;
-
 /**
  * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
  * <ol>
@@ -37,37 +35,37 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      */
     Parser getParser();
 
-    /**
-     * Fetch the entries from the given URL. This method is used by {@link #performSearch(String)} and {@link #performComplexSearch(ComplexSearchQuery)}
-     */
-    default List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
-        LoggerFactory.getLogger(this.getClass()).debug("Using query URL {}", urlForQuery.toString());
-        try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
-            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
-            fetchedEntries.forEach(this::doPostCleanup);
-            return fetchedEntries;
-        } catch (IOException e) {
-            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
-            throw new FetcherException(String.format("A network error occurred when fetching from %s", urlForQuery.toString()), e);
-        } catch (ParseException e) {
-            throw new FetcherException(String.format("An internal parser error occurred when fetching from %s", urlForQuery.toString()), e);
-        }
-    }
-
     @Override
     default List<BibEntry> performSearch(String query) throws FetcherException {
         if (StringUtil.isBlank(query)) {
             return Collections.emptyList();
         }
 
-        URL urlForQuery;
-        try {
-            urlForQuery = getURLForQuery(query);
-        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
-            throw new FetcherException(String.format("Search URI %s is malformed", query), e);
-        }
+        try (InputStream stream = getUrlDownload(getURLForQuery(query)).asInputStream()) {
+            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
-        return getBibEntries(urlForQuery);
+            // Post-cleanup
+            fetchedEntries.forEach(this::doPostCleanup);
+
+            return fetchedEntries;
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
+            try {
+                throw new FetcherException("A network error occurred while fetching from " + getURLForQuery(query), e);
+            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
+                // does not happen
+                throw new FetcherException("A network error occurred", e);
+            }
+        } catch (ParseException e) {
+            try {
+                throw new FetcherException("An internal parser error occurred while fetching from " + getURLForQuery(query), e);
+            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
+                // does not happen
+                throw new FetcherException("An internal parser error occurred", e);
+            }
+        }
     }
 
     /**
@@ -79,13 +77,28 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      */
     @Override
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        URL complexQueryURL;
-        try {
-            complexQueryURL = getComplexQueryURL(complexSearchQuery);
-        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+        try (InputStream stream = getUrlDownload(getComplexQueryURL(complexSearchQuery)).asInputStream()) {
+            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+            fetchedEntries.forEach(this::doPostCleanup);
+            return fetchedEntries;
+        } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
+            try {
+                throw new FetcherException("A network error occurred while fetching from " + getURLForQuery(query), e);
+            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
+                // does not happen
+                throw new FetcherException("A network error occurred", e);
+            }
+        } catch (ParseException e) {
+            try {
+                throw new FetcherException("An internal parser error occurred while fetching from " + getURLForQuery(query), e);
+            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
+                // does not happen
+                throw new FetcherException("An internal parser error occurred", e);
+            }
         }
-        return getBibEntries(complexQueryURL);
     }
 
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
