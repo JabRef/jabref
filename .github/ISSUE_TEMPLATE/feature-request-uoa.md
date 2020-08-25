@@ -1,5 +1,5 @@
 ---
-name: Feature Request
+name: UoA Feature Request
 about: Create a feature request
 title: ''
 labels: feature
