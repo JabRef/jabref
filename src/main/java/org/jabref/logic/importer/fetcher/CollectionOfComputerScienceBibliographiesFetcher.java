@@ -15,6 +15,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -58,7 +59,7 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
         new FieldFormatterCleanup(StandardField.EDITOR, new RemoveDigitsFormatter()).cleanup(entry);
         // identifier fields is a key-value field
         // example: "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000505046100032; Scopus 2-s2.0-85037741580"
-        // thus, key can contain multiple ":"; sometimes value seaprated by " " instead of ":"
+        // thus, key can contain multiple ":"; sometimes value separated by " " instead of ":"
         UnknownField identifierField = new UnknownField("identifier");
         entry.getField(identifierField)
              .stream()
@@ -77,7 +78,10 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
                  // in the case "urn:isbn:", just "isbn" is used
                  String key = identifierKeyValueSplit[length - 2];
                  String value = identifierKeyValueSplit[length - 1];
-                 entry.setField(FieldFactory.parseField(key), value);
+                 Field field = FieldFactory.parseField(key);
+                 if (!entry.hasField(field)) {
+                     entry.setField(field, value);
+                 }
              });
         entry.clearField(identifierField);
     }
