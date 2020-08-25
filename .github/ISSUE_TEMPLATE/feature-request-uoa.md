@@ -2,7 +2,7 @@
 name: UoA Feature Request
 about: Create a feature request
 title: ''
-labels: feature
+labels: user story
 assignees: ''
 
 ---
