@@ -217,8 +217,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         String content = new URLDownload(queryURL).asString();
 
         if (needsCaptcha(content)) {
-            LOGGER.info("Captcha hit at {}", queryURL);
-            throw new FetcherException("Fetching from Google Scholar failed.",
+            throw new FetcherException("Fetching from Google Scholar failed: Captacha hit at " + queryURL + ".",
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 

@@ -67,8 +67,6 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
                 .withCiteKey("oai:DiVA.org:lnu-68408")
-                // instead of the plain "identifier" field, the converter maps that field to
-                // .withField(new UnknownField("identifier"), "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000505046100032; Scopus 2-s2.0-85037741580")
                 .withField(StandardField.ISBN, "978-1-4503-5217-8")
                 .withField(StandardField.DOI, "10.1145/3129790.3129810")
                 .withField(new UnknownField("ISI"), "000505046100032")
