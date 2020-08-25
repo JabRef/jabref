@@ -122,5 +122,4 @@ public class Medra implements IdBasedParserFetcher {
     public void doPostCleanup(BibEntry entry) {
         new DoiCleanup().cleanup(entry);
     }
-
 }

@@ -26,20 +26,24 @@ import javafx.scene.input.TransferMode;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -50,43 +54,43 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
 
     private final BasePanel panel;
-
     private final BibDatabaseContext database;
-    private final UndoManager undoManager;
-
     private final MainTableDataModel model;
+
     private final ImportHandler importHandler;
     private final CustomLocalDragboard localDragboard;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
-    public MainTable(MainTableDataModel model, JabRefFrame frame,
-                     BasePanel panel, BibDatabaseContext database,
-                     MainTablePreferences preferences, ExternalFileTypes externalFileTypes, KeyBindingRepository keyBindingRepository) {
+    public MainTable(MainTableDataModel model,
+                     BasePanel panel,
+                     BibDatabaseContext database,
+                     PreferencesService preferencesService,
+                     DialogService dialogService,
+                     StateManager stateManager,
+                     ExternalFileTypes externalFileTypes,
+                     KeyBindingRepository keyBindingRepository) {
         super();
 
-        this.setOnKeyTyped(key -> {
-            if (this.getSortOrder().isEmpty()) {
-                return;
-            }
-            this.jumpToSearchKey(getSortOrder().get(0), key);
-        });
-
-        this.model = model;
+        this.panel = panel;
         this.database = Objects.requireNonNull(database);
-
-        this.undoManager = panel.getUndoManager();
+        this.model = model;
+        UndoManager undoManager = panel.getUndoManager();
+        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
-                frame.getDialogService(), database, externalFileTypes,
-                Globals.prefs,
+                dialogService, database, externalFileTypes,
+                preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
-                Globals.stateManager);
-        localDragboard = Globals.stateManager.getLocalDragboard();
+                stateManager);
 
-        this.getColumns().addAll(new MainTableColumnFactory(database, preferences.getColumnPreferences(), externalFileTypes, panel.getUndoManager(), frame.getDialogService()).createColumns());
+        localDragboard = stateManager.getLocalDragboard();
+
+        this.getColumns().addAll(
+                new MainTableColumnFactory(database, preferencesService, externalFileTypes, panel.getUndoManager(), dialogService)
+                        .createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -94,7 +98,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel.showAndEdit(entry.getEntry());
                     }
                 })
-                .withContextMenu(entry -> RightClickMenu.create(entry, keyBindingRepository, panel, frame.getDialogService(), Globals.stateManager, Globals.prefs))
+                .withContextMenu(entry -> RightClickMenu.create(entry,
+                        keyBindingRepository,
+                        panel,
+                        dialogService,
+                        stateManager,
+                        preferencesService))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -103,33 +112,40 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
-        preferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
                     .ifPresent(column -> this.getSortOrder().add(column)));
 
-        if (preferences.getResizeColumnsToFit()) {
+        if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
         }
+
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
+
         // Enable sorting
         model.getEntriesFilteredAndSorted().comparatorProperty().bind(this.comparatorProperty());
-
-        this.panel = panel;
 
         this.getStylesheets().add(MainTable.class.getResource("MainTable.css").toExternalForm());
 
         // Store visual state
-        new PersistenceVisualStateTable(this, Globals.prefs);
+        new PersistenceVisualStateTable(this, preferencesService);
 
         // TODO: Float marked entries
         // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
+
+        this.setOnKeyTyped(key -> {
+            if (this.getSortOrder().isEmpty()) {
+                return;
+            }
+            this.jumpToSearchKey(getSortOrder().get(0), key);
+        });
 
         database.getDatabase().registerListener(this);
     }
@@ -143,11 +159,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      */
 
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
-        if (keyEvent.getCharacter() == null || sortedColumn == null) {
+        if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {
             return;
         }
 
-        if (System.currentTimeMillis() - lastKeyPressTime < 700) {
+        if ((System.currentTimeMillis() - lastKeyPressTime) < 700) {
             columnSearchTerm += keyEvent.getCharacter().toLowerCase();
         } else {
             columnSearchTerm = keyEvent.getCharacter().toLowerCase();
@@ -221,9 +237,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        paste();
-                        event.consume();
-                        break;
+                        if (!OS.OS_X) { // ugly hack, prevents duplicate entries on pasting. Side effect: Prevents pasting using cmd+v on an empty library
+                            paste();
+                            event.consume();
+                            break;
+                        }
                     case COPY:
                         copy();
                         event.consume();
@@ -258,6 +276,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }
+
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

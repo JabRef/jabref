@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>ZooKeys</title>
-    <id>http://www.zotero.org/styles/zookeys</id>
-    <link href="http://www.zotero.org/styles/zookeys" rel="self"/>
+    <title>Pensoft Journals</title>
+    <id>http://www.zotero.org/styles/pensoft-journals</id>
+    <link href="http://www.zotero.org/styles/pensoft-journals" rel="self"/>
     <link href="http://www.zotero.org/styles/zootaxa" rel="template"/>
     <link href="https://zookeys.pensoft.net/about#CitationsandReferences" rel="documentation"/>
     <author>
       <name>Brian Stucky</name>
       <email>stuckyb@colorado.edu</email>
     </author>
+    <author>
+      <name>Teodor Georgiev</name>
+      <email>t.georgiev@pensoft.net</email>
+    </author>
     <category citation-format="author-date"/>
-    <category field="biology"/>
-    <issn>1313-2989</issn>
-    <eissn>1313-2970</eissn>
-    <summary>The ZooKeys style.</summary>
-    <updated>2015-11-07T07:40:10+00:00</updated>
+    <summary>The Pensoft Journals style</summary>
+    <updated>2020-08-21T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -24,11 +25,17 @@
       <date-part name="day" suffix=", "/>
       <date-part name="year"/>
     </date>
+    <terms>
+      <term name="editor" form="short">
+        <single>ed.</single>
+        <multiple>eds</multiple>
+      </term>
+    </terms>
   </locale>
   <macro name="editor">
     <names variable="editor" delimiter=", ">
       <name initialize-with="" name-as-sort-order="all" sort-separator=" "/>
-      <label form="short" prefix=" (" text-case="capitalize-first" suffix=")" strip-periods="true"/>
+      <label form="short" prefix=" (" text-case="capitalize-first" suffix=")"/>
     </names>
   </macro>
   <macro name="anon">
@@ -38,7 +45,7 @@
     <names variable="author">
       <name delimiter-precedes-last="never" initialize-with="" name-as-sort-order="all" sort-separator=" "/>
       <et-al font-style="italic"/>
-      <label form="short" prefix=" " suffix="." text-case="lowercase" strip-periods="true"/>
+      <label form="short" prefix=" (" text-case="capitalize-first" suffix=")"/>
       <substitute>
         <names variable="editor"/>
         <text macro="anon"/>
@@ -48,7 +55,6 @@
   <macro name="author-short">
     <names variable="author">
       <name form="short" delimiter=" " and="text" delimiter-precedes-last="never" initialize-with=". "/>
-      <et-al font-style="normal"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -83,14 +89,7 @@
     </choose>
   </macro>
   <macro name="title">
-    <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text variable="title" font-style="normal"/>
-      </if>
-      <else>
-        <text variable="title" quotes="false"/>
-      </else>
-    </choose>
+    <text variable="title"/>
   </macro>
   <macro name="legal_case">
     <group prefix=" " delimiter=" ">
@@ -135,7 +134,7 @@
       <if is-numeric="edition">
         <group delimiter=" ">
           <number variable="edition" form="ordinal"/>
-          <text term="edition" form="short" suffix="." strip-periods="true"/>
+          <text term="edition" form="short"/>
         </group>
       </if>
       <else>
@@ -156,7 +155,7 @@
       </else>
     </choose>
   </macro>
-  <citation name-form="short" et-al-min="3" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
+  <citation name-form="short" et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
       <key macro="year-date"/>
       <key macro="author-short"/>
@@ -179,8 +178,8 @@
       <key variable="title"/>
     </sort>
     <layout suffix=" ">
-      <text macro="author" suffix=" ("/>
-      <date variable="issued" suffix=")">
+      <text macro="author" suffix=" "/>
+      <date variable="issued" prefix="(" suffix=")">
         <date-part name="year"/>
       </date>
       <choose>
@@ -200,8 +199,8 @@
           <text macro="title" prefix=" " suffix="."/>
           <group prefix=" In: " delimiter=" ">
             <text macro="editor" suffix=","/>
-            <text variable="container-title" font-style="normal" suffix="."/>
-            <text variable="collection-title" font-style="normal" suffix="."/>
+            <text variable="container-title" suffix="."/>
+            <text variable="collection-title" suffix="."/>
             <group suffix=".">
               <text macro="publisher"/>
               <group delimiter=" " prefix=", " suffix=".">
@@ -228,7 +227,7 @@
             <text macro="editor"/>
           </group>
           <group prefix=" " suffix=".">
-            <text variable="container-title" font-style="normal"/>
+            <text variable="container-title"/>
             <group prefix=" ">
               <text variable="volume"/>
             </group>
