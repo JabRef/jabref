@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -27,7 +28,7 @@ public class SpringerLink implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
 
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
-    private static final String API_KEY = "a98b4a55181ffcd27259bea45edad12e";
+    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
 
     @Override
