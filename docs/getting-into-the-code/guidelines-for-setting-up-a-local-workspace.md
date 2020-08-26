@@ -150,8 +150,8 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".  
    ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
-* Add the folder `src/main/gen` as generated sources root  
-   ![src/main/gen is generated](../.gitbook/assets/intellij-mark-src-main-gen-as-generated-sources-root.png.png)
+* Make sure that the folder `src/main/gen` is indeed set as generated sources root. If not, mark it as "generated sources root":  
+   ![src/main/gen is generated](../.gitbook/assets/intellij-mark-src-main-gen-as-generated-sources-root.png)
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins`. Otherwise, you will see folowing error:
 
    ```text
