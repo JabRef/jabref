@@ -41,31 +41,14 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try (InputStream stream = getUrlDownload(getURLForQuery(query)).asInputStream()) {
-            List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
-
-            // Post-cleanup
-            fetchedEntries.forEach(this::doPostCleanup);
-
-            return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
-            try {
-                throw new FetcherException("A network error occurred while fetching from " + getURLForQuery(query), e);
-            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
-                // does not happen
-                throw new FetcherException("A network error occurred", e);
-            }
-        } catch (ParseException e) {
-            try {
-                throw new FetcherException("An internal parser error occurred while fetching from " + getURLForQuery(query), e);
-            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
-                // does not happen
-                throw new FetcherException("An internal parser error occurred", e);
-            }
+        // ADR-0014
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForQuery(query);
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+            throw new FetcherException(String.format("Search URI crafted from query %s is malformed", query), e);
         }
+        return getBibEntries(urlForQuery);
     }
 
     /**
@@ -77,27 +60,25 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      */
     @Override
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        try (InputStream stream = getUrlDownload(getComplexQueryURL(complexSearchQuery)).asInputStream()) {
+        // ADR-0014
+        URL urlForQuery;
+        try {
+            urlForQuery = getComplexQueryURL(complexSearchQuery);
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
+        }
+        return getBibEntries(urlForQuery);
+    }
+
+    private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
+        try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
             fetchedEntries.forEach(this::doPostCleanup);
             return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401/403 errors and report that user has no rights to access resource
-            try {
-                throw new FetcherException("A network error occurred while fetching from " + getComplexQueryURL(complexSearchQuery), e);
-            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
-                // does not happen
-                throw new FetcherException("A network error occurred", e);
-            }
+            throw new FetcherException("A network error occurred while fetching from " + urlForQuery, e);
         } catch (ParseException e) {
-            try {
-                throw new FetcherException("An internal parser error occurred while fetching from " + getComplexQueryURL(complexSearchQuery), e);
-            } catch (URISyntaxException | MalformedURLException uriSyntaxException) {
-                // does not happen
-                throw new FetcherException("An internal parser error occurred", e);
-            }
+            throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
         }
     }
 

@@ -92,7 +92,6 @@ Example code:
         ...
     } catch (URISyntaxException | MalformedURLException | FetcherException e) {
         throw new FetcherException(String.format("Search URI %s is malformed", query), e);
-    }
     } catch (IOException e) {
         throw new FetcherException("A network error occurred while fetching from " + urlForQuery.toString(), e);
     } catch (ParseException e) {
