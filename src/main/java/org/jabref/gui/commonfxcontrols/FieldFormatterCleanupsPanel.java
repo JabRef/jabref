@@ -22,7 +22,6 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
