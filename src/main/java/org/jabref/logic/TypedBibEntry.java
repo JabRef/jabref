@@ -22,7 +22,8 @@ public class TypedBibEntry {
     public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
         this.database = Optional.empty();
-        this.mode = Objects.requireNonNull(mode);
+        // mode may be null
+        this.mode = mode;
     }
 
     public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {

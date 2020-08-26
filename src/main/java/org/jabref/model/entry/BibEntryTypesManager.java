@@ -136,7 +136,9 @@ public class BibEntryTypesManager {
     }
 
     /**
-     * This method returns the BibtexEntryType for the entry type.
+     * This method returns the BibEntryType for the entry type.
+     *
+     * @param mode the mode of the BibDatabase, may be null
      */
     public Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.enrich(type) : BIBTEX.enrich(type);
