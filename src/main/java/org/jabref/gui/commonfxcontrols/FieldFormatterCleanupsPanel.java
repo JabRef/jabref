@@ -22,6 +22,7 @@ import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
@@ -106,7 +107,13 @@ public class FieldFormatterCleanupsPanel extends VBox {
     }
 
     private void setupBindings() {
-        cleanupsEnabled.selectedProperty().bindBidirectional(cleanupsDisableProperty());
+        // cannot bindBidirectional, because viewModel.cleanupsDisableProperty().not() provides a read only
+        // BooleanBinding, but bindBidirectional requires a simple BooleanProperty
+        cleanupsEnabled.selectedProperty().addListener((observableValue, oldValue, newValue) ->
+                viewModel.cleanupsDisableProperty().setValue(!observableValue.getValue()));
+        viewModel.cleanupsDisableProperty().addListener((observableValue, oldValue, newValue) ->
+                cleanupsEnabled.setSelected(!observableValue.getValue()));
+
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
         addableFields.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
