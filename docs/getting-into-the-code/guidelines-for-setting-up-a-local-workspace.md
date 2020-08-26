@@ -153,6 +153,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * Add the folder `src/main/gen` as generated sources root  
    ![src/main/gen is generated](../.gitbook/assets/intellij-mark-src-main-gen-as-generated-sources-root.png.png)
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins`. Otherwise, you will see folowing error:
+
    ```text
   Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
   ```
