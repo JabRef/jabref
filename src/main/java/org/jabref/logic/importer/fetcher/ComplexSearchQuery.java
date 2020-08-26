@@ -1,15 +1,18 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.strings.StringUtil;
 
+import org.apache.lucene.index.Term;
+
 public class ComplexSearchQuery {
     // Field for non-fielded search
-    private final String defaultField;
+    private final List<String> defaultField;
     private final List<String> authors;
     private final List<String> titlePhrases;
     private final Integer fromYear;
@@ -17,7 +20,7 @@ public class ComplexSearchQuery {
     private final Integer singleYear;
     private final String journal;
 
-    private ComplexSearchQuery(String defaultField, List<String> authors, List<String> titlePhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal) {
+    private ComplexSearchQuery(List<String> defaultField, List<String> authors, List<String> titlePhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal) {
         this.defaultField = defaultField;
         this.authors = authors;
         this.titlePhrases = titlePhrases;
@@ -28,7 +31,7 @@ public class ComplexSearchQuery {
         this.singleYear = singleYear;
     }
 
-    public Optional<String> getDefaultField() {
+    public Optional<List<String>> getDefaultFieldPhrases() {
         return Optional.ofNullable(defaultField);
     }
 
@@ -61,7 +64,7 @@ public class ComplexSearchQuery {
     }
 
     public static class ComplexSearchQueryBuilder {
-        private String defaultField;
+        private List<String> defaultFieldPhrases;
         private List<String> authors;
         private List<String> titlePhrases;
         private String journal;
@@ -69,14 +72,18 @@ public class ComplexSearchQuery {
         private Integer toYear;
         private Integer singleYear;
 
-        public ComplexSearchQueryBuilder() {
+        private ComplexSearchQueryBuilder() {
         }
 
-        public ComplexSearchQueryBuilder defaultField(String defaultField) {
-            if (Objects.requireNonNull(defaultField).isBlank()) {
+        public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
+            if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
-            this.defaultField = defaultField;
+            if (Objects.isNull(defaultFieldPhrases)) {
+                this.defaultFieldPhrases = new ArrayList<>();
+            }
+            // Strip all quotes before wrapping
+            this.defaultFieldPhrases.add(String.format("\"%s\"", defaultFieldPhrase.replace("\"", "")));
             return this;
         }
 
@@ -135,6 +142,21 @@ public class ComplexSearchQuery {
             return this;
         }
 
+        public ComplexSearchQueryBuilder terms(Collection<Term> terms) {
+            terms.forEach(term -> {
+                String termText = term.text();
+                switch (term.field().toLowerCase()) {
+                    case "author" -> this.author(termText);
+                    case "title" -> this.titlePhrase(termText);
+                    case "journal" -> this.journal(termText);
+                    case "year" -> this.singleYear(Integer.valueOf(termText));
+                    case "year-range" -> this.fromYearAndToYear(Integer.valueOf(termText.split("-")[0]), Integer.valueOf(termText.split("-")[1]));
+                    case "default" -> this.defaultFieldPhrase(termText);
+                }
+            });
+            return this;
+        }
+
         /**
          * Instantiates the AdvancesSearchConfig from the provided Builder parameters
          * If all text fields are empty an empty optional is returned
@@ -147,11 +169,11 @@ public class ComplexSearchQuery {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
                 throw new IllegalStateException("At least one text field has to be set");
             }
-            return new ComplexSearchQuery(defaultField, authors, titlePhrases, fromYear, toYear, singleYear, journal);
+            return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, fromYear, toYear, singleYear, journal);
         }
 
         private boolean textSearchFieldsAndYearFieldsAreEmpty() {
-            return StringUtil.isBlank(defaultField) && this.stringListIsBlank(titlePhrases) &&
+            return this.stringListIsBlank(defaultFieldPhrases) && this.stringListIsBlank(titlePhrases) &&
                     this.stringListIsBlank(authors) && StringUtil.isBlank(journal) && yearFieldsAreEmpty();
         }
 

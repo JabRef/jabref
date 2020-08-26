@@ -137,6 +137,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.1') {
+        exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
+    }
+
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
 
     implementation 'org.postgresql:postgresql:42.2.16'

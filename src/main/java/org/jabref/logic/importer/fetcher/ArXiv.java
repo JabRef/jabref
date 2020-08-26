@@ -269,7 +269,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
         // Since ArXiv API does not support year search, we ignore the year related terms
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
-        complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
+        complexSearchQuery.getDefaultFieldPhrases().ifPresent(searchTerms::addAll);
         String complexQueryString = String.join(" AND ", searchTerms);
         return performSearch(complexQueryString);
     }

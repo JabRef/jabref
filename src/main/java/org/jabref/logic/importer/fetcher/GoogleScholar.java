@@ -203,7 +203,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
         List<String> searchTerms = new ArrayList<>();
-        complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
+        complexSearchQuery.getDefaultFieldPhrases().ifPresent(searchTerms::addAll);
         complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("author:" + author)));
         complexSearchQuery.getTitlePhrases().ifPresent(phrases -> searchTerms.add("allintitle:" + String.join(" ", phrases)));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("source:" + journal));
