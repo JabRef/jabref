@@ -88,7 +88,7 @@ Example code:
 ### Include URL creation as statement before the stream creation in the try-with-resources block
 
 ```java
-    try (URL urlForQuery = getURLForQuery(query); InputStream stream = getURLForQuery(query).asInputStream()) {
+    try (URL urlForQuery = getURLForQuery(query); InputStream stream = urlForQuery.asInputStream()) {
         ...
     } catch (URISyntaxException | MalformedURLException | FetcherException e) {
         throw new FetcherException(String.format("Search URI %s is malformed", query), e);
@@ -102,4 +102,4 @@ Example code:
 
 * Good, because the single try/catch-block can be kept
 * Good, because logical flow is kept
-* Bad, because does not compile
+* Bad, because does not compile (because URL is not an `AutoClosable`)
