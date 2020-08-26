@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Taxon</title>
     <id>http://www.zotero.org/styles/taxon</id>
     <link href="http://www.zotero.org/styles/taxon" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
-    <link href="http://www.iapt-taxon.org/pages/taxonguidelines" rel="documentation"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/19968175/homepage/author-guidelines" rel="documentation"/>
     <author>
       <name>Patrick O'Brien, PhD</name>
       <email>obrienpat86@gmail.com</email>
@@ -18,7 +19,7 @@
     <category field="botany"/>
     <issn>0040-0262</issn>
     <eissn>1996-8175</eissn>
-    <updated>2020-08-20T12:00:00+00:00</updated>
+    <updated>2020-08-24T15:01:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -110,7 +111,7 @@
             </choose>
           </else-if>
           <else>
-            <text variable="title" form="short" quotes="true"/>
+            <text variable="title" form="short" quotes="false"/>
           </else>
         </choose>
       </substitute>
@@ -125,18 +126,12 @@
           </if>
           <else-if variable="archive" match="any">
             <group>
-              <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-              <text term="from" suffix=" "/>
               <text variable="archive" suffix="."/>
               <text variable="archive_location" prefix=" (" suffix=")"/>
             </group>
           </else-if>
           <else>
-            <group>
-              <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-              <text term="from" suffix=" "/>
-              <text variable="URL"/>
-            </group>
+            <text variable="URL"/>
           </else>
         </choose>
       </if>
@@ -161,11 +156,7 @@
                 </group>
               </if>
               <else>
-                <group>
-                  <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-                  <text term="from" suffix=" "/>
-                  <text variable="URL"/>
-                </group>
+                <text variable="URL"/>
               </else>
             </choose>
           </else>
@@ -219,7 +210,7 @@
     <text macro="title"/>
     <choose>
       <if type="report thesis" match="any">
-        <group prefix=" (" suffix=")" delimiter=", ">
+        <group prefix=". " delimiter=", ">
           <group delimiter=" ">
             <choose>
               <if variable="genre" match="any">
@@ -262,18 +253,12 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="report" match="any">
+      <if type="report thesis" match="any">
         <group delimiter=": ">
           <text variable="publisher-place"/>
           <text variable="publisher"/>
         </group>
       </if>
-      <else-if type="thesis" match="any">
-        <group delimiter=", ">
-          <text variable="publisher"/>
-          <text variable="publisher-place"/>
-        </group>
-      </else-if>
       <else-if type="post-weblog webpage" match="none">
         <group delimiter=", ">
           <choose>
@@ -342,7 +327,7 @@
                     <date-part prefix=", " name="month"/>
                   </date>
                 </if>
-                <else-if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song dataset" match="none">
+                <else-if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song thesis dataset" match="none">
                   <date variable="issued">
                     <date-part prefix=", " name="month"/>
                     <date-part prefix=" " name="day"/>
@@ -369,7 +354,7 @@
   </macro>
   <macro name="issued-sort">
     <choose>
-      <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song dataset" match="none">
+      <if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song thesis dataset" match="none">
         <date variable="issued">
           <date-part name="year"/>
           <date-part name="month"/>
@@ -459,9 +444,9 @@
               </group>
             </if>
             <else>
-              <group>
+              <group delimiter=" ">
+                <number variable="number-of-volumes" form="numeric"/>
                 <text term="volume" form="short" plural="true" text-case="lowercase" suffix=" "/>
-                <number variable="number-of-volumes" form="numeric" prefix="1&#8211;"/>
               </group>
             </else>
           </choose>
@@ -481,14 +466,11 @@
     </choose>
   </macro>
   <macro name="citation-locator">
-    <group>
+    <group delimiter=" ">
       <choose>
-        <if locator="chapter">
-          <label variable="locator" form="long" text-case="capitalize-first"/>
-        </if>
-        <else-if locator="page" match="none">
+        <if locator="page" match="none">
           <label variable="locator" form="short" suffix=" "/>
-        </else-if>
+        </if>
       </choose>
       <text variable="locator"/>
     </group>
@@ -499,7 +481,11 @@
         <group>
           <choose>
             <if type="chapter paper-conference entry-encyclopedia" match="any">
-              <text term="in" suffix=": "/>
+              <group prefix=" " suffix=" " delimiter=" ">
+                <label text-case="capitalize-first" variable="page" form="short"/>
+                <text variable="page"/>
+                <text term="in" suffix=": "/>
+              </group>
             </if>
           </choose>
           <group delimiter=", ">
@@ -566,7 +552,7 @@
   </macro>
   <macro name="series">
     <choose>
-      <if type="book chapter">
+      <if type="book chapter" match="any">
         <group delimiter=" ">
           <text variable="collection-title" text-case="title"/>
           <text variable="collection-number"/>

@@ -174,7 +174,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("name:" + author)));
         complexSearchQuery.getTitlePhrases().ifPresent(titlePhrases -> titlePhrases.forEach(title -> searchTerms.add("title:" + title)));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
-        // Since Springer API does not support year range search we ignore formYear and toYear.
+        // Since Springer API does not support year range search, we ignore formYear and toYear and use "singleYear" only
         complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("year:" + year.toString()));
         complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
         return String.join(" AND ", searchTerms);
