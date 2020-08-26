@@ -61,6 +61,8 @@ Example code:
 ```java
     try (InputStream stream = getUrlDownload(getURLForQuery(query)).asInputStream()) {
         ...
+    } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+        throw new FetcherException(String.format("Search URI %s is malformed", query), e);
     } catch (IOException e) {
         try {
             throw new FetcherException("A network error occurred while fetching from " + getURLForQuery(query), e);
@@ -81,6 +83,7 @@ Example code:
 * Good, because code inside the `try` statement stays the same
 * OK, because "Java by Comparison" does not state anything about it
 * Bad, because an additional try/catch-block is added to each catch statement
+* Bad, because needs a `throw` statement in the `URISyntaxException` catch block (even though at this point the exception cannot be thrown), because Java otherwise misses a `return` statement.
 
 ### Include URL creation as statement before the stream creation in the try-with-resources block
 
