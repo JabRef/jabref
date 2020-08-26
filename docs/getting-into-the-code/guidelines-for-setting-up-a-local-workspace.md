@@ -55,8 +55,9 @@ It is strongly recommend that you have git installed.
 ### IDE
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse \(for advanced users\)](https://eclipse.org/) \(`2020-03` or newer\).
+Version 2020.2 does not work. Please use version [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds).
 
-Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
+On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
 ### Other Tooling
 
@@ -142,13 +143,19 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
+Note that these steps do not work on IntelliJ 2020.2.
+
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
-
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".  
-
    ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
+* Add the folder `src/main/gen` as generated sources root  
+   ![src/main/gen is generated](../.gitbook/assets/intellij-mark-src-main-gen-as-generated-sources-root.png.png)
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins`. Otherwise, you will see folowing error:
+   ```text
+  Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
+  ```
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
