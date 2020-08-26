@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" default-locale="da-DK" and="symbol">
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" and="symbol" default-locale="da-DK">
   <info>
-    <title>University College Lillebælt - Harvard (Danish)</title>
-    <id>http://www.zotero.org/styles/university-college-lillebaelt-harvard</id>
-    <link href="http://www.zotero.org/styles/university-college-lillebaelt-harvard" rel="self"/>
-    <link href="http://esdhweb.ucl.dk/480836.Formm%C3%A6ssige%20krav%202014.pdf" rel="documentation"/>
+    <title>UCL University College - Harvard (Danish)</title>
+    <id>http://www.zotero.org/styles/ucl-university-college-harvard</id>
+    <link href="http://www.zotero.org/styles/ucl-university-college-harvard" rel="self"/>
+    <link href="https://sites.google.com/ucl.dk/ucl-formelle-krav/harvard" rel="documentation"/>
     <author>
       <name>Roald Erik Frøsig</name>
       <email>roaldfrosig@gmail.com</email>
     </author>
+    <contributor>
+      <name>Camilla K. Andresen</name>
+      <email>ckan1@ucl.dk</email>
+    </contributor>
     <category citation-format="author-date"/>
     <updated>2015-03-26T09:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
