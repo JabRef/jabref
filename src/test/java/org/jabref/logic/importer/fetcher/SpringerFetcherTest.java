@@ -81,6 +81,12 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
+    @Disabled("Year search is currently broken, because the API returns mutliple years.")
+    @Override
+    public void supportsYearSearch() throws Exception {
+    }
+
+    @Test
     @Disabled("Year range search is not natively supported by the API, but can be emulated by multiple single year searches.")
     @Override
     public void supportsYearRangeSearch() throws Exception {
