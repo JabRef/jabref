@@ -7,19 +7,6 @@ In case, there is no issue present, the pull request implementing the feature is
 
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
-
-### Added
-
-### Changed
-
-### Fixed
-
-- We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
-
-### Removed
-
-
 ## [5.1] – 2020-08-27
 
 ### Added
@@ -120,6 +107,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with the [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ads) fetcher where `\textbackslash` appeared at the end of the abstract.
 - We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. Fixes [#5860](https://github.com/JabRef/jabref/issues/5860)
 - We fixed an issue with the Library of Congress importer.
+- We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
 
 ### Removed
 
