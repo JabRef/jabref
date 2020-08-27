@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.model.cleanup.Formatter;
@@ -85,8 +84,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
 
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         // Default Implementation behaves like getURLForQuery using the default field phrases as query
-        Optional<List<String>> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
-        return this.getURLForQuery(defaultPhrases.map(strings -> String.join(" ", strings)).orElse(""));
+        List<String> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
+        return this.getURLForQuery(String.join(" ", defaultPhrases));
     }
 
     /**

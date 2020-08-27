@@ -31,16 +31,32 @@ public class ComplexSearchQuery {
         this.singleYear = singleYear;
     }
 
-    public Optional<List<String>> getDefaultFieldPhrases() {
-        return Optional.ofNullable(defaultField);
+    public static ComplexSearchQuery fromTerms(Collection<Term> terms) {
+        ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
+        terms.forEach(term -> {
+            String termText = term.text();
+            switch (term.field().toLowerCase()) {
+                case "author" -> builder.author(termText);
+                case "title" -> builder.titlePhrase(termText);
+                case "journal" -> builder.journal(termText);
+                case "year" -> builder.singleYear(Integer.valueOf(termText));
+                case "year-range" -> builder.fromYearAndToYear(Integer.valueOf(termText.split("-")[0]), Integer.valueOf(termText.split("-")[1]));
+                case "default" -> builder.defaultFieldPhrase(termText);
+            }
+        });
+        return builder.build();
     }
 
-    public Optional<List<String>> getAuthors() {
-        return Optional.ofNullable(authors);
+    public List<String> getDefaultFieldPhrases() {
+        return defaultField;
     }
 
-    public Optional<List<String>> getTitlePhrases() {
-        return Optional.ofNullable(titlePhrases);
+    public List<String> getAuthors() {
+        return authors;
+    }
+
+    public List<String> getTitlePhrases() {
+        return titlePhrases;
     }
 
     public Optional<Integer> getFromYear() {
@@ -63,10 +79,35 @@ public class ComplexSearchQuery {
         return new ComplexSearchQueryBuilder();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ComplexSearchQuery that = (ComplexSearchQuery) o;
+
+        // Just check for set equality, order does not matter
+        if (!(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) && that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases())))
+            return false;
+        if (!(getAuthors().containsAll(that.getAuthors()) && that.getAuthors().containsAll(getAuthors())))
+            return false;
+        if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) && that.getTitlePhrases().containsAll(getTitlePhrases())))
+            return false;
+        if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent())
+            return false;
+        if (getToYear().isPresent() ? !getToYear().equals(that.getToYear()) : that.getToYear().isPresent())
+            return false;
+        if (getSingleYear().isPresent() ? !getSingleYear().equals(that.getSingleYear()) : that.getSingleYear().isPresent())
+            return false;
+        return getJournal().isPresent() ? getJournal().equals(that.getJournal()) : !that.getJournal().isPresent();
+    }
+
     public static class ComplexSearchQueryBuilder {
-        private List<String> defaultFieldPhrases;
-        private List<String> authors;
-        private List<String> titlePhrases;
+        private List<String> defaultFieldPhrases = new ArrayList<>();
+        private List<String> authors = new ArrayList<>();
+        private List<String> titlePhrases = new ArrayList<>();
         private String journal;
         private Integer fromYear;
         private Integer toYear;
@@ -78,9 +119,6 @@ public class ComplexSearchQuery {
         public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
             if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
-            }
-            if (Objects.isNull(defaultFieldPhrases)) {
-                this.defaultFieldPhrases = new ArrayList<>();
             }
             // Strip all quotes before wrapping
             this.defaultFieldPhrases.add(String.format("\"%s\"", defaultFieldPhrase.replace("\"", "")));
@@ -94,9 +132,6 @@ public class ComplexSearchQuery {
             if (Objects.requireNonNull(author).isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
             }
-            if (Objects.isNull(authors)) {
-                this.authors = new ArrayList<>();
-            }
             // Strip all quotes before wrapping
             this.authors.add(String.format("\"%s\"", author.replace("\"", "")));
             return this;
@@ -108,9 +143,6 @@ public class ComplexSearchQuery {
         public ComplexSearchQueryBuilder titlePhrase(String titlePhrase) {
             if (Objects.requireNonNull(titlePhrase).isBlank()) {
                 throw new IllegalArgumentException("Parameter must not be blank");
-            }
-            if (Objects.isNull(titlePhrases)) {
-                this.titlePhrases = new ArrayList<>();
             }
             // Strip all quotes before wrapping
             this.titlePhrases.add(String.format("\"%s\"", titlePhrase.replace("\"", "")));
