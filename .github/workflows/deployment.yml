@@ -55,7 +55,7 @@ jobs:
         uses: joschi/setup-jdk@v2
         with:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
-          java-version: 1
+          java-version: 15
           release_type: ea
         if: matrix.os == 'macos-latest'
       - name: Set up JDK for linux and windows
