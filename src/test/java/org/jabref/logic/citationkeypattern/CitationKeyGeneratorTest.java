@@ -1100,7 +1100,7 @@ class CitationKeyGeneratorTest {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setField(StandardField.AUTHOR, "Gödel, Kurt");
 
-        assertEquals(2, generateKey(bibEntry, "[auth:truncate2").length());
+        assertEquals(2, generateKey(bibEntry, "[auth:truncate2]").length());
     }
 
     @Test
