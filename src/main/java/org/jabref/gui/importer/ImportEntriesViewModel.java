@@ -34,6 +34,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -53,8 +54,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private ParserResult parserResult = null;
-    private ObservableList<BibEntry> entries;
-    private PreferencesService preferences;
+    private final ObservableList<BibEntry> entries;
+    private final PreferencesService preferences;
 
     /**
      * @param databaseContext the database to import into
@@ -103,7 +104,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      *
      * @param entriesToImport subset of the entries contained in parserResult
      */
-    public void importEntries(List<BibEntry> entriesToImport, boolean downloadFiles) {
+    public void importEntries(List<BibEntry> entriesToImport, boolean shouldDownloadFiles) {
         // Check if we are supposed to warn about duplicates.
         // If so, then see if there are duplicates, and warn if yes.
         if (preferences.shouldWarnAboutDuplicatesForImport()) {
@@ -130,10 +131,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             buildImportHandlerThenImportEntries(entriesToImport);
         }
 
-        if (downloadFiles) {
+        // Remember the selection in the dialog
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        filePreferences.setShouldDownloadLinkedFiles(shouldDownloadFiles);
+        preferences.storeFilePreferences(filePreferences);
+
+        if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
                 for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, bibEntry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), ExternalFileTypes.getInstance());
+                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, bibEntry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), filePreferences, ExternalFileTypes.getInstance());
                     linkedFileViewModel.download();
                 }
             }
@@ -163,7 +169,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         MetaData targetMetada = databaseContext.getMetaData();
         parserResult.getMetaData()
                     .getContentSelectorList()
-                    .forEach(contentSelector -> targetMetada.addContentSelector(contentSelector));
+                    .forEach(targetMetada::addContentSelector);
         // TODO undo of content selectors (currently not implemented)
 
         // copy groups to target database

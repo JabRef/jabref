@@ -257,7 +257,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
-    public static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -363,6 +362,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
+    private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -654,8 +654,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
-        // Don't download files by default
-        defaults.put(DOWNLOAD_LINKED_FILES, false);
+        // Download files by default
+        defaults.put(DOWNLOAD_LINKED_FILES, true);
 
         customImports = new CustomImportList(this);
 
@@ -1187,6 +1187,15 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES));
+    }
+
+    @Override
+    public void storeFilePreferences(FilePreferences filePreferences) {
+        put(JabRefPreferences.MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
+        putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
+        put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
+        put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
+        putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
     }
 
     @Override

@@ -178,12 +178,15 @@ public class DefaultAuxParser implements AuxParser {
      * Insert a clone of each given entry. The clones are each given a new unique ID.
      *
      * @param entries Entries to be cloned
-     * @param result AUX file
+     * @param result the parser result (representing the AUX file)
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();
         for (BibEntry entry : entries) {
-            clonedEntries.add((BibEntry) entry.clone());
+            BibEntry bibEntryToAdd = (BibEntry) entry.clone();
+            // ensure proper "rendering" of the BibTeX code
+            bibEntryToAdd.setChanged(true);
+            clonedEntries.add(bibEntryToAdd);
         }
         result.getGeneratedBibDatabase().insertEntries(clonedEntries);
     }

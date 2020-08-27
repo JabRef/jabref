@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.29.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.21.2'
+    id 'org.beryx.jlink' version '2.21.3'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -139,7 +139,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
 
-    implementation 'org.postgresql:postgresql:42.2.14'
+    implementation 'org.postgresql:postgresql:42.2.16'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -158,7 +158,7 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.0.1-SNAPSHOT'
+    implementation 'com.tobiasdiez:easybind:2.1.0'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
@@ -166,7 +166,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.9.00'
+    implementation 'com.konghq:unirest-java:3.10.00'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -203,7 +203,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.14'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.4.6'
+    testImplementation 'org.mockito:mockito-core:3.5.5'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
@@ -373,6 +373,8 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
+    options.annotationProcessorGeneratedSourcesDirectory = file("${projectDir}/src/main/gen")
+
     moduleOptions {
         // TODO: Remove access to internal api
         addExports = [
@@ -388,33 +390,32 @@ run {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
-                
+
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
                 'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle',
-                
+
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls',
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
                 'javafx.controls/com.sun.javafx.scene.control.inputmap' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.event' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.collections' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.runtime': 'org.controlsfx.controls',
                 'javafx.web/com.sun.webkit' : 'org.controlsfx.controls',
-                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls'
         ]
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                
+
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-                
+
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
                 'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
                 'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
@@ -684,6 +685,9 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
+            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
+            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            skipInstaller = true
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',

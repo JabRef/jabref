@@ -47,8 +47,7 @@ public class HTMLChars implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || (c == '%')
-                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -140,6 +139,7 @@ public class HTMLChars implements LayoutFormatter {
                         sb.append(' ');
                     }
                 } else {
+                    sb.append(c);
                     /*
                      * TODO: this point is reached, apparently, if a command is
                      * terminated in a strange way, such as with "$\omega$".

@@ -12,11 +12,15 @@
       <email>naritatsu@gmail.com</email>
       <uri>http://www.mendeley.com/profiles/naritatsu-saito/</uri>
     </author>
+    <contributor>
+      <name>Naritatsu Saito, M.D., Ph.D.</name>
+      <uri>https://www.mendeley.com/profiles/naritatsu-saito/</uri>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>1346-9843</issn>
     <eissn>1347-4820</eissn>
-    <updated>2017-11-30T07:54:21+00:00</updated>
+    <updated>2020-08-27T01:19:44+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -87,13 +91,13 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="[" suffix="]" delimiter=",">
+    <layout vertical-align="sup" delimiter=",">
       <text variable="citation-number"/>
     </layout>
   </citation>
   <bibliography entry-spacing="0" second-field-align="flush" et-al-min="7" et-al-use-first="6">
     <layout suffix=".">
-      <text variable="citation-number" prefix="[" suffix="]"/>
+      <text variable="citation-number" suffix="."/>
       <text macro="author" suffix=". "/>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
@@ -156,7 +160,7 @@
                 <text variable="volume"/>
               </group>
             </group>
-            <text variable="page" form="short"/>
+            <text variable="page"/>
           </group>
         </else>
       </choose>
