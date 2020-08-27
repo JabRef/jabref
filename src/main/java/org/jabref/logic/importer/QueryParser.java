@@ -23,14 +23,14 @@ import org.apache.lucene.search.QueryVisitor;
 public class QueryParser {
 
     /**
-     * Converts the given query string into a complex query using lucene.
+     * Parses the given query string into a complex query using lucene.
      * Note: For unique fields, the alphabetically first instance in the query string is used in the complex query.
      *
      * @param queryString The given query string
      * @return A complex query containing all fields of the query string
      * @throws QueryNodeException Error during parsing
      */
-    public Optional<ComplexSearchQuery> convertQueryStringIntoComplexQuery(String queryString) {
+    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String queryString) {
         try {
             ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
 
