@@ -47,7 +47,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.4
         with:
-          versionSpec: "5.2.x"
+          versionSpec: "5.3.7"
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
@@ -193,3 +193,4 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+
