@@ -35,8 +35,6 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
-
 /**
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
  * such as [year]_[author]_[firstpage], using information from a provided BibEntry.
@@ -848,7 +846,8 @@ public class BracketedPattern {
             return "";
         }
 
-        String lastName = authorList.getAuthor(mminusone).getLast().orElse("");
+        String lastName = authorList.getAuthor(mminusone).getLast()
+                                    .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
         return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 
@@ -856,12 +855,7 @@ public class BracketedPattern {
      * First N chars of the first author's last name.
      */
     private static String authN(AuthorList authorList, int num) {
-        String fa = firstAuthor(authorList);
-        fa = CitationKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
-        if (num > fa.length()) {
-            num = fa.length();
-        }
-        return fa.substring(0, num);
+        return authNofMth(authorList, num, 1);
     }
 
     /**
