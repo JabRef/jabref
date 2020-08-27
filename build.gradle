@@ -62,7 +62,7 @@ ext.allowJava9 = true
 sourceSets {
     main {
         java {
-            srcDirs = ["src/main/java", "src/main/gen"]
+            srcDirs = ["src/main/java", "src/main/generated"]
         }
 
         resources {
@@ -262,7 +262,7 @@ task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
 }
 
 clean {
-    delete "src/main/gen"
+    delete "src/main/generated"
 }
 
 processResources {
@@ -306,7 +306,7 @@ task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
 
     antlr = ANTLR3
     inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
-    outputDir = 'src/main/gen/org/jabref/logic/bst/'
+    outputDir = 'src/main/generated/org/jabref/logic/bst/'
 }
 
 task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
@@ -315,7 +315,7 @@ task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
 
     antlr = ANTLR4
     inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
-    outputDir = "src/main/gen/org/jabref/search"
+    outputDir = "src/main/generated/org/jabref/search"
     javaPackage = "org.jabref.search"
 }
 
@@ -324,7 +324,7 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
@@ -333,7 +333,7 @@ task generateBibtexmlSource(type: XjcTask) {
     description = "Generates java files for the bibtexml importer."
 
     schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src/main/gen"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
@@ -342,7 +342,7 @@ task generateEndnoteSource(type: XjcTask) {
     description = "Generates java files for the endnote importer."
 
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
 }
 
@@ -352,7 +352,7 @@ task generateModsSource(type: XjcTask) {
 
     schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
     bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.mods"
     arguments = '-npa'
 }
@@ -373,7 +373,7 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
-    options.annotationProcessorGeneratedSourcesDirectory = file("${projectDir}/src/main/gen")
+    options.annotationProcessorGeneratedSourcesDirectory = file("${projectDir}/src/main/generated")
 
     moduleOptions {
         // TODO: Remove access to internal api
