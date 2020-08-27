@@ -153,16 +153,28 @@ Essentially, you now have the best of both worlds: You can run Gradle tasks usin
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-  1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
-  2. Close the settings afterwards and restart IntelliJ
+
+   1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+   2. Close the settings afterwards and restart IntelliJ
+
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
-* Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File** 1. Import the CheckStyle configuration file by clicking the \[+\] button 2. For the description provide "JabRef" 3. Click "Browse" and choose `config/checkstyle/checkstyle.xml` 4. Click "Next" and "Finish" 5. Activate the CheckStyle configuration file by ticking it in the list 6. Ensure that the latest CheckStyle version is selected \(8.32 or higher\) 7. Set the "Scan Scope" to "Only Java sources \(including tests\) 8. Save settings by clicking "OK" 9. Your configuration should now look like this:
+* Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
 
-  ```text
-  ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
-  ```
+   1. Import the CheckStyle configuration file by clicking the \[+\] button
+   2. For the description provide "JabRef"
+   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
+   4. Click "Next" and "Finish"
+   5. Activate the CheckStyle configuration file by ticking it in the list
+   6. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
+   7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+   8. Save settings by clicking "OK"
+   9. Your configuration should now look like this:
+
+      ```text
+      ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
+      ```
 
 ### Setup for Eclipse
 
