@@ -176,9 +176,7 @@ Contributions to JabRef's source code need to have a code formatting that is con
    8. Save settings by clicking "OK"
    9. Your configuration should now look like this:
 
-      ```text
-      ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
-      ```
+       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
 
 ### Setup for Eclipse
 
