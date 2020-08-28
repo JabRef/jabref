@@ -15,13 +15,20 @@ import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MetaData {
 
@@ -40,6 +47,8 @@ public class MetaData {
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -246,6 +255,54 @@ public class MetaData {
     }
 
     /**
+     * @param other           the metaData to merge into this one
+     * @param otherFilename   the filename of the other library. Pass "unknown" if not known.
+     * @param allOtherEntries list of all other entries
+     */
+    public void merge(MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
+        Objects.requireNonNull(other);
+        Objects.requireNonNull(otherFilename);
+        Objects.requireNonNull(allOtherEntries);
+
+        mergeGroups(other, otherFilename, allOtherEntries);
+        mergeContentSelectors(other);
+    }
+
+    private void mergeGroups(MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
+        // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
+        // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
+        // inserted directly, i.e. they are not deepCopy()'d.
+        other.getGroups().ifPresent(newGroups -> {
+            // ensure that there is always only one AllEntriesGroup in the resulting database
+            // "Rename" the AllEntriesGroup of the imported database to "Imported"
+            if (newGroups.getGroup() instanceof AllEntriesGroup) {
+                // create a dummy group
+                try {
+                    // This will cause a bug if the group already exists
+                    // There will be group where the two groups are merged
+                    String newGroupName = otherFilename;
+                    ExplicitGroup group = new ExplicitGroup("Imported " + newGroupName, GroupHierarchyType.INDEPENDENT,
+                            JabRefPreferences.getInstance().getKeywordDelimiter());
+                    newGroups.setGroup(group);
+                    group.add(allOtherEntries);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.error("Problem appending entries to group", e);
+                }
+            }
+            this.getGroups().ifPresentOrElse(
+                    newGroups::moveTo,
+                    // target does not contain any groups, so we can just use the new groups
+                    () -> this.setGroups(newGroups));
+        });
+    }
+
+    private void mergeContentSelectors(MetaData other) {
+        for (ContentSelector selector : other.getContentSelectorList()) {
+            this.addContentSelector(selector);
+        }
+    }
+
+    /**
      * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
      */
     private void postChange() {
@@ -266,7 +323,7 @@ public class MetaData {
     }
 
     /**
-     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
      */
     public void setEncoding(Charset encoding, ChangePropagation postChanges) {
         this.encoding = Objects.requireNonNull(encoding);
