@@ -47,7 +47,7 @@ jobs:
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.4
         with:
-          versionSpec: "5.2.x"
+          versionSpec: "5.3.7"
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
@@ -61,7 +61,7 @@ jobs:
       - name: Set up JDK for linux and windows
         uses: actions/setup-java@v1
         with:
-          java-version: 15-ea
+          java-version: 14
         if: matrix.os != 'macos-latest'
       - name: Restore gradle cache
         uses: actions/cache@master
@@ -193,3 +193,4 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
+
