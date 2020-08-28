@@ -55,7 +55,6 @@ It is strongly recommend that you have git installed.
 ### IDE
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse \(for advanced users\)](https://eclipse.org/) \(`2020-03` or newer\).
-Version 2020.2 does not work. Please use version [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds).
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
@@ -88,6 +87,13 @@ This section explains how you get the JabRef code onto your machine in a form al
 These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
 
 ### Setup for IntelliJ IDEA
+
+We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
+
+IntelliJ instructions checked for
+
+* [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds)
+* [2020.2](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds) - works with restrictions (outlined below)
 
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
 
@@ -135,19 +141,25 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
-You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
+**Note that these steps do not work on IntelliJ 2020.2.** There you have to use gradle for executing tasks.
 
-Note that these steps do not work on IntelliJ 2020.2.
+You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
     ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins`. Otherwise, you will see folowing error:
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` (location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`). Otherwise, you will see folowing error:
 
-   ```text
+  ```text
   Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
+  ```
+
+  or following error:
+
+  ```text
+  Error:(16, 25) java: package org.jabref.search does not exist
   ```
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
@@ -253,3 +265,4 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
 
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independet of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
