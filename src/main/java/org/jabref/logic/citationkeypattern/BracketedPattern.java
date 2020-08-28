@@ -157,73 +157,81 @@ public class BracketedPattern {
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if ("\"".equals(token)) {
-                sb.append(token);
-                while (st.hasMoreTokens()) {
-                    token = st.nextToken();
-                    sb.append(token);
-                    if ("\"".equals(token)) {
-                        break;
+            switch (token) {
+                case "\"" -> appendQuote(sb, st);
+                case "[" -> {
+                    String fieldMarker = contentBetweenBrackets(st, pattern);
+
+                    List<String> fieldParts = parseFieldMarker(fieldMarker);
+                    // check whether there is a modifier on the end such as
+                    // ":lower":
+                    if (fieldParts.size() <= 1) {
+                        sb.append(getFieldValue(entry, fieldMarker, keywordDelimiter, database));
+                    } else {
+                        // apply modifiers:
+                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+                        sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                 }
-            } else {
-                if ("\\".equals(token)) {
+                case "\\" -> {
                     if (st.hasMoreTokens()) {
                         sb.append(st.nextToken());
                     }
                     // FIXME: else -> raise exception or log? (S.G.)
-                } else {
-                    if ("[".equals(token)) {
-                        Boolean foundClosingBracket = false;
-                        // Fetch the next token after the '[':
-                        token = st.nextToken();
-                        if ("]".equals(token)) {
-                            LOGGER.warn("Found empty brackets \"[]\" in '" + pattern + "'");
-                            foundClosingBracket = true;
-                        }
-                        // make sure to read until the next ']'
-                        while (st.hasMoreTokens() && !foundClosingBracket) {
-                            String subtoken = st.nextToken();
-                            // I the beginning of a quote is found, include the content in the original token
-                            if ("\"".equals(subtoken)) {
-                                token = token + subtoken;
-                                while (st.hasMoreTokens()) {
-                                    subtoken = st.nextToken();
-                                    token = token + subtoken;
-                                    if ("\"".equals(subtoken)) {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                if ("]".equals(subtoken)) {
-                                    foundClosingBracket = true;
-                                    break;
-                                } else {
-                                    token = token + subtoken;
-                                }
-                            }
-                        }
-                        if (!foundClosingBracket) {
-                            LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
-                        }
-                        List<String> fieldParts = parseFieldMarker(token);
-                        // check whether there is a modifier on the end such as
-                        // ":lower":
-                        if (fieldParts.size() <= 1) {
-                            sb.append(getFieldValue(entry, token, keywordDelimiter, database));
-                        } else {
-                            // apply modifiers:
-                            String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
-                            sb.append(applyModifiers(fieldValue, fieldParts, 1));
-                        }
-                    } else {
-                        sb.append(token);
-                    }
                 }
+                default -> sb.append(token);
             }
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the enclosing brackets.
+     * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
+     * is encountered, and has been consumed, by the {@code StringTokenizer}.
+     *
+     * @param pattern   pattern used by {@code expandBrackets}, used for logging
+     * @param tokenizer the tokenizer producing the tokens
+     * @return the content enclosed by brackets
+     */
+    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
+        StringBuilder bracketContent = new StringBuilder();
+        boolean foundClosingBracket = false;
+        // make sure to read until the next ']'
+        while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
+            String token = tokenizer.nextToken();
+            // If the beginning of a quote is found, append the content
+            switch (token) {
+                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "]" -> foundClosingBracket = true;
+                default -> bracketContent.append(token);
+            }
+        }
+
+        if (!foundClosingBracket) {
+            LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
+        } else if (bracketContent.length() == 0) {
+            LOGGER.warn("Found empty brackets \"[]\" in '" + pattern + "'");
+        }
+        return bracketContent.toString();
+    }
+
+    /**
+     * Appends the content between, and including, two \" to the provided <code>StringBuilder</code>. Intended to be
+     * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
+     * encountered by the StringTokenizer.
+     *
+     * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
+     * @param tokenizer     the tokenizer producing the tokens
+     */
+    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
+        stringBuilder.append("\"");  // We know that the previous token was \"
+        String token = "";
+        while (tokenizer.hasMoreTokens() && !"\"".equals(token)) {
+            token = tokenizer.nextToken();
+            stringBuilder.append(token);
+        }
     }
 
     /**
