@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+<!--Please start the issue title with [Xpt] where X is the number of story points estimated for the issue.-->
+
 **User Story**
 <!--As a [user role], I'd like to [do something], so that [some goal].-->
 
