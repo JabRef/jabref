@@ -41,6 +41,7 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -238,7 +239,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        new EditAction(StandardActions.PASTE, panel.frame(), Globals.stateManager).execute();
+                        if (!OS.OS_X) {
+                            new EditAction(StandardActions.PASTE, panel.frame(), Globals.stateManager).execute();
+                        }
                         event.consume();
                         break;
                     case COPY:
