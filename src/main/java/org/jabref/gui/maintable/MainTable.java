@@ -29,6 +29,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -39,7 +41,6 @@ import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -237,17 +238,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case PASTE:
-                        if (!OS.OS_X) { // ugly hack, prevents duplicate entries on pasting. Side effect: Prevents pasting using cmd+v on an empty library
-                            paste();
-                            event.consume();
-                            break;
-                        }
+                        new EditAction(StandardActions.PASTE, panel.frame(), Globals.stateManager).execute();
+                        event.consume();
+                        break;
                     case COPY:
-                        copy();
+                        new EditAction(StandardActions.COPY, panel.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
                     case CUT:
-                        cut();
+                        new EditAction(StandardActions.CUT, panel.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
                     default:
