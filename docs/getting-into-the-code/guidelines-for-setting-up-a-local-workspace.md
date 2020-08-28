@@ -92,7 +92,7 @@ We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.
 
 IntelliJ instructions checked for
 
-* [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds)
+* [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds) - works with restrictions (outlined below)
 * [2020.2](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds) - works with restrictions (outlined below)
 
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
@@ -141,7 +141,8 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
-**Note that these steps do not work on IntelliJ 2020.2.** There you have to use gradle for executing tasks.
+**Note that these steps do not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks.
+See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.
 
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
@@ -163,6 +164,9 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
   ```
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
+
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independet of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
+
 
 #### Using JabRef's code style
 
@@ -264,5 +268,3 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 ### Problems with generated source files
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
-
-In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independet of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
