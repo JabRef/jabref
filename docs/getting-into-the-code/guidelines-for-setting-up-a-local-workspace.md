@@ -91,23 +91,19 @@ These steps are very important. They allow you to focus on the content and ensur
 
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
 
-To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_
+To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_:
 
 * Navigate to **File \| Settings \| Plugins \| Installed** and check that you have
   the _Gradle_ and _Gradle Extension_ enabled.
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-* Ensure you have a Java 14 SDK configured by navigating to
-
-  **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
-
-  location of a JDK 14.
+Ensure you have a Java 14 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 14:
 
 * Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as the Gradle JVM at the bottom.
 
-To prepare IntelliJ's build system two additional steps are required
+To prepare IntelliJ's build system two additional steps are required:
 
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module:
 
@@ -116,20 +112,19 @@ To prepare IntelliJ's build system two additional steps are required
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
   ```
 
-* Enable annotation processors by navigating to  
-  **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
+* Enable annotation processors by navigating to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
+
+   ![Enable annotation processing](../.gitbook/assets/intellij-enable-annotation-processing.png)
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik.png)
+   ![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
-* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to  
-  **View \| Tool Windows \| Gradle**.
-
+* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View \| Tool Windows \| Gradle**.
 * In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
   with the setting changes.
 
