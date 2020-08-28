@@ -52,7 +52,8 @@ public class EditAction extends SimpleCommand {
                         textInput.cut();
                         break;
                     case PASTE:
-                        textInput.paste();
+                        // handled by FX in TextInputControl#paste
+                        // textInput.paste();
                         break;
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
