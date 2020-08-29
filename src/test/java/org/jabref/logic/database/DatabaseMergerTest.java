@@ -1,6 +1,5 @@
 package org.jabref.logic.database;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,10 +9,13 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.Test;
 
@@ -155,14 +157,35 @@ class DatabaseMergerTest {
         new DatabaseMerger().mergeMetaData(target, other, "unknown", List.of());
 
         // Assert that content selectors are all merged
-        List<ContentSelector> sortedResultSelectors = target.getContentSelectorList();
-        sortedResultSelectors.sort(Comparator.comparing(contentSelector -> contentSelector.getField().getName()));
-        assertEquals(expectedContentSelectors, sortedResultSelectors);
+        assertEquals(expectedContentSelectors, target.getContentSelectorList());
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());
         assertEquals(target.getGroups().get().getChildren().size(), 1);
         assertEquals(otherRootGroup, target.getGroups().get().getChildren().get(0));
+    }
+
+    @Test
+    void mergeMetaDataWithAllEntriesGroup() {
+        MetaData target = new MetaData();
+        target.addContentSelector(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")));
+        GroupTreeNode targetRootGroup = new GroupTreeNode(new AllEntriesGroup("targetGroup"));
+        target.setGroups(targetRootGroup);
+        MetaData other = new MetaData();
+        GroupTreeNode otherRootGroup = new GroupTreeNode(new AllEntriesGroup("otherGroup"));
+        other.setGroups(otherRootGroup);
+        other.addContentSelector(new ContentSelector(StandardField.TITLE, List.of("Test Title")));
+        List<ContentSelector> expectedContentSelectors =
+                List.of(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")),
+                        new ContentSelector(StandardField.TITLE, List.of("Test Title")));
+        GroupTreeNode expectedImportedGroupNode = new GroupTreeNode(new ExplicitGroup("Imported unknown", GroupHierarchyType.INDEPENDENT, JabRefPreferences.getInstance().getKeywordDelimiter()));
+
+        new DatabaseMerger().mergeMetaData(target, other, "unknown", List.of());
+
+        // Assert that groups of other are children of root node of target
+        assertEquals(targetRootGroup, target.getGroups().get());
+        assertEquals(target.getGroups().get().getChildren().size(), 1);
+        assertEquals(expectedImportedGroupNode, target.getGroups().get().getChildren().get(0));
     }
 
     static class TestGroup extends AbstractGroup {
