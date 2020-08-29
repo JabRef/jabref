@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.database;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class BibDatabaseMergerTest {
+class DatabaseMergerTest {
 
     @Test
     void mergeAddsNonDuplicateEntries() {
@@ -67,7 +67,7 @@ class BibDatabaseMergerTest {
 
         BibDatabase database = new BibDatabase(List.of(entry1, entry2));
         BibDatabase other = new BibDatabase(List.of(entry3, entry4));
-        new BibDatabaseMerger().merge(database, other);
+        new DatabaseMerger().merge(database, other);
 
         assertEquals(3, database.getEntries().size());
         assertEquals(List.of(entry1, entry3, entry4), database.getEntries());
@@ -92,8 +92,8 @@ class BibDatabaseMergerTest {
         source1.addString(sourceString1);
         source2.addString(sourceString2);
 
-        new BibDatabaseMerger().mergeStrings(target, source1);
-        new BibDatabaseMerger().mergeStrings(target, source2);
+        new DatabaseMerger().mergeStrings(target, source1);
+        new DatabaseMerger().mergeStrings(target, source2);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
                                                  .stream()
@@ -121,7 +121,7 @@ class BibDatabaseMergerTest {
         source.addString(sourceString1);
         source.addString(sourceString2);
 
-        new BibDatabaseMerger().mergeStrings(target, source);
+        new DatabaseMerger().mergeStrings(target, source);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
                                                  .stream()

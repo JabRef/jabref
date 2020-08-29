@@ -16,7 +16,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.BibDatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
@@ -130,7 +129,7 @@ public class ImportAction {
                 continue;
             }
             ParserResult parserResult = importResult.parserResult;
-            new BibDatabaseMerger().merge(resultDatabase, parserResult.getDatabase());
+            resultDatabase.getEntries().addAll(parserResult.getDatabase().getEntries());
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX

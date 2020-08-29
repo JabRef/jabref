@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.database;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,9 +12,9 @@ import org.jabref.model.entry.BibtexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BibDatabaseMerger {
+public class DatabaseMerger {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseMerger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMerger.class);
 
     /**
      * Merges all entries and strings of the other database into the target database. Any duplicates are ignored.

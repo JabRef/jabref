@@ -22,8 +22,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.BibDatabaseMerger;
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.database.DatabaseMerger;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -139,7 +139,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }
         }
 
-        new BibDatabaseMerger().mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
+        new DatabaseMerger().mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
         databaseContext.getMetaData().merge(
                 parserResult.getMetaData(),
                 parserResult.getFile().map(File::getName).orElse("unknown"),
