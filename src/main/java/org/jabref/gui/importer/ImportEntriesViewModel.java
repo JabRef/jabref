@@ -140,7 +140,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         }
 
         new DatabaseMerger().mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
-        databaseContext.getMetaData().merge(
+        new DatabaseMerger().mergeMetaData(databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getFile().map(File::getName).orElse("unknown"),
                 parserResult.getDatabase().getEntries());

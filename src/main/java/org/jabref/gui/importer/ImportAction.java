@@ -16,6 +16,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
@@ -133,7 +134,8 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                result.getMetaData().merge(
+                new DatabaseMerger().mergeMetaData(
+                        result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
                         parserResult.getDatabase().getEntries());
