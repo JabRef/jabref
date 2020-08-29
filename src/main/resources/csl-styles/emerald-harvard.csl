@@ -4,8 +4,8 @@
     <title>Emerald - Harvard</title>
     <id>http://www.zotero.org/styles/emerald-harvard</id>
     <link href="http://www.zotero.org/styles/emerald-harvard" rel="self"/>
-    <link href="http://www.emeraldinsight.com/authors/guides/write/harvard.htm?part=2" rel="documentation"/>
-    <link href="http://www.emeraldgrouppublishing.com/products/journals/author_guidelines.htm?id=jmp#23" rel="documentation"/>
+    <link href="https://www.emeraldgrouppublishing.com/use-harvard-reference-system" rel="documentation"/>
+    <link href="https://www.emeraldgrouppublishing.com/journal/jmp?id=jmp#author-guidelines" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -30,7 +30,7 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2015-12-07T22:06:38+00:00</updated>
+    <updated>2020-08-26T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -61,6 +61,7 @@
     <names variable="author">
       <name name-as-sort-order="all" and="text" sort-separator=", " initialize-with="." delimiter=", " delimiter-precedes-last="never"/>
       <label form="short" prefix=" (" suffix=")" text-case="capitalize-first"/>
+      <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -76,6 +77,7 @@
   <macro name="author-short">
     <names variable="author">
       <name form="short" and="text" delimiter=", " initialize-with="." delimiter-precedes-last="never"/>
+      <et-al font-style="italic"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
