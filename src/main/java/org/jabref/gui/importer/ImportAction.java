@@ -130,7 +130,7 @@ public class ImportAction {
                 continue;
             }
             ParserResult parserResult = importResult.parserResult;
-            resultDatabase.getEntries().addAll(parserResult.getDatabase().getEntries());
+            resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
