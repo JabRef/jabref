@@ -1,5 +1,6 @@
 package org.jabref.logic.database;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,6 +9,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.Test;
 
@@ -130,5 +136,54 @@ class DatabaseMergerTest {
                                                  .collect(Collectors.toList());
 
         assertEquals(List.of(targetString1.toString(), targetString2.toString()), resultStringsSorted);
+    }
+
+    @Test
+    void mergeMetaDataWithoutAllEntriesGroup() {
+        MetaData target = new MetaData();
+        target.addContentSelector(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")));
+        GroupTreeNode targetRootGroup = new GroupTreeNode(new TestGroup("targetGroup", GroupHierarchyType.INDEPENDENT));
+        target.setGroups(targetRootGroup);
+        MetaData other = new MetaData();
+        GroupTreeNode otherRootGroup = new GroupTreeNode(new TestGroup("otherGroup", GroupHierarchyType.INCLUDING));
+        other.setGroups(otherRootGroup);
+        other.addContentSelector(new ContentSelector(StandardField.TITLE, List.of("Test Title")));
+        List<ContentSelector> expectedContentSelectors =
+                List.of(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")),
+                        new ContentSelector(StandardField.TITLE, List.of("Test Title")));
+
+        new DatabaseMerger().mergeMetaData(target, other, "unknown", List.of());
+
+        // Assert that content selectors are all merged
+        List<ContentSelector> sortedResultSelectors = target.getContentSelectorList();
+        sortedResultSelectors.sort(Comparator.comparing(contentSelector -> contentSelector.getField().getName()));
+        assertEquals(expectedContentSelectors, sortedResultSelectors);
+
+        // Assert that groups of other are children of root node of target
+        assertEquals(targetRootGroup, target.getGroups().get());
+        assertEquals(target.getGroups().get().getChildren().size(), 1);
+        assertEquals(otherRootGroup, target.getGroups().get().getChildren().get(0));
+    }
+
+    static class TestGroup extends AbstractGroup {
+
+        protected TestGroup(String name, GroupHierarchyType context) {
+            super(name, context);
+        }
+
+        @Override
+        public boolean contains(BibEntry entry) {
+            return false;
+        }
+
+        @Override
+        public boolean isDynamic() {
+            return false;
+        }
+
+        @Override
+        public AbstractGroup deepCopy() {
+            return null;
+        }
     }
 }
