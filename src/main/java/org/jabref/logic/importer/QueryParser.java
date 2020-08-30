@@ -46,7 +46,7 @@ public class QueryParser {
             sortedTerms.sort(Comparator.comparing(Term::text));
             builder.terms(sortedTerms);
             return Optional.of(builder.build());
-        } catch (QueryNodeException ex) {
+        } catch (QueryNodeException | IllegalStateException ex) {
             return Optional.empty();
         }
     }
