@@ -40,6 +40,7 @@ public class EditAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
+            LOGGER.debug("EditAction - focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
             if (focusOwner instanceof TextInputControl) {
                 // Focus is on text field -> copy/paste/cut selected text
                 TextInputControl textInput = (TextInputControl) focusOwner;
@@ -63,7 +64,7 @@ public class EditAction extends SimpleCommand {
 
             } else if (focusOwner instanceof MainTable) {
 
-                LOGGER.debug("I am a Maintable in Edit action");
+                LOGGER.debug("EditAction - MainTable: {}", frame.getCurrentBasePanel().getTabTitle());
                 // Not sure what is selected -> copy/paste/cut selected entries
 
                 // ToDo: Should be handled by BibDatabaseContext instead of BasePanel
