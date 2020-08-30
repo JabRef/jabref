@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -49,17 +50,31 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.setResizable(false);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
-                .withGraphic(this::createIdentifierGraphic)
+                .withGraphic(values -> createIdentifierGraphic(values))
                 .withTooltip(this::createIdentifierTooltip)
                 .withMenu(this::createIdentifierMenu)
+                .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
+                    if ((event.getButton() == MouseButton.PRIMARY) && (linkedFiles.size() == 1)) {
+                        // Open linked identifier directly only if 1 entry is preset
+                        try {
+                            for (Field field : linkedFiles.keySet()) {
+                                JabRefDesktop.openExternalViewer(database, linkedFiles.get(field), field);
+                            }
+                        } catch (IOException e) {
+                            dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                        }
+                    }
+                })
                 .install(this);
     }
 
     private Node createIdentifierGraphic(Map<Field, String> values) {
-        if (values.isEmpty()) {
-            return null;
-        } else {
+        if (values.size() > 1) {
+            return cellFactory.getTableIcon(StandardField.URLS);
+        } else if (values.size() == 1) {
             return cellFactory.getTableIcon(StandardField.URL);
+        } else {
+            return null;
         }
     }
 
@@ -71,6 +86,10 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
 
     private ContextMenu createIdentifierMenu(BibEntryTableViewModel entry, Map<Field, String> values) {
         ContextMenu contextMenu = new ContextMenu();
+
+        if (values.size() <= 1) {
+            return null;
+        }
 
         values.keySet().forEach(field -> {
             MenuItem menuItem = new MenuItem(field.getDisplayName() + ": " +

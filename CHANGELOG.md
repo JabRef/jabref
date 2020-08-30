@@ -1,3 +1,4 @@
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -126,6 +127,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
 - We fixed an issue regarding pasting on Linux. [#6293](https://github.com/JabRef/jabref/issues/6293)
 
+- We fixed linked identifier icon inconsistency[#6705](https://github.com/JabRef/jabref/issues/6705)
 ### Removed
 
 - We removed the option of the "enforce legal key". [#6295](https://github.com/JabRef/jabref/issues/6295)

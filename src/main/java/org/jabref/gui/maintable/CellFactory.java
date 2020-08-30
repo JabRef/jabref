@@ -27,9 +27,13 @@ public class CellFactory {
         // icon.setToo(Localization.lang("Open") + " PDF");
         TABLE_ICONS.put(StandardField.PDF, icon);
 
-        icon = IconTheme.JabRefIcons.WWW;
+        icon = IconTheme.JabRefIcons.DATABASE;
         // icon.setToolTipText(Localization.lang("Open") + " URL");
         TABLE_ICONS.put(StandardField.URL, icon);
+
+        icon = IconTheme.JabRefIcons.DATABASE_PLUS;
+        // icon.setToolTipText(Localization.lang("Open") + " URL");
+        TABLE_ICONS.put(StandardField.URLS, icon);
 
         icon = IconTheme.JabRefIcons.WWW;
         // icon.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
@@ -94,6 +98,7 @@ public class CellFactory {
         icon = printedViewModel.getIcon();
         // icon.setToolTipText(printedViewModel.getLocalization());
         TABLE_ICONS.put(SpecialField.PRINTED, icon);
+
     }
 
     public Node getTableIcon(Field field) {
