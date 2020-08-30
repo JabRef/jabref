@@ -52,8 +52,7 @@ public class EditAction extends SimpleCommand {
                         textInput.cut();
                         break;
                     case PASTE:
-                        //Executed twice for mac when pasting via cmd+v
-                         textInput.paste();
+                        textInput.paste();
                         break;
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
