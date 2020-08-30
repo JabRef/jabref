@@ -132,6 +132,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -278,6 +279,11 @@ public class JabRefFrame extends BorderPane {
                     case NEW_UNPUBLISHED:
                         new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
+                    case PASTE:
+                        if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
+                            event.consume();
+                            break;
+                        }
                     default:
                 }
             }
