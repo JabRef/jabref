@@ -731,7 +731,8 @@ public class BracketedPattern {
      */
     private static String authorsAlpha(AuthorList authorList) {
         StringBuilder alphaStyle = new StringBuilder();
-        int maxAuthors = authorList.getNumberOfAuthors() > MAX_ALPHA_AUTHORS ? 3 : authorList.getNumberOfAuthors();
+        int maxAuthors = authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS ?
+                authorList.getNumberOfAuthors() : (MAX_ALPHA_AUTHORS - 1);
 
         if (authorList.getNumberOfAuthors() == 1) {
             String[] firstAuthor = authorList.getAuthor(0).getLastOnly()
