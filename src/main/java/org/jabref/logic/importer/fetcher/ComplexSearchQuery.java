@@ -40,30 +40,11 @@ public class ComplexSearchQuery {
                 case "title" -> builder.titlePhrase(termText);
                 case "journal" -> builder.journal(termText);
                 case "year" -> builder.singleYear(Integer.valueOf(termText));
-                case "year-range" -> parseYearRange(builder, termText);
+                case "year-range" -> builder.parseYearRange(termText);
                 case "default" -> builder.defaultFieldPhrase(termText);
             }
         });
         return builder.build();
-    }
-
-    private static void parseYearRange(ComplexSearchQueryBuilder builder, String termText) {
-        String[] split = termText.split("-");
-        int fromYear = 0;
-        int toYear = 9999;
-        try {
-            fromYear = Integer.parseInt(split[0]);
-        } catch (NumberFormatException e) {
-            // default value already set
-        }
-        if (split.length > 1) {
-            try {
-                toYear = Integer.parseInt(split[1]);
-            } catch (NumberFormatException e) {
-                // default value already set
-            }
-        }
-        builder.fromYearAndToYear(fromYear, toYear);
     }
 
     public List<String> getDefaultFieldPhrases() {
@@ -221,7 +202,7 @@ public class ComplexSearchQuery {
                     case "title" -> this.titlePhrase(termText);
                     case "journal" -> this.journal(termText);
                     case "year" -> this.singleYear(Integer.valueOf(termText));
-                    case "year-range" -> parseYearRange(this, termText);
+                    case "year-range" -> this.parseYearRange(termText);
                     case "default" -> this.defaultFieldPhrase(termText);
                 }
             });
@@ -241,6 +222,25 @@ public class ComplexSearchQuery {
                 throw new IllegalStateException("At least one text field has to be set");
             }
             return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, fromYear, toYear, singleYear, journal);
+        }
+
+        void parseYearRange(String termText) {
+            String[] split = termText.split("-");
+            int fromYear = 0;
+            int toYear = 9999;
+            try {
+                fromYear = Integer.parseInt(split[0]);
+            } catch (NumberFormatException e) {
+                // default value already set
+            }
+            if (split.length > 1) {
+                try {
+                    toYear = Integer.parseInt(split[1]);
+                } catch (NumberFormatException e) {
+                    // default value already set
+                }
+            }
+            this.fromYearAndToYear(fromYear, toYear);
         }
 
         private boolean textSearchFieldsAndYearFieldsAreEmpty() {
