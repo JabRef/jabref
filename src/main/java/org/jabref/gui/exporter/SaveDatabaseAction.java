@@ -77,10 +77,9 @@ public class SaveDatabaseAction {
 
    public static void shutdown(BasePanel panel) {
 
-
    }
    private void saveStart() {
-       throttler.schedule(() -> save());
+       var f = throttler.scheduleTask( ()  -> save());
    }
 
    public static SaveDatabaseAction start(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
