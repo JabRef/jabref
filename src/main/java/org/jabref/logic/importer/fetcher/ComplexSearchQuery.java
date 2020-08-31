@@ -81,27 +81,47 @@ public class ComplexSearchQuery {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ComplexSearchQuery that = (ComplexSearchQuery) o;
 
         // Just check for set equality, order does not matter
-        if (!(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) && that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases())))
+        if (!(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) && that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases()))) {
             return false;
-        if (!(getAuthors().containsAll(that.getAuthors()) && that.getAuthors().containsAll(getAuthors())))
+        }
+        if (!(getAuthors().containsAll(that.getAuthors()) && that.getAuthors().containsAll(getAuthors()))) {
             return false;
-        if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) && that.getTitlePhrases().containsAll(getTitlePhrases())))
+        }
+        if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) && that.getTitlePhrases().containsAll(getTitlePhrases()))) {
             return false;
-        if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent())
+        }
+        if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent()) {
             return false;
-        if (getToYear().isPresent() ? !getToYear().equals(that.getToYear()) : that.getToYear().isPresent())
+        }
+        if (getToYear().isPresent() ? !getToYear().equals(that.getToYear()) : that.getToYear().isPresent()) {
             return false;
-        if (getSingleYear().isPresent() ? !getSingleYear().equals(that.getSingleYear()) : that.getSingleYear().isPresent())
+        }
+        if (getSingleYear().isPresent() ? !getSingleYear().equals(that.getSingleYear()) : that.getSingleYear().isPresent()) {
             return false;
+        }
         return getJournal().isPresent() ? getJournal().equals(that.getJournal()) : !that.getJournal().isPresent();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = defaultField != null ? defaultField.hashCode() : 0;
+        result = 31 * result + (getAuthors() != null ? getAuthors().hashCode() : 0);
+        result = 31 * result + (getTitlePhrases() != null ? getTitlePhrases().hashCode() : 0);
+        result = 31 * result + (getFromYear().isPresent() ? getFromYear().hashCode() : 0);
+        result = 31 * result + (getToYear().isPresent() ? getToYear().hashCode() : 0);
+        result = 31 * result + (getSingleYear().isPresent() ? getSingleYear().hashCode() : 0);
+        result = 31 * result + (getJournal().isPresent() ? getJournal().hashCode() : 0);
+        return result;
     }
 
     public static class ComplexSearchQueryBuilder {
