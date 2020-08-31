@@ -44,7 +44,14 @@ import org.slf4j.LoggerFactory;
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
+    /**
+     * The maximum number of characters in the first author's last name.
+     */
     private static final int CHARS_OF_FIRST = 5;
+    /**
+     * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
+     * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
+     */
     private static final int MAX_ALPHA_AUTHORS = 4;
 
     /** Matches everything that is not an uppercase ASCII letter */
