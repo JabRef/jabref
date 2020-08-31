@@ -72,7 +72,7 @@ In case you do not have time to add a test case, we nevertheless ask you to at l
 ### When adding a library
 
 Please try to use a version available at JCenter and add it to `build.gradle`.
-In any case, describe the library at [external-libraries.txt](external-libraries.txt).
+In any case, describe the library at [external-libraries.md](external-libraries.md).
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
 Also add a txt file stating the license in `libraries/`.
 It is used at `gradlew processResources` to generate the About.html files.

@@ -264,12 +264,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         List<String> searchTerms = new ArrayList<>();
-        complexSearchQuery.getAuthors().ifPresent(authors -> authors.forEach(author -> searchTerms.add("au:" + author)));
-        complexSearchQuery.getTitlePhrases().ifPresent(title -> searchTerms.add("ti:" + title));
+        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
+        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
         // Since ArXiv API does not support year search, we ignore the year related terms
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
-        complexSearchQuery.getDefaultField().ifPresent(defaultField -> searchTerms.add(defaultField));
+        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         String complexQueryString = String.join(" AND ", searchTerms);
         return performSearch(complexQueryString);
     }

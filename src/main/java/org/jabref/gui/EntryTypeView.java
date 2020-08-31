@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-
-import javax.inject.Inject;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -43,10 +42,10 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- *
- * @return null if canceled
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
+
+    @Inject StateManager stateManager;
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
@@ -61,8 +60,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TitledPane ieeeTranTitlePane;
     @FXML private TitledPane customTitlePane;
     @FXML private TitledPane biblatexSoftwareTitlePane;
-
-    @Inject StateManager stateManager;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
@@ -202,11 +199,12 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         this.close();
     }
 
-    //The description is coming from biblatex manual chapter 2
-    //Biblatex documentation is favored over the bibtex,
-    //since bibtex is a subset of biblatex and biblatex is better documented.
+    /**
+     * The description is originating from biblatex manual chapter 2
+     * Biblatex documentation is favored over the bibtex,
+     * since bibtex is a subset of biblatex and biblatex is better documented.
+     */
     public static String getDescription(EntryType selectedType) {
-        //CHECKSTYLE:OFF
         if (selectedType instanceof StandardEntryType) {
             switch ((StandardEntryType) selectedType) {
                 case Article -> {
@@ -312,7 +310,5 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         } else {
             return "";
         }
-        //CHECKSTYLE:ON
-
     }
 }

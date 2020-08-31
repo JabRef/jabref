@@ -269,7 +269,7 @@
           </if>
         </choose>
       </if>
-      <else-if type="book graphic manuscript report map personal_communication" match="any">
+      <else-if type="book thesis graphic manuscript report map personal_communication" match="any">
         <text variable="title" text-case="title" font-style="italic"/>
         <text variable="version" prefix=" "/>
       </else-if>

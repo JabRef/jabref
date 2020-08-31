@@ -54,7 +54,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -412,6 +412,11 @@ public class JabRefPreferences implements PreferencesService {
      */
     private List<MainTableColumnModel> mainTableColumnSortOrder;
 
+    /**
+     * Cache variable for getTheme
+     */
+    private Theme globalTheme;
+
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
         try {
@@ -701,7 +706,7 @@ public class JabRefPreferences implements PreferencesService {
                         + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+        defaults.put(JabRefPreferences.FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
@@ -815,11 +820,6 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.debug("Hostname not found.", ex);
             return get(DEFAULT_OWNER);
         }
-    }
-
-    @Override
-    public String getTheme() {
-        return get(FX_THEME);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -2179,6 +2179,38 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    @Override
+    public Theme getTheme() {
+        if (globalTheme == null) {
+            updateTheme();
+        }
+        return globalTheme;
+    }
+
+    @Override
+    public void updateTheme() {
+        this.globalTheme = new Theme(get(FX_THEME), this);
+    }
+
+    @Override
+    public AppearancePreferences getAppearancePreferences() {
+        return new AppearancePreferences(
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                getTheme());
+    }
+
+    @Override
+    public void storeAppearancePreference(AppearancePreferences preferences) {
+        putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
+        putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
+        put(FX_THEME, preferences.getTheme().getPath().toString());
     }
 
     //*************************************************************************************************************
