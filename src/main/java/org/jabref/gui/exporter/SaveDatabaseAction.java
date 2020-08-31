@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
@@ -47,16 +49,19 @@ import org.slf4j.LoggerFactory;
  */
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
+    private static Set<SaveDatabaseAction> runningInstances = new HashSet<>();
 
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private DelayTaskThrottler throttler = new DelayTaskThrottler(15000);
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
     }
+
 
    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
@@ -64,7 +69,18 @@ public class SaveDatabaseAction {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.throttler = new DelayTaskThrottler(15000);
+
     }
+
+
+   public static void shutdown(BibDatabaseContext bibDatabaseContext) {
+
+
+   }
+   public static SaveDatabaseAction start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
+
+   }
 
     public boolean save() {
         return save(panel.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);

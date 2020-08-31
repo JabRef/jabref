@@ -18,6 +18,7 @@ public class SaveAction extends SimpleCommand {
     private final SaveMethod saveMethod;
     private final JabRefFrame frame;
 
+
     public SaveAction(SaveMethod saveMethod, JabRefFrame frame, StateManager stateManager) {
         this.saveMethod = saveMethod;
         this.frame = frame;
