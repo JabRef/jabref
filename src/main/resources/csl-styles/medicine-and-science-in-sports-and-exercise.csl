@@ -18,7 +18,7 @@
     <category field="medicine"/>
     <issn>0195-9131</issn>
     <eissn>1530-0315</eissn>
-    <updated>2017-12-13T13:21:47+00:00</updated>
+    <updated>2020-08-23T15:13:28+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -62,7 +62,7 @@
                 <if match="none" variable="page">
                   <group prefix="[" suffix="]" delimiter=" ">
                     <text term="cited"/>
-                    <date variable="accessed" suffix=" ">
+                    <date variable="accessed">
                       <date-part name="year"/>
                       <date-part name="month" prefix=" " form="short" strip-periods="true"/>
                       <date-part name="day" prefix=" "/>
@@ -91,7 +91,7 @@
           <if match="none" variable="page">
             <group delimiter=". ">
               <group delimiter=": ">
-                <text term="available at"/>
+                <text term="available at" text-case="capitalize-first"/>
                 <text variable="URL"/>
               </group>
               <text variable="DOI" prefix="doi:"/>
@@ -120,15 +120,6 @@
   <macro name="title">
     <group delimiter=" ">
       <text variable="title"/>
-      <choose>
-        <if type="article-journal" match="any">
-          <choose>
-            <if variable="page" match="none">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
-        </if>
-      </choose>
     </group>
   </macro>
   <macro name="edition">
@@ -185,7 +176,18 @@
         </else-if>
         <else>
           <text macro="title" suffix=". "/>
-          <text variable="container-title" form="short" strip-periods="true" font-style="italic" suffix=". "/>
+          <group delimiter=" " suffix=". ">
+            <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
+            <choose>
+              <if type="article-journal" match="any">
+                <choose>
+                  <if variable="page" match="none">
+                    <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
+                  </if>
+                </choose>
+              </if>
+            </choose>
+          </group>
           <text macro="date" suffix=";"/>
           <text variable="volume"/>
           <text variable="issue" prefix="(" suffix=")"/>

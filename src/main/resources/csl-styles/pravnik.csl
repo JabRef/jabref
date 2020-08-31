@@ -15,7 +15,7 @@
     <category field="law"/>
     <issn>0231-6625</issn>
     <summary>Suitable for Právník - a journal published by the Institute of State and Law of the Czech Academy of Sciences.</summary>
-    <updated>2020-05-30T10:00:00+00:00</updated>
+    <updated>2020-08-23T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -322,7 +322,7 @@
           </group>
         </if>
         <else-if position="ibid">
-          <text term="ibid"/>
+          <text term="ibid" suffix="."/>
         </else-if>
         <else-if position="subsequent">
           <text macro="contributors-short" suffix=". "/>

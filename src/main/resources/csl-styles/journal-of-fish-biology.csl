@@ -16,7 +16,7 @@
     <issn>0022-1112</issn>
     <eissn>1095-8649</eissn>
     <summary>The style for the Journal of Fish Biology.</summary>
-    <updated>2019-11-05T09:32:12+00:00</updated>
+    <updated>2020-08-13T10:48:28+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -36,16 +36,10 @@
     </terms>
   </locale>
   <macro name="editor">
-    <group delimiter="; ">
-      <names variable="editor translator" delimiter="; ">
-        <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-        <label form="short" text-case="lowercase" strip-periods="true" font-variant="normal" prefix=", "/>
-      </names>
-      <names variable="collection-editor">
-        <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-        <label form="short" prefix=", " text-case="lowercase"/>
-      </names>
-    </group>
+    <names variable="editor translator" delimiter="; ">
+      <name and="symbol" initialize-with=". "/>
+      <label form="short" text-case="capitalize-first" strip-periods="false" font-variant="normal" prefix=" (" suffix=")"/>
+    </names>
   </macro>
   <macro name="author">
     <names variable="author" suffix=".">
@@ -73,18 +67,28 @@
     </names>
   </macro>
   <macro name="publisher">
-    <group delimiter=": ">
-      <text variable="publisher-place"/>
-      <text variable="publisher"/>
-    </group>
+    <choose>
+      <if type="thesis" match="any">
+        <group delimiter=", ">
+          <text variable="publisher"/>
+          <text variable="publisher-place"/>
+        </group>
+      </if>
+      <else>
+        <group delimiter=": ">
+          <text variable="publisher-place"/>
+          <text variable="publisher"/>
+        </group>
+      </else>
+    </choose>
   </macro>
   <macro name="title">
     <choose>
       <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-        <text variable="title" text-case="title" font-style="italic"/>
+        <text variable="title" font-style="italic"/>
       </if>
       <else>
-        <text variable="title" text-case="title"/>
+        <text variable="title"/>
       </else>
     </choose>
   </macro>
@@ -98,23 +102,13 @@
     <text variable="collection-title"/>
   </macro>
   <macro name="pages">
-    <text variable="page"/>
+    <group delimiter=" ">
+      <label variable="page" form="short"/>
+      <text variable="page"/>
+    </group>
   </macro>
   <macro name="book-container">
-    <group delimiter=". ">
-      <text macro="title"/>
-      <choose>
-        <if type="entry-dictionary entry-encyclopedia" match="none">
-          <group delimiter=" ">
-            <text term="in" text-case="capitalize-first"/>
-            <text variable="container-title" font-style="italic"/>
-          </group>
-        </if>
-        <else>
-          <text variable="container-title" font-style="italic"/>
-        </else>
-      </choose>
-    </group>
+    <text variable="container-title" font-style="italic"/>
   </macro>
   <macro name="issued">
     <date delimiter=" " variable="issued">
@@ -141,10 +135,16 @@
       </else>
     </choose>
   </macro>
+  <macro name="number-of-pages">
+    <group delimiter=" ">
+      <text variable="number-of-pages"/>
+      <label variable="number-of-pages" form="short"/>
+    </group>
+  </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
-      <key macro="issued"/>
       <key macro="author"/>
+      <key macro="issued"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
@@ -191,14 +191,16 @@
           </group>
         </else-if>
         <else-if type="thesis">
-          <group delimiter=", ">
-            <group delimiter=". ">
+          <group delimiter=". ">
+            <group delimiter=" ">
               <text macro="title"/>
-              <text variable="genre"/>
+              <text variable="genre" prefix="(" suffix=")"/>
             </group>
-            <text macro="publisher"/>
-            <text macro="volume"/>
-            <text macro="pages"/>
+            <group delimiter=", ">
+              <text macro="publisher"/>
+              <text macro="number-of-pages"/>
+            </group>
+            <text variable="URL"/>
           </group>
         </else-if>
         <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
@@ -211,9 +213,12 @@
             <text macro="series"/>
             <choose>
               <if type="report">
-                <group delimiter=" ">
-                  <text variable="genre"/>
-                  <text variable="number"/>
+                <group delimiter=", ">
+                  <group delimiter=" ">
+                    <text variable="genre"/>
+                    <text variable="number"/>
+                  </group>
+                  <text macro="number-of-pages"/>
                 </group>
               </if>
             </choose>
@@ -236,15 +241,22 @@
           </group>
         </else-if>
         <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
-          <text macro="book-container" suffix=" "/>
-          <group delimiter=", ">
-            <text macro="editor" prefix="(" suffix=")"/>
-            <text macro="series"/>
-            <group delimiter=" ">
-              <label variable="page" form="short"/>
-              <text macro="pages"/>
-              <text macro="publisher"/>
+          <group delimiter=". ">
+            <text macro="title"/>
+            <group delimiter=", ">
+              <group delimiter=" ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor"/>
+              </group>
+              <group delimiter=" ">
+                <text macro="book-container" suffix=" "/>
+                <text macro="pages" prefix="(" suffix=")"/>
+              </group>
             </group>
+            <text macro="publisher"/>
+          </group>
+          <group delimiter=", ">
+            <text macro="series"/>
           </group>
         </else-if>
         <else-if type="webpage post post-weblog" match="any">

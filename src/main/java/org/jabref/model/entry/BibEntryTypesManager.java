@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -20,7 +21,7 @@ import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 public class BibEntryTypesManager {
     public static final String ENTRYTYPE_FLAG = "jabref-entrytype: ";
     private final InternalEntryTypes BIBTEX = new InternalEntryTypes(Stream.concat(BibtexEntryTypeDefinitions.ALL.stream(), IEEETranEntryTypeDefinitions.ALL.stream()).collect(Collectors.toList()));
-    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypeDefinitions.ALL);
+    private final InternalEntryTypes BIBLATEX = new InternalEntryTypes(Stream.concat(BiblatexEntryTypeDefinitions.ALL.stream(), BiblatexSoftwareEntryTypeDefinitions.ALL.stream()).collect(Collectors.toList()));
 
     public BibEntryTypesManager() {
     }
@@ -97,6 +98,7 @@ public class BibEntryTypesManager {
         } else {
             return customizedTypes.stream()
                                   .filter(entryType -> BiblatexEntryTypeDefinitions.ALL.stream().noneMatch(biblatexType -> biblatexType.getType().equals(entryType.getType())))
+                                  .filter(entryType -> BiblatexSoftwareEntryTypeDefinitions.ALL.stream().noneMatch(biblatexSoftware -> biblatexSoftware.getType().equals(entryType.getType())))
                                   .collect(Collectors.toList());
         }
     }
@@ -134,7 +136,9 @@ public class BibEntryTypesManager {
     }
 
     /**
-     * This method returns the BibtexEntryType for the entry type.
+     * This method returns the BibEntryType for the entry type.
+     *
+     * @param mode the mode of the BibDatabase, may be null
      */
     public Optional<BibEntryType> enrich(EntryType type, BibDatabaseMode mode) {
         return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.enrich(type) : BIBTEX.enrich(type);

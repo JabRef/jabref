@@ -18,11 +18,11 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 ### Java Development Kit 14
 
-A working Java (Develoment Kit) 14 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
+A working Java \(Develoment Kit\) 14 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 14 \(e.g `javac 14`\). If `javac` is not found or a wrong version is reported, check your PATH environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. We recommend to setup the full Liberica JDK including JavaFX. You can get it from <https://bell-sw.com/pages/downloads/?version=java-14&package=jdk-full>. On Windows, you can execute `choco install libericajdkfull` \(requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)\).
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. We recommend to setup the full Liberica JDK including JavaFX. You can get it from [https://bell-sw.com/pages/downloads/?version=java-14&package=jdk-full](https://bell-sw.com/pages/downloads/?version=java-14&package=jdk-full). On Windows, you can execute `choco install libericajdkfull` \(requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)\).
 
-Alternatively, you can download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download download the "jmods" JavaFX 14 zip archive from <https://gluonhq.com/products/javafx/> and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-14.0.1\jmods`.
+Alternatively, you can download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download download the "jmods" JavaFX 14 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-14.0.1\jmods`.
 
 ### GitHub Account
 
@@ -49,12 +49,7 @@ Examples:
 It is strongly recommend that you have git installed.
 
 * In Debian-based distros: `sudo apt-get install git`
-* In Windows: [Download the installer](http://git-scm.com/download/win) and install it.
-
-  Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a\) install git and b\) have linux commands such as `grep` available in your `PATH`.
-
-  For more advanced tooling, you may use [Fork - a fast and friendly git client for Mac and Windows](https://git-fork.com/): `choco install git-fork`.
-
+* In Windows: [Download the installer](http://git-scm.com/download/win) and install it. Using chocolatey, you can run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal` to a\) install git and b\) have linux commands such as `grep` available in your `PATH`.
 * [official installation instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 ### IDE
@@ -110,9 +105,7 @@ After that, you can open `jabref/build.gradle` as a project. It is crucial that 
   location of a JDK 14.
 
 * Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as
-
-  the Gradle JVM at the bottom.
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as the Gradle JVM at the bottom.
 
 To prepare IntelliJ's build system two additional steps are required
 
@@ -123,25 +116,18 @@ To prepare IntelliJ's build system two additional steps are required
    --add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
   ```
 
-* Enable annotation processors by navigating to
-
-  **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
+* Enable annotation processors by navigating to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik.png)
+![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik%20%281%29.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
-* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to
-
-  **View \| Tool Windows \| Gradle**.
-
-* In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
-
-  with the setting changes.
+* Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View \| Tool Windows \| Gradle**.
+* In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
 
@@ -155,13 +141,10 @@ You should use IntelliJ IDEA's internal build system for compiling and running J
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
-* in **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and
+* In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
+* Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-  "Test using" is set to "IntelliJ IDEA".
-
-* Ignore the Gradle project "buildSrc":  
-
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%281%29.png)
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
@@ -170,34 +153,28 @@ Essentially, you now have the best of both worlds: You can run Gradle tasks usin
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-  1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
-  2. Close the settings afterwards and restart IntelliJ
+
+   1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+   2. Close the settings afterwards and restart IntelliJ
+
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
-* Go to **File \| Settings \| Checkstyle \| Configuration File**
-  1. Import the CheckStyle configuration file by clicking the \[+\] button
-  2. For the description provide "JabRef"
-  3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-  4. Check "Store relative to project location"
-  5. Click "Next" and "Finish"
-  6. Activate the CheckStyle configuration file by ticking it in the list
-  7. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
-  8. Set the "Scan Scope" to "Only Java sources \(including tests\)
-  9. Save settings by clicking "OK"
-  10. Your configuration should now look like this:  
+* Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
 
+   1. Import the CheckStyle configuration file by clicking the \[+\] button
+   2. For the description provide "JabRef"
+   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
+   4. Click "Next" and "Finish"
+   5. Activate the CheckStyle configuration file by ticking it in the list
+   6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
+   7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+   8. Save settings by clicking "OK"
+   9. Your configuration should now look like this:
+
+      ```text
       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
-
-#### Troubleshooting when using both IDEA and Eclipse
-
-If you have configured Eclipse for the same project \(the required steps are described below\), then the additionally added file `Log4jPlugins.java` must be excluded from the compilation process, otherwise an error will occur during the compilation of the project:
-
-* **File \| Settings \| Build, Execution, Deployment \| Compiler \| Excludes** and add the following file to the
-
-  list \(\[+\]\), in order to exclude it:
-
-  * `src/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`
+      ```
 
 ### Setup for Eclipse
 
@@ -208,12 +185,14 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
    * This step is only required once.
 2. Run `./gradlew eclipse`
    * **This must always be executed, when there are new upstream changes.**
-3. Copy the file `Log4jPlugins.java` from `build/generated/sources/annotationProcessor/java/main/org/jabref/gui/logging/plugins` to `src/main/java/org/jabref/gui/logging/plugins/`
-   * Usually, the folder `plugins` must be created for that.
-4. Open or import the existing project in Eclipse as Java project.
+3. Open or import the existing project in Eclipse as Java project.
    * Remark: Importing it as gradle project will not work correctly.
    * Refresh the project in Eclipse
-5. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
+4. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
+   * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
+
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config.png)
+
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
      ```text
@@ -239,8 +218,8 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
      ```
 
    * In the tab "Dependencies" of the run/debug configuration tick the checkbox "Exclude test code"
-6. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
-7. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
+5. Optional: Install the [e\(fx\)clipse plugin](http://www.eclipse.org/efxclipse/index.html) from the Eclipse marketplace: 1. Help -&gt; Eclipse Marketplace... -&gt; Search tab 2. Enter "e\(fx\)clipse" in the search dialogue 3. Click "Go" 4. Click "Install" button next to the plugin 5. Click "Finish"
+6. Now you can build and run/debug the application by either using "JabRefLauncher" or "JabRefMain". This is the recommended way, since the application starts quite fast.
 
 ## Final comments
 

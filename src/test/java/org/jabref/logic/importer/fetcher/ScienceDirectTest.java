@@ -50,6 +50,18 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
+    void findByDoiWorksForBoneArticle() throws IOException {
+        // The DOI is an example by a user taken from https://github.com/JabRef/jabref/issues/5860
+        entry.setField(StandardField.DOI, "https://doi.org/10.1016/j.bone.2020.115226");
+
+        assertEquals(
+                Optional.of(new URL("https://www.sciencedirect.com/science/article/pii/S8756328220300065/pdfft?md5=0ad75ff155637dec358e5c9fb8b90afd&pid=1-s2.0-S8756328220300065-main.pdf")),
+                finder.findFullText(entry)
+        );
+    }
+
+    @Test
+    @DisabledOnCIServer("CI server is blocked")
     void notFoundByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
 

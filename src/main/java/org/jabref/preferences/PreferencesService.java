@@ -14,6 +14,7 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -58,6 +59,8 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
+    void storeFilePreferences(FilePreferences filePreferences);
+
     FieldWriterPreferences getFieldWriterPreferences();
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
@@ -69,6 +72,8 @@ public interface PreferencesService {
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
+
+    String setLastPreferencesExportPath();
 
     OpenOfficePreferences getOpenOfficePreferences();
 
@@ -95,8 +100,6 @@ public interface PreferencesService {
     Charset getDefaultEncoding();
 
     String getUser();
-
-    String getTheme();
 
     SaveOrderConfig loadExportSaveOrder();
 
@@ -227,6 +230,18 @@ public interface PreferencesService {
     MainTableNameFormatPreferences getMainTableNameFormatPreferences();
 
     void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    Theme getTheme();
+
+    void updateTheme();
+
+    AppearancePreferences getAppearancePreferences();
+
+    void storeAppearancePreference(AppearancePreferences preferences);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences

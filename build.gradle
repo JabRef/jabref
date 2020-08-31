@@ -12,11 +12,11 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
-    id 'me.champeau.gradle.jmh' version '0.5.0'
-    id 'com.github.ben-manes.versions' version '0.28.0'
+    id 'me.champeau.gradle.jmh' version '0.5.1'
+    id 'com.github.ben-manes.versions' version '0.29.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.21.0'
+    id 'org.beryx.jlink' version '2.21.3'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -62,7 +62,7 @@ ext.allowJava9 = true
 sourceSets {
     main {
         java {
-            srcDirs = ["src/main/java", "src/main/gen"]
+            srcDirs = ["src/main/java", "src/main/generated"]
         }
 
         resources {
@@ -137,9 +137,13 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.1'
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.1') {
+        exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
+    }
 
-    implementation 'org.postgresql:postgresql:42.2.14'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
+
+    implementation 'org.postgresql:postgresql:42.2.16'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -158,7 +162,7 @@ dependencies {
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.0.0-SNAPSHOT'
+    implementation 'com.tobiasdiez:easybind:2.1.0'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
@@ -166,7 +170,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.8.06'
+    implementation 'com.konghq:unirest-java:3.10.00'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -195,15 +199,15 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.87'
+    testImplementation 'io.github.classgraph:classgraph:4.8.89'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.6.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.13'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.14'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.3.3'
+    testImplementation 'org.mockito:mockito-core:3.5.7'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
@@ -211,7 +215,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.34'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.36'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
     jython 'org.python:jython-standalone:2.7.2'
 }
@@ -262,7 +266,7 @@ task checkOutdatedDependencies(dependsOn: dependencyUpdates) {
 }
 
 clean {
-    delete "src/main/gen"
+    delete "src/main/generated"
 }
 
 processResources {
@@ -306,7 +310,7 @@ task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
 
     antlr = ANTLR3
     inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
-    outputDir = 'src/main/gen/org/jabref/logic/bst/'
+    outputDir = 'src/main/generated/org/jabref/logic/bst/'
 }
 
 task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
@@ -315,7 +319,7 @@ task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
 
     antlr = ANTLR4
     inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
-    outputDir = "src/main/gen/org/jabref/search"
+    outputDir = "src/main/generated/org/jabref/search"
     javaPackage = "org.jabref.search"
 }
 
@@ -324,7 +328,7 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
@@ -333,7 +337,7 @@ task generateBibtexmlSource(type: XjcTask) {
     description = "Generates java files for the bibtexml importer."
 
     schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src/main/gen"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
@@ -342,7 +346,7 @@ task generateEndnoteSource(type: XjcTask) {
     description = "Generates java files for the endnote importer."
 
     schemaFile = "src/main/resources/xjc/endnote/endnote.xsd"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.endnote"
 }
 
@@ -352,7 +356,7 @@ task generateModsSource(type: XjcTask) {
 
     schemaFile = "src/main/resources/xjc/mods/mods-3-7.xsd"
     bindingFile = "src/main/resources/xjc/mods/mods-binding.xjb"
-    outputDirectory = "src/main/gen/"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.mods"
     arguments = '-npa'
 }
@@ -373,6 +377,8 @@ compileJava {
     options.compilerArgs << "-Xlint:none"
     dependsOn "generateSource"
 
+    options.annotationProcessorGeneratedSourcesDirectory = file("${projectDir}/src/main/generated")
+
     moduleOptions {
         // TODO: Remove access to internal api
         addExports = [
@@ -388,33 +394,32 @@ run {
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
-                
+
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
                 'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle',
-                
+
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
                 'javafx.graphics/com.sun.javafx.scene' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.scene.traversal' : 'org.controlsfx.controls',
                 'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls',
-                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.controlsfx.controls',
+                'javafx.controls/com.sun.javafx.scene.control.behavior' : 'org.controlsfx.controls',
                 'javafx.controls/com.sun.javafx.scene.control.inputmap' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.event' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.collections' : 'org.controlsfx.controls',
                 'javafx.base/com.sun.javafx.runtime': 'org.controlsfx.controls',
                 'javafx.web/com.sun.webkit' : 'org.controlsfx.controls',
-                'javafx.graphics/com.sun.javafx.css' : 'org.controlsfx.controls'
         ]
 
         addOpens = [
                 'javafx.controls/javafx.scene.control' : 'org.jabref',
                 'org.controlsfx.controls/org.controlsfx.control.textfield' : 'org.jabref',
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                
+
                 'javafx.controls/javafx.scene.control.skin' : 'org.controlsfx.controls',
                 'javafx.graphics/javafx.scene' : 'org.controlsfx.controls',
-                
+
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
                 'javafx.base/com.sun.javafx.binding' : 'com.jfoenix',
                 'javafx.graphics/com.sun.javafx.stage' : 'com.jfoenix',
@@ -684,6 +689,9 @@ jlink {
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
                     '--resource-dir', "${projectDir}/buildres/mac"
             ]
+            // Due to a signing bug in jpackage we have to first resign the created app and therefore build the dmg manually
+            // See https://bugs.openjdk.java.net/browse/JDK-8251892 for details
+            skipInstaller = true
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',
@@ -717,13 +725,16 @@ if (OperatingSystem.current().isLinux()) {
     }
 }
 
-// Delete unnecessary folder in application image
-// TODO: Remove this workaround as soon as https://github.com/beryx/badass-jlink-plugin/issues/51 is fixed
-task deleteModsFolder(type: Delete) {
-    delete "$buildDir/distribution/JabRef/app/mods"
+if (OperatingSystem.current().isMacOsX()) {
+    tasks.jpackageImage.doLast {
+        copy {
+            from("${projectDir}/buildres/mac") {
+                include "native-messaging-host/**", "jabrefHost.py"
+            }
+            into "$buildDir/distribution/JabRef.app/Contents/Resources"
+        }
+    }
 }
-deleteModsFolder.shouldRunAfter jpackageImage
-
 jmh {
     warmupIterations = 5
     iterations = 10

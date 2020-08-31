@@ -27,6 +27,11 @@
     <updated>2020-06-30T08:44:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
+  <locale xml:lang="de">
+    <terms>
+      <term name="et-al">et al.</term>
+    </terms>
+  </locale>
   <macro name="author">
     <names suffix=". " variable="author">
       <name sort-separator=" " name-as-sort-order="all" initialize-with="" et-al-use-first="3" et-al-min="4" delimiter-precedes-last="always"/>

@@ -40,7 +40,8 @@ public enum StandardFileType implements FileType {
     XML("xml"),
     JSON("json"),
     XMP("xmp"),
-    ZIP("zip");
+    ZIP("zip"),
+    CSS("css");
 
     private final List<String> extensions;
 

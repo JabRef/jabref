@@ -694,7 +694,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    public void saveAlsoSavesSecondModification() throws Exception {
+    void saveAlsoSavesSecondModification() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -730,21 +730,21 @@ class BibtexDatabaseWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  author  = {Test}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
-                "  number  = {1}," + OS.NEWLINE +
                 "  note    = {some note}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE +
                 "" + OS.NEWLINE +
                 "@Comment{jabref-meta: databaseType:bibtex;}" + OS.NEWLINE, stringWriter.toString());
     }
 
     @Test
-    public void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchanged() throws Exception {
+    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchanged() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -770,7 +770,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    public void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchangedEvenInThePrecenseOfSavedModifications() throws Exception {
+    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchangedEvenInThePrecenseOfSavedModifications() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +

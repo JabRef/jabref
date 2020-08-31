@@ -55,7 +55,7 @@ import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.preferences.ImportTabViewModel;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -257,7 +257,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
-    public static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -363,6 +362,7 @@ public class JabRefPreferences implements PreferencesService {
 
     // Dialog states
     private static final String PREFS_EXPORT_PATH = "prefsExportPath";
+    private static final String DOWNLOAD_LINKED_FILES = "downloadLinkedFiles";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -413,6 +413,11 @@ public class JabRefPreferences implements PreferencesService {
      * Cache variable for getColumnSortOrder
      */
     private List<MainTableColumnModel> mainTableColumnSortOrder;
+
+    /**
+     * Cache variable for getTheme
+     */
+    private Theme globalTheme;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -654,8 +659,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILENAMEPATTERN, ImportTabViewModel.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
         defaults.put(IMPORT_FILEDIRPATTERN, "");
-        // Don't download files by default
-        defaults.put(DOWNLOAD_LINKED_FILES, false);
+        // Download files by default
+        defaults.put(DOWNLOAD_LINKED_FILES, true);
 
         customImports = new CustomImportList(this);
 
@@ -703,7 +708,7 @@ public class JabRefPreferences implements PreferencesService {
                         + "</dd>__NEWLINE__<p></p></font>");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, ThemeLoader.MAIN_CSS);
+        defaults.put(JabRefPreferences.FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
@@ -817,11 +822,6 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.debug("Hostname not found.", ex);
             return get(DEFAULT_OWNER);
         }
-    }
-
-    @Override
-    public String getTheme() {
-        return get(FX_THEME);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1125,7 +1125,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     public void exportPreferences(Path file) throws JabRefException {
-        LOGGER.debug("Exporting preferences ", file.toAbsolutePath());
+        LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
@@ -1187,6 +1187,15 @@ public class JabRefPreferences implements PreferencesService {
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES));
+    }
+
+    @Override
+    public void storeFilePreferences(FilePreferences filePreferences) {
+        put(JabRefPreferences.MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
+        putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
+        put(JabRefPreferences.IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
+        put(JabRefPreferences.IMPORT_FILEDIRPATTERN, filePreferences.getFileDirPattern());
+        putBoolean(JabRefPreferences.DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
     }
 
     @Override
@@ -1555,14 +1564,7 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
-    public Optional<Integer> getFontSize() {
-        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
-            return Optional.of(getInt(MAIN_FONT_SIZE));
-        } else {
-            return Optional.empty();
-        }
-    }
-
+    @Override
     public String setLastPreferencesExportPath() {
         return get(PREFS_EXPORT_PATH);
     }
@@ -2308,6 +2310,38 @@ public class JabRefPreferences implements PreferencesService {
 
         putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
         putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+    }
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    @Override
+    public Theme getTheme() {
+        if (globalTheme == null) {
+            updateTheme();
+        }
+        return globalTheme;
+    }
+
+    @Override
+    public void updateTheme() {
+        this.globalTheme = new Theme(get(FX_THEME), this);
+    }
+
+    @Override
+    public AppearancePreferences getAppearancePreferences() {
+        return new AppearancePreferences(
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                getTheme());
+    }
+
+    @Override
+    public void storeAppearancePreference(AppearancePreferences preferences) {
+        putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
+        putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
+        put(FX_THEME, preferences.getTheme().getPath().toString());
     }
 
     //*************************************************************************************************************
