@@ -89,4 +89,6 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
+    requires lucene.queryparser;
+    requires lucene.core;
 }

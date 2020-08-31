@@ -4,10 +4,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javax.inject.Inject;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -27,6 +28,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
@@ -40,10 +42,10 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 /**
  * Dialog that prompts the user to choose a type for an entry.
- *
- * @return null if canceled
  */
 public class EntryTypeView extends BaseDialog<EntryType> {
+
+    @Inject StateManager stateManager;
 
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
@@ -52,12 +54,12 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private FlowPane bibTexPane;
     @FXML private FlowPane ieeetranPane;
     @FXML private FlowPane customPane;
+    @FXML private FlowPane biblatexSoftwarePane;
     @FXML private TitledPane biblatexTitlePane;
     @FXML private TitledPane bibTexTitlePane;
     @FXML private TitledPane ieeeTranTitlePane;
     @FXML private TitledPane customTitlePane;
-
-    @Inject StateManager stateManager;
+    @FXML private TitledPane biblatexSoftwareTitlePane;
 
     private final BasePanel basePanel;
     private final DialogService dialogService;
@@ -140,9 +142,11 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         ieeeTranTitlePane.managedProperty().bind(ieeeTranTitlePane.visibleProperty());
         biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
+        biblatexSoftwareTitlePane.managedProperty().bind(biblatexSoftwareTitlePane.visibleProperty());
 
         if (basePanel.getBibDatabaseContext().isBiblatexMode()) {
             addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
+            addEntriesToPane(biblatexSoftwarePane, BiblatexSoftwareEntryTypeDefinitions.ALL);
 
             bibTexTitlePane.setVisible(false);
             ieeeTranTitlePane.setVisible(false);
@@ -155,6 +159,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         } else {
             biblatexTitlePane.setVisible(false);
+            biblatexSoftwareTitlePane.setVisible(false);
             addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
             addEntriesToPane(ieeetranPane, IEEETranEntryTypeDefinitions.ALL);
 
@@ -194,11 +199,12 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         this.close();
     }
 
-    //The description is coming from biblatex manual chapter 2
-    //Biblatex documentation is favored over the bibtex,
-    //since bibtex is a subset of biblatex and biblatex is better documented.
+    /**
+     * The description is originating from biblatex manual chapter 2
+     * Biblatex documentation is favored over the bibtex,
+     * since bibtex is a subset of biblatex and biblatex is better documented.
+     */
     public static String getDescription(EntryType selectedType) {
-        //CHECKSTYLE:OFF
         if (selectedType instanceof StandardEntryType) {
             switch ((StandardEntryType) selectedType) {
                 case Article -> {
@@ -304,7 +310,5 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         } else {
             return "";
         }
-        //CHECKSTYLE:ON
-
     }
 }

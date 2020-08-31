@@ -3,6 +3,7 @@ package org.jabref.gui.commonfxcontrols;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -13,6 +14,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -106,7 +108,11 @@ public class FieldFormatterCleanupsPanel extends VBox {
     }
 
     private void setupBindings() {
-        cleanupsEnabled.selectedProperty().bindBidirectional(cleanupsDisableProperty());
+        BindingsHelper.bindBidirectional((ObservableValue<Boolean>) cleanupsEnabled.selectedProperty(),
+                viewModel.cleanupsDisableProperty(),
+                disabled -> cleanupsEnabled.selectedProperty().setValue(!disabled),
+                selected -> viewModel.cleanupsDisableProperty().setValue(!selected));
+
         cleanupsList.itemsProperty().bind(viewModel.cleanupsListProperty());
         addableFields.itemsProperty().bind(viewModel.availableFieldsProperty());
         addableFields.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
