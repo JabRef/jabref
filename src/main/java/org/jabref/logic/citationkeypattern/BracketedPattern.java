@@ -152,38 +152,38 @@ public class BracketedPattern {
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(pattern, "\\[]\"", true);
+        StringBuilder expandedPattern = new StringBuilder();
+        StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
 
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
+        while (parsedPattern.hasMoreTokens()) {
+            String token = parsedPattern.nextToken();
             switch (token) {
-                case "\"" -> appendQuote(sb, st);
+                case "\"" -> appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
-                    String fieldMarker = contentBetweenBrackets(st, pattern);
+                    String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
 
                     List<String> fieldParts = parseFieldMarker(fieldMarker);
                     // check whether there is a modifier on the end such as
                     // ":lower":
                     if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(entry, fieldMarker, keywordDelimiter, database));
+                        expandedPattern.append(getFieldValue(entry, fieldMarker, keywordDelimiter, database));
                     } else {
                         // apply modifiers:
                         String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
-                        sb.append(applyModifiers(fieldValue, fieldParts, 1));
+                        expandedPattern.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                 }
                 case "\\" -> {
-                    if (st.hasMoreTokens()) {
-                        sb.append(st.nextToken());
+                    if (parsedPattern.hasMoreTokens()) {
+                        expandedPattern.append(parsedPattern.nextToken());
                     }
                     // FIXME: else -> raise exception or log? (S.G.)
                 }
-                default -> sb.append(token);
+                default -> expandedPattern.append(token);
             }
         }
 
-        return sb.toString();
+        return expandedPattern.toString();
     }
 
     /**
