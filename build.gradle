@@ -298,8 +298,7 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource",
-                                "generateJournalAbbreviationList"]) {
+                                "generateModsSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }

@@ -12,21 +12,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2-beta
+        uses: actions/checkout@v2
         with:
           ref: master
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+      - uses: actions/cache@v1
+        name: Restore gradle cache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
+            ${{ runner.OS }}-gradle-
+            ${{ runner.OS }}-
+      - name: Restore gradle cache
+        uses: actions/cache@master
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Update journal lists
         run: |
           cd /tmp
           git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
           cd abbrv.jabref.org
-          ./combine_journal_lists_dots.py $GITHUB_WORKSPACE/src/main/resources/journals/journalList.csv
-          ./combine_journal_lists_dotless.py $GITHUB_WORKSPACE/src/main/resources/journals/journalList_dotless.csv
+          mkdir ../journal-lists
+          ./combine_journal_lists_dots.py /tmp/journal-lists/journalList.csv
+          # ./combine_journal_lists_dotless.py /tmp/journal-lists/journalList_dotless.csv
           cd $GITHUB_WORKSPACE
+          ./gradlew generateJournalAbbreviationList
           git add .
           git config user.email "jabrefmail+webfeedback@gmail.com"
           git config user.name "GitHub Actions"
-          git commit -m"Update journalList.csv"
+          git commit -m"Update journalList.mv"
 #      - uses: ad-m/github-push-action@master
 #        with:
 #          github_token: ${{ secrets.GITHUB_TOKEN }}
