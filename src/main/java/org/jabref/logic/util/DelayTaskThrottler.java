@@ -46,7 +46,11 @@ public class DelayTaskThrottler {
         }
     }
 
+    /**
+     * Shuts everything down. Upon termination, this method returns.
+     */
     public void shutdown() {
+        // this is non-blocking. See https://stackoverflow.com/a/57383461/873282.
         executor.shutdown();
         try {
             if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {

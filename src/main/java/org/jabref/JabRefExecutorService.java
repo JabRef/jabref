@@ -132,13 +132,47 @@ public class JabRefExecutorService {
         timer.schedule(timerTask, millisecondsDelay);
     }
 
+    /**
+     * Shuts everything down. Upon termination, this method returns.
+     */
     public void shutdownEverything() {
-        // those threads will be allowed to finish
-        this.executorService.shutdown();
-        // those threads will be interrupted in their current task
-        this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();
+
+        try {
+            // those threads will be allowed to finish
+            this.executorService.shutdown();
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                LOGGER.debug("One minute passed, saving still not completed. Trying forced shutdown.");
+                executorService.shutdownNow();
+                if (executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    LOGGER.debug("One minute passed again - forced shutdown worked.");
+                } else {
+                    LOGGER.error("DelayedTaskThrottler did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+                executorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            // those threads will be interrupted in their current task
+            this.lowPriorityExecutorService.shutdownNow();
+            if (!lowPriorityExecutorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                LOGGER.debug("One minute passed, saving still not completed. Trying forced shutdown.");
+                lowPriorityExecutorService.shutdownNow();
+                if (lowPriorityExecutorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    LOGGER.debug("One minute passed again - forced shutdown worked.");
+                } else {
+                    LOGGER.error("DelayedTaskThrottler did not terminate");
+                }
+            }
+        } catch (InterruptedException ie) {
+            lowPriorityExecutorService.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
         timer.cancel();
     }
 
