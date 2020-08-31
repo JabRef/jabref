@@ -36,10 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The BracketedExpressionExpander provides methods to expand bracketed expressions,
- * such as [year]_[author]_[firstpage], using information from a provided BibEntry.
- * The above-mentioned expression would yield 2017_Kitsune_123 when expanded using the
- * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
+ * The BracketedExpressionExpander provides methods to expand bracketed expressions, such as
+ * [year]_[author]_[firstpage], using information from a provided BibEntry. The above-mentioned expression would yield
+ * 2017_Kitsune_123 when expanded using the BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017},
+ * pages={123-6}}".
  */
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
@@ -54,27 +54,41 @@ public class BracketedPattern {
      */
     private static final int MAX_ALPHA_AUTHORS = 4;
 
-    /** Matches everything that is not an uppercase ASCII letter */
-    private static final Pattern NOT_CAPITAL_FIRST_CHARACTER = Pattern.compile("[^A-Z]");
-    /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
+    /**
+     * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
+     */
+    private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
+    /**
+     * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
+     */
     private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
-    /** Matches with "dep"/"dip", case insensitive */
+    /**
+     * Matches with "dep"/"dip", case insensitive
+     */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+
     private enum Institution {
         SCHOOL,
         DEPARTMENT,
         UNIVERSITY,
         TECHNOLOGY;
 
-        /** Matches "uni" at the start of a string or after a space, case insensitive */
+        /**
+         * Matches "uni" at the start of a string or after a space, case insensitive
+         */
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
-        /** Matches with "tech", case insensitive */
+        /**
+         * Matches with "tech", case insensitive
+         */
         private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
-        /** Matches with "dep"/"dip"/"lab", case insensitive */
+        /**
+         * Matches with "dep"/"dip"/"lab", case insensitive
+         */
         private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
         /**
          * Find which types of institutions have words in common with the given name parts.
+         *
          * @param nameParts a list of words that constitute parts of an institution's name.
          * @return set containing all types that matches
          */
@@ -272,18 +286,30 @@ public class BracketedPattern {
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
                 switch (pattern) {
-                    case "auth": return firstAuthor(authorList);
-                    case "authForeIni": return firstAuthorForenameInitials(authorList);
-                    case "authFirstFull": return firstAuthorVonAndLast(authorList);
-                    case "authors": return allAuthors(authorList);
-                    case "authorsAlpha": return authorsAlpha(authorList);
-                    case "authorLast": return lastAuthor(authorList);
-                    case "authorLastForeIni": return lastAuthorForenameInitials(authorList);
-                    case "authorIni": return oneAuthorPlusInitials(authorList);
-                    case "auth.auth.ea": return authAuthEa(authorList);
-                    case "auth.etal": return authEtal(authorList, ".", ".etal");
-                    case "authEtAl": return authEtal(authorList, "", "EtAl");
-                    case "authshort": return authshort(authorList);
+                    case "auth":
+                        return firstAuthor(authorList);
+                    case "authForeIni":
+                        return firstAuthorForenameInitials(authorList);
+                    case "authFirstFull":
+                        return firstAuthorVonAndLast(authorList);
+                    case "authors":
+                        return allAuthors(authorList);
+                    case "authorsAlpha":
+                        return authorsAlpha(authorList);
+                    case "authorLast":
+                        return lastAuthor(authorList);
+                    case "authorLastForeIni":
+                        return lastAuthorForenameInitials(authorList);
+                    case "authorIni":
+                        return oneAuthorPlusInitials(authorList);
+                    case "auth.auth.ea":
+                        return authAuthEa(authorList);
+                    case "auth.etal":
+                        return authEtal(authorList, ".", ".etal");
+                    case "authEtAl":
+                        return authEtal(authorList, "", "EtAl");
+                    case "authshort":
+                        return authshort(authorList);
                 }
 
                 if (pattern.matches("authIni[\\d]+")) {
@@ -311,14 +337,22 @@ public class BracketedPattern {
                 AuthorList editorList = createAuthorList(unparsedEditors);
 
                 switch (pattern) {
-                    case "edtr": return firstAuthor(editorList);
-                    case "edtrForeIni": return firstAuthorForenameInitials(editorList);
-                    case "editors": return allAuthors(editorList);
-                    case "editorLast": return lastAuthor(editorList); // Last author's last name
-                    case "editorLastForeIni": return lastAuthorForenameInitials(editorList);
-                    case "editorIni": return oneAuthorPlusInitials(editorList);
-                    case "edtr.edtr.ea": return authAuthEa(editorList);
-                    case "edtrshort": return authshort(editorList);
+                    case "edtr":
+                        return firstAuthor(editorList);
+                    case "edtrForeIni":
+                        return firstAuthorForenameInitials(editorList);
+                    case "editors":
+                        return allAuthors(editorList);
+                    case "editorLast":
+                        return lastAuthor(editorList); // Last author's last name
+                    case "editorLastForeIni":
+                        return lastAuthorForenameInitials(editorList);
+                    case "editorIni":
+                        return oneAuthorPlusInitials(editorList);
+                    case "edtr.edtr.ea":
+                        return authAuthEa(editorList);
+                    case "edtrshort":
+                        return authshort(editorList);
                 }
 
                 if (pattern.matches("edtrIni[\\d]+")) {
@@ -422,6 +456,7 @@ public class BracketedPattern {
     /**
      * Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
      * Afterward, any institutions are formatted into an institution key.
+     *
      * @param unparsedAuthors a string representation of authors or editors
      * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
      */
@@ -447,6 +482,7 @@ public class BracketedPattern {
 
     /**
      * Checks if an author is an institution by verifying that only the last name is present.
+     *
      * @param author the checked author
      * @return true if only the last name is present
      */
@@ -653,7 +689,8 @@ public class BracketedPattern {
      * Gets the last name of the first author/editor
      *
      * @param authorList an {@link AuthorList}
-     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return
+     * null.
      */
     private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
@@ -665,7 +702,8 @@ public class BracketedPattern {
      * Gets the first name initials of the first author/editor
      *
      * @param authorList an {@link AuthorList}
-     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to
+     * never return null.
      */
     private static String firstAuthorForenameInitials(AuthorList authorList) {
         return authorList.getAuthors().stream()
@@ -679,7 +717,8 @@ public class BracketedPattern {
      * Gets the von part and the last name of the first author/editor. No spaces are returned.
      *
      * @param authorList an {@link AuthorList}
-     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
+     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to
+     * never return null.
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
         return authorList.isEmpty() ? "" :
@@ -703,7 +742,8 @@ public class BracketedPattern {
      * Gets the forename initials of the last author/editor
      *
      * @param authorList an {@link AuthorList}
-     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
+     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never
+     * return null.
      */
     private static String lastAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
@@ -736,7 +776,7 @@ public class BracketedPattern {
 
         if (authorList.getNumberOfAuthors() == 1) {
             String[] firstAuthor = authorList.getAuthor(0).getLastOnly()
-                                           .replaceAll("\\s+", " ").trim().split(" ");
+                                             .replaceAll("\\s+", " ").trim().split(" ");
             // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
             for (int j = 0; j < (firstAuthor.length - 1); j++) {
                 alphaStyle.append(firstAuthor[j], 0, 1);
@@ -752,7 +792,7 @@ public class BracketedPattern {
                 // replace all whitespaces by " "
                 // split the lastname at " "
                 String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
-                for (String part: nameParts) {
+                for (String part : nameParts) {
                     // use first character of each part of lastname
                     alphaStyle.append(part, 0, 1);
                 }
@@ -767,10 +807,11 @@ public class BracketedPattern {
     /**
      * Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
      * `maxAuthors`, replace all excess authors with `suffix`.
+     *
      * @param authorList the list of authors
      * @param maxAuthors the maximum number of authors in the string
-     * @param delimiter delimiter separating the last names of the authors
-     * @param suffix to replace excess authors with
+     * @param delimiter  delimiter separating the last names of the authors
+     * @param suffix     to replace excess authors with
      * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
      * `maxAuthors` replaced with `suffix`
      */
@@ -785,7 +826,7 @@ public class BracketedPattern {
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      *
      * @param authorList an {@link AuthorList}
-     * @param n           the number of desired authors
+     * @param n          the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
     private static String nAuthors(AuthorList authorList, int n) {
@@ -793,10 +834,9 @@ public class BracketedPattern {
     }
 
     /**
-     * Gets the first part of the last name of the first
-     * author/editor, and appends the last name initial of the
-     * remaining authors/editors.
-     * Maximum 5 characters
+     * Gets the first part of the last name of the first author/editor, and appends the last name initial of the
+     * remaining authors/editors. Maximum 5 characters
+     *
      * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
@@ -816,11 +856,15 @@ public class BracketedPattern {
 
     /**
      * auth.auth.ea format:
-     * Isaac Newton and James Maxwell and Albert Einstein (1960)
-     * Isaac Newton and James Maxwell (1960)
-     *  give:
-     * Newton.Maxwell.ea
-     * Newton.Maxwell
+     * <ol>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
+     * <li>Isaac Newton and James Maxwell (1960)</li>
+     * </ol>
+     * give:
+     * <ol>
+     * <li>Newton.Maxwell.ea</li>
+     * <li>Newton.Maxwell</li>
+     * </ol>
      */
     private static String authAuthEa(AuthorList authorList) {
         return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
@@ -828,21 +872,27 @@ public class BracketedPattern {
 
     /**
      * auth.etal, authEtAl, ... format:
-     * Isaac Newton and James Maxwell and Albert Einstein (1960)
-     * Isaac Newton and James Maxwell (1960)
-     *
-     *  auth.etal give (delim=".", append=".etal"):
-     * Newton.etal
-     * Newton.Maxwell
-     *
-     *  authEtAl give (delim="", append="EtAl"):
-     * NewtonEtAl
-     * NewtonMaxwell
-     *
+     * <ol>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
+     * <li>Isaac Newton and James Maxwell (1960)</li>
+     * </ol>
+     * <p>
+     * auth.etal give (delim=".", append=".etal"):
+     * <ol>
+     * <li>Newton.etal</li>
+     * <li>Newton.Maxwell</li>
+     * </ol>
+     * </p>
+     * <p>
+     * authEtAl give (delim="", append="EtAl"):
+     * <ol>
+     * <li>NewtonEtAl</li>
+     * <li>NewtonMaxwell</li>
+     * </ol>
+     * </p>
      * Note that [authEtAl] equals [authors2]
      */
-    private static String authEtal(AuthorList authorList, String delim,
-                                  String append) {
+    private static String authEtal(AuthorList authorList, String delim, String append) {
         if (authorList.getNumberOfAuthors() <= 2) {
             return joinAuthorsOnLastName(authorList, 2, delim, "");
         } else {
@@ -851,8 +901,7 @@ public class BracketedPattern {
     }
 
     /**
-     * The first N characters of the Mth author's or editor's last name.
-     * M starts counting from 1
+     * The first N characters of the Mth author's or editor's last name. M starts counting from 1
      */
     private static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
@@ -876,27 +925,18 @@ public class BracketedPattern {
 
     /**
      * authshort format:
-     * added by Kolja Brix, kbx@users.sourceforge.net
-     *
+     * <p>
      * given author names
-     *
-     *   Isaac Newton and James Maxwell and Albert Einstein and N. Bohr
-     *
-     *   Isaac Newton and James Maxwell and Albert Einstein
-     *
-     *   Isaac Newton and James Maxwell
-     *
-     *   Isaac Newton
-     *
+     * <ol><li>Isaac Newton and James Maxwell and Albert Einstein and N. Bohr</li>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein</li>
+     * <li>Isaac Newton and James Maxwell</li>
+     * <li>Isaac Newton</li></ol>
      * yield
-     *
-     *   NME+
-     *
-     *   NME
-     *
-     *   NM
-     *
-     *   Newton
+     * <ol><li>NME+</li>
+     * <li>NME</li>
+     * <li>NM</li>
+     * <li>Newton</li></ol></p>
+     * {@author added by Kolja Brix, kbx@users.sourceforge.net}
      */
     private static String authshort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
@@ -918,30 +958,28 @@ public class BracketedPattern {
 
     /**
      * authIniN format:
-     *
-     * Each author gets (N div #authors) chars, the remaining (N mod #authors)
-     * chars are equally distributed to the authors first in the row.
-     *
-     * If (N < #authors), only the first N authors get mentioned.
-     *
+     * <p>
+     * Each author gets (N div #authors) chars, the remaining (N mod #authors) chars are equally distributed to the
+     * authors first in the row. If (N < #authors), only the first N authors get mentioned.
+     * <p>
      * For example if
+     * <ol>
+     * <li> I. Newton and J. Maxwell and A. Einstein and N. Bohr (..) </li>
+     * <li> I. Newton and J. Maxwell and A. Einstein </li>
+     * <li> I. Newton and J. Maxwell </li>
+     * <li> I. Newton </li>
+     * </ol>
+     * authIni4 gives:
+     * <ol>
+     * <li> NMEB </li>
+     * <li> NeME </li>
+     * <li> NeMa </li>
+     * <li> Newt </li>
+     * </ol>
      *
-     * a) I. Newton and J. Maxwell and A. Einstein and N. Bohr (..)
-     *
-     * b) I. Newton and J. Maxwell and A. Einstein
-     *
-     * c) I. Newton and J. Maxwell
-     *
-     * d) I. Newton
-     *
-     * authIni4 gives: a) NMEB, b) NeME, c) NeMa, d) Newt
-     *
-     * @param authorList
-     *            The authors to format.
-     *
-     * @param n
-     *            The maximum number of characters this string will be long. A
-     *            negative number or zero will lead to "" be returned.
+     * @param authorList The authors to format.
+     * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
+     *                   to "" be returned.
      */
     private static String authIniN(AuthorList authorList, int n) {
         if (n <= 0 || authorList.isEmpty()) {
@@ -963,19 +1001,15 @@ public class BracketedPattern {
         if (author.length() <= n) {
             return author.toString();
         } else {
-            return author.toString().substring(0, n);
+            return author.substring(0, n);
         }
     }
 
     /**
      * Split the pages field into separate numbers and return the lowest
      *
-     * @param pages
-     *            (may not be null) a pages string such as 42--111 or
-     *            7,41,73--97 or 43+
-     *
+     * @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
      * @return the first page number or "" if no number is found in the string
-     *
      * @throws NullPointerException if pages is null
      */
     public static String firstPage(String pages) {
@@ -1000,14 +1034,9 @@ public class BracketedPattern {
     /**
      * Return the non-digit prefix of pages
      *
-     * @param pages
-     *            a pages string such as L42--111 or L7,41,73--97 or L43+
-     *
-     * @return the non-digit prefix of pages (like "L" of L7)
-     *         or "" if no non-digit prefix is found in the string
-     *
-     * @throws NullPointerException
-     *             if pages is null.
+     * @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+     * @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
+     * @throws NullPointerException if pages is null.
      */
     public static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
@@ -1041,8 +1070,8 @@ public class BracketedPattern {
     }
 
     /**
-     * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
-     * as well as escaped colons and parentheses.
+     * Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
+     * parentheses.
      *
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
@@ -1083,9 +1112,10 @@ public class BracketedPattern {
 
     /**
      * Will remove diacritics from the content.
-     *
-     * Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.
-     * Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.
+     * <ul>
+     * <li>Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.</li>
+     * <li>Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.</li>
+     * </ul>
      *
      * @param content The content.
      * @return The content without diacritics.
@@ -1109,9 +1139,10 @@ public class BracketedPattern {
 
     /**
      * Unifies umlauts.
-     *
-     * Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}
-     * Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol
+     * <ul>
+     * <li>Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}</li>
+     * <li>Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol</li>
+     * </ul>
      *
      * @param content The content.
      * @return The content with unified diacritics.
@@ -1126,50 +1157,42 @@ public class BracketedPattern {
 
     /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the
-     * key generator builds very long keys, e.g.: for &ldquo;The Attributed
-     * Graph Grammar System (AGG)&rdquo; ->
-     * &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
+     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+     * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *
      * <p>
-     * An institution name should be inside <code>{}</code> brackets. If the
-     * institution name includes its abbreviation this abbreviation should
-     * be in <code>{}</code> brackets. For the previous example the value
-     * should look like:
+     * An institution name should be inside <code>{}</code> brackets. If the institution name includes its abbreviation
+     * this abbreviation should be in <code>{}</code> brackets. For the previous example the value should look like:
      * <code>{The Attributed Graph Grammar System ({AGG})}</code>.
      * </p>
      *
      * <p>
-     * If an institution includes its abbreviation, i.e. "...({XYZ})", first
-     * such abbreviation should be used as the key value part of such author.
+     * If an institution includes its abbreviation, i.e. "...({XYZ})", first such abbreviation should be used as the key
+     * value part of such author.
      * </p>
      *
      * <p>
-     * If an institution does not include its abbreviation the key should be
-     * generated from its name in the following way:
+     * If an institution does not include its abbreviation the key should be generated from its name in the following
+     * way:
      * </p>
      *
      * <p>
-     * The institution value can contain: institution name, part of the
-     * institution, address, etc. These values should be comma separated.
-     * Institution name and possible part of the institution
-     * should be in the beginning, while address and secondary information
-     * should be in the end.
+     * The institution value can contain: institution name, part of the institution, address, etc. These values should
+     * be comma separated. Institution name and possible part of the institution should be in the beginning, while
+     * address and secondary information should be in the end.
      * </p>
-     *
+     * <p>
      * Each part is examined separately:
      * <ol>
-     * <li>We remove all tokens of a part which are one of the defined ignore
-     * words (the, press), which end with a dot (ltd., co., ...) and which first
-     * character is lowercase (of, on, di, ...).</li>
+     * <li>We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
+     * (ltd., co., ...) and which first character is lowercase (of, on, di, ...).</li>
      * <li>We detect the types of the part: university, technology institute,
      * department, school, rest
      * <ul>
      * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
-     * <li>Department: If the institution value contains more than one comma
-     * separated part, the department will be an abbreviation of all words
-     * beginning with the uppercase letter except of words:
+     * <li>Department: If the institution value contains more than one comma separated part, the department will be an
+     * abbreviation of all words beginning with the uppercase letter except of words:
      * <code>d[ei]p.*</code>, school, faculty</li>
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
@@ -1250,11 +1273,11 @@ public class BracketedPattern {
                 for (String k : tokenParts) {
                     if (noOtherInstitutionKeyWord(k)) {
                         if (tokenTypes.contains(Institution.SCHOOL)) {
-                            schoolSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
+                            schoolSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                         // Explicitly defined department part is build the same way as school
                         if (tokenTypes.contains(Institution.DEPARTMENT)) {
-                            departmentSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
+                            departmentSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                     }
                 }
@@ -1287,7 +1310,9 @@ public class BracketedPattern {
     }
 
     /**
-     * Checks that this is not an institution keyword and has an uppercase first letter, except univ/tech key word.
+     * Helper method for {@link BracketedPattern#generateInstitutionKey(String)}. Checks that the word is not an
+     * institution keyword and has an uppercase first letter, except univ/tech key word.
+     *
      * @param word to check
      * @return
      */
@@ -1295,7 +1320,7 @@ public class BracketedPattern {
         return !DEPARTMENTS.matcher(word).matches()
                 && !StandardField.SCHOOL.getName().equalsIgnoreCase(word)
                 && !"faculty".equalsIgnoreCase(word)
-                && !NOT_CAPITAL_FIRST_CHARACTER.matcher(word).replaceAll("").isEmpty();
+                && !NOT_CAPITAL_CHARACTER.matcher(word).replaceAll("").isEmpty();
     }
 
     private static List<String> getValidInstitutionNameParts(String name) {
