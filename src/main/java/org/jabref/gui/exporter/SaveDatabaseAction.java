@@ -28,11 +28,11 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.FilePreferences;

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileHelper;

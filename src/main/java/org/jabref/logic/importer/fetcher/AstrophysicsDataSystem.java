@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -29,7 +30,6 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;

@@ -13,8 +13,8 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;

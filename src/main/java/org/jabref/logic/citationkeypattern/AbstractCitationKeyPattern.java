@@ -1,4 +1,4 @@
-package org.jabref.model.bibtexkeypattern;
+package org.jabref.logic.citationkeypattern;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +20,28 @@ public abstract class AbstractCitationKeyPattern {
     protected List<String> defaultPattern = new ArrayList<>();
 
     protected Map<EntryType, List<String>> data = new HashMap<>();
+
+    /**
+     * This method takes a string of the form [field1]spacer[field2]spacer[field3]..., where the fields are the
+     * (required) fields of a BibTex entry. The string is split into fields and spacers by recognizing the [ and ].
+     *
+     * @param bibtexKeyPattern a <code>String</code>
+     * @return an <code>ArrayList</code> The first item of the list is a string representation of the key pattern (the
+     * parameter), the remaining items are the fields
+     */
+    public static List<String> split(String bibtexKeyPattern) {
+        // A holder for fields of the entry to be used for the key
+        List<String> fieldList = new ArrayList<>();
+
+        // Before we do anything, we add the parameter to the ArrayLIst
+        fieldList.add(bibtexKeyPattern);
+
+        StringTokenizer tok = new StringTokenizer(bibtexKeyPattern, "[]", true);
+        while (tok.hasMoreTokens()) {
+            fieldList.add(tok.nextToken());
+        }
+        return fieldList;
+    }
 
     public void addCitationKeyPattern(EntryType type, String pattern) {
         data.put(type, AbstractCitationKeyPattern.split(pattern));
@@ -52,12 +74,10 @@ public abstract class AbstractCitationKeyPattern {
     }
 
     /**
-     * Gets an object for a desired key from this CitationKeyPattern or one of it's
-     * parents (in the case of DatabaseCitationKeyPattern). This method first tries to obtain the object from this
-     * CitationKeyPattern via the <code>get</code> method of <code>Hashtable</code>.
-     * If this fails, we try the default.<br />
-     * If that fails, we try the parent.<br />
-     * If that fails, we return the DEFAULT_LABELPATTERN<br />
+     * Gets an object for a desired key from this CitationKeyPattern or one of it's parents (in the case of
+     * DatabaseCitationKeyPattern). This method first tries to obtain the object from this CitationKeyPattern via the
+     * <code>get</code> method of <code>Hashtable</code>. If this fails, we try the default.<br /> If that fails, we try
+     * the parent.<br /> If that fails, we return the DEFAULT_LABELPATTERN<br />
      *
      * @param entryType a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
@@ -75,31 +95,6 @@ public abstract class AbstractCitationKeyPattern {
             }
         }
         return result;
-
-    }
-
-    /**
-     * This method takes a string of the form [field1]spacer[field2]spacer[field3]...,
-     * where the fields are the (required) fields of a BibTex entry. The string is split
-     * into fields and spacers by recognizing the [ and ].
-     *
-     * @param bibtexKeyPattern a <code>String</code>
-     * @return an <code>ArrayList</code> The first item of the list
-     * is a string representation of the key pattern (the parameter),
-     * the remaining items are the fields
-     */
-    public static List<String> split(String bibtexKeyPattern) {
-        // A holder for fields of the entry to be used for the key
-        List<String> fieldList = new ArrayList<>();
-
-        // Before we do anything, we add the parameter to the ArrayLIst
-        fieldList.add(bibtexKeyPattern);
-
-        StringTokenizer tok = new StringTokenizer(bibtexKeyPattern, "[]", true);
-        while (tok.hasMoreTokens()) {
-            fieldList.add(tok.nextToken());
-        }
-        return fieldList;
     }
 
     /**

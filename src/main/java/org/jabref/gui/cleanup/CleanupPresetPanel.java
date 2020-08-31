@@ -14,8 +14,8 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.cleanup.CleanupPreset;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.FilePreferences;

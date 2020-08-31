@@ -1,4 +1,4 @@
-package org.jabref.model.database.shared;
+package org.jabref.logic.shared;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -22,6 +22,10 @@ public enum DBMSType {
         this.driverPath = driverPath;
         this.urlPattern = urlPattern;
         this.defaultPort = defaultPort;
+    }
+
+    public static Optional<DBMSType> fromString(String typeName) {
+        return Arrays.stream(DBMSType.values()).filter(dbmsType -> dbmsType.type.equalsIgnoreCase(typeName)).findAny();
     }
 
     @Override
@@ -48,9 +52,5 @@ public enum DBMSType {
      */
     public int getDefaultPort() {
         return this.defaultPort;
-    }
-
-    public static Optional<DBMSType> fromString(String typeName) {
-        return Arrays.stream(DBMSType.values()).filter(dbmsType -> dbmsType.type.equalsIgnoreCase(typeName)).findAny();
     }
 }

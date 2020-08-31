@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.model.database.event.CoarseChangeFilter;
-import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;

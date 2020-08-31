@@ -21,8 +21,6 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

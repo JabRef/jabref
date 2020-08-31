@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;

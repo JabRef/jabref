@@ -9,8 +9,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.JabRefPreferences;

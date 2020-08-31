@@ -1,4 +1,4 @@
-package org.jabref.model.cleanup;
+package org.jabref.logic.cleanup;
 
 /**
  * The Formatter is used for a Filter design-pattern. Extending classes have to accept a String and returned a formatted
