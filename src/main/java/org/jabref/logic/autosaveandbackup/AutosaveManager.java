@@ -1,16 +1,14 @@
-package org.jabref.gui.exporter;
+package org.jabref.logic.autosaveandbackup;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.jabref.gui.exporter.SaveAction.SaveMethod;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.CoarseChangeFilter;
-import org.jabref.model.database.event.SaveEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -22,11 +20,11 @@ import org.slf4j.LoggerFactory;
  * An intelligent {@link ScheduledThreadPoolExecutor} prevents a high load while saving and rejects all redundant save tasks.
  * The scheduled action is stored and canceled if a newer save action is proposed.
  */
-public class GlobalSaveManager {
+public class AutosaveManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSaveManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);
 
-    private static Map<BibDatabaseContext, GlobalSaveManager> runningInstances = new HashMap<>();
+    private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
 
@@ -34,7 +32,7 @@ public class GlobalSaveManager {
     private final CoarseChangeFilter changeFilter;
     private final DelayTaskThrottler throttler;
 
-    private GlobalSaveManager(BibDatabaseContext bibDatabaseContext) {
+    private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.throttler = new DelayTaskThrottler(2000);
         this.eventBus = new EventBus();
@@ -45,37 +43,8 @@ public class GlobalSaveManager {
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
         throttler.schedule(() -> {
-            eventBus.post(new SaveEvent());
+            eventBus.post(new AutosaveEvent());
         });
-    }
-
-    public static void addSaveAction(SaveDatabaseAction action, SaveMethod saveMethod, BibDatabaseContext bibDatabaseContext) {
-
-        var instance = runningInstances.get(bibDatabaseContext);
-
-                // Never happens
-
-        if(instance != null) {
-            instance.throttler.schedule(() -> {
-                execsaveAction(saveMethod, action);
-            });
-
-
-        }
-    }
-    private static void execsaveAction(SaveMethod saveMethod, SaveDatabaseAction action) {
-        switch (saveMethod) {
-            case SAVE:
-                action.save();
-                break;
-            case SAVE_AS:
-                action.saveAs();
-                break;
-            case SAVE_SELECTED:
-                action.saveSelectedAsPlain();
-                break;
-            default:
-        }
     }
 
     private void shutdown() {
@@ -89,9 +58,9 @@ public class GlobalSaveManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static GlobalSaveManager start(BibDatabaseContext bibDatabaseContext) {
-        GlobalSaveManager autosaver = new GlobalSaveManager(bibDatabaseContext);
-        runningInstances.put(bibDatabaseContext, autosaver);
+    public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
+        AutosaveManager autosaver = new AutosaveManager(bibDatabaseContext);
+        runningInstances.add(autosaver);
         return autosaver;
     }
 
@@ -101,14 +70,12 @@ public class GlobalSaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        var instance = runningInstances.get(bibDatabaseContext);
-        if(instance != null) {
-            instance.shutdown();
-            runningInstances.remove(bibDatabaseContext);
-        }
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
+                        .ifPresent(instance -> {
+                            instance.shutdown();
+                            runningInstances.remove(instance);
+                        });
     }
-
-
 
     public void registerListener(Object listener) {
         eventBus.register(listener);
@@ -122,6 +89,4 @@ public class GlobalSaveManager {
             LOGGER.debug("Proble, unregistering", e);
         }
     }
-
-
 }

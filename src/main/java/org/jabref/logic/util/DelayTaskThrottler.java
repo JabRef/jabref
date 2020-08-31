@@ -45,6 +45,18 @@ public class DelayTaskThrottler {
         }
     }
 
+    public Future<?> scheduleTask(Runnable command) {
+        if (scheduledTask != null) {
+            scheduledTask.cancel(false);
+        }
+        try {
+            scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
+        } catch (RejectedExecutionException e) {
+            LOGGER.debug("Rejecting while another process is already running.");
+        }
+        return scheduledTask;
+    }
+
     public void shutdown() {
         executor.shutdown();
     }

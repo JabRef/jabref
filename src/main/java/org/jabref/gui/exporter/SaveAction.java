@@ -18,7 +18,6 @@ public class SaveAction extends SimpleCommand {
     private final SaveMethod saveMethod;
     private final JabRefFrame frame;
 
-
     public SaveAction(SaveMethod saveMethod, JabRefFrame frame, StateManager stateManager) {
         this.saveMethod = saveMethod;
         this.frame = frame;
@@ -36,7 +35,18 @@ public class SaveAction extends SimpleCommand {
                                                                        frame.getCurrentBasePanel(),
                                                                        Globals.prefs,
                                                                        Globals.entryTypesManager);
-        GlobalSaveManager.addSaveAction(saveDatabaseAction, saveMethod, frame.getCurrentBasePanel().getBibDatabaseContext());
-
+        switch (saveMethod) {
+            case SAVE:
+                saveDatabaseAction.save();
+                break;
+            case SAVE_AS:
+                saveDatabaseAction.saveAs();
+                break;
+            case SAVE_SELECTED:
+                saveDatabaseAction.saveSelectedAsPlain();
+                break;
+            default:
+                // Never happens
+        }
     }
 }

@@ -75,7 +75,6 @@ import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
 import org.jabref.gui.exporter.ExportToClipboardAction;
-import org.jabref.gui.exporter.GlobalSaveManager;
 import org.jabref.gui.exporter.ManageCustomExportsAction;
 import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -122,7 +121,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.UndoRedoAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.IdFetcher;
@@ -446,7 +445,6 @@ public class JabRefFrame extends BorderPane {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
-            GlobalSaveManager.shutdown(context);
             BackupManager.shutdown(context);
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
@@ -1148,9 +1146,9 @@ public class JabRefFrame extends BorderPane {
         basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
-        GlobalSaveManager autosaver=  GlobalSaveManager.start(context);
 
         if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUiManager(basePanel));
         }
 
@@ -1294,7 +1292,6 @@ public class JabRefFrame extends BorderPane {
             removeTab(panel);
         }
 
-        GlobalSaveManager.shutdown(context);
         BackupManager.shutdown(context);
     }
 
