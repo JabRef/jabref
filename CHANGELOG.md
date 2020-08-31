@@ -23,6 +23,10 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 
 ## [5.1] – 2020-08-27
+### Removed
+
+
+## [5.1] – 2020-08-30
 
 ### Added
 
@@ -123,6 +127,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with the Science Direct fetcher where PDFs could not be downloaded. Fixes [#5860](https://github.com/JabRef/jabref/issues/5860)
 - We fixed an issue with the Library of Congress importer.
 - We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
+- We fixed an issue regarding pasting on Linux. [#6293](https://github.com/JabRef/jabref/issues/6293)
 
 ### Removed
 
