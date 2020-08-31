@@ -4,7 +4,6 @@ on:
   schedule:
     # run on 1st and 15th of each month
     - cron: '2 20 1,15 * *'
-  push:
 
 jobs:
   publish:
