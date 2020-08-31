@@ -7,10 +7,8 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -21,14 +19,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.NewLineSeparator;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
-public class FileTabViewModel implements PreferenceTabViewModel {
+public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
@@ -50,7 +47,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final FilePreferences initialFilePreferences;
     private final AutoLinkPreferences initialAutoLinkPreferences;
 
-    public FileTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public LinkedFilesTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialFilePreferences = preferences.getFilePreferences();
@@ -84,17 +81,11 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
         // Autolink preferences
         switch (initialAutoLinkPreferences.getCitationKeyDependency()) {
-            default:
-            case START:
-                autolinkFileStartsBibtexProperty.setValue(true);
-                break;
-            case EXACT:
-                autolinkFileExactBibtexProperty.setValue(true);
-                break;
-            case REGEX:
-                autolinkUseRegexProperty.setValue(true);
-                break;
+            case START -> autolinkFileStartsBibtexProperty.setValue(true);
+            case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
+            case REGEX -> autolinkUseRegexProperty.setValue(true);
         }
+
         autolinkRegexKeyProperty.setValue(initialAutoLinkPreferences.getRegularExpression());
     }
 

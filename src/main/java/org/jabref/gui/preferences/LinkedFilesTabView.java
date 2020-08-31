@@ -13,16 +13,14 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.NewLineSeparator;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
+public class LinkedFilesTabView extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
     @FXML private TextField mainFileDirectory;
     @FXML private CheckBox useBibLocationAsPrimary;
@@ -39,7 +37,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public FileTabView(JabRefPreferences preferences) {
+    public LinkedFilesTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -49,11 +47,11 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
 
     @Override
     public String getTabName() {
-        return Localization.lang("File");
+        return Localization.lang("Linked files");
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(dialogService, preferences);
+        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
