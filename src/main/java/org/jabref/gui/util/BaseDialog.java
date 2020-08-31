@@ -36,7 +36,7 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
         setDialogIcon(IconTheme.getJabRefImageFX());
         setResizable(true);
-        Globals.getThemeLoader().installCss(getDialogPane().getScene(), Globals.prefs);
+        Globals.prefs.getTheme().installCss(getDialogPane().getScene());
     }
 
     private Optional<Button> getDefaultButton() {
