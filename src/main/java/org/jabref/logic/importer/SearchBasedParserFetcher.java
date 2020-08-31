@@ -83,8 +83,9 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        // Default Implementation behaves like getURLForQuery using the default field as query
-        return this.getURLForQuery(complexSearchQuery.getDefaultField().orElse(""));
+        // Default implementation behaves as getURLForQuery using the default field phrases as query
+        List<String> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
+        return this.getURLForQuery(String.join(" ", defaultPhrases));
     }
 
     /**
