@@ -608,20 +608,14 @@ public class BracketedPattern {
     public static String camelizeSignificantWordsInTitle(String title) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
-        Boolean camelize;
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
             while (titleScanner.hasNext()) {
                 String word = titleScanner.next();
-                camelize = true;
 
                 // Camelize the word if it is significant
-                for (String smallWord : Word.SMALLER_WORDS) {
-                    if (word.equalsIgnoreCase(smallWord)) {
-                        camelize = false;
-                        continue;
-                    }
-                }
+                boolean camelize = !Word.SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
+
                 // We want to capitalize significant words and the first word of the title
                 if (camelize || (stringJoiner.length() == 0)) {
                     word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
