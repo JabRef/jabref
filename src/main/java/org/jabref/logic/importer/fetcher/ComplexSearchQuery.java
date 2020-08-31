@@ -40,11 +40,30 @@ public class ComplexSearchQuery {
                 case "title" -> builder.titlePhrase(termText);
                 case "journal" -> builder.journal(termText);
                 case "year" -> builder.singleYear(Integer.valueOf(termText));
-                case "year-range" -> builder.fromYearAndToYear(Integer.valueOf(termText.split("-")[0]), Integer.valueOf(termText.split("-")[1]));
+                case "year-range" -> parseYearRange(builder, termText);
                 case "default" -> builder.defaultFieldPhrase(termText);
             }
         });
         return builder.build();
+    }
+
+    private static void parseYearRange(ComplexSearchQueryBuilder builder, String termText) {
+        String[] split = termText.split("-");
+        int fromYear = 0;
+        int toYear = 9999;
+        try {
+            fromYear = Integer.parseInt(split[0]);
+        } catch (NumberFormatException e) {
+            // default value already set
+        }
+        if (split.length > 1) {
+            try {
+                toYear = Integer.parseInt(split[1]);
+            } catch (NumberFormatException e) {
+                // default value already set
+            }
+        }
+        builder.fromYearAndToYear(fromYear, toYear);
     }
 
     public List<String> getDefaultFieldPhrases() {
@@ -202,7 +221,7 @@ public class ComplexSearchQuery {
                     case "title" -> this.titlePhrase(termText);
                     case "journal" -> this.journal(termText);
                     case "year" -> this.singleYear(Integer.valueOf(termText));
-                    case "year-range" -> this.fromYearAndToYear(Integer.valueOf(termText.split("-")[0]), Integer.valueOf(termText.split("-")[1]));
+                    case "year-range" -> parseYearRange(this, termText);
                     case "default" -> this.defaultFieldPhrase(termText);
                 }
             });
