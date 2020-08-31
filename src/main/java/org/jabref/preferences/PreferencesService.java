@@ -6,25 +6,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableNameFormatPreferences;
+import org.jabref.gui.maintable.MainTablePreferences;
+import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+import org.jabref.gui.util.Theme;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -45,6 +59,12 @@ public interface PreferencesService {
 
     FilePreferences getFilePreferences();
 
+    void storeFilePreferences(FilePreferences filePreferences);
+
+    FieldWriterPreferences getFieldWriterPreferences();
+
+    FieldContentFormatterPreferences getFieldContentParserPreferences();
+
     XmpPreferences getXMPPreferences();
 
     AutoLinkPreferences getAutoLinkPreferences();
@@ -53,27 +73,19 @@ public interface PreferencesService {
 
     void setWorkingDir(Path dir);
 
+    String setLastPreferencesExportPath();
+
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
     PreviewPreferences getPreviewPreferences();
 
-    Map<String, Set<Field>> getEntryEditorTabList();
-
-    Map<String, String> getCustomTabsNamesAndFields();
-
-    void setCustomTabsNameAndFields(String name, String fields, int defNumber);
-
-    void purgeSeries(String prefix, int number);
-
-    void updateEntryEditorTabList();
-
-    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationLoader loader);
+    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
 
-    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationLoader loader);
+    LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
 
@@ -89,8 +101,6 @@ public interface PreferencesService {
 
     String getUser();
 
-    String getTheme();
-
     SaveOrderConfig loadExportSaveOrder();
 
     void storeExportSaveOrder(SaveOrderConfig config);
@@ -99,19 +109,21 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveCustomEntryTypes();
+    void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager);
 
-    EntryEditorPreferences getEntryEditorPreferences();
+    void clearBibEntryTypes(BibDatabaseMode mode);
 
     List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
-    CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader);
+    CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository repository);
 
     CleanupPreset getCleanupPreset();
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
 
-    // General
+    //*************************************************************************************************************
+    // GeneralPreferences
+    //*************************************************************************************************************
 
     Language getLanguage();
 
@@ -125,7 +137,7 @@ public interface PreferencesService {
 
     void askedToCollectTelemetry();
 
-    boolean getEnforceLegalKeys();
+    String getUnwantedCharacters();
 
     boolean getAllowIntegerEdition();
 
@@ -141,4 +153,109 @@ public interface PreferencesService {
 
     void storeTimestampPreferences(TimestampPreferences preferences);
 
+    //*************************************************************************************************************
+    // ToDo: GroupPreferences
+    //*************************************************************************************************************
+
+    GroupViewMode getGroupViewMode();
+
+    void setGroupViewMode(GroupViewMode mode);
+
+    boolean getDisplayGroupCount();
+
+    //*************************************************************************************************************
+    // EntryEditorPreferences
+    //*************************************************************************************************************
+
+    Map<String, Set<Field>> getEntryEditorTabList();
+
+    void updateEntryEditorTabList();
+
+    Map<String, Set<Field>> getDefaultTabNamesAndFields();
+
+    List<Field> getAllDefaultTabFieldNames();
+
+    void storeEntryEditorTabList(Map<String, Set<Field>> customTabsMap);
+
+    EntryEditorPreferences getEntryEditorPreferences();
+
+    void storeEntryEditorPreferences(EntryEditorPreferences preferences);
+
+    //*************************************************************************************************************
+    // Network preferences
+    //*************************************************************************************************************
+
+    RemotePreferences getRemotePreferences();
+
+    void storeRemotePreferences(RemotePreferences remotePreferences);
+
+    ProxyPreferences getProxyPreferences();
+
+    void storeProxyPreferences(ProxyPreferences proxyPreferences);
+
+    //*************************************************************************************************************
+    // CitationKeyPatternPreferences
+    //*************************************************************************************************************
+
+    GlobalCitationKeyPattern getGlobalCitationKeyPattern();
+
+    void updateGlobalCitationKeyPattern();
+
+    CitationKeyPatternPreferences getCitationKeyPatternPreferences();
+
+    void storeCitationKeyPatternPreferences(CitationKeyPatternPreferences preferences);
+
+    //*************************************************************************************************************
+    // ExternalApplicationsPreferences
+    //*************************************************************************************************************
+
+    ExternalApplicationsPreferences getExternalApplicationsPreferences();
+
+    void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
+
+    //*************************************************************************************************************
+    // MainTablePreferences
+    //*************************************************************************************************************
+
+    void updateMainTableColumns();
+
+    ColumnPreferences getColumnPreferences();
+
+    void storeColumnPreferences(ColumnPreferences columnPreferences);
+
+    MainTablePreferences getMainTablePreferences();
+
+    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
+
+    MainTableNameFormatPreferences getMainTableNameFormatPreferences();
+
+    void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences);
+
+    //*************************************************************************************************************
+    // AppearancePreferences
+    //*************************************************************************************************************
+
+    Theme getTheme();
+
+    void updateTheme();
+
+    AppearancePreferences getAppearancePreferences();
+
+    void storeAppearancePreference(AppearancePreferences preferences);
+
+    //*************************************************************************************************************
+    // ToDo: Misc preferences
+    //*************************************************************************************************************
+
+    AutoCompletePreferences getAutoCompletePreferences();
+
+    void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences);
+
+    SpecialFieldsPreferences getSpecialFieldsPreferences();
+
+    void storeSpecialFieldsPreferences(SpecialFieldsPreferences specialFieldsPreferences);
+
+    SearchPreferences getSearchPreferences();
+
+    void storeSearchPreferences(SearchPreferences preferences);
 }

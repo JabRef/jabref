@@ -514,7 +514,6 @@ public class VM implements Warn {
             }
         });
 
-
         /*
          * Pops the top three literals (they are the two integers literals
          * len and start, and a string literal, in that order). It pushes
@@ -685,10 +684,10 @@ public class VM implements Warn {
                     }
                     // end
                 }
-            }
-            // else if (str_pool[sp_ptr-1] = right_brace) then
-            // begin
-            else if (c[i - 1] == '}') {
+
+                // else if (str_pool[sp_ptr-1] = right_brace) then
+                // begin
+            } else if (c[i - 1] == '}') {
                 // if (sp_brace_level > 0) then
                 if (braceLevel > 0) {
                     // decr(sp_brace_level);

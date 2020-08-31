@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
   <info>
-    <title>American Medical Association (no URL)</title>
-    <title-short>AMA</title-short>
+    <title>American Medical Association 11th edition (no URL)</title>
+    <title-short>AMA (11th ed.)</title-short>
     <id>http://www.zotero.org/styles/american-medical-association-no-url</id>
     <link href="http://www.zotero.org/styles/american-medical-association-no-url" rel="self"/>
+    <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
     <link href="https://westlibrary.txwes.edu/sites/default/files/pdf/AMACitationStyle.pdf" rel="documentation"/>
+    <link href="https://www.amamanualofstyle.com/fileasset/AMAMOS/aaaAMWA%20presentation%20Nov%202019%20FULL.pdf" rel="documentation"/>
     <author>
       <name>Julian Onions</name>
       <email>julian.onions@gmail.com</email>
@@ -14,10 +16,18 @@
       <name>Christian Pietsch</name>
       <uri>http://purl.org/net/pietsch</uri>
     </contributor>
+    <contributor>
+      <name>Daniel W Chan</name>
+      <email>danwchan@protonmail.com</email>
+    </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+      <email>obrienpat86@gmail.com</email>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <summary>The American Medical Association style as used in JAMA, without the URL.</summary>
-    <updated>2012-09-30T23:21:11+00:00</updated>
+    <summary>The American Medical Association style as used in JAMA, without the URL. Version 11 as per November-2019.</summary>
+    <updated>2020-04-23T13:38:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -54,10 +64,7 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=": ">
-      <text variable="publisher-place"/>
-      <text variable="publisher"/>
-    </group>
+    <text variable="publisher"/>
   </macro>
   <macro name="edition">
     <choose>
@@ -182,6 +189,33 @@
             </date>
           </group>
         </else-if>
+        <else-if type="webpage post post-weblog" match="any">
+          <text variable="container-title" prefix=" " suffix="."/>
+        </else-if>
+        <else-if type="speech">
+          <group prefix=" " suffix=":">
+            <choose>
+              <if variable="genre">
+                <text variable="genre" suffix=" "/>
+                <text term="presented at"/>
+              </if>
+              <else>
+                <text term="presented at" text-case="capitalize-first"/>
+              </else>
+            </choose>
+          </group>
+          <group delimiter="; " prefix=" " suffix=".">
+            <text variable="event"/>
+            <group>
+              <date delimiter=" " variable="issued">
+                <date-part name="month"/>
+                <date-part name="day" suffix=","/>
+                <date-part name="year"/>
+              </date>
+            </group>
+            <text variable="event-place"/>
+          </group>
+        </else-if>
         <else>
           <text macro="editor" prefix=" " suffix="."/>
           <group prefix=" " suffix=".">
@@ -194,10 +228,10 @@
                   </date>
                 </if>
                 <else>
-                  <date variable="issued">
-                    <date-part name="month" suffix=" "/>
-                    <date-part name="year"/>
-                  </date>
+                  <group delimiter=" ">
+                    <text value="Published online"/>
+                    <date form="text" date-parts="year-month-day" variable="issued"/>
+                  </group>
                 </else>
               </choose>
               <group>

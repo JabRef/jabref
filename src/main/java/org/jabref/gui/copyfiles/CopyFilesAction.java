@@ -1,7 +1,6 @@
 package org.jabref.gui.copyfiles;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,12 +46,12 @@ public class CopyFilesAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .withInitialDirectory(Path.of(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(path -> {
             Task<List<CopyFilesResultItemViewModel>> exportTask = new CopyFilesTask(database, entries, path);
-            dialogService.showProgressDialogAndWait(
+            dialogService.showProgressDialog(
                     Localization.lang("Copy linked files to folder..."),
                     Localization.lang("Copy linked files to folder..."),
                     exportTask);

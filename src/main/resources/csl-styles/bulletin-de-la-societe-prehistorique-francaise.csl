@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="fr-FR" version="1.0" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
   <info>
     <title>Bulletin de la Société préhistorique française (French)</title>
     <title-short>BSPF</title-short>
@@ -10,17 +10,21 @@
       <name>Benedicte Macgregor</name>
       <email>benedicte.macgregor@mae.u-paris10.fr</email>
     </author>
+    <contributor>
+      <name>Dominique Commelin</name>
+      <email>commelin@mmsh.univ-aix.fr</email>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
     <issn>0037-9514</issn>
     <eissn>1760-7361</eissn>
-    <summary>Style élaborée à partir du style ehess de F Heimburger</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <summary>Style élaboré à partir du style ehess de F Heimburger</summary>
+    <updated>2018-05-22T00:59:23+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
     <terms>
-      <term name="editor" form="short">dir</term>
+      <term name="editor" form="short">(dir.)</term>
     </terms>
   </locale>
   <macro name="editor">
@@ -39,8 +43,8 @@
   <macro name="author">
     <names variable="author">
       <name name-as-sort-order="all" sort-separator=" " initialize-with="." delimiter=", ">
-        <name-part name="family" text-case="uppercase"/>
-        <name-part name="given" text-case="uppercase"/>
+        <name-part name="family" font-variant="small-caps"/>
+        <name-part name="given" font-variant="small-caps"/>
       </name>
       <label form="short" prefix=" "/>
       <substitute>
@@ -66,7 +70,7 @@
   <macro name="access">
     <choose>
       <if variable="URL">
-        <text value="consultable à&#160;" text-case="capitalize-first" suffix=" "/>
+        <text value="&#160;" text-case="capitalize-first" suffix=" "/>
         <text variable="URL"/>
         <group prefix=" [" suffix="]">
           <text value="accédé le" text-case="capitalize-first" suffix=" "/>
@@ -90,7 +94,7 @@
     </choose>
   </macro>
   <macro name="publisher">
-    <group delimiter=", ">
+    <group delimiter=", " prefix=", ">
       <text variable="publisher-place"/>
       <text variable="publisher"/>
     </group>
@@ -124,7 +128,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="1">
+  <bibliography et-al-min="100" et-al-use-first="1">
     <sort>
       <key macro="author"/>
       <key variable="title"/>
@@ -145,27 +149,29 @@
               <text variable="volume"/>
             </group>
             <text variable="edition"/>
-            <text macro="publisher"/>
-            <text variable="collection-title" prefix="("/>
-            <text variable="collection-number" suffix=")"/>
-            <date variable="issued">
-              <date-part name="year"/>
-            </date>
           </group>
-          <group>
-            <text variable="number-of-pages" prefix=", " suffix="&#160;p."/>
+          <text macro="publisher"/>
+          <group delimiter=" " prefix=" (" suffix=")">
+            <text variable="collection-title"/>
+            <text variable="collection-number"/>
           </group>
+          <text variable="number-of-pages" prefix=", " suffix="&#160;p."/>
         </if>
         <else-if type="chapter paper-conference" match="any">
           <text macro="title" prefix=" " suffix=","/>
-          <group prefix=" " suffix=" ">
+          <group prefix=" " suffix=".">
             <text value="in" font-style="italic" suffix=" "/>
             <text macro="editor" suffix=", "/>
             <text variable="container-title" font-style="italic" suffix=", "/>
-            <text variable="collection-title" suffix=", "/>
-            <group suffix=".">
-              <text macro="publisher" suffix=", "/>
-              <text macro="pages"/>
+            <group prefix=" " suffix="">
+              <text macro="publisher"/>
+              <group prefix=" (" suffix="), ">
+                <group delimiter=" ">
+                  <text variable="collection-title"/>
+                  <text variable="collection-number"/>
+                </group>
+              </group>
+              <text macro="pages" prefix=" &#160;"/>
             </group>
           </group>
         </else-if>
@@ -193,7 +199,7 @@
             </group>
             <group prefix=", ">
               <label variable="locator" form="short"/>
-              <text variable="page" prefix="p.&#160;"/>
+              <text variable="page" prefix="&#160;"/>
             </group>
           </group>
         </else>

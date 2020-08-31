@@ -31,7 +31,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
     }
 
     /**
-     *   We override this here to select the radio buttons accordingly
+     * We override this here to select the radio buttons accordingly
      */
     @Override
     public void setAccepted(boolean accepted) {

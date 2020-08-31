@@ -76,10 +76,10 @@ public class BiblioscapeImporter extends Importer {
                                                           .toString());
                     } else if ("TI".equals(entry.getKey())) {
                         titleTI = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("ST".equals(entry.getKey())) {
                         titleST = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("YP".equals(entry.getKey())) {
                         hm.put(StandardField.YEAR, entry
                                 .getValue().toString());
@@ -91,22 +91,22 @@ public class BiblioscapeImporter extends Importer {
                                 .getValue().toString());
                     } else if ("PS".equals(entry.getKey())) {
                         pages[0] = entry.getValue()
-                                .toString();
+                                        .toString();
                     } else if ("PE".equals(entry.getKey())) {
                         pages[1] = entry.getValue()
-                                .toString();
+                                        .toString();
                     } else if ("KW".equals(entry.getKey())) {
                         hm.put(StandardField.KEYWORDS, entry
                                 .getValue().toString());
                     } else if ("RT".equals(entry.getKey())) {
                         type[0] = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("SB".equals(entry.getKey())) {
                         comments.add("Subject: "
                                 + entry.getValue());
                     } else if ("SA".equals(entry.getKey())) {
                         comments
-                        .add("Secondary Authors: " + entry.getValue());
+                                .add("Secondary Authors: " + entry.getValue());
                     } else if ("NT".equals(entry.getKey())) {
                         hm.put(StandardField.NOTE, entry
                                 .getValue().toString());
@@ -115,22 +115,22 @@ public class BiblioscapeImporter extends Importer {
                                 .getValue().toString());
                     } else if ("TA".equals(entry.getKey())) {
                         comments
-                        .add("Tertiary Authors: " + entry.getValue());
+                                .add("Tertiary Authors: " + entry.getValue());
                     } else if ("TT".equals(entry.getKey())) {
                         comments
-                        .add("Tertiary Title: " + entry.getValue());
+                                .add("Tertiary Title: " + entry.getValue());
                     } else if ("ED".equals(entry.getKey())) {
                         hm.put(StandardField.EDITION, entry
                                 .getValue().toString());
                     } else if ("TW".equals(entry.getKey())) {
                         type[1] = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("QA".equals(entry.getKey())) {
                         comments
-                        .add("Quaternary Authors: " + entry.getValue());
+                                .add("Quaternary Authors: " + entry.getValue());
                     } else if ("QT".equals(entry.getKey())) {
                         comments
-                        .add("Quaternary Title: " + entry.getValue());
+                                .add("Quaternary Title: " + entry.getValue());
                     } else if ("IS".equals(entry.getKey())) {
                         hm.put(StandardField.ISBN, entry
                                 .getValue().toString());
@@ -139,13 +139,13 @@ public class BiblioscapeImporter extends Importer {
                                 .getValue().toString());
                     } else if ("AD".equals(entry.getKey())) {
                         address = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("LG".equals(entry.getKey())) {
                         hm.put(StandardField.LANGUAGE, entry
                                 .getValue().toString());
                     } else if ("CO".equals(entry.getKey())) {
                         country = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
                         hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? StandardField.URL
@@ -177,14 +177,13 @@ public class BiblioscapeImporter extends Importer {
                     } else if ("TH".equals(entry.getKey())) {
                         comments.add("Short Title: "
                                 + entry.getValue());
-                    } else if ("SE".equals(entry.getKey()))
-                    {
+                    } else if ("SE".equals(entry.getKey())) {
                         hm.put(StandardField.CHAPTER, entry
                                 .getValue().toString());
-                        //else if (entry.getKey().equals("AC"))
-                        // hm.put("",entry.getValue().toString());
-                        //else if (entry.getKey().equals("LP"))
-                        // hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("AC"))
+                        //   hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("LP"))
+                        //   hm.put("",entry.getValue().toString());
                     }
                 }
 
@@ -281,5 +280,4 @@ public class BiblioscapeImporter extends Importer {
 
         return new ParserResult(bibItems);
     }
-
 }

@@ -1,8 +1,8 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -99,7 +100,8 @@ public class GroupDialogViewModel {
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
-    private CompositeValidator validator = new CompositeValidator();
+    private Validator texGroupFilePathValidator;
+    private final CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -142,10 +144,8 @@ public class GroupDialogViewModel {
                             return false;
                         }
 
-                        if ((editedGroup != null) && !editedGroup.getName().equals(name) && (groupsWithSameName > 0)) {
-                            // Edit group, changed name to something that is already present
-                            return false;
-                        }
+                        // Edit group, changed name to something that is already present
+                        return (editedGroup == null) || editedGroup.getName().equals(name) || (groupsWithSameName <= 0);
                     }
                     return true;
                 },
@@ -215,8 +215,24 @@ public class GroupDialogViewModel {
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %n %s",
                         Localization.lang("Free search expression"),
-                        Localization.lang("Search term is empty.")
-                )));
+                        Localization.lang("Search term is empty."))));
+
+        texGroupFilePathValidator = new FunctionBasedValidator<>(
+                texGroupFilePathProperty,
+                input -> {
+                    if (StringUtil.isBlank(input)) {
+                        return false;
+                    } else {
+                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
+                        if (!Files.isRegularFile(texFilePath)) {
+                            return false;
+                        }
+                        return FileUtil.getFileExtension(input)
+                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .orElse(false);
+                    }
+                },
+                ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
         validator.addValidators(nameValidator, sameNameValidator);
 
@@ -233,6 +249,14 @@ public class GroupDialogViewModel {
                 validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
+            }
+        });
+
+        typeTexProperty.addListener((obs, oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(texGroupFilePathValidator);
+            } else {
+                validator.removeValidators(texGroupFilePathValidator);
             }
         });
     }
@@ -286,12 +310,22 @@ public class GroupDialogViewModel {
                         searchGroupRegexProperty.getValue());
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
+                    // Set default value for delimiters: ',' for base and '>' for hierarchical
+                    char delimiter = ',';
+                    char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    // Modify values for delimiters if user provided customized values
+                    if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
+                        delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
+                    }
+                    if (!autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty()) {
+                        hierarDelimiter = autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0);
+                    }
                     resultingGroup = new AutomaticKeywordGroup(
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                            autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                            autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
+                            delimiter,
+                            hierarDelimiter);
                 } else {
                     resultingGroup = new AutomaticPersonsGroup(
                             groupName,
@@ -302,7 +336,7 @@ public class GroupDialogViewModel {
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        Paths.get(texGroupFilePathProperty.getValue().trim()),
+                        Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         Globals.getFileUpdateMonitor(),
                         currentDatabase.getMetaData());
@@ -440,6 +474,10 @@ public class GroupDialogViewModel {
 
     public ValidationStatus keywordSearchTermEmptyValidationStatus() {
         return keywordSearchTermEmptyValidator.getValidationStatus();
+    }
+
+    public ValidationStatus texGroupFilePathValidatonStatus() {
+        return texGroupFilePathValidator.getValidationStatus();
     }
 
     public StringProperty nameProperty() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" demote-non-dropping-particle="never" default-locale="fr-FR" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" demote-non-dropping-particle="never" page-range-format="expanded" default-locale="fr-FR">
   <info>
     <title>Bibliothèque d'archéologie méditerranéenne et africaine (BiAMA) (French)</title>
     <id>http://www.zotero.org/styles/bibliotheque-d-archeologie-mediterraneenne-et-africaine-biama</id>
@@ -15,7 +15,7 @@
     <category field="anthropology"/>
     <issn>2101-2849</issn>
     <summary>Feuille de style pour la Bibliothèque d'archéologie méditerranéenne et africaine</summary>
-    <updated>2019-03-02T12:37:23+00:00</updated>
+    <updated>2020-05-09T05:39:57+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -111,10 +111,43 @@
   </macro>
   <macro name="publisher">
     <group delimiter=", ">
-      <text variable="publisher"/>
-      <text macro="edition"/>
       <text variable="publisher-place"/>
+      <text macro="edition"/>
+      <text variable="publisher"/>
     </group>
+  </macro>
+  <macro name="event-date">
+    <group prefix="(" suffix=")">
+      <choose>
+        <if variable="event-date">
+          <date variable="event-date" form="text"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="year-date-short">
+    <choose>
+      <if variable="event-date">
+        <group delimiter=" ">
+          <date variable="event-date">
+            <date-part name="year"/>
+          </date>
+          <date variable="issued" prefix="[" suffix="]">
+            <date-part name="year"/>
+          </date>
+          <text variable="year-suffix"/>
+        </group>
+      </if>
+      <else-if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+        <text variable="year-suffix"/>
+      </else-if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
   </macro>
   <macro name="year-date">
     <choose>
@@ -151,14 +184,14 @@
     <layout delimiter="&#160;; ">
       <group>
         <text macro="author-short" suffix=" "/>
-        <text macro="year-date"/>
+        <text macro="year-date-short"/>
         <text macro="locator"/>
       </group>
     </layout>
   </citation>
   <bibliography>
     <sort>
-      <key macro="author"/>
+      <key macro="author-short"/>
       <key variable="issued"/>
       <key variable="page-first"/>
       <key variable="title"/>
@@ -174,7 +207,7 @@
           </if>
           <else-if variable="editor">
             <names variable="editor">
-              <name form="short" delimiter=", " et-al-min="4" et-al-use-first="1"/>
+              <name form="short" delimiter=", " et-al-use-first="1" et-al-min="4"/>
               <substitute>
                 <text macro="container-author"/>
               </substitute>
@@ -184,7 +217,7 @@
             <text variable="title-short"/>
           </else>
         </choose>
-        <text macro="year-date" prefix=" " suffix="&#160;: "/>
+        <text macro="year-date-short" prefix=" " suffix="&#160;: "/>
       </group>
       <group>
         <choose>
@@ -235,6 +268,10 @@
           <else-if type="book graphic" match="any">
             <group delimiter=", ">
               <text macro="title"/>
+              <group delimiter=" ">
+                <text variable="genre"/>
+                <text macro="event-date"/>
+              </group>
               <text macro="publisher"/>
               <text macro="collection"/>
               <text macro="year-date"/>
@@ -268,6 +305,10 @@
                 <text macro="editor"/>
               </group>
               <text variable="container-title" font-style="italic"/>
+              <group delimiter=" ">
+                <text variable="genre"/>
+                <text macro="event-date"/>
+              </group>
               <text macro="publisher"/>
               <text macro="collection"/>
               <text macro="year-date"/>

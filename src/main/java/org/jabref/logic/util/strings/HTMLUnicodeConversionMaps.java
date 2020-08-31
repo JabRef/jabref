@@ -436,7 +436,6 @@ public class HTMLUnicodeConversionMaps {
             {"60", "lt", "$<$"}, // less-than sign, U+003C ISOnum
             {"62", "gt", "$>$"}, // greater-than sign, U+003E ISOnum
 
-
             /* General Punctuation */
             {"8194", "ensp", "\\hspace{0.5em}"}, // en space, U+2002 ISOpub
             {"8195", "emsp", "\\hspace{1em}"}, // em space, U+2003 ISOpub
@@ -571,8 +570,8 @@ public class HTMLUnicodeConversionMaps {
             {"316", "", "{\\c{l}}"}, // small l with cedilla
             {"317", "", "{{\\v{L}}}"}, // capital L with caron
             {"318", "", "{\\v{l}}"}, // small l with caron
-            //{"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
-            //{"320", "lmidot", "{\\lmidot}"}, // lower case l with mid dot
+            // {"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
+            // {"320", "lmidot", "{\\lmidot}"}, // lower case l with mid dot
             {"321", "Lstrok", "{{\\L}}"}, // upper case L with stroke
             {"322", "lstrok", "{{\\l}}"}, // lower case l with stroke
             {"323", "Nacute", "{{\\'{N}}}"}, // upper case N with acute
@@ -669,8 +668,8 @@ public class HTMLUnicodeConversionMaps {
             {"733", "dblac", "{{\\H{}}}"}, // Double acute
             {"949", "epsi", "$\\epsilon$"}, // Epsilon - double check
             {"1013", "epsiv", "$\\varepsilonup$"}, // lunate epsilon, requires txfonts
-            //{"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
-            //{"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
+            // {"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
+            // {"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
             // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
             // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
             {"8192", "", "\\hspace{0.5em}"}, // en quad
@@ -745,7 +744,7 @@ public class HTMLUnicodeConversionMaps {
             {"8897", "xvee", "$\\bigvee$"}, // Big vee
             {"8942", "vdots", "$\\vdots$"}, // vertical ellipsis U+22EE
             {"8943", "cdots", "$\\cdots$"}, // midline horizontal ellipsis U+22EF
-            /*{"8944", "", "$\\ddots$"}, // up right diagonal ellipsis U+22F0 */
+            /* {"8944", "", "$\\ddots$"}, // up right diagonal ellipsis U+22F0 */
             {"8945", "ddots", "$\\ddots$"}, // down right diagonal ellipsis U+22F1
 
             {"9426", "circledc", "{\\copyright}"}, // circled small letter C
@@ -907,5 +906,4 @@ public class HTMLUnicodeConversionMaps {
         // Get rid of \{}$ from the LaTeX-string
         return escapedString.replaceAll("[\\\\\\{\\}\\$]", "");
     }
-
 }

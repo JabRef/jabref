@@ -5,14 +5,13 @@ on:
     branches:
       - snapcraft
   schedule:
-    # run on each day
-    - cron: '33 4 * * *'
+   # run on each day
+  - cron: "33 4 * * *"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Create snapcraft image
-
     steps:
       - name: Check secrets presence
         id: checksecrets
@@ -30,11 +29,11 @@ jobs:
       # The image relies on https://builds.jabref.org/master/JabRef-5.0-portable_linux.tar.gz^
       # See snap/snapcraft.yml for details
       - name: Build snap (1) Run build
-        uses: jhenstridge/snapcraft-build-action@v1
+        uses: snapcore/action-build@v1
         id: snapcraft
       - name: Build snap (2) Upload snap
         if: ${{ steps.checksecrets.outputs.secretspresent }}
-        uses: jhenstridge/snapcraft-publish-action@v1
+        uses: snapcore/action-publish@v1
         with:
           store_login: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
           snap: ${{ steps.snapcraft.outputs.snap }}

@@ -23,5 +23,4 @@ public interface DatabaseConnectionProperties {
     boolean isAllowPublicKeyRetrieval();
 
     String getServerTimezone();
-
 }

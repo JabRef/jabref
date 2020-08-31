@@ -22,6 +22,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
 
     /**
      * Constructs a URL based on the {@link BibEntry}.
+     *
      * @param entry the entry to look information for
      */
     URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
@@ -42,6 +43,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {

@@ -30,7 +30,7 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         this.ensureThatIsbnIsValid(identifier);
         URIBuilder uriBuilder = new URIBuilder(BASE_URL);
         uriBuilder.addParameter("isbn", identifier);
@@ -49,5 +49,4 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
         new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
-
 }

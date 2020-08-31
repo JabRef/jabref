@@ -146,8 +146,8 @@ public class Author {
 
     /**
      * Compare this object with the given one.
-     * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     *
+     * @return `true` iff the other object is an Author and all fields are `Objects.equals`.
      */
     @Override
     public boolean equals(Object other) {
@@ -157,16 +157,18 @@ public class Author {
 
         if (other instanceof Author) {
             Author that = (Author) other;
-            return Objects.equals(firstPart, that.firstPart) && Objects.equals(firstAbbr, that.firstAbbr)
-                    && Objects.equals(
-                            vonPart, that.vonPart)
-                    && Objects.equals(lastPart, that.lastPart) && Objects.equals(jrPart, that.jrPart);
+            return Objects.equals(firstPart, that.firstPart)
+                    && Objects.equals(firstAbbr, that.firstAbbr)
+                    && Objects.equals(vonPart, that.vonPart)
+                    && Objects.equals(lastPart, that.lastPart)
+                    && Objects.equals(jrPart, that.jrPart);
         }
+
         return false;
     }
 
     /**
-     * @return true if the brackets in s are properly paired
+     * @return true iff the brackets in s are properly paired
      */
     private boolean properBrackets(String s) {
         // nested construct is there, check for "proper" nesting
@@ -175,17 +177,17 @@ public class Author {
         while (i < s.length()) {
             char c = s.charAt(i);
             switch (c) {
-            case '{':
-                level++;
-                break;
-            case '}':
-                level--;
-                if (level == -1) { // improper nesting
-                    return false;
-                }
-                break;
-            default:
-                break;
+                case '{':
+                    level++;
+                    break;
+                case '}':
+                    level--;
+                    if (level == -1) { // improper nesting
+                        return false;
+                    }
+                    break;
+                default:
+                    break;
             }
             i++;
         }

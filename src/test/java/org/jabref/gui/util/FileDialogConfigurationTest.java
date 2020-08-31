@@ -1,7 +1,6 @@
 package org.jabref.gui.util;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ class FileDialogConfigurationTest {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(tempFolder).build();
 
-        assertEquals(Optional.of(Paths.get(tempFolder)), fileDialogConfiguration.getInitialDirectory());
+        assertEquals(Optional.of(Path.of(tempFolder)), fileDialogConfiguration.getInitialDirectory());
     }
 
     @Test

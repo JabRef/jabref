@@ -19,7 +19,7 @@
     <issn>1142-2904</issn>
     <eissn>1965-0795</eissn>
     <summary>style of the french Quaternary studies journal</summary>
-    <updated>2020-01-29T19:53:01+00:00</updated>
+    <updated>2020-03-21T02:51:12+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -74,7 +74,7 @@
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="short" and="symbol" delimiter-precedes-last="never"></name>
+          <name form="short" and="symbol" delimiter-precedes-last="never"/>
         </names>
       </else-if>
       <else-if type="book">
@@ -116,14 +116,11 @@
   <macro name="access">
     <choose>
       <if variable="DOI">
-        <text value="Disponible sur : " prefix=" "/>
-        <group prefix="&lt; " suffix=" &gt;">
-          <text value="https://doi.org/"/>
+        <group>
           <text variable="DOI"/>
         </group>
       </if>
       <else-if variable="URL">
-        <text value="URL : " prefix=". "/>
         <group>
           <text variable="URL"/>
         </group>
@@ -133,7 +130,7 @@
   <macro name="accessed-date">
     <choose>
       <if variable="URL">
-        <group prefix=", " delimiter=" ">
+        <group delimiter=" " prefix=" " suffix=". ">
           <text value="consulté le"/>
           <date variable="accessed">
             <date-part name="day" suffix=" "/>
@@ -167,14 +164,14 @@
     </choose>
   </macro>
   <macro name="title">
-      <choose>
-        <if type="chapter paper-conference article-journal article-magazine article-newspaper webpage" match="none">
-          <text variable="title" font-style="italic" text-case="title"/>
-        </if>
-        <else>
-          <text variable="title" text-case="title"/>
-        </else>
-      </choose>
+    <choose>
+      <if type="chapter paper-conference article-journal article-magazine article-newspaper webpage" match="none">
+        <text variable="title" font-style="italic" text-case="title"/>
+      </if>
+      <else>
+        <text variable="title" text-case="title"/>
+      </else>
+    </choose>
   </macro>
   <macro name="edition">
     <choose>
@@ -217,17 +214,6 @@
     <text variable="issue" prefix=" n?" suffix=","/>
     <text variable="page" prefix=" p.&#160;" suffix="."/>
   </macro>
-  <macro name="webpageinfo">
-    <text variable="note" prefix="Tome " suffix=" | "/>
-    <text macro="year-date" suffix=","/>
-  </macro>
-  <macro name="parution">
-    <date variable="issued">
-      <date-part name="day" suffix=" "/>
-      <date-part name="month" suffix=" "/>
-      <date-part name="year"/>
-    </date>
-  </macro>
   <!--  ***************** Citation ********************* -->
   <citation disambiguate-add-year-suffix="true">
     <sort>
@@ -252,24 +238,28 @@
     </sort>
     <layout>
       <group display="block" delimiter="">
+        <!-- ***************** elements communs à tous les types ***************** -->
         <text macro="author" font-weight="bold"/>
         <text macro="year-date" suffix=" - " font-weight="bold"/>
         <text macro="title" suffix=". "/>
+        <!-- ***************** modifs selon la nature de l'ouvrage ***************** -->
         <choose>
           <if type="thesis">
             <text variable="genre" suffix=". "/>
             <group delimiter=", " suffix=".">
               <text macro="publisher"/>
               <text variable="number-of-pages" suffix=" p."/>
+              <text macro="access" prefix=", "/>
             </group>
           </if>
-          <else-if type="bill book graphic legal_case legislation motion_picture report song manuscript" match="any">
+          <else-if type="bill book graphic legal_case legislation motion_picture report song manuscript map" match="any">
             <text variable="genre" suffix=", " font-style="italic"/>
             <text macro="collection" suffix=". "/>
             <group delimiter=", " suffix=".">
               <text macro="publisher"/>
               <text macro="edition"/>
               <text macro="pages" suffix=" p."/>
+              <text macro="access"/>
             </group>
           </else-if>
           <else-if type="patent">
@@ -287,10 +277,11 @@
               <text variable="event" font-style="italic" suffix=", "/>
               <text macro="journal-title" suffix=". "/>
             </group>
-            <group suffix=".">
+            <group delimiter=", " suffix=".">
               <text variable="collection-title" suffix=". "/>
               <text macro="publisher"/>
               <text variable="page" prefix=", " suffix="."/>
+              <text macro="access" prefix=", "/>
             </group>
           </else-if>
           <!-- Chapitre de livre -->
@@ -305,29 +296,31 @@
             <group delimiter=", " suffix=".">
               <text macro="publisher"/>
               <text variable="page"/>
+              <text macro="access"/>
             </group>
           </else-if>
+          <!-- page web -->
           <else-if type="webpage" match="any">
-            <group prefix=" ">
+            <group prefix=" " delimiter=", " suffix=". ">
               <text macro="editor"/>
               <text macro="journal-title"/>
               <text variable="event" suffix=". " font-style="italic"/>
             </group>
-            <text macro="webpageinfo" prefix=" "/>
-            <text variable="page" prefix=" p. " suffix="."/>
-            <text macro="parution" prefix=" mis en ligne le "/>
-            <text macro="accessed-date"/>
-            <text macro="access"/>
+            <group delimiter=", " suffix=". ">
+              <text macro="access"/>
+              <text macro="accessed-date"/>
+            </group>
           </else-if>
           <!-- article de revue -->
           <else-if type="article-journal" match="any">
             <group prefix=" ">
               <text macro="journal-title" suffix=", "/>
             </group>
-            <group suffix=".">
+            <group delimiter=", " suffix=".">
               <text variable="volume" form="short" font-weight="bold"/>
               <text variable="issue" prefix=" (" form="short" suffix=")"/>
-              <text variable="page" prefix=", "/>
+              <text variable="page"/>
+              <text macro="access"/>
             </group>
           </else-if>
           <else>

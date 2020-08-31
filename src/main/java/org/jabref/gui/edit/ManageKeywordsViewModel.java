@@ -18,7 +18,7 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ManageKeywordsViewModel {
 
@@ -110,7 +110,7 @@ public class ManageKeywordsViewModel {
         }
 
         NamedCompound ce = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        //TODO: bp.getUndoManager().addEdit(ce);
+        // TODO: bp.getUndoManager().addEdit(ce);
     }
 
     private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,

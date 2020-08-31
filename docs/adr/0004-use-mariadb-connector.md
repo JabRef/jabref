@@ -30,3 +30,4 @@ The [MySQL Connector](https://www.mysql.com/de/products/connector/) is distribut
 * Good, because it stems from the same development team than MySQL
 * Bad, because the "Universal FOSS Exception" makes licensing more complicated.
 
+<!-- markdownlint-disable-file MD024 -->
