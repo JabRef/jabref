@@ -26,6 +26,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Update journal lists
         run: |
+          echo "check 1"
+          ls -la $GITHUB_WORKSPACE/src/main/resources/journals
           set +o pipefail
           cd /tmp
           git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
@@ -33,12 +35,18 @@ jobs:
           rm journals/journal_abbreviations_ieee.csv
           touch journals/journal_abbreviations_ieee.csv
           mkdir -p $GITHUB_WORKSPACE/build/journals
+          echo "check 2"
           ls -la $GITHUB_WORKSPACE/src/main/resources/journals
+          echo "check 2b"
+          ls -la $GITHUB_WORKSPACE/build/journals/
           ./combine_journal_lists_dots.py $GITHUB_WORKSPACE/build/journals/journalList.csv
           # ./combine_journal_lists_dotless.py /$GITHUB_WORKSPACE/build/journals/journalList_dotless.csv
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
+          echo "check 3"
           ls -la $GITHUB_WORKSPACE/src/main/resources/journals
+          echo "check 3b"
+          ls -la $GITHUB_WORKSPACE/build/journals/
           git diff
           git config user.email "jabrefmail+webfeedback@gmail.com"
           git config user.name "GitHub Actions"
