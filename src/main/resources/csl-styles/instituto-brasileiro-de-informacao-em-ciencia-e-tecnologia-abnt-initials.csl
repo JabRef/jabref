@@ -26,7 +26,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The Brazilian Standard Style by IBICT</summary>
-    <updated>2020-04-09T14:37:00+00:00</updated>
+    <updated>2020-04-11T15:24:32+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -87,7 +87,7 @@
     </choose>
   </macro>
   <macro name="translator">
-    <text value="Tradução: "/>
+    <text term="translator" form="verb-short" suffix=" "/>
     <names variable="translator" delimiter=", ">
       <name delimiter="; " sort-separator=" " delimiter-precedes-last="always">
         <name-part name="given" text-case="capitalize-first"/>
@@ -155,11 +155,22 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="DOI URL accessed" match="all">
+      <if variable="URL DOI" match="all">
         <text variable="DOI" prefix="DOI " suffix=". "/>
         <text term="available at" text-case="capitalize-first" prefix=" " suffix=": "/>
-        <text variable="URL" suffix="."/>
-        <text term="accessed" text-case="capitalize-first" prefix=" " suffix=" "/>
+        <text variable="URL"/>
+      </if>
+      <else-if variable="URL" match="any">
+        <text term="available at" text-case="capitalize-first" prefix=" " suffix=": "/>
+        <text variable="URL"/>
+      </else-if>
+      <else>
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </else>
+    </choose>
+    <choose>
+      <if variable="accessed" match="any">
+        <text term="accessed" text-case="capitalize-first" prefix=". " suffix=" "/>
         <text term="at" text-case="lowercase" suffix=": "/>
         <date variable="accessed">
           <date-part name="day" suffix=" "/>
@@ -167,21 +178,6 @@
           <date-part name="year"/>
         </date>
       </if>
-      <else-if variable="URL accessed" match="all">
-        <text term="available at" text-case="capitalize-first" prefix=" " suffix=": "/>
-        <text variable="URL" suffix="."/>
-        <text term="accessed" text-case="capitalize-first" prefix=" " suffix=" "/>
-        <text term="at" text-case="lowercase" suffix=": "/>
-        <date variable="accessed">
-          <date-part name="day" suffix=" "/>
-          <date-part name="month" form="short" suffix=" "/>
-          <date-part name="year"/>
-        </date>
-      </else-if>
-      <else-if variable="accessed" match="none">
-        <text term="available at" text-case="capitalize-first" prefix=" " suffix=": "/>
-        <text variable="URL" suffix="."/>
-      </else-if>
     </choose>
   </macro>
   <macro name="title">
@@ -306,18 +302,19 @@
         <choose>
           <if variable="volume" match="any">
             <text term="volume" form="short"/>
-            <text variable="volume" prefix=" "/>
+            <text variable="volume" prefix=" " suffix=","/>
           </if>
         </choose>
         <choose>
           <if variable="issue" match="any">
-            <text term="issue" form="short" prefix=", "/>
+            <text term="issue" form="short" prefix=" "/>
             <text variable="issue" prefix=" "/>
           </if>
         </choose>
         <choose>
           <if variable="edition" match="any">
-            <text variable="edition" prefix="n. " suffix=", "/>
+            <text term="edition" form="short" prefix=" " suffix="."/>
+            <text variable="edition" prefix=" "/>
           </if>
         </choose>
         <choose>
@@ -333,7 +330,7 @@
           </if>
         </choose>
       </if>
-      <else-if type="book chapter" match="any">
+      <else-if type="book chapter paper-conference" match="any">
         <choose>
           <if variable="volume" match="any">
             <text term="volume" form="short"/>
@@ -392,7 +389,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" et-al-min="4" et-al-use-first="1" entry-spacing="1">
+  <bibliography hanging-indent="false" et-al-min="21" et-al-use-last="true" et-al-use-first="19" entry-spacing="1" line-spacing="1">
     <sort>
       <key macro="author"/>
       <key macro="title"/>
@@ -442,7 +439,7 @@
               <text variable="archive" prefix=", "/>
               <text variable="page"/>
             </group>
-            <text macro="access"/>
+            <text macro="access" prefix=". "/>
             <!-- On Zotero, use the field 'Extra' to insert DOI names for books.-->
           </group>
         </else-if>
@@ -483,15 +480,16 @@
           </group>
         </else-if>
         <else-if type="manuscript">
-          <group>
+          <group suffix=".">
             <text macro="author" suffix=". "/>
             <text macro="title" suffix=". "/>
             <text macro="edition" suffix=". "/>
             <text macro="abstract" suffix=". "/>
+            <text macro="container-title" suffix=". "/>
             <text macro="place" suffix=", "/>
             <text macro="issued" suffix=". "/>
-            <text macro="access" suffix=". "/>
-            <text macro="archive" suffix=". "/>
+            <text macro="access"/>
+            <text macro="archive" prefix=". "/>
           </group>
         </else-if>
         <else-if type="paper-conference">
@@ -505,9 +503,9 @@
             <text variable="note" prefix=", "/>
             <text macro="container-title" prefix=". "/>
             <text macro="publisher" prefix=". "/>
-            <text macro="issued" prefix=", " suffix=". "/>
-            <text macro="locators" suffix=". "/>
-            <text macro="access"/>
+            <text macro="issued" prefix=", "/>
+            <text macro="locators" prefix=". "/>
+            <text macro="access" prefix=". "/>
           </group>
         </else-if>
         <else-if type="report">
@@ -524,7 +522,7 @@
           <text macro="issued" prefix=", " suffix="."/>
           <text macro="access" prefix=" " suffix="."/>
         </else-if>
-        <else-if type="webpage">
+        <else-if type="webpage post-weblog">
           <group suffix=".">
             <text macro="author" suffix=". "/>
             <text macro="title" suffix=". "/>
@@ -532,9 +530,9 @@
             <text macro="container-title" suffix=". "/>
             <text macro="genre" prefix=" [" suffix="]. "/>
             <text macro="access"/>
-            <!-- On Zotero, use the field 'Extra' for notes.-->
-            <text variable="note" prefix=" (" suffix=")"/>
           </group>
+          <!-- On Zotero, use the field 'Extra' for notes.-->
+          <text variable="note" prefix=" (" suffix=")."/>
         </else-if>
         <else-if type="thesis">
           <group suffix=".">
@@ -545,8 +543,8 @@
             <text variable="genre" suffix=" &#8211; "/>
             <text variable="publisher" suffix=", "/>
             <text variable="publisher-place" suffix=", "/>
-            <text macro="issued-year" suffix=". "/>
-            <text macro="access"/>
+            <text macro="issued-year"/>
+            <text macro="access" prefix=". "/>
           </group>
         </else-if>
         <else>
@@ -560,7 +558,7 @@
             <text macro="locators" suffix=". "/>
             <text macro="publisher" suffix=", "/>
             <text macro="issued"/>
-            <text macro="access"/>
+            <text macro="access" prefix=". "/>
           </group>
         </else>
       </choose>

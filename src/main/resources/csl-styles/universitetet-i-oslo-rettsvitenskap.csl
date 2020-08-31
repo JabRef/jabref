@@ -13,7 +13,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>University of Oslo Law Library's citation style. Created for use primarily with Norwegian legal sources.</summary>
-    <updated>2017-11-16T10:04:01+00:00</updated>
+    <updated>2020-06-24T21:21:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="nb-NO">
@@ -165,6 +165,25 @@
       </else>
     </choose>
   </macro>
+  <macro name="locator">
+    <choose>
+      <if type="legislation bill" match="none">
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
+      </if>
+      <else-if locator="section paragraph" match="any">
+        <text variable="locator" prefix=" § "/>
+      </else-if>
+      <else>
+        <group delimiter=" ">
+          <label variable="locator" form="short"/>
+          <text variable="locator"/>
+        </group>
+      </else>
+    </choose>
+  </macro>
   <citation disambiguate-add-givenname="true" givenname-disambiguation-rule="primary-name" disambiguate-add-year-suffix="true" et-al-min="2" et-al-use-first="1">
     <sort>
       <key macro="author-short"/>
@@ -192,6 +211,7 @@
             <text variable="title"/>
           </else>
         </choose>
+        <text macro="locator"/>
       </group>
     </layout>
   </citation>

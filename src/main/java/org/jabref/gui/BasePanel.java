@@ -7,16 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
-import org.jabref.gui.autocompleter.AutoCompleteUpdater;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
@@ -40,9 +37,7 @@ import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -54,8 +49,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,12 +88,10 @@ public class BasePanel extends StackPane {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
-    private JabRefExecutorService executorService;
 
     public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
-        this.executorService = JabRefExecutorService.INSTANCE;
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
@@ -108,12 +101,13 @@ public class BasePanel extends StackPane {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), Globals.prefs, Globals.stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
 
         setupMainPanel();
+        setupAutoCompletion();
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
@@ -257,28 +251,24 @@ public class BasePanel extends StackPane {
 
     public void insertEntries(final List<BibEntry> entries) {
         if (!entries.isEmpty()) {
-            try {
-                bibDatabaseContext.getDatabase().insertEntries(entries);
+            bibDatabaseContext.getDatabase().insertEntries(entries);
 
-                // Set owner and timestamp
-                for (BibEntry entry : entries) {
-                    UpdateField.setAutomaticFields(entry,
-                            true,
-                            true,
-                            Globals.prefs.getOwnerPreferences(),
-                            Globals.prefs.getTimestampPreferences());
-                }
-                // Create an UndoableInsertEntries object.
-                getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
-
-                markBaseChanged(); // The database just changed.
-                if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
-                    showAndEdit(entries.get(0));
-                }
-                clearAndSelect(entries.get(0));
-            } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + ex.getId(), ex);
+            // Set owner and timestamp
+            for (BibEntry entry : entries) {
+                UpdateField.setAutomaticFields(entry,
+                        true,
+                        true,
+                        Globals.prefs.getOwnerPreferences(),
+                        Globals.prefs.getTimestampPreferences());
             }
+            // Create an UndoableInsertEntries object.
+            getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
+
+            markBaseChanged(); // The database just changed.
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+                showAndEdit(entries.get(0));
+            }
+            clearAndSelect(entries.get(0));
         }
     }
 
@@ -294,7 +284,14 @@ public class BasePanel extends StackPane {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, preferences.getKeyBindings());
+        mainTable = new MainTable(tableModel,
+                this,
+                bibDatabaseContext,
+                Globals.prefs,
+                dialogService,
+                Globals.stateManager,
+                externalFileTypes,
+                preferences.getKeyBindings());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -304,68 +301,6 @@ public class BasePanel extends StackPane {
                                                          .stream()
                                                          .findFirst()
                                                          .ifPresent(entryEditor::setEntry));
-
-        // TODO: Register these actions globally
-        /*
-        String clearSearch = "clearSearch";
-        mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
-        mainTable.getActionMap().put(clearSearch, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
-                switch (mode) {
-                    case SHOWING_NOTHING:
-                        frame.getGlobalSearchBar().endSearch();
-                        break;
-                    case SHOWING_PREVIEW:
-                        getPreviewPanel().close();
-                        break;
-                    case SHOWING_EDITOR:
-                    case WILL_SHOW_EDITOR:
-                        entryEditorClosing(getEntryEditor());
-                        break;
-                    default:
-                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
-                        break;
-                }
-            }
-        });
-
-        mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.CUT);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not cut", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.COPY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.PASTE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not paste", ex);
-                }
-            }
-        });
-        */
     }
 
     public void setupMainPanel() {
@@ -379,16 +314,11 @@ public class BasePanel extends StackPane {
 
         splitPane.getItems().add(mainTable);
 
-        // Set up name autocompleter for search:
-        setupAutoCompletion();
-        executorService.execute(this::instantiateSearchAutoCompleter);
-        this.getDatabase().registerListener(new SearchAutoCompleteListener());
-
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.monadic(Bindings.valueAt(splitPane.getDividers(), 0))
-                                              .flatMap(SplitPane.Divider::positionProperty)
-                                              .subscribe((observable, oldValue, newValue) -> saveDividerLocation(newValue));
+        dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
+                                              .mapObservable(SplitPane.Divider::positionProperty)
+                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -413,26 +343,16 @@ public class BasePanel extends StackPane {
     private void setupAutoCompletion() {
         AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
-            suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
-            suggestionProviders.indexDatabase(getDatabase());
-            // Ensure that the suggestion providers are in sync with entries
-            CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
-            changeFilter.registerListener(new AutoCompleteUpdater(suggestionProviders));
+            suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository);
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
         }
+        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());
     }
 
     public void updateSearchManager() {
         frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
-    }
-
-    private void instantiateSearchAutoCompleter() {
-        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields());
-        for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-            searchAutoCompleter.indexEntry(entry);
-        }
     }
 
     private void adjustSplitter() {
@@ -599,10 +519,6 @@ public class BasePanel extends StackPane {
      * preference setting.
      */
     private void saveDividerLocation(Number position) {
-        if (position == null) {
-            return;
-        }
-
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             preferences.setEntryEditorDividerPosition(position.doubleValue());
         }
@@ -727,23 +643,6 @@ public class BasePanel extends StackPane {
         @Subscribe
         public void listen(EntriesRemovedEvent entriesRemovedEvent) {
             ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
-        }
-    }
-
-    /**
-     * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
-     * harvest words from the entry Actual methods for autocomplete indexing  must run in javafx thread
-     */
-    private class SearchAutoCompleteListener {
-
-        @Subscribe
-        public void listen(EntriesAddedEvent addedEntriesEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> addedEntriesEvent.getBibEntries().forEach(entry -> searchAutoCompleter.indexEntry(entry)));
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry()));
         }
     }
 

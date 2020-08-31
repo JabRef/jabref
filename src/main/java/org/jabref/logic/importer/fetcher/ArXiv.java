@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
  * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
  * description on how to use the API
- *
+ * <p>
  * Similar implementions:
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
@@ -158,7 +158,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
-        throws FetcherException {
+            throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
 
@@ -194,7 +194,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             }
             if (!ids.isEmpty()) {
                 uriBuilder.addParameter("id_list",
-                                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
+                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -251,8 +251,27 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
         return searchForEntries(query).stream().map(
-                                                    (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                       .collect(Collectors.toList());
+    }
+
+    /**
+     * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
+     *
+     * @param complexSearchQuery the search query defining all fielded search parameters
+     * @return A list of entries matching the complex query
+     */
+    @Override
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
+        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
+        // Since ArXiv API does not support year search, we ignore the year related terms
+        complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
+        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
+        String complexQueryString = String.join(" AND ", searchTerms);
+        return performSearch(complexQueryString);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(this.preferences.get(JabRefPreferences.FX_THEME));
+        previewView.setTheme(this.preferences.getTheme());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
@@ -79,15 +79,15 @@ public class PreviewPanel extends VBox {
                 List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
 
                 if (event.getTransferMode() == TransferMode.MOVE) {
-                    LOGGER.debug("Mode MOVE"); //shift on win or no modifier
+                    LOGGER.debug("Mode MOVE"); // shift on win or no modifier
                     fileLinker.moveFilesToFileDirAndAddToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.LINK) {
-                    LOGGER.debug("Node LINK"); //alt on win
+                    LOGGER.debug("Node LINK"); // alt on win
                     fileLinker.addFilesToEntry(entry, files);
                 }
                 if (event.getTransferMode() == TransferMode.COPY) {
-                    LOGGER.debug("Mode Copy"); //ctrl on win, no modifier on Xubuntu
+                    LOGGER.debug("Mode Copy"); // ctrl on win, no modifier on Xubuntu
                     fileLinker.copyFilesToFileDirAndAddToEntry(entry, files);
                 }
                 success = true;
@@ -113,6 +113,10 @@ public class PreviewPanel extends VBox {
         if (!init) {
             dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getName()));
         }
+    }
+
+    private void updateLayoutByPreferences(JabRefPreferences preferences) {
+        previewView.setLayout(preferences.getPreviewPreferences().getCurrentPreviewStyle());
     }
 
     private void createKeyBindings() {
@@ -153,6 +157,7 @@ public class PreviewPanel extends VBox {
     }
 
     public void setEntry(BibEntry entry) {
+        updateLayoutByPreferences(preferences);
         this.entry = entry;
         previewView.setEntry(entry);
     }
@@ -170,7 +175,8 @@ public class PreviewPanel extends VBox {
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
+        PreviewPreferences previewPreferences = preferences
+                .getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
                 .build();

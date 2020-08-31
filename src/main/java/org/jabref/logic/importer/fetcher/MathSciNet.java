@@ -57,7 +57,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
         if (mrNumberInEntry.isPresent()) {
             // We are lucky and already know the id, so use it instead
-            return getURLForID(mrNumberInEntry.get());
+            return getUrlForIdentifier(mrNumberInEntry.get());
         }
 
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
@@ -83,7 +83,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg1", "MR"); // search MR number
         uriBuilder.addParameter("s1", identifier); // identifier

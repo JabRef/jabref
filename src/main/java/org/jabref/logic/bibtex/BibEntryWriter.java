@@ -3,10 +3,13 @@ package org.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -21,7 +24,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
@@ -91,30 +93,44 @@ public class BibEntryWriter {
      */
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, Writer out,
                                                                BibDatabaseMode bibDatabaseMode) throws IOException {
-        // Write header with type and bibtex-key.
+        // Write header with type and bibtex-key
         TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
         out.write('@' + typedEntry.getTypeForDisplay() + '{');
 
         writeKeyField(entry, out);
 
-        TreeSet<Field> written = new TreeSet<>(Comparator.comparing(Field::getName));
+        Set<Field> written = new HashSet<>();
         written.add(InternalField.KEY_FIELD);
         int indentation = getLengthOfLongestFieldName(entry);
 
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), bibDatabaseMode);
         if (type.isPresent()) {
-            // Write required fields first.
-            for (OrFields value : type.get().getRequiredFields()) {
-                for (Field field : value) {
-                    writeField(entry, out, field, indentation);
-                    written.add(field);
-                }
+            // Write required fields first
+            List<Field> requiredFields = type.get()
+                                             .getRequiredFields()
+                                             .stream()
+                                             .flatMap(Collection::stream)
+                                             .sorted(Comparator.comparing(Field::getName))
+                                             .collect(Collectors.toList());
+
+            for (Field field : requiredFields) {
+                writeField(entry, out, field, indentation);
             }
-            // Then optional fields.
-            for (BibField field : type.get().getOptionalFields()) {
-                writeField(entry, out, field.getField(), indentation);
-                written.add(field.getField());
+
+            // Then optional fields
+            List<Field> optionalFields = type.get()
+                                             .getOptionalFields()
+                                             .stream()
+                                             .map(BibField::getField)
+                                             .sorted(Comparator.comparing(Field::getName))
+                                             .collect(Collectors.toList());
+
+            for (Field field : optionalFields) {
+                writeField(entry, out, field, indentation);
             }
+
+            written.addAll(requiredFields);
+            written.addAll(optionalFields);
         }
         // Then write remaining fields in alphabetic order.
         SortedSet<Field> remainingFields = entry.getFields()
@@ -159,10 +175,10 @@ public class BibEntryWriter {
     }
 
     private int getLengthOfLongestFieldName(BibEntry entry) {
-        Predicate<Field> isNotBibtexKey = field -> !InternalField.KEY_FIELD.equals(field);
+        Predicate<Field> isNotCitationKey = field -> !InternalField.KEY_FIELD.equals(field);
         return entry.getFields()
                     .stream()
-                    .filter(isNotBibtexKey)
+                    .filter(isNotCitationKey)
                     .mapToInt(field -> field.getName().length())
                     .max()
                     .orElse(0);

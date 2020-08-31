@@ -3,12 +3,14 @@ adopt-info: jabref
 icon: snap/gui/jabref.png
 license: MIT
 summary: Bibliography manager
-description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
-
+description: |
+  JabRef is an open source bibliography reference manager.
+  The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+  To access files in external media (i.e. usb drives) you must run:
+  `snap connect jabref:removable-media`
 grade: stable
 confinement: strict
 base: core18
-license: MIT
 architectures:
   - build-on: amd64
 
@@ -37,10 +39,10 @@ plugs:
 apps:
   jabref:
     command: bin/JabRef
-    extensions: [gnome-3-28]
+    extensions: [gnome-3-34]
   browser-proxy:
     command: lib/jabrefHost.py
-    extensions: [gnome-3-28]
+    extensions: [gnome-3-34]
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
@@ -48,12 +50,21 @@ environment:
 parts:
   jabref:
     plugin: dump
-    # source: build/distribution/JabRef-5.0-portable_linux.tar.gz
+    # source: build/distribution/JabRef-5.1-portable_linux.tar.gz
     # Use this source for debug purposes:
-    source: https://builds.jabref.org/master/JabRef-5.0-portable_linux.tar.gz
+    source: https://builds.jabref.org/master/JabRef-5.1-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
       snapcraftctl build
       snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
+      rm $SNAPCRAFT_PART_INSTALL/bin/JabRef
+  jabref-launcher:
+    after:
+      - jabref
+    source: snap/local
+    source-type: local
+    plugin: dump
+    organize:
+      JabRef-launcher: bin/JabRef

@@ -32,8 +32,8 @@ public class EntryConverter {
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(StandardField.SCHOOL, StandardField.INSTITUTION);
 
         // inverse map
-        EntryConverter.FIELD_ALIASES_LTX_TO_TEX = EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()
-                .stream()
+        EntryConverter.FIELD_ALIASES_LTX_TO_TEX = EntryConverter.FIELD_ALIASES_TEX_TO_LTX
+                .entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
         // all aliases

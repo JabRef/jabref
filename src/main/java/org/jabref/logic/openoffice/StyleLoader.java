@@ -35,7 +35,7 @@ public class StyleLoader {
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
     public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
-            Charset encoding) {
+                       Charset encoding) {
         this.preferences = Objects.requireNonNull(preferences);
         this.layoutFormatterPreferences = Objects.requireNonNull(jabrefPreferences);
         this.encoding = Objects.requireNonNull(encoding);
@@ -51,6 +51,7 @@ public class StyleLoader {
 
     /**
      * Adds the given style to the list of styles
+     *
      * @param filename The filename of the style
      * @return True if the added style is valid, false otherwise
      */
@@ -83,7 +84,7 @@ public class StyleLoader {
         for (String filename : lists) {
             try {
                 OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
-                if (style.isValid()) { //Problem!
+                if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {
                     LOGGER.error(String.format("Style with filename %s is invalid", filename));

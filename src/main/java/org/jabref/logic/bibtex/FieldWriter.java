@@ -60,7 +60,7 @@ public class FieldWriter {
 
         // Then we throw an exception if the error criteria are met.
         if (!(right == 0) && (left == 0)) {
-            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text );
+            LOGGER.error("Unescaped '}' character without opening bracket ends string prematurely. Field value: {}", text);
             throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely. Field value: " + text);
         }
         if (!(right == 0) && (right < left)) {
@@ -96,7 +96,7 @@ public class FieldWriter {
 
     /**
      * This method handles # in the field content to get valid bibtex strings
-     *
+     * <p>
      * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
      */
     private String formatAndResolveStrings(String content, Field field) throws InvalidFieldValueException {
@@ -136,9 +136,9 @@ public class FieldWriter {
                                 + "In JabRef, use pairs of # characters to indicate a string. "
                                 + "Note that the entry causing the problem has been selected. Field value: {}", content);
                         throw new InvalidFieldValueException(
-                                                             "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
-                                                             + "In JabRef, use pairs of # characters to indicate a string.\n"
-                                                             + "Note that the entry causing the problem has been selected. Field value: " + content);
+                                "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
+                                        + "In JabRef, use pairs of # characters to indicate a string.\n"
+                                        + "Note that the entry causing the problem has been selected. Field value: " + content);
                     }
                 }
             }
@@ -151,7 +151,7 @@ public class FieldWriter {
                 // an occurrence of ## will simply be ignored. Should it instead
                 // cause an error message?
                 writeStringLabel(stringBuilder, content, pos1 + 1, pos2, pos1 == pivot,
-                                 (pos2 + 1) == content.length());
+                        (pos2 + 1) == content.length());
             }
 
             if (pos2 > -1) {
@@ -185,7 +185,7 @@ public class FieldWriter {
 
     /**
      * @param stringBuilder the StringBuilder to append the text to
-     * @param text the text to append
+     * @param text          the text to append
      */
     private void writeText(StringBuilder stringBuilder, String text, int startPos, int endPos) {
         stringBuilder.append(FIELD_START);

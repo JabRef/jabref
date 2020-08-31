@@ -32,8 +32,8 @@ public class FileFieldWriter {
      */
     public static String encodeStringArray(String[][] values) {
         return Arrays.stream(values)
-                .map(FileFieldWriter::encodeStringArray)
-                .collect(Collectors.joining(";"));
+                     .map(FileFieldWriter::encodeStringArray)
+                     .collect(Collectors.joining(";"));
     }
 
     /**
@@ -44,8 +44,8 @@ public class FileFieldWriter {
      */
     private static String encodeStringArray(String[] entry) {
         return Arrays.stream(entry)
-                .map(FileFieldWriter::quote)
-                .collect(Collectors.joining(":"));
+                     .map(FileFieldWriter::quote)
+                     .collect(Collectors.joining(":"));
     }
 
     public static String quote(String s) {
@@ -62,5 +62,4 @@ public class FileFieldWriter {
         }
         return sb.toString();
     }
-
 }

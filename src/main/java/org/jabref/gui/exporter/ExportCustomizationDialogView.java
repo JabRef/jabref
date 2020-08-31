@@ -11,12 +11,12 @@ import javafx.scene.control.TableView;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
@@ -31,7 +31,7 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private JournalAbbreviationLoader loader;
+    @Inject private JournalAbbreviationRepository repository;
     private ExportCustomizationDialogViewModel viewModel;
 
     public ExportCustomizationDialogView() {
@@ -52,10 +52,10 @@ public class ExportCustomizationDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, loader);
+        viewModel = new ExportCustomizationDialogViewModel(preferences, dialogService, repository);
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());
-        EasyBind.listBind(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
+        EasyBind.bindContent(viewModel.selectedExportersProperty(), exporterTable.getSelectionModel().getSelectedItems());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
         layoutColumn.setCellValueFactory(cellData -> cellData.getValue().layoutFileName());
         extensionColumn.setCellValueFactory(cellData -> cellData.getValue().extension());

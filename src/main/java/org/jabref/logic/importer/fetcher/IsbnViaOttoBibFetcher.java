@@ -39,7 +39,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
      * @return null, because the identifier is passed using form data. This method is not used.
      */
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         return null;
     }
 
@@ -64,7 +64,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
+        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry));
         return entry;
-
     }
 }

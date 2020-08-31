@@ -20,15 +20,15 @@ public class JabRefPreferencesFilter {
         Map<String, Object> prefs = preferences.getPreferences();
 
         return prefs.entrySet().stream()
-                .map(entry -> new PreferenceOption(entry.getKey(), entry.getValue(), defaults.get(entry.getKey())))
-                .collect(Collectors.toList());
+                    .map(entry -> new PreferenceOption(entry.getKey(), entry.getValue(), defaults.get(entry.getKey())))
+                    .collect(Collectors.toList());
     }
 
     public List<PreferenceOption> getDeviatingPreferences() {
         return getPreferenceOptions().stream()
-                .filter(PreferenceOption::isChanged)
-                .sorted()
-                .collect(Collectors.toList());
+                                     .filter(PreferenceOption::isChanged)
+                                     .sorted()
+                                     .collect(Collectors.toList());
     }
 
     public enum PreferenceType {
@@ -97,5 +97,4 @@ public class JabRefPreferencesFilter {
             return Objects.compare(this.key, o.key, String::compareTo);
         }
     }
-
 }

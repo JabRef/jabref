@@ -15,8 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Convenience class for getting BibTeX entries from the BibSonomy scraper,
- * from an URL pointing to an entry.
+ * Convenience class for getting BibTeX entries from the BibSonomy scraper, from an URL pointing to an entry.
  */
 public class BibsonomyScraper {
 
@@ -30,6 +29,7 @@ public class BibsonomyScraper {
 
     /**
      * Return a BibEntry by looking up the given url from the BibSonomy scraper.
+     *
      * @param entryUrl
      * @return
      */
@@ -37,7 +37,7 @@ public class BibsonomyScraper {
         try {
             // Replace special characters by corresponding sequences:
             String cleanURL = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
-                    .replace("&", "%26").replace("=", "%3D");
+                                      .replace("&", "%26").replace("=", "%3D");
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).asString();

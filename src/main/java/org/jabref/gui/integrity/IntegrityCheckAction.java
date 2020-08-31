@@ -43,9 +43,8 @@ public class IntegrityCheckAction extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
-                Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
+                Globals.prefs.getCitationKeyPatternPreferences(),
+                Globals.journalAbbreviationRepository,
                 Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 
         Task<List<IntegrityMessage>> task = new Task<>() {
@@ -54,6 +53,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 List<IntegrityMessage> result = new ArrayList<>();
 
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
+                result.addAll(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
@@ -78,7 +78,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),
                 Localization.lang("Checking integrity..."),
                 task);

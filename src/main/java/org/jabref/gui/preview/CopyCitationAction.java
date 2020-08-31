@@ -58,6 +58,7 @@ public class CopyCitationAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
+    @Override
     public void execute() {
         BackgroundTask.wrap(this::generateCitations)
                       .onFailure(ex -> LOGGER.error("Error while copying citations to the clipboard", ex))
@@ -80,7 +81,7 @@ public class CopyCitationAction extends SimpleCommand {
             }
 
             StringReader sr = new StringReader(previewStyle.replace("__NEWLINE__", "\n"));
-            LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
             Layout layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
 
             List<String> citations = new ArrayList<>(selectedEntries.size());
@@ -116,8 +117,8 @@ public class CopyCitationAction extends SimpleCommand {
      */
     protected static ClipboardContent processRtf(List<String> citations) {
         String result = "{\\rtf" + OS.NEWLINE +
-                        String.join(CitationStyleOutputFormat.RTF.getLineSeparator(), citations) +
-                        "}";
+                String.join(CitationStyleOutputFormat.RTF.getLineSeparator(), citations) +
+                "}";
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
         content.putRtf(result);
@@ -129,21 +130,21 @@ public class CopyCitationAction extends SimpleCommand {
      */
     protected static ClipboardContent processXslFo(List<String> citations) {
         String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
-                        "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
-                        "   <fo:layout-master-set>" + OS.NEWLINE +
-                        "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
-                        "         <fo:region-body/>" + OS.NEWLINE +
-                        "      </fo:simple-page-master>" + OS.NEWLINE +
-                        "   </fo:layout-master-set>" + OS.NEWLINE +
-                        "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
-                        "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
+                "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
+                "   <fo:layout-master-set>" + OS.NEWLINE +
+                "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
+                "         <fo:region-body/>" + OS.NEWLINE +
+                "      </fo:simple-page-master>" + OS.NEWLINE +
+                "   </fo:layout-master-set>" + OS.NEWLINE +
+                "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
+                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
 
         result += String.join(CitationStyleOutputFormat.XSL_FO.getLineSeparator(), citations);
 
         result += OS.NEWLINE +
-                  "      </fo:flow>" + OS.NEWLINE +
-                  "   </fo:page-sequence>" + OS.NEWLINE +
-                  "</fo:root>" + OS.NEWLINE;
+                "      </fo:flow>" + OS.NEWLINE +
+                "   </fo:page-sequence>" + OS.NEWLINE +
+                "</fo:root>" + OS.NEWLINE;
 
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
@@ -156,16 +157,16 @@ public class CopyCitationAction extends SimpleCommand {
      */
     protected static ClipboardContent processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
-                        "<html>" + OS.NEWLINE +
-                        "   <head>" + OS.NEWLINE +
-                        "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                        "   </head>" + OS.NEWLINE +
-                        "   <body>" + OS.NEWLINE + OS.NEWLINE;
+                "<html>" + OS.NEWLINE +
+                "   <head>" + OS.NEWLINE +
+                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                "   </head>" + OS.NEWLINE +
+                "   <body>" + OS.NEWLINE + OS.NEWLINE;
 
         result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
         result += OS.NEWLINE +
-                  "   </body>" + OS.NEWLINE +
-                  "</html>" + OS.NEWLINE;
+                "   </body>" + OS.NEWLINE +
+                "</html>" + OS.NEWLINE;
 
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
@@ -175,7 +176,7 @@ public class CopyCitationAction extends SimpleCommand {
 
     private void setClipBoardContent(List<String> citations) {
         // if it's not a citation style take care of the preview
-        if (!(style instanceof  CitationStylePreviewLayout)) {
+        if (!(style instanceof CitationStylePreviewLayout)) {
             clipBoardManager.setContent(processPreview(citations));
         } else {
             // if it's generated by a citation style take care of each output format
@@ -204,5 +205,4 @@ public class CopyCitationAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
     }
-
 }

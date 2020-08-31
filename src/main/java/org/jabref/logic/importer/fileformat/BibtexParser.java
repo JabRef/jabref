@@ -89,7 +89,7 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @param fileMonitor
-     * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
     public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
@@ -140,11 +140,7 @@ public class BibtexParser implements Parser {
 
         skipWhitespace();
 
-        try {
-            return parseFileContent();
-        } catch (KeyCollisionException kce) {
-            throw new IOException("Duplicate ID in bibtex file: " + kce);
-        }
+        return parseFileContent();
     }
 
     private void initializeParserResult() {
@@ -245,10 +241,7 @@ public class BibtexParser implements Parser {
             // store complete parsed serialization (comments, type definition + type contents)
             entry.setParsedSerialization(commentsAndEntryTypeDefinition + dumpTextReadSoFarToString());
 
-            boolean duplicateKey = database.insertEntry(entry);
-            if (duplicateKey) {
-                parserResult.addDuplicateKey(entry.getCiteKey());
-            }
+            database.insertEntry(entry);
         } catch (IOException ex) {
             // Trying to make the parser more robust.
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
@@ -265,8 +258,8 @@ public class BibtexParser implements Parser {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
             /* if we get an IO Exception here, than we have an unbracketed comment,
-            * which means that we should just return and the comment will be picked up as arbitrary text
-            *  by the parser
+             * which means that we should just return and the comment will be picked up as arbitrary text
+             *  by the parser
              */
             LOGGER.info("Found unbracketed comment");
             return;
@@ -275,7 +268,7 @@ public class BibtexParser implements Parser {
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0, Math.min(comment.length(), MetaData.META_FLAG.length())).equals(MetaData.META_FLAG)) {
 
-            if (comment.substring(0, MetaData.META_FLAG.length()).equals(MetaData.META_FLAG)) {
+            if (comment.startsWith(MetaData.META_FLAG)) {
                 String rest = comment.substring(MetaData.META_FLAG.length());
 
                 int pos = rest.indexOf(':');
@@ -305,7 +298,6 @@ public class BibtexParser implements Parser {
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
         }
-
     }
 
     private void parseBibtexString() throws IOException {
@@ -511,7 +503,6 @@ public class BibtexParser implements Parser {
     private String parsePreamble() throws IOException {
         skipWhitespace();
         return parseBracketedText();
-
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
@@ -574,7 +565,7 @@ public class BibtexParser implements Parser {
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
-                    //multiple keywords fields should be combined to one
+                    // multiple keywords fields should be combined to one
                     entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {
@@ -668,59 +659,59 @@ public class BibtexParser implements Parser {
 
         // Restore if possible:
         switch (currentChar) {
-        case '=':
-            // Get entryfieldname, push it back and take rest as key
-            key = key.reverse();
+            case '=':
+                // Get entryfieldname, push it back and take rest as key
+                key = key.reverse();
 
-            boolean matchedAlpha = false;
-            for (int i = 0; i < key.length(); i++) {
-                currentChar = key.charAt(i);
+                boolean matchedAlpha = false;
+                for (int i = 0; i < key.length(); i++) {
+                    currentChar = key.charAt(i);
 
-                /// Skip spaces:
-                if (!matchedAlpha && (currentChar == ' ')) {
-                    continue;
-                }
-                matchedAlpha = true;
-
-                // Begin of entryfieldname (e.g. author) -> push back:
-                unread(currentChar);
-                if ((currentChar == ' ') || (currentChar == '\n')) {
-
-                    /*
-                     * found whitespaces, entryfieldname completed -> key in
-                     * keybuffer, skip whitespaces
-                     */
-                    StringBuilder newKey = new StringBuilder();
-                    for (int j = i; j < key.length(); j++) {
-                        currentChar = key.charAt(j);
-                        if (!Character.isWhitespace(currentChar)) {
-                            newKey.append(currentChar);
-                        }
+                    /// Skip spaces:
+                    if (!matchedAlpha && (currentChar == ' ')) {
+                        continue;
                     }
+                    matchedAlpha = true;
 
-                    // Finished, now reverse newKey and remove whitespaces:
-                    key = newKey.reverse();
-                    parserResult.addWarning(
-                            Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
+                    // Begin of entryfieldname (e.g. author) -> push back:
+                    unread(currentChar);
+                    if ((currentChar == ' ') || (currentChar == '\n')) {
+
+                        /*
+                         * found whitespaces, entryfieldname completed -> key in
+                         * keybuffer, skip whitespaces
+                         */
+                        StringBuilder newKey = new StringBuilder();
+                        for (int j = i; j < key.length(); j++) {
+                            currentChar = key.charAt(j);
+                            if (!Character.isWhitespace(currentChar)) {
+                                newKey.append(currentChar);
+                            }
+                        }
+
+                        // Finished, now reverse newKey and remove whitespaces:
+                        key = newKey.reverse();
+                        parserResult.addWarning(
+                                Localization.lang("Line %0: Found corrupted citation key %1.", String.valueOf(line), key.toString()));
+                    }
                 }
-            }
-            break;
+                break;
 
-        case ',':
-            parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
-            break;
+            case ',':
+                parserResult.addWarning(
+                        Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
+                break;
 
-        case '\n':
-            parserResult.addWarning(
-                    Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
-            break;
+            case '\n':
+                parserResult.addWarning(
+                        Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
+                break;
 
-        default:
+            default:
 
-            // No more lookahead, give up:
-            unreadBuffer(key);
-            return "";
+                // No more lookahead, give up:
+                unreadBuffer(key);
+                return "";
         }
 
         return removeWhitespaces(key).toString();
@@ -794,10 +785,8 @@ public class BibtexParser implements Parser {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
                             + "allowed in bibtex keys.");
                 }
-
             }
         }
-
     }
 
     private String parseBracketedText() throws IOException {
@@ -832,7 +821,6 @@ public class BibtexParser implements Parser {
                 } else {
                     value.append(' ');
                 }
-
             } else {
                 value.append((char) character);
             }

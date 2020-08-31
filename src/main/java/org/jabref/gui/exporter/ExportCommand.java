@@ -51,12 +51,12 @@ public class ExportCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.loadForExportFromPreferences();
         XmpPreferences xmpPreferences = preferences.getXMPPreferences();
 
-        //Get list of exporters and sort before adding to file dialog
+        // Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
                                                         .sorted(Comparator.comparing(Exporter::getName))
                                                         .collect(Collectors.toList());

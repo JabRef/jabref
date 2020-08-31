@@ -69,17 +69,29 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public void removeFormatter(NameFormatterItemModel formatter) { formatterListProperty.remove(formatter); }
+    public void removeFormatter(NameFormatterItemModel formatter) {
+        formatterListProperty.remove(formatter);
+    }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public ListProperty<NameFormatterItemModel> formatterListProperty() { return formatterListProperty; }
+    public ListProperty<NameFormatterItemModel> formatterListProperty() {
+        return formatterListProperty;
+    }
 
-    public StringProperty addFormatterNameProperty() { return addFormatterNameProperty; }
+    public StringProperty addFormatterNameProperty() {
+        return addFormatterNameProperty;
+    }
 
-    public StringProperty addFormatterStringProperty() { return addFormatterStringProperty; }
+    public StringProperty addFormatterStringProperty() {
+        return addFormatterStringProperty;
+    }
 }

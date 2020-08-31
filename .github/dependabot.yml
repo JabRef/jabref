@@ -1,0 +1,25 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  labels:
+  - "type: dependencies"
+  ignore:
+  - dependency-name: com.microsoft.azure:applicationinsights-core
+    versions:
+    - ">= 2.5.a, <= 2.6.1" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+  - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
+    versions:
+    - ">= 2.5.a, <= 2.6.1" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+  - dependency-name: de.jensd:fontawesomefx-materialdesignfont
+    versions:
+    - "> 1.7.22-4" # Strange versioning format
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: weekly
+  labels:
+  - "type: dependencies"

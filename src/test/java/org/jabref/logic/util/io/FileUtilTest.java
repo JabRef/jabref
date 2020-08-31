@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class FileUtilTest {
-    private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
+    private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
     private LayoutFormatterPreferences layoutFormatterPreferences;
@@ -54,14 +53,14 @@ class FileUtilTest {
 
     @Test
     void extensionBakAddedCorrectly() {
-        assertEquals(Paths.get("demo.bib.bak"),
-                FileUtil.addExtension(Paths.get("demo.bib"), ".bak"));
+        assertEquals(Path.of("demo.bib.bak"),
+                FileUtil.addExtension(Path.of("demo.bib"), ".bak"));
     }
 
     @Test
     void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
-        assertEquals(Paths.get("tmp", "demo.bib.bak"),
-                FileUtil.addExtension(Paths.get("tmp", "demo.bib"), ".bak"));
+        assertEquals(Path.of("tmp", "demo.bib.bak"),
+                FileUtil.addExtension(Path.of("tmp", "demo.bib"), ".bak"));
     }
 
     @Test
@@ -152,22 +151,22 @@ class FileUtilTest {
 
     @Test
     void testGetFileExtensionSimpleFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.pdf")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Path.of("test.pdf")).get());
     }
 
     @Test
     void testGetFileExtensionMultipleDotsFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("te.st.PdF")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Path.of("te.st.PdF")).get());
     }
 
     @Test
     void testGetFileExtensionNoExtensionFile() {
-        assertFalse(FileHelper.getFileExtension(Paths.get("JustTextNotASingleDot")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Path.of("JustTextNotASingleDot")).isPresent());
     }
 
     @Test
     void testGetFileExtensionNoExtension2File() {
-        assertFalse(FileHelper.getFileExtension(Paths.get(".StartsWithADotIsNotAnExtension")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Path.of(".StartsWithADotIsNotAnExtension")).isPresent());
     }
 
     @Test
@@ -207,12 +206,12 @@ class FileUtilTest {
 
     @Test
     void uniquePathSubstrings() {
-        String[] pathArr = {Paths.get("C:/uniquefile.bib").toString(),
-                Paths.get("C:/downloads/filename.bib").toString(), Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("C:/external/mypaper/bib/filename.bib").toString(), ""};
-        String[] uniqArr = {Paths.get("uniquefile.bib").toString(), Paths.get("downloads/filename.bib").toString(),
-                Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("external/mypaper/bib/filename.bib").toString(), ""};
+        String[] pathArr = {Path.of("C:/uniquefile.bib").toString(),
+                Path.of("C:/downloads/filename.bib").toString(), Path.of("C:/mypaper/bib/filename.bib").toString(),
+                Path.of("C:/external/mypaper/bib/filename.bib").toString(), ""};
+        String[] uniqArr = {Path.of("uniquefile.bib").toString(), Path.of("downloads/filename.bib").toString(),
+                Path.of("C:/mypaper/bib/filename.bib").toString(),
+                Path.of("external/mypaper/bib/filename.bib").toString(), ""};
         List<String> paths = Arrays.asList(pathArr);
         List<String> uniqPath = Arrays.asList(uniqArr);
 
@@ -324,7 +323,7 @@ class FileUtilTest {
     void testRenameFileSuccessful(@TempDir Path otherTemporaryFolder) {
         // Be careful. This "otherTemporaryFolder" is the same as the "temporaryFolder"
         // in the @BeforeEach method.
-        Path temp = Paths.get(otherTemporaryFolder.resolve("123").toString());
+        Path temp = Path.of(otherTemporaryFolder.resolve("123").toString());
 
         System.out.println(temp);
         FileUtil.renameFile(existingTestFile, temp);
@@ -358,15 +357,25 @@ class FileUtilTest {
     @Test
     void testGetLinkedDirNameDefaultFullTitle() {
         // bibkey - title
-        String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
+        String fileDirPattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
         entry.setField(StandardField.YEAR, "1998");
         entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
 
-        assertEquals("PDF/1998/Åuthör/1234 - mytitle",
-                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("PDF/1998/Åuthör/1234 - mytitle", FileUtil.createDirNameFromPattern(null, entry, fileDirPattern));
+    }
+
+    @Test
+    void testGetLinkedDirNamePatternEmpty() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField(StandardField.TITLE, "mytitle");
+        entry.setField(StandardField.YEAR, "1998");
+        entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
+
+        assertEquals("", FileUtil.createDirNameFromPattern(null, entry, ""));
     }
 
     @Test

@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -33,7 +33,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = "file" + FilePreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -91,12 +91,12 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
         Objects.requireNonNull(globalPattern);
-        AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
+        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addBibtexKeyPattern);
+        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
         getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
 
         return bibtexKeyPattern;
@@ -108,7 +108,7 @@ public class MetaData {
      * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
      *                         is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
+    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();

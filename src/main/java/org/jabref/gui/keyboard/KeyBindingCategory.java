@@ -22,5 +22,4 @@ public enum KeyBindingCategory {
     public String getName() {
         return name;
     }
-
 }

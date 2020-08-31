@@ -83,23 +83,23 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String name, String lfFileName, String extension, LayoutFormatterPreferences layoutPreferences,
                             SavePreferences savePreferences) {
-        this(name, name, lfFileName, null, StandardFileType.newFileType(extension), layoutPreferences, savePreferences);
+        this(name, name, lfFileName, null, StandardFileType.fromExtensions(extension), layoutPreferences, savePreferences);
     }
 
     /**
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.
      *
-     * @param displayName Name to display to the user.
-     * @param consoleName Name to call this format in the console.
-     * @param lfFileName  Name of the main layout file.
-     * @param directory   Directory in which to find the layout file.
-     * @param extension   Should contain the . (for instance .txt).
+     * @param displayName       Name to display to the user.
+     * @param consoleName       Name to call this format in the console.
+     * @param lfFileName        Name of the main layout file.
+     * @param directory         Directory in which to find the layout file.
+     * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
-     * @param savePreferences Preferences for saving
+     * @param savePreferences   Preferences for saving
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
@@ -111,20 +111,18 @@ public class TemplateExporter extends Exporter {
         this.savePreferences = savePreferences;
     }
 
-
     /**
      * Initialize another export format based on templates stored in dir with
      * layoutFile lfFilename.
      * The display name is automatically derived from the FileType
      *
-     *
-     * @param consoleName Name to call this format in the console.
-     * @param lfFileName  Name of the main layout file.
-     * @param directory   Directory in which to find the layout file.
-     * @param extension   Should contain the . (for instance .txt).
+     * @param consoleName       Name to call this format in the console.
+     * @param lfFileName        Name of the main layout file.
+     * @param directory         Directory in which to find the layout file.
+     * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
-     * @param savePreferences Preferences for saving
-     * @param deleteBlankLines If blank lines should be remove (default: false)
+     * @param savePreferences   Preferences for saving
+     * @param deleteBlankLines  If blank lines should be remove (default: false)
      */
     public TemplateExporter(String consoleName, String lfFileName, String directory, StandardFileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
         this(consoleName, consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
@@ -198,7 +196,7 @@ public class TemplateExporter extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-            final Charset encoding, List<BibEntry> entries) throws Exception {
+                       final Charset encoding, List<BibEntry> entries) throws Exception {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
@@ -269,7 +267,6 @@ public class TemplateExporter extends Exporter {
                         if (layout != null) {
                             missingFormatters.addAll(layout.getMissingFormatters());
                         }
-
                     } catch (IOException ex) {
                         // The exception indicates that no type-specific layout
                         // exists, so we

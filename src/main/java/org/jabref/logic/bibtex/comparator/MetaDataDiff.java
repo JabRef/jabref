@@ -47,7 +47,7 @@ public class MetaDataDiff {
         if (!Objects.equals(originalMetaData.getSaveOrderConfig(), newMetaData.getSaveOrderConfig())) {
             changes.add(Localization.lang("Save sort order"));
         }
-        if (!Objects.equals(originalMetaData.getCiteKeyPattern(preferences.getKeyPattern()), newMetaData.getCiteKeyPattern(preferences.getKeyPattern()))) {
+        if (!Objects.equals(originalMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()), newMetaData.getCiteKeyPattern(preferences.getGlobalCitationKeyPattern()))) {
             changes.add(Localization.lang("Key patterns"));
         }
         if (!Objects.equals(originalMetaData.getUserFileDirectories(), newMetaData.getUserFileDirectories())) {

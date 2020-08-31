@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
@@ -31,7 +31,7 @@ import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.preview.PreviewPanel;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -49,13 +49,13 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final JabRefPreferences preferences;
     private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
-    private final JournalAbbreviationLoader journalAbbreviationLoader;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
     private PreviewPanel previewPanel;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private GridPane gridPane;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
+    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -64,7 +64,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.preferences = Objects.requireNonNull(preferences);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.journalAbbreviationLoader = Objects.requireNonNull(journalAbbreviationLoader);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -92,7 +92,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         List<Label> labels = new ArrayList<>();
         for (Field field : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
-                    journalAbbreviationLoader.getRepository(preferences.getJournalAbbreviationPreferences()),
+                    journalAbbreviationRepository,
                     preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
             fieldEditor.bindToEntry(entry);
 
@@ -196,7 +196,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         }
     }
 
-    protected abstract SortedSet<Field> determineFieldsToShow(BibEntry entry);
+    protected abstract Set<Field> determineFieldsToShow(BibEntry entry);
 
     public Collection<Field> getShownFields() {
         return fields;
