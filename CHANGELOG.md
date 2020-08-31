@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 ### Fixed
+- We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
 
 ### Removed
 
