@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -78,9 +79,7 @@ public class SaveDatabaseAction {
    public static void shutdown(BasePanel panel) {
 
    }
-   private void saveStart() {
-       var f = throttler.scheduleTask( ()  -> save());
-   }
+
 
    public static SaveDatabaseAction start(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
 
@@ -92,6 +91,7 @@ public class SaveDatabaseAction {
    }
 
     public boolean save() {
+
         return save(panel.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
     }
 
@@ -201,6 +201,20 @@ public class SaveDatabaseAction {
     }
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
+
+        var f = throttler.scheduleTask( ()  -> executeSave(targetPath, mode));
+        try {
+          return (boolean) f.get();
+        } catch (InterruptedException | ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
+
+
+    }
+
+    private boolean executeSave(Path targetPath, SaveDatabaseMode mode) {
         if (mode == SaveDatabaseMode.NORMAL) {
             dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
         }
@@ -235,6 +249,7 @@ public class SaveDatabaseAction {
         } finally {
             // release panel from save status
             panel.setSaving(false);
+
         }
     }
 
