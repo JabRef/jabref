@@ -131,8 +131,7 @@ public class BracketedPattern {
     }
 
     public String expand(BibEntry bibentry) {
-        BibDatabase null_database = null;
-        return expand(bibentry, null_database);
+        return expand(bibentry, null);
     }
 
     /**
