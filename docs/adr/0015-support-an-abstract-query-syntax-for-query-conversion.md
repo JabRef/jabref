@@ -21,20 +21,20 @@ For simplicitly, and lack of universal capabilities across fetchers, only basic 
 * All terms in the query are whitespace separated and will be ANDed
 * Default and certain fielded terms are supported
 * Fielded Terms:
-  * author
-  * title
-  * journal
-  * year (for single year)
-  * year-range (for range e.g. year-range:2012-2015)
-* The journal, year, and year-range fields should only be populated once in each query
+  * `author`
+  * `title`
+  * `journal`
+  * `year` (for single year)
+  * `year-range` (for range e.g. `year-range:2012-2015`)
+* The `journal`, `year`, and `year-range` fields should only be populated once in each query
 * Example:
-  * \[author:"Igor Steinmacher" author:"Christoph Treude" year:2017\] will be converted to
-  * \[author:"Igor Steinmacher" AND author:"Christoph Treude" AND year:2017\]
+  * `author:"Igor Steinmacher" author:"Christoph Treude" year:2017` will be converted to
+  * `author:"Igor Steinmacher" AND author:"Christoph Treude" AND year:2017`
 
 ### Positive Consequences
 
 * Already tested
-* Well Known
+* Well known
 * Easy to implement
 * Can use an existing parser
 

@@ -26,7 +26,7 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        // Default Implementation behaves like perform search using the default field phrases as query
+        // Default implementation behaves as performSearch using the default field phrases as query
         List<String> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
         return performSearch(String.join(" ", defaultPhrases));
     }
