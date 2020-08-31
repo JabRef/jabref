@@ -8,11 +8,9 @@ description: |
   The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
   To access files in external media (i.e. usb drives) you must run:
   `snap connect jabref:removable-media`
-
 grade: stable
 confinement: strict
 base: core18
-license: MIT
 architectures:
   - build-on: amd64
 
