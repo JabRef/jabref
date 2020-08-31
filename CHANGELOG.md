@@ -16,6 +16,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We restructured the 'File' tab and related tabs in the preferences dialog into a new 'Import and Export' tab and 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
+
 ### Fixed
 
 ### Removed
