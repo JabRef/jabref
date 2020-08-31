@@ -30,17 +30,6 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
-    private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
-    private final BooleanProperty resolveStringsBibTexProperty = new SimpleBooleanProperty();
-    private final BooleanProperty resolveStringsAllProperty = new SimpleBooleanProperty();
-    private final StringProperty resolveStringsExceptProperty = new SimpleStringProperty("");
-    private final ListProperty<NewLineSeparator> newLineSeparatorListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
-    private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
-
-    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
-
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
     private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
     private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
@@ -85,17 +74,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
-        noWrapFilesProperty.setValue(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
-        resolveStringsAllProperty.setValue(preferences.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS)); // Flipped around
-        resolveStringsBibTexProperty.setValue(!resolveStringsAllProperty.getValue());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        newLineSeparatorListProperty.setValue(FXCollections.observableArrayList(NewLineSeparator.values()));
-        selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
-        alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
-
-        autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
-
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(initialFilePreferences.getFileDirectory().orElse(Path.of("")).toString());
         useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.isBibLocationAsPrimary());
@@ -122,20 +100,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        // -> Export preferences
-        preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
-        if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
-            preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
-        }
-        preferences.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAllProperty.getValue());
-        preferences.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, resolveStringsExceptProperty.getValue().trim());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        preferences.storeNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
-
-        // Autosave
-        preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
-
         // External files preferences / Attached files preferences / File preferences
         preferences.storeFilePreferences(new FilePreferences(
                 initialFilePreferences.getUser(),
@@ -186,45 +150,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(mainFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
                      .ifPresent(f -> mainFileDirectoryProperty.setValue(f.toString()));
-    }
-
-    // General
-
-    public BooleanProperty openLastStartupProperty() {
-        return openLastStartupProperty;
-    }
-
-    public StringProperty noWrapFilesProperty() {
-        return noWrapFilesProperty;
-    }
-
-    public BooleanProperty resolveStringsBibTexProperty() {
-        return resolveStringsBibTexProperty;
-    }
-
-    public BooleanProperty resolveStringsAllProperty() {
-        return resolveStringsAllProperty;
-    }
-
-    public StringProperty resolvStringsExceptProperty() {
-        return resolveStringsExceptProperty;
-    }
-
-    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() {
-        return newLineSeparatorListProperty;
-    }
-
-    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() {
-        return selectedNewLineSeparatorProperty;
-    }
-
-    public BooleanProperty alwaysReformatBibProperty() {
-        return alwaysReformatBibProperty;
-    }
-
-    // Autosave
-    public BooleanProperty autosaveLocalLibrariesProperty() {
-        return autosaveLocalLibraries;
     }
 
     // External file links
