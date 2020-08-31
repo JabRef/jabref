@@ -40,10 +40,9 @@ jobs:
           ./gradlew generateJournalAbbreviationList
           ls -la $GITHUB_WORKSPACE/src/main/resources/journals
           git diff
-          git add .
           git config user.email "jabrefmail+webfeedback@gmail.com"
           git config user.name "GitHub Actions"
-          git commit -m"Update journalList.mv"
+          git add . && git commit -m"Update journalList.mv"
 #      - uses: ad-m/github-push-action@master
 #        with:
 #          github_token: ${{ secrets.GITHUB_TOKEN }}
