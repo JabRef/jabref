@@ -17,12 +17,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-- We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
-
-### Removed
-
-
-## [5.1] – 2020-08-27
 ### Removed
 
 
