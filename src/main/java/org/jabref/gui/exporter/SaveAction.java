@@ -31,10 +31,11 @@ public class SaveAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
-                                                                       frame.getCurrentBasePanel(),
-                                                                       Globals.prefs,
-                                                                       Globals.entryTypesManager);
+
+        SaveDatabaseAction saveDatabaseAction = SaveDatabaseAction.start(frame.getCurrentBasePanel(),
+                                                                         Globals.prefs,
+                                                                         Globals.entryTypesManager);
+
         switch (saveMethod) {
             case SAVE:
                 saveDatabaseAction.save();
