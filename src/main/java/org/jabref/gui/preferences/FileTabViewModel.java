@@ -20,7 +20,7 @@ import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.NewLineSeparator;
 import org.jabref.preferences.PreferencesService;
 
-public class ImportExportTabViewModel implements PreferenceTabViewModel {
+public class FileTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();
     private final StringProperty noWrapFilesProperty = new SimpleStringProperty("");
@@ -52,7 +52,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
     private final SaveOrderConfig initialExportOrder;
     private final ImportExportPreferences initialImportExportPreferences;
 
-    ImportExportTabViewModel(PreferencesService preferences) {
+    FileTabViewModel(PreferencesService preferences) {
         this.preferences = preferences;
         this.initialExportOrder = preferences.loadExportSaveOrder();
         this.initialImportExportPreferences = preferences.getImportExportPreferences();

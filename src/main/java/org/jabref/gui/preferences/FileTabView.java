@@ -23,7 +23,7 @@ import org.jabref.preferences.NewLineSeparator;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ImportExportTabView extends AbstractPreferenceTabView<ImportExportTabViewModel> implements PreferencesTab {
+public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
@@ -38,7 +38,7 @@ public class ImportExportTabView extends AbstractPreferenceTabView<ImportExportT
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    public ImportExportTabView(JabRefPreferences preferences) {
+    public FileTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -47,7 +47,7 @@ public class ImportExportTabView extends AbstractPreferenceTabView<ImportExportT
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(preferences);
+        this.viewModel = new FileTabViewModel(preferences);
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
@@ -83,7 +83,7 @@ public class ImportExportTabView extends AbstractPreferenceTabView<ImportExportT
 
     @Override
     public String getTabName() {
-        return Localization.lang("Import and Export");
+        return Localization.lang("File");
     }
 
     @Override
