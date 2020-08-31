@@ -250,6 +250,10 @@ public interface PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
+    boolean shouldOpenLastFilesOnStartup();
+
+    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
+
     NewLineSeparator getNewLineSeparator();
 
     void storeNewLineSeparator(NewLineSeparator newLineSeparator);
@@ -261,6 +265,14 @@ public interface PreferencesService {
     AutoLinkPreferences getAutoLinkPreferences();
 
     void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
+
+    ImportExportPreferences getImportExportPreferences();
+
+    void storeImportExportPreferences(ImportExportPreferences importExportPreferences);
+
+    boolean getShouldAutosave();
+
+    void storeShouldAutosave(boolean shouldAutosave);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences

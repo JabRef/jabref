@@ -16,8 +16,9 @@ import javafx.collections.FXCollections;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.NewLineSeparator;
+import org.jabref.preferences.PreferencesService;
 
 public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
@@ -47,25 +48,28 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
+    private final SaveOrderConfig initialExportOrder;
+    private final ImportExportPreferences initialImportExportPreferences;
 
-    ImportExportTabViewModel(JabRefPreferences preferences) {
+    ImportExportTabViewModel(PreferencesService preferences) {
         this.preferences = preferences;
+        this.initialExportOrder = preferences.loadExportSaveOrder();
+        this.initialImportExportPreferences = preferences.getImportExportPreferences();
     }
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
-        noWrapFilesProperty.setValue(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
-        resolveStringsAllProperty.setValue(preferences.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS)); // Flipped around
-        resolveStringsBibTexProperty.setValue(!resolveStringsAllProperty.getValue());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
+
+        noWrapFilesProperty.setValue(initialImportExportPreferences.getNonWrappableFields());
+        resolveStringsAllProperty.setValue(initialImportExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
+        resolveStringsBibTexProperty.setValue(initialImportExportPreferences.shouldResolveStringsForStandardBibtexFields());
+        resolveStringsExceptProperty.setValue(initialImportExportPreferences.getNonResolvableFields());
         newLineSeparatorListProperty.setValue(FXCollections.observableArrayList(NewLineSeparator.values()));
-        selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
+        selectedNewLineSeparatorProperty.setValue(initialImportExportPreferences.getNewLineSeparator());
 
-        alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
-
-        SaveOrderConfig initialExportOrder = preferences.loadExportSaveOrder();
+        alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
 
         if (initialExportOrder.saveInOriginalOrder()) {
             saveInOriginalProperty.setValue(true);
@@ -88,21 +92,21 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
         saveSecondaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(1).descending);
         saveTertiaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(2).descending);
 
-        autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+        autosaveLocalLibraries.setValue(preferences.getShouldAutosave());
     }
 
     @Override
     public void storeSettings() {
+        preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
-        preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
-        if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
-            preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
-        }
-        preferences.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAllProperty.getValue());
-        preferences.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, resolveStringsExceptProperty.getValue().trim());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        preferences.storeNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
+        ImportExportPreferences newImportExportPreferences = new ImportExportPreferences(
+                noWrapFilesProperty.getValue().trim(),
+                resolveStringsBibTexProperty.getValue(),
+                resolveStringsAllProperty.getValue(),
+                resolveStringsExceptProperty.getValue().trim(),
+                selectedNewLineSeparatorProperty.getValue(),
+                alwaysReformatBibProperty.getValue());
+        preferences.storeImportExportPreferences(newImportExportPreferences);
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 saveInOriginalProperty.getValue(),
@@ -118,7 +122,7 @@ public class ImportExportTabViewModel implements PreferenceTabViewModel {
                         saveTertiaryDescPropertySelected.getValue()));
         preferences.storeExportSaveOrder(newSaveOrderConfig);
 
-        preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
+        preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
 
     @Override

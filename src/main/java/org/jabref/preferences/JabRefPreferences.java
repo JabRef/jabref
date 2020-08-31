@@ -985,7 +985,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Clear all preferences.
      *
-     * @throws BackingStoreException
+     * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
      */
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
@@ -1962,19 +1962,18 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(GENERATE_KEYS_BEFORE_SAVING, preferences.shouldGenerateCiteKeysBeforeSaving());
 
         switch (preferences.getKeySuffix()) {
-            case ALWAYS:
+            case ALWAYS -> {
                 putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, true);
                 putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-                break;
-            case SECOND_WITH_A:
+            }
+            case SECOND_WITH_A -> {
                 putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
                 putBoolean(KEY_GEN_FIRST_LETTER_A, true);
-                break;
-            default:
-            case SECOND_WITH_B:
+            }
+            case SECOND_WITH_B -> {
                 putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, false);
                 putBoolean(KEY_GEN_FIRST_LETTER_A, false);
-                break;
+            }
         }
 
         put(KEY_PATTERN_REGEX, preferences.getKeyPatternRegex());
@@ -2272,6 +2271,16 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public boolean shouldOpenLastFilesOnStartup() {
+        return getBoolean(OPEN_LAST_EDITED);
+    }
+
+    @Override
+    public void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup) {
+        putBoolean(OPEN_LAST_EDITED, openLastFilesOnStartup);
+    }
+
+    @Override
     public NewLineSeparator getNewLineSeparator() {
         return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
     }
@@ -2366,21 +2375,50 @@ public class JabRefPreferences implements PreferencesService {
     public void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences) {
         // Starts bibtex only omitted, as it is not being saved
         switch (autoLinkPreferences.getCitationKeyDependency()) {
-            default:
-            case START:
+            case START -> {
                 putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-                break;
-            case EXACT:
+            }
+            case EXACT -> {
                 putBoolean(AUTOLINK_EXACT_KEY_ONLY, true);
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-                break;
-            case REGEX:
+            }
+            case REGEX -> {
                 putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
-                break;
+            }
         }
         put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autoLinkPreferences.getRegularExpression());
+    }
+
+    @Override
+    public ImportExportPreferences getImportExportPreferences() {
+        return new ImportExportPreferences(
+                get(JabRefPreferences.NON_WRAPPABLE_FIELDS),
+                !getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
+                getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
+                get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR),
+                getNewLineSeparator(),
+                getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
+    }
+
+    @Override
+    public void storeImportExportPreferences(ImportExportPreferences importExportPreferences) {
+        put(JabRefPreferences.NON_WRAPPABLE_FIELDS, importExportPreferences.getNonWrappableFields());
+        putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, importExportPreferences.shouldResolveStringsForAllStrings());
+        put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, importExportPreferences.getNonResolvableFields());
+        storeNewLineSeparator(importExportPreferences.getNewLineSeparator());
+        putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, importExportPreferences.shouldAlwaysReformatOnSave());
+    }
+
+    @Override
+    public boolean getShouldAutosave() {
+        return getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+    }
+
+    @Override
+    public void storeShouldAutosave(boolean shouldAutosave) {
+        putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, shouldAutosave);
     }
 
     //*************************************************************************************************************
