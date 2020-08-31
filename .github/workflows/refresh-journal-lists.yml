@@ -41,6 +41,7 @@ jobs:
           git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
           cd abbrv.jabref.org
           rm journals/journal_abbreviations_ieee.csv
+          touch journals/journal_abbreviations_ieee.csv
           mkdir ../journal-lists
           ./combine_journal_lists_dots.py /tmp/journal-lists/journalList.csv
           # ./combine_journal_lists_dotless.py /tmp/journal-lists/journalList_dotless.csv
