@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added a query parser and mapping layer to enable conversion of queries formulated in simplified lucene syntax by the user into api queries. [#6799](https://github.com/JabRef/jabref/pull/6799)
+
 ### Changed
 
 ### Fixed
