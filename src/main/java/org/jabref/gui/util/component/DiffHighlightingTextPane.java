@@ -11,7 +11,6 @@ public class DiffHighlightingTextPane extends TextFlow {
 
     private static final String CONTENT_TYPE = "text/html";
 
-
     public DiffHighlightingTextPane() {
         super();
 //        setContentType(CONTENT_TYPE);
@@ -22,5 +21,4 @@ public class DiffHighlightingTextPane extends TextFlow {
 //        sheet.addRule(CHANGE_STYLE);
 //        setEditable(false);
     }
-
 }

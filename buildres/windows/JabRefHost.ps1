@@ -11,7 +11,7 @@ function Respond($response) {
     }
 }
 
-$jabRefExe = [System.IO.Path]::Combine($PSScriptRoot, "JabRef.exe")
+$jabRefExe = [System.IO.Path]::Combine($PSScriptRoot, "runtime\\bin\\JabRef.bat")
 
 try {
     $reader = New-Object System.IO.BinaryReader([System.Console]::OpenStandardInput())
@@ -37,9 +37,10 @@ try {
     #$wshell = New-Object -ComObject Wscript.Shell
     #$wshell.Popup($message.Text,0,"JabRef", 0x0 + 0x30)
 
-    $messageText = $message.Text
-    $output = & $jabRefExe -importBibtex "$messageText" 2>&1
-    #$output = & echoargs -importBibtex $messageText 2>&1
+    $messageText = $message.Text.replace("`n"," ").replace("`r"," ")
+    $output = & $jabRefExe -importBibtex "$messageText" *>&1
+    #$output = "$messageText"
+    #$wshell = New-Object -ComObject Wscript.Shell
     #$wshell.Popup($output,0,"JabRef", 0x0 + 0x30)
     return Respond @{message="ok";output="$output"}
 } finally {

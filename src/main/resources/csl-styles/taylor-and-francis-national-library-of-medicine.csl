@@ -14,7 +14,7 @@
     <category field="medicine"/>
     <category field="generic-base"/>
     <summary>NLM style as used by T &amp; F : Brackets, no et-al, no issue numbers, locators in text possible.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-05-14T22:06:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -94,7 +94,7 @@
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
         <group suffix="." delimiter=" ">
-          <text variable="container-title" form="short"/>
+          <text variable="container-title" form="short" strip-periods="true"/>
           <choose>
             <if variable="URL">
               <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>

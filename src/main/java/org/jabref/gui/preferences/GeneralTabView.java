@@ -15,6 +15,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
@@ -31,7 +32,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
-    @FXML private CheckBox enforceLegalKeys;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
@@ -60,23 +60,33 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     }
 
     @Override
-    public String getTabName() { return Localization.lang("General"); }
+    public String getTabName() {
+        return Localization.lang("General");
+    }
 
     public void initialize() {
         this.viewModel = new GeneralTabViewModel(dialogService, preferences);
 
+        new ViewModelListCellFactory<Language>()
+                .withText(Language::getDisplayName)
+                .install(language);
         language.itemsProperty().bind(viewModel.languagesListProperty());
         language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());
 
+        new ViewModelListCellFactory<Charset>()
+                .withText(Charset::displayName)
+                .install(defaultEncoding);
         defaultEncoding.itemsProperty().bind(viewModel.encodingsListProperty());
         defaultEncoding.valueProperty().bindBidirectional(viewModel.selectedEncodingProperty());
 
+        new ViewModelListCellFactory<BibDatabaseMode>()
+                .withText(BibDatabaseMode::getFormattedName)
+                .install(biblatexMode);
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
         biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
 
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
-        enforceLegalKeys.selectedProperty().bindBidirectional(viewModel.enforceLegalKeysProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());

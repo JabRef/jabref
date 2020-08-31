@@ -18,7 +18,7 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -56,11 +56,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private final GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private final GlobalCitationKeyPattern globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalBibtexKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -73,7 +73,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
      *
-     * @param event {@link EntryAddedEvent} object
+     * @param event {@link EntriesAddedEvent} object
      */
     @Subscribe
     public void listen(EntriesAddedEvent event) {
@@ -82,12 +82,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
-            List<BibEntry> entries = event.getBibEntries();
-            for (BibEntry entry : entries) {
-                dbmsProcessor.insertEntry(entry);
+            dbmsProcessor.insertEntries(event.getBibEntries());
             }
         }
-    }
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
@@ -280,7 +277,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Synchronizes all shared meta data.
      */
-    private void synchronizeSharedMetaData(MetaData data, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPattern globalCiteKeyPattern) {
         if (!checkCurrentConnection()) {
             return;
         }
@@ -299,15 +296,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
-            // synchronize only if changes were present
-            if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData).isEmpty()) {
-                try {
+            try {
+                // synchronize only if changes were present
+                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData).isEmpty()) {
                     dbmsProcessor.updateEntry(bibEntry);
-                } catch (OfflineLockException exception) {
-                    eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-                } catch (SQLException e) {
-                    LOGGER.error("SQL Error: ", e);
                 }
+            } catch (OfflineLockException exception) {
+                eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
+            } catch (SQLException e) {
+                LOGGER.error("SQL Error: ", e);
             }
         }
     }

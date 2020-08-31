@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.BibField;
@@ -16,12 +15,12 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 /**
  * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
  */
-public class NoBibtexFieldChecker implements Checker {
+public class NoBibtexFieldChecker implements EntryChecker {
 
     private Set<Field> getAllBiblatexOnlyFields() {
-        Set<BibField> allBibtexFields = BibtexEntryTypeDefinitions.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
+        Set<BibField> allBibtexFields = BibtexEntryTypeDefinitions.ALL.stream().flatMap(type -> type.getAllBibFields().stream()).collect(Collectors.toSet());
         return BiblatexEntryTypeDefinitions.ALL.stream()
-                                               .flatMap(type -> type.getAllFields().stream())
+                                               .flatMap(type -> type.getAllBibFields().stream())
                                                .filter(field -> !allBibtexFields.contains(field))
                                                .map(BibField::getField)
                                                // these fields are displayed by JabRef as default

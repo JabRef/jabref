@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.jabref.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
@@ -31,43 +32,51 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void setUp() throws SQLException {
         connection.createStatement().executeUpdate(
-                                                   "CREATE TABLE IF NOT EXISTS \"ENTRY\" (" +
-                                                   "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
-                                                   "\"TYPE\" VARCHAR, " +
-                                                   "\"VERSION\" INTEGER DEFAULT 1)");
+                "CREATE TABLE IF NOT EXISTS \"ENTRY\" (" +
+                        "\"SHARED_ID\" SERIAL PRIMARY KEY, " +
+                        "\"TYPE\" VARCHAR, " +
+                        "\"VERSION\" INTEGER DEFAULT 1)");
 
         connection.createStatement().executeUpdate(
-                                                   "CREATE TABLE IF NOT EXISTS \"FIELD\" (" +
-                                                   "\"ENTRY_SHARED_ID\" INTEGER REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE, " +
-                                                   "\"NAME\" VARCHAR, " +
-                                                   "\"VALUE\" TEXT)");
+                "CREATE TABLE IF NOT EXISTS \"FIELD\" (" +
+                        "\"ENTRY_SHARED_ID\" INTEGER REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE, " +
+                        "\"NAME\" VARCHAR, " +
+                        "\"VALUE\" TEXT)");
 
         connection.createStatement().executeUpdate(
-                                                   "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
-                                                   + "\"KEY\" VARCHAR,"
-                                                   + "\"VALUE\" TEXT)");
+                "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
+                        + "\"KEY\" VARCHAR,"
+                        + "\"VALUE\" TEXT)");
     }
 
     @Override
-    protected void insertIntoEntryTable(BibEntry bibEntry) {
-        // Inserting into ENTRY table
+    protected void insertIntoEntryTable(List<BibEntry> bibEntries) {
         StringBuilder insertIntoEntryQuery = new StringBuilder()
-                                                                .append("INSERT INTO ")
-                                                                .append(escape("ENTRY"))
-                                                                .append("(")
-                                                                .append(escape("TYPE"))
-                                                                .append(") VALUES(?)");
-
-        // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
+                .append("INSERT INTO ")
+                .append(escape("ENTRY"))
+                .append("(")
+                .append(escape("TYPE"))
+                .append(") VALUES(?)");
+        // Number of commas is bibEntries.size() - 1
+        for (int i = 0; i < bibEntries.size() - 1; i++) {
+            insertIntoEntryQuery.append(", (?)");
+        }
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                                                                                    Statement.RETURN_GENERATED_KEYS)) {
-
-            preparedEntryStatement.setString(1, bibEntry.getType().getName());
+                Statement.RETURN_GENERATED_KEYS)) {
+            for (int i = 0; i < bibEntries.size(); i++) {
+                preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
+            }
             preparedEntryStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
+                // The following assumes that we get the generated keys in the order the entries were inserted
+                // This should be the case
+                for (BibEntry bibEntry : bibEntries) {
+                    generatedKeys.next();
+                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1));
+                }
                 if (generatedKeys.next()) {
-                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
+                    LOGGER.error("Error: Some shared IDs left unassigned");
                 }
             }
         } catch (SQLException e) {
@@ -83,7 +92,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         // Disable cleanup output of ThreadedHousekeeper
-        //Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
+        // Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
         try {
             connection.createStatement().execute("LISTEN jabrefLiveUpdate");
             // Do not use `new PostgresSQLNotificationListener(...)` as the object has to exist continuously!
@@ -91,7 +100,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             PGConnection pgConnection = connection.unwrap(PGConnection.class);
             listener = new PostgresSQLNotificationListener(dbmsSynchronizer, pgConnection);
             JabRefExecutorService.INSTANCE.execute(listener);
-
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }

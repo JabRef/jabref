@@ -62,6 +62,7 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
         icon.setGraphic(viewModel.getIcon());
 
         defaultApplication.selectedProperty().bindBidirectional(viewModel.defaultApplicationSelectedProperty());
+        customApplication.selectedProperty().bindBidirectional(viewModel.customApplicationSelectedProperty());
         selectedApplication.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
         btnBrowse.disableProperty().bind(viewModel.defaultApplicationSelectedProperty());
 
@@ -75,5 +76,4 @@ public class EditExternalFileTypeEntryDialog extends BaseDialog<Void> {
     private void openFileChooser(ActionEvent event) {
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> viewModel.selectedApplicationProperty().setValue(path.toAbsolutePath().toString()));
     }
-
 }

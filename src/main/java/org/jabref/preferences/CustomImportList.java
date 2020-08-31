@@ -22,7 +22,6 @@ public class CustomImportList extends TreeSet<CustomImporter> {
 
     private final JabRefPreferences prefs;
 
-
     public CustomImportList(JabRefPreferences prefs) {
         super();
         this.prefs = prefs;
@@ -59,7 +58,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
      * one is replaced.</p>
      *
      * @param customImporter new (version of an) importer
-     * @return  if the importer was contained
+     * @return if the importer was contained
      */
     public boolean replaceImporter(CustomImporter customImporter) {
         boolean wasContained = this.remove(customImporter);

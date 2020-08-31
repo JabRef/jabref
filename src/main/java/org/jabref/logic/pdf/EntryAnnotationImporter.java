@@ -33,8 +33,8 @@ public class EntryAnnotationImporter {
      */
     private List<LinkedFile> getFilteredFileList() {
         return entry.getFiles().stream()
-                .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
-                .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
+                    .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
+                    .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
     }
 
     /**
@@ -47,7 +47,7 @@ public class EntryAnnotationImporter {
         Map<Path, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
 
-        //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
+        // import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
         for (LinkedFile linkedFile : this.getFilteredFileList()) {
             linkedFile.findIn(databaseContext, filePreferences)
                       .ifPresent(file -> annotations.put(file, importer.importAnnotations(file)));

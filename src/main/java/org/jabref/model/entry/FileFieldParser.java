@@ -22,10 +22,9 @@ public class FileFieldParser {
             if (!escaped && (c == '\\')) {
                 escaped = true;
                 continue;
-            }
-            // Check if we are entering an XML special character construct such
-            // as "&#44;", because we need to know in order to ignore the semicolon.
-            else if (!escaped && (c == '&') && !inXmlChar) {
+            } else if (!escaped && (c == '&') && !inXmlChar) {
+                // Check if we are entering an XML special character construct such
+                // as "&#44;", because we need to know in order to ignore the semicolon.
                 sb.append(c);
                 if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
                     inXmlChar = true;

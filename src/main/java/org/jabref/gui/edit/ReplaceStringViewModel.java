@@ -30,7 +30,6 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
     private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
-
     public ReplaceStringViewModel(BasePanel basePanel) {
         Objects.requireNonNull(basePanel);
         this.panel = basePanel;

@@ -176,7 +176,7 @@ public class SidePaneManager {
     /**
      * Helper class for sorting visible components based on their preferred position.
      */
-    private class PreferredIndexSort implements Comparator<SidePaneComponent> {
+    private static class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
         private final Map<SidePaneType, Integer> preferredPositions;
 

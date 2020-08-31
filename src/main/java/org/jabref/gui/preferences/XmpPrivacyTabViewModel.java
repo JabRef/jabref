@@ -21,6 +21,7 @@ import org.jabref.preferences.JabRefPreferences;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
@@ -32,7 +33,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    private FunctionBasedValidator xmpFilterListValidator;
+    private Validator xmpFilterListValidator;
 
     XmpPrivacyTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
         this.dialogService = dialogService;
@@ -42,7 +43,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
                 xmpFilterListProperty,
                 input -> input.size() > 0,
                 ValidationMessage.error(String.format("%s > %s %n %n %s",
-                        Localization.lang("XMP-metadata"),
+                        Localization.lang("XMP metadata"),
                         Localization.lang("Filter List"),
                         Localization.lang("List must not be empty."))));
     }
@@ -53,7 +54,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         xmpFilterListProperty.clear();
         List<Field> xmpFilters = preferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS)
-                .stream().map(FieldFactory::parseField).collect(Collectors.toList());
+                                            .stream().map(FieldFactory::parseField).collect(Collectors.toList());
         xmpFilterListProperty.addAll(xmpFilters);
 
         availableFieldsProperty.clear();
@@ -64,8 +65,8 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     public void storeSettings() {
         preferences.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, xmpFilterEnabledProperty.getValue());
         preferences.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, xmpFilterListProperty.getValue().stream()
-                        .map(Field::getName)
-                        .collect(Collectors.toList()));
+                                                                                              .map(Field::getName)
+                                                                                              .collect(Collectors.toList()));
     }
 
     public void addField() {
@@ -99,14 +100,23 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty xmpFilterEnabledProperty() { return xmpFilterEnabledProperty; }
+    public BooleanProperty xmpFilterEnabledProperty() {
+        return xmpFilterEnabledProperty;
+    }
 
-    public ListProperty<Field> filterListProperty() { return xmpFilterListProperty; }
+    public ListProperty<Field> filterListProperty() {
+        return xmpFilterListProperty;
+    }
 
-    public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
+    public ListProperty<Field> availableFieldsProperty() {
+        return availableFieldsProperty;
+    }
 
-    public ObjectProperty<Field> addFieldNameProperty() { return addFieldProperty; }
-
+    public ObjectProperty<Field> addFieldNameProperty() {
+        return addFieldProperty;
+    }
 }

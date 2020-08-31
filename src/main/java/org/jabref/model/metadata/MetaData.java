@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
@@ -33,7 +33,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = "file" + FilePreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -91,12 +91,12 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
         Objects.requireNonNull(globalPattern);
-        AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
+        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addBibtexKeyPattern);
+        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
         getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
 
         return bibtexKeyPattern;
@@ -108,7 +108,7 @@ public class MetaData {
      * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
      *                         is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
+    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
@@ -216,16 +216,16 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<Path> getLaTexFileDirectory(String user) {
+    public Optional<Path> getLatexFileDirectory(String user) {
         return Optional.ofNullable(laTexFileDirectory.get(user));
     }
 
-    public void setLaTexFileDirectory(String user, Path path) {
+    public void setLatexFileDirectory(String user, Path path) {
         laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
         postChange();
     }
 
-    public void clearLaTexFileDirectory(String user) {
+    public void clearLatexFileDirectory(String user) {
         laTexFileDirectory.remove(user);
         postChange();
     }
@@ -294,7 +294,7 @@ public class MetaData {
         }
     }
 
-    private Optional<String> getDefaultCiteKeyPattern() {
+    public Optional<String> getDefaultCiteKeyPattern() {
         return Optional.ofNullable(defaultCiteKeyPattern);
     }
 
@@ -306,7 +306,7 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, Path> getLaTexFileDirectories() {
+    public Map<String, Path> getLatexFileDirectories() {
         return Collections.unmodifiableMap(laTexFileDirectory);
     }
 
@@ -314,7 +314,7 @@ public class MetaData {
         return Collections.unmodifiableMap(unkownMetaData);
     }
 
-    public void putUnkownMetaDataItem(String key, List<String> value) {
+    public void putUnknownMetaDataItem(String key, List<String> value) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
@@ -330,14 +330,16 @@ public class MetaData {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected) && Objects.equals(groupsRoot, metaData.groupsRoot)
+        return (isProtected == metaData.isProtected)
+                && Objects.equals(groupsRoot, metaData.groupsRoot)
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, metaData.userFileDirectory)
-               && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
+                && Objects.equals(laTexFileDirectory, metaData.laTexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
+                && Objects.equals(saveActions, metaData.saveActions)
+                && (mode == metaData.mode)
                 && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
                 && Objects.equals(contentSelectors, metaData.contentSelectors);
     }

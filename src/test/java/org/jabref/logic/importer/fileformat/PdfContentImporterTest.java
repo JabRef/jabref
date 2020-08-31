@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -42,14 +41,14 @@ class PdfContentImporterTest {
 
     @Test
     void doesNotHandleEncryptedPdfs() throws Exception {
-        Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void importTwiceWorksAsExpected() throws Exception {
-        Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
+        Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings);

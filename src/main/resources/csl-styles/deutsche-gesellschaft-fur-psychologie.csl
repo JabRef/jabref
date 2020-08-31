@@ -118,9 +118,12 @@
     <choose>
       <if type="report thesis" match="any">
         <text variable="title" font-style="italic" suffix="."/>
-        <group prefix=" " suffix=".">
+        <group prefix=" " suffix="." delimiter=" ">
           <text variable="genre"/>
-          <text variable="number" prefix=" No. "/>
+          <group delimiter=" ">
+            <text term="issue" form="short"/>
+            <text variable="number"/>
+          </group>
         </group>
       </if>
       <else-if type="bill book graphic legislation motion_picture report song" match="any">

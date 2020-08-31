@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtexkeypattern.BracketedPattern;
+import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -71,7 +71,7 @@ public class FileUtil {
 
     /**
      * Returns a valid filename for most operating systems.
-     *
+     * <p>
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
      */
     public static String getValidFileName(String fileName) {
@@ -216,9 +216,10 @@ public class FileUtil {
      * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
      * possible.
      * <p>
-     * This method works correctly only if directories are sorted decent in their length i.e. /home/user/literature/important before /home/user/literature.
+     * This method works correctly only if directories are sorted decent in their length i.e.
+     * /home/user/literature/important before /home/user/literature.
      *
-     * @param file the file to be shortened
+     * @param file        the file to be shortened
      * @param directories directories to check
      */
     public static Path relativize(Path file, List<Path> directories) {
@@ -246,9 +247,9 @@ public class FileUtil {
         Objects.requireNonNull(fileDirs);
 
         return bes.stream()
-                .flatMap(entry -> entry.getFiles().stream())
-                .flatMap(file -> OptionalUtil.toStream(file.findIn(fileDirs)))
-                .collect(Collectors.toList());
+                  .flatMap(entry -> entry.getFiles().stream())
+                  .flatMap(file -> OptionalUtil.toStream(file.findIn(fileDirs)))
+                  .collect(Collectors.toList());
     }
 
     /**
@@ -266,28 +267,29 @@ public class FileUtil {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
 
-        //Removes illegal characters from filename
+        // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
 
     /**
-     * Determines filename provided by an entry in a database
+     * Determines directory name provided by an entry in a database
      *
      * @param database        the database, where the entry is located
-     * @param entry           the entry to which the file should be linked to
-     * @param fileNamePattern the filename pattern
-     * @return a suggested fileName
+     * @param entry           the entry to which the directory should be linked to
+     * @param directoryNamePattern the dirname pattern
+     * @return a suggested dirName
      */
-    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String directoryNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(directoryNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
-            targetName = entry.getCiteKeyOptional().orElse("default");
+            return targetName;
         }
 
-        //Removes illegal characters from filename
+        // Removes illegal characters from directory name
         targetName = FileNameCleaner.cleanDirectoryName(targetName);
+
         return targetName;
     }
 
@@ -326,8 +328,8 @@ public class FileUtil {
     }
 
     /**
-     * Creates a string representation of the given path that should work on all systems.
-     * This method should be used when a path needs to be stored in the bib file or preferences.
+     * Creates a string representation of the given path that should work on all systems. This method should be used
+     * when a path needs to be stored in the bib file or preferences.
      */
     public static String toPortableString(Path path) {
         return path.toString()
@@ -336,11 +338,11 @@ public class FileUtil {
 
     /**
      * Test if the file is a bib file by simply checking the extension to be ".bib"
+     *
      * @param file The file to check
      * @return True if file extension is ".bib", false otherwise
      */
-    public static boolean isBibFile(Path file)
-    {
+    public static boolean isBibFile(Path file) {
         return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
     }
 }

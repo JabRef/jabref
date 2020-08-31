@@ -7,13 +7,13 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * JabRef internal fields
+ * JabRef internal fields. These are not normal fields but mostly place holders with special functions.
  */
 public enum InternalField implements Field {
-    OWNER("owner"),
-    TIMESTAMP("timestamp", FieldProperty.DATE),
-    GROUPS("groups"),
     KEY_FIELD("bibtexkey"),
+    /**
+     * field which indicates the entrytype
+     */
     TYPE_HEADER("entrytype"),
     OBSOLETE_TYPE_HEADER("bibtextype"),
     MARKED_INTERNAL("__markedentry"), // used in old versions of JabRef. Currently used for conversion only

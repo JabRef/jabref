@@ -15,12 +15,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -51,6 +51,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
 
@@ -65,22 +66,14 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
-            case "Books":
-                entry.setType(StandardEntryType.Book);
-                break;
-            case "Conferences":
-                entry.setType(StandardEntryType.InProceedings);
-                break;
-            case "Courses":
-                entry.setType(StandardEntryType.Misc);
-                break;
-            default:
-                entry.setType(StandardEntryType.Article);
-                break;
+            case "Books" -> entry.setType(StandardEntryType.Book);
+            case "Conferences" -> entry.setType(StandardEntryType.InProceedings);
+            case "Courses" -> entry.setType(StandardEntryType.Misc);
+            default -> entry.setType(StandardEntryType.Article);
         }
 
         entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
-        //entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
+        // entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
 
         final List<String> authors = new ArrayList<>();
         JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
@@ -88,10 +81,10 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             JSONObject author = (JSONObject) authorPure;
             authors.add(author.optString("full_name"));
         });
-        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, String.join(" and ", authors));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
-        entry.setField(StandardField.YEAR,jsonEntry.optString("publication_year"));
+        entry.setField(StandardField.YEAR, jsonEntry.optString("publication_year"));
         entry.setField(StandardField.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
@@ -113,7 +106,11 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
+        try {
+            entry.addFile(new LinkedFile(new URL(jsonEntry.optString("pdf_url")), "PDF"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("Fetched PDF URL String is malformed.");
+        }
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
         entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
@@ -141,13 +138,12 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
                 stampString = STAMP_BASE_STRING_DOCUMENT + docId;
             }
 
-            //You get this url if you export bibtex from IEEE
+            // You get this url if you export bibtex from IEEE
             Matcher stampMatcher = STAMP_PATTERN.matcher(urlString.get());
             if (stampMatcher.find()) {
                 // Found it
                 stampString = stampMatcher.group(1);
             }
-
         }
 
         // If not, try DOI
@@ -156,7 +152,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
-                //We don't need to modify the cookies, but we need support for them
+                // We don't need to modify the cookies, but we need support for them
                 urlDownload.getCookieFromUrl();
 
                 String resolvedDOIPage = urlDownload.asString();
@@ -176,7 +172,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         // Download the HTML page containing a frame with the PDF
         URLDownload urlDownload = new URLDownload(BASE_URL + stampString);
-        //We don't need to modify the cookies, but we need support for them
+        // We don't need to modify the cookies, but we need support for them
         urlDownload.getCookieFromUrl();
 
         String framePage = urlDownload.asString();
@@ -196,9 +192,9 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", "86wnawtvtc986d3wtnqynm8c");
+        uriBuilder.addParameter("apikey", API_KEY);
         uriBuilder.addParameter("querytext", query);
 
         URLDownload.bypassSSLVerification();
@@ -234,5 +230,30 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", API_KEY);
+        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
+            uriBuilder.addParameter("querytext", String.join(" AND ", complexSearchQuery.getDefaultFieldPhrases()));
+        }
+        if (!complexSearchQuery.getAuthors().isEmpty()) {
+            uriBuilder.addParameter("author", String.join(" AND ", complexSearchQuery.getAuthors()));
+        }
+        if (!complexSearchQuery.getAuthors().isEmpty()) {
+            uriBuilder.addParameter("article_title", String.join(" AND ", complexSearchQuery.getTitlePhrases()));
+        }
+        complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
+        complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
+        complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
+        complexSearchQuery.getSingleYear().map(String::valueOf).ifPresent(year -> {
+            uriBuilder.addParameter("start_year", year);
+            uriBuilder.addParameter("end_year", year);
+        });
+
+        URLDownload.bypassSSLVerification();
+        return uriBuilder.build().toURL();
     }
 }

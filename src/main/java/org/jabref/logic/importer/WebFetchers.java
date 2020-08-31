@@ -7,11 +7,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.ACS;
+import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CiteSeer;
+import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
@@ -27,6 +29,7 @@ import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
+import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
@@ -90,7 +93,8 @@ public class WebFetchers {
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
-        set.add(new ACMPortalFetcher(importFormatPreferences));
+        // see https://github.com/JabRef/jabref/issues/5804
+        // set.add(new ACMPortalFetcher(importFormatPreferences));
         set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher());
@@ -98,6 +102,8 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
+        set.add(new CompositeSearchBasedFetcher(set, 30));
+        set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         return set;
     }
 
@@ -118,6 +124,7 @@ public class WebFetchers {
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
+        set.add(new Medra());
         return set;
     }
 
@@ -137,8 +144,8 @@ public class WebFetchers {
     /**
      * @return sorted set containing id fetchers
      */
-    public static SortedSet<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
-        SortedSet<IdFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+    public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new CrossRef());
         set.add(new ArXiv(importFormatPreferences));
         return set;
@@ -157,6 +164,7 @@ public class WebFetchers {
         fetchers.add(new ACS());
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new ApsFetcher());
         // Meta search
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());

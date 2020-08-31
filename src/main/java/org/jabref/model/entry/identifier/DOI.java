@@ -2,6 +2,7 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -14,16 +15,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for working with Digital object identifiers (DOIs) and Short DOIs
- *
- * @see https://en.wikipedia.org/wiki/Digital_object_identifier
- * @see http://shortdoi.org
+ * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers
+ * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
+
+    public static final URI AGENCY_RESOLVER = URI.create("https://doi.org/doiRA");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
     // DOI/Short DOI resolver
     private static final URI RESOLVER = URI.create("https://doi.org");
+
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -119,8 +122,8 @@ public class DOI implements Identifier {
     }
 
     /**
-     * Creates an Optional<DOI> from various schemes including URL, URN, and plain DOIs.
-     *
+     * Creates an Optional&lt;DOI> from various schemes including URL, URN, and plain DOIs.
+     * <p>
      * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor and checking for
      * Optional.isPresent() instead.
      *
@@ -230,4 +233,25 @@ public class DOI implements Identifier {
     public String getNormalized() {
         return doi;
     }
+
+    /**
+     * DOIs are case-insensitive. Thus, 10.1109/cloud.2017.89 equals 10.1109/CLOUD.2017.89
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+        DOI other = (DOI) o;
+        return doi.equalsIgnoreCase(other.doi);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
+    }
+
 }

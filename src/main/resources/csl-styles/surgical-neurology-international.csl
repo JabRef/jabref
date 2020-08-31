@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
     <title>Surgical Neurology International</title>
+    <title-short>SNI</title-short>
     <id>http://www.zotero.org/styles/surgical-neurology-international</id>
     <link href="http://www.zotero.org/styles/surgical-neurology-international" rel="self"/>
     <link href="http://www.zotero.org/styles/journal-of-neurosurgery" rel="template"/>
-    <link href="http://surgicalneurologyinternational.com/docs/Author_Instructions.pdf" rel="documentation"/>
+    <link href="https://surgicalneurologyint.com/submit-article/" rel="documentation"/>
+    <link href="http://surgicalneurologyint.com/wp-content/uploads/2018/12/Author_Instructions.pdf" rel="documentation"/>
     <author>
       <name>Pieter Kubben</name>
       <email>pieter@kubben.nl</email>
@@ -16,7 +18,7 @@
     <issn>2229-5097</issn>
     <eissn>2152-7806</eissn>
     <summary>Style for Surgical Neurology International, the open-acccess journal for neurosurgery and clinical neuroscience.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2019-12-23T14:40:52+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -47,7 +49,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
+      <if type="webpage post post-weblog">
         <text value="Available:" suffix=" "/>
         <text variable="URL" suffix="."/>
         <group prefix=" ">
@@ -120,7 +122,7 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="7" et-al-use-first="6">
+  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
     <sort>
       <key macro="author-sort"/>
       <key variable="title"/>
@@ -163,13 +165,12 @@
           <text macro="title" prefix=" " suffix=". "/>
           <group delimiter=":">
             <group delimiter=" ">
-              <text variable="container-title" form="short"/>
+              <text variable="container-title" form="short" strip-periods="true"/>
               <text macro="cite-date" suffix=";"/>
               <text variable="volume"/>
             </group>
             <group delimiter=", ">
               <text variable="page" suffix="."/>
-              <!-- <text variable="DOI"/> -->
             </group>
           </group>
         </else>

@@ -46,5 +46,4 @@ class StringAddChangeViewModel extends DatabaseChangeViewModel {
         );
         return container;
     }
-
 }

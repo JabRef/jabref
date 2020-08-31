@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,34 +72,37 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToSuggestedName() throws IOException {
-        return renameToName(getSuggestedFileName());
+        return renameToName(getSuggestedFileName(), false);
     }
 
-    public boolean renameToName(String targetFileName) throws IOException {
+    public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
         Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
         if (!oldFile.isPresent()) {
-            // Could not find file
             return false;
         }
 
-        Path newPath = oldFile.get().resolveSibling(targetFileName);
+        final Path oldPath = oldFile.get();
+        final Path newPath = oldPath.resolveSibling(targetFileName);
 
-        String expandedOldFilePath = oldFile.get().toString();
+        String expandedOldFilePath = oldPath.toString();
         boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                                        && !newPath.toString().equals(expandedOldFilePath);
+                && !newPath.toString().equals(expandedOldFilePath);
 
-        if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
-            // We do not overwrite files
-            // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
-            // nonetheless rename files to a new name which just differs by case.
-            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldFile.get(), newPath);
+        // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+        // nonetheless rename files to a new name which just differs by case.
+        if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
+            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
             return false;
+        }
+
+        if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
+            Files.createDirectories(newPath.getParent());
+            LOGGER.debug("Overwriting existing file {}", newPath);
+            Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
         } else {
             Files.createDirectories(newPath.getParent());
+            Files.move(oldPath, newPath);
         }
-
-        // Rename
-        Files.move(oldFile.get(), newPath);
 
         // Update path
         fileEntry.setLink(relativize(newPath));
@@ -120,8 +124,8 @@ public class LinkedFileHandler {
 
     public String getSuggestedFileName(String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim()
-                                + '.'
-                                + extension;
+                + '.'
+                + extension;
 
         // Only create valid file names
         return FileUtil.getValidFileName(targetFileName);
@@ -138,8 +142,8 @@ public class LinkedFileHandler {
         Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
                                      .get().getParent().resolve(targetFileName);
         Path oldFilePath = flEntry.findIn(databaseContext, filePreferences).get();
-        //Check if file already exists in directory with different case.
-        //This is necessary because other entries may have such a file.
+        // Check if file already exists in directory with different case.
+        // This is necessary because other entries may have such a file.
         Optional<Path> matchedByDiffCase = Optional.empty();
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream.filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))

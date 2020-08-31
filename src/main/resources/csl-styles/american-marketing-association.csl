@@ -5,8 +5,8 @@
     <title-short>AMA</title-short>
     <id>http://www.zotero.org/styles/american-marketing-association</id>
     <link href="http://www.zotero.org/styles/american-marketing-association" rel="self"/>
-    <link href="https://www.ama.org/publications/JournalOfMarketing/Documents/AMA_Reference_Style.pdf" rel="documentation"/>
-    <link href="https://www.ama.org/publications/JournalOfMarketingResearch/Documents/AMA_Reference_Style.pdf" rel="documentation"/>
+    <link href="https://www.ama.org/submission-guidelines-journal-of-marketing/" rel="documentation"/>
+    <link href="https://www.ama.org/american-marketing-association-journals-reference-style-examples/" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -14,11 +14,14 @@
       <name>Rintze Zelle</name>
       <uri>http://twitter.com/rintzezelle</uri>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <category field="communications"/>
     <summary>AMA Reference List Style published by the American Marketing Association</summary>
-    <updated>2014-10-17T21:46:29+00:00</updated>
+    <updated>2020-07-27T14:58:51+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -189,7 +192,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" entry-spacing="0" subsequent-author-substitute="&#8212;&#8212;&#8212;" subsequent-author-substitute-rule="partial-each">
+  <bibliography subsequent-author-substitute-rule="partial-each" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key variable="issued"/>

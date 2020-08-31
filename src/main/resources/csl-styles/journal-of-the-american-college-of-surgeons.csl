@@ -14,8 +14,9 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>1072-7515</issn>
+    <eissn>1879-1190</eissn>
     <summary>Journal of the American College of surgeons</summary>
-    <updated>2014-06-05T04:18:55+00:00</updated>
+    <updated>2020-06-11T10:06:59+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -41,7 +42,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
+      <if type="webpage post post-weblog" match="any">
         <text value="Available at:" suffix=" "/>
         <text variable="URL" suffix="."/>
         <group prefix=" ">
@@ -56,33 +57,15 @@
     </choose>
   </macro>
   <macro name="title">
-    <choose>
-      <if type="article-journal article-magazine article-newspaper book" match="any">
-        <text variable="title" suffix=". "/>
-        <choose>
-          <if variable="URL">
-            <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
-          </if>
-        </choose>
-        <text macro="edition" prefix=". "/>
-      </if>
-      <else-if type="chapter">
-        <text variable="title" suffix=", "/>
-      </else-if>
-    </choose>
+    <text variable="title"/>
   </macro>
   <macro name="container-title">
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
-        <group suffix="" delimiter=" ">
-          <text variable="container-title" form="short"/>
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
+        <group delimiter=". ">
+          <text variable="container-title" form="short" strip-periods="true"/>
+          <text macro="edition" prefix=" "/>
         </group>
-        <text macro="edition" prefix=" "/>
       </if>
       <else>
         <text variable="container-title" suffix="" form="short"/>
@@ -122,13 +105,13 @@
       <text macro="author"/>
       <choose>
         <if type="article-journal article-magazine article-newspaper" match="any">
-          <group suffix=".">
+          <group delimiter=". ">
             <text macro="title" prefix=" " suffix="."/>
             <text macro="container-title"/>
             <text macro="edition" prefix=" "/>
           </group>
           <text prefix=" " macro="publisher"/>
-          <group suffix="." prefix="; ">
+          <group prefix=" " suffix=".">
             <date variable="issued">
               <date-part name="year"/>
             </date>
@@ -137,17 +120,19 @@
           </group>
         </if>
         <else-if type="chapter paper-conference book" match="any">
-          <text macro="title" prefix=" " suffix="."/>
-          <group prefix=" ">
-            <text term="in" text-case="capitalize-first" suffix=": "/>
-            <text macro="editor"/>
+          <group delimiter=". ">
+            <text macro="title" prefix=" "/>
+            <group delimiter=": " prefix=" ">
+              <text term="in" text-case="capitalize-first"/>
+              <text macro="editor"/>
+            </group>
             <text variable="container-title" prefix=" " suffix="."/>
             <text variable="volume" prefix="Vol " suffix="."/>
             <text macro="edition" prefix=" "/>
             <text variable="collection-title" prefix=" " suffix="."/>
-            <group suffix=".">
+            <group delimiter="; " suffix=".">
               <text macro="publisher" prefix=" "/>
-              <group suffix="." prefix=", ">
+              <group>
                 <date variable="issued">
                   <date-part name="year"/>
                 </date>

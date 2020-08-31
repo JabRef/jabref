@@ -40,24 +40,28 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     /**
      * Runs the formatter on the specified field in the given entry.
-     *
+     * <p>
      * If the formatter returns an empty string, then the field is removed.
+     *
      * @param fieldKey the field on which to run the formatter
-     * @param entry the entry to be cleaned up
+     * @param entry    the entry to be cleaned up
      * @return a list of changes of the entry
      */
     private List<FieldChange> cleanupSingleField(Field fieldKey, BibEntry entry) {
         if (!entry.hasField(fieldKey)) {
             // Not set -> nothing to do
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         String oldValue = entry.getField(fieldKey).orElse(null);
 
         // Run formatter
         String newValue = formatter.format(oldValue);
+        if (formatter instanceof NormalizeNewlinesFormatter) {
+            newValue = oldValue;
+        }
 
         if (oldValue.equals(newValue)) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         } else {
             if (newValue.isEmpty()) {
                 entry.clearField(fieldKey);

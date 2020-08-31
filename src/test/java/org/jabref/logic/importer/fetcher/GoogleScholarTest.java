@@ -6,9 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class GoogleScholarTest {
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -31,8 +32,8 @@ class GoogleScholarTest {
     @BeforeEach
     void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+                mock(FieldContentFormatterPreferences.class));
         finder = new GoogleScholar(importFormatPreferences);
         entry = new BibEntry();
     }
@@ -51,7 +52,7 @@ class GoogleScholarTest {
     @Test
     @DisabledOnCIServer("CI server is blocked by Google")
     void noLinkFound() throws IOException, FetcherException {
-        entry.setField(StandardField.TITLE, "Pro WF: Windows Workflow in NET 3.5");
+        entry.setField(StandardField.TITLE, "Curriculum programme of career-oriented java specialty guided by principles of software engineering");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
@@ -77,6 +78,21 @@ class GoogleScholarTest {
     void findManyEntries() throws FetcherException {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
-        assertEquals(10, foundEntries.size());
+        assertEquals(20, foundEntries.size());
+    }
+
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return finder;
+    }
+
+    @Override
+    public List<String> getTestAuthors() {
+        return List.of("Mittermeier", "Myers");
+    }
+
+    @Override
+    public String getTestJournal() {
+        return "Nature";
     }
 }

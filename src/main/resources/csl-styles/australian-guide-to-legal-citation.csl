@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Support for the development of the CSL style was provided by the Faculty of Law, University of Technology Sydney. The AGLC is published by the University of Melbourne Faculty of Law.</summary>
-    <updated>2018-09-03T17:14:48+00:00</updated>
+    <updated>2020-07-09T03:49:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -23,6 +23,14 @@
       <term name="editor" form="verb-short">ed.</term>
       <term name="translator" form="verb-short">tr.</term>
       <term name="editortranslator" form="verb-short">ed. and tr.</term>
+      <!--Ordinals' in superscript-->
+      <term name="ordinal">ᵗʰ</term>
+      <term name="ordinal-01">ˢᵗ</term>
+      <term name="ordinal-02">ⁿᵈ</term>
+      <term name="ordinal-03">ʳᵈ</term>
+      <term name="ordinal-11">ᵗʰ</term>
+      <term name="ordinal-12">ᵗʰ</term>
+      <term name="ordinal-13">ᵗʰ</term>
     </terms>
   </locale>
   <!--Authors and Persons-->
@@ -98,7 +106,7 @@
       <else-if type="patent">
         <text macro="patent"/>
       </else-if>
-      <else>
+      <else-if type="bill legal_case legislation" match="none">
         <names variable="author">
           <name delimiter-precedes-last="never" and="text" delimiter=", " initialize="false" initialize-with="" form="short"/>
           <substitute>
@@ -107,7 +115,7 @@
             <text macro="title"/>
           </substitute>
         </names>
-      </else>
+      </else-if>
     </choose>
   </macro>
   <macro name="author">
@@ -200,7 +208,7 @@
   <macro name="title-short">
     <choose>
       <if type="book legislation webpage thesis motion_picture manuscript legal_case" match="any">
-        <text variable="title-short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic" text-case="title"/>
       </if>
       <else>
         <text variable="title" quotes="true" text-case="title" form="short"/>
@@ -390,17 +398,14 @@
           </choose>
           <choose>
             <if type="article-newspaper">
-              <group delimiter=" ">
+              <group delimiter=", ">
+                <text variable="publisher-place"/>
                 <choose>
                   <if variable="URL">
                     <text term="online"/>
-                    <text term="at"/>
                   </if>
                 </choose>
-                <group delimiter=", ">
-                  <text variable="publisher-place"/>
-                  <text macro="issued-full"/>
-                </group>
+                <text macro="issued-full"/>
               </group>
             </if>
             <else-if type="legislation bill" match="any">
@@ -750,7 +755,6 @@
           </group>
           <text variable="references"/>
           <text macro="URL"/>
-          <text macro="title-short-flag" quotes="true" prefix="(" suffix=")"/>
         </group>
       </group>
     </layout>

@@ -18,8 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents the Application Version with the major and minor number, the full Version String and if it's a developer
- * version
+ * Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
  */
 public class Version {
 
@@ -29,8 +28,9 @@ public class Version {
     private static final Version UNKNOWN_VERSION = new Version();
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
-    private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
+    private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
+    private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
 
     private String fullVersion = BuildInfo.UNKNOWN_VERSION;
     private int major = -1;
@@ -46,8 +46,7 @@ public class Version {
     }
 
     /**
-     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?}
-     *                (e.g., 3.3; 3.4-dev)
+     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
      * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
     public static Version parse(String version) {
@@ -57,6 +56,10 @@ public class Version {
         }
 
         Version parsedVersion = new Version();
+
+        // remove "-ci.1" suffix
+        Matcher ciSuffixMatcher = CI_SUFFIX_PATTERN.matcher(version);
+        version = ciSuffixMatcher.replaceAll("");
 
         parsedVersion.fullVersion = version;
         Matcher matcher = VERSION_PATTERN.matcher(version);
@@ -277,7 +280,7 @@ public class Version {
             } else if (stage.equals(BETA.stage)) {
                 return BETA;
             }
-            LOGGER.warn("Unknown development stage: " + stage);
+            LOGGER.warn("Unknown development stage: {}", stage);
             return UNKNOWN;
         }
 

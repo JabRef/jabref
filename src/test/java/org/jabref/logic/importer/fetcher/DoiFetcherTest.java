@@ -21,7 +21,9 @@ import static org.mockito.Mockito.mock;
 public class DoiFetcherTest {
 
     private DoiFetcher fetcher;
-    private BibEntry bibEntryBurd2011, bibEntryDecker2007;
+    private BibEntry bibEntryBurd2011;
+    private BibEntry bibEntryDecker2007;
+    private BibEntry bibEntryIannarelli2019;
 
     @BeforeEach
     public void setUp() {
@@ -47,16 +49,30 @@ public class DoiFetcherTest {
         bibEntryDecker2007.setField(StandardField.TITLE, "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies");
         bibEntryDecker2007.setField(StandardField.YEAR, "2007");
         bibEntryDecker2007.setField(StandardField.DOI, "10.1109/icws.2007.59");
+
+        // mEDRA BibEntry
+        bibEntryIannarelli2019 = new BibEntry(StandardEntryType.Article)
+                                                                        .withField(StandardField.AUTHOR,
+                                                                                   ""
+                                                                                                         + "Iannarelli Riccardo  and "
+                                                                                                         + "Novello Anna  and "
+                                                                                                         + "Stricker Damien  and "
+                                                                                                         + "Cisternino Marco  and "
+                                                                                                         + "Gallizio Federico  and "
+                                                                                                         + "Telib Haysam  and "
+                                                                                                         + "Meyer Thierry ")
+                                                                        .withField(StandardField.PUBLISHER, "AIDIC: Italian Association of Chemical Engineering")
+                                                                        .withField(StandardField.TITLE, "Safety in research institutions: how to better communicate the risks using numerical simulations")
+                                                                        .withField(StandardField.YEAR, "2019")
+                                                                        .withField(StandardField.DOI, "10.3303/CET1977146")
+                                                                        .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
+                                                                        .withField(StandardField.PAGES, "871-876")
+                                                                        .withField(StandardField.VOLUME, "77");
     }
 
     @Test
     public void testGetName() {
         assertEquals("DOI", fetcher.getName());
-    }
-
-    @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-publication-identifiers/doitobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test
@@ -69,6 +85,12 @@ public class DoiFetcherTest {
     public void testPerformSearchDecker2007() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/ICWS.2007.59");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchIannarelli2019() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.3303/CET1977146");
+        assertEquals(Optional.of(bibEntryIannarelli2019), fetchedEntry);
     }
 
     @Test

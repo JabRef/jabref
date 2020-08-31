@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import org.jabref.model.Defaults;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -33,6 +35,7 @@ class MoveFilesCleanupTest {
     private MoveFilesCleanup cleanup;
     private BibEntry entry;
     private FilePreferences filePreferences;
+    private BibDatabaseContext databaseContext;
 
     @BeforeEach
     void setUp(@TempDir Path bibFolder) throws IOException {
@@ -48,9 +51,9 @@ class MoveFilesCleanupTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(defaultFileFolder.toAbsolutePath().toString());
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData);
         Files.createFile(bibFolder.resolve("test.bib"));
-        databaseContext.setDatabaseFile(bibFolder.resolve("test.bib"));
+        databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -60,7 +63,7 @@ class MoveFilesCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.isBibLocationAsPrimary()).thenReturn(false); //Biblocation as Primary overwrites all other dirs, therefore we set it to false here
+        when(filePreferences.isBibLocationAsPrimary()).thenReturn(false); // Biblocation as Primary overwrites all other dirs, therefore we set it to false here
         cleanup = new MoveFilesCleanup(databaseContext, filePreferences);
     }
 
@@ -109,6 +112,19 @@ class MoveFilesCleanupTest {
     }
 
     @Test
+    void doesNotMoveFileWithEmptyFileDirPattern() throws Exception {
+        when(filePreferences.getFileDirPattern()).thenReturn("");
+        cleanup.cleanup(entry);
+
+        Path fileAfter = defaultFileFolder.resolve("test.pdf");
+        assertEquals(
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "test.pdf", ""))),
+                entry.getField(StandardField.FILE));
+        assertFalse(Files.exists(fileBefore));
+        assertTrue(Files.exists(fileAfter));
+    }
+
+    @Test
     void movesFileWithSubdirectoryPattern() throws Exception {
         when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
@@ -119,5 +135,13 @@ class MoveFilesCleanupTest {
                 entry.getField(StandardField.FILE));
         assertFalse(Files.exists(fileBefore));
         assertTrue(Files.exists(fileAfter));
+    }
+
+    @Test
+    void movesFileWithNoDirectory() throws Exception {
+        databaseContext.setMetaData(new MetaData());
+        when(filePreferences.getFileDirPattern()).thenReturn("");
+        List<FieldChange> changes = cleanup.cleanup(entry);
+        assertEquals(Collections.emptyList(), changes);
     }
 }

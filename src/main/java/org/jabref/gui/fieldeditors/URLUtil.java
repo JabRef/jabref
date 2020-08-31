@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -48,12 +47,12 @@ public class URLUtil {
             // extract url parameter
             String[] pairs = query.split("&");
 
-            for (String pair: pairs) {
+            for (String pair : pairs) {
                 // "clean" url is decoded value of "url" parameter
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf('=') + 1);
 
-                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
+                    String decode = URLDecoder.decode(value, StandardCharsets.UTF_8);
                     // url?
                     if (decode.matches(URL_EXP)) {
                         return decode;
@@ -61,13 +60,14 @@ public class URLUtil {
                 }
             }
             return url;
-        } catch (UnsupportedEncodingException | MalformedURLException e) {
+        } catch (MalformedURLException e) {
             return url;
         }
     }
 
     /**
      * Checks whether the given String is a URL.
+     * <p>
      * Currently only checks for a protocol String.
      *
      * @param url the String to check for a URL
@@ -79,6 +79,7 @@ public class URLUtil {
 
     /**
      * Look for the last '.' in the link, and return the following characters.
+     * <p>
      * This gives the extension for most reasonably named links.
      *
      * @param link The link

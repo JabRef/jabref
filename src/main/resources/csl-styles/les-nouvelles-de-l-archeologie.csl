@@ -54,8 +54,8 @@
       <name and="symbol" name-as-sort-order="all" font-variant="small-caps" sort-separator=" " delimiter=", " delimiter-precedes-last="never" initialize-with="."/>
       <label form="short" prefix=" "/>
       <substitute>
-          <names variable="editor" />
-          <names variable="editorial-director"/>
+        <names variable="editor"/>
+        <names variable="editorial-director"/>
       </substitute>
     </names>
   </macro>

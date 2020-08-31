@@ -53,4 +53,14 @@ public class SpringerLinkTest {
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
+
+    @Test
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.PUBLISHER, finder.getTrustLevel());
+    }
 }

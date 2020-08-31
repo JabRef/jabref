@@ -155,7 +155,7 @@ class ModsExporter extends Exporter {
             context = JAXBContext.newInstance(ModsCollectionDefinition.class);
         }
         Marshaller marshaller = context.createMarshaller();
-        //format the output
+        // format the output
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
 
@@ -164,7 +164,7 @@ class ModsExporter extends Exporter {
     }
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
-            ModsDefinition mods) {
+                                                    ModsDefinition mods) {
 
         relatedItem.getModsGroup().add(partDefinition);
         relatedItem.setAtType("host");
@@ -208,7 +208,7 @@ class ModsExporter extends Exporter {
 
     private void addLocation(ModsDefinition mods, String value) {
         LocationDefinition locationDefinition = new LocationDefinition();
-        //There can be more than one location
+        // There can be more than one location
         String[] locations = value.split(", ");
         for (String location : locations) {
             PhysicalLocationDefinition physicalLocation = new PhysicalLocationDefinition();
@@ -290,7 +290,7 @@ class ModsExporter extends Exporter {
             name.setAtType("personal");
             NamePartDefinition namePart = new NamePartDefinition();
             if (author.contains(",")) {
-                //if author contains ","  then this indicates that the author has a forename and family name
+                // if author contains ","  then this indicates that the author has a forename and family name
                 int commaIndex = author.indexOf(',');
                 String familyName = author.substring(0, commaIndex);
                 namePart.setAtType("family");
@@ -300,7 +300,7 @@ class ModsExporter extends Exporter {
                         NamePartDefinition.class, namePart);
                 name.getNamePartOrDisplayFormOrAffiliation().add(element);
 
-                //now take care of the forenames
+                // now take care of the forenames
                 String forename = author.substring(commaIndex + 1);
                 String[] forenames = forename.split(" ");
                 for (String given : forenames) {
@@ -315,7 +315,7 @@ class ModsExporter extends Exporter {
                 }
                 mods.getModsGroup().add(name);
             } else {
-                //no "," indicates that there should only be a family name
+                // no "," indicates that there should only be a family name
                 namePart.setAtType("family");
                 namePart.setValue(author);
                 JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"),
@@ -390,12 +390,12 @@ class ModsExporter extends Exporter {
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
         } else if (field.equals(StandardField.ADDRESS)) {
             PlaceDefinition placeDefinition = new PlaceDefinition();
-            //There can be more than one place, so we split to get all places and add them
+            // There can be more than one place, so we split to get all places and add them
             String[] places = value.split(", ");
             for (String place : places) {
                 PlaceTermDefinition placeTerm = new PlaceTermDefinition();
-                //There's no possibility to see from a bib entry whether it is code or text, but since it is in the bib entry
-                //we assume that it is text
+                // There's no possibility to see from a bib entry whether it is code or text, but since it is in the bib entry
+                // we assume that it is text
                 placeTerm.setType(CodeOrText.TEXT);
                 placeTerm.setValue(place);
                 placeDefinition.getPlaceTerm().add(placeTerm);

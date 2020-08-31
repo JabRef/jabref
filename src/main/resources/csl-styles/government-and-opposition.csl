@@ -14,7 +14,7 @@
     <category field="humanities"/>
     <issn>0017-257X</issn>
     <eissn>1477-7053</eissn>
-    <updated>2018-08-27T15:55:20+00:00</updated>
+    <updated>2020-02-13T16:43:07+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -156,7 +156,7 @@
       </if>
       <else>
         <choose>
-          <if variable="DOI">
+          <if type="article-journal">
             <text variable="DOI" prefix="https://doi.org/"/>
           </if>
           <else>
@@ -188,7 +188,7 @@
       <if type="book dataset graphic manuscript motion_picture report song speech thesis" match="any">
         <choose>
           <if variable="version" type="book" match="all">
-            <text variable="title"/>
+            <text variable="title" text-case="title"/>
           </if>
           <else>
             <text variable="title" font-style="italic"/>
@@ -199,7 +199,7 @@
         <choose>
           <if variable="reviewed-title">
             <group delimiter=" ">
-              <text variable="title"/>
+              <text variable="title" text-case="title"/>
               <group delimiter=", " prefix="[" suffix="]">
                 <text variable="reviewed-title" font-style="italic" prefix="Review of "/>
                 <names variable="reviewed-author" delimiter=", ">
@@ -211,7 +211,7 @@
           </if>
           <else>
             <group delimiter=", " prefix="[" suffix="]">
-              <text variable="title" font-style="italic" prefix="Review of "/>
+              <text variable="title" text-case="title" font-style="italic" prefix="Review of "/>
               <names variable="reviewed-author" delimiter=", ">
                 <label form="verb-short" suffix=" "/>
                 <name and="text" initialize-with=". " delimiter=", "/>
@@ -224,7 +224,7 @@
         <text macro="patent-number" font-style="italic"/>
       </else-if>
       <else>
-        <text variable="title"/>
+        <text variable="title" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -618,7 +618,7 @@
         <text variable="container-title" font-style="italic" text-case="title"/>
       </if>
       <else-if type="bill legal_case legislation" match="none">
-        <text variable="container-title" font-style="italic"/>
+        <text variable="container-title" text-case="title" font-style="italic"/>
       </else-if>
     </choose>
   </macro>
@@ -706,7 +706,7 @@
               <text macro="issued" prefix=" (" suffix=")"/>
             </else>
           </choose>
-          <text macro="title-plus-extra"/>
+          <text macro="title-plus-extra" suffix="."/>
           <text macro="container"/>
         </group>
         <text macro="legal-cites"/>

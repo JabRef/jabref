@@ -12,7 +12,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
@@ -49,15 +48,16 @@ public class JabRefGUI {
         this.bibDatabases = databases;
         this.isBlank = isBlank;
         this.correctedWindowPos = false;
+
         mainFrame = new JabRefFrame(mainStage);
 
         openWindow(mainStage);
-        new VersionWorker(Globals.BUILD_INFO.getVersion(), Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
+        new VersionWorker(Globals.BUILD_INFO.version, Globals.prefs.getVersionPreferences().getIgnoredVersion(), mainFrame.getDialogService(), Globals.TASK_EXECUTOR)
                 .checkForNewVersionDelayed();
     }
 
     private void openWindow(Stage mainStage) {
-        GUIGlobals.init();
+        IconTheme.loadFonts();
 
         LOGGER.debug("Initializing frame");
         mainFrame.init();
@@ -66,7 +66,7 @@ public class JabRefGUI {
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             mainStage.setMaximized(true);
         } else if (Screen.getScreens().size() == 1 && isWindowPositionOutOfBounds()) {
-            //corrects the Window, if its outside of the mainscreen
+            // corrects the Window, if its outside of the mainscreen
             LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
             mainStage.setX(0);
             mainStage.setY(0);
@@ -87,7 +87,7 @@ public class JabRefGUI {
         root.getChildren().add(JabRefGUI.mainFrame);
 
         Scene scene = new Scene(root, 800, 800);
-        Globals.getThemeLoader().installCss(scene, Globals.prefs);
+        Globals.prefs.getTheme().installCss(scene);
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
@@ -95,8 +95,8 @@ public class JabRefGUI {
 
         mainStage.setOnCloseRequest(event -> {
             if (!correctedWindowPos) {
-                //saves the window position only if its not  corrected -> the window will rest at the old Position,
-                //if the external Screen is connected again.
+                // saves the window position only if its not  corrected -> the window will rest at the old Position,
+                // if the external Screen is connected again.
                 saveWindowState(mainStage);
             }
             boolean reallyQuit = mainFrame.quit();
@@ -105,6 +105,13 @@ public class JabRefGUI {
             }
         });
         Platform.runLater(this::openDatabases);
+
+        if (!(Globals.getFileUpdateMonitor().isActive())) {
+            this.getMainFrame().getDialogService()
+                    .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
+                            "and processes and restart. You may encounter errors if you continue " +
+                            "with this session."));
+        }
     }
 
     private void openDatabases() {
@@ -248,7 +255,7 @@ public class JabRefGUI {
                 continue;
             }
 
-            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+            if (BackupManager.backupFileDiffers(dbFile.toPath())) {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 

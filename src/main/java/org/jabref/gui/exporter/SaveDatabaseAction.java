@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.dialogs.AutosaveUIManager;
+import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -47,31 +47,178 @@ import org.slf4j.LoggerFactory;
  * operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction {
-
-    public enum SaveDatabaseMode {
-        SILENT, NORMAL
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final DialogService dialogService;
-    private final JabRefPreferences prefs;
+    private final JabRefPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences prefs, BibEntryTypesManager entryTypesManager) {
+    public enum SaveDatabaseMode {
+        SILENT, NORMAL
+    }
+
+    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
-        this.prefs = prefs;
+        this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
     }
 
+    public boolean save() {
+        return save(panel.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
+    }
+
+    public boolean save(SaveDatabaseMode mode) {
+        return save(panel.getBibDatabaseContext(), mode);
+    }
+
+    /**
+     * Asks the user for the path and saves afterwards
+     */
+    public void saveAs() {
+        askForSavePath().ifPresent(this::saveAs);
+    }
+
+    public boolean saveAs(Path file) {
+        return this.saveAs(file, SaveDatabaseMode.NORMAL);
+    }
+
+    public void saveSelectedAsPlain() {
+        askForSavePath().ifPresent(path -> {
+            try {
+                saveDatabase(path, true, preferences.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
+                frame.getFileHistory().newFile(path);
+                dialogService.notify(Localization.lang("Saved selected to '%0'.", path.toString()));
+            } catch (SaveException ex) {
+                LOGGER.error("A problem occurred when trying to save the file", ex);
+                dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            }
+        });
+    }
+
+    /**
+     * @param file the new file name to save the data base to. This is stored in the database context of the panel upon
+     *             successful save.
+     * @return true on successful save
+     */
+    boolean saveAs(Path file, SaveDatabaseMode mode) {
+        BibDatabaseContext context = panel.getBibDatabaseContext();
+
+        // Close AutosaveManager and BackupManager for original library
+        Optional<Path> databasePath = context.getDatabasePath();
+        if (databasePath.isPresent()) {
+            final Path oldFile = databasePath.get();
+            context.setDatabasePath(oldFile);
+            AutosaveManager.shutdown(context);
+            BackupManager.shutdown(context);
+        }
+
+        // Set new location
+        if (context.getLocation() == DatabaseLocation.SHARED) {
+            // Save all properties dependent on the ID. This makes it possible to restore them.
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
+                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+        }
+
+        boolean saveResult = save(file, mode);
+
+        if (saveResult) {
+            // we managed to successfully save the file
+            // thus, we can store the store the path into the context
+            context.setDatabasePath(file);
+            frame.refreshTitleAndTabs();
+
+            // Reinstall AutosaveManager and BackupManager for the new file name
+            panel.resetChangeMonitorAndChangePane();
+            if (readyForAutosave(context)) {
+                AutosaveManager autosaver = AutosaveManager.start(context);
+                autosaver.registerListener(new AutosaveUiManager(panel));
+            }
+            if (readyForBackup(context)) {
+                BackupManager.start(context, entryTypesManager, preferences);
+            }
+
+            frame.getFileHistory().newFile(file);
+        }
+
+        return saveResult;
+    }
+
+    /**
+     * Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
+     * opening the dialog.
+     *
+     * @return the path set by the user
+     */
+    private Optional<Path> askForSavePath() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                .build();
+        Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
+        selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
+        return selectedPath;
+    }
+
+    private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
+        Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
+        if (!databasePath.isPresent()) {
+            Optional<Path> savePath = askForSavePath();
+            if (!savePath.isPresent()) {
+                return false;
+            }
+            return saveAs(savePath.get(), mode);
+        }
+
+        return save(databasePath.get(), mode);
+    }
+
+    private boolean save(Path targetPath, SaveDatabaseMode mode) {
+        if (mode == SaveDatabaseMode.NORMAL) {
+            dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
+        }
+
+        panel.setSaving(true);
+        try {
+            Charset encoding = panel.getBibDatabaseContext()
+                                    .getMetaData()
+                                    .getEncoding()
+                                    .orElse(preferences.getDefaultEncoding());
+            // Make sure to remember which encoding we used.
+            panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
+
+            // Save the database
+            boolean success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
+
+            if (success) {
+                panel.getUndoManager().markUnchanged();
+                // After a successful save the following statement marks that the base is unchanged since last save
+                panel.setNonUndoableChange(false);
+                panel.setBaseChanged(false);
+
+                frame.setTabTitle(panel, panel.getTabTitle(), targetPath.toAbsolutePath().toString());
+                frame.setWindowTitle();
+                frame.updateAllTabTitles();
+            }
+            return success;
+        } catch (SaveException ex) {
+            LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
+            dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
+            return false;
+        } finally {
+            // release panel from save status
+            panel.setSaving(false);
+        }
+    }
+
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SavePreferences preferences = prefs.loadForSaveFromPreferences()
-                                           .withEncoding(encoding)
-                                           .withSaveType(saveType);
+        SavePreferences preferences = this.preferences.loadForSaveFromPreferences()
+                                                      .withEncoding(encoding)
+                                                      .withSaveType(saveType);
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
@@ -89,7 +236,7 @@ public class SaveDatabaseAction {
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
         } catch (IOException ex) {
-            throw new SaveException("Problems saving:", ex);
+            throw new SaveException("Problems saving: " + ex, ex);
         }
 
         return true;
@@ -107,152 +254,30 @@ public class SaveDatabaseAction {
 
         ButtonType tryDifferentEncoding = new ButtonType(Localization.lang("Try different encoding"), ButtonBar.ButtonData.OTHER);
         ButtonType ignore = new ButtonType(Localization.lang("Ignore"), ButtonBar.ButtonData.APPLY);
-        boolean saveWithDifferentEncoding = frame.getDialogService()
-                                                 .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
-                                                 .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
-                                                 .isPresent();
+        boolean saveWithDifferentEncoding = dialogService
+                .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
+                .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
+                .isPresent();
         if (saveWithDifferentEncoding) {
-            Optional<Charset> newEncoding = frame.getDialogService().showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
+            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
-                saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
-
                 // Make sure to remember which encoding we used.
                 panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
+
+                saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }
         }
-    }
-
-    private boolean doSave() {
-        panel.setSaving(true);
-        Path targetPath = panel.getBibDatabaseContext().getDatabasePath().get();
-        try {
-            // Save the database
-            boolean success = saveDatabase(targetPath, false,
-                    panel.getBibDatabaseContext()
-                         .getMetaData()
-                         .getEncoding()
-                         .orElse(prefs.getDefaultEncoding()),
-                    SavePreferences.DatabaseSaveType.ALL);
-
-            if (success) {
-                panel.getUndoManager().markUnchanged();
-                // (Only) after a successful save the following
-                // statement marks that the base is unchanged
-                // since last save:
-                panel.setNonUndoableChange(false);
-                panel.setBaseChanged(false);
-
-                // Reset title of tab
-                frame.setTabTitle(panel, panel.getTabTitle(),
-                        panel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
-                frame.setWindowTitle();
-                frame.updateAllTabTitles();
-            }
-            return success;
-        } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file " + targetPath, ex);
-            frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
-            return false;
-        } finally {
-            // release panel from save status
-            panel.setSaving(false);
-        }
-    }
-
-    public boolean save() {
-        return save(SaveDatabaseMode.NORMAL);
-    }
-
-    public boolean save(SaveDatabaseMode mode) {
-        if (panel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-            if (mode == SaveDatabaseMode.NORMAL) {
-                panel.frame().getDialogService().notify(Localization.lang("Saving library") + "...");
-            }
-            return doSave();
-        } else {
-            Optional<Path> savePath = getSavePath();
-            if (savePath.isPresent()) {
-                saveAs(savePath.get());
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void saveAs() {
-        getSavePath().ifPresent(this::saveAs);
-    }
-
-    private Optional<Path> getSavePath() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(prefs.get(JabRefPreferences.WORKING_DIRECTORY))
-                .build();
-        Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        selectedPath.ifPresent(path -> prefs.setWorkingDir(path.getParent()));
-        return selectedPath;
-    }
-
-    public void saveAs(Path file) {
-        BibDatabaseContext context = panel.getBibDatabaseContext();
-
-        // Close AutosaveManager and BackupManager for original library
-        Optional<Path> databasePath = context.getDatabasePath();
-        if (databasePath.isPresent()) {
-            final Path oldFile = databasePath.get();
-            context.setDatabaseFile(oldFile.toFile());
-            AutosaveManager.shutdown(context);
-            BackupManager.shutdown(context);
-        }
-
-        // Set new location
-        if (context.getLocation() == DatabaseLocation.SHARED) {
-            // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
-        }
-        context.setDatabaseFile(file);
-
-        // Save
-        save();
-
-        // Reinstall AutosaveManager and BackupManager
-        panel.resetChangeMonitorAndChangePane();
-        if (readyForAutosave(context)) {
-            AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUIManager(panel));
-        }
-        if (readyForBackup(context)) {
-            BackupManager.start(context, entryTypesManager, prefs);
-        }
-
-        context.getDatabasePath().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile));
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
                 context.getDatabasePath().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {
         return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabasePath().isPresent();
-    }
-
-    public void saveSelectedAsPlain() {
-        getSavePath().ifPresent(path -> {
-            try {
-                saveDatabase(path, true, prefs.getDefaultEncoding(), SavePreferences.DatabaseSaveType.PLAIN_BIBTEX);
-                frame.getFileHistory().newFile(path);
-                frame.getDialogService().notify(Localization.lang("Saved selected to '%0'.", path.toString()));
-            } catch (SaveException ex) {
-                LOGGER.error("A problem occurred when trying to save the file", ex);
-                frame.getDialogService().showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
-            }
-        });
     }
 }

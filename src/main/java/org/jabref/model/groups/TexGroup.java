@@ -23,12 +23,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
-    private Path filePath;
+    private final Path filePath;
     private Set<String> keysUsedInAux = null;
     private final FileUpdateMonitor fileMonitor;
-    private AuxParser auxParser;
+    private final AuxParser auxParser;
     private final MetaData metaData;
-    private String user;
+    private final String user;
 
     TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
         super(name, context);
@@ -52,7 +52,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
     }
-    
+
     @Override
     public boolean contains(BibEntry entry) {
         if (keysUsedInAux == null) {
@@ -97,7 +97,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public String toString() {
         return "TexGroup{" +
-               "filePath=" + filePath +
+                "filePath=" + filePath +
                 ", keysUsedInAux=" + keysUsedInAux +
                 ", auxParser=" + auxParser +
                 ", fileMonitor=" + fileMonitor +
@@ -126,13 +126,13 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileHelper.expandFilenameAsPath(path.toString(), fileDirectories).orElse(path);
+        return FileHelper.find(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
 
-        metaData.getLaTexFileDirectory(user)
+        metaData.getLatexFileDirectory(user)
                 .ifPresent(fileDirs::add);
 
         return fileDirs;
