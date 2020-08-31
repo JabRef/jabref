@@ -76,8 +76,6 @@ public interface PreferencesService {
 
     void setWorkingDir(Path dir);
 
-    String setLastPreferencesExportPath();
-
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
