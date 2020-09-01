@@ -41,6 +41,7 @@ public class WebSearchPaneViewModel {
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final Pattern queryPattern;
+    private final Pattern laxQueryPattern;
 
     public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService) {
         // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
@@ -66,6 +67,8 @@ public class WebSearchPaneViewModel {
         // Either a single word, or a phrase with quotes, or a year-range
         String allowedTermText = "(((\\d{4}-\\d{4})|(\\w+)|(\"\\w+[^\"]*\"))\\s?)+";
         queryPattern = Pattern.compile("^(" + allowedFields + allowedTermText + ")+$");
+        String laxFields = "(\\w+:\\s?)?";
+        laxQueryPattern = Pattern.compile("^(" + laxFields + allowedTermText + ")+$");
     }
 
     public ObservableList<SearchBasedFetcher> getFetchers() {
@@ -124,28 +127,35 @@ public class WebSearchPaneViewModel {
 
     public void validateQueryStringAndGiveColorFeedback(TextField querySource, String queryString) {
         Matcher queryValidation = queryPattern.matcher(queryString.strip());
-        if (queryValidation.matches()) {
-            if (containsYearAndYearRange(queryString)) {
-                setPseudoClassToInvalid(querySource);
-                querySource.setTooltip(new Tooltip(Localization.lang("The query cannot contain a year and year-range field.")));
+        if (!queryString.strip().isBlank() && !queryValidation.matches()) {
+            Matcher laxQueryValidation = laxQueryPattern.matcher(queryString.strip());
+            if (laxQueryValidation.matches()) {
+                setPseudoClassToUnsupported(querySource);
+                querySource.setTooltip(new Tooltip(Localization.lang("This query uses unsupported fields.")));
             } else {
-                setPseudoClassToValid(querySource);
-                querySource.setTooltip(new Tooltip(Localization.lang("This search contains entries that match all specified terms.")));
+                setPseudoClassToInvalid(querySource);
+                querySource.setTooltip(new Tooltip(Localization.lang("This query uses unsupported syntax.")));
             }
-        } else {
+        } else if (containsYearAndYearRange(queryString)) {
             setPseudoClassToInvalid(querySource);
-            querySource.setTooltip(new Tooltip(Localization.lang("This query uses an unsupported syntax.")));
+            querySource.setTooltip(new Tooltip(Localization.lang("The query cannot contain a year and year-range field.")));
+        } else {
+            setPseudoClassToValid(querySource);
         }
     }
 
-    private void setPseudoClassToValid(TextField querySource) {
+    private void setPseudoClassToUnsupported(TextField querySource) {
         querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("invalid"), false);
-        querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("valid"), true);
+        querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("unsupported"), true);
+    }
+
+    public void setPseudoClassToValid(TextField querySource) {
+        querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("invalid"), false);
+        querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("unsupported"), false);
     }
 
     private void setPseudoClassToInvalid(TextField querySource) {
         querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("invalid"), true);
-        querySource.pseudoClassStateChanged(PseudoClass.getPseudoClass("valid"), false);
     }
 
     private boolean containsYearAndYearRange(String queryString) {

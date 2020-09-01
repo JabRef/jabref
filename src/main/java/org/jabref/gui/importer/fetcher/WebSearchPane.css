@@ -1,8 +1,0 @@
-.searchBar:valid {
-    -fx-background-color: rgba(50, 205, 50, 0.5)
-}
-
-.searchBar:invalid {
-    -fx-background-color: rgba(240, 128, 128, 0.5);
-}
-
