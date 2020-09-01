@@ -1219,10 +1219,6 @@ public class JabRefPreferences implements PreferencesService {
         put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
-    private NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
-    }
-
     public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
         put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
         return this;
@@ -2424,6 +2420,16 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
+
+    @Override
+    public NameFormatterPreferences getNameFormatterPreferences() {
+        return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
+    }
+
+    @Override
+    public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
+
+    }
 
     @Override
     public AutoCompletePreferences getAutoCompletePreferences() {
