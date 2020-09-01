@@ -14,12 +14,12 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 class MainArchitectureTests {
 
     public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
-    private static final String PACKAGE_JAVAX_SWING = "javax.swing";
-    private static final String PACKAGE_JAVA_AWT = "java.awt";
-    private static final String PACKAGE_JAVA_FX = "javafx";
-    private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
-    private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
-    private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
+    private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
+    private static final String PACKAGE_JAVA_AWT = "java.awt..";
+    private static final String PACKAGE_JAVA_FX = "javafx..";
+    private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
+    private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
+    private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
 
     @ArchTest
     public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -91,17 +91,17 @@ class MainArchitectureTests {
                 .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
                 .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
                 .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
-                .layer("Cli").definedBy("org.jabref.cli")
-                .layer("Migrations").definedBy("org.jabref.migrations")
-                .layer("Preferences").definedBy("org.jabref.preferences")
-                .layer("Styletester").definedBy("org.jabref.styletester")
+                .layer("Cli").definedBy("org.jabref.cli..")
+                .layer("Migrations").definedBy("org.jabref.migrations..")
+                .layer("Preferences").definedBy("org.jabref.preferences..")
+                .layer("Styletester").definedBy("org.jabref.styletester..")
 
-                .whereLayer("Gui").mayOnlyBeAccessedByLayers("Gui")
+                .whereLayer("Gui").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui")
                 .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations")
                 .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Migrations").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester") // TODO: Remove logic here
+                .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
 
                 .check(classes);
     }
