@@ -124,6 +124,19 @@ public class ComplexSearchQuery {
         return result;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringRepresentation = new StringBuilder();
+        getSingleYear().ifPresent(singleYear -> stringRepresentation.append(singleYear).append(" "));
+        getFromYear().ifPresent(fromYear -> stringRepresentation.append(fromYear).append(" "));
+        getToYear().ifPresent(toYear -> stringRepresentation.append(toYear).append(" "));
+        getJournal().ifPresent(journal -> stringRepresentation.append(journal).append(" "));
+        stringRepresentation.append(String.join(" ", getTitlePhrases()))
+                            .append(String.join(" ", getDefaultFieldPhrases()))
+                            .append(String.join(" ", getAuthors()));
+        return stringRepresentation.toString();
+    }
+
     public static class ComplexSearchQueryBuilder {
         private List<String> defaultFieldPhrases = new ArrayList<>();
         private List<String> authors = new ArrayList<>();
