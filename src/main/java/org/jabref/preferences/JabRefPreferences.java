@@ -2405,7 +2405,7 @@ public class JabRefPreferences implements PreferencesService {
         put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
         putBoolean(PREVIEW_AS_TAB, previewPreferences.showPreviewAsExtraTab());
 
-        this.previewPreferences = previewPreferences;
+        updatePreviewPreferences();
     }
 
     //*************************************************************************************************************
