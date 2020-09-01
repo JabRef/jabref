@@ -120,7 +120,7 @@ To prepare IntelliJ's build system two additional steps are required
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik%20%281%29.png)
+![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik%20%281%29%20%281%29.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
@@ -144,7 +144,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%281%29.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%281%29%20%281%29.png)
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
@@ -153,28 +153,25 @@ Essentially, you now have the best of both worlds: You can run Gradle tasks usin
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-
-   1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
-   2. Close the settings afterwards and restart IntelliJ
-
+  1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+  2. Close the settings afterwards and restart IntelliJ
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
 * Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
+  1. Import the CheckStyle configuration file by clicking the \[+\] button
+  2. For the description provide "JabRef"
+  3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
+  4. Click "Next" and "Finish"
+  5. Activate the CheckStyle configuration file by ticking it in the list
+  6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
+  7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+  8. Save settings by clicking "OK"
+  9. Your configuration should now look like this:
 
-   1. Import the CheckStyle configuration file by clicking the \[+\] button
-   2. For the description provide "JabRef"
-   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-   4. Click "Next" and "Finish"
-   5. Activate the CheckStyle configuration file by ticking it in the list
-   6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
-   7. Set the "Scan Scope" to "Only Java sources \(including tests\)
-   8. Save settings by clicking "OK"
-   9. Your configuration should now look like this:
-
-      ```text
-      ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
-      ```
+     ```text
+     ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
+     ```
 
 ### Setup for Eclipse
 
@@ -191,7 +188,7 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
 4. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
