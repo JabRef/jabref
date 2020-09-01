@@ -90,11 +90,6 @@ These steps are very important. They allow you to focus on the content and ensur
 
 We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
 
-IntelliJ instructions checked for
-
-* [2020.1](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds) - works with restrictions (outlined below)
-* [2020.2](https://confluence.jetbrains.com/display/IDEADEV/IDEA+2020.1+latest+builds) - works with restrictions (outlined below)
-
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
 
 To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_:
