@@ -228,8 +228,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
      * The checking result could be either success or fail, if fail, the cause will be displayed.
      */
     public void checkConnection() {
-        final String connectionProblemText = Localization.lang("Problem with connection: ");
-        final String connectionSuccessText = Localization.lang("Connection Successful!");
+        final String connectionSuccessText = Localization.lang("Connection successful!");
+        final String connectionFailedText = Localization.lang("Connection failed!");
         final String dialogTitle = Localization.lang("Check Proxy Setting");
 
         final String testUrl = "http://jabref.org";
@@ -238,17 +238,18 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         // preferences.storeProxyPreferences(...) below.
         storeProxySettings();
 
-        URLDownload dl;
+        URLDownload urlDownload;
         try {
-            dl = new URLDownload(testUrl);
-            int connectionStatus = dl.checkConnection();
-            if (connectionStatus == 200) {
+            urlDownload = new URLDownload(testUrl);
+            if (urlDownload.canBeReached()) {
                 dialogService.showInformationDialogAndWait(dialogTitle, connectionSuccessText);
             } else {
-                dialogService.showErrorDialogAndWait(dialogTitle, connectionProblemText + Localization.lang("Request failed with status code ") + connectionStatus);
+                dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
             }
-        } catch (MalformedURLException | UnirestException e) {
-            dialogService.showErrorDialogAndWait(dialogTitle, connectionProblemText + e.getMessage());
+        } catch (MalformedURLException e) {
+            // Why would that happen? Because one of developers inserted a failing url in testUrl...
+        } catch (UnirestException e) {
+            dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
         }
 
         preferences.storeProxyPreferences(initialProxyPreferences);

@@ -175,16 +175,14 @@ public class URLDownload {
     /**
      * Check the connection by using the HEAD request.
      * UnirestException can be thrown for invalid request.
+     *
      * @return the status code of the response
      */
-    public int checkConnection() {
+    public boolean canBeReached() throws UnirestException {
         Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
-        try {
-            int statusCode = Unirest.head(source.toString()).asString().getStatus();
-            return statusCode;
-        } catch (UnirestException e) {
-            throw e;
-        }
+
+        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        return statusCode >= 200 && statusCode < 300;
     }
 
     public boolean isMimeType(String type) {
@@ -305,8 +303,7 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+        Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
 
             String line;
