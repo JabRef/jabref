@@ -123,7 +123,6 @@ public enum StandardField implements Field {
     TYPE("type", FieldProperty.TYPE),
     URI("uri", "URI"),
     URL("url", "URL", FieldProperty.EXTERNAL, FieldProperty.VERBATIM),
-    URLS("urls", "URLS", FieldProperty.VERBATIM),
     URLDATE("urldate", FieldProperty.DATE),
     VENUE("venue"),
     VERSION("version"),

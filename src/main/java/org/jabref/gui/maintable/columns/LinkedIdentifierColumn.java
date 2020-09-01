@@ -22,7 +22,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 
 /**
  * A clickable icons column for DOIs, URLs, URIs and EPrints.
@@ -50,7 +49,7 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
         this.setResizable(false);
         this.setCellValueFactory(cellData -> cellData.getValue().getLinkedIdentifiers());
         new ValueTableCellFactory<BibEntryTableViewModel, Map<Field, String>>()
-                .withGraphic(values -> createIdentifierGraphic(values))
+                .withGraphic(this::createIdentifierGraphic)
                 .withTooltip(this::createIdentifierTooltip)
                 .withMenu(this::createIdentifierMenu)
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
@@ -70,9 +69,9 @@ public class LinkedIdentifierColumn extends MainTableColumn<Map<Field, String>> 
 
     private Node createIdentifierGraphic(Map<Field, String> values) {
         if (values.size() > 1) {
-            return cellFactory.getTableIcon(StandardField.URLS);
+            return IconTheme.JabRefIcons.LINK_VARIANT.getGraphicNode();
         } else if (values.size() == 1) {
-            return cellFactory.getTableIcon(StandardField.URL);
+            return IconTheme.JabRefIcons.LINK.getGraphicNode();
         } else {
             return null;
         }
