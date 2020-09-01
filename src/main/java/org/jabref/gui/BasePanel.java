@@ -614,7 +614,7 @@ public class BasePanel extends StackPane {
     }
 
     public void paste() {
-        mainTable.paste();
+        mainTable.paste(this.bibDatabaseContext.getMode());
     }
 
     public void cut() {

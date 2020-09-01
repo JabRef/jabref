@@ -18,9 +18,12 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -64,6 +67,8 @@ public class FetchAndMergeEntry {
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
+                                      ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                                      cleanup.doPostCleanup(entry);
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
                                           showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
@@ -147,6 +152,8 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
+                              ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                              cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {
                               dialogService.notify(Localization.lang("Could not find any bibliographic information."));
