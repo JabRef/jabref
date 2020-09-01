@@ -60,14 +60,14 @@ public abstract class SuggestionProvider<T> {
 
     protected abstract Equivalence<T> getEquivalence();
 
-    public final Collection<T> getPossibleSuggestions(){
-        List<T> suggestions = new ArrayList<>();
-        synchronized (possibleSuggestionsLock) {
-            for (T possibleSuggestion : possibleSuggestions) {
-                    suggestions.add(possibleSuggestion);
-            }
-        }
-        return suggestions;
+    public Collection<T> getPossibleSuggestions() {
+        Comparator<T> comparator = getComparator().reversed();
+        Equivalence<T> equivalence = getEquivalence();
+        return getSource().map(equivalence::wrap) // Need to do a bit of acrobatic as there is no distinctBy method
+                          .distinct()
+                          .map(Equivalence.Wrapper::get)
+                          .sorted(comparator)
+                          .collect(Collectors.toList());
     }
 
     /**

@@ -222,9 +222,6 @@ public class FieldNameLabel extends Label {
                     return Localization.lang("Owner/creator of this entry.");
                 case TIMESTAMP:
                     return Localization.lang("Timestamp of this entry, when it has been created or last modified.");
-                case CROSSREF:
-                    return Localization.lang("Linking entries together (child parent relation).") + "\n" +
-                            Localization.lang("Enter the key of the other entry.");
             }
         } else if (field instanceof InternalField) {
             InternalField internalField = (InternalField) field;

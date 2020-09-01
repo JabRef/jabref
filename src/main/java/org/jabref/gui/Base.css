@@ -1177,5 +1177,5 @@ TextFlow * {
 .chips-pane > .editor {
     -fx-pref-height: 30px;
     -fx-padding: 0px 0px 0px -8px;
-    -fx-margin: 0px;
+    -fx-margin: 0em;
 }

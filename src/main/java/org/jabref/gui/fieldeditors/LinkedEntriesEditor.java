@@ -1,16 +1,14 @@
 package org.jabref.gui.fieldeditors;
 
-import com.jfoenix.controls.JFXChip;
-import com.jfoenix.controls.JFXChipView;
-import com.jfoenix.controls.JFXDefaultChip;
+import java.util.stream.Collectors;
+
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.util.component.TagBar;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -18,8 +16,9 @@ import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
-
-import java.util.Collection;
+import com.jfoenix.controls.JFXChip;
+import com.jfoenix.controls.JFXChipView;
+import com.jfoenix.controls.JFXDefaultChip;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
@@ -28,7 +27,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @FXML
     private JFXChipView<ParsedEntryLink> chipView;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<BibEntry> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
 
         ViewLoader.view(this)
@@ -36,14 +35,17 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         chipView.setConverter(viewModel.getStringConverter());
-        chipView.getSuggestions().addAll((Collection<? extends ParsedEntryLink>) suggestionProvider.getPossibleSuggestions());
+        var autoCompletionItemFactory = new ViewModelListCellFactory<ParsedEntryLink>()
+                .withText(ParsedEntryLink::getKey);
+        chipView.getAutoCompletePopup().setSuggestionsCellFactory(autoCompletionItemFactory);
+        chipView.getAutoCompletePopup().setCellLimit(5);
+        chipView.getSuggestions().addAll(suggestionProvider.getPossibleSuggestions().stream().map(ParsedEntryLink::new).collect(Collectors.toList()));
 
-            chipView.setChipFactory(
-                    (view, item) -> {
-                            JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
-                            chip.setOnMouseClicked(event -> viewModel.jumpToEntry(item));
-                            return chip;
-                    });
+        chipView.setChipFactory((view, item) -> {
+            JFXChip<ParsedEntryLink> chip = new JFXDefaultChip<>(view, item);
+            chip.setOnMouseClicked(event -> viewModel.jumpToEntry(item));
+            return chip;
+        });
 
         Bindings.bindContentBidirectional(chipView.getChips(), viewModel.linkedEntriesProperty());
     }
