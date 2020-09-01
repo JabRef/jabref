@@ -1174,10 +1174,16 @@ TextFlow * {
     -fx-fill: -fx-text-background-color;
 }
 
+.chips-pane > .editor {
+    -fx-pref-height: 30px;
+    -fx-padding: 0px 0px 0px -8px;
+    -fx-margin: 0em;
+
 .searchBar:invalid {
     -fx-background-color: rgba(240, 128, 128, 0.5);
 }
 
 .searchBar:unsupported {
     -fx-background-color: rgba(255, 159, 67, 0.5);
+
 }

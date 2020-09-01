@@ -45,7 +45,7 @@ public class EntryLinkListTest {
 
     @Test
     public void givenFieldValueAndDatabaseWhenParsingThenExpectDataBase() {
-        assertEquals(database, link.getDataBase());
+        assertEquals(database, link.getDatabase());
     }
 
     @Test
