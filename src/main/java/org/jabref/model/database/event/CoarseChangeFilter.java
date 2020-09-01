@@ -1,5 +1,7 @@
 package org.jabref.model.database.event;
 
+import java.util.Optional;
+
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -18,7 +20,7 @@ public class CoarseChangeFilter {
     private final EventBus eventBus = new EventBus();
     private final DelayTaskThrottler delayPost;
 
-    private Field lastFieldChanged;
+    private Optional<Field> lastFieldChanged;
     private int totalDelta;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
@@ -28,8 +30,7 @@ public class CoarseChangeFilter {
         this.context = bibDatabaseContext;
         // Delay event post by 5 seconds
         this.delayPost = new DelayTaskThrottler(5000);
-        // 'null' throws NullPointerException
-        this.lastFieldChanged = new UnknownField("unknownField");
+        this.lastFieldChanged = Optional.empty();
         this.totalDelta = 0;
     }
 
@@ -51,19 +52,17 @@ public class CoarseChangeFilter {
             totalDelta += fieldChange.getDelta();
 
             // If editing is started
-            boolean isNewEdit = lastFieldChanged.getName().equals("unknownField");
+            boolean isNewEdit = lastFieldChanged.isEmpty();
             // If other field is edited
             boolean isEditOnOtherField = !lastFieldChanged.equals(fieldChange.getField());
             // Only deltas of 1 registered by fieldChange, major change means editing much content
             boolean isMajorChange = totalDelta >= 100;
 
-            if (isEditOnOtherField && !isNewEdit) {
+            if ((isEditOnOtherField && !isNewEdit) || isMajorChange) {
                 // Submit old changes immediately
                 eventPost.run();
             } else {
-                if (isNewEdit || isMajorChange) {
-                    delayPost.schedule(eventPost);
-                }
+                delayPost.schedule(eventPost);
             }
             // Set new last field
             lastFieldChanged = fieldChange.getField();
