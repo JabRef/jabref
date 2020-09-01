@@ -70,7 +70,9 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Create text field for query input
         TextField query = SearchTextField.create();
-        query.setOnAction(event -> viewModel.search());
+        query.getStyleClass().add("searchBar");
+        query.textProperty().addListener((observable, oldValue, newValue) -> viewModel.validateQueryStringAndGiveColorFeedback(query, newValue));
+
         viewModel.queryProperty().bind(query.textProperty());
 
         // Create button that triggers search
@@ -80,6 +82,7 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Put everything together
         VBox container = new VBox();
+        container.getStylesheets().add(WebSearchPane.class.getResource("WebSearchPane.css").toExternalForm());
         container.setAlignment(Pos.CENTER);
         container.getChildren().addAll(fetcherContainer, query, search);
         return container;

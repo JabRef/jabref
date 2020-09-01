@@ -27,9 +27,22 @@ For simplicitly, and lack of universal capabilities across fetchers, only basic 
   * `year` (for single year)
   * `year-range` (for range e.g. `year-range:2012-2015`)
 * The `journal`, `year`, and `year-range` fields should only be populated once in each query
+* The `year` and `year-range` fields are mutually exclusive
 * Example:
   * `author:"Igor Steinmacher" author:"Christoph Treude" year:2017` will be converted to
   * `author:"Igor Steinmacher" AND author:"Christoph Treude" AND year:2017`
+
+The supported syntax can be expressed in EBNF as follows:
+
+Query := {Clause} \
+Clause:= \[Field\] Term \
+Field := author: | title: | journal: | year: | year-range: | default:\
+Term  := Word | Phrase \
+
+Word can be derived to any series of non-whitespace characters.
+Phrases are multiple words wrapped in quotes and may contain white-space characters within the quotes.\
+Note: Even though this EBNF syntactically allows the creation of queries with year and year-range fields,
+such a query does not make sense semantically and therefore will not be executed.
 
 ### Positive Consequences
 
