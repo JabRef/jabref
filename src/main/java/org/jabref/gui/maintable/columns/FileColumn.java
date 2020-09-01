@@ -68,7 +68,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 entry.getEntry(),
                                 database, Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService.getXMPPreferences(),
+                                preferencesService.getXmpPreferences(),
                                 preferencesService.getFilePreferences(),
                                 externalFileTypes);
                         linkedFileViewModel.open();
@@ -132,7 +132,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferencesService.getXMPPreferences(),
+                    preferencesService.getXmpPreferences(),
                     preferencesService.getFilePreferences(),
                     externalFileTypes);
 

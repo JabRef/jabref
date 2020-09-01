@@ -37,7 +37,7 @@ public class OpenFolderAction extends SimpleCommand {
                             databaseContext,
                             Globals.TASK_EXECUTOR,
                             dialogService,
-                            preferencesService.getXMPPreferences(),
+                            preferencesService.getXmpPreferences(),
                             preferencesService.getFilePreferences(),
                             ExternalFileTypes.getInstance()
                     );

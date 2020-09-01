@@ -461,7 +461,7 @@ public class ArgumentProcessor {
             LayoutFormatterPreferences layoutPreferences =
                     Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
             SavePreferences savePreferences = Globals.prefs.getSavePreferencesForExport();
-            XmpPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
+            XmpPreferences xmpPreferences = Globals.prefs.getXmpPreferences();
             Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);

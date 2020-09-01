@@ -18,8 +18,8 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -38,7 +38,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    public FileTabView(JabRefPreferences preferences) {
+    public FileTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
