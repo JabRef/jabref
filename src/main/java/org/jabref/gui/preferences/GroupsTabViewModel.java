@@ -14,12 +14,10 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class GroupsTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty grayNonHitsProperty = new SimpleBooleanProperty();
     private final BooleanProperty groupViewModeIntersectionProperty = new SimpleBooleanProperty();
     private final BooleanProperty groupViewModeUnionProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
-    private final StringProperty defaultGroupingFieldProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
@@ -32,7 +30,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        grayNonHitsProperty.setValue(preferences.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         switch (preferences.getGroupViewMode()) {
             case INTERSECTION:
                 groupViewModeIntersectionProperty.setValue(true);
@@ -46,13 +43,11 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         autoAssignGroupProperty.setValue(preferences.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
         displayGroupCountProperty.setValue(preferences.getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT));
 
-        defaultGroupingFieldProperty.setValue(preferences.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         keywordSeparatorProperty.setValue(preferences.get(JabRefPreferences.KEYWORD_SEPARATOR));
     }
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayNonHitsProperty.getValue());
         if (groupViewModeIntersectionProperty.getValue()) {
             preferences.setGroupViewMode(GroupViewMode.INTERSECTION);
         } else if (groupViewModeUnionProperty.getValue()) {
@@ -61,7 +56,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
         preferences.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroupProperty.getValue());
         preferences.putBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT, displayGroupCountProperty.getValue());
 
-        preferences.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, defaultGroupingFieldProperty.getValue().trim());
         preferences.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparatorProperty.getValue());
     }
 
@@ -73,10 +67,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     @Override
     public List<String> getRestartWarnings() {
         return new ArrayList<>();
-    }
-
-    public BooleanProperty grayNonHitsProperty() {
-        return grayNonHitsProperty;
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {
@@ -93,10 +83,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty displayGroupCount() {
         return displayGroupCountProperty;
-    }
-
-    public StringProperty defaultGroupingFieldProperty() {
-        return defaultGroupingFieldProperty;
     }
 
     public StringProperty keywordSeparatorProperty() {

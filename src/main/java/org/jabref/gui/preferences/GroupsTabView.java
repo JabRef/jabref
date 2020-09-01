@@ -12,12 +12,10 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel> implements PreferencesTab {
 
-    @FXML private CheckBox grayNonHits;
     @FXML private RadioButton groupViewModeIntersection;
     @FXML private RadioButton groupViewModeUnion;
     @FXML private CheckBox autoAssignGroup;
     @FXML private CheckBox displayGroupCount;
-    @FXML private TextField defaultGroupingField;
     @FXML private TextField keywordSeparator;
 
     public GroupsTabView(JabRefPreferences preferences) {
@@ -36,12 +34,10 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
     public void initialize() {
         this.viewModel = new GroupsTabViewModel(dialogService, preferences);
 
-        grayNonHits.selectedProperty().bindBidirectional(viewModel.grayNonHitsProperty());
         groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
         groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());
         autoAssignGroup.selectedProperty().bindBidirectional(viewModel.autoAssignGroupProperty());
         displayGroupCount.selectedProperty().bindBidirectional(viewModel.displayGroupCount());
-        defaultGroupingField.textProperty().bindBidirectional(viewModel.defaultGroupingFieldProperty());
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
     }
 }
