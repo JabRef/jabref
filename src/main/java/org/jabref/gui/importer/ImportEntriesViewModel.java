@@ -61,7 +61,14 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
      */
-    public ImportEntriesViewModel(BackgroundTask<ParserResult> task, TaskExecutor taskExecutor, BibDatabaseContext databaseContext, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
+    public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
+                                  TaskExecutor taskExecutor,
+                                  BibDatabaseContext databaseContext,
+                                  DialogService dialogService,
+                                  UndoManager undoManager,
+                                  PreferencesService preferences,
+                                  StateManager stateManager,
+                                  FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -94,9 +101,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     public boolean hasDuplicate(BibEntry entry) {
-        return findInternalDuplicate(entry).isPresent()
-                ||
-                new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
+        return findInternalDuplicate(entry).isPresent() ||
+                new DuplicateCheck(Globals.entryTypesManager)
+                .containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
     }
 
     /**
@@ -132,8 +139,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         }
 
         // Remember the selection in the dialog
-        FilePreferences filePreferences = preferences.getFilePreferences();
-        filePreferences.setShouldDownloadLinkedFiles(shouldDownloadFiles);
+        FilePreferences filePreferences = preferences.getFilePreferences()
+                                                     .withShouldDownloadLinkedFiles(shouldDownloadFiles);
         preferences.storeFilePreferences(filePreferences);
 
         if (shouldDownloadFiles) {

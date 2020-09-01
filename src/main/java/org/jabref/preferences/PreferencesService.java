@@ -34,6 +34,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
@@ -63,17 +64,17 @@ public interface PreferencesService {
 
     FieldWriterPreferences getFieldWriterPreferences();
 
+    FileHistory getFileHistory();
+
+    void storeFileHistory(FileHistory history);
+
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
     XmpPreferences getXMPPreferences();
 
-    AutoLinkPreferences getAutoLinkPreferences();
-
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
-
-    String setLastPreferencesExportPath();
 
     OpenOfficePreferences getOpenOfficePreferences();
 
@@ -91,7 +92,9 @@ public interface PreferencesService {
 
     boolean isKeywordSyncEnabled();
 
-    SavePreferences loadForExportFromPreferences();
+    SavePreferences getSavePreferencesForExport();
+
+    SavePreferences getSavePreferences();
 
     String getExportWorkingDirectory();
 
@@ -242,6 +245,34 @@ public interface PreferencesService {
     AppearancePreferences getAppearancePreferences();
 
     void storeAppearancePreference(AppearancePreferences preferences);
+
+    //*************************************************************************************************************
+    // File preferences
+    //*************************************************************************************************************
+
+    boolean shouldOpenLastFilesOnStartup();
+
+    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
+
+    NewLineSeparator getNewLineSeparator();
+
+    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
+
+    void storeLastPreferencesExportPath(Path exportFile);
+
+    String getLastPreferencesExportPath();
+
+    AutoLinkPreferences getAutoLinkPreferences();
+
+    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
+
+    ImportExportPreferences getImportExportPreferences();
+
+    void storeImportExportPreferences(ImportExportPreferences importExportPreferences);
+
+    boolean getShouldAutosave();
+
+    void storeShouldAutosave(boolean shouldAutosave);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences
