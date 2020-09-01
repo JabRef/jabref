@@ -28,6 +28,7 @@ import org.jabref.preferences.JabRefPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("unchecked")
 public class FieldEditors {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);
@@ -84,10 +85,8 @@ public class FieldEditors {
                 return new OptionEditor<>(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers));
             }
         } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            //noinspection unchecked
             return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            //noinspection unchecked
             return new LinkedEntriesEditor(field, databaseContext, (SuggestionProvider<BibEntry>) suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(field, suggestionProvider, preferences, fieldCheckers, isMultiLine);
@@ -101,7 +100,6 @@ public class FieldEditors {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static SuggestionProvider<?> getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
         SuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(field);
 
