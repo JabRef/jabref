@@ -32,7 +32,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
-    private final  AtomicBoolean notShutdown = new AtomicBoolean(true);
+    private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private Optional<JabRefException> filesystemMonitorFailure;
 
     @Override
@@ -68,7 +68,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             }
         } catch (IOException e) {
             filesystemMonitorFailure = Optional.of(new WatchServiceUnavailableException(e.getMessage(),
-                    e.getLocalizedMessage(), e.getCause()));
+                                                                                        e.getLocalizedMessage(), e.getCause()));
             LOGGER.warn(filesystemMonitorFailure.get().getLocalizedMessage(), e);
         }
     }
@@ -99,7 +99,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void shutdown() {
-        listeners.clear();
+        // listeners.clear();
         notShutdown.set(false);
     }
 }
