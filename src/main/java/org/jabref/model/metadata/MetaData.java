@@ -22,6 +22,8 @@ import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MetaData {
 
@@ -40,6 +42,8 @@ public class MetaData {
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -266,7 +270,7 @@ public class MetaData {
     }
 
     /**
-     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
      */
     public void setEncoding(Charset encoding, ChangePropagation postChanges) {
         this.encoding = Objects.requireNonNull(encoding);

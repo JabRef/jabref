@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.database;
 
 import java.util.Collection;
 import java.util.HashMap;
