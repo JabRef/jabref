@@ -212,9 +212,9 @@ public class SaveDatabaseAction {
             panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
-           boolean  success = false;
-           var sheduledTask = throttler.scheduleTask(() -> saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL));
-           success = (boolean) sheduledTask.get();
+            boolean success = false;
+            var sheduledTask = throttler.scheduleTask(() -> saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL));
+            success = (boolean) sheduledTask.get();
 
             if (success) {
                 panel.getUndoManager().markUnchanged();
