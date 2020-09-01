@@ -122,6 +122,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
     }
 
+    /**
+     * Shuts everything down. After termination, this method returns.
+     */
     @Override
     public void shutdown() {
         executor.shutdownNow();
