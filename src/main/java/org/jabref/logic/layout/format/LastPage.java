@@ -23,6 +23,5 @@ public class LastPage implements LayoutFormatter {
         } else {
             return "";
         }
-
     }
 }

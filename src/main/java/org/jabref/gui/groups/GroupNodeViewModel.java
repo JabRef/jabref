@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -22,13 +22,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -37,10 +35,12 @@ import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.base.Enums;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
@@ -50,7 +50,7 @@ public class GroupNodeViewModel {
     private final BibDatabaseContext databaseContext;
     private final StateManager stateManager;
     private final GroupTreeNode groupNode;
-    private final SimpleIntegerProperty hits;
+    private final ObservableList<BibEntry> matchedEntries = FXCollections.observableArrayList();
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
@@ -58,14 +58,15 @@ public class GroupNodeViewModel {
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
-    private final DelayTaskThrottler throttler;
+    private final PreferencesService preferencesService;
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard) {
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
         this.localDragBoard = Objects.requireNonNull(localDragBoard);
+        this.preferencesService = preferencesService;
 
         displayName = new LatexToUnicodeFormatter().format(groupNode.getName());
         isRoot = groupNode.isRoot();
@@ -78,12 +79,11 @@ public class GroupNodeViewModel {
                                      .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                                      .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
-            children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
+            children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        hits = new SimpleIntegerProperty(0);
-        calculateNumberOfMatches();
+        updateMatchedEntries();
         expandedProperty.set(groupNode.getGroup().isExpanded());
         expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
@@ -91,31 +91,31 @@ public class GroupNodeViewModel {
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
-        throttler = taskExecutor.createThrottler(1000);
 
-        ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
-        anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
-        allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
+        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
+        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
+        // 'all' returns 'true' for empty streams, so this has to be checked explicitly
+        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard) {
-        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard);
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, PreferencesService preferencesService) {
+        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferencesService);
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard);
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferencesService);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferencesService);
     }
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        //if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
-        //{
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+        // {
         //    return; // user aborted operation
-        //}
+        // }
 
         var changes = groupNode.addEntriesToGroup(entries);
 
@@ -157,8 +157,8 @@ public class GroupNodeViewModel {
         return groupNode.getGroup().getDescription().orElse("");
     }
 
-    public SimpleIntegerProperty getHits() {
-        return hits;
+    public IntegerBinding getHits() {
+        return Bindings.size(matchedEntries);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class GroupNodeViewModel {
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
-                ", hits=" + hits +
+                ", matchedEntries=" + matchedEntries +
                 '}';
     }
 
@@ -222,17 +222,47 @@ public class GroupNodeViewModel {
      * Gets invoked if an entry in the current database changes.
      */
     private void onDatabaseChanged(ListChangeListener.Change<? extends BibEntry> change) {
-        throttler.schedule(this::calculateNumberOfMatches);
+        while (change.next()) {
+            if (change.wasPermutated()) {
+                // Nothing to do, as permutation doesn't change matched entries
+            } else if (change.wasUpdated()) {
+                for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
+                    if (groupNode.matches(changedEntry)) {
+                        if (!matchedEntries.contains(changedEntry)) {
+                            matchedEntries.add(changedEntry);
+                        }
+                    } else {
+                        matchedEntries.remove(changedEntry);
+                    }
+                }
+            } else {
+                for (BibEntry removedEntry : change.getRemoved()) {
+                    matchedEntries.remove(removedEntry);
+                }
+                for (BibEntry addedEntry : change.getAddedSubList()) {
+                    if (groupNode.matches(addedEntry)) {
+                        if (!matchedEntries.contains(addedEntry)) {
+                            matchedEntries.add(addedEntry);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private void calculateNumberOfMatches() {
+    private void updateMatchedEntries() {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        BackgroundTask
-                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                .onSuccess(hits::setValue)
-                .executeWith(taskExecutor);
+        if (preferencesService.getDisplayGroupCount()) {
+            BackgroundTask
+                    .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
+                    .onSuccess(entries -> {
+                        matchedEntries.clear();
+                        matchedEntries.addAll(entries);
+                    })
+                    .executeWith(taskExecutor);
+        }
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
@@ -274,13 +304,13 @@ public class GroupNodeViewModel {
 
     public void moveTo(GroupNodeViewModel target) {
         // TODO: Add undo and display message
-        //MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
         //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
 
         getGroupNode().moveTo(target.getGroupNode());
-        //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
-        //panel.markBaseChanged();
-        //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        // panel.markBaseChanged();
+        // frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
     }
 
     public void moveTo(GroupTreeNode target, int targetIndex) {
@@ -313,15 +343,15 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-            case BOTTOM:
-                this.moveTo(targetParent.get(), targetIndex + 1);
-                break;
-            case CENTER:
-                this.moveTo(target);
-                break;
-            case TOP:
-                this.moveTo(targetParent.get(), targetIndex);
-                break;
+                case BOTTOM:
+                    this.moveTo(targetParent.get(), targetIndex + 1);
+                    break;
+                case CENTER:
+                    this.moveTo(target);
+                    break;
+                case TOP:
+                    this.moveTo(targetParent.get(), targetIndex);
+                    break;
             }
         } else {
             // No parent = root -> just add

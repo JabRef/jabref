@@ -33,9 +33,9 @@ public class BibtexNameFormatter {
      * Formats the nth author of the author name list by a given format string
      *
      * @param authorsNameList The string from an author field
-     * @param whichName index of the list, starting with 1
-     * @param formatString TODO
-     * @param warn collects the warnings, may-be-null
+     * @param whichName       index of the list, starting with 1
+     * @param formatString    TODO
+     * @param warn            collects the warnings, may-be-null
      * @return
      */
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
@@ -108,20 +108,20 @@ public class BibtexNameFormatter {
 
                 Optional<String> tokenS;
                 switch (type) {
-                case 'f':
-                    tokenS = author.getFirst();
-                    break;
-                case 'v':
-                    tokenS = author.getVon();
-                    break;
-                case 'l':
-                    tokenS = author.getLast();
-                    break;
-                case 'j':
-                    tokenS = author.getJr();
-                    break;
-                default:
-                    throw new VMException("Internal error");
+                    case 'f':
+                        tokenS = author.getFirst();
+                        break;
+                    case 'v':
+                        tokenS = author.getVon();
+                        break;
+                    case 'l':
+                        tokenS = author.getLast();
+                        break;
+                    case 'j':
+                        tokenS = author.getJr();
+                        break;
+                    default:
+                        throw new VMException("Internal error");
                 }
 
                 if (!tokenS.isPresent()) {
@@ -174,7 +174,7 @@ public class BibtexNameFormatter {
                                 String[] dashes = token.split("-");
 
                                 token = Arrays.asList(dashes).stream().map(BibtexNameFormatter::getFirstCharOfString)
-                                        .collect(Collectors.joining(".-"));
+                                              .collect(Collectors.joining(".-"));
                             }
 
                             // Output token
@@ -215,7 +215,7 @@ public class BibtexNameFormatter {
                     boolean noDisTie = false;
                     if ((sb.charAt(sb.length() - 1) == '~') &&
                             ((BibtexNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||
-                            ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
+                                    ((sb.length() > 1) && (noDisTie = sb.charAt(sb.length() - 2) == '~')))) {
                         sb.deleteCharAt(sb.length() - 1);
                         if (!noDisTie) {
                             sb.append(' ');
@@ -320,5 +320,4 @@ public class BibtexNameFormatter {
         }
         return result;
     }
-
 }

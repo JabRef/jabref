@@ -35,14 +35,16 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Name formatter"); }
+    public String getTabName() {
+        return Localization.lang("Name formatter");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new NameFormatterTabViewModel(dialogService, preferences);
 
         formatterNameColumn.setSortable(true);
@@ -61,14 +63,14 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         formatterStringColumn.setEditable(true);
         formatterStringColumn.setOnEditCommit(
                 (TableColumn.CellEditEvent<NameFormatterItemModel, String> event) ->
-                    event.getRowValue().setFormat(event.getNewValue()));
+                        event.getRowValue().setFormat(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<NameFormatterItemModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove formatter %0", name))
+                .withTooltip(name -> Localization.lang("Remove formatter '%0'", name))
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeFormatter(formatterList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
@@ -105,6 +107,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
         actionFactory.configureIconButton(StandardActions.HELP_NAME_FORMATTER, new HelpAction(HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER), formatterHelp);
     }
 
-    public void addFormatter() { viewModel.addFormatter(); }
-
+    public void addFormatter() {
+        viewModel.addFormatter();
+    }
 }

@@ -31,6 +31,9 @@ eclipse {
                 def javafxgraphics = entries.find { isJavafxGraphics(it) };
                 javafxgraphics.entryAttributes['add-opens'] = 'javafx.graphics/javafx.scene=org.controlsfx.controls';
 
+                def javafxfxml = entries.find { isJavafxFXML(it) };
+                javafxfxml.entryAttributes['add-opens'] = 'javafx.fxml/javafx.fxml=org.jabref';
+
                 def graaltruffle = entries.find{ isTruffleGraal(it) } ;
                 graaltruffle.entryAttributes['add-exports'] = 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle';
 
@@ -60,6 +63,8 @@ boolean isControlsfx(entry) { return entry.properties.path.contains('controlsfx'
 boolean isJavafxControls(entry) { return entry.properties.path.contains('javafx-controls'); }
 
 boolean isJavafxGraphics(entry) { return entry.properties.path.contains('javafx-graphics'); }
+
+boolean isJavafxFXML(entry) { return entry.properties.path.contains('javafx-fxml'); }
 
 boolean isTruffleGraal(entry)  {return entry.properties.path.contains('org.graalvm.regex'); }
 

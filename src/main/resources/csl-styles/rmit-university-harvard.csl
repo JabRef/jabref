@@ -8,11 +8,11 @@
     <link href="https://www.lib.rmit.edu.au/easy-cite/" rel="documentation"/>
     <author>
       <name>Katie Finch</name>
-      <email>katie.finch@rmit.edu.au</email>
+      <email>library.systems@rmit.edu.au</email>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <updated>2020-01-13T00:52:05+00:00</updated>
+    <updated>2020-06-24T03:04:07+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -86,15 +86,48 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL" type="webpage">
+      <if variable="URL" type="article-newspaper webpage speech report">
+        <text value="viewed"/>
         <group prefix=" " delimiter=", ">
-          <date variable="accessed" prefix="viewed ">
+          <date variable="accessed" delimiter=" ">
             <date-part name="day" suffix=" "/>
             <date-part name="month" suffix=" "/>
             <date-part name="year" suffix=","/>
           </date>
+          <text variable="URL" prefix=" &lt;" suffix="&gt;"/>
         </group>
-        <text variable="URL" prefix=" &lt;" suffix="&gt;"/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="newspaper-webpage">
+    <choose>
+      <if type="article-newspaper">
+        <group prefix=" " delimiter=", ">
+          <date variable="issued" prefix="">
+            <date-part name="day" suffix=" "/>
+            <date-part name="month" suffix=""/>
+          </date>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="presentation">
+    <choose>
+      <if type="speech">
+        <group delimiter=", ">
+          <!-- suffix=", "> -->
+          <text variable="genre"/>
+          <!-- <text term="presented at"/> -->
+          <text variable="event"/>
+          <text variable="event-place"/>
+        </group>
+      </if>
+    </choose>
+  </macro>
+  <macro name="report-number">
+    <choose>
+      <if type="report">
+        <text variable="number" suffix=","/>
       </if>
     </choose>
   </macro>
@@ -148,14 +181,14 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" collapse="year">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">
           <text macro="author-short"/>
           <text macro="year-date"/>
         </group>
-        <group>
+        <group delimiter=" ">
           <label variable="locator" form="short"/>
           <text variable="locator"/>
         </group>
@@ -174,9 +207,10 @@
       </date>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
-          <group prefix=" " delimiter=" " suffix=",">
+          <group delimiter=" " prefix=" ">
             <text macro="title"/>
-            <text macro="edition"/>
+            <text macro="report-number"/>
+            <text macro="edition" suffix=","/>
             <text macro="editor"/>
           </group>
           <text prefix=" " macro="publisher"/>
@@ -210,6 +244,8 @@
           </group>
         </else>
       </choose>
+      <text prefix=", " macro="presentation"/>
+      <text prefix=", " macro="newspaper-webpage"/>
       <text prefix=", " macro="access"/>
     </layout>
   </bibliography>

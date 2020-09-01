@@ -27,11 +27,9 @@ public class EditExternalFileTypeViewModel {
 
         if (fileType.getOpenWithApplication().isEmpty()) {
             defaultApplicationSelectedProperty.setValue(true);
-        }
-        else {
+        } else {
             customApplicationSelectedProperty.setValue(true);
         }
-
     }
 
     public StringProperty extensionProperty() {
@@ -84,5 +82,4 @@ public class EditExternalFileTypeViewModel {
             fileType.setOpenWith(application);
         }
     }
-
 }

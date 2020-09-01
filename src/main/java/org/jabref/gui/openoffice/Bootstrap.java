@@ -105,7 +105,7 @@ public class Bootstrap {
      * </pre>
      *
      * @return an array of default commandline options
-     * @see #bootstrap( String[] )
+     * @see #bootstrap(String[])
      * @since LibreOffice 5.1
      */
     public static final String[] getDefaultOptions() {
@@ -113,23 +113,23 @@ public class Bootstrap {
     }
 
     /**
-       backwards compatibility stub.
-        @param context_entries the hash table contains mappings of entry names (type string) to
-        context entries (type class ComponentContextEntry).
-        @throws Exception if things go awry.
-        @return a new context.
+     * backwards compatibility stub.
+     *
+     * @param context_entries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
+     * @return a new context.
+     * @throws Exception if things go awry.
      */
     public static XComponentContext createInitialComponentContext(Hashtable<String, Object> context_entries) throws Exception {
         return createInitialComponentContext((Map<String, Object>) context_entries);
     }
 
-    /** Bootstraps an initial component context with service manager and basic
-        jurt components inserted.
-        @param context_entries the hash table contains mappings of entry names (type string) to
-        context entries (type class ComponentContextEntry).
-        @throws Exception if things go awry.
-        @return a new context.
-    */
+    /**
+     * Bootstraps an initial component context with service manager and basic jurt components inserted.
+     *
+     * @param context_entries the hash table contains mappings of entry names (type string) to context entries (type class ComponentContextEntry).
+     * @return a new context.
+     * @throws Exception if things go awry.
+     */
     public static XComponentContext createInitialComponentContext(Map<String, Object> context_entries) throws Exception {
         ServiceManager xSMgr = new ServiceManager();
 
@@ -158,24 +158,25 @@ public class Bootstrap {
 
     /**
      * Bootstraps a servicemanager with the jurt base components registered.
-     *
+     * <p>
      * See also UNOIDL <code>com.sun.star.lang.ServiceManager</code>.
      *
+     * @return a freshly bootstrapped service manager
      * @throws Exception if things go awry.
-     * @return     a freshly bootstrapped service manager
      */
     public static XMultiServiceFactory createSimpleServiceManager() throws Exception {
         return UnoRuntime.queryInterface(XMultiServiceFactory.class, createInitialComponentContext((Map<String, Object>) null).getServiceManager());
     }
 
-    /** Bootstraps the initial component context from a native UNO installation.
-
-        @throws Exception if things go awry.
-        @return a freshly bootstrapped component context.
-
-        See also
-        <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
-    */
+    /**
+     * Bootstraps the initial component context from a native UNO installation.
+     *
+     * @return a freshly bootstrapped component context.
+     * <p>
+     * See also
+     * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
+     * @throws Exception if things go awry.
+     */
     public static final XComponentContext defaultBootstrap_InitialComponentContext() throws Exception {
         return defaultBootstrap_InitialComponentContext((String) null, (Map<String, String>) null);
     }
@@ -183,31 +184,26 @@ public class Bootstrap {
     /**
      * Backwards compatibility stub.
      *
-     * @param ini_file
-     *        ini_file (may be null: uno.rc besides cppuhelper lib)
-     * @param bootstrap_parameters
-     *        bootstrap parameters (maybe null)
-     *
-     * @throws Exception if things go awry.
+     * @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
+     * @param bootstrap_parameters bootstrap parameters (maybe null)
      * @return a freshly bootstrapped component context.
+     * @throws Exception if things go awry.
      */
     public static final XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) throws Exception {
         return defaultBootstrap_InitialComponentContext(ini_file, (Map<String, String>) bootstrap_parameters);
     }
 
-    /** Bootstraps the initial component context from a native UNO installation.
-
-        See also
-        <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
-
-        @param ini_file
-               ini_file (may be null: uno.rc besides cppuhelper lib)
-        @param bootstrap_parameters
-               bootstrap parameters (maybe null)
-
-        @throws Exception if things go awry.
-        @return a freshly bootstrapped component context.
-    */
+    /**
+     * Bootstraps the initial component context from a native UNO installation.
+     * <p>
+     * See also
+     * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
+     *
+     * @param ini_file             ini_file (may be null: uno.rc besides cppuhelper lib)
+     * @param bootstrap_parameters bootstrap parameters (maybe null)
+     * @return a freshly bootstrapped component context.
+     * @throws Exception if things go awry.
+     */
     public static final XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Map<String, String> bootstrap_parameters) throws Exception {
         // jni convenience: easier to iterate over array than calling Hashtable
         String pairs[] = null;
@@ -254,10 +250,8 @@ public class Bootstrap {
     /**
      * Bootstraps the component context from a UNO installation.
      *
-     * @throws BootstrapException if things go awry.
-     *
      * @return a bootstrapped component context.
-     *
+     * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
     public static final XComponentContext bootstrap(URLClassLoader loader) throws BootstrapException {
@@ -269,15 +263,10 @@ public class Bootstrap {
     /**
      * Bootstraps the component context from a UNO installation.
      *
-     * @param argArray
-     *        an array of strings - commandline options to start instance of
-     *        soffice with
-     * @see #getDefaultOptions()
-     *
-     * @throws BootstrapException if things go awry.
-     *
+     * @param argArray an array of strings - commandline options to start instance of soffice with
      * @return a bootstrapped component context.
-     *
+     * @throws BootstrapException if things go awry.
+     * @see #getDefaultOptions()
      * @since LibreOffice 5.1
      */
     public static final XComponentContext bootstrap(String[] argArray, URLClassLoader loader) throws BootstrapException {
@@ -300,7 +289,7 @@ public class Bootstrap {
             }
 
             // create call with arguments
-            //We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
+            // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
             cmdArray[0] = fOffice.getPath();
             cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");
@@ -325,7 +314,7 @@ public class Bootstrap {
             String sConnect = "uno:socket,host=localhost,port=2083" + ";urp;StarOffice.ComponentContext";
 
             // wait until office is started
-            for (int i = 0;; ++i) {
+            for (int i = 0; ; ++i) {
                 try {
                     // try to connect to office
                     Object context = xUrlResolver.resolve(sConnect);
@@ -363,7 +352,7 @@ public class Bootstrap {
                 try {
                     BufferedReader r = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-                    for (;;) {
+                    for (; ; ) {
                         String s = r.readLine();
                         if (s == null) {
                             break;

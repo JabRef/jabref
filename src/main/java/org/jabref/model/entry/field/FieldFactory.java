@@ -3,15 +3,15 @@ package org.jabref.model.entry.field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 public class FieldFactory {
@@ -47,21 +47,24 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
+                     .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
     public static Set<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
+                     .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseOrFields)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
+                     .filter(StringUtil::isNotBlank)
                      .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static String serializeFieldsList(Collection<Field> fields) {
@@ -92,16 +95,31 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a sorted List with all standard fields and including some common internal fields
+     * Returns a  List with all standard fields and including some common internal fields
      */
     public static Set<Field> getCommonFields() {
-        TreeSet<Field> publicAndInternalFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
+
+        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
-        publicAndInternalFields.addAll(EnumSet.allOf(StandardField.class));
+        publicAndInternalFields.addAll(allFields);
 
         return publicAndInternalFields;
+    }
+
+    /**
+     * Returns a  List with all standard fields and the bibtexkey field
+     */
+    public static Set<Field> getStandardFielsdsWithBibTexKey() {
+        EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
+
+        LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
+        standardFieldsWithBibtexKey.add(InternalField.KEY_FIELD);
+        standardFieldsWithBibtexKey.addAll(allFields);
+
+        return standardFieldsWithBibtexKey;
     }
 
     public static Set<Field> getBookNameFields() {
@@ -134,18 +152,14 @@ public class FieldFactory {
      * separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, InternalField.GROUPS, InternalField.OWNER, InternalField.TIMESTAMP));
+        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }
 
-    // TODO: Move somewhere more appropriate and make user-configurable
-    public static boolean isSingleLineField(final Field field) {
-        if (field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT)) {
-            return false;
-        }
-
+    // TODO: This should ideally be user configurable! Move somewhere more appropriate in the future
+    public static boolean isMultiLineField(final Field field, List<Field> nonWrappableFields) {
         // Treat unknown fields as multi-line fields
-        return !(field instanceof UnknownField);
+        return (field instanceof UnknownField) || nonWrappableFields.contains(field) || field.equals(StandardField.ABSTRACT) || field.equals(StandardField.COMMENT) || field.equals(StandardField.REVIEW);
     }
 }

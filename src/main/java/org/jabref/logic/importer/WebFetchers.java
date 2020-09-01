@@ -12,6 +12,8 @@ import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import org.jabref.logic.importer.fetcher.CiteSeer;
+import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.DOAJFetcher;
@@ -19,7 +21,6 @@ import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
-import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -28,6 +29,7 @@ import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
+import org.jabref.logic.importer.fetcher.Medra;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
@@ -100,7 +102,8 @@ public class WebFetchers {
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
         set.add(new IEEE(importFormatPreferences));
-        set.add(new GrobidCitationFetcher(importFormatPreferences));
+        set.add(new CompositeSearchBasedFetcher(set, 30));
+        set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         return set;
     }
 
@@ -121,6 +124,7 @@ public class WebFetchers {
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
+        set.add(new Medra());
         return set;
     }
 
@@ -140,8 +144,8 @@ public class WebFetchers {
     /**
      * @return sorted set containing id fetchers
      */
-    public static SortedSet<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
-        SortedSet<IdFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
+    public static SortedSet<IdFetcher<? extends Identifier>> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+        SortedSet<IdFetcher<?>> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new CrossRef());
         set.add(new ArXiv(importFormatPreferences));
         return set;

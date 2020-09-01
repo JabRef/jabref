@@ -1,8 +1,4 @@
 package org.jabref.gui.groups;
 
-public enum GroupViewMode {
+public enum GroupViewMode { INTERSECTION, UNION }
 
-    INTERSECTION,
-    UNION,
-
-}

@@ -15,7 +15,6 @@ public class HowPublishedChecker implements ValueChecker {
 
     private final BibDatabaseContext databaseContext;
 
-
     public HowPublishedChecker(BibDatabaseContext databaseContext) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
     }
@@ -32,7 +31,7 @@ public class HowPublishedChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        //BibTeX
+        // BibTeX
         if (!databaseContext.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));
         }

@@ -30,7 +30,6 @@ public enum JabRefMaterialDesignIcon implements GlyphIcons {
     VSCODE("\ue90d"),
     CANCEL("\ue90e");
 
-
     private final String unicode;
 
     JabRefMaterialDesignIcon(String unicode) {

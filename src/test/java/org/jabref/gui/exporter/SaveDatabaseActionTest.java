@@ -17,8 +17,9 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.shared.DatabaseLocation;
@@ -111,9 +112,10 @@ class SaveDatabaseActionTest {
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
         when(savePreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(savePreferences.getFieldWriterPreferences()).thenReturn(fieldWriterPreferences);
-        GlobalBibtexKeyPattern emptyGlobalBibtexKeyPattern = GlobalBibtexKeyPattern.fromPattern("");
-        when(savePreferences.getGlobalCiteKeyPattern()).thenReturn(emptyGlobalBibtexKeyPattern);
-        when(metaData.getCiteKeyPattern(any(GlobalBibtexKeyPattern.class))).thenReturn(emptyGlobalBibtexKeyPattern);
+        GlobalCitationKeyPattern emptyGlobalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern("");
+        when(metaData.getCiteKeyPattern(any(GlobalCitationKeyPattern.class))).thenReturn(emptyGlobalCitationKeyPattern);
+        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(mock(CitationKeyPatternPreferences.class));
+        when(savePreferences.getCitationKeyPatternPreferences().getKeyPattern()).thenReturn(emptyGlobalCitationKeyPattern);
         when(dbContext.getDatabasePath()).thenReturn(Optional.of(file));
         when(dbContext.getLocation()).thenReturn(DatabaseLocation.LOCAL);
         when(dbContext.getDatabase()).thenReturn(database);
@@ -144,7 +146,7 @@ class SaveDatabaseActionTest {
 
         assertEquals(database
                         .getEntries().stream()
-                        .map(entry -> entry.hasChanged()).filter(changed -> false).collect(Collectors.toList()),
+                        .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
                 Collections.emptyList());
     }
 

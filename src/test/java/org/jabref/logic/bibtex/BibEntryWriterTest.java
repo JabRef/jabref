@@ -48,10 +48,10 @@ class BibEntryWriterTest {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        //set a required field
+        // set a required field
         entry.setField(StandardField.AUTHOR, "Foo Bar");
         entry.setField(StandardField.JOURNAL, "International Journal of Something");
-        //set an optional field
+        // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
@@ -81,7 +81,7 @@ class BibEntryWriterTest {
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCiteKey("test");
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -111,10 +111,10 @@ class BibEntryWriterTest {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.InBook);
-        //set an required OR field (author/editor)
+        // set an required OR field (author/editor)
         entry.setField(StandardField.EDITOR, "Foo Bar");
         entry.setField(StandardField.JOURNAL, "International Journal of Something");
-        //set an optional field
+        // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
@@ -139,11 +139,11 @@ class BibEntryWriterTest {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.InBook);
-        //set an required OR field with both fields(author/editor)
+        // set an required OR field with both fields(author/editor)
         entry.setField(StandardField.AUTHOR, "Foo Thor");
         entry.setField(StandardField.EDITOR, "Edi Bar");
         entry.setField(StandardField.JOURNAL, "International Journal of Something");
-        //set an optional field
+        // set an optional field
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
 
@@ -199,7 +199,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -223,7 +223,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -272,8 +272,8 @@ class BibEntryWriterTest {
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
                 "  HowPublished             = {asdf}," + OS.NEWLINE +
                 "}";
         // @formatter:on
@@ -286,7 +286,7 @@ class BibEntryWriterTest {
         // modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -323,7 +323,7 @@ class BibEntryWriterTest {
         // modify entry
         entry.setType(StandardEntryType.InProceedings);
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -346,8 +346,8 @@ class BibEntryWriterTest {
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
@@ -356,7 +356,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -389,7 +389,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -418,7 +418,7 @@ class BibEntryWriterTest {
         assertTrue(fields.contains(StandardField.MONTH));
         assertEquals("#mar#", entry.getField(StandardField.MONTH).get());
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -479,7 +479,7 @@ class BibEntryWriterTest {
         // modify entry
         entry.setField(StandardField.HOWPUBLISHED, "asdf");
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -542,7 +542,7 @@ class BibEntryWriterTest {
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -557,8 +557,8 @@ class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -570,7 +570,7 @@ class BibEntryWriterTest {
         // change the entry
         entry.setField(StandardField.AUTHOR, "John Doe");
 
-        //write out bibtex string
+        // write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
@@ -592,15 +592,15 @@ class BibEntryWriterTest {
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        //required fields
+        // required fields
         entry.setField(StandardField.AUTHOR, "Foo Bar");
         entry.setField(StandardField.JOURNALTITLE, "International Journal of Something");
         entry.setField(StandardField.TITLE, "Title");
         entry.setField(StandardField.DATE, "2019-10-16");
-        //optional fields
+        // optional fields
         entry.setField(StandardField.NUMBER, "1");
         entry.setField(StandardField.NOTE, "some note");
-        //unknown fields
+        // unknown fields
         entry.setField(StandardField.YEAR, "2019");
         entry.setField(StandardField.CHAPTER, "chapter");
 

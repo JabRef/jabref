@@ -467,6 +467,9 @@
     </layout>
   </citation>
   <bibliography>
+    <sort>
+      <key macro="author_title-bibliography"/>
+    </sort>
     <layout suffix=".">
       <text macro="author_title-bibliography"/>
       <text macro="reference-publication-details"/>

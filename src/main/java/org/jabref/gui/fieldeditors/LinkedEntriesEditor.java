@@ -8,7 +8,9 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.util.component.TagBar;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,12 +28,12 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @FXML
     private JFXChipView<ParsedEntryLink> chipView;
 
-    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public LinkedEntriesEditor(Field field, BibDatabaseContext databaseContext, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         this.viewModel = new LinkedEntriesEditorViewModel(field, suggestionProvider, databaseContext, fieldCheckers);
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
 
         chipView.setConverter(viewModel.getStringConverter());
         chipView.getSuggestions().addAll((Collection<? extends ParsedEntryLink>) suggestionProvider.getPossibleSuggestions());

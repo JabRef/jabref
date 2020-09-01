@@ -41,7 +41,7 @@ class RenamePdfCleanupTest {
         entry.setCiteKey("Toot");
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
+        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         cleanup = new RenamePdfCleanup(false, context, filePreferences);
     }
 
@@ -82,7 +82,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithCitationKey(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 

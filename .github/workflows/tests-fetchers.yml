@@ -22,7 +22,9 @@ on:
     - cron: '2 3 * * 3'
 
 env:
-  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
 
 jobs:
   fetchertests:
@@ -30,10 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v1
-        with:
-          depth: 1
-          submodules: false
+        uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:

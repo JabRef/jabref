@@ -5,10 +5,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 public class UpdateField {
 
@@ -18,9 +20,9 @@ public class UpdateField {
     /**
      * Updating a field will result in the entry being reformatted on save
      *
-     * @param be         BibEntry
-     * @param field      Field name
-     * @param newValue   New field value
+     * @param be       BibEntry
+     * @param field    Field name
+     * @param newValue New field value
      */
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue) {
         return updateField(be, field, newValue, false);
@@ -29,9 +31,9 @@ public class UpdateField {
     /**
      * Updating a non-displayable field does not result in the entry being reformatted on save
      *
-     * @param be         BibEntry
-     * @param field      Field name
-     * @param newValue   New field value
+     * @param be       BibEntry
+     * @param field    Field name
+     * @param newValue New field value
      */
     public static Optional<FieldChange> updateNonDisplayableField(BibEntry be, Field field, String newValue) {
         boolean changed = be.hasChanged();
@@ -43,10 +45,10 @@ public class UpdateField {
     /**
      * Undoable change of field value
      *
-     * @param be                          BibEntry
-     * @param field                       Field name
-     * @param newValue                    New field value
-     * @param nullFieldIfValueIsTheSame   If true the field value is removed when the current value is equals to newValue
+     * @param be                        BibEntry
+     * @param field                     Field name
+     * @param newValue                  New field value
+     * @param nullFieldIfValueIsTheSame If true the field value is removed when the current value is equals to newValue
      */
     public static Optional<FieldChange> updateField(BibEntry be, Field field, String newValue,
                                                     Boolean nullFieldIfValueIsTheSame) {
@@ -89,18 +91,23 @@ public class UpdateField {
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
-            UpdateFieldPreferences prefs) {
-        String defaultOwner = prefs.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
-        Field timeStampField = prefs.getTimeStampField();
-        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(InternalField.OWNER)));
-        boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
+                                          OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
+        String defaultOwner = ownerPreferences.getDefaultOwner();
+        String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
+        Field timeStampField = timestampPreferences.getTimestampField();
+        boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(StandardField.OWNER)));
+        boolean setTimeStamp = timestampPreferences.isUseTimestamps() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
 
-    public static void setAutomaticFields(BibEntry entry, UpdateFieldPreferences prefs) {
-        UpdateField.setAutomaticFields(entry, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
+    public static void setAutomaticFields(BibEntry entry,
+                                          OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
+        UpdateField.setAutomaticFields(entry,
+                ownerPreferences.isOverwriteOwner(),
+                timestampPreferences.isOverwriteTimestamp(),
+                ownerPreferences,
+                timestampPreferences);
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp,
@@ -109,7 +116,7 @@ public class UpdateField {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(InternalField.OWNER, owner);
+            entry.setField(StandardField.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -123,30 +130,35 @@ public class UpdateField {
      *
      * @param bibs List of bibtex entries
      */
-    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner,
-            boolean overwriteTimestamp, UpdateFieldPreferences prefs) {
+    public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner, boolean overwriteTimestamp,
+                                          OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
 
-        boolean globalSetOwner = prefs.isUseOwner();
-        boolean globalSetTimeStamp = prefs.isUseTimeStamp();
+        boolean globalSetOwner = ownerPreferences.isUseOwner();
+        boolean globalSetTimeStamp = timestampPreferences.isUseTimestamps();
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp)) {
             return;
         }
 
-        Field timeStampField = prefs.getTimeStampField();
-        String defaultOwner = prefs.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
+        Field timeStampField = timestampPreferences.getTimestampField();
+        String defaultOwner = ownerPreferences.getDefaultOwner();
+        String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalField.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(StandardField.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }
     }
 
-    public static void setAutomaticFields(Collection<BibEntry> bibs, UpdateFieldPreferences prefs) {
-        UpdateField.setAutomaticFields(bibs, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
+    public static void setAutomaticFields(Collection<BibEntry> bibs,
+                                          OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
+        UpdateField.setAutomaticFields(bibs,
+                ownerPreferences.isOverwriteOwner(),
+                timestampPreferences.isOverwriteTimestamp(),
+                ownerPreferences,
+                timestampPreferences);
     }
 }

@@ -9,22 +9,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.DialogService;
 import org.jabref.preferences.JabRefPreferences;
 
 public class ImportTabViewModel implements PreferenceTabViewModel {
 
-    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] { "[bibtexkey]", "[bibtexkey] - [title]" };
+    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
 
     private final ListProperty<String> defaultFileNamePatternsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(DEFAULT_FILENAME_PATTERNS));
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirPatternProperty = new SimpleStringProperty();
 
-    private final DialogService dialogService;
     private final JabRefPreferences preferences;
 
-    public ImportTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
-        this.dialogService = dialogService;
+    public ImportTabViewModel(JabRefPreferences preferences) {
         this.preferences = preferences;
     }
 
@@ -50,9 +47,15 @@ public class ImportTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>();
     }
 
-    public ListProperty<String> defaultFileNamePatternsProperty() { return defaultFileNamePatternsProperty; }
+    public ListProperty<String> defaultFileNamePatternsProperty() {
+        return defaultFileNamePatternsProperty;
+    }
 
-    public StringProperty fileNamePatternProperty() { return fileNamePatternProperty; }
+    public StringProperty fileNamePatternProperty() {
+        return fileNamePatternProperty;
+    }
 
-    public StringProperty fileDirPatternProperty() { return fileDirPatternProperty; }
+    public StringProperty fileDirPatternProperty() {
+        return fileDirPatternProperty;
+    }
 }

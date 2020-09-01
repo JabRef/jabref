@@ -24,6 +24,7 @@ public class BibTeXConverter {
 
     /**
      * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
+     *
      * @param entry The MsBibEntry to convert
      * @return The bib entry
      */

@@ -106,9 +106,8 @@ tendo as inicias separadas por ponto.-->
   <!--A macro 'translator' e responsavel por mostrar os nomes dos tradutores, serao apresentados SOBRENOME, INICIAIS PRENOMES
 tendo as inicias separadas por ponto. -->
   <macro name="translator">
-    <text value="Traducao "/>
     <names variable="translator" delimiter="; ">
-      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always">
+      <name delimiter="; " sort-separator=" " delimiter-precedes-last="always" prefix="Tradução: ">
         <name-part name="given" text-case="capitalize-first"/>
         <name-part name="family" text-case="capitalize-first"/>
       </name>
@@ -201,8 +200,7 @@ autores, exceto em arquivos do tipo 'artigo de jornal, artigo de revista, artigo
           <if variable="publisher-place">
             <text variable="publisher-place" suffix=": "/>
           </if>
-          <else-if type="entry-encyclopedia">
-        </else-if>
+          <else-if type="entry-encyclopedia"/>
           <else>
             <text value="[s.l.] "/>
           </else>

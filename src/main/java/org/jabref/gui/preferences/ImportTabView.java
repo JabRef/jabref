@@ -12,24 +12,26 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ImportTabView extends AbstractPreferenceTabView<ImportTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<String> fileNamePattern;
-    @FXML private TextField fileDirPattern;
+    @FXML private TextField fileDirectoryPattern;
 
     public ImportTabView(JabRefPreferences preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
-    public void initialize () {
-        this.viewModel = new ImportTabViewModel(dialogService, preferences);
+    public void initialize() {
+        this.viewModel = new ImportTabViewModel(preferences);
 
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
-        fileDirPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
+        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirPatternProperty());
     }
 
     @Override
-    public String getTabName() { return Localization.lang("Import"); }
+    public String getTabName() {
+        return Localization.lang("Import");
+    }
 }

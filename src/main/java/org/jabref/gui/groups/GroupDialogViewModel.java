@@ -1,8 +1,8 @@
 package org.jabref.gui.groups;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
@@ -33,6 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -56,7 +58,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GroupDialogViewModel {
-
     // Basic Settings
     private final StringProperty nameProperty = new SimpleStringProperty("");
     private final StringProperty descriptionProperty = new SimpleStringProperty("");
@@ -95,10 +96,12 @@ public class GroupDialogViewModel {
     private Validator nameContainsDelimiterValidator;
     private Validator sameNameValidator;
     private Validator keywordRegexValidator;
+    private Validator keywordFieldEmptyValidator;
     private Validator keywordSearchTermEmptyValidator;
     private Validator searchRegexValidator;
     private Validator searchSearchTermEmptyValidator;
-    private CompositeValidator validator = new CompositeValidator();
+    private Validator texGroupFilePathValidator;
+    private final CompositeValidator validator = new CompositeValidator();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -141,10 +144,8 @@ public class GroupDialogViewModel {
                             return false;
                         }
 
-                        if ((editedGroup != null) && !editedGroup.getName().equals(name) && (groupsWithSameName > 0)) {
-                            // Edit group, changed name to something that is already present
-                            return false;
-                        }
+                        // Edit group, changed name to something that is already present
+                        return (editedGroup == null) || editedGroup.getName().equals(name) || (groupsWithSameName <= 0);
                     }
                     return true;
                 },
@@ -172,6 +173,11 @@ public class GroupDialogViewModel {
                         Localization.lang("Searching for keywords"),
                         Localization.lang("Keywords"),
                         Localization.lang("Invalid regular expression."))));
+
+        keywordFieldEmptyValidator = new FunctionBasedValidator<>(
+                keywordGroupSearchFieldProperty,
+                StringUtil::isNotBlank,
+                ValidationMessage.error(Localization.lang("Please enter a field name to search for keywords.")));
 
         keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
@@ -209,108 +215,145 @@ public class GroupDialogViewModel {
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %n %s",
                         Localization.lang("Free search expression"),
-                        Localization.lang("Search term is empty.")
-                )));
+                        Localization.lang("Search term is empty."))));
+
+        texGroupFilePathValidator = new FunctionBasedValidator<>(
+                texGroupFilePathProperty,
+                input -> {
+                    if (StringUtil.isBlank(input)) {
+                        return false;
+                    } else {
+                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
+                        if (!Files.isRegularFile(texFilePath)) {
+                            return false;
+                        }
+                        return FileUtil.getFileExtension(input)
+                                .map(extension -> extension.toLowerCase().equals("aux"))
+                                .orElse(false);
+                    }
+                },
+                ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
         validator.addValidators(nameValidator, sameNameValidator);
 
-        typeSearchProperty.addListener((obs,oldVal,newVal) -> {
-            if (newVal) {
+        typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
+            if (isSelected) {
                 validator.addValidators(searchRegexValidator, searchSearchTermEmptyValidator);
             } else {
                 validator.removeValidators(searchRegexValidator, searchSearchTermEmptyValidator);
             }
         });
 
-        typeKeywordsProperty.addListener((obs,oldVal,newVal) -> {
-            if (newVal) {
-                validator.addValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+        typeKeywordsProperty.addListener((obs, _oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
             } else {
-                validator.removeValidators(keywordRegexValidator, keywordSearchTermEmptyValidator);
+                validator.removeValidators(keywordFieldEmptyValidator, keywordRegexValidator, keywordSearchTermEmptyValidator);
+            }
+        });
+
+        typeTexProperty.addListener((obs, oldValue, isSelected) -> {
+            if (isSelected) {
+                validator.addValidators(texGroupFilePathValidator);
+            } else {
+                validator.removeValidators(texGroupFilePathValidator);
             }
         });
     }
 
-    public AbstractGroup resultConverter(ButtonType button) {
-        if (button == ButtonType.OK) {
-            ValidationStatus validationStatus = validator.getValidationStatus();
-            if (validationStatus.getHighestMessage().isPresent()) {
-                dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
-                return null;
-            }
-
-            AbstractGroup resultingGroup = null;
-            try {
-                String groupName = nameProperty.getValue().trim();
-                if (typeExplicitProperty.getValue()) {
-                    resultingGroup = new ExplicitGroup(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            preferencesService.getKeywordDelimiter());
-                } else if (typeKeywordsProperty.getValue()) {
-                    if (keywordGroupRegexProperty.getValue()) {
-                        resultingGroup = new RegexKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
-                                keywordGroupSearchTermProperty.getValue().trim(),
-                                keywordGroupCaseSensitiveProperty.getValue());
-                    } else {
-                        resultingGroup = new WordKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
-                                keywordGroupSearchTermProperty.getValue().trim(),
-                                keywordGroupCaseSensitiveProperty.getValue(),
-                                preferencesService.getKeywordDelimiter(),
-                                false);
-                    }
-                } else if (typeSearchProperty.getValue()) {
-                    resultingGroup = new SearchGroup(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            searchGroupSearchTermProperty.getValue().trim(),
-                            searchGroupCaseSensitiveProperty.getValue(),
-                            searchGroupRegexProperty.getValue());
-                } else if (typeAutoProperty.getValue()) {
-                    if (autoGroupKeywordsOptionProperty.getValue()) {
-                        resultingGroup = new AutomaticKeywordGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
-                                autoGroupKeywordsDelimiterProperty.getValue().charAt(0),
-                                autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0));
-                    } else {
-                        resultingGroup = new AutomaticPersonsGroup(
-                                groupName,
-                                groupHierarchySelectedProperty.getValue(),
-                                FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
-                    }
-                } else if (typeTexProperty.getValue()) {
-                    resultingGroup = TexGroup.create(
-                            groupName,
-                            groupHierarchySelectedProperty.getValue(),
-                            Paths.get(texGroupFilePathProperty.getValue().trim()),
-                            new DefaultAuxParser(new BibDatabase()),
-                            Globals.getFileUpdateMonitor(),
-                            currentDatabase.getMetaData());
-                }
-
-                if (resultingGroup != null) {
-                    resultingGroup.setColor(colorProperty.getValue());
-                    resultingGroup.setDescription(descriptionProperty.getValue());
-                    resultingGroup.setIconName(iconProperty.getValue());
-                    return resultingGroup;
-                } else {
-                    return null;
-                }
-
-            } catch (IllegalArgumentException | IOException exception) {
-                dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
-                return null;
-            }
+    public void validationHandler(Event event) {
+        ValidationStatus validationStatus = validator.getValidationStatus();
+        if (validationStatus.getHighestMessage().isPresent()) {
+            dialogService.showErrorDialogAndWait(validationStatus.getHighestMessage().get().getMessage());
+            // consume the event to prevent the dialog to close
+            event.consume();
         }
-        return null;
+    }
+
+    public AbstractGroup resultConverter(ButtonType button) {
+        if (button != ButtonType.OK) {
+            return null;
+        }
+
+        AbstractGroup resultingGroup = null;
+        try {
+            String groupName = nameProperty.getValue().trim();
+            if (typeExplicitProperty.getValue()) {
+                resultingGroup = new ExplicitGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        preferencesService.getKeywordDelimiter());
+            } else if (typeKeywordsProperty.getValue()) {
+                if (keywordGroupRegexProperty.getValue()) {
+                    resultingGroup = new RegexKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
+                            keywordGroupSearchTermProperty.getValue().trim(),
+                            keywordGroupCaseSensitiveProperty.getValue());
+                } else {
+                    resultingGroup = new WordKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
+                            keywordGroupSearchTermProperty.getValue().trim(),
+                            keywordGroupCaseSensitiveProperty.getValue(),
+                            preferencesService.getKeywordDelimiter(),
+                            false);
+                }
+            } else if (typeSearchProperty.getValue()) {
+                resultingGroup = new SearchGroup(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        searchGroupSearchTermProperty.getValue().trim(),
+                        searchGroupCaseSensitiveProperty.getValue(),
+                        searchGroupRegexProperty.getValue());
+            } else if (typeAutoProperty.getValue()) {
+                if (autoGroupKeywordsOptionProperty.getValue()) {
+                    // Set default value for delimiters: ',' for base and '>' for hierarchical
+                    char delimiter = ',';
+                    char hierarDelimiter = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
+                    // Modify values for delimiters if user provided customized values
+                    if (!autoGroupKeywordsDelimiterProperty.getValue().isEmpty()) {
+                        delimiter = autoGroupKeywordsDelimiterProperty.getValue().charAt(0);
+                    }
+                    if (!autoGroupKeywordsHierarchicalDelimiterProperty.getValue().isEmpty()) {
+                        hierarDelimiter = autoGroupKeywordsHierarchicalDelimiterProperty.getValue().charAt(0);
+                    }
+                    resultingGroup = new AutomaticKeywordGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
+                            delimiter,
+                            hierarDelimiter);
+                } else {
+                    resultingGroup = new AutomaticPersonsGroup(
+                            groupName,
+                            groupHierarchySelectedProperty.getValue(),
+                            FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
+                }
+            } else if (typeTexProperty.getValue()) {
+                resultingGroup = TexGroup.create(
+                        groupName,
+                        groupHierarchySelectedProperty.getValue(),
+                        Path.of(texGroupFilePathProperty.getValue().trim()),
+                        new DefaultAuxParser(new BibDatabase()),
+                        Globals.getFileUpdateMonitor(),
+                        currentDatabase.getMetaData());
+            }
+
+            if (resultingGroup != null) {
+                resultingGroup.setColor(colorProperty.getValue());
+                resultingGroup.setDescription(descriptionProperty.getValue());
+                resultingGroup.setIconName(iconProperty.getValue());
+                return resultingGroup;
+            }
+
+            return null;
+        } catch (IllegalArgumentException | IOException exception) {
+            dialogService.showErrorDialogAndWait(exception.getLocalizedMessage(), exception);
+            return null;
+        }
     }
 
     public void setValues() {
@@ -397,69 +440,143 @@ public class GroupDialogViewModel {
         return fileDirs;
     }
 
-    public ValidationStatus validationStatus() { return validator.getValidationStatus(); }
+    public ValidationStatus validationStatus() {
+        return validator.getValidationStatus();
+    }
 
-    public ValidationStatus nameValidationStatus() { return nameValidator.getValidationStatus(); }
+    public ValidationStatus nameValidationStatus() {
+        return nameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus nameContainsDelimiterValidationStatus() { return nameContainsDelimiterValidator.getValidationStatus(); }
+    public ValidationStatus nameContainsDelimiterValidationStatus() {
+        return nameContainsDelimiterValidator.getValidationStatus();
+    }
 
-    public ValidationStatus sameNameValidationStatus() { return sameNameValidator.getValidationStatus(); }
+    public ValidationStatus sameNameValidationStatus() {
+        return sameNameValidator.getValidationStatus();
+    }
 
-    public ValidationStatus searchRegexValidationStatus() { return searchRegexValidator.getValidationStatus(); }
+    public ValidationStatus searchRegexValidationStatus() {
+        return searchRegexValidator.getValidationStatus();
+    }
 
-    public ValidationStatus searchSearchTermEmptyValidationStatus() { return searchSearchTermEmptyValidator.getValidationStatus(); }
+    public ValidationStatus searchSearchTermEmptyValidationStatus() {
+        return searchSearchTermEmptyValidator.getValidationStatus();
+    }
 
-    public ValidationStatus keywordRegexValidationStatus() { return keywordRegexValidator.getValidationStatus(); }
+    public ValidationStatus keywordRegexValidationStatus() {
+        return keywordRegexValidator.getValidationStatus();
+    }
 
-    public ValidationStatus keywordSearchTermEmptyValidationStatus() { return keywordSearchTermEmptyValidator.getValidationStatus(); }
+    public ValidationStatus keywordFieldEmptyValidationStatus() {
+        return keywordFieldEmptyValidator.getValidationStatus();
+    }
 
-    public StringProperty nameProperty() { return nameProperty; }
+    public ValidationStatus keywordSearchTermEmptyValidationStatus() {
+        return keywordSearchTermEmptyValidator.getValidationStatus();
+    }
 
-    public StringProperty descriptionProperty() { return descriptionProperty; }
+    public ValidationStatus texGroupFilePathValidatonStatus() {
+        return texGroupFilePathValidator.getValidationStatus();
+    }
 
-    public StringProperty iconProperty() { return iconProperty; }
+    public StringProperty nameProperty() {
+        return nameProperty;
+    }
 
-    public ObjectProperty<Color> colorFieldProperty() { return colorProperty; }
+    public StringProperty descriptionProperty() {
+        return descriptionProperty;
+    }
 
-    public ListProperty<GroupHierarchyType> groupHierarchyListProperty() { return groupHierarchyListProperty; }
+    public StringProperty iconProperty() {
+        return iconProperty;
+    }
 
-    public ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty() { return groupHierarchySelectedProperty; }
+    public ObjectProperty<Color> colorFieldProperty() {
+        return colorProperty;
+    }
 
-    public BooleanProperty typeExplicitProperty() { return typeExplicitProperty; }
+    public ListProperty<GroupHierarchyType> groupHierarchyListProperty() {
+        return groupHierarchyListProperty;
+    }
 
-    public BooleanProperty typeKeywordsProperty() { return typeKeywordsProperty; }
+    public ObjectProperty<GroupHierarchyType> groupHierarchySelectedProperty() {
+        return groupHierarchySelectedProperty;
+    }
 
-    public BooleanProperty typeSearchProperty() { return typeSearchProperty; }
+    public BooleanProperty typeExplicitProperty() {
+        return typeExplicitProperty;
+    }
 
-    public BooleanProperty typeAutoProperty() { return typeAutoProperty; }
+    public BooleanProperty typeKeywordsProperty() {
+        return typeKeywordsProperty;
+    }
 
-    public BooleanProperty typeTexProperty() { return typeTexProperty; }
+    public BooleanProperty typeSearchProperty() {
+        return typeSearchProperty;
+    }
 
-    public StringProperty keywordGroupSearchTermProperty() { return keywordGroupSearchTermProperty; }
+    public BooleanProperty typeAutoProperty() {
+        return typeAutoProperty;
+    }
 
-    public StringProperty keywordGroupSearchFieldProperty() { return keywordGroupSearchFieldProperty; }
+    public BooleanProperty typeTexProperty() {
+        return typeTexProperty;
+    }
 
-    public BooleanProperty keywordGroupCaseSensitiveProperty() { return keywordGroupCaseSensitiveProperty; }
+    public StringProperty keywordGroupSearchTermProperty() {
+        return keywordGroupSearchTermProperty;
+    }
 
-    public BooleanProperty keywordGroupRegexProperty() { return keywordGroupRegexProperty; }
+    public StringProperty keywordGroupSearchFieldProperty() {
+        return keywordGroupSearchFieldProperty;
+    }
 
-    public StringProperty searchGroupSearchTermProperty() { return searchGroupSearchTermProperty; }
+    public BooleanProperty keywordGroupCaseSensitiveProperty() {
+        return keywordGroupCaseSensitiveProperty;
+    }
 
-    public BooleanProperty searchGroupCaseSensitiveProperty() { return searchGroupCaseSensitiveProperty; }
+    public BooleanProperty keywordGroupRegexProperty() {
+        return keywordGroupRegexProperty;
+    }
 
-    public BooleanProperty searchGroupRegexProperty() { return searchGroupRegexProperty; }
+    public StringProperty searchGroupSearchTermProperty() {
+        return searchGroupSearchTermProperty;
+    }
 
-    public BooleanProperty autoGroupKeywordsOptionProperty() { return autoGroupKeywordsOptionProperty; }
+    public BooleanProperty searchGroupCaseSensitiveProperty() {
+        return searchGroupCaseSensitiveProperty;
+    }
 
-    public StringProperty autoGroupKeywordsFieldProperty() { return autoGroupKeywordsFieldProperty; }
+    public BooleanProperty searchGroupRegexProperty() {
+        return searchGroupRegexProperty;
+    }
 
-    public StringProperty autoGroupKeywordsDeliminatorProperty() { return autoGroupKeywordsDelimiterProperty; }
+    public BooleanProperty autoGroupKeywordsOptionProperty() {
+        return autoGroupKeywordsOptionProperty;
+    }
 
-    public StringProperty autoGroupKeywordsHierarchicalDeliminatorProperty() { return autoGroupKeywordsHierarchicalDelimiterProperty; }
+    public StringProperty autoGroupKeywordsFieldProperty() {
+        return autoGroupKeywordsFieldProperty;
+    }
 
-    public BooleanProperty autoGroupPersonsOptionProperty() { return autoGroupPersonsOptionProperty; }
+    public StringProperty autoGroupKeywordsDeliminatorProperty() {
+        return autoGroupKeywordsDelimiterProperty;
+    }
 
-    public StringProperty autoGroupPersonsFieldProperty() { return autoGroupPersonsFieldProperty; }
+    public StringProperty autoGroupKeywordsHierarchicalDeliminatorProperty() {
+        return autoGroupKeywordsHierarchicalDelimiterProperty;
+    }
 
-    public StringProperty texGroupFilePathProperty() { return texGroupFilePathProperty; }
+    public BooleanProperty autoGroupPersonsOptionProperty() {
+        return autoGroupPersonsOptionProperty;
+    }
+
+    public StringProperty autoGroupPersonsFieldProperty() {
+        return autoGroupPersonsFieldProperty;
+    }
+
+    public StringProperty texGroupFilePathProperty() {
+        return texGroupFilePathProperty;
+    }
 }

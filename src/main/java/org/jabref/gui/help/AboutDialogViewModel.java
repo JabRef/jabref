@@ -24,7 +24,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private static final String HOMEPAGE_URL = "https://www.jabref.org";
     private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
@@ -155,5 +155,4 @@ public class AboutDialogViewModel extends AbstractViewModel {
             logger.error("Could not open default browser.", e);
         }
     }
-
 }

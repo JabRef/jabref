@@ -3,9 +3,9 @@ package org.jabref.preferences;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.logic.citationstyle.PreviewLayout;
-import org.jabref.logic.citationstyle.TextBasedPreviewLayout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.TextBasedPreviewLayout;
+import org.jabref.logic.preview.PreviewLayout;
 
 public class PreviewPreferences {
 
@@ -54,7 +54,7 @@ public class PreviewPreferences {
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences() {
-        return Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+        return Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
     }
 
     public PreviewLayout getTextBasedPreviewLayout() {
@@ -120,5 +120,4 @@ public class PreviewPreferences {
             return new PreviewPreferences(previewCycle, previewCyclePosition, previewPanelDividerPosition, previewStyle, previewStyleDefault, showPreviewAsExtraTab);
         }
     }
-
 }
