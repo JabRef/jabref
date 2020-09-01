@@ -6,7 +6,6 @@ import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.UnknownField;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
