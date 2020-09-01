@@ -96,9 +96,9 @@ class MainArchitectureTests {
                 .layer("Preferences").definedBy("org.jabref.preferences..")
                 .layer("Styletester").definedBy("org.jabref.styletester..")
 
-                .whereLayer("Gui").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui")
-                .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations")
+                .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences") // TODO: Remove preferences here
+                .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations")
+                .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli")
                 .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Migrations").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
