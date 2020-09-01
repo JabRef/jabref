@@ -38,7 +38,7 @@ Chosen option: "Gradle", because it is lean and fits our development style.
 * Good, because [it offers custom dependency scopes](https://gradle.org/maven-vs-gradle/)
 * Good, because [it has good community support](https://linuxhint.com/ant-vs-maven-vs-gradle/)
 * Good, because [its performance can be 100 times more than maven's performance](https://gradle.org/gradle-vs-maven-performance/).
-* Bad, because [not that many plugins are available/maintained yet](https://blog.philipphauer.de/moving-back-from-gradle-to-maven/)
+* Bad, because [not that many plugins are available/maintained yet](https://phauer.com/2018/moving-back-from-gradle-to-maven/)
 * Bad, because [it lacks a wide variety of application server integrations](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
 * Bad, because [it has a medium popularity](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
 * Bad, because [it allows custom build scripts which need to be debugged](https://www.softwareyoga.com/10-reasons-why-we-chose-maven-over-gradle/)
