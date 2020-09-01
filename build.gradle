@@ -298,8 +298,7 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
                                 "generateMedlineSource",
                                 "generateBibtexmlSource",
                                 "generateEndnoteSource",
-                                "generateModsSource",
-                                "generateJournalAbbreviationList"]) {
+                                "generateModsSource"]) {
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
@@ -365,7 +364,7 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     group = 'JabRef'
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
 
-    inputDir = file("src/main/resources/journals")
+    inputDir = file("build/journals")
     outputDir = file("src/main/resources/journals")
 }
 

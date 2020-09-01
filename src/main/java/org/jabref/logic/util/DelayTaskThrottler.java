@@ -5,6 +5,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.JabRefExecutorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ public class DelayTaskThrottler {
         this.delay = delay;
         this.executor = new ScheduledThreadPoolExecutor(1);
         this.executor.setRemoveOnCancelPolicy(true);
+        this.executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
     }
 
     public void schedule(Runnable command) {
@@ -45,7 +48,10 @@ public class DelayTaskThrottler {
         }
     }
 
+    /**
+     * Shuts everything down. Upon termination, this method returns.
+     */
     public void shutdown() {
-        executor.shutdown();
+        JabRefExecutorService.gracefullyShutdown(executor);
     }
 }

@@ -64,7 +64,7 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength) throws IOException {
         // If the string has not been modified, write it back as it was
-        if (!preferences.isReformatFile() && !bibtexString.hasChanged()) {
+        if (!preferences.shouldReformatFile() && !bibtexString.hasChanged()) {
             writer.write(bibtexString.getParsedSerialization());
             return;
         }
@@ -130,6 +130,6 @@ public class BibtexDatabaseWriter extends BibDatabaseWriter {
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode) throws IOException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferences.getFieldWriterPreferences()), entryTypesManager);
-        bibtexEntryWriter.write(entry, writer, mode, preferences.isReformatFile());
+        bibtexEntryWriter.write(entry, writer, mode, preferences.shouldReformatFile());
     }
 }

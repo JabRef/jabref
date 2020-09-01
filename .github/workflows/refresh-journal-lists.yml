@@ -1,0 +1,59 @@
+name: Refresh Journal Lists
+
+on:
+  schedule:
+    # run on 1st and 15th of each month
+    - cron: '2 20 1,15 * *'
+  workflow_dispatch:
+    # Allow to run manually
+
+jobs:
+  publish:
+    name: Refresh Journal List Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+      - uses: actions/cache@v1
+        name: Restore gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Update journal lists
+        run: |
+          set +o pipefail
+
+          # prepare journal lists
+          cd /tmp
+          git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
+          cd abbrv.jabref.org/journals
+
+          # remove all lists without dot in them
+          # we use abbrevatiation lists containing dots in them only (to be consistent)
+          rm journal_abbreviations_entrez.csv
+          rm journal_abbreviations_medicus.csv
+          rm journal_abbreviations_webofscience-dots.csv
+
+          # prepare building
+          mkdir -p $GITHUB_WORKSPACE/build/journals
+          cp * $GITHUB_WORKSPACE/build/journals/
+
+          # create .mv file
+          cd $GITHUB_WORKSPACE
+          ./gradlew generateJournalAbbreviationList
+
+          # git commit
+          git config user.email "jabrefmail+webfeedback@gmail.com"
+          git config user.name "JabRef refresh journal lists [bot]"
+          git add . && git commit -m"Update journalList.mv"
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

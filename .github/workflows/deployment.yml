@@ -40,6 +40,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v2
         with:
@@ -99,6 +103,12 @@ jobs:
           codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app
           jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
           codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements buildres/mac/myapp.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
+          productsign --sign "Developer ID Installer: Tobias Diez (W2PU6LW5U5)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
+      - name: Notarize dmg and pkg installer
+        if: matrix.os == 'macos-latest' && github.ref == 'refs/heads/master'
+        shell: bash
+        run: |
           REQUEST_UUID=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
           while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
             echo "Verification in progress..."
@@ -108,12 +118,6 @@ jobs:
           spctl -vvv --assess --type exec build/distribution/JabRef.app
           codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
-      - name: Build, sign and notarize pkg installer for OSX
-        if: matrix.os == 'macos-latest'
-        shell: bash
-        run: |
-          jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          productsign --sign "Developer ID Installer: Tobias Diez (W2PU6LW5U5)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
           REQUEST_UUID=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
           while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
             echo "Verification in progress..."
@@ -193,4 +197,3 @@ jobs:
           ssh_options: '-p 9922'
           src: 'build/distribution/'
           dest: jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/
-

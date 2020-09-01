@@ -1,3 +1,4 @@
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -12,10 +13,18 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Added
 
 - We added a query parser and mapping layer to enable conversion of queries formulated in simplified lucene syntax by the user into api queries. [#6799](https://github.com/JabRef/jabref/pull/6799)
+- We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
 
 ### Changed
 
+- We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
+- JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
+
 ### Fixed
+
+- We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
+- We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
+- We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
 
 ### Removed
 

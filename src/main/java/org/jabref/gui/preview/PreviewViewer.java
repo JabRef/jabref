@@ -22,7 +22,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
@@ -116,11 +116,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
     }
 
-    public void setTheme(String theme) {
-        if (theme.equals(ThemeLoader.DARK_CSS)) {
+    public void setTheme(Theme theme) {
+        if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
             // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
-            URL url = JabRefFrame.class.getResource(ThemeLoader.DARK_CSS);
+            URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
