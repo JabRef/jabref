@@ -1187,14 +1187,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public XmpPreferences getXMPPreferences() {
-        return new XmpPreferences(
-                getBoolean(USE_XMP_PRIVACY_FILTER),
-                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
-                getKeywordDelimiter());
-    }
-
-    @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
                 get(JabRefPreferences.OO_JARS_PATH),
@@ -2231,7 +2223,7 @@ public class JabRefPreferences implements PreferencesService {
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
-                getXMPPreferences(),
+                getXmpPreferences(),
                 isKeywordSyncEnabled());
     }
 
@@ -2420,6 +2412,20 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
+
+    @Override
+    public XmpPreferences getXmpPreferences() {
+        return new XmpPreferences(
+                getBoolean(USE_XMP_PRIVACY_FILTER),
+                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),
+                getKeywordDelimiter());
+    }
+
+    @Override
+    public void storeXmpPreferences(XmpPreferences preferences) {
+        putBoolean(USE_XMP_PRIVACY_FILTER, preferences.shouldUseXmpPrivacyFilter());
+        putStringList(XMP_PRIVACY_FILTERS, preferences.getXmpPrivacyFilter().stream().map(Field::getName).collect(Collectors.toList()));
+    }
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {

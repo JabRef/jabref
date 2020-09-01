@@ -71,8 +71,6 @@ public interface PreferencesService {
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
-    XmpPreferences getXMPPreferences();
-
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
@@ -278,6 +276,10 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // ToDo: Misc preferences
     //*************************************************************************************************************
+
+    XmpPreferences getXmpPreferences();
+
+    void storeXmpPreferences(XmpPreferences preferences);
 
     NameFormatterPreferences getNameFormatterPreferences();
 
