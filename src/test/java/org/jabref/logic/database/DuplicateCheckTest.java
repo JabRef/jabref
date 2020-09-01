@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.database;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;

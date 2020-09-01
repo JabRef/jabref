@@ -26,7 +26,8 @@ import static org.mockito.Mockito.when;
 public class AutoSetFileLinksUtilTest {
 
     private final FilePreferences fileDirPrefs = mock(FilePreferences.class);
-    private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(false, "", true, ';');
+    private final AutoLinkPreferences autoLinkPrefs =
+            new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.REGEX, "", ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);

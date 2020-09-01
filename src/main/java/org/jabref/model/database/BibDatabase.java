@@ -548,9 +548,9 @@ public class BibDatabase {
      * Registers an listener object (subscriber) to the internal event bus.
      * The following events are posted:
      *
-     *   - {@link EntryAddedEvent}
-     *   - {@link EntryChangedEvent}
-     *   - {@link EntriesRemovedEvent}
+     * - {@link EntriesAddedEvent}
+     * - {@link EntryChangedEvent}
+     * - {@link EntriesRemovedEvent}
      *
      * @param listener listener (subscriber) to add
      */

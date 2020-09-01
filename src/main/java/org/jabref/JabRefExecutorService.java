@@ -22,24 +22,29 @@ import org.slf4j.LoggerFactory;
 public class JabRefExecutorService {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefExecutorService.class);
+
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
+
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef LowPriorityCachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
+
     private final Timer timer = new Timer("timer", true);
+
     private Thread remoteThread;
 
     private JabRefExecutorService() {
-    }
+   }
 
     public void execute(Runnable command) {
         Objects.requireNonNull(command);
@@ -132,13 +137,16 @@ public class JabRefExecutorService {
         timer.schedule(timerTask, millisecondsDelay);
     }
 
+    /**
+     * Shuts everything down. After termination, this method returns.
+     */
     public void shutdownEverything() {
-        // those threads will be allowed to finish
-        this.executorService.shutdown();
-        // those threads will be interrupted in their current task
-        this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
         stopRemoteThread();
+
+        gracefullyShutdown(this.executorService);
+        gracefullyShutdown(this.lowPriorityExecutorService);
+
         timer.cancel();
     }
 
@@ -162,6 +170,30 @@ public class JabRefExecutorService {
             } finally {
                 Thread.currentThread().setName(orgName);
             }
+        }
+    }
+
+    /**
+     * Shuts down the provided executor service by first trying a normal shutdown, then waiting for the shutdown and then forcibly shutting it down.
+     * Returns if the status of the shut down is known.
+     */
+    public static void gracefullyShutdown(ExecutorService executorService) {
+        try {
+            // This is non-blocking. See https://stackoverflow.com/a/57383461/873282.
+            executorService.shutdown();
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                LOGGER.debug("One minute passed, {} still not completed. Trying forced shutdown.", executorService.toString());
+                // those threads will be interrupted in their current task
+                executorService.shutdownNow();
+                if (executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    LOGGER.debug("One minute passed again - forced shutdown of {} worked.", executorService.toString());
+                } else {
+                    LOGGER.error("{} did not terminate", executorService.toString());
+                }
+            }
+        } catch (InterruptedException ie) {
+            executorService.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 }
