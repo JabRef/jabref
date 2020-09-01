@@ -8,6 +8,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.JabRefException;
 import org.jabref.model.util.FileUpdateListener;
@@ -31,7 +32,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
-    private boolean notShutdown = true;
+    private final  AtomicBoolean notShutdown = new AtomicBoolean(true);
     private Optional<JabRefException> filesystemMonitorFailure;
 
     @Override
@@ -40,7 +41,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             this.watcher = watcher;
             filesystemMonitorFailure = Optional.empty();
 
-            while (notShutdown) {
+            while (notShutdown.get()) {
                 WatchKey key;
                 try {
                     key = watcher.take();
@@ -99,6 +100,6 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     @Override
     public void shutdown() {
         listeners.clear();
-        notShutdown = false;
+        notShutdown.set(false);
     }
 }
