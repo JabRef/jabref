@@ -20,12 +20,6 @@ class MainArchitectureTests {
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
-    private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
-    private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
-    private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
-    private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
-    private static final String EXCEPTION_CLASS_JAVA_FX_PAIR = "javafx.util.Pair";
-
 
     @ArchTest
     public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
@@ -93,9 +87,9 @@ class MainArchitectureTests {
     @ArchTest
     public static void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture()
-                .layer("Gui").definedBy("org.jabref.gui")
-                .layer("Logic").definedBy("org.jabref.logic")
-                .layer("Model").definedBy("org.jabref.model")
+                .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
+                .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
+                .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
                 .layer("Cli").definedBy("org.jabref.cli")
                 .layer("Migrations").definedBy("org.jabref.migrations")
                 .layer("Preferences").definedBy("org.jabref.preferences")
@@ -113,7 +107,7 @@ class MainArchitectureTests {
     @ArchTest
     public static void doNotUseLogicInModel(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
-                   .should().dependOnClassesThat().resideInAPackage("org.jabref.logic")
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .orShould().beAnnotatedWith(AllowedToUseLogic.class)
                    .check(classes);
     }
