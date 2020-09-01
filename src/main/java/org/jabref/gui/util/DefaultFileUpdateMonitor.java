@@ -31,6 +31,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
+    private boolean notShutdown = true;
     private Optional<JabRefException> filesystemMonitorFailure;
 
     @Override
@@ -39,7 +40,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             this.watcher = watcher;
             filesystemMonitorFailure = Optional.empty();
 
-            while (true) {
+            while (notShutdown) {
                 WatchKey key;
                 try {
                     key = watcher.take();
@@ -71,6 +72,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         }
     }
 
+    @Override
     public boolean isActive() {
         return filesystemMonitorFailure.isEmpty();
     }
@@ -92,5 +94,11 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     @Override
     public void removeListener(Path path, FileUpdateListener listener) {
         listeners.remove(path, listener);
+    }
+
+    @Override
+    public void shutdown() {
+        listeners.clear();
+        notShutdown = false;
     }
 }
