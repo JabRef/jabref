@@ -81,6 +81,7 @@ class MainArchitectureTests {
         noClasses().should()
                    .accessClassesThat()
                    .belongToAnyOf(Paths.class)
+                   .because("Path.of(...) should be used instead")
                    .check(classes);
     }
 
@@ -93,13 +94,14 @@ class MainArchitectureTests {
                 .layer("Cli").definedBy("org.jabref.cli")
                 .layer("Migrations").definedBy("org.jabref.migrations")
                 .layer("Preferences").definedBy("org.jabref.preferences")
+                .layer("Styletester").definedBy("org.jabref.styletester")
 
-                .whereLayer("Gui").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Logic").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Model").mayNotBeAccessedByAnyLayer()
+                .whereLayer("Gui").mayOnlyBeAccessedByLayers("Gui")
+                .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui")
+                .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations")
                 .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
                 .whereLayer("Migrations").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Preferences").mayNotBeAccessedByAnyLayer()
+                .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester") // TODO: Remove logic here
 
                 .check(classes);
     }

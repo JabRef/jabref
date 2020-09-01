@@ -444,6 +444,7 @@ test {
     }
 
     moduleOptions {
+        // TODO: Remove this as soon as archunit is modularized
         runOnClasspath = true
     }
 
