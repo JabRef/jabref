@@ -79,8 +79,6 @@ public interface PreferencesService {
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
-    PreviewPreferences getPreviewPreferences();
-
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
     void storeCustomExportFormats(List<TemplateExporter> exporters);
@@ -272,6 +270,16 @@ public interface PreferencesService {
     boolean getShouldAutosave();
 
     void storeShouldAutosave(boolean shouldAutosave);
+
+    //*************************************************************************************************************
+    // Preview preferences
+    //*************************************************************************************************************
+
+    PreviewPreferences getPreviewPreferences();
+
+    void updatePreviewPreferences();
+
+    void storePreviewPreferences(PreviewPreferences previewPreferences);
 
     //*************************************************************************************************************
     // ToDo: Misc preferences
