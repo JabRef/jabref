@@ -72,10 +72,9 @@ public class SaveDatabaseAction {
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
         this.throttler = new DelayTaskThrottler(1000);
-
     }
 
-    public static void shutDown(BibDatabaseContext context) {
+    public static void shutdown(BibDatabaseContext context) {
         runningInstances.stream().filter(instance -> instance.panel.getBibDatabaseContext() == context).forEach(SaveDatabaseAction::shutdown);
         runningInstances.removeIf(instance -> instance.panel.getBibDatabaseContext() == context);
     }
@@ -200,26 +199,9 @@ public class SaveDatabaseAction {
     }
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
-
-        var f = throttler.scheduleTask(() -> executeSave(targetPath, mode));
-        try {
-            var ok = f.get();
-            LOGGER.debug("Saved {}", ok);
-
-            return (boolean) f.get();
-        } catch (InterruptedException | ExecutionException e) {
-            // TODO Auto-generated catch block
-            LOGGER.error("Exectutor Exception", e);
-        }
-        return false;
-
-    }
-
-    private boolean executeSave(Path targetPath, SaveDatabaseMode mode) {
         if (mode == SaveDatabaseMode.NORMAL) {
             dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
         }
-
         panel.setSaving(true);
         try {
             Charset encoding = panel.getBibDatabaseContext()
@@ -230,7 +212,9 @@ public class SaveDatabaseAction {
             panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
-            boolean success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
+           boolean  success = false;
+           var sheduledTask = throttler.scheduleTask(() -> saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL));
+           success = (boolean) sheduledTask.get();
 
             if (success) {
                 panel.getUndoManager().markUnchanged();
@@ -243,7 +227,7 @@ public class SaveDatabaseAction {
                 frame.updateAllTabTitles();
             }
             return success;
-        } catch (SaveException ex) {
+        } catch (InterruptedException | ExecutionException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;

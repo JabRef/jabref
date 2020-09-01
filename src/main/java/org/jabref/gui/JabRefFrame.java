@@ -444,7 +444,7 @@ public class JabRefFrame extends BorderPane {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
-            SaveDatabaseAction.shutDown(context);
+            SaveDatabaseAction.shutdown(context);
             BackupManager.shutdown(context);
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
@@ -1086,28 +1086,25 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void updateAllTabTitles() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
+        List<String> paths = getUniquePathParts();
+        for (int i = 0; i < getBasePanelCount(); i++) {
+            String uniqPath = paths.get(i);
+            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
-            List<String> paths = getUniquePathParts();
-            for (int i = 0; i < getBasePanelCount(); i++) {
-                String uniqPath = paths.get(i);
-                Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
-
-                if (file.isPresent()) {
-                    if (!uniqPath.equals(file.get().getFileName().toString()) && uniqPath.contains(File.separator)) {
-                        // remove filename
-                        uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
-                    } else {
-                        // set original filename (again)
-                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
-                    }
+            if (file.isPresent()) {
+                if (!uniqPath.equals(file.get().getFileName().toString()) && uniqPath.contains(File.separator)) {
+                    // remove filename
+                    uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
                 } else {
+                    // set original filename (again)
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
                 }
-                tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
+            } else {
+                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
             }
-        });
+            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
+        }
     }
 
     private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
@@ -1295,7 +1292,7 @@ public class JabRefFrame extends BorderPane {
             removeTab(panel);
         }
 
-        SaveDatabaseAction.shutDown(context);
+        SaveDatabaseAction.shutdown(context);
         BackupManager.shutdown(context);
     }
 
