@@ -443,6 +443,10 @@ test {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
     }
 
+    moduleOptions {
+        runOnClasspath = true
+    }
+
     testLogging {
         // set options for log level LIFECYCLE
         // for debugging tests: add "STANDARD_OUT", "STANDARD_ERROR"
