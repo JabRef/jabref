@@ -383,5 +383,4 @@ public class EntryEditor extends BorderPane {
     public void previousPreviewStyle() {
         this.entryEditorTabs.forEach(EntryEditorTab::previousPreviewStyle);
     }
-
 }
