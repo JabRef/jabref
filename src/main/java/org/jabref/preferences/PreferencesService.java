@@ -120,6 +120,9 @@ public interface PreferencesService {
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
 
+    @Deprecated
+    String getDefaultsDefaultCitationKeyPattern();
+
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************

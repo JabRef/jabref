@@ -17,7 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -46,7 +46,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public NetworkTabView(JabRefPreferences preferences) {
+    public NetworkTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -62,7 +62,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
-        remoteLabel.setVisible(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
+        remoteLabel.setVisible(preferences.getGeneralPreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());

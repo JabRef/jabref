@@ -21,7 +21,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -49,9 +49,7 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    private final JabRefPreferences preferences;
-
-    public TableTabView(JabRefPreferences preferences) {
+    public TableTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

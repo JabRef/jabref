@@ -6,7 +6,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -18,7 +18,7 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
     @FXML private CheckBox displayGroupCount;
     @FXML private TextField keywordSeparator;
 
-    public GroupsTabView(JabRefPreferences preferences) {
+    public GroupsTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

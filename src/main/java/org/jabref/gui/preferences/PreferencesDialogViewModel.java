@@ -155,10 +155,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Checks if all tabs are valid
-     * ToDo: After conversion of all tabs use mvvmfx-validator
-     * ToDo: should be observable for binding of OK-button in View
      */
-
     public boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {

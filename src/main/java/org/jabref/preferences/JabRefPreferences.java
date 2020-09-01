@@ -1455,6 +1455,12 @@ public class JabRefPreferences implements PreferencesService {
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
 
+    @Override
+    @Deprecated
+    public String getDefaultsDefaultCitationKeyPattern() {
+        return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
+    }
+
     //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
