@@ -56,7 +56,7 @@ It is strongly recommend that you have git installed.
 
 We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/) or [Eclipse \(for advanced users\)](https://eclipse.org/) \(`2020-03` or newer\).
 
-Under Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
+On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. Under Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
 ### Other Tooling
 
@@ -88,26 +88,22 @@ These steps are very important. They allow you to focus on the content and ensur
 
 ### Setup for IntelliJ IDEA
 
+We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
+
 IntelliJ IDEA fully supports Gradle as a build tool, but also has an internal build system which is usually faster. For JabRef, Gradle is required to make a full build but once set up, IntelliJ IDEA's internal system can be used for sub-sequent builds.
 
-To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_
+To configure IntelliJ IDEA for developing JabRef, you should first ensure that you have enabled both bundled plugins _Gradle_ and _Gradle Extension_:
 
-* Navigate to **File \| Settings \| Plugins \| Installed** and check that you have
-
-  the _Gradle_ and _Gradle Extension_ enabled.
+* Navigate to **File \| Settings \| Plugins \| Installed** and check that you have the _Gradle_ and _Gradle Extension_ enabled.
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 14 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-* Ensure you have a Java 14 SDK configured by navigating to
-
-  **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the
-
-  location of a JDK 14.
+Ensure you have a Java 14 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 14:
 
 * Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 14
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the Java 14 SDK as the Gradle JVM at the bottom.
 
-To prepare IntelliJ's build system two additional steps are required
+To prepare IntelliJ's build system two additional steps are required:
 
 * Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module:
 
@@ -118,16 +114,19 @@ To prepare IntelliJ's build system two additional steps are required
 
 * Enable annotation processors by navigating to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Annotation processors** and check "Enable annotation processing"
 
+   ![Enable annotation processing](../.gitbook/assets/intellij-enable-annotation-processing.png)
+
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/grafik%20%281%29.png)
+![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
 * Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View \| Tool Windows \| Gradle**.
-* In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
+* In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
+  with the setting changes.
 
 After that, you can use the Gradle Tool Window to build all parts JabRef and run it. To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks. From there, you can
 
@@ -137,44 +136,54 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
+**Note that these steps do not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks.
+See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.
+
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
 
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
+    ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc.png)
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` (location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`). Otherwise, you will see folowing error:
 
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%281%29.png)
+  ```text
+  Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
+  ```
+
+  or following error:
+
+  ```text
+  Error:(16, 25) java: package org.jabref.search does not exist
+  ```
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
+
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` (e.g., `Error:(16, 25) java: package org.jabref.search does not exist`), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independet of having enabled or disabled Annotation Processing (see above at "Enable Annotation Processing").
 
 #### Using JabRef's code style
 
 Contributions to JabRef's source code need to have a code formatting that is consistent with existing source code. For that purpose, JabRef provides code-style and check-style definitions.
 
 * Install the [CheckStyle-IDEA plugin](http://plugins.jetbrains.com/plugin/1065?pr=idea), it can be found via the plug-in repository:
-
-   1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
-   2. Close the settings afterwards and restart IntelliJ
-
+  1. Navigate to **File \| Settings \| Plugins \| Marketplace** and search for "Checkstyle" and choose "CheckStyle-IDEA"
+  2. Close the settings afterwards and restart IntelliJ
 * Go to **File \| Settings \| Editor \| Code Style**
 * Click on the settings wheel \(next to the scheme chooser\), then click "Import Scheme"
 * Select the IntelliJ configuration file `config/IntelliJ Code Style.xml`
 * Go to **File \| Settings \| Tools \| Checkstyle \| Configuration File**
-
-   1. Import the CheckStyle configuration file by clicking the \[+\] button
-   2. For the description provide "JabRef"
-   3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
-   4. Click "Next" and "Finish"
-   5. Activate the CheckStyle configuration file by ticking it in the list
-   6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
-   7. Set the "Scan Scope" to "Only Java sources \(including tests\)
-   8. Save settings by clicking "OK"
-   9. Your configuration should now look like this:
-
-      ```text
+  1. Import the CheckStyle configuration file by clicking the \[+\] button
+  2. For the description provide "JabRef"
+  3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
+  4. Click "Next" and "Finish"
+  5. Activate the CheckStyle configuration file by ticking it in the list
+  6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
+  7. Set the "Scan Scope" to "Only Java sources \(including tests\)
+  8. Save settings by clicking "OK"
+  9. Your configuration should now look like this:
+  
       ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
-      ```
 
 ### Setup for Eclipse
 
@@ -191,7 +200,7 @@ Make sure your Eclipse installation us up to date, Eclipse JEE 2020-03 or newer 
 4. Create a run/debug configuration for the main class `org.jabref.JabRefLauncher` and/or for `org.jabref.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
@@ -250,4 +259,3 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 ### Problems with generated source files
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
-
