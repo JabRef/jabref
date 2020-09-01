@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -15,6 +21,7 @@ import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.model.strings.StringUtil;
@@ -25,6 +32,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import kong.unirest.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
@@ -213,6 +221,56 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check the connection by using the given url. Used for validating the http proxy.
+     * The checking result will be appear when request finished.
+     * The checking result could be either success or fail, if fail, the cause will be displayed.
+     */
+    public void checkConnection() {
+        DialogPane dialogPane = new DialogPane();
+        GridPane settingsPane = new GridPane();
+        settingsPane.setHgap(4.0);
+        settingsPane.setVgap(4.0);
+
+        Label messageLabel = new Label();
+        messageLabel.setText(Localization.lang("Warning: your settings will be saved.\nEnter any URL to check connection to:"));
+
+        TextField url = new TextField();
+        url.setText("http://");
+
+        settingsPane.add(messageLabel, 1, 0);
+
+        settingsPane.add(url, 1, 1);
+        dialogPane.setContent(settingsPane);
+        String title = Localization.lang("Check Proxy Setting");
+        dialogService.showCustomDialogAndWait(
+                title,
+                dialogPane,
+                ButtonType.OK, ButtonType.CANCEL)
+                .ifPresent(btn -> {
+                            if (btn == ButtonType.OK) {
+                                String connectionProblemText = Localization.lang("Problem with connection: ");
+                                String connectionSuccessText = Localization.lang("Connection Successful!");
+                                storeProxySettings();
+                                URLDownload dl;
+                                try {
+                                    dl = new URLDownload(url.getText());
+                                    int connectionStatus = dl.checkConnection();
+                                    if (connectionStatus == 200) {
+                                        dialogService.showInformationDialogAndWait(title, connectionSuccessText);
+                                    } else {
+                                        dialogService.showErrorDialogAndWait(title, connectionProblemText + Localization.lang("Request failed with status code ") + connectionStatus);
+                                    }
+                                } catch (MalformedURLException e) {
+                                    dialogService.showErrorDialogAndWait(title, connectionProblemText + e.getMessage());
+                                } catch (UnirestException e) {
+                                    dialogService.showErrorDialogAndWait(title, connectionProblemText + e.getMessage());
+                                }
+                            }
+                        }
+                );
     }
 
     @Override
