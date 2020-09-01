@@ -182,7 +182,7 @@ Contributions to JabRef's source code need to have a code formatting that is con
    3. Click "Browse" and choose `config/checkstyle/checkstyle.xml`
    4. Click "Next" and "Finish"
    5. Activate the CheckStyle configuration file by ticking it in the list
-   6. Ensure that the latest CheckStyle version is selected \(8.32 or higher\)
+   6. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 14.
    7. Set the "Scan Scope" to "Only Java sources \(including tests\)
    8. Save settings by clicking "OK"
    9. Your configuration should now look like this:

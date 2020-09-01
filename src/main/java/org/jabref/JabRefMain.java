@@ -11,6 +11,7 @@ import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -165,10 +166,14 @@ public class JabRefMain extends Application {
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                Globals.prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
-        Globals.exportFactory = Globals.prefs.getExporterFactory(Globals.journalAbbreviationRepository);
+        Globals.exportFactory = ExporterFactory.create(
+                Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
+                Globals.prefs.getSavePreferencesForExport(),
+                Globals.prefs.getXmpPreferences());
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

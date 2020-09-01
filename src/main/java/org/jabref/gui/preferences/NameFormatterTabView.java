@@ -17,7 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -31,7 +31,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
     @FXML private TextField addFormatterString;
     @FXML private Button formatterHelp;
 
-    public NameFormatterTabView(JabRefPreferences preferences) {
+    public NameFormatterTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

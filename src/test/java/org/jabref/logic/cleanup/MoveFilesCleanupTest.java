@@ -69,7 +69,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFile() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
@@ -86,7 +86,7 @@ class MoveFilesCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
                 Arrays.asList(new LinkedFile("", "", ""), fileField, new LinkedFile("", "", ""))));
 
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
@@ -100,7 +100,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithFileDirPattern() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("test.pdf");
@@ -113,7 +113,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void doesNotMoveFileWithEmptyFileDirPattern() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
@@ -126,7 +126,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithSubdirectoryPattern() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]/[year]/[auth]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("1989").resolve("test.pdf");
@@ -140,7 +140,7 @@ class MoveFilesCleanupTest {
     @Test
     void movesFileWithNoDirectory() throws Exception {
         databaseContext.setMetaData(new MetaData());
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         List<FieldChange> changes = cleanup.cleanup(entry);
         assertEquals(Collections.emptyList(), changes);
     }

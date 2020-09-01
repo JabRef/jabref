@@ -1,28 +1,33 @@
 package org.jabref.logic.util.io;
 
 public class AutoLinkPreferences {
-    boolean useRegularExpression;
-    String regularExpression;
-    Character keywordDelimiter;
-    boolean onlyFindByExactCiteKey;
 
-    public AutoLinkPreferences(boolean useRegularExpression, String regularExpression, boolean onlyFindByExactCiteKey, Character keywordDelimiter) {
-        this.useRegularExpression = useRegularExpression;
+    public enum CitationKeyDependency {
+        START, // Filenames starting with the citation key
+        EXACT, // Filenames exactly matching the citation key
+        REGEX // Filenames matching a regular expression pattern
+    }
+
+    private final CitationKeyDependency citationKeyDependency;
+    private final String regularExpression;
+
+    private final Character keywordDelimiter;
+
+    public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
+                               String regularExpression,
+
+                               Character keywordDelimiter) {
+        this.citationKeyDependency = citationKeyDependency;
         this.regularExpression = regularExpression;
-        this.onlyFindByExactCiteKey = onlyFindByExactCiteKey;
         this.keywordDelimiter = keywordDelimiter;
     }
 
-    public boolean isUseRegularExpression() {
-        return useRegularExpression;
+    public CitationKeyDependency getCitationKeyDependency() {
+        return citationKeyDependency;
     }
 
     public String getRegularExpression() {
         return regularExpression;
-    }
-
-    public boolean isOnlyFindByExactCiteKey() {
-        return onlyFindByExactCiteKey;
     }
 
     public Character getKeywordDelimiter() {

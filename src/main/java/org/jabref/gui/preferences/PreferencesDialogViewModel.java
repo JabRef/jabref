@@ -52,8 +52,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
                 new CitationKeyPatternTabView(preferences),
-                new ImportTabView(preferences),
-                new ExportSortingTabView(preferences),
+                new LinkedFilesTabView(preferences),
                 new NameFormatterTabView(preferences),
                 new XmpPrivacyTabView(preferences),
                 new NetworkTabView(preferences),
@@ -69,7 +68,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.setLastPreferencesExportPath()).build();
+                .withInitialDirectory(preferences.getLastPreferencesExportPath()).build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
             try {
@@ -89,7 +88,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.XML)
                 .withDefaultExtension(StandardFileType.XML)
-                .withInitialDirectory(preferences.setLastPreferencesExportPath())
+                .withInitialDirectory(preferences.getLastPreferencesExportPath())
                 .build();
 
         dialogService.showFileSaveDialog(fileDialogConfiguration)
@@ -97,7 +96,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                          try {
                              storeAllSettings();
                              preferences.exportPreferences(exportFile);
-                             preferences.setLastPreferencesExportPath(exportFile);
+                             preferences.storeLastPreferencesExportPath(exportFile);
                          } catch (JabRefException ex) {
                              LOGGER.warn(ex.getMessage(), ex);
                              dialogService.showErrorDialogAndWait(Localization.lang("Export preferences"), ex);
@@ -143,8 +142,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
@@ -156,10 +155,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Checks if all tabs are valid
-     * ToDo: After conversion of all tabs use mvvmfx-validator
-     * ToDo: should be observable for binding of OK-button in View
      */
-
     public boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {
