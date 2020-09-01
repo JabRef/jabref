@@ -176,7 +176,6 @@ public class JabRefFrame extends BorderPane {
     private SidePane sidePane;
     private PopOver progressViewPopOver;
 
-
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
         this.dialogService = new JabRefDialogService(mainStage, this, prefs);
@@ -452,7 +451,6 @@ public class JabRefFrame extends BorderPane {
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
         waitForSaveFinishedDialog.showAndWait(getBasePanelList());
-
 
         // Good bye!
         tearDownJabRef(filenames);
@@ -1088,35 +1086,28 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void updateAllTabTitles() {
-
         DefaultTaskExecutor.runInJavaFXThread(() -> {
 
+            List<String> paths = getUniquePathParts();
+            for (int i = 0; i < getBasePanelCount(); i++) {
+                String uniqPath = paths.get(i);
+                Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
 
-        List<String> paths = getUniquePathParts();
-        for (int i = 0; i < getBasePanelCount(); i++) {
-            String uniqPath = paths.get(i);
-            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
-
-
-            if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getFileName().toString()) && uniqPath.contains(File.separator)) {
-                    // remove filename
-                    uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                if (file.isPresent()) {
+                    if (!uniqPath.equals(file.get().getFileName().toString()) && uniqPath.contains(File.separator)) {
+                        // remove filename
+                        uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                    } else {
+                        // set original filename (again)
+                        tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                    }
                 } else {
-                    // set original filename (again)
                     tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
                 }
-            } else {
-                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
+                tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
             }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
-
-
-
-        }
         });
-
     }
 
     private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
