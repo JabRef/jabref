@@ -5,6 +5,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.JabRefExecutorService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,21 +52,6 @@ public class DelayTaskThrottler {
      * Shuts everything down. Upon termination, this method returns.
      */
     public void shutdown() {
-        // this is non-blocking. See https://stackoverflow.com/a/57383461/873282.
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                LOGGER.debug("One minute passed, saving still not completed. Trying forced shutdown.");
-                executor.shutdownNow();
-                if (executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    LOGGER.debug("One minute passed again - forced shutdown worked.");
-                } else {
-                    LOGGER.error("DelayedTaskThrottler did not terminate");
-                }
-            }
-        } catch (InterruptedException ie) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
+        JabRefExecutorService.gracefullyShutdown(executor);
     }
 }
