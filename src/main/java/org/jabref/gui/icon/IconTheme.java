@@ -301,8 +301,6 @@ public class IconTheme {
         NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignIcon.PLUS_BOX),
         REMOTE_DATABASE(MaterialDesignIcon.DATABASE),
         HOME(MaterialDesignIcon.HOME),
-        DATABASE(MaterialDesignIcon.DATABASE),
-        DATABASE_PLUS(MaterialDesignIcon.DATABASE_PLUS),
         LINK(MaterialDesignIcon.LINK_VARIANT_OFF),
         LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT);
 
