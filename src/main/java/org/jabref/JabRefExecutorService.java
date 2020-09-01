@@ -138,7 +138,7 @@ public class JabRefExecutorService {
     }
 
     /**
-     * Shuts everything down. Upon termination, this method returns.
+     * Shuts everything down. After termination, this method returns.
      */
     public void shutdownEverything() {
         // kill the remote thread

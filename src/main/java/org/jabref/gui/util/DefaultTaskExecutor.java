@@ -123,7 +123,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
     }
 
     /**
-     * Shuts everything down. Upon termination, this method returns.
+     * Shuts everything down. After termination, this method returns.
      */
     @Override
     public void shutdown() {
