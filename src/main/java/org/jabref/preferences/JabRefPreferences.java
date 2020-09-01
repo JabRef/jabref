@@ -2429,12 +2429,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
+        return new NameFormatterPreferences(
+                getStringList(NAME_FORMATER_KEY),
+                getStringList(NAME_FORMATTER_VALUE));
     }
 
     @Override
     public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
-
+        putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
+        putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
     }
 
     @Override
