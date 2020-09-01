@@ -7,7 +7,7 @@ import java.util.Objects;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class CleanupWorker {
 

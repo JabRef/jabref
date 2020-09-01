@@ -3,6 +3,9 @@ package org.jabref.model.entry;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.importer.util.FileFieldParser;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

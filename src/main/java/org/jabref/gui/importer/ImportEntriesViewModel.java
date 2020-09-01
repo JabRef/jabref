@@ -34,9 +34,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;

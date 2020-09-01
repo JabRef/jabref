@@ -23,8 +23,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

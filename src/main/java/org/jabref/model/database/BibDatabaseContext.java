@@ -12,8 +12,8 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData

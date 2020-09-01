@@ -104,7 +104,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 

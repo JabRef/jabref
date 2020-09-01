@@ -20,6 +20,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;

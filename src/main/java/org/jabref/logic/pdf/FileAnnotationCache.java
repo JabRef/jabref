@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.preferences.FilePreferences;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

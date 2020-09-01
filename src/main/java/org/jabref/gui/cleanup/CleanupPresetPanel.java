@@ -18,7 +18,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 

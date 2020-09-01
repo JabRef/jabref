@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jabref.Globals;
-import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
