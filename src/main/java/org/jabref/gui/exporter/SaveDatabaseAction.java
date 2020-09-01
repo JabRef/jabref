@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
  * operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
     private static Set<SaveDatabaseAction> runningInstances = new HashSet<>();
 
@@ -64,31 +65,34 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-
-   public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    private SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
-        this.throttler = new DelayTaskThrottler(15000);
+        this.throttler = new DelayTaskThrottler(1000);
 
     }
 
+    public static void shutDown(BibDatabaseContext context) {
+        runningInstances.stream().filter(instance -> instance.panel.getBibDatabaseContext() == context).forEach(SaveDatabaseAction::shutdown);
+        runningInstances.removeIf(instance -> instance.panel.getBibDatabaseContext() == context);
+    }
 
-   public static void shutdown(BasePanel panel) {
+    private void shutdown() {
+        this.throttler.shutdown();
 
-   }
+    }
 
+    public static SaveDatabaseAction start(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
 
-   public static SaveDatabaseAction start(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+        var saveAction = new SaveDatabaseAction(panel, preferences, entryTypesManager);
 
-       var saveAction = new SaveDatabaseAction(panel, preferences, entryTypesManager);
+        runningInstances.add(saveAction);
+        return saveAction;
 
-       runningInstances.add(saveAction);
-       return saveAction;
-
-   }
+    }
 
     public boolean save() {
 
@@ -143,7 +147,7 @@ public class SaveDatabaseAction {
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
             new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+                                                                                           .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
         boolean saveResult = save(file, mode);
@@ -178,10 +182,10 @@ public class SaveDatabaseAction {
      */
     private Optional<Path> askForSavePath() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
-                .build();
+                                                                                               .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                                                                                               .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                                                                                               .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
         return selectedPath;
@@ -202,15 +206,17 @@ public class SaveDatabaseAction {
 
     private boolean save(Path targetPath, SaveDatabaseMode mode) {
 
-        var f = throttler.scheduleTask( ()  -> executeSave(targetPath, mode));
+        var f = throttler.scheduleTask(() -> executeSave(targetPath, mode));
         try {
-          return (boolean) f.get();
+            var ok = f.get();
+            LOGGER.debug("Saved {}", ok);
+
+            return (boolean) f.get();
         } catch (InterruptedException | ExecutionException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+             LOGGER.error("Exectutor Exception", e);
         }
         return false;
-
 
     }
 
@@ -284,18 +290,17 @@ public class SaveDatabaseAction {
         DialogPane pane = new DialogPane();
         VBox vbox = new VBox();
         vbox.getChildren().addAll(
-                new Text(Localization.lang("The chosen encoding '%0' could not encode the following characters:", encoding.displayName())),
-                new Text(encodingProblems.stream().map(Object::toString).collect(Collectors.joining("."))),
-                new Text(Localization.lang("What do you want to do?"))
-        );
+                                  new Text(Localization.lang("The chosen encoding '%0' could not encode the following characters:", encoding.displayName())),
+                                  new Text(encodingProblems.stream().map(Object::toString).collect(Collectors.joining("."))),
+                                  new Text(Localization.lang("What do you want to do?")));
         pane.setContent(vbox);
 
         ButtonType tryDifferentEncoding = new ButtonType(Localization.lang("Try different encoding"), ButtonBar.ButtonData.OTHER);
         ButtonType ignore = new ButtonType(Localization.lang("Ignore"), ButtonBar.ButtonData.APPLY);
         boolean saveWithDifferentEncoding = dialogService
-                .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
-                .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
-                .isPresent();
+                                                         .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
+                                                         .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
+                                                         .isPresent();
         if (saveWithDifferentEncoding) {
             Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
@@ -310,9 +315,9 @@ public class SaveDatabaseAction {
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
-                &&
-                context.getDatabasePath().isPresent();
+                 && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+               &&
+               context.getDatabasePath().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {

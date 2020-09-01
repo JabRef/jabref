@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -46,10 +46,10 @@ class SaveDatabaseActionTest {
 
     private static final String TEST_BIBTEX_LIBRARY_LOCATION = "C:\\Users\\John_Doe\\Jabref\\literature.bib";
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
-    private DialogService dialogService = mock(DialogService.class);
-    private JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private final DialogService dialogService = mock(DialogService.class);
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
     private BasePanel basePanel = mock(BasePanel.class);
-    private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
+    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
@@ -59,7 +59,7 @@ class SaveDatabaseActionTest {
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class)));
+        saveDatabaseAction = spy(SaveDatabaseAction.start(basePanel, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test
@@ -129,7 +129,7 @@ class SaveDatabaseActionTest {
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class));
+        saveDatabaseAction =  SaveDatabaseAction.start(basePanel, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 
