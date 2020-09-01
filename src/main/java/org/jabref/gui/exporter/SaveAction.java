@@ -32,7 +32,7 @@ public class SaveAction extends SimpleCommand {
     @Override
     public void execute() {
 
-        SaveDatabaseAction saveDatabaseAction = SaveDatabaseAction.start(frame.getCurrentBasePanel(),
+        SaveDatabaseAction saveDatabaseAction = SaveDatabaseAction.create(frame.getCurrentBasePanel(),
                                                                          Globals.prefs,
                                                                          Globals.entryTypesManager);
 

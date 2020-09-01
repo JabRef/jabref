@@ -1264,7 +1264,7 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = SaveDatabaseAction.start(panel, Globals.prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = SaveDatabaseAction.create(panel, Globals.prefs, Globals.entryTypesManager);
 
                 if (saveAction.save()) {
                     return true;

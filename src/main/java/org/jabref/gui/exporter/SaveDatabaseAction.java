@@ -82,20 +82,15 @@ public class SaveDatabaseAction {
 
     private void shutdown() {
         this.throttler.shutdown();
-
     }
 
-    public static SaveDatabaseAction start(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
-
-        var saveAction = new SaveDatabaseAction(panel, preferences, entryTypesManager);
-
+    public static SaveDatabaseAction create(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+        SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, preferences, entryTypesManager);
         runningInstances.add(saveAction);
         return saveAction;
-
     }
 
     public boolean save() {
-
         return save(panel.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
     }
 
@@ -214,7 +209,7 @@ public class SaveDatabaseAction {
             return (boolean) f.get();
         } catch (InterruptedException | ExecutionException e) {
             // TODO Auto-generated catch block
-             LOGGER.error("Exectutor Exception", e);
+            LOGGER.error("Exectutor Exception", e);
         }
         return false;
 

@@ -81,7 +81,6 @@ public class AtomicFileOutputStream extends FilterOutputStream {
 
         try {
             // Lock files (so that at least not another JabRef instance writes at the same time to the same tmp file)
-            LOGGER.debug("Class of out {}", out.getClass()); //Reports FileChannel and not FileOutputStreamm, lock is never set
             if (out instanceof FileOutputStream) {
                 temporaryFileLock = ((FileOutputStream) out).getChannel().lock();
             } else {
@@ -102,13 +101,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     private static Path getPathOfTemporaryFile(Path targetFile) {
-        try {
-            return Files.createTempFile(targetFile.getParent(), targetFile.getFileName().toString(), TEMPORARY_EXTENSION);
-        } catch (IOException ex) {
-            LOGGER.error("Error creating temp file", ex);
-        }
-
-        return null;
+        return FileUtil.addExtension(targetFile, TEMPORARY_EXTENSION);
     }
 
     private static Path getPathOfBackupFile(Path targetFile) {
@@ -184,12 +177,10 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             // We successfully wrote everything to the temporary file, lets copy it to the correct place
             // First, make backup of original file and try to save file permissions to restore them later (by default: 664)
             Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
-                                                                     PosixFilePermission.OWNER_WRITE,
-                                                                     PosixFilePermission.GROUP_READ,
-                                                                     PosixFilePermission.GROUP_WRITE,
-                                                                     PosixFilePermission.OTHERS_READ);
-            // Set a breakpoint here and wait for more than one thread to arrive
-            // Then resume the threads
+                    PosixFilePermission.OWNER_WRITE,
+                    PosixFilePermission.GROUP_READ,
+                    PosixFilePermission.GROUP_WRITE,
+                    PosixFilePermission.OTHERS_READ);
             if (Files.exists(targetFile)) {
                 Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
                 if (FileUtil.IS_POSIX_COMPILANT) {

@@ -59,7 +59,7 @@ class SaveDatabaseActionTest {
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(SaveDatabaseAction.start(basePanel, preferences, mock(BibEntryTypesManager.class)));
+        saveDatabaseAction = spy(SaveDatabaseAction.create(basePanel, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test
@@ -129,7 +129,7 @@ class SaveDatabaseActionTest {
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction =  SaveDatabaseAction.start(basePanel, preferences, mock(BibEntryTypesManager.class));
+        saveDatabaseAction =  SaveDatabaseAction.create(basePanel, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 
