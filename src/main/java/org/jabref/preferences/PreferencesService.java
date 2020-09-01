@@ -9,6 +9,7 @@ import java.util.Set;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
@@ -50,8 +51,6 @@ public interface PreferencesService {
     void setProtectedTermsPreferences(ProtectedTermsLoader loader);
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
-
-    Character getKeywordDelimiter();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
@@ -154,8 +153,14 @@ public interface PreferencesService {
     void storeTimestampPreferences(TimestampPreferences preferences);
 
     //*************************************************************************************************************
-    // ToDo: GroupPreferences
+    // GroupsPreferences
     //*************************************************************************************************************
+
+    Character getKeywordDelimiter();
+
+    GroupsPreferences getGroupsPreferences();
+
+    void storeGroupsPreferences(GroupsPreferences preferences);
 
     GroupViewMode getGroupViewMode();
 
@@ -282,7 +287,7 @@ public interface PreferencesService {
     void storePreviewPreferences(PreviewPreferences previewPreferences);
 
     //*************************************************************************************************************
-    // ToDo: Misc preferences
+    // Misc preferences
     //*************************************************************************************************************
 
     XmpPreferences getXmpPreferences();

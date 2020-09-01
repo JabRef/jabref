@@ -44,6 +44,7 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -1309,11 +1310,6 @@ public class JabRefPreferences implements PreferencesService {
                 new SaveOrderConfig.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));
     }
 
-    @Override
-    public Character getKeywordDelimiter() {
-        return get(KEYWORD_SEPARATOR).charAt(0);
-    }
-
     public String getOrCreateUserId() {
         Optional<String> userId = getAsOptional(USER_ID);
         if (userId.isPresent()) {
@@ -1577,8 +1573,30 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // ToDo: GroupPreferences
+    // GroupsPreferences
     //*************************************************************************************************************
+
+    @Override
+    public Character getKeywordDelimiter() {
+        return get(KEYWORD_SEPARATOR).charAt(0);
+    }
+
+    @Override
+    public GroupsPreferences getGroupsPreferences() {
+        return new GroupsPreferences(
+                GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
+                getBoolean(AUTO_ASSIGN_GROUP),
+                getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT),
+                get(JabRefPreferences.KEYWORD_SEPARATOR).charAt(0));
+    }
+
+    @Override
+    public void storeGroupsPreferences(GroupsPreferences preferences) {
+        put(GROUP_INTERSECT_UNION_VIEW_MODE, preferences.getGroupViewMode().name());
+        putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, preferences.shouldAutoAssignGroup());
+        putBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT, preferences.shouldDisplayGroupCount());
+        put(KEYWORD_SEPARATOR, String.valueOf(preferences.getKeywordDelimiter()));
+    }
 
     @Override
     public GroupViewMode getGroupViewMode() {
@@ -2405,7 +2423,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // ToDo: Misc preferences
+    // Misc preferences
     //*************************************************************************************************************
 
     @Override
