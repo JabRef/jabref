@@ -29,18 +29,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ImportEntriesViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;

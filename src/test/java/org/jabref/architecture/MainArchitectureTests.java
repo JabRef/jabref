@@ -28,7 +28,7 @@ class MainArchitectureTests {
 
 
     @ArchTest
-    static void doNotUseApacheCommonsLang3(JavaClasses classes) {
+    public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
         noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
                    .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
                    .check(classes);
@@ -91,7 +91,7 @@ class MainArchitectureTests {
     }
 
     @ArchTest
-    static void respectLayeredArchitecture(JavaClasses classes) {
+    public static void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture()
                 .layer("Gui").definedBy("org.jabref.gui")
                 .layer("Logic").definedBy("org.jabref.logic")
@@ -111,7 +111,7 @@ class MainArchitectureTests {
     }
 
     @ArchTest
-    static void doNotUseLogicInModel(JavaClasses classes) {
+    public static void doNotUseLogicInModel(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage("org.jabref.logic")
                    .orShould().beAnnotatedWith(AllowedToUseLogic.class)
@@ -119,7 +119,7 @@ class MainArchitectureTests {
     }
 
     @ArchTest
-    static void restrictUsagesInModel(JavaClasses classes) {
+    public static void restrictUsagesInModel(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                    .orShould().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
@@ -129,7 +129,7 @@ class MainArchitectureTests {
     }
 
     @ArchTest
-    static void restrictUsagesInLogic(JavaClasses classes) {
+    public static void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                    .orShould().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)

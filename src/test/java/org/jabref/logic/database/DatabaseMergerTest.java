@@ -15,7 +15,6 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.Test;
 
@@ -144,7 +143,7 @@ class DatabaseMergerTest {
         List<ContentSelector> expectedContentSelectors =
                 List.of(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")),
                         new ContentSelector(StandardField.TITLE, List.of("Test Title")));
-        GroupTreeNode expectedImportedGroupNode = new GroupTreeNode(new ExplicitGroup("Imported unknown", GroupHierarchyType.INDEPENDENT, JabRefPreferences.getInstance().getKeywordDelimiter()));
+        GroupTreeNode expectedImportedGroupNode = new GroupTreeNode(new ExplicitGroup("Imported unknown", GroupHierarchyType.INDEPENDENT, ';'));
 
         new DatabaseMerger().mergeMetaData(target, other, "unknown", List.of());
 
