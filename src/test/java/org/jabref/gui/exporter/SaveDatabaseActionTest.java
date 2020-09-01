@@ -129,7 +129,7 @@ class SaveDatabaseActionTest {
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction =  SaveDatabaseAction.create(basePanel, preferences, mock(BibEntryTypesManager.class));
+        saveDatabaseAction = SaveDatabaseAction.create(basePanel, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 
@@ -145,9 +145,9 @@ class SaveDatabaseActionTest {
         saveDatabaseAction.save();
 
         assertEquals(database
-                        .getEntries().stream()
-                        .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
-                Collections.emptyList());
+                             .getEntries().stream()
+                             .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
+                     Collections.emptyList());
     }
 
     @Test
