@@ -234,7 +234,6 @@ public class SaveDatabaseAction {
         } finally {
             // release panel from save status
             panel.setSaving(false);
-
         }
     }
 
