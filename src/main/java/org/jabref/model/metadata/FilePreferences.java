@@ -14,7 +14,7 @@ public class FilePreferences {
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
-    private final boolean shouldDownloadLinkedFiles;
+    private boolean shouldDownloadLinkedFiles;
     private final boolean shouldSearchFilesOnOpen;
     private final boolean shouldOpenBrowseOnCreate;
 
@@ -65,15 +65,8 @@ public class FilePreferences {
     }
 
     public FilePreferences withShouldDownloadLinkedFiles(boolean newShouldDownloadLinkedFiles) {
-        return new FilePreferences(
-                this.user,
-                this.mainFileDirectory,
-                this.bibLocationAsPrimary,
-                this.fileNamePattern,
-                this.fileDirPattern,
-                newShouldDownloadLinkedFiles,
-                this.shouldSearchFilesOnOpen,
-                this.shouldOpenBrowseOnCreate);
+        this.shouldDownloadLinkedFiles = newShouldDownloadLinkedFiles;
+        return this;
     }
 
     public boolean shouldSearchFilesOnOpen() {

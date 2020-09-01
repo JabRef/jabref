@@ -14,12 +14,12 @@ public class SavePreferences {
     public static final String ENCODING_PREFIX = "Encoding: ";
 
     private final boolean reformatFile;
-    private final boolean saveInOriginalOrder;
-    private final SaveOrderConfig saveOrder;
-    private final Charset encoding;
-    private final boolean makeBackup;
-    private final DatabaseSaveType saveType;
-    private final boolean takeMetadataSaveOrderInAccount;
+    private boolean saveInOriginalOrder;
+    private SaveOrderConfig saveOrder;
+    private Charset encoding;
+    private boolean makeBackup;
+    private DatabaseSaveType saveType;
+    private boolean takeMetadataSaveOrderInAccount;
     private final FieldWriterPreferences fieldWriterPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
@@ -69,16 +69,8 @@ public class SavePreferences {
     }
 
     public SavePreferences withTakeMetadataSaveOrderInAccount(boolean newTakeMetadataSaveOrderInAccount) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                this.saveOrder,
-                this.encoding,
-                this.makeBackup,
-                this.saveType,
-                newTakeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.takeMetadataSaveOrderInAccount = newTakeMetadataSaveOrderInAccount;
+        return this;
     }
 
     public SaveOrderConfig getSaveOrder() {
@@ -86,16 +78,8 @@ public class SavePreferences {
     }
 
     public SavePreferences withSaveOrder(SaveOrderConfig newSaveOrder) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                newSaveOrder,
-                this.encoding,
-                this.makeBackup,
-                this.saveType,
-                this.takeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.saveOrder = newSaveOrder;
+        return this;
     }
 
     public boolean shouldSaveInOriginalOrder() {
@@ -103,16 +87,8 @@ public class SavePreferences {
     }
 
     public SavePreferences withSaveInOriginalOrder(Boolean newSaveInOriginalOrder) {
-        return new SavePreferences(
-                newSaveInOriginalOrder,
-                this.saveOrder,
-                this.encoding,
-                this.makeBackup,
-                this.saveType,
-                this.takeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.saveInOriginalOrder = newSaveInOriginalOrder;
+        return this;
     }
 
     public boolean shouldMakeBackup() {
@@ -125,16 +101,8 @@ public class SavePreferences {
      * @param newMakeBackup whether a backup (.bak file) should be made
      */
     public SavePreferences withMakeBackup(Boolean newMakeBackup) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                this.saveOrder,
-                this.encoding,
-                newMakeBackup,
-                this.saveType,
-                this.takeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.makeBackup = newMakeBackup;
+        return this;
     }
 
     public Charset getEncoding() {
@@ -142,16 +110,8 @@ public class SavePreferences {
     }
 
     public SavePreferences withEncoding(Charset newEncoding) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                this.saveOrder,
-                newEncoding,
-                this.makeBackup,
-                this.saveType,
-                this.takeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.encoding = newEncoding;
+        return this;
     }
 
     public DatabaseSaveType getSaveType() {
@@ -159,33 +119,12 @@ public class SavePreferences {
     }
 
     public SavePreferences withSaveType(DatabaseSaveType newSaveType) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                this.saveOrder,
-                this.encoding,
-                this.makeBackup,
-                newSaveType,
-                this.takeMetadataSaveOrderInAccount,
-                this.reformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
+        this.saveType = newSaveType;
+        return this;
     }
 
     public boolean shouldReformatFile() {
         return reformatFile;
-    }
-
-    public SavePreferences withReformatFile(boolean newReformatFile) {
-        return new SavePreferences(
-                this.saveInOriginalOrder,
-                this.saveOrder,
-                this.encoding,
-                this.makeBackup,
-                this.saveType,
-                this.takeMetadataSaveOrderInAccount,
-                newReformatFile,
-                this.fieldWriterPreferences,
-                this.citationKeyPatternPreferences);
     }
 
     public FieldWriterPreferences getFieldWriterPreferences() {
