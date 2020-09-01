@@ -7,25 +7,33 @@ import org.jabref.model.strings.StringUtil;
 
 public class FilePreferences {
 
+    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {"[bibtexkey]", "[bibtexkey] - [title]"};
+
     private final String user;
     private final String mainFileDirectory;
     private final boolean bibLocationAsPrimary;
     private final String fileNamePattern;
     private final String fileDirPattern;
     private boolean shouldDownloadLinkedFiles;
+    private final boolean shouldSearchFilesOnOpen;
+    private final boolean shouldOpenBrowseOnCreate;
 
     public FilePreferences(String user,
                            String mainFileDirectory,
                            boolean bibLocationAsPrimary,
                            String fileNamePattern,
                            String fileDirPattern,
-                           boolean shouldDownloadLinkedFiles) {
+                           boolean shouldDownloadLinkedFiles,
+                           boolean shouldSearchFilesOnOpen,
+                           boolean shouldOpenBrowseOnCreate) {
         this.user = user;
         this.mainFileDirectory = mainFileDirectory;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
         this.fileNamePattern = fileNamePattern;
         this.fileDirPattern = fileDirPattern;
         this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
+        this.shouldSearchFilesOnOpen = shouldSearchFilesOnOpen;
+        this.shouldOpenBrowseOnCreate = shouldOpenBrowseOnCreate;
     }
 
     public String getUser() {
@@ -48,7 +56,7 @@ public class FilePreferences {
         return fileNamePattern;
     }
 
-    public String getFileDirPattern() {
+    public String getFileDirectoryPattern() {
         return fileDirPattern;
     }
 
@@ -56,7 +64,16 @@ public class FilePreferences {
         return shouldDownloadLinkedFiles;
     }
 
-    public void setShouldDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
-        this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
+    public FilePreferences withShouldDownloadLinkedFiles(boolean newShouldDownloadLinkedFiles) {
+        this.shouldDownloadLinkedFiles = newShouldDownloadLinkedFiles;
+        return this;
+    }
+
+    public boolean shouldSearchFilesOnOpen() {
+        return shouldSearchFilesOnOpen;
+    }
+
+    public boolean shouldOpenBrowseOnCreate() {
+        return shouldOpenBrowseOnCreate;
     }
 }
