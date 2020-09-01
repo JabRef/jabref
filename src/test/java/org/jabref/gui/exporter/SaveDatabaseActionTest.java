@@ -124,7 +124,7 @@ class SaveDatabaseActionTest {
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
-        when(preferences.loadForSaveFromPreferences()).thenReturn(savePreferences);
+        when(preferences.getSavePreferences()).thenReturn(savePreferences);
         when(basePanel.frame()).thenReturn(jabRefFrame);
         when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
         when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
