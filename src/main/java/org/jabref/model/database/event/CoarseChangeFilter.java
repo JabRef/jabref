@@ -53,12 +53,12 @@ public class CoarseChangeFilter {
             // If editing is started
             boolean isNewEdit = lastFieldChanged.isEmpty();
             // If other field is edited
-            boolean isEditOnOtherField = lastFieldChanged.isPresent() && ! lastFieldChanged.get().equals(fieldChange.getField());
+            boolean isEditOnOtherField = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
             // Only deltas of 1 registered by fieldChange, major change means editing much content
             boolean isMajorChange = totalDelta >= 100;
 
             if ((isEditOnOtherField && !isNewEdit) || isMajorChange) {
-                // Submit old changes immediatebugly
+                // Submit old changes immediately
                 eventPost.run();
             } else {
                 delayPost.schedule(eventPost);

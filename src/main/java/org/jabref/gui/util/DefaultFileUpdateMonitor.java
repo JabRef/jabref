@@ -46,7 +46,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 WatchKey key;
                 try {
                     key = watcher.take();
-                } catch (InterruptedException | ClosedWatchServiceException e ) {
+                } catch (InterruptedException | ClosedWatchServiceException e) {
                     return;
                 }
 
@@ -104,7 +104,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             notShutdown.set(false);
             watcher.close();
         } catch (IOException e) {
-            LOGGER.error("error closing watcher",e);
+            LOGGER.error("error closing watcher", e);
         }
 
     }
