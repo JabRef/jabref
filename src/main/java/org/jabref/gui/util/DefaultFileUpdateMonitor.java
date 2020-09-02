@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.io.IOException;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -45,7 +46,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 WatchKey key;
                 try {
                     key = watcher.take();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | ClosedWatchServiceException e ) {
                     return;
                 }
 
@@ -99,7 +100,12 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     @Override
     public void shutdown() {
-        // listeners.clear();
-        notShutdown.set(false);
+        try {
+            notShutdown.set(false);
+            watcher.close();
+        } catch (IOException e) {
+            LOGGER.error("error closing watcher",e);
+        }
+
     }
 }
