@@ -45,7 +45,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
     private Path testFile4Entries;
     private Path testFile5EntriesWithDuplicate;
     private JournalAbbreviationPreferences abbreviationPreferences;
-    private final JournalAbbreviationRepository repo = JournalAbbreviationLoader.loadBuiltInRepository();
+    private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
 
     @BeforeEach
@@ -56,7 +56,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repo);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repository);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
@@ -198,7 +198,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
         viewModel.addBuiltInList();
         assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
-        ObservableList<Abbreviation> expected = FXCollections.observableArrayList(repo.getBuiltin());
+        ObservableList<Abbreviation> expected = FXCollections.observableArrayList(repository.getAllLoaded());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
                                               .map(AbbreviationViewModel::getAbbreviationObject)

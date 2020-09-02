@@ -108,7 +108,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     void addBuiltInList() {
         BackgroundTask
-                .wrap(journalAbbreviationRepository::getBuiltin)
+                .wrap(journalAbbreviationRepository::getAllLoaded)
                 .onRunning(() -> isLoading.setValue(true))
                 .onSuccess(result -> {
                     isLoading.setValue(false);

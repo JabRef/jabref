@@ -126,7 +126,7 @@ public class JournalAbbreviationRepository {
         return fullToAbbreviation.keySet();
     }
 
-    public List<Abbreviation> getBuiltin() {
+    public List<Abbreviation> getAllLoaded() {
         return fullToAbbreviation.entrySet().stream().map(entry ->
                 new Abbreviation(entry.getKey(), entry.getValue())).collect(Collectors.toList());
     }

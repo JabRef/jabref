@@ -47,7 +47,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
     private Path testFile5EntriesWithDuplicate;
     private JournalAbbreviationPreferences abbreviationPreferences;
     private DialogService dialogService;
-    private final JournalAbbreviationRepository repo = JournalAbbreviationLoader.loadBuiltInRepository();
+    private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
@@ -57,7 +57,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repo);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repository);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
@@ -200,7 +200,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
         assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(repo.getBuiltin());
+                .observableArrayList(repository.getAllLoaded());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
                                               .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
