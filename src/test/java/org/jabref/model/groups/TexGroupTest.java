@@ -2,6 +2,7 @@ package org.jabref.model.groups;
 
 import java.nio.file.Path;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@AllowedToUseLogic("because class under test relies on logic classes")
 public class TexGroupTest {
 
     private MetaData metaData;

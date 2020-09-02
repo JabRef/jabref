@@ -1,7 +1,8 @@
-package org.jabref.model.database.shared;
+package org.jabref.logic.shared;
 
 /**
- * This exception is thrown in case that the SQL database structure is not compatible with the current shared database support mechanisms.
+ * This exception is thrown in case that the SQL database structure is not compatible with the current shared database
+ * support mechanisms.
  */
 public class DatabaseNotSupportedException extends Exception {
 

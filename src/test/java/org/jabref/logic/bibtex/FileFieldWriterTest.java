@@ -1,7 +1,10 @@
-package org.jabref.model.entry;
+package org.jabref.logic.bibtex;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.Test;
 

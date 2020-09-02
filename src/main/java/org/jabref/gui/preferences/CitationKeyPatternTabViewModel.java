@@ -17,7 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelItemModel;
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternPanelViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.preferences.PreferencesService;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {

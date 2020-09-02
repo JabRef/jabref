@@ -1,4 +1,4 @@
-package org.jabref.model.auxparser;
+package org.jabref.logic.auxparser;
 
 import java.nio.file.Path;
 

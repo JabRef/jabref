@@ -1,4 +1,4 @@
-package org.jabref.model.entry;
+package org.jabref.logic.importer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +9,9 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
 public class AuthorListParser {
 
@@ -25,19 +28,9 @@ public class AuthorListParser {
 
     private static final int OFFSET_TOKEN_TERM = 2; // Character -- token terminator (either " " or
     // "-") comma)
-
-    // Token types (returned by getToken procedure)
-    private enum Token {
-        EOF,
-        AND,
-        COMMA,
-        WORD
-    }
-
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = Set.of(
             "aa", "ae", "l", "o", "oe", "i", "AA", "AE", "L", "O", "OE", "j");
-
     /**
      * the raw bibtex author/editor field
      */
@@ -63,6 +56,36 @@ public class AuthorListParser {
      * true if upper-case token, false if lower-case
      */
     private boolean tokenCase;
+
+    /**
+     * Builds a new array of strings with stringbuilder. Regarding to the name affixes.
+     *
+     * @return New string with correct seperation
+     */
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+        int avoidedTimes = 0;
+        for (int i = 0; i < nameList.size(); i++) {
+            if (indexArray.contains(i)) {
+                // We hit a name affix
+                stringBuilder.append(nameList.get(i));
+                stringBuilder.append(',');
+                avoidedTimes++;
+            } else {
+                stringBuilder.append(nameList.get(i));
+                if (((i + avoidedTimes) % 2) == 0) {
+                    // Hit separation between last name and firstname --> comma has to be kept
+                    stringBuilder.append(',');
+                } else {
+                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
+                    // Will be treated correctly by AuthorList.parse(authors);
+                    stringBuilder.append(';');
+                }
+            }
+        }
+        return stringBuilder;
+    }
 
     /**
      * Parses the String containing person names and returns a list of person information.
@@ -131,41 +154,9 @@ public class AuthorListParser {
     }
 
     /**
-     * Builds a new array of strings with stringbuilder.
-     * Regarding to the name affixes.
-     *
-     * @return New string with correct seperation
-     */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
-        int avoidedTimes = 0;
-        for (int i = 0; i < nameList.size(); i++) {
-            if (indexArray.contains(i)) {
-                // We hit a name affix
-                stringBuilder.append(nameList.get(i));
-                stringBuilder.append(',');
-                avoidedTimes++;
-            } else {
-                stringBuilder.append(nameList.get(i));
-                if (((i + avoidedTimes) % 2) == 0) {
-                    // Hit separation between last name and firstname --> comma has to be kept
-                    stringBuilder.append(',');
-                } else {
-                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
-                    // Will be treated correctly by AuthorList.parse(authors);
-                    stringBuilder.append(';');
-                }
-            }
-        }
-        return stringBuilder;
-    }
-
-    /**
      * Parses one author name and returns preformatted information.
      *
-     * @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is
-     * empty.
+     * @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is empty.
      */
     private Optional<Author> getAuthor() {
         List<Object> tokens = new ArrayList<>(); // initialization
@@ -337,13 +328,13 @@ public class AuthorListParser {
     }
 
     /**
-     * Concatenates list of tokens from 'tokens' Vector. Tokens are separated by
-     * spaces or dashes, depending on stored in 'tokens'. Callers always ensure
-     * that start < end; thus, there exists at least one token to be
-     * concatenated.
+     * Concatenates list of tokens from 'tokens' Vector. Tokens are separated by spaces or dashes, depending on stored
+     * in 'tokens'. Callers always ensure that start < end; thus, there exists at least one token to be concatenated.
      *
-     * @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
-     * @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by TOKEN_GROUP_LENGTH).
+     * @param start    index of the first token to be concatenated in 'tokens' Vector (always divisible by
+     *                 TOKEN_GROUP_LENGTH).
+     * @param end      index of the first token not to be concatenated in 'tokens' Vector (always divisible by
+     *                 TOKEN_GROUP_LENGTH).
      * @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
      * @param dotAfter <CODE>true</CODE> -- add period after each token, <CODE>false</CODE> --
      *                 do not add.
@@ -371,27 +362,24 @@ public class AuthorListParser {
     /**
      * Parses the next token.
      * <p>
-     * The string being parsed is stored in global variable <CODE>original</CODE>,
-     * and position which parsing has to start from is stored in global variable
+     * The string being parsed is stored in global variable <CODE>original</CODE>, and position which parsing has to
+     * start from is stored in global variable
      * <CODE>token_end</CODE>; thus, <CODE>token_end</CODE> has to be set
-     * to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>;
-     * thus, subsequent invocations do not require any additional variable
-     * settings.
+     * to 0 before the first invocation. Procedure updates <CODE>token_end</CODE>; thus, subsequent invocations do not
+     * require any additional variable settings.
      * <p>
-     * The type of the token is returned; if it is <CODE>Token.WORD</CODE>,
-     * additional information is given in global variables <CODE>token_start</CODE>,
+     * The type of the token is returned; if it is <CODE>Token.WORD</CODE>, additional information is given in global
+     * variables <CODE>token_start</CODE>,
      * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
-     * and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE>
-     * is the text of the token, <CODE>original.substring(token_start,token_abbr)</CODE>
-     * is the token abbreviation, <CODE>token_term</CODE> contains token
-     * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
-     * if token is upper-case and <CODE>false</CODE> if token is lower-case.
+     * and <CODE>token_case</CODE>; namely: <CODE>original.substring(token_start,token_end)</CODE> is the text of the
+     * token, <CODE>original.substring(token_start,token_abbr)</CODE> is the token abbreviation, <CODE>token_term</CODE>
+     * contains token terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>, if token is
+     * upper-case and <CODE>false</CODE> if token is lower-case.
      *
      * @return <CODE>Token.EOF</CODE> -- no more tokens, <CODE>Token.COMMA</CODE> --
-     * token is comma, <CODE>Token.AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.) or a semicolon, <CODE>Token.WORD</CODE> --
-     * token is a word; additional information is given in global
-     * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
+     * token is comma, <CODE>Token.AND</CODE> -- token is the word "and" (or "And", or "aND", etc.) or a semicolon,
+     * <CODE>Token.WORD</CODE> -- token is a word; additional information is given in global variables
+     * <CODE>token_start</CODE>, <CODE>token_end</CODE>,
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
      * <CODE>token_case</CODE>.
      */
@@ -475,5 +463,13 @@ public class AuthorListParser {
         } else {
             return Token.WORD;
         }
+    }
+
+    // Token types (returned by getToken procedure)
+    private enum Token {
+        EOF,
+        AND,
+        COMMA,
+        WORD
     }
 }

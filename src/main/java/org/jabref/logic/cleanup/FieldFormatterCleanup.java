@@ -1,4 +1,4 @@
-package org.jabref.model.cleanup;
+package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Collections;

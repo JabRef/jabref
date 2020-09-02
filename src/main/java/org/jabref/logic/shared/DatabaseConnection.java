@@ -1,4 +1,4 @@
-package org.jabref.model.database.shared;
+package org.jabref.logic.shared;
 
 import java.sql.Connection;
 

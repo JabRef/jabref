@@ -3,9 +3,9 @@ package org.jabref.cli;
 import java.nio.file.Path;
 
 import org.jabref.gui.auximport.AuxParserResultViewModel;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.DefaultAuxParser;
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.strings.StringUtil;
 

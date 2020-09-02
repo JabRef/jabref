@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
-import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 

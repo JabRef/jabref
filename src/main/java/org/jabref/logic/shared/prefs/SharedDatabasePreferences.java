@@ -7,8 +7,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.jabref.JabRefMain;
+import org.jabref.logic.shared.DatabaseConnectionProperties;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
