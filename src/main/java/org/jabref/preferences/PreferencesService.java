@@ -86,8 +86,6 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
-    boolean isKeywordSyncEnabled();
-
     SavePreferences getSavePreferencesForExport();
 
     SavePreferences getSavePreferences();

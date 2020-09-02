@@ -53,22 +53,14 @@ public class SpecialFieldViewModel {
     }
 
     public Action getAction() {
-        switch (field) {
-            case PRINTED:
-                return StandardActions.PRINTED;
-            case PRIORITY:
-                return StandardActions.PRIORITY;
-            case QUALITY:
-                return StandardActions.QUALITY;
-            case RANKING:
-                return StandardActions.RANKING;
-            case READ_STATUS:
-                return StandardActions.READ_STATUS;
-            case RELEVANCE:
-                return StandardActions.RELEVANCE;
-            default:
-                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
-        }
+        return switch (field) {
+            case PRINTED -> StandardActions.PRINTED;
+            case PRIORITY -> StandardActions.PRIORITY;
+            case QUALITY -> StandardActions.QUALITY;
+            case RANKING -> StandardActions.RANKING;
+            case READ_STATUS -> StandardActions.READ_STATUS;
+            case RELEVANCE -> StandardActions.RELEVANCE;
+        };
     }
 
     public JabRefIcon getEmptyIcon() {
@@ -81,8 +73,15 @@ public class SpecialFieldViewModel {
                     .collect(Collectors.toList());
     }
 
-    public void setSpecialFieldValue(BibEntry be, SpecialFieldValue value) {
-        List<FieldChange> changes = SpecialFieldsUtils.updateField(getField(), value.getFieldValue().orElse(null), be, getField().isSingleValueField(), Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
+    public void setSpecialFieldValue(BibEntry bibEntry, SpecialFieldValue value) {
+        List<FieldChange> changes = SpecialFieldsUtils.updateField(
+                getField(),
+                value.getFieldValue().orElse(null),
+                bibEntry,
+                getField().isSingleValueField(),
+                Globals.prefs.getSpecialFieldsPreferences().isKeywordSyncEnabled(),
+                Globals.prefs.getKeywordDelimiter());
+
         for (FieldChange change : changes) {
             undoManager.addEdit(new UndoableFieldChange(change));
         }

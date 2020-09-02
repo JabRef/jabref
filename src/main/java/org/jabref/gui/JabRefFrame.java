@@ -218,9 +218,7 @@ public class JabRefFrame extends BorderPane {
                 }
             });
 
-            this.getScene().setOnDragExited(event -> {
-                tabbedPane.getTabs().remove(dndIndicator);
-            });
+            this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
 
             this.getScene().setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
@@ -792,7 +790,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+        if (Globals.prefs.getSpecialFieldsPreferences().getSpecialFieldsEnabled()) {
             edit.getItems().addAll(
                     new SeparatorMenuItem(),
                     // ToDo: SpecialField needs the active BasePanel to mark it as changed.

@@ -1148,12 +1148,6 @@ public class JabRefPreferences implements PreferencesService {
         return '[' + get(DEFAULT_OWNER) + ']';
     }
 
-    @Override
-    public boolean isKeywordSyncEnabled() {
-        return getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)
-                && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
-    }
-
     private FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
@@ -2177,7 +2171,7 @@ public class JabRefPreferences implements PreferencesService {
                 getCitationKeyPatternPreferences(),
                 getFieldContentParserPreferences(),
                 getXmpPreferences(),
-                isKeywordSyncEnabled());
+                getSpecialFieldsPreferences().isKeywordSyncEnabled());
     }
 
     @Override

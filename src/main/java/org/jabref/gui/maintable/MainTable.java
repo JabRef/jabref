@@ -105,7 +105,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         panel,
                         dialogService,
                         stateManager,
-                        preferencesService))
+                        preferencesService,
+                        Globals.clipboardManager))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)

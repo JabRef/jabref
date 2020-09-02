@@ -25,4 +25,8 @@ public class SpecialFieldsPreferences {
     public boolean getSerializeSpecialFields() {
         return serializeSpecialFields;
     }
+
+    public boolean isKeywordSyncEnabled() {
+        return specialFieldsEnabled && autoSyncSpecialFieldsToKeyWords;
+    }
 }
