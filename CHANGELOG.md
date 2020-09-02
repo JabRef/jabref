@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
+- We changed the synchronization of SpecialFields to keywords to not to do so as default. [#6621](https://github.com/JabRef/jabref/issues/6621)
 
 ### Fixed
 
