@@ -22,8 +22,6 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -67,7 +65,7 @@ public class FetchAndMergeEntry {
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                                      ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
                                       cleanup.doPostCleanup(entry);
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
@@ -152,7 +150,7 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
-                              ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                              ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
                               cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {
