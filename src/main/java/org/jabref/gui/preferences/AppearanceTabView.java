@@ -10,7 +10,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -26,7 +26,7 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AppearanceTabView(JabRefPreferences preferences) {
+    public AppearanceTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
