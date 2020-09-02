@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
@@ -87,6 +88,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
  */
+@AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
 
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();

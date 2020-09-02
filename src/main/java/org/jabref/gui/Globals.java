@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javafx.stage.Screen;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
@@ -31,6 +32,7 @@ import kong.unirest.Unirest;
  * @deprecated try to use {@link StateManager} and {@link org.jabref.preferences.PreferencesService}
  */
 @Deprecated
+@AllowedToUseAwt("Requires AWT for headless check")
 public class Globals {
 
     /**

@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.layout.Layout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -25,6 +26,7 @@ import com.sun.star.uno.UnoRuntime;
 /**
  * Utility methods for processing OO Writer documents.
  */
+@AllowedToUseAwt("Requires AWT for changing document properties")
 public class OOUtil {
 
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
