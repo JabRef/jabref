@@ -143,7 +143,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
@@ -155,10 +155,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
     /**
      * Checks if all tabs are valid
-     * ToDo: After conversion of all tabs use mvvmfx-validator
-     * ToDo: should be observable for binding of OK-button in View
      */
-
     public boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {

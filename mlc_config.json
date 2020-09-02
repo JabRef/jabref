@@ -4,6 +4,9 @@
             "pattern": "^CONTRIBUTING\\.md"
         },
         {
+            "pattern": "^https://codecov\\.io/"
+        },
+        {
             "pattern": "^https://dl\\.acm\\.org"
         },
         {

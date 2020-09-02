@@ -127,7 +127,7 @@ public class WriteXMPAction extends SimpleCommand {
                 for (Path file : files) {
                     if (Files.exists(file)) {
                         try {
-                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXMPPreferences());
+                            XmpUtilWriter.writeXmp(file, entry, database, Globals.prefs.getXmpPreferences());
                             Platform.runLater(
                                     () -> optionsDialog.getProgressArea().appendText("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;

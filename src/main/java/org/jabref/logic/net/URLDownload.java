@@ -42,6 +42,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,6 +172,19 @@ public class URLDownload {
         return "";
     }
 
+    /**
+     * Check the connection by using the HEAD request.
+     * UnirestException can be thrown for invalid request.
+     *
+     * @return the status code of the response
+     */
+    public boolean canBeReached() throws UnirestException {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        return statusCode >= 200 && statusCode < 300;
+    }
+
     public boolean isMimeType(String type) {
         String mime = getMimeType();
 
@@ -289,8 +303,7 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+        Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
 
             String line;
