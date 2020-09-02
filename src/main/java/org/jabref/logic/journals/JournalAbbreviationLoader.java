@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +13,6 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
-
-    private static List<Abbreviation> readJournalListFromResource(String resource) {
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromResource(Objects.requireNonNull(resource));
-        return parser.getAbbreviations();
-    }
 
     public static List<Abbreviation> readJournalListFromFile(Path file) throws IOException {
         LOGGER.debug(String.format("Reading journal list from file %s", file));

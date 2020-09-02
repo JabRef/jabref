@@ -20,7 +20,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -159,7 +158,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
-                                                 Localization.lang("Journal file %s already added", filePath.toString()));
+                    Localization.lang("Journal file %s already added", filePath.toString()));
             return;
         }
         if (abbreviationsFile.exists()) {
@@ -208,7 +207,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                                                 Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                    Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
@@ -236,7 +235,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                                                         Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                            Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
                 }
             } else {
                 setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
@@ -269,10 +268,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         currentAbbreviation.get().setAbbreviation(abbreviation);
         currentAbbreviation.get().setShortestUniqueAbbreviation(shortestUniqueAbbreviation);
         shouldWriteLists = true;
-    }
-
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
-        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, "");
     }
 
     /**
@@ -336,7 +331,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     /**
      * This method first saves all external files to its internal list, then writes all abbreviations to their files and
      * finally updates the abbreviations auto complete. It basically calls {@link #saveExternalFilesList()}, {@link
-     * #saveJournalAbbreviationFiles() } and finally {@link JournalAbbreviationLoader#update(JournalAbbreviationPreferences)}.
+     * #saveJournalAbbreviationFiles() }}.
      */
     public void save() {
         BackgroundTask.wrap(() -> {
@@ -385,7 +380,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void addAbbreviation() {
         addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"),
-                        Localization.lang("Shortest unique abbreviation"));
+                Localization.lang("Shortest unique abbreviation"));
     }
 
     public void init() {
