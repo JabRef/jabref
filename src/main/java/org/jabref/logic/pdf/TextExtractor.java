@@ -4,6 +4,8 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.Objects;
 
+import org.jabref.architecture.AllowedToUseAwt;
+
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSInteger;
@@ -14,6 +16,7 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 /**
  * Extracts the text of marked annotations using bounding boxes.
  */
+@AllowedToUseAwt("org.apache.pdfbox.text.PDFTextStripperByArea.addRegion uses AWT's Rectangle to indicate a region")
 public final class TextExtractor {
 
     private final COSArray boundingBoxes;

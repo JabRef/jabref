@@ -13,7 +13,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 @AnalyzeClasses(packages = "org.jabref")
 class MainArchitectureTests {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
+    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
     private static final String PACKAGE_JAVA_FX = "javafx..";
@@ -68,11 +68,10 @@ class MainArchitectureTests {
                    .check(classes);
     }
 
-    // "Currently disabled as there is no alternative for the rest of classes who need awt"
-    @ArchIgnore
     @ArchTest
     public static void doNotUseJavaAWT(JavaClasses classes) {
-        noClasses().should().accessClassesThat().resideInAPackage("java.awt..")
+        noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
+                   .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                    .check(classes);
     }
 
@@ -86,7 +85,8 @@ class MainArchitectureTests {
     }
 
     @ArchTest
-    @ArchIgnore // Fails currently
+    @ArchIgnore
+    // Fails currently
     public static void respectLayeredArchitecture(JavaClasses classes) {
         layeredArchitecture()
                 .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
@@ -109,7 +109,8 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void doNotUseLogicInModel(JavaClasses classes) {
-        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL).and().areNotAnnotatedWith(AllowedToUseLogic.class)
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .check(classes);
     }
@@ -117,8 +118,7 @@ class MainArchitectureTests {
     @ArchTest
     public static void restrictUsagesInModel(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
-                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
-                   .orShould().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
@@ -126,10 +126,8 @@ class MainArchitectureTests {
     @ArchTest
     public static void restrictUsagesInLogic(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
-                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
-                   .orShould().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
-
 }

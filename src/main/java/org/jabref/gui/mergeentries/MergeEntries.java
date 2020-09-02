@@ -32,7 +32,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
