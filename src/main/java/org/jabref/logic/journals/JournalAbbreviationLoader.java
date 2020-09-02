@@ -1,7 +1,6 @@
 package org.jabref.logic.journals;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,13 +31,6 @@ public class JournalAbbreviationLoader {
         LOGGER.debug(String.format("Reading journal list from file %s", file));
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(file);
-        return parser.getAbbreviations();
-    }
-
-    private static List<Abbreviation> readJournalListFromFile(Path file, Charset encoding) throws IOException {
-        LOGGER.debug(String.format("Reading journal list from file %s", file));
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(file, Objects.requireNonNull(encoding));
         return parser.getAbbreviations();
     }
 
