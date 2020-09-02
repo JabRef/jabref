@@ -369,7 +369,7 @@ The following expressions can be used in FXML attributes, according to the [offi
 
 All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code Example:
 
-````markup
+```xml
 <VBox>
             <fx:define>
                 <ToggleGroup fx:id="citeToggleGroup"/>
@@ -383,4 +383,4 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
                 <TextField fx:id="pageInfo"/>
             </children>
 </VBox>
-````
+```
