@@ -22,15 +22,14 @@ Principles:
 * Catch and wrap all API exceptions \(such as `IOExceptions`\) and rethrow them
   * Example:
 
-       ```java
+    ```java
        try {
            // ...
        } catch (IOException ioe) {
            throw new JabRefException("Something went wrong...",
                Localization.lang("Something went wrong...", ioe);
        }
-       ```
-
+    ```
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).

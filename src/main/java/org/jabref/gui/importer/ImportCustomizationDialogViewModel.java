@@ -120,7 +120,10 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
     public void saveToPrefs() {
         Globals.prefs.customImports.clear();
         Globals.prefs.customImports.addAll(importers);
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(), Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getXmpPreferences(),
+                Globals.getFileUpdateMonitor());
     }
 
     public ListProperty<CustomImporter> selectedImportersProperty() {

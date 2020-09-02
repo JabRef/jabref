@@ -107,7 +107,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXMPPreferences(),
+                preferences.getXmpPreferences(),
                 preferences.getFilePreferences(),
                 externalFileTypes);
     }
@@ -128,7 +128,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       databaseContext,
                                       taskExecutor,
                                       dialogService,
-                                      preferences.getXMPPreferences(),
+                                      preferences.getXmpPreferences(),
                                       preferences.getFilePreferences(),
                                       externalFileTypes))
                               .collect(Collectors.toList());
@@ -159,7 +159,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     databaseContext,
                     taskExecutor,
                     dialogService,
-                    preferences.getXMPPreferences(),
+                    preferences.getXmpPreferences(),
                     preferences.getFilePreferences(),
                     externalFileTypes));
         });
@@ -197,7 +197,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         databaseContext,
                         taskExecutor,
                         dialogService,
-                        preferences.getXMPPreferences(),
+                        preferences.getXmpPreferences(),
                         preferences.getFilePreferences(),
                         externalFileTypes);
                 newLinkedFile.markAsAutomaticallyFound();
@@ -248,7 +248,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXMPPreferences(),
+                preferences.getXmpPreferences(),
                 preferences.getFilePreferences(),
                 externalFileTypes);
         files.add(onlineFile);

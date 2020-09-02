@@ -12,8 +12,13 @@ We recommend to start early and constantly, since students working earlier and m
 2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
 3. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](getting-into-the-code/development-strategy.md) for more details.
 4. Choose tasks from one of the following boards. Write a comment on each issue so that it can be reserved for your course.
+   * Candidates for university projects: [https://github.com/JabRef/jabref/projects/9](https://github.com/JabRef/jabref/projects/9)
+     * This board categorizes in small, medium, and large features
    * Feature Board: [https://github.com/JabRef/jabref/projects/7](https://github.com/JabRef/jabref/projects/7)
+     * This is a general feature board. Recommended, if the board above is empty or you did not find something suitable
    * Bug Board: [https://github.com/JabRef/jabref/projects/5](https://github.com/JabRef/jabref/projects/5)
+     * This is an excellent board to find issues training the maintainance knowledge which is essential for industry work
+   * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the projectd boards listed above.
 5. Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
 6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
 
