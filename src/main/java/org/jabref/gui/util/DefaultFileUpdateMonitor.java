@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jabref.logic.JabRefException;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.model.util.WatchServiceUnavailableException;
+import org.jabref.logic.WatchServiceUnavailableException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

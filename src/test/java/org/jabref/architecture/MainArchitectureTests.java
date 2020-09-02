@@ -109,16 +109,24 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void doNotUseLogicInModel(JavaClasses classes) {
-        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL).and().areNotAnnotatedWith(AllowedToUseLogic.class)
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
                    .check(classes);
     }
 
     @ArchTest
-    public static void restrictUsagesInModel(JavaClasses classes) {
+    public static void restrictUsagesInModelRegardingAwt(JavaClasses classes) {
         noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
-                   .orShould().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void restrictUsagesInModelRegardingSwingAndGlobals(JavaClasses classes) {
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
                    .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
                    .check(classes);
     }
