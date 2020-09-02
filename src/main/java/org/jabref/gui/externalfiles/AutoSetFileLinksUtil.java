@@ -14,6 +14,8 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.JabRefDialogService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 public class AutoSetFileLinksUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
+    private JabRefDialogService errorDialog;
     private List<Path> directories;
     private AutoLinkPreferences autoLinkPreferences;
     private ExternalFileTypes externalFileTypes;
@@ -55,6 +58,7 @@ public class AutoSetFileLinksUtil {
                 linkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
                 LOGGER.error("Problem finding files", e);
+                errorDialog.showErrorDialogAndWait(null, Localization.lang("Problem finding files"));
             }
 
             if (ce != null) {
