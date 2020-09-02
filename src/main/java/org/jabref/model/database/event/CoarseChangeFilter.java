@@ -34,7 +34,7 @@ public class CoarseChangeFilter {
     }
 
     @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+    public synchronized void listen(BibDatabaseContextChangedEvent event) {
         Runnable eventPost = () -> {
             // Reset total change delta
             totalDelta = 0;
@@ -53,7 +53,7 @@ public class CoarseChangeFilter {
             // If editing is started
             boolean isNewEdit = lastFieldChanged.isEmpty();
             // If other field is edited
-            boolean isEditOnOtherField = !lastFieldChanged.get().equals(fieldChange.getField());
+            boolean isEditOnOtherField = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
             // Only deltas of 1 registered by fieldChange, major change means editing much content
             boolean isMajorChange = totalDelta >= 100;
 
