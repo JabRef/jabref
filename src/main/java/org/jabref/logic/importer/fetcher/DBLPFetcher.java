@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -17,8 +19,6 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.layout.LayoutFormatterBasedFormatter;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;

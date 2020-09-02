@@ -17,7 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;

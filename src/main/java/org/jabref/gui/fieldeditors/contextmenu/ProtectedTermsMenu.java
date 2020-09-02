@@ -9,11 +9,11 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
 
 import org.jabref.Globals;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.model.cleanup.Formatter;
 
 class ProtectedTermsMenu extends Menu {
 

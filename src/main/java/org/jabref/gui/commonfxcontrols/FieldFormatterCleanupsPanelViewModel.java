@@ -12,8 +12,8 @@ import javafx.scene.control.SelectionModel;
 import org.jabref.Globals;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 

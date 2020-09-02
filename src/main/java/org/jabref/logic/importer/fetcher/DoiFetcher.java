@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -18,7 +19,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;

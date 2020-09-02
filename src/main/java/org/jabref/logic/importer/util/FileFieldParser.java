@@ -1,7 +1,9 @@
-package org.jabref.model.entry;
+package org.jabref.logic.importer.util;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jabref.model.entry.LinkedFile;
 
 public class FileFieldParser {
 

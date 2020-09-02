@@ -8,8 +8,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 

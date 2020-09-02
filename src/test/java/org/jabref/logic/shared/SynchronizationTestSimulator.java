@@ -3,7 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

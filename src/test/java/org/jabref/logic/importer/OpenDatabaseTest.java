@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -39,8 +38,7 @@ class OpenDatabaseTest {
         bibWrongHeader = Path.of(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
         bibHeader = Path.of(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
         bibHeaderAndSignature = Path.of(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
-        bibEncodingWithoutNewline = Paths
-                .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
+        bibEncodingWithoutNewline = Path.of(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
     }
 
     @BeforeEach

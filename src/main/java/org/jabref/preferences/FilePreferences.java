@@ -1,4 +1,4 @@
-package org.jabref.model.metadata;
+package org.jabref.preferences;
 
 import java.nio.file.Path;
 import java.util.Optional;

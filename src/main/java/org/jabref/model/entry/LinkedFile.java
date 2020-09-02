@@ -17,8 +17,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).

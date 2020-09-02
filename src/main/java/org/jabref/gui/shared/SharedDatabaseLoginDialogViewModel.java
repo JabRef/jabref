@@ -32,14 +32,14 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+import org.jabref.logic.shared.DBMSType;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;

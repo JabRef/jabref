@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
