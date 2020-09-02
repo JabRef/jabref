@@ -19,6 +19,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +46,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
     private Path testFile4Entries;
     private Path testFile5EntriesWithDuplicate;
     private JournalAbbreviationPreferences abbreviationPreferences;
+    private final JournalAbbreviationRepository repo = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
 
     @BeforeEach
@@ -55,7 +57,7 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, JournalAbbreviationLoader.loadBuiltInRepository());
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repo);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
@@ -197,11 +199,10 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
         viewModel.addBuiltInList();
         assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
-        ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
+        ObservableList<Abbreviation> expected = FXCollections.observableArrayList(repo.getBuiltin());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
-                .observableArrayList(viewModel.abbreviationsProperty().stream()
-                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
+                                                                        .observableArrayList(viewModel.abbreviationsProperty().stream()
+                                                                                                      .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
 
         assertEquals(expected, actualAbbreviations);
     }
@@ -398,19 +399,19 @@ class ManageJournalAbbreviationsViewModelMixedAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
         List<String> expected = Arrays.asList(
-                "Abbreviations;Abb;Abb",
-                "Test Entry;TE;T",
-                "MoreEntries;ME;M",
-                "JabRefTestEntry;JTE;JTE");
+                                              "Abbreviations;Abb;Abb",
+                                              "Test Entry;TE;T",
+                                              "MoreEntries;ME;M",
+                                              "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE;EE",
-                "Abbreviations;Abb;Abb",
-                "Test Entry;TE;T",
-                "SomeOtherEntry;SOE;SOE");
+                                 "EntryEntry;EE;EE",
+                                 "Abbreviations;Abb;Abb",
+                                 "Test Entry;TE;T",
+                                 "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);

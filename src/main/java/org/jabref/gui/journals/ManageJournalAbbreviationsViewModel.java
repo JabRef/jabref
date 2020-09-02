@@ -109,7 +109,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     void addBuiltInList() {
         BackgroundTask
-                .wrap(JournalAbbreviationLoader::getBuiltInAbbreviations)
+                .wrap(journalAbbreviationRepository::getBuiltin)
                 .onRunning(() -> isLoading.setValue(true))
                 .onSuccess(result -> {
                     isLoading.setValue(false);
@@ -159,7 +159,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal File"),
-                    Localization.lang("Journal file %s already added", filePath.toString()));
+                                                 Localization.lang("Journal file %s already added", filePath.toString()));
             return;
         }
         if (abbreviationsFile.exists()) {
@@ -208,7 +208,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                    Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                                                 Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
@@ -236,7 +236,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
                 } else {
                     dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                            Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
+                                                         Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviation, name));
                 }
             } else {
                 setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, shortestUniqueAbbreviation);
@@ -385,7 +385,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void addAbbreviation() {
         addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"),
-                Localization.lang("Shortest unique abbreviation"));
+                        Localization.lang("Shortest unique abbreviation"));
     }
 
     public void init() {

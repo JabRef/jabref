@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -29,15 +30,15 @@ public class JournalAbbreviationRepository {
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
-                || name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
+               || name.equalsIgnoreCase(abbreviation.getAbbreviation())
+               || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+               || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
     }
 
     private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
         boolean isAbbreviated = name.equalsIgnoreCase(abbreviation.getAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
-                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
+                                || name.equalsIgnoreCase(abbreviation.getMedlineAbbreviation())
+                                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());
         boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());
         return isAbbreviated && !isExpanded;
     }
@@ -65,8 +66,8 @@ public class JournalAbbreviationRepository {
         String journal = journalName.trim();
 
         return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
-                ||
-                abbreviationToFull.containsKey(journal);
+               ||
+               abbreviationToFull.containsKey(journal);
     }
 
     /**
@@ -125,4 +126,9 @@ public class JournalAbbreviationRepository {
     public Set<String> getFullNames() {
         return fullToAbbreviation.keySet();
     }
+
+    public List<Abbreviation> getBuiltin() {
+        return fullToAbbreviation.entrySet().stream().map(entry -> new Abbreviation(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+    }
+
 }

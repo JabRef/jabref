@@ -17,12 +17,12 @@ class AbbreviationsTest {
     @Test
     void getNextAbbreviationAbbreviatesJournalTitle() {
         assertEquals("2D Mater.",
-                repository.getNextAbbreviation("2D Materials").get());
+                     repository.getNextAbbreviation("2D Materials").get());
     }
 
     @Test
     void getNextAbbreviationConvertsAbbreviationToDotLessAbbreviation() {
         assertEquals("2D Mater",
-                repository.getNextAbbreviation("2D Mater.").get());
+                     repository.getNextAbbreviation("2D Mater.").get());
     }
 }

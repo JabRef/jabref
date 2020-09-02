@@ -15,12 +15,6 @@ public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
 
-    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.csv";
-
-    public static List<Abbreviation> getBuiltInAbbreviations() {
-        return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
-    }
-
     private static List<Abbreviation> readJournalListFromResource(String resource) {
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromResource(Objects.requireNonNull(resource));
