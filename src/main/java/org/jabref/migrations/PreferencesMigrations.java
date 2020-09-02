@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import javafx.scene.control.TableColumn;
 
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefMain;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;

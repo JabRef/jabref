@@ -4,10 +4,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
+import org.jabref.logic.JabRefException;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
