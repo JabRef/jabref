@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
 import org.jabref.gui.JabRefFrame;

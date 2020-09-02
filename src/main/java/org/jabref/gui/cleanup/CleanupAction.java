@@ -3,7 +3,7 @@ package org.jabref.gui.cleanup;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;

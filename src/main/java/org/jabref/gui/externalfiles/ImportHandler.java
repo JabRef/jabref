@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;

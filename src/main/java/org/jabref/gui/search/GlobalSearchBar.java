@@ -31,7 +31,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;

@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import java.awt.GraphicsEnvironment;
 import java.util.Optional;
@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import javafx.stage.Screen;
 
-import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;

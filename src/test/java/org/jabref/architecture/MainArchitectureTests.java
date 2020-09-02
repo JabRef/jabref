@@ -13,7 +13,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 @AnalyzeClasses(packages = "org.jabref")
 class MainArchitectureTests {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
+    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
     private static final String PACKAGE_JAVA_AWT = "java.awt..";
     private static final String PACKAGE_JAVA_FX = "javafx..";

@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import java.util.Collection;
 import java.util.Collections;

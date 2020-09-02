@@ -19,7 +19,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;

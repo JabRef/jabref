@@ -1,6 +1,6 @@
 package org.jabref.model.util;
 
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 
 public class WatchServiceUnavailableException extends JabRefException {
     public WatchServiceUnavailableException(final String message, final String localizedMessage, final Throwable cause) {

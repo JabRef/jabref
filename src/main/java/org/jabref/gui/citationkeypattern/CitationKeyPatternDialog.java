@@ -2,7 +2,7 @@ package org.jabref.gui.citationkeypattern;
 
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;

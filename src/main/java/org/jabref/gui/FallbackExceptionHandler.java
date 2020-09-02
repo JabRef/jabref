@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
 
