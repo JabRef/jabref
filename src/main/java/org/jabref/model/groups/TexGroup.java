@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
@@ -19,6 +20,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("because it needs access to aux parser")
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);

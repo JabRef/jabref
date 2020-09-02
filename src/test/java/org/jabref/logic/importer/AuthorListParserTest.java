@@ -1,9 +1,11 @@
-package org.jabref.model.entry;
+package org.jabref.logic.importer;
 
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.AuthorListParser;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,7 +33,7 @@ class AuthorListParserTest {
     @MethodSource("data")
     void parseCorrectly(String authorsString, Author authorsParsed) {
         AuthorListParser parser = new AuthorListParser();
-        assertEquals(new AuthorList(authorsParsed), parser.parse(authorsString));
+        Assertions.assertEquals(new AuthorList(authorsParsed), parser.parse(authorsString));
     }
 
     @Test

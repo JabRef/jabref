@@ -1,9 +1,9 @@
-package org.jabref.model.database.event;
+package org.jabref.logic.util;
 
 import java.util.Optional;
 
-import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 
