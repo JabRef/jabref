@@ -166,14 +166,14 @@ public class JabRefMain extends Application {
 
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+                Globals.prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = ExporterFactory.create(
                 Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
                 Globals.prefs.getSavePreferencesForExport(),
-                Globals.prefs.getXMPPreferences());
+                Globals.prefs.getXmpPreferences());
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());

@@ -20,7 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -51,7 +51,7 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public GeneralTabView(JabRefPreferences preferences) {
+    public GeneralTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

@@ -6,7 +6,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -27,7 +27,7 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
     @FXML private RadioButton firstNameModeFull;
     @FXML private RadioButton firstNameModeBoth;
 
-    public EntryEditorTabView(JabRefPreferences preferences) {
+    public EntryEditorTabView(PreferencesService preferences) {
         this.preferences = preferences;
         ViewLoader.view(this)
                   .root(this)

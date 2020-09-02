@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel> extends VBox implements PreferencesTab {
 
@@ -18,7 +18,7 @@ public abstract class AbstractPreferenceTabView<T extends PreferenceTabViewModel
 
     protected T viewModel;
 
-    protected JabRefPreferences preferences;
+    protected PreferencesService preferences;
 
     @Override
     public Node getBuilder() {
