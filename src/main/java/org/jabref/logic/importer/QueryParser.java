@@ -43,10 +43,9 @@ public class QueryParser {
             luceneQuery.visit(visitor);
 
             List<Term> sortedTerms = new ArrayList<>(terms);
-            sortedTerms.sort(Comparator.comparing(Term::text));
-            builder.terms(sortedTerms);
-            return Optional.of(builder.build());
-        } catch (QueryNodeException | IllegalStateException ex) {
+            sortedTerms.sort(Comparator.comparing(Term::text).reversed());
+            return Optional.of(ComplexSearchQuery.fromTerms(terms));
+        } catch (QueryNodeException | IllegalStateException | IllegalArgumentException ex) {
             return Optional.empty();
         }
     }

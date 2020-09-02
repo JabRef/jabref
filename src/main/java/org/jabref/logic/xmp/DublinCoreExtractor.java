@@ -342,7 +342,7 @@ public class DublinCoreExtractor {
 
     public void fillDublinCoreSchema() {
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
+        boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
         Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());

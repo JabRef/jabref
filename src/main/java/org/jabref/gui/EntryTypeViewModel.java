@@ -16,8 +16,8 @@ import javafx.concurrent.Worker;
 
 import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
-import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;

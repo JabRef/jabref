@@ -45,7 +45,7 @@ public interface TaskExecutor {
     <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit);
 
     /**
-     * Shutdown the task executor.
+     * Shutdown the task executor. May happen in the background or may be finished when this method returns.
      */
     void shutdown();
 
