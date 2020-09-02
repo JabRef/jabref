@@ -109,9 +109,8 @@ class MainArchitectureTests {
 
     @ArchTest
     public static void doNotUseLogicInModel(JavaClasses classes) {
-        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL).and().areNotAnnotatedWith(AllowedToUseLogic.class)
                    .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
-                   .orShould().beAnnotatedWith(AllowedToUseLogic.class)
                    .check(classes);
     }
 
