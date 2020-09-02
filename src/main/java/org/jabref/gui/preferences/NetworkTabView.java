@@ -40,6 +40,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
+    @FXML private Button checkConnectionButton;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -119,5 +120,10 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
         }
+    }
+
+    @FXML
+    void checkConnection() {
+        viewModel.checkConnection();
     }
 }
