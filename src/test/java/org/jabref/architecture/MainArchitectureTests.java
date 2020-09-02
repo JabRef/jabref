@@ -71,7 +71,7 @@ class MainArchitectureTests {
     @ArchTest
     public static void doNotUseJavaAWT(JavaClasses classes) {
         noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
-                   .should().accessClassesThat().resideInAPackage("PACKAGE_JAVA_AWT")
+                   .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
                    .check(classes);
     }
 
