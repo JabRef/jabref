@@ -23,4 +23,6 @@ public class MindMapEdge {
     public void setChild(MindMapNode child) {
         this.child = child;
     }
+
+
 }
