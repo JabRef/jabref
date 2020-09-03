@@ -73,8 +73,8 @@ class CitationKeyGeneratorTest {
     }
 
     private static BibEntry createABibEntryAuthor(String author) {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.AUTHOR, author);
+        return new BibEntry()
+          .withField(StandardField.AUTHOR, author);
         return bibEntry;
     }
 
