@@ -119,8 +119,6 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
-        // Open entry editor for first entry on start up.
-        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
