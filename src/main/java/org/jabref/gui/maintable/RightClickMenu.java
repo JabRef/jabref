@@ -53,7 +53,7 @@ public class RightClickMenu {
 
         contextMenu.getItems().add(new SeparatorMenuItem());
 
-        if (preferencesService.getSpecialFieldsPreferences().getSpecialFieldsEnabled()) {
+        if (preferencesService.getSpecialFieldsPreferences().isSpecialFieldsEnabled()) {
             contextMenu.getItems().add(SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, panel.frame(), dialogService, stateManager));
             contextMenu.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, panel.frame(), dialogService, stateManager));
             contextMenu.getItems().add(SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, panel.frame(), dialogService, stateManager));
