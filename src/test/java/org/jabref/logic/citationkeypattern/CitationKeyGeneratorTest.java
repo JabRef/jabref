@@ -82,7 +82,7 @@ class CitationKeyGeneratorTest {
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
         GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue("[" + pattern + "]");
+        keyPattern.setDefaultValue(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -102,7 +102,7 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Holland",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -118,7 +118,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("Holland",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -127,7 +127,7 @@ class CitationKeyGeneratorTest {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences, fileMonitor);
         assertEquals("HerlandHaugeHelgeland",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "authors3",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[authors3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -143,7 +143,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("HerlandHaugeHelgeland",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "authors3",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[authors3]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -152,7 +152,7 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences, fileMonitor);
         assertEquals("Popovicova",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -166,73 +166,73 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences, fileMonitor);
         assertEquals("Koe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Aoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Eoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Ioe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Loe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Noe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Ooe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Roe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Soe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Uoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Yoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Zoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -244,49 +244,49 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Aoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Eoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Ioe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Ooe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Uoe",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Oraib Al-Ketan}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("AlK",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés D'Alessandro}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("DAl",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andrés Aʹrnold}, year={2000}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("Arn",
-                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "auth3",
+                CitationKeyGenerator.cleanKey(generateKey(entry0.orElse(null), "[auth3]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -370,7 +370,7 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences, fileMonitor);
         assertEquals("UniLinkoeping",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -386,7 +386,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoeping",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -396,7 +396,7 @@ class CitationKeyGeneratorTest {
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("UniLinkoepingEE",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -412,7 +412,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingEE",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -422,7 +422,7 @@ class CitationKeyGeneratorTest {
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("UniLinkoepingCE",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -432,7 +432,7 @@ class CitationKeyGeneratorTest {
                 "@ARTICLE{null, author={{Department of Localhost NullGenerators}}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("DLN",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -442,7 +442,7 @@ class CitationKeyGeneratorTest {
                 "@ARTICLE{null, author={{The School of Null}}}",
                 importFormatPreferences, fileMonitor);
         assertEquals("SchoolNull",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -458,7 +458,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("UniLinkoepingCE",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -467,7 +467,7 @@ class CitationKeyGeneratorTest {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences, fileMonitor);
         assertEquals("MIT",
-                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry.orElse(null), "[auth]",
                         new BibDatabase()), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -483,7 +483,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry2);
 
         assertEquals("MIT",
-                CitationKeyGenerator.cleanKey(generateKey(entry1, "auth",
+                CitationKeyGenerator.cleanKey(generateKey(entry1, "[auth]",
                         database), DEFAULT_UNWANTED_CHARACTERS));
     }
 
@@ -505,7 +505,7 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testAuthIniNEmptyReturnsEmpty() {
-        assertEquals("", generateKey(AUTHOR_EMPTY, "authIni1"));
+        assertEquals("", generateKey(AUTHOR_EMPTY, "[authIni1]"));
     }
 
     /**
@@ -884,13 +884,13 @@ class CitationKeyGeneratorTest {
     void keywordNKeywordsSeparatedBySpace() {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
-        assertEquals("w1", generateKey(entry, "keyword1"));
+        assertEquals("w1", generateKey(entry, "[keyword1]"));
 
         // check keywords with space
-        assertEquals("w2aw2b", generateKey(entry, "keyword2"));
+        assertEquals("w2aw2b", generateKey(entry, "[keyword2]"));
 
         // check out of range
-        assertEquals("", generateKey(entry, "keyword4"));
+        assertEquals("", generateKey(entry, "[keyword4]"));
     }
 
     @Test
@@ -904,7 +904,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
-        assertEquals("w1", generateKey(entry1, "keyword1", database));
+        assertEquals("w1", generateKey(entry1, "[keyword1]", database));
     }
 
     @Test
@@ -912,13 +912,13 @@ class CitationKeyGeneratorTest {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         // all keywords
-        assertEquals("w1w2aw2bw3", generateKey(entry, "keywords"));
+        assertEquals("w1w2aw2bw3", generateKey(entry, "[keywords]"));
 
         // check keywords with space
-        assertEquals("w1w2aw2b", generateKey(entry, "keywords2"));
+        assertEquals("w1w2aw2b", generateKey(entry, "[keywords2]"));
 
         // check out of range
-        assertEquals("w1w2aw2bw3", generateKey(entry, "keywords55"));
+        assertEquals("w1w2aw2bw3", generateKey(entry, "[keywords55]"));
     }
 
     @Test
@@ -932,7 +932,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
-        assertEquals("w1w2aw2bw3", generateKey(entry1, "keywords", database));
+        assertEquals("w1w2aw2bw3", generateKey(entry1, "[keywords]", database));
     }
 
     @Test
@@ -958,8 +958,8 @@ class CitationKeyGeneratorTest {
     @Test
     void testApplyModifiers() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of Whatever");
-        assertEquals("GSo", generateKey(entry, "shorttitleINI"));
-        assertEquals("GreenSchedulingWhatever", generateKey(entry, "shorttitle",
+        assertEquals("GSo", generateKey(entry, "[shorttitleINI]"));
+        assertEquals("GreenSchedulingWhatever", generateKey(entry, "[shorttitle]",
                 new BibDatabase()));
     }
 
@@ -974,7 +974,7 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
-        assertEquals("GreenSchedulingWhatever", generateKey(entry1, "shorttitle",
+        assertEquals("GreenSchedulingWhatever", generateKey(entry1, "[shorttitle]",
                 database));
     }
 
@@ -989,61 +989,61 @@ class CitationKeyGeneratorTest {
         database.insertEntry(entry1);
         entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
-        assertEquals("GSo", generateKey(entry1, "shorttitleINI", database));
+        assertEquals("GSo", generateKey(entry1, "[shorttitleINI]", database));
     }
 
     @Test
     void generateKeyStripsColonFromTitle() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of: Whatever");
-        assertEquals("GreenSchedulingOfWhatever", generateKey(entry, "title"));
+        assertEquals("GreenSchedulingOfWhatever", generateKey(entry, "[title]"));
     }
 
     @Test
     void generateKeyStripsApostropheFromTitle() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of `Whatever`");
-        assertEquals("GreenSchedulingofWhatever", generateKey(entry, "title"));
+        assertEquals("GreenSchedulingofWhatever", generateKey(entry, "[title]"));
     }
 
     @Test
     void generateKeyWithOneModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "The Interesting Title");
-        assertEquals("theinterestingtitle", generateKey(entry, "title:lower"));
+        assertEquals("theinterestingtitle", generateKey(entry, "[title:lower]"));
     }
 
     @Test
     void generateKeyWithTwoModifiers() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "The Interesting Title");
-        assertEquals("theinterestingtitle", generateKey(entry, "title:lower:(_)"));
+        assertEquals("theinterestingtitle", generateKey(entry, "[title:lower:(_)]"));
     }
 
     @Test
     void generateKeyWithTitleCapitalizeModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
-        assertEquals("TheInterestingTitleLongerThanThreeWords", generateKey(entry, "title:capitalize"));
+        assertEquals("TheInterestingTitleLongerThanThreeWords", generateKey(entry, "[title:capitalize]"));
     }
 
     @Test
     void generateKeyWithShortTitleCapitalizeModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
-        assertEquals("InterestingTitleLonger", generateKey(entry, "shorttitle:capitalize"));
+        assertEquals("InterestingTitleLonger", generateKey(entry, "[shorttitle:capitalize]"));
     }
 
     @Test
     void generateKeyWithTitleTitleCaseModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "A title WITH some of The key words");
-        assertEquals("ATitlewithSomeoftheKeyWords", generateKey(entry, "title:titlecase"));
+        assertEquals("ATitlewithSomeoftheKeyWords", generateKey(entry, "[title:titlecase]"));
     }
 
     @Test
     void generateKeyWithShortTitleTitleCaseModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
-        assertEquals("InterestingTitleLonger", generateKey(entry, "shorttitle:titlecase"));
+        assertEquals("InterestingTitleLonger", generateKey(entry, "[shorttitle:titlecase]"));
     }
 
     @Test
     void generateKeyWithTitleSentenceCaseModifier() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "A title WITH some of The key words");
-        assertEquals("Atitlewithsomeofthekeywords", generateKey(entry, "title:sentencecase"));
+        assertEquals("Atitlewithsomeofthekeywords", generateKey(entry, "[title:sentencecase]"));
     }
 
     @Test
