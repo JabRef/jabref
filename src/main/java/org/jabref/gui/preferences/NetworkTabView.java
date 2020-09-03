@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -40,6 +40,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
+    @FXML private Button checkConnectionButton;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
@@ -119,5 +120,10 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
         }
+    }
+
+    @FXML
+    void checkConnection() {
+        viewModel.checkConnection();
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
 /**

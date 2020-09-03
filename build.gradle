@@ -46,7 +46,7 @@ java {
 }
 
 application {
-    mainClassName = "$moduleName/org.jabref.JabRefLauncher"
+    mainClassName = "$moduleName/org.jabref.gui.JabRefLauncher"
 }
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
@@ -210,6 +210,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.5.7'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.14.1'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
@@ -440,6 +441,11 @@ localization.script = 'scripts/syncLang.py'
 test {
     useJUnitPlatform {
         excludeTags 'DatabaseTest', 'FetcherTest', 'GUITest'
+    }
+
+    moduleOptions {
+        // TODO: Remove this as soon as archunit is modularized
+        runOnClasspath = true
     }
 
     testLogging {

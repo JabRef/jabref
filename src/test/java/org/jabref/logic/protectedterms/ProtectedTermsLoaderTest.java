@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,10 +46,10 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAddProtectedTermsListFromFile() throws URISyntaxException {
-        String filename = Paths
-                .get(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                                               .toURI())
-                .toFile().getPath();
+        String filename = Path.of(
+                ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
+                                          .toURI())
+                              .toFile().getPath();
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), loader.getProtectedTermsLists().size());
         loader.addProtectedTermsListFromFile(filename, false);
         assertEquals(ProtectedTermsLoader.getInternalLists().size() + 1, loader.getProtectedTermsLists().size());

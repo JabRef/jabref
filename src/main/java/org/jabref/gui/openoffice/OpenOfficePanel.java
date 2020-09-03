@@ -28,9 +28,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -266,7 +266,7 @@ public class OpenOfficePanel {
         HBox hbox = new HBox();
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
         hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
-        
+
         FlowPane flow = new FlowPane();
         flow.setPadding(new Insets(5, 5, 5, 5));
         flow.setVgap(4);

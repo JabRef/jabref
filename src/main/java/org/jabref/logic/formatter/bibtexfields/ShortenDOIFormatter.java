@@ -2,10 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.importer.util.ShortDOIService;
 import org.jabref.logic.importer.util.ShortDOIServiceException;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.identifier.DOI;
 
 import org.slf4j.Logger;

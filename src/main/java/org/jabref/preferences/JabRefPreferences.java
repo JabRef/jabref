@@ -35,9 +35,7 @@ import java.util.stream.Stream;
 import javafx.scene.control.TableColumn.SortType;
 import javafx.scene.paint.Color;
 
-import org.jabref.Globals;
-import org.jabref.JabRefException;
-import org.jabref.JabRefMain;
+import org.jabref.gui.Globals;
 import org.jabref.gui.SidePaneType;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -56,14 +54,17 @@ import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -92,8 +93,6 @@ import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -103,7 +102,6 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
@@ -344,7 +342,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
-    private static final Class<JabRefMain> PREFS_BASE_CLASS = JabRefMain.class;
+    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
     private static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
@@ -412,7 +410,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(PREFS_BASE_CLASS);
+        prefs = PREFS_NODE;
 
         // Since some of the preference settings themselves use localized strings, we cannot set the language after
         // the initialization of the preferences in main
@@ -705,14 +703,10 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
-        if (mode == BibDatabaseMode.BIBLATEX) {
-            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBLATEX_TYPES);
-        }
-        if (mode == BibDatabaseMode.BIBTEX) {
-            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBTEX_TYPES);
-        }
-
-        throw new IllegalArgumentException("Unknown BibDatabaseMode: " + mode);
+        return switch (mode) {
+            case BIBTEX -> PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES);
+            case BIBLATEX -> PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);
+        };
     }
 
     private static Optional<String> getNextUnit(Reader data) throws IOException {
@@ -1813,7 +1807,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void updateGlobalCitationKeyPattern() {
         this.globalCitationKeyPattern = GlobalCitationKeyPattern.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             String[] keys = preferences.keys();
             if (keys.length > 0) {
@@ -1844,7 +1838,7 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         // Store overridden definitions to Preferences.
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1862,7 +1856,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void clearCitationKeyPatterns() throws BackingStoreException {
-        Preferences preferences = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CITATION_KEY_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);
         preferences.clear();
         updateGlobalCitationKeyPattern();
     }
@@ -2025,8 +2019,8 @@ public class JabRefPreferences implements PreferencesService {
         getStringList(COLUMN_SORT_ORDER).forEach(columnName ->
                 mainTableColumns.stream().filter(column ->
                         column.getName().equals(columnName))
-                                             .findFirst()
-                                             .ifPresent(columnsOrdered::add));
+                                .findFirst()
+                                .ifPresent(columnsOrdered::add));
 
         mainTableColumnSortOrder = columnsOrdered;
     }

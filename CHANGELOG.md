@@ -14,6 +14,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 - We added a query parser and mapping layer to enable conversion of queries formulated in simplified lucene syntax by the user into api queries. [#6799](https://github.com/JabRef/jabref/pull/6799)
 - We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
+- We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
 
 ### Changed
 
@@ -21,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
 - We changed the synchronization of SpecialFields to keywords to not to do so as default. [#6621](https://github.com/JabRef/jabref/issues/6621)
+- JabRef no longer opens the entry editor with the first entry on startup [6855](https://github.com/JabRef/jabref/issues/6855)
 
 ### Fixed
 

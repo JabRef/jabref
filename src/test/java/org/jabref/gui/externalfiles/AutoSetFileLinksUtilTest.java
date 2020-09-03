@@ -12,7 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ public class AutoSetFileLinksUtilTest {
 
     private final FilePreferences fileDirPrefs = mock(FilePreferences.class);
     private final AutoLinkPreferences autoLinkPrefs =
-            new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.REGEX, "", ';');
+            new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);

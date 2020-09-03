@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

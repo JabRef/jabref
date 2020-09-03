@@ -11,10 +11,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -29,16 +29,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ImportEntriesViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;

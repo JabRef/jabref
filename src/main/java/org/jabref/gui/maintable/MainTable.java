@@ -24,10 +24,10 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
@@ -40,9 +40,11 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
@@ -158,7 +160,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
      * The {@link MainTable} will scroll to the cell with the same starting column value and typed string
      *
      * @param sortedColumn The sorted column in {@link MainTable}
-     * @param keyEvent The pressed character
+     * @param keyEvent     The pressed character
      */
 
     private void jumpToSearchKey(TableColumn<BibEntryTableViewModel, ?> sortedColumn, KeyEvent keyEvent) {
@@ -272,14 +274,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         scrollTo(getItems().size() - 1);
     }
 
-    public void paste() {
+    public void paste(BibDatabaseMode bibDatabaseMode) {
         // Find entries in clipboard
         List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
+        ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
+        cleanup.doPostCleanup(entriesToAdd);
         panel.insertEntries(entriesToAdd);
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }
-
     }
 
     private void handleOnDragOver(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel item, DragEvent event) {

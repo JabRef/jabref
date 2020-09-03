@@ -2,8 +2,6 @@ package org.jabref.logic.citationkeypattern;
 
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;

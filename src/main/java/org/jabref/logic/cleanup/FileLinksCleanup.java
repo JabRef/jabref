@@ -4,10 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 

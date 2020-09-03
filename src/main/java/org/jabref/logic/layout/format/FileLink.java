@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.ParamLayoutFormatter;
-import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 
 /**

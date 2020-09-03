@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.io.IOException;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -8,11 +9,12 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.WatchServiceUnavailableException;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.model.util.WatchServiceUnavailableException;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -31,6 +33,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private WatchService watcher;
+    private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private Optional<JabRefException> filesystemMonitorFailure;
 
     @Override
@@ -39,11 +42,11 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             this.watcher = watcher;
             filesystemMonitorFailure = Optional.empty();
 
-            while (true) {
+            while (notShutdown.get()) {
                 WatchKey key;
                 try {
                     key = watcher.take();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | ClosedWatchServiceException e) {
                     return;
                 }
 
@@ -66,11 +69,12 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             }
         } catch (IOException e) {
             filesystemMonitorFailure = Optional.of(new WatchServiceUnavailableException(e.getMessage(),
-                    e.getLocalizedMessage(), e.getCause()));
+                                                                                        e.getLocalizedMessage(), e.getCause()));
             LOGGER.warn(filesystemMonitorFailure.get().getLocalizedMessage(), e);
         }
     }
 
+    @Override
     public boolean isActive() {
         return filesystemMonitorFailure.isEmpty();
     }
@@ -92,5 +96,16 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     @Override
     public void removeListener(Path path, FileUpdateListener listener) {
         listeners.remove(path, listener);
+    }
+
+    @Override
+    public void shutdown() {
+        try {
+            notShutdown.set(false);
+            watcher.close();
+        } catch (IOException e) {
+            LOGGER.error("error closing watcher", e);
+        }
+
     }
 }

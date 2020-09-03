@@ -8,13 +8,14 @@ import java.util.List;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -107,7 +108,8 @@ public class ImportHandler {
     public void importEntries(List<BibEntry> entries) {
         // TODO: Add undo/redo
         // undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
-
+        ImportCleanup cleanup = new ImportCleanup(database.getMode());
+        cleanup.doPostCleanup(entries);
         database.getDatabase().insertEntries(entries);
 
         // Set owner/timestamp

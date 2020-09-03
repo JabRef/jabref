@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.Globals;
-import org.jabref.JabRefMain;
+import org.jabref.gui.Globals;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -38,7 +37,7 @@ public class PreferencesMigrations {
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
     public static void runMigrations() {
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+        Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(Globals.prefs);
@@ -184,7 +183,7 @@ public class PreferencesMigrations {
     private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs) {
 
         try {
-            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+            Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
             // Migrate default pattern
             if (mainPrefsNode.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, null) == null) {

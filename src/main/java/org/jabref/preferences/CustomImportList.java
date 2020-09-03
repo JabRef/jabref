@@ -3,7 +3,7 @@ package org.jabref.preferences;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 

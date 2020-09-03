@@ -1,7 +1,7 @@
 package org.jabref.logic.formatter.casechanger;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
 public class CapitalizeFormatter extends Formatter {
 

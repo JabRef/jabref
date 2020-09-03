@@ -22,14 +22,14 @@ Principles:
 * Catch and wrap all API exceptions \(such as `IOExceptions`\) and rethrow them
   * Example:
 
-       ```java
+    ```java
        try {
            // ...
        } catch (IOException ioe) {
            throw new JabRefException("Something went wrong...",
                Localization.lang("Something went wrong...", ioe);
        }
-       ```
+    ```
 
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
@@ -52,7 +52,7 @@ TODO: Usage of status bar and Swing Dialogs
 
 ## Using the EventSystem
 
-### What the EventSystem is used for?
+### What the EventSystem is used for
 
 Many times there is a need to provide an object on many locations simultaneously. This design pattern is quite similar to Java's Observer, but it is much simplier and readable while having the same functional sense.
 
@@ -369,7 +369,7 @@ The following expressions can be used in FXML attributes, according to the [offi
 
 All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code Example:
 
-```markup
+```xml
 <VBox>
             <fx:define>
                 <ToggleGroup fx:id="citeToggleGroup"/>
@@ -384,4 +384,3 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
             </children>
 </VBox>
 ```
-

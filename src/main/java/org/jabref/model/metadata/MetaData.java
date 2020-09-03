@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
@@ -25,6 +26,7 @@ import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
