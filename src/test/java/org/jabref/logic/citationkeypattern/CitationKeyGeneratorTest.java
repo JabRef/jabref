@@ -109,11 +109,10 @@ class CitationKeyGeneratorTest {
     @Test
     void testCrossrefAndInAuthorNames() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "Simon Holland");
+        BibEntry entry1 = new BibEntry().withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "Simon Holland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -134,11 +133,11 @@ class CitationKeyGeneratorTest {
     @Test
     void testCrossrefAndAuthorNames() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -377,11 +376,11 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefUniversity() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -403,11 +402,11 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefDepartment() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -449,11 +448,11 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefSchool() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -474,11 +473,11 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefInstituteOfTechnology() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
-        entry2.setField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -896,10 +895,10 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefkeywordNKeywordsSeparatedBySpace() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
@@ -924,13 +923,13 @@ class CitationKeyGeneratorTest {
     @Test
     void crossrefkeywordsNKeywordsSeparatedBySpace() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         assertEquals("w1w2aw2bw3", generateKey(entry1, "[keywords]", database));
     }
@@ -966,13 +965,13 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefShorttitle() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.TITLE, "Green Scheduling of Whatever");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
         assertEquals("GreenSchedulingWhatever", generateKey(entry1, "[shorttitle]",
                 database));
@@ -981,13 +980,13 @@ class CitationKeyGeneratorTest {
     @Test
     void testcrossrefShorttitleInitials() {
         BibDatabase database = new BibDatabase();
-        BibEntry entry1 = new BibEntry();
-        BibEntry entry2 = new BibEntry();
-        entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.CROSSREF, "entry2");
+        BibEntry entry2 = new BibEntry()
+                .withCiteKey("entry2")
+                .withField(StandardField.TITLE, "Green Scheduling of Whatever");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
-        entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
 
         assertEquals("GSo", generateKey(entry1, "[shorttitleINI]", database));
     }
