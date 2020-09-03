@@ -50,12 +50,8 @@ public class AutoSetFileLinksUtilTest {
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
     }
-    
-    /*
-    @Test
-    public void linkAssociatedFilesErrorDialog() throws Exception {
-        
-     */
+
+
     @Test
     public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false);

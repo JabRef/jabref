@@ -14,7 +14,7 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.JabRefDialogService;
+import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
@@ -34,10 +34,11 @@ import org.slf4j.LoggerFactory;
 public class AutoSetFileLinksUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
-    private JabRefDialogService errorDialog;
-    private List<Path> directories;
-    private AutoLinkPreferences autoLinkPreferences;
-    private ExternalFileTypes externalFileTypes;
+    private final List<Path> directories;
+    private final AutoLinkPreferences autoLinkPreferences;
+    private final ExternalFileTypes externalFileTypes;
+
+    private DialogService errorDialog;
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
         this(databaseContext.getFileDirectoriesAsPaths(filePreferences), autoLinkPreferences, externalFileTypes);
@@ -51,17 +52,24 @@ public class AutoSetFileLinksUtil {
 
     public List<BibEntry> linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
         List<BibEntry> changedEntries = new ArrayList<>();
+
+        List<IOException> fileExceptions = new ArrayList<>(); //change
         for (BibEntry entry : entries) {
 
             List<LinkedFile> linkedFiles = new ArrayList<>();
             try {
                 linkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
+                fileExceptions.add(e); //change
                 LOGGER.error("Problem finding files", e);
-                errorDialog.showErrorDialogAndWait(null, Localization.lang("Problem finding files"));
+
             }
 
             if (ce != null) {
+                if (!fileExceptions.isEmpty()) { // is this where it goes? find out!
+                    errorDialog.notify(Localization.lang("Problem finding files"));
+                }
+
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
                     String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
