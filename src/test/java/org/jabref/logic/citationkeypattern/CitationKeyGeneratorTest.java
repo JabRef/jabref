@@ -73,9 +73,7 @@ class CitationKeyGeneratorTest {
     }
 
     private static BibEntry createABibEntryAuthor(String author) {
-        return new BibEntry()
-          .withField(StandardField.AUTHOR, author);
-        return bibEntry;
+        return new BibEntry().withField(StandardField.AUTHOR, author);
     }
 
     static String generateKey(BibEntry entry, String pattern) {
@@ -883,8 +881,7 @@ class CitationKeyGeneratorTest {
 
     @Test
     void keywordNKeywordsSeparatedBySpace() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         assertEquals("w1", generateKey(entry, "keyword1"));
 
@@ -911,8 +908,7 @@ class CitationKeyGeneratorTest {
 
     @Test
     void keywordsNKeywordsSeparatedBySpace() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
 
         // all keywords
         assertEquals("w1w2aw2bw3", generateKey(entry, "keywords"));
@@ -960,8 +956,7 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testApplyModifiers() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "Green Scheduling of Whatever");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of Whatever");
         assertEquals("GSo", generateKey(entry, "shorttitleINI"));
         assertEquals("GreenSchedulingWhatever", generateKey(entry, "shorttitle",
                 new BibDatabase()));
@@ -998,115 +993,105 @@ class CitationKeyGeneratorTest {
 
     @Test
     void generateKeyStripsColonFromTitle() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "Green Scheduling of: Whatever");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of: Whatever");
         assertEquals("GreenSchedulingOfWhatever", generateKey(entry, "title"));
     }
 
     @Test
     void generateKeyStripsApostropheFromTitle() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "Green Scheduling of `Whatever`");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of `Whatever`");
         assertEquals("GreenSchedulingofWhatever", generateKey(entry, "title"));
     }
 
     @Test
     void generateKeyWithOneModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "The Interesting Title");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "The Interesting Title");
         assertEquals("theinterestingtitle", generateKey(entry, "title:lower"));
     }
 
     @Test
     void generateKeyWithTwoModifiers() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "The Interesting Title");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "The Interesting Title");
         assertEquals("theinterestingtitle", generateKey(entry, "title:lower:(_)"));
     }
 
     @Test
     void generateKeyWithTitleCapitalizeModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("TheInterestingTitleLongerThanThreeWords", generateKey(entry, "title:capitalize"));
     }
 
     @Test
     void generateKeyWithShortTitleCapitalizeModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("InterestingTitleLonger", generateKey(entry, "shorttitle:capitalize"));
     }
 
     @Test
     void generateKeyWithTitleTitleCaseModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "A title WITH some of The key words");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "A title WITH some of The key words");
         assertEquals("ATitlewithSomeoftheKeyWords", generateKey(entry, "title:titlecase"));
     }
 
     @Test
     void generateKeyWithShortTitleTitleCaseModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
         assertEquals("InterestingTitleLonger", generateKey(entry, "shorttitle:titlecase"));
     }
 
     @Test
     void generateKeyWithTitleSentenceCaseModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, "A title WITH some of The key words");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "A title WITH some of The key words");
         assertEquals("Atitlewithsomeofthekeywords", generateKey(entry, "title:sentencecase"));
     }
 
     @Test
     void generateKeyWithAuthUpperYearShortTitleCapitalizeModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
-        entry.setField(StandardField.YEAR, "2019");
-        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+
         assertEquals("NEWTON2019InterestingTitleLonger", generateKey(entry, "[auth:upper][year][shorttitle:capitalize]"));
     }
 
     @Test
     void generateKeyWithYearAuthUpperTitleSentenceCaseModifier() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3);
-        entry.setField(StandardField.YEAR, "2019");
-        entry.setField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3)
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.TITLE, "the InTeresting title longer than THREE words");
+
         assertEquals("NewtonMaxwellEtAl_2019_TheInterestingTitleLongerThanThreeWords", generateKey(entry, "[authors2]_[year]_[title:capitalize]"));
     }
 
     @Test
     void generateKeyWithMinusInCitationStyleOutsideAField() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1);
-        entry.setField(StandardField.YEAR, "2019");
+        BibEntry entry = new BibEntry()
+                .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
+                .withField(StandardField.YEAR, "2019");
 
         assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
     void generateKeyWithWithFirstNCharacters() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.AUTHOR, "Newton, Isaac");
-        entry.setField(StandardField.YEAR, "2019");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac")
+                                       .withField(StandardField.YEAR, "2019");
 
         assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test
     void generateKeyCorrectKeyLengthWithTruncateModifierAndUnicode() {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.AUTHOR, "Gödel, Kurt");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Gödel, Kurt");
 
         assertEquals(2, generateKey(bibEntry, "[auth:truncate2]").length());
     }
 
     @Test
     void generateKeyCorrectKeyLengthWithAuthNofMthAndUnicode() {
-        BibEntry bibEntry = new BibEntry();
-        bibEntry.setField(StandardField.AUTHOR, "Gödel, Kurt");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Gödel, Kurt");
 
         assertEquals(4, generateKey(bibEntry, "[auth4_1]").length());
     }
