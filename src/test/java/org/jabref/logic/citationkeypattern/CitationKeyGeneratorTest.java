@@ -291,8 +291,9 @@ class CitationKeyGeneratorTest {
     }
 
     /**
-     * Tests if cleanKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps
-     * there is a better method than the current.
+     * Tests if cleanKey replaces Non-ASCII chars. There are quite a few chars that should be replaced. Perhaps there is
+     * a better method than the current.
+     *
      * @see CitationKeyGenerator#cleanKey(String, String)
      */
     @Test
