@@ -30,7 +30,6 @@ Principles:
                Localization.lang("Something went wrong...", ioe);
        }
     ```
-
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -369,7 +368,7 @@ The following expressions can be used in FXML attributes, according to the [offi
 
 All radio buttons that should be grouped together need to have a ToggleGroup defined in the FXML code Example:
 
-```xml
+```markup
 <VBox>
             <fx:define>
                 <ToggleGroup fx:id="citeToggleGroup"/>
@@ -384,3 +383,4 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
             </children>
 </VBox>
 ```
+
