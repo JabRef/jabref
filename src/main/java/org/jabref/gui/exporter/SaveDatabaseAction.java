@@ -59,7 +59,7 @@ public class SaveDatabaseAction {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
-    private DelayTaskThrottler throttler = new DelayTaskThrottler(15000);
+    private final DelayTaskThrottler throttler;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -140,8 +140,7 @@ public class SaveDatabaseAction {
         // Set new location
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())
-                                                                                           .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID()).putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());
         }
 
         boolean saveResult = save(file, mode);
@@ -176,10 +175,10 @@ public class SaveDatabaseAction {
      */
     private Optional<Path> askForSavePath() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                                                                                               .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                                                                                               .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
-                                                                                               .build();
+                                   .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                                   .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                                   .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                                   .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
         return selectedPath;
@@ -276,9 +275,9 @@ public class SaveDatabaseAction {
         ButtonType tryDifferentEncoding = new ButtonType(Localization.lang("Try different encoding"), ButtonBar.ButtonData.OTHER);
         ButtonType ignore = new ButtonType(Localization.lang("Ignore"), ButtonBar.ButtonData.APPLY);
         boolean saveWithDifferentEncoding = dialogService
-                                                         .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
-                                                         .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
-                                                         .isPresent();
+                     .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
+                     .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
+                     .isPresent();
         if (saveWithDifferentEncoding) {
             Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
