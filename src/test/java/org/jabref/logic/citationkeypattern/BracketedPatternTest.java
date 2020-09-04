@@ -28,7 +28,7 @@ class BracketedPatternTest {
 
         dbentry = new BibEntry();
         dbentry.setType(StandardEntryType.Article);
-        dbentry.setCiteKey("HipKro03");
+        dbentry.setCitationKey("HipKro03");
         dbentry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
         dbentry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
         dbentry.setField(StandardField.JOURNAL, "Organization Science");
@@ -178,14 +178,20 @@ class BracketedPatternTest {
     }
 
     @Test
-    void bibtexkeyPatternExpandsToBibTeXKey() {
+    void bibtexkeyPatternExpandsToCitationKey() {
         Character separator = ';';
         assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
     }
 
     @Test
-    void bibtexkeyPatternWithEmptyModifierExpandsToBibTeXKey() {
-        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", ';', dbentry, database));
+    void citationKeyPatternExpandsToCitationKey() {
+        Character separator = ';';
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[citationkey]", separator, dbentry, database));
+    }
+
+    @Test
+    void citationKeyPatternWithEmptyModifierExpandsToBibTeXKey() {
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[citationkey:]", ';', dbentry, database));
     }
 
     @Test
@@ -219,10 +225,10 @@ class BracketedPatternTest {
         assertEquals("eric von hippel and georg von krogh",
                 BracketedPattern.expandBrackets("[author:lower]", separator, child, database));
 
-        // the bibtexkey is not inherited
-        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey]", separator, child, database));
+        // the citation key is not inherited
+        assertEquals("", BracketedPattern.expandBrackets("[citationkey]", separator, child, database));
 
-        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey:]", separator, child, database));
+        assertEquals("", BracketedPattern.expandBrackets("[citationkey:]", separator, child, database));
     }
 
     @Test

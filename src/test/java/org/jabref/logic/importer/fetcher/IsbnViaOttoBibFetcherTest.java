@@ -23,7 +23,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     public void setUp() {
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("bloch2008effective");
+        bibEntry.setCitationKey("bloch2008effective");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison-Wesley");
         bibEntry.setField(StandardField.YEAR, "2008");
@@ -61,7 +61,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     public void authorsAreCorrectlyFormatted() throws Exception {
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("dumas2018fundamentals");
+        bibEntry.setCitationKey("dumas2018fundamentals");
         bibEntry.setField(StandardField.TITLE, "Fundamentals of business process management");
         bibEntry.setField(StandardField.PUBLISHER, "Springer");
         bibEntry.setField(StandardField.AUTHOR, "Dumas, Marlon");
@@ -77,7 +77,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
     public void testISBNNotAvaiableOnEbookDeOrChimbori() throws Exception {
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("denis2012les");
+        bibEntry.setCitationKey("denis2012les");
         bibEntry.setField(StandardField.TITLE, "Les mots du passé : roman");
         bibEntry.setField(StandardField.PUBLISHER, "Éd. les Nouveaux auteurs");
         bibEntry.setField(StandardField.ADDRESS, "Paris");

@@ -89,7 +89,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "Simon Holland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -114,7 +114,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -361,7 +361,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -387,7 +387,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -433,7 +433,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -458,7 +458,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.setField(StandardField.AUTHOR, "{Massachusetts Institute of Technology}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
@@ -939,7 +939,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
@@ -968,7 +968,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
@@ -1011,7 +1011,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");
@@ -1026,7 +1026,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry1 = new BibEntry();
         BibEntry entry2 = new BibEntry();
         entry1.setField(StandardField.CROSSREF, "entry2");
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         database.insertEntry(entry2);
         database.insertEntry(entry1);
         entry2.setField(StandardField.TITLE, "Green Scheduling of Whatever");

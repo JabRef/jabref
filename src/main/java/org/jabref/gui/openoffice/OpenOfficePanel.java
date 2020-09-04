@@ -514,7 +514,7 @@ public class OpenOfficePanel {
         // Check if there are empty keys
         boolean emptyKeys = false;
         for (BibEntry entry : entries) {
-            if (!entry.getCiteKeyOptional().isPresent()) {
+            if (!entry.getCitationKey().isPresent()) {
                 // Found one, no need to look further for now
                 emptyKeys = true;
                 break;
@@ -538,7 +538,7 @@ public class OpenOfficePanel {
             CitationKeyPatternPreferences prefs = jabRefPreferences.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (!entry.getCiteKeyOptional().isPresent()) {
+                if (!entry.getCitationKey().isPresent()) {
                     // Generate key
                     new CitationKeyGenerator(panel.getBibDatabaseContext(), prefs)
                             .generateAndSetKey(entry)
