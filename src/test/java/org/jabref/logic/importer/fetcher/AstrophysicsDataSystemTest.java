@@ -136,7 +136,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void testGetName() {
-        assertEquals("SAO/NASA Astrophysics Data System", fetcher.getName());
+        assertEquals("SAO/NASA ADS", fetcher.getName());
     }
 
     @Test
