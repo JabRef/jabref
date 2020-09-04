@@ -1,7 +1,6 @@
 package org.jabref.logic.util;
 
 import java.util.Optional;
-import java.util.concurrent.ScheduledFuture;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -10,7 +9,6 @@ import org.jabref.model.entry.field.Field;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.microsoft.applicationinsights.internal.channel.TelemetrySerializer;
 
 /**
  * Filters change events and only relays major changes.
