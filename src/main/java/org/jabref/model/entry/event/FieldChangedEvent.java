@@ -27,7 +27,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     /**
@@ -40,7 +40,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     /**
@@ -51,7 +51,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {

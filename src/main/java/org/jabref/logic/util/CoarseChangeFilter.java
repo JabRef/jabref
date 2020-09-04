@@ -1,6 +1,7 @@
 package org.jabref.logic.util;
 
 import java.util.Optional;
+import java.util.concurrent.ScheduledFuture;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -9,6 +10,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.microsoft.applicationinsights.internal.channel.TelemetrySerializer;
 
 /**
  * Filters change events and only relays major changes.
@@ -17,34 +19,23 @@ public class CoarseChangeFilter {
 
     private final BibDatabaseContext context;
     private final EventBus eventBus = new EventBus();
-    private final DelayTaskThrottler delayPost;
 
     private Optional<Field> lastFieldChanged;
     private int totalDelta;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
         // Listen for change events
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
         this.context = bibDatabaseContext;
-        // Delay event post by 5 seconds
-        this.delayPost = new DelayTaskThrottler(5000);
+        context.getDatabase().registerListener(this);
+        context.getMetaData().registerListener(this);
         this.lastFieldChanged = Optional.empty();
         this.totalDelta = 0;
     }
 
     @Subscribe
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
-        Runnable eventPost = () -> {
-            // Reset total change delta
-            totalDelta = 0;
-            // Post event
-            eventBus.post(event);
-        };
 
-        if (!(event instanceof FieldChangedEvent)) {
-            eventPost.run();
-        } else {
+        if (event instanceof FieldChangedEvent) {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
             // Sum up change delta
@@ -53,19 +44,30 @@ public class CoarseChangeFilter {
             // If editing is started
             boolean isNewEdit = lastFieldChanged.isEmpty();
             // If other field is edited
-            boolean isEditOnOtherField = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
+            boolean isEditChanged = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
             // Only deltas of 1 registered by fieldChange, major change means editing much content
-            boolean isMajorChange = totalDelta >= 100;
+            boolean isMajorChange = totalDelta >= 30;
 
-            if ((isEditOnOtherField && !isNewEdit) || isMajorChange) {
-                // Submit old changes immediately
-                eventPost.run();
-            } else {
-                delayPost.schedule(eventPost);
-            }
+            // Event is filtered out if neither the edited field has changed nor a major change has occurred
+            fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
+            // Post every FieldChangedEvent, but some have been marked (filtered)
+            eventPost(fieldChange);
             // Set new last field
             lastFieldChanged = Optional.of(fieldChange.getField());
+
         }
+        else {
+            eventPost(event);
+        }
+    }
+
+    private void eventPost(BibDatabaseContextChangedEvent event) {
+        // Reset total change delta
+        totalDelta = 0;
+        // Reset last field that changed
+        lastFieldChanged = Optional.empty();
+        // Post event
+        eventBus.post(event);
     }
 
     public void registerListener(Object listener) {
