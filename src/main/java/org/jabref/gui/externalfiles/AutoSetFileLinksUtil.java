@@ -14,8 +14,6 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.DialogService;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
@@ -38,7 +36,8 @@ public class AutoSetFileLinksUtil {
     private final AutoLinkPreferences autoLinkPreferences;
     private final ExternalFileTypes externalFileTypes;
 
-    private DialogService errorDialog;
+    ArrayList<IOException> fileExceptions = new ArrayList<>(); //change
+
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
         this(databaseContext.getFileDirectoriesAsPaths(filePreferences), autoLinkPreferences, externalFileTypes);
@@ -52,8 +51,8 @@ public class AutoSetFileLinksUtil {
 
     public List<BibEntry> linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
         List<BibEntry> changedEntries = new ArrayList<>();
-
-        List<IOException> fileExceptions = new ArrayList<>(); //change
+        fileExceptions.clear(); //change
+        //change
         for (BibEntry entry : entries) {
 
             List<LinkedFile> linkedFiles = new ArrayList<>();
@@ -66,9 +65,6 @@ public class AutoSetFileLinksUtil {
             }
 
             if (ce != null) {
-                if (!fileExceptions.isEmpty()) { // is this where it goes? find out!
-                    errorDialog.notify(Localization.lang("Problem finding files"));
-                }
 
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
@@ -88,6 +84,11 @@ public class AutoSetFileLinksUtil {
             }
         }
         return changedEntries;
+    }
+
+    public ArrayList<IOException> returnFileExceptions() { //change
+
+        return fileExceptions;
     }
 
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
