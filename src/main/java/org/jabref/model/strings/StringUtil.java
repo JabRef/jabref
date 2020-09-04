@@ -720,6 +720,14 @@ public class StringUtil {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
 
+    /**
+     * Returns a list of sentences contained in the given text.
+     */
+    public static List<String> getStringAsSentences(String text) {
+        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm][Rr]\\.|[Mm][Rr][Ss]\\.|[Dd][Rr]\\.|[Mm][Ss]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
+        return Arrays.asList(splitTextPattern.split(text));
+    }
+
     @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);

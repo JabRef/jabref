@@ -26,6 +26,36 @@ public class SentenceCaseFormatterTest {
     }
 
     @Test
+    public void secondSentenceAfterQuestionMarkGetsCapitalized() {
+        assertEquals("Whose music? A sociology of musical language",
+                     formatter.format("Whose music? a sociology of musical language"));
+    }
+
+    @Test
+    public void testSimpleTwoSentenceTitle() {
+        assertEquals("Bibliographic software. A comparison.",
+                     formatter.format("bibliographic software. a comparison."));
+    }
+
+    @Test
+    public void sentenceAfterSemicolonGetsCapitalized() {
+        assertEquals("England’s monitor; The history of the separation",
+                     formatter.format("England’s Monitor; the History of the Separation"));
+    }
+
+    @Test
+    public void commonAbbreviationIsNotTreatedAsSeperateSentence() {
+        assertEquals("Dr. schultz: a dentist turned bounty hunter.",
+                     formatter.format("Dr. schultz: a dentist turned bounty hunter."));
+    }
+
+    @Test
+    public void secondSentenceInBracketsIsLeftUnchanged() {
+        assertEquals("Example case. {EXCLUDED SENTENCE.}",
+                     formatter.format("Example case. {EXCLUDED SENTENCE.}"));
+    }
+
+    @Test
     public void formatExample() {
         assertEquals("I have {Aa} dream", formatter.format(formatter.getExampleInput()));
     }

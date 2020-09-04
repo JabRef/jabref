@@ -1,7 +1,10 @@
 package org.jabref.logic.formatter.casechanger;
 
+import java.util.List;
+
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
 
 public class SentenceCaseFormatter extends Formatter {
 
@@ -20,11 +23,17 @@ public class SentenceCaseFormatter extends Formatter {
      */
     @Override
     public String format(String input) {
-        Title title = new Title(new LowerCaseFormatter().format(input));
+        List<String> sentences = StringUtil.getStringAsSentences(input);
+        StringBuilder result = new StringBuilder();
+        for (String sentence : sentences) {
+            Title title = new Title(new LowerCaseFormatter().format(sentence));
 
-        title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
+            title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
 
-        return title.toString();
+            result.append(title.toString() + " ");
+        }
+        result.deleteCharAt(result.length() - 1);
+        return result.toString();
     }
 
     @Override

@@ -81,6 +81,18 @@ public class TitleCaseFormatterTest {
     }
 
     @Test
+    public void testSimpleTwoSentenceTitle() {
+        assertEquals("Bibliographic Software. A Comparison.",
+                     formatter.format("bibliographic software. a comparison."));
+    }
+
+    @Test
+    public void secondSentenceInBracketsIsLeftUnchanged() {
+        assertEquals("Bibliographic Software. {A COMPARISON.}",
+                     formatter.format("bibliographic software. {A COMPARISON.}"));
+    }
+
+    @Test
     public void formatExample() {
         assertEquals("{BPMN} Conformance in Open Source Engines", formatter.format(formatter.getExampleInput()));
     }
