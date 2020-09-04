@@ -8,7 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextInputControl;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;

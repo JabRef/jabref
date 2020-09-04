@@ -46,8 +46,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -219,9 +217,7 @@ public class JabRefFrame extends BorderPane {
                 }
             });
 
-            this.getScene().setOnDragExited(event -> {
-                tabbedPane.getTabs().remove(dndIndicator);
-            });
+            this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
 
             this.getScene().setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
@@ -793,7 +789,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+        if (Globals.prefs.getSpecialFieldsPreferences().isSpecialFieldsEnabled()) {
             edit.getItems().addAll(
                     new SeparatorMenuItem(),
                     // ToDo: SpecialField needs the active BasePanel to mark it as changed.
@@ -1034,7 +1030,7 @@ public class JabRefFrame extends BorderPane {
         } else {
             // only add tab if DB is not already open
             Optional<BasePanel> panel = getBasePanelList().stream()
-                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(parserResult.getFile()))
+                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(parserResult.getPath()))
                                                           .findFirst();
 
             if (panel.isPresent()) {

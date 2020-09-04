@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.logic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.JabRefMain;
 import org.jabref.logic.util.StandardFileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
@@ -135,7 +134,7 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = JabRefMain.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
+        URL url = CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
         Objects.requireNonNull(url);
 
         try {

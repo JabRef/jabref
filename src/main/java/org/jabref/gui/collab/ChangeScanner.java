@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;

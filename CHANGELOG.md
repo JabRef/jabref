@@ -21,9 +21,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
+- Synchronization of SpecialFields to keywords is now disabled by default. [#6621](https://github.com/JabRef/jabref/issues/6621)
+- JabRef no longer opens the entry editor with the first entry on startup [6855](https://github.com/JabRef/jabref/issues/6855)
 
 ### Fixed
 
+- We fixed an issue changing the icon link_variation_off that is not meaningful. [#6834][https://github.com/JabRef/jabref/issues/6834]
 - We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
 - We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)

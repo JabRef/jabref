@@ -11,10 +11,10 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;

@@ -25,9 +25,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;

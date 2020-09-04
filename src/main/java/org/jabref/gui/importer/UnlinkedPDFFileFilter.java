@@ -3,7 +3,7 @@ package org.jabref.gui.importer;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.util.io.DatabaseFileLookup;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

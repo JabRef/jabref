@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -11,8 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
