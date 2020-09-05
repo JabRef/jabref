@@ -125,7 +125,7 @@ To have autoformat working properly in the context of line wrapping, "Wrap at ri
 Ensuring JabRef builds with Gradle should always the first step because, e.g. it generates additional sources that are required for compiling the code. After adjusting all settings mentioned earlier, your first step should be to
 
 * Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View \| Tool Windows \| Gradle**.
-* In the Gradle Tool Window, press the "Reimport All Gradle Projects" button to ensure that all settings are up-to-date
+* In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date
 
   with the setting changes.
 
