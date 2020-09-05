@@ -144,6 +144,15 @@ public class ClipBoardManager {
         setPrimaryClipboardContent(content);
     }
 
+    //@overload
+    public void setHtmlContent(String html, String fallbackPlain) {
+        final ClipboardContent content = new ClipboardContent();
+        content.putHtml(html);
+        content.putString(fallbackPlain);
+        clipboard.setContent(content);
+        setPrimaryClipboardContent(content);
+    }
+
     public void setContent(String string) {
         final ClipboardContent content = new ClipboardContent();
         content.putString(string);

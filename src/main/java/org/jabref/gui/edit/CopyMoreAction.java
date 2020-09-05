@@ -207,6 +207,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         StringBuilder keyAndLink = new StringBuilder();
+        StringBuilder fallbackString = new StringBuilder();
 
         List<BibEntry> entriesWithKey = entries.stream()
                                                .filter(BibEntry::hasCiteKey)
@@ -222,9 +223,11 @@ public class CopyMoreAction extends SimpleCommand {
             String url = entry.getField(StandardField.URL).orElse("");
             keyAndLink.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
             keyAndLink.append(OS.NEWLINE);
+            fallbackString.append(url.isEmpty() ? key : String.format("%s - %s", key, url));
+            fallbackString.append(OS.NEWLINE);
         }
 
-        clipBoardManager.setContent(keyAndLink.toString());
+        clipBoardManager.setHtmlContent(keyAndLink.toString(),fallbackString.toString());
 
         if (entriesWithKey.size() == entries.size()) {
             // All entries had keys.
