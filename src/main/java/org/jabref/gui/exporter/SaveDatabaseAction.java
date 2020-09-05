@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -34,6 +37,7 @@ import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -59,7 +63,7 @@ public class SaveDatabaseAction {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
-    private final DelayTaskThrottler throttler;
+    private final DelayTaskThrottler<Set<Character>> throttler;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -71,7 +75,7 @@ public class SaveDatabaseAction {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
-        this.throttler = new DelayTaskThrottler(1000);
+        this.throttler = new DelayTaskThrottler<>(1500);
     }
 
     public static void shutdown(BibDatabaseContext context) {
@@ -123,7 +127,7 @@ public class SaveDatabaseAction {
 
     /**
      * @param file the new file name to save the data base to. This is stored in the database context of the panel upon
-     *             successful save.
+     *                 successful save.
      * @return true on successful save
      */
     boolean saveAs(Path file, SaveDatabaseMode mode) {
@@ -175,10 +179,10 @@ public class SaveDatabaseAction {
      */
     private Optional<Path> askForSavePath() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                   .addExtensionFilter(StandardFileType.BIBTEX_DB)
-                                   .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                                   .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
-                                   .build();
+                                                                                               .addExtensionFilter(StandardFileType.BIBTEX_DB)
+                                                                                               .withDefaultExtension(StandardFileType.BIBTEX_DB)
+                                                                                               .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
         return selectedPath;
@@ -212,8 +216,7 @@ public class SaveDatabaseAction {
 
             // Save the database
             boolean success = false;
-            var sheduledTask = throttler.scheduleTask(() -> saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL));
-            success = (boolean) sheduledTask.get();
+            success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
 
             if (success) {
                 panel.getUndoManager().markUnchanged();
@@ -226,7 +229,7 @@ public class SaveDatabaseAction {
                 frame.updateAllTabTitles();
             }
             return success;
-        } catch (InterruptedException | ExecutionException ex) {
+        } catch (SaveException ex) {
             LOGGER.error(String.format("A problem occurred when trying to save the file %s", targetPath), ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
@@ -237,22 +240,47 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
+
         SavePreferences preferences = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
                                                       .withSaveType(saveType);
+
+        Consumer<List<FieldChange>> consumer = f -> panel.registerUndoableChanges(f);
+
+        var future = throttler.scheduleTask(() -> saveThrotteld(file, selectedOnly, encoding, saveType, panel.getBibDatabaseContext(), consumer));
+        Set<Character> characters;
+        try {
+            characters = future.get();
+            if (!characters.isEmpty()) {
+                saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), characters, saveType);
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            throw new SaveException("Error excuting save acton", e);
+        }
+
+        return true;
+
+    }
+
+    private Set<Character> saveThrotteld(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, BibDatabaseContext context, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
+        SavePreferences preferences = this.preferences.getSavePreferences()
+                                                      .withEncoding(encoding)
+                                                      .withSaveType(saveType);
+
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.shouldMakeBackup())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());
+                databaseWriter.savePartOfDatabase(context, panel.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(panel.getBibDatabaseContext());
+                databaseWriter.saveDatabase(context);
             }
 
-            panel.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+            consumeFieldChanges.accept(databaseWriter.getSaveActionsFieldChanges());
 
             if (fileWriter.hasEncodingProblems()) {
-                saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), fileWriter.getEncodingProblems(), saveType);
+                return fileWriter.getEncodingProblems();
             }
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
@@ -260,7 +288,7 @@ public class SaveDatabaseAction {
             throw new SaveException("Problems saving: " + ex, ex);
         }
 
-        return true;
+        return Collections.emptySet();
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
@@ -275,9 +303,9 @@ public class SaveDatabaseAction {
         ButtonType tryDifferentEncoding = new ButtonType(Localization.lang("Try different encoding"), ButtonBar.ButtonData.OTHER);
         ButtonType ignore = new ButtonType(Localization.lang("Ignore"), ButtonBar.ButtonData.APPLY);
         boolean saveWithDifferentEncoding = dialogService
-                     .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
-                     .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
-                     .isPresent();
+                                                         .showCustomDialogAndWait(Localization.lang("Save library"), pane, ignore, tryDifferentEncoding)
+                                                         .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
+                                                         .isPresent();
         if (saveWithDifferentEncoding) {
             Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
@@ -291,10 +319,10 @@ public class SaveDatabaseAction {
 
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL)
-                 && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
-               &&
-               context.getDatabasePath().isPresent();
+                        ((context.getLocation() == DatabaseLocation.LOCAL)
+                                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                        &&
+                        context.getDatabasePath().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {

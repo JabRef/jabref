@@ -44,7 +44,7 @@ public class BackupManager {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
-    private final DelayTaskThrottler throttler;
+    private final DelayTaskThrottler<Void> throttler;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
 
@@ -52,7 +52,7 @@ public class BackupManager {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
-        this.throttler = new DelayTaskThrottler(15000);
+        this.throttler = new DelayTaskThrottler<>(15000);
 
         changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
@@ -160,7 +160,7 @@ public class BackupManager {
     }
 
     private void startBackupTask() {
-        throttler.schedule(() -> determineBackupPath().ifPresent(this::performBackup));
+        throttler.schedule(()-> determineBackupPath().ifPresent(this::performBackup));
     }
 
     /**
