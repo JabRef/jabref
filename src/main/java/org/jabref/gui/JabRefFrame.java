@@ -145,6 +145,7 @@ import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,7 +277,10 @@ public class JabRefFrame extends BorderPane {
                         break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
-                            event.consume();
+                            // Extra workaround for CodeArea, which does not inherit from TextInputControl
+                            if(! (stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea)) ) {
+                                event.consume();
+                            }
                             break;
                         }
                     default:
