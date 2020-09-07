@@ -22,8 +22,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
 - Synchronization of SpecialFields to keywords is now disabled by default. [#6621](https://github.com/JabRef/jabref/issues/6621)
-- JabRef no longer opens the entry editor with the first entry on startup [6855](https://github.com/JabRef/jabref/issues/6855)
-- Fetch by ID: (long) "SAO/NASA Astrophysics Data System" replaced by (short) "SAO/NASA ADS" [6876]{https://github.com/JabRef/jabref/pull/6876}
+- JabRef no longer opens the entry editor with the first entry on startup [#6855](https://github.com/JabRef/jabref/issues/6855)
+- Fetch by ID: (long) "SAO/NASA Astrophysics Data System" replaced by (short) "SAO/NASA ADS" [#6876](https://github.com/JabRef/jabref/pull/6876)
 
 ### Fixed
 
@@ -33,7 +33,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
 
 ### Removed
-
 
 ## [5.1] – 2020-08-30
 
