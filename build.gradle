@@ -105,7 +105,7 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.20'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.21'
     implementation 'org.apache.pdfbox:fontbox:2.0.20'
     implementation 'org.apache.pdfbox:xmpbox:2.0.20'
 
