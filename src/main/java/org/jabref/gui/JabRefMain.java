@@ -28,10 +28,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.cli.ParseException;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.jersey.servlet.ServletContainer;
+import org.jabref.rest.resources.RootResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public class JabRefMain extends Application {
                     return;
                 }
 
-                starthttpEndPoint();
+                startHttpEndPoint();
 
                 // TODO: How and when to shut down the server
                 // Waits until server is finished.
@@ -99,38 +98,38 @@ public class JabRefMain extends Application {
         }
     }
 
-    private void starthttpEndPoint() {
-        Server server = this.createHttpServer(9898);;
+    private void startHttpEndPoint() {
+        Server server = this.createHttpServer();
+        //Starts server to http://localhost:9898/root/test
+
         try {
             server.start();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Server createHttpServer(int port) {
+    private Server createHttpServer() {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        addServlet(context);
-        Server server = new Server(port);
+
+        Server server = new Server(9898);
         server.setHandler(context);
+        this.addServlet(context);
         return server;
     }
 
     private void addServlet(ServletContextHandler context) {
         // this mirrors a webapp/WEB-INF/web.xml
-        ServletHolder h = context.addServlet(ServletContainer.class, "/*");
-        h.setInitParameter("jersey.config.server.provider.packages",
-                "org.jabref.rest.resources");
-        h.setInitParameter("jersey.config.server.provider.classnames",
-                "org.glassfish.jersey.logging.LoggingFeature," +
-                        "org.glassfish.jersey.media.multipart.MultiPartFeature"
-        );
+        ServletHolder jerseyServlet = context.addServlet(
+                org.glassfish.jersey.servlet.ServletContainer.class, "/*");
+        jerseyServlet.setInitOrder(0);
 
-        // context.addFilter(RequestLoggingFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-        context.addServlet(DefaultServlet.class, "/");
-
-        h.setInitOrder(1);
+        // Tells the Jersey Servlet which REST service/class to load.
+        jerseyServlet.setInitParameter(
+                "jersey.config.server.provider.classnames",
+                RootResource.class.getCanonicalName());
     }
 
     @Override

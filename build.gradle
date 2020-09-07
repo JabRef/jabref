@@ -205,6 +205,7 @@ dependencies {
     implementation 'org.eclipse.jetty:jetty-servlets:9.4.31.v20200723'
     implementation 'org.glassfish.jersey.containers:jersey-container-servlet:2.31'
     implementation 'org.glassfish.jersey.inject:jersey-hk2:2.31'
+    //implementation 'org.glassfish.jersey.bundles:jaxrs-ri:2.31'
 
     // Required to serialize and deserialize data at the http API
     //implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:2.31'
