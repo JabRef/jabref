@@ -91,4 +91,8 @@ open module org.jabref {
     requires com.h2database.mvstore;
     requires lucene.queryparser;
     requires lucene.core;
+    requires org.eclipse.jetty.server;
+    requires org.eclipse.jetty.servlet;
+    requires jersey.container.servlet.core;
+    requires java.ws.rs;
 }

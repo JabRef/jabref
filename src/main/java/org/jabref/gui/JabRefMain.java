@@ -27,6 +27,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.cli.ParseException;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +77,15 @@ public class JabRefMain extends Application {
                     return;
                 }
 
-                // If not, start GUI
+                starthttpEndPoint();
+
+                // TODO: How and when to shut down the server
+                // Waits until server is finished.
+                // Will never happen, thus user has to press Ctrl+C.
+                // See also https://stackoverflow.com/a/14981621/873282.
+                // server.join();
+
+                // If there isn't a running JabRef instance or multiple instances are allowed, start GUI
                 new JabRefGUI(mainStage, argumentProcessor.getParserResults(), argumentProcessor.isBlank());
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
@@ -84,6 +97,40 @@ public class JabRefMain extends Application {
             LOGGER.error("Unexpected exception", ex);
             Platform.exit();
         }
+    }
+
+    private void starthttpEndPoint() {
+        Server server = this.createHttpServer(9898);;
+        try {
+            server.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Server createHttpServer(int port) {
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        addServlet(context);
+        Server server = new Server(port);
+        server.setHandler(context);
+        return server;
+    }
+
+    private void addServlet(ServletContextHandler context) {
+        // this mirrors a webapp/WEB-INF/web.xml
+        ServletHolder h = context.addServlet(ServletContainer.class, "/*");
+        h.setInitParameter("jersey.config.server.provider.packages",
+                "org.jabref.rest.resources");
+        h.setInitParameter("jersey.config.server.provider.classnames",
+                "org.glassfish.jersey.logging.LoggingFeature," +
+                        "org.glassfish.jersey.media.multipart.MultiPartFeature"
+        );
+
+        // context.addFilter(RequestLoggingFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+        context.addServlet(DefaultServlet.class, "/");
+
+        h.setInitOrder(1);
     }
 
     @Override

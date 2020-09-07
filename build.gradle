@@ -184,7 +184,7 @@ dependencies {
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
@@ -198,6 +198,20 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
+
+    // Required for the standalone server
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'org.eclipse.jetty:jetty-servlet:9.4.31.v20200723'
+    implementation 'org.eclipse.jetty:jetty-servlets:9.4.31.v20200723'
+    implementation 'org.glassfish.jersey.containers:jersey-container-servlet:2.31'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:2.31'
+
+    // Required to serialize and deserialize data at the http API
+    //implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:2.31'
+    implementation 'org.glassfish.jersey.core:jersey-common:2.31'
+    //implementation 'com.fasterxml.jackson.core:jackson-core:2.11.2'
+    // implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
+    // implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.89'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
