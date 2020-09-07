@@ -1,6 +1,6 @@
 # Architectural Decisions
 
-This directory contains the architectural decisions for JabRef.
+Architectural decisions for JabRef:
 
 * [ADR-0000](https://github.com/JabRef/jabref/tree/docs/adr/0000-use-markdown-architectural-decision-records.md) - Use Markdown Architectural Decision Records
 * [ADR-0001](https://github.com/JabRef/jabref/tree/docs/adr/0001-use-crowdin-for-translations.md) - Use Crowdin for translations
@@ -13,6 +13,14 @@ This directory contains the architectural decisions for JabRef.
 * [ADR-0008](https://github.com/JabRef/jabref/tree/docs/adr/0008-use-public-final-instead-of-getters.md) - Use public final instead of getters to offer access to immutable variables
 * [ADR-0009](https://github.com/JabRef/jabref/tree/docs/adr/0009-use-plain-junit5-for-testing.md) - Use Plain JUnit5 for advanced test assertions
 * [ADR-0010](https://github.com/JabRef/jabref/tree/docs/adr/0010-use-h2-as-internal-database.md) - Use H2 as Internal SQL Database
+* [ADR-0011](https://github.com/JabRef/jabref/tree/docs/adr/0011-test-external-links-in-documentation.md) - Test external links in documentation
+* [ADR-0012](https://github.com/JabRef/jabref/tree/docs/adr/0012-handle-different-bibEntry-formats-of-fetchers.md) - Handle different bibentry formats of fetchers by adding a layer
+* [ADR-0013](https://github.com/JabRef/jabref/tree/docs/adr/0013-add-native-support-biblatex-software.md) - Add Native Support for BibLatex-Sotware
+fix checkstyle in adr
+* [ADR-0014](https://github.com/JabRef/jabref/tree/docs/adr/0014-separate-URL-creation-to-enable-proper-logging.md) - Separate URL creation to enable proper logging
+* [ADR-0015](https://github.com/JabRef/jabref/tree/docs/adr/0015-support-an-abstract-query-syntax-for-query-conversion.md) - Query syntax design
+* [ADR-0016](https://github.com/JabRef/jabref/tree/docs/adr/0016-mutable-preferences-objects.md) - Mutable preferences objects
+* [ADR-0017](https://github.com/JabRef/jabref/tree/docs/adr/0017-allow-model-access-logic.md) - Allow org.jabref.model to access org.jabref.logic
 
 
 For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/98e9fc3ddc7b59ca35101c7f37b183ca2e69d8a0/docs/adr/template.md) as basis. More information on the used format is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/). Then add them to the above list.
