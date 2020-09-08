@@ -44,7 +44,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang("paste entries");
             } else if (entries.size() == 1) {
                 return Localization.lang("paste entry %0",
-                        StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                        StringUtil.boldHTML(entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))));
             } else {
                 return null;
             }
@@ -53,7 +53,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
                 return Localization.lang("insert entries");
             } else if (entries.size() == 1) {
                 return Localization.lang("insert entry %0",
-                        StringUtil.boldHTML(entries.get(0).getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                        StringUtil.boldHTML(entries.get(0).getCitationKey().orElse(Localization.lang("undefined"))));
             } else {
                 return null;
             }

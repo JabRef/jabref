@@ -110,9 +110,9 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a  List with all standard fields and the bibtexkey field
+     * Returns a  List with all standard fields and the citation key field
      */
-    public static Set<Field> getStandardFielsdsWithBibTexKey() {
+    public static Set<Field> getStandardFieldsWithCitationKey() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
         LinkedHashSet<Field> standardFieldsWithBibtexKey = new LinkedHashSet<>(allFields.size() + 1);
