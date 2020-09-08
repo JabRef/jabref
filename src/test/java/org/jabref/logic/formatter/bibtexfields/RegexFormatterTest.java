@@ -63,6 +63,12 @@ class RegexFormatterTest {
     }
 
     @Test
+    void constructorWithEmptyStringArgumentReturnUnchangedString() {
+        formatter = new RegexFormatter("");
+        assertEquals("AaBbCc", formatter.format("AaBbCc"));
+    }
+
+    @Test
     void constructorAllowsSpacesBetweenQuotes() {
         formatter = new RegexFormatter("(\"[A-Z]\", \"\")");
         assertEquals("abc", formatter.format("AaBbCc"));
