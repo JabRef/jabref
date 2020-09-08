@@ -13,7 +13,7 @@ import com.google.common.base.Equivalence;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
- * Delivers possible completions as a list of {@link BibEntry} based on their cite key.
+ * Delivers possible completions as a list of {@link BibEntry} based on their citation key.
  */
 public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> {
 
@@ -25,7 +25,7 @@ public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> {
 
     @Override
     protected Equivalence<BibEntry> getEquivalence() {
-        return Equivalence.equals().onResultOf(BibEntry::getCiteKeyOptional);
+        return Equivalence.equals().onResultOf(BibEntry::getCitationKey);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> {
     @Override
     protected boolean isMatch(BibEntry entry, AutoCompletionBinding.ISuggestionRequest request) {
         String userText = request.getUserText();
-        return entry.getCiteKeyOptional()
+        return entry.getCitationKey()
                     .map(key -> StringUtil.containsIgnoreCase(key, userText))
                     .orElse(false);
     }

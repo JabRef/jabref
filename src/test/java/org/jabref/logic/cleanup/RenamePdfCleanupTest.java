@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class RenamePdfCleanupTest {
         context.setDatabasePath(path);
 
         entry = new BibEntry();
-        entry.setCiteKey("Toot");
+        entry.setCitationKey("Toot");
 
         filePreferences = mock(FilePreferences.class);
         when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
@@ -56,7 +56,7 @@ class RenamePdfCleanupTest {
         LinkedFile fileField = new LinkedFile("", path.toAbsolutePath().toString(), "");
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
@@ -72,7 +72,7 @@ class RenamePdfCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
                 Arrays.asList(new LinkedFile("", "", ""), new LinkedFile("", path.toAbsolutePath().toString(), ""), new LinkedFile("", "", ""))));
 
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
         assertEquals(
@@ -82,7 +82,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithCitationKey(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
@@ -90,7 +90,7 @@ class RenamePdfCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
         entry.setField(StandardField.TITLE, "test title");
 
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
@@ -105,7 +105,7 @@ class RenamePdfCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
         entry.setField(StandardField.TITLE, "test title");
 
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey] - [fulltitle]");
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
         LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");

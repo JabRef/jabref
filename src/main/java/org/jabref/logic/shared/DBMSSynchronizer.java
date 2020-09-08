@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -18,15 +19,10 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.shared.DatabaseConnection;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -56,11 +52,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
-    private final GlobalBibtexKeyPattern globalCiteKeyPattern;
+    private final GlobalCitationKeyPattern globalCiteKeyPattern;
     private final FileUpdateMonitor fileMonitor;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
-                            GlobalBibtexKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPattern globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -277,7 +273,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     /**
      * Synchronizes all shared meta data.
      */
-    private void synchronizeSharedMetaData(MetaData data, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+    private void synchronizeSharedMetaData(MetaData data, GlobalCitationKeyPattern globalCiteKeyPattern) {
         if (!checkCurrentConnection()) {
             return;
         }

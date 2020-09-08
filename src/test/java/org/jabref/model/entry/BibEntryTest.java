@@ -98,6 +98,19 @@ class BibEntryTest {
     }
 
     @Test
+    void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() throws Exception {
+        BibEntry entryClone = (BibEntry) entry.clone();
+        assertFalse(entryClone.hasChanged());
+    }
+
+    @Test
+    void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() throws Exception {
+        entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
+        BibEntry entryClone = (BibEntry) entry.clone();
+        assertFalse(entryClone.hasChanged());
+    }
+
+    @Test
     void setAndGetAreConsistentForMonth() throws Exception {
         entry.setField(StandardField.MONTH, "may");
         assertEquals(Optional.of("may"), entry.getField(StandardField.MONTH));
@@ -263,16 +276,16 @@ class BibEntryTest {
 
     @Test
     void settingCiteKeyLeadsToCorrectCiteKey() {
-        assertFalse(entry.hasCiteKey());
-        entry.setCiteKey("Einstein1931");
-        assertEquals(Optional.of("Einstein1931"), entry.getCiteKeyOptional());
+        assertFalse(entry.hasCitationKey());
+        entry.setCitationKey("Einstein1931");
+        assertEquals(Optional.of("Einstein1931"), entry.getCitationKey());
     }
 
     @Test
     void settingCiteKeyLeadsToHasCiteKy() {
-        assertFalse(entry.hasCiteKey());
-        entry.setCiteKey("Einstein1931");
-        assertTrue(entry.hasCiteKey());
+        assertFalse(entry.hasCitationKey());
+        entry.setCitationKey("Einstein1931");
+        assertTrue(entry.hasCitationKey());
     }
 
     @Test
@@ -322,22 +335,22 @@ class BibEntryTest {
     @Test
     void isNullCiteKeyThrowsNPE() {
         BibEntry e = new BibEntry(StandardEntryType.Article);
-        assertThrows(NullPointerException.class, () -> e.setCiteKey(null));
+        assertThrows(NullPointerException.class, () -> e.setCitationKey(null));
     }
 
     @Test
     void isEmptyCiteKey() {
         BibEntry e = new BibEntry(StandardEntryType.Article);
-        assertFalse(e.hasCiteKey());
+        assertFalse(e.hasCitationKey());
 
-        e.setCiteKey("");
-        assertFalse(e.hasCiteKey());
+        e.setCitationKey("");
+        assertFalse(e.hasCitationKey());
 
-        e.setCiteKey("key");
-        assertTrue(e.hasCiteKey());
+        e.setCitationKey("key");
+        assertTrue(e.hasCitationKey());
 
         e.clearField(InternalField.KEY_FIELD);
-        assertFalse(e.hasCiteKey());
+        assertFalse(e.hasCitationKey());
     }
 
     @Test
@@ -587,7 +600,7 @@ class BibEntryTest {
         database.insertEntry(entry);
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         database.insertEntry(entry2);
 
         KeywordList actual = entry.getResolvedKeywords(',', database);
@@ -601,7 +614,7 @@ class BibEntryTest {
         entry.setField(StandardField.CROSSREF, "entry2");
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.addKeyword("kw", ',');
 
         database.insertEntry(entry2);
@@ -618,7 +631,7 @@ class BibEntryTest {
         entry.setField(StandardField.CROSSREF, "entry2");
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("entry2");
+        entry2.setCitationKey("entry2");
         entry2.addKeyword("kw", ',');
         entry2.addKeyword("kw2", ',');
         entry2.addKeyword("kw3", ',');

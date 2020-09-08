@@ -35,8 +35,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
@@ -57,7 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI Dialog for the feature "Find unlinked files".
+ * GUI Dialog for the feature "Search for unlinked local files".
  */
 public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
 
@@ -77,7 +77,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
 
     public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, CountingUndoManager undoManager) {
         super();
-        this.setTitle(Localization.lang("Find unlinked files"));
+        this.setTitle(Localization.lang("Search for unlinked local files"));
         this.dialogService = dialogService;
 
         databaseContext = database;
@@ -376,11 +376,15 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         List<Path> filesList = new ArrayList<>();
         for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
             CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
-            if (child.isLeaf() && child.isSelected()) {
-                Path nodeFile = child.getValue().path;
-                if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
-                    filesList.add(nodeFile);
+            if (child.isLeaf()) {
+                if (child.isSelected()) {
+                    Path nodeFile = child.getValue().path;
+                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
+                        filesList.add(nodeFile);
+                    }
                 }
+            } else {
+                filesList.addAll(getFileListFromNode(child));
             }
         }
         return filesList;

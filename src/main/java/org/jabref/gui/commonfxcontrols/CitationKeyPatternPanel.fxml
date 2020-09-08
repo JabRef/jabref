@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<fx:root editable="true" minWidth="280.0" type="TableView"
+         xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="org.jabref.gui.commonfxcontrols.CitationKeyPatternPanel">
+    <columns>
+        <TableColumn fx:id="entryTypeColumn" editable="false" minWidth="100.0" text="%Name"/>
+        <TableColumn fx:id="patternColumn" minWidth="100.0" text="%Key pattern"/>
+        <TableColumn fx:id="actionsColumn" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"
+                     reorderable="false" resizable="false" sortable="false"/>
+    </columns>
+    <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+    </columnResizePolicy>
+</fx:root>

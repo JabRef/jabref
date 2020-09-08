@@ -79,7 +79,7 @@ class BibEntryWriterTest {
 
         BibEntry entry = new BibEntry(new UnknownEntryType("other"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -173,7 +173,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry();
         entry.setType(new UnknownEntryType("ReallyUnknownType"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -272,8 +272,8 @@ class BibEntryWriterTest {
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
                 "  HowPublished             = {asdf}," + OS.NEWLINE +
                 "}";
         // @formatter:on
@@ -346,8 +346,8 @@ class BibEntryWriterTest {
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
@@ -557,8 +557,8 @@ class BibEntryWriterTest {
                 "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
-                "  Note                     = {some note}," + OS.NEWLINE +
-                "  Number                   = {1}" + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 

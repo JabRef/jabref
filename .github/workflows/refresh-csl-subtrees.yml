@@ -1,10 +1,6 @@
 name: Refresh Citation Style Language Files
 
 on:
-  push:
-    paths:
-      - '.github/workflows/refresh-csl-subtrees.yml'
-      - 'src/main/resources/csl-locales/**'
   schedule:
     # run on 1st and 15th of each month
     - cron: '1 2 1,15 * *'
@@ -13,6 +9,7 @@ jobs:
   publish:
     name: Refresh Citation Style Language Files
     runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
     steps:
       - name: Checkout source
         uses: actions/checkout@v2

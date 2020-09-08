@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class GoogleScholarTest {
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -60,7 +61,7 @@ class GoogleScholarTest {
     @DisabledOnCIServer("CI server is blocked by Google")
     void findSingleEntry() throws FetcherException {
         entry.setType(StandardEntryType.InProceedings);
-        entry.setCiteKey("geiger2013detecting");
+        entry.setCitationKey("geiger2013detecting");
         entry.setField(StandardField.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
         entry.setField(StandardField.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
         entry.setField(StandardField.BOOKTITLE, "ZEUS");
@@ -78,5 +79,20 @@ class GoogleScholarTest {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
         assertEquals(20, foundEntries.size());
+    }
+
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return finder;
+    }
+
+    @Override
+    public List<String> getTestAuthors() {
+        return List.of("Mittermeier", "Myers");
+    }
+
+    @Override
+    public String getTestJournal() {
+        return "Nature";
     }
 }

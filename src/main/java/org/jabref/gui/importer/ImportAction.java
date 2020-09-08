@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
-import org.jabref.JabRefException;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
@@ -23,12 +24,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexString;
-import org.jabref.model.groups.AllEntriesGroup;
-import org.jabref.model.groups.ExplicitGroup;
-import org.jabref.model.groups.GroupHierarchyType;
-import org.jabref.model.metadata.ContentSelector;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,55 +130,15 @@ public class ImportAction {
                 continue;
             }
             ParserResult parserResult = importResult.parserResult;
-            List<BibEntry> entries = parserResult.getDatabase().getEntries();
-            resultDatabase.insertEntries(entries);
+            resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                // merge into existing database
-
-                // Merge strings
-                for (BibtexString bibtexString : parserResult.getDatabase().getStringValues()) {
-                    String bibtexStringName = bibtexString.getName();
-                    if (resultDatabase.hasStringByName(bibtexStringName)) {
-                        String importedContent = bibtexString.getContent();
-                        String existingContent = resultDatabase.getStringByName(bibtexStringName).get().getContent();
-                        if (!importedContent.equals(existingContent)) {
-                            LOGGER.warn("String contents differ for {}: {} != {}", bibtexStringName, importedContent, existingContent);
-                            // TODO: decide what to do here (in case the same string exits)
-                        }
-                    } else {
-                        resultDatabase.addString(bibtexString);
-                    }
-                }
-
-                // Merge groups
-                // Adds the specified node as a child of the current root. The group contained in <b>newGroups </b> must not be of
-                // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups </b> are
-                // inserted directly, i.e. they are not deepCopy()'d.
-                parserResult.getMetaData().getGroups().ifPresent(newGroups -> {
-                    // ensure that there is always only one AllEntriesGroup in the resulting database
-                    // "Rename" the AllEntriesGroup of the imported database to "Imported"
-                    if (newGroups.getGroup() instanceof AllEntriesGroup) {
-                        // create a dummy group
-                        try {
-                            // This will cause a bug if the group already exists
-                            // There will be group where the two groups are merged
-                            String newGroupName = importResult.parserResult.getFile().map(File::getName).orElse("unknown");
-                            ExplicitGroup group = new ExplicitGroup("Imported " + newGroupName, GroupHierarchyType.INDEPENDENT,
-                                    Globals.prefs.getKeywordDelimiter());
-                            newGroups.setGroup(group);
-                            group.add(parserResult.getDatabase().getEntries());
-                        } catch (IllegalArgumentException e) {
-                            LOGGER.error("Problem appending entries to group", e);
-                        }
-                    }
-                    result.getMetaData().getGroups().ifPresent(newGroups::moveTo);
-                });
-
-                for (ContentSelector selector : parserResult.getMetaData().getContentSelectorList()) {
-                    result.getMetaData().addContentSelector(selector);
-                }
+                new DatabaseMerger().mergeMetaData(
+                        result.getMetaData(),
+                        parserResult.getMetaData(),
+                        importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
+                        parserResult.getDatabase().getEntries());
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }

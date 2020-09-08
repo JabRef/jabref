@@ -460,23 +460,15 @@
   </macro>
   <macro name="access">
     <choose>
-      <if type="bill legal_case legislation" match="any"/>
+      <if type="bill legal_case legislation" variable="page" match="any"/>
       <else-if type="article-journal article-magazine article-newspaper" match="any">
-        <choose>
-          <if variable="page"/>
-          <else>
-            <text macro="online-access"/>
-          </else>
-        </choose>
+        <text macro="online-access"/>
       </else-if>
       <else>
         <choose>
-          <if variable="publisher page" match="any">
-            <text macro="publisher" suffix="."/>
-          </if>
-          <else>
+          <if variable="publisher" match="none">
             <text macro="online-access"/>
-          </else>
+          </if>
         </choose>
       </else>
     </choose>
@@ -517,19 +509,10 @@
                   <text variable="archive_location" prefix="(" suffix=")"/>
                 </group>
               </if>
-              <else>
-                <text macro="publisher" suffix="."/>
-              </else>
             </choose>
           </if>
-          <else>
-            <text macro="publisher" suffix="."/>
-          </else>
         </choose>
       </else-if>
-      <else>
-        <text macro="publisher" suffix="."/>
-      </else>
     </choose>
   </macro>
   <macro name="title">
@@ -809,6 +792,25 @@
         </group>
       </else>
     </choose>
+  </macro>
+  <macro name="title-and-descriptions">
+    <group delimiter=" ">
+      <text macro="title"/>
+      <choose>
+        <if variable="title interviewer" type="interview" match="any">
+          <group delimiter=" ">
+            <text macro="description"/>
+            <text macro="format"/>
+          </group>
+        </if>
+        <else>
+          <group delimiter=" ">
+            <text macro="format"/>
+            <text macro="description"/>
+          </group>
+        </else>
+      </choose>
+    </group>
   </macro>
   <macro name="archive">
     <group delimiter=". ">
@@ -1407,6 +1409,46 @@
       </else-if>
     </choose>
   </macro>
+  <!-- After 'source', APA also prints publication history (original publication, reprint info, retraction info) -->
+  <macro name="publication-history">
+    <choose>
+      <if type="patent" match="none">
+        <group prefix="(" suffix=")">
+          <choose>
+            <if variable="references">
+              <!-- This provides the option for more elaborate description 
+                   of publication history, such as full "reprinted" references
+                   (example 26) or retracted references -->
+              <text variable="references"/>
+            </if>
+            <else>
+              <choose>
+                <if variable="original-date">
+                  <group delimiter=" ">
+                    <text macro="original-published"/>
+                    <choose>
+                      <if is-uncertain-date="original-date">
+                        <group prefix="[" suffix="]" delimiter=" ">
+                          <text term="circa" form="short"/>
+                          <text macro="original-date"/>
+                        </group>
+                      </if>
+                      <else>
+                        <text macro="original-date"/>
+                      </else>
+                    </choose>
+                  </group>
+                </if>
+              </choose>
+            </else>
+          </choose>
+        </group>
+      </if>
+      <else>
+        <text variable="references" prefix="(" suffix=")"/>
+      </else>
+    </choose>
+  </macro>
   <macro name="legal-cites">
     <choose>
       <if type="legal_case">
@@ -1513,57 +1555,28 @@
       <key macro="title"/>
     </sort>
     <layout>
-      <group suffix=".">
-        <group delimiter=". ">
+      <group delimiter=" ">
+        <group delimiter=". " suffix=".">
           <text macro="author"/>
           <choose>
             <if is-uncertain-date="issued">
-              <group prefix=" [" suffix="]" delimiter=" ">
+              <group prefix="[" suffix="]" delimiter=" ">
                 <text term="circa" form="short"/>
                 <text macro="issued"/>
               </group>
             </if>
             <else>
-              <text macro="issued" prefix=" (" suffix=")"/>
+              <text macro="issued" prefix="(" suffix=")"/>
             </else>
           </choose>
-          <group delimiter=" ">
-            <text macro="title"/>
-            <choose>
-              <if variable="title interviewer" type="interview" match="any">
-                <group delimiter=" ">
-                  <text macro="description"/>
-                  <text macro="format"/>
-                </group>
-              </if>
-              <else>
-                <group delimiter=" ">
-                  <text macro="format"/>
-                  <text macro="description"/>
-                </group>
-              </else>
-            </choose>
-          </group>
+          <text macro="title-and-descriptions"/>
           <text macro="container"/>
+          <text macro="event"/>
+          <text macro="publisher"/>
         </group>
-        <text macro="event" prefix=". "/>
+        <text macro="access"/>
+        <text macro="publication-history"/>
       </group>
-      <text macro="access" prefix=" "/>
-      <choose>
-        <if is-uncertain-date="original-date">
-          <group prefix=" [" suffix="]" delimiter=" ">
-            <text macro="original-published"/>
-            <text term="circa" form="short"/>
-            <text macro="original-date"/>
-          </group>
-        </if>
-        <else-if variable="original-date">
-          <group prefix=" (" suffix=")" delimiter=" ">
-            <text macro="original-published"/>
-            <text macro="original-date"/>
-          </group>
-        </else-if>
-      </choose>
     </layout>
   </bibliography>
 </style>

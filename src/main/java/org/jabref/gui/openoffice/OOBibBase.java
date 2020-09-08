@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
@@ -87,6 +88,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
  */
+@AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
 
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
@@ -320,7 +322,7 @@ class OOBibBase {
             }
 
             String keyString = String.join(",",
-                    entries.stream().map(entry -> entry.getCiteKeyOptional().orElse("")).collect(Collectors.toList()));
+                    entries.stream().map(entry -> entry.getCitationKey().orElse("")).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -399,7 +401,7 @@ class OOBibBase {
      *
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
-     * @return A list of those referenced BibTeX keys that could not be resolved.
+     * @return A list of those referenced citation keys that could not be resolved.
      * @throws UndefinedCharacterFormatException
      * @throws NoSuchElementException
      * @throws IllegalArgumentException
@@ -450,7 +452,7 @@ class OOBibBase {
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
             for (BibEntry entry : entries.keySet()) {
-                cited.add(entry.getCiteKeyOptional().orElse(null));
+                cited.add(entry.getCitationKey().orElse(null));
             }
             names = Arrays.asList(xReferenceMarks.getElementNames());
         } else {
@@ -489,12 +491,12 @@ class OOBibBase {
                     BibDatabase database = linkSourceBase.get(keys[j]);
                     Optional<BibEntry> tmpEntry = Optional.empty();
                     if (database != null) {
-                        tmpEntry = database.getEntryByKey(keys[j]);
+                        tmpEntry = database.getEntryByCitationKey(keys[j]);
                     }
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
+                        LOGGER.info("Citation key not found: '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
                         throw new BibEntryNotFoundException(names.get(i), Localization
                                 .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
@@ -503,12 +505,12 @@ class OOBibBase {
 
                 String[] normCitMarker = new String[keys.length];
                 String citationMarker;
-                if (style.isBibtexKeyCiteMarkers()) {
+                if (style.isCitationKeyCiteMarkers()) {
                     StringBuilder sb = new StringBuilder();
                     normCitMarkers[i] = new String[keys.length];
                     for (int j = 0; j < keys.length; j++) {
-                        normCitMarkers[i][j] = cEntries[j].getCiteKeyOptional().orElse(null);
-                        sb.append(cEntries[j].getCiteKeyOptional().orElse(""));
+                        normCitMarkers[i][j] = cEntries[j].getCitationKey().orElse(null);
+                        sb.append(cEntries[j].getCitationKey().orElse(""));
                         if (j < (keys.length - 1)) {
                             sb.append(',');
                         }
@@ -565,7 +567,7 @@ class OOBibBase {
                         }
                         // Update key list to match the new sorting:
                         for (int j = 0; j < cEntries.length; j++) {
-                            bibtexKeys[i][j] = cEntries[j].getCiteKeyOptional().orElse(null);
+                            bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
                         }
                     }
 
@@ -583,7 +585,7 @@ class OOBibBase {
         }
 
         uniquefiers.clear();
-        if (!style.isBibtexKeyCiteMarkers() && !style.isNumberEntries()) {
+        if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // See if there are duplicate citations marks referring to different entries. If so, we need to
             // use uniquefiers:
             Map<String, List<String>> refKeys = new HashMap<>();
@@ -649,12 +651,12 @@ class OOBibBase {
                             needsChange = true;
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                tmpEntry = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByCitationKey(currentKey);
                             }
                         } else {
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                tmpEntry = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByCitationKey(currentKey);
                             }
                         }
                         uniquif[k] = "";
@@ -662,7 +664,7 @@ class OOBibBase {
                         needsChange = true;
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
-                            tmpEntry = database.getEntryByKey(currentKey);
+                            tmpEntry = database.getEntryByCitationKey(currentKey);
                         }
                         uniquif[k] = uniq;
                     }
@@ -828,7 +830,7 @@ class OOBibBase {
         for (String key : keys) {
             boolean found = false;
             for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByKey(key);
+                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
                 if (entry.isPresent()) {
                     entries.put(entry.get(), database);
                     linkSourceBase.put(key, database);
@@ -850,10 +852,10 @@ class OOBibBase {
     }
 
     /**
-     * Extract the list of bibtex keys from a reference mark name.
+     * Extract the list of citation keys from a reference mark name.
      *
      * @param name The reference mark name.
-     * @return The list of bibtex keys encoded in the name.
+     * @return The list of citation keys encoded in the name.
      */
     public List<String> parseRefMarkName(String name) {
         List<String> keys = new ArrayList<>();
@@ -870,13 +872,12 @@ class OOBibBase {
     }
 
     /**
-     * Resolve the bibtex key from a citation reference marker name, and look up the index of the key in a list of keys.
+     * Resolve the citation key from a citation reference marker name, and look up the index of the key in a list of keys.
      *
      * @param citRefName The name of the ReferenceMark representing the citation.
-     * @param keys       A List of bibtex keys representing the entries in the bibliography.
+     * @param keys       A List of citation keys representing the entries in the bibliography.
      * @return the indices of the cited keys, -1 if a key is not found. Returns null if the ref name could not be resolved as a citation.
      */
-
     private List<Integer> findCitedEntryIndex(String citRefName, List<String> keys) {
         Matcher citeMatcher = CITE_PATTERN.matcher(citRefName);
         if (citeMatcher.find()) {
@@ -904,14 +905,14 @@ class OOBibBase {
                     BibDatabase database = linkSourceBase.get(key);
                     Optional<BibEntry> origEntry = Optional.empty();
                     if (database != null) {
-                        origEntry = database.getEntryByKey(key);
+                        origEntry = database.getEntryByCitationKey(key);
                     }
                     if (origEntry.isPresent()) {
                         if (!newList.containsKey(origEntry.get())) {
                             newList.put(origEntry.get(), database);
                         }
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + key + "'");
+                        LOGGER.info("Citation key not found: '" + key + "'");
                         LOGGER.info("Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(key), null);
                     }
@@ -994,7 +995,7 @@ class OOBibBase {
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
             OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry.getKey(),
-                    entry.getValue(), uniquefiers.get(entry.getKey().getCiteKeyOptional().orElse(null)));
+                    entry.getValue(), uniquefiers.get(entry.getKey().getCitationKey().orElse(null)));
         }
     }
 
@@ -1238,7 +1239,7 @@ class OOBibBase {
                 List<BibEntry> entries = new ArrayList<>();
                 for (String key : keys) {
                     for (BibDatabase database : databases) {
-                        Optional<BibEntry> entry = database.getEntryByKey(key);
+                        Optional<BibEntry> entry = database.getEntryByCitationKey(key);
                         if (entry.isPresent()) {
                             entries.add(entry.get());
                             break;
@@ -1246,7 +1247,7 @@ class OOBibBase {
                     }
                 }
                 Collections.sort(entries, new FieldComparator(StandardField.YEAR));
-                String keyString = String.join(",", entries.stream().map(entry -> entry.getCiteKeyOptional().orElse(""))
+                String keyString = String.join(",", entries.stream().map(entry -> entry.getCitationKey().orElse(""))
                                                            .collect(Collectors.toList()));
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
@@ -1272,7 +1273,7 @@ class OOBibBase {
         for (String key : cited) {
             // Loop through the available databases
             for (BibDatabase loopDatabase : databases) {
-                Optional<BibEntry> entry = loopDatabase.getEntryByKey(key);
+                Optional<BibEntry> entry = loopDatabase.getEntryByCitationKey(key);
                 // If entry found
                 if (entry.isPresent()) {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
@@ -1281,9 +1282,9 @@ class OOBibBase {
                     // Check if the cloned entry has a crossref field
                     clonedEntry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
-                        if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
+                        if (!resultDatabase.getEntryByCitationKey(crossref).isPresent()) {
                             // Add it if it is in the current library
-                            loopDatabase.getEntryByKey(crossref).ifPresent(entriesToInsert::add);
+                            loopDatabase.getEntryByCitationKey(crossref).ifPresent(entriesToInsert::add);
                         }
                     });
 

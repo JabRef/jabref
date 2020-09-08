@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -43,6 +43,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {

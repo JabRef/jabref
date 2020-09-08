@@ -300,7 +300,9 @@ public class IconTheme {
         REMOVE_ABBREVIATION(MaterialDesignIcon.PLAYLIST_MINUS),
         NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignIcon.PLUS_BOX),
         REMOTE_DATABASE(MaterialDesignIcon.DATABASE),
-        HOME(MaterialDesignIcon.HOME);
+        HOME(MaterialDesignIcon.HOME),
+        LINK(MaterialDesignIcon.LINK),
+        LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT);
 
         private final JabRefIcon icon;
 

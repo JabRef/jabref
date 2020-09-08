@@ -8,15 +8,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class MoveFilesCleanupTest {
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
-        entry.setCiteKey("Toot");
+        entry.setCitationKey("Toot");
         entry.setField(StandardField.TITLE, "test title");
         entry.setField(StandardField.YEAR, "1989");
         LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath().toString(), "");
@@ -69,7 +69,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFile() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
@@ -86,7 +86,7 @@ class MoveFilesCleanupTest {
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
                 Arrays.asList(new LinkedFile("", "", ""), fileField, new LinkedFile("", "", ""))));
 
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("test.pdf");
@@ -100,7 +100,7 @@ class MoveFilesCleanupTest {
 
     @Test
     void movesFileWithFileDirPattern() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("test.pdf");
@@ -112,8 +112,21 @@ class MoveFilesCleanupTest {
     }
 
     @Test
+    void doesNotMoveFileWithEmptyFileDirPattern() throws Exception {
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        cleanup.cleanup(entry);
+
+        Path fileAfter = defaultFileFolder.resolve("test.pdf");
+        assertEquals(
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "test.pdf", ""))),
+                entry.getField(StandardField.FILE));
+        assertFalse(Files.exists(fileBefore));
+        assertTrue(Files.exists(fileAfter));
+    }
+
+    @Test
     void movesFileWithSubdirectoryPattern() throws Exception {
-        when(filePreferences.getFileDirPattern()).thenReturn("[entrytype]/[year]/[auth]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
 
         Path fileAfter = defaultFileFolder.resolve("Misc").resolve("1989").resolve("test.pdf");
@@ -127,7 +140,7 @@ class MoveFilesCleanupTest {
     @Test
     void movesFileWithNoDirectory() throws Exception {
         databaseContext.setMetaData(new MetaData());
-        when(filePreferences.getFileDirPattern()).thenReturn("");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         List<FieldChange> changes = cleanup.cleanup(entry);
         assertEquals(Collections.emptyList(), changes);
     }

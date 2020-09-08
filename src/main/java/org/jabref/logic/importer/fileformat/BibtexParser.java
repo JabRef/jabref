@@ -515,7 +515,7 @@ public class BibtexParser implements Parser {
             skipWhitespace();
         }
         String key = parseKey();
-        result.setCiteKey(key);
+        result.setCitationKey(key);
         skipWhitespace();
 
         while (true) {
@@ -692,19 +692,19 @@ public class BibtexParser implements Parser {
                         // Finished, now reverse newKey and remove whitespaces:
                         key = newKey.reverse();
                         parserResult.addWarning(
-                                Localization.lang("Line %0: Found corrupted BibTeX key %1.", String.valueOf(line), key.toString()));
+                                Localization.lang("Line %0: Found corrupted citation key %1.", String.valueOf(line), key.toString()));
                     }
                 }
                 break;
 
             case ',':
                 parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted BibTeX key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
+                        Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
                 break;
 
             case '\n':
                 parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted BibTeX key %1 (comma missing).", String.valueOf(line), key.toString()));
+                        Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
                 break;
 
             default:
@@ -748,7 +748,7 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * This method is used to parse the bibtex key for an entry.
+     * This method is used to parse the citation key of an entry.
      */
     private String parseKey() throws IOException {
         StringBuilder token = new StringBuilder(20);
@@ -783,7 +783,7 @@ public class BibtexParser implements Parser {
                     return token.toString();
                 } else {
                     throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
-                            + "allowed in bibtex keys.");
+                            + "allowed in citation keys.");
                 }
             }
         }

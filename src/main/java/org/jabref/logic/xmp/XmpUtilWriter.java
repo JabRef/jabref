@@ -245,7 +245,7 @@ public class XmpUtilWriter {
         BibEntry resolvedEntry = XmpUtilWriter.getDefaultOrDatabaseEntry(entry, database);
 
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
+        boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
         // Set all the values including key and entryType
         for (Entry<Field, String> fieldValuePair : resolvedEntry.getFieldMap().entrySet()) {

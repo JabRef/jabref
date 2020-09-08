@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.Globals;
-import org.jabref.JabRefMain;
+import org.jabref.gui.Globals;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -38,12 +37,12 @@ public class PreferencesMigrations {
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
     public static void runMigrations() {
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+        Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(Globals.prefs);
         upgradeFaultyEncodingStrings(Globals.prefs);
-        upgradeLabelPatternToBibtexKeyPattern(Globals.prefs);
+        upgradeLabelPatternToCitationKeyPattern(Globals.prefs);
         upgradeImportFileAndDirePatterns(Globals.prefs, mainPrefsNode);
         upgradeStoredBibEntryTypes(Globals.prefs, mainPrefsNode);
         upgradeKeyBindingsToJavaFX(Globals.prefs);
@@ -179,24 +178,24 @@ public class PreferencesMigrations {
     }
 
     /**
-     * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
+     * Migrate LabelPattern configuration from versions <=3.5 to new CitationKeyPatterns
      */
-    private static void upgradeLabelPatternToBibtexKeyPattern(JabRefPreferences prefs) {
+    private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs) {
 
         try {
-            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+            Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
             // Migrate default pattern
-            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null) == null) {
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, null) == null) {
                 // Check whether old defaultLabelPattern is set
                 String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
                 if (oldDefault != null) {
-                    prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
+                    prefs.put(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, oldDefault);
                     LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
             }
             // Pref node already exists do not migrate from previous version
-            if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
+            if (mainPrefsNode.nodeExists(JabRefPreferences.CITATION_KEY_PATTERNS_NODE)) {
                 return;
             }
 
@@ -248,13 +247,13 @@ public class PreferencesMigrations {
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[] {
+            String[] oldStylePatterns = new String[]{
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[] {"[bibtexkey]",
-                    "[bibtexkey] - [title]"};
+            String[] newStylePatterns = new String[]{"[citationkey]",
+                    "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -295,12 +294,12 @@ public class PreferencesMigrations {
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
-        GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(
+                prefs.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
-            keyPattern.addBibtexKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
+            keyPattern.addCitationKeyPattern(EntryTypeFactory.parse(key), oldPatternPrefs.get(key, null));
         }
-        prefs.storeGlobalBibtexKeyPattern(keyPattern);
+        prefs.storeGlobalCitationKeyPattern(keyPattern);
     }
 
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {

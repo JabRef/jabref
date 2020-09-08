@@ -6,9 +6,9 @@ import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
 import org.jabref.gui.Dialog;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -43,7 +43,7 @@ public class IntegrityCheckAction extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
-                Globals.prefs.getBibtexKeyPatternPreferences(),
+                Globals.prefs.getCitationKeyPatternPreferences(),
                 Globals.journalAbbreviationRepository,
                 Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
 

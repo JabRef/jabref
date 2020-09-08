@@ -65,10 +65,9 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameDefaultFullTitle() {
-        // bibkey - title
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
+        String fileNamePattern = "[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
@@ -77,10 +76,9 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameDefaultWithLowercaseTitle() {
-        // bibkey - title
-        String fileNamePattern = "[bibtexkey] - [title:lower]";
+        String fileNamePattern = "[citationkey] - [title:lower]";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
@@ -89,10 +87,9 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameBibTeXKey() {
-        // bibkey
-        String fileNamePattern = "[bibtexkey]";
+        String fileNamePattern = "[citationkey]";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234",
@@ -103,7 +100,7 @@ class FileUtilTest {
     void testGetLinkedFileNameNoPattern() {
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
@@ -120,17 +117,15 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameGetKeyIfEmptyField() {
-        // bibkey - title
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
     void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
-        // bibkey - title
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
 
@@ -139,7 +134,6 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedFileNameByYearAuthorFirstpage() {
-        // bibkey - title
         String fileNamePattern = "[year]_[auth]_[firstpage]";
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "O. Kitsune");
@@ -356,27 +350,36 @@ class FileUtilTest {
 
     @Test
     void testGetLinkedDirNameDefaultFullTitle() {
-        // bibkey - title
-        String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
+        String fileDirPattern = "PDF/[year]/[auth]/[citationkey] - [fulltitle]";
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("1234");
+        entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
         entry.setField(StandardField.YEAR, "1998");
         entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
 
-        assertEquals("PDF/1998/Åuthör/1234 - mytitle",
-                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("PDF/1998/Åuthör/1234 - mytitle", FileUtil.createDirNameFromPattern(null, entry, fileDirPattern));
     }
 
     @Test
-    public void testIsBibFile() throws IOException {
+    void testGetLinkedDirNamePatternEmpty() {
+        BibEntry entry = new BibEntry();
+        entry.setCitationKey("1234");
+        entry.setField(StandardField.TITLE, "mytitle");
+        entry.setField(StandardField.YEAR, "1998");
+        entry.setField(StandardField.AUTHOR, "A. Åuthör and Author, Bete");
+
+        assertEquals("", FileUtil.createDirNameFromPattern(null, entry, ""));
+    }
+
+    @Test
+    void testIsBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.bib"));
 
         assertTrue(FileUtil.isBibFile(bibFile));
     }
 
     @Test
-    public void testIsNotBibFile() throws IOException {
+    void testIsNotBibFile() throws IOException {
         Path bibFile = Files.createFile(rootDir.resolve("test.pdf"));
         assertFalse(FileUtil.isBibFile(bibFile));
     }

@@ -1,20 +1,22 @@
 # Table of contents
 
 * [Overview on Developing](README.md)
-  * [Contributing](contributing.md)
-* [Architectural Decisions](adr/README.md)
-* Getting into the code
-  * [Set up a local workspace](guidelines-for-setting-up-a-local-workspace.md)
-  * [High-level documentation](high-level-documentation.md)
-  * [How to test](testing.md)
-  * [Code Howtos](code-howtos.md)
-  * [JabRef's development strategy](development-strategy.md)
-* Advanced reading
-  * [Code Quality](code-quality.md)
-  * [Recommendations for UI design](ui-recommendations.md)
-  * [Custom SVG icons](custom-svg-icons.md)
-  * [Creating a binary and debug it](jpackage.md)
+* [Contributing](contributing.md)
+* [Architectural Decisions](adr.md)
+* [Getting into the code](getting-into-the-code/README.md)
+  * [Set up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace.md)
+  * [High-level documentation](getting-into-the-code/high-level-documentation.md)
+  * [How to test](getting-into-the-code/testing.md)
+  * [Code Howtos](getting-into-the-code/code-howtos.md)
+  * [JabRef's development strategy](getting-into-the-code/development-strategy.md)
+* [Advanced reading](advanced-reading/README.md)
+  * [Code Quality](advanced-reading/code-quality.md)
+  * [Recommendations for UI design](advanced-reading/ui-recommendations.md)
+  * [Custom SVG icons](advanced-reading/custom-svg-icons.md)
+  * [Working on fetchers](advanced-reading/fetchers.md)
+  * [Creating a binary and debug it](advanced-reading/jpackage.md)
 * [JabRef and Software Engineering](teaching.md)
-* Readings on Coding
-  * [Readings on JavaFX](javafx.md)
-  * [Useful development tooling](tools.md)
+* [Readings on Coding](readings-on-coding/README.md)
+  * [Readings on JavaFX](readings-on-coding/javafx.md)
+  * [Useful development tooling](readings-on-coding/tools.md)
+

@@ -18,12 +18,12 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Encodings;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -128,7 +128,6 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsDisableProperty().setValue(!value.isEnabled());
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
             cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
             cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });

@@ -136,10 +136,12 @@ public class ActionFactory {
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
+        button.setFocusTraversable(false); // Prevent the buttons from stealing the focus
         return button;
     }
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+        ActionUtils.unconfigureButton(button);
         ActionUtils.configureButton(
                 new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,

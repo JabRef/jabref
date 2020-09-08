@@ -9,10 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -23,8 +23,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -138,7 +138,7 @@ class IntegrityCheckTest {
 
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                createBibtexKeyPatternPreferences(),
+                createCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
 
@@ -171,7 +171,7 @@ class IntegrityCheckTest {
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                createBibtexKeyPatternPreferences(),
+                createCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false)
                 .check();
         assertNotEquals(Collections.emptyList(), messages);
@@ -182,7 +182,7 @@ class IntegrityCheckTest {
         when(filePreferencesMock.isBibLocationAsPrimary()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
-                createBibtexKeyPatternPreferences(),
+                createCitationKeyPatternPreferences(),
                 JournalAbbreviationLoader.loadBuiltInRepository(), false
         ).check();
         assertEquals(Collections.emptyList(), messages);
@@ -191,22 +191,22 @@ class IntegrityCheckTest {
     private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                                                              mock(FilePreferences.class),
-                                                             createBibtexKeyPatternPreferences(),
+                                                             createCitationKeyPatternPreferences(),
                                                              JournalAbbreviationLoader.loadBuiltInRepository(),
                                                              allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 
-    private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
-        final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
-        return new BibtexKeyPatternPreferences(
+    private CitationKeyPatternPreferences createCitationKeyPatternPreferences() {
+        final GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
+        return new CitationKeyPatternPreferences(
                 false,
                 false,
                 false,
-                BibtexKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B,
                 "",
                 "",
-                BibtexKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
+                CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
                 ',');
     }

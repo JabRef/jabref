@@ -96,4 +96,5 @@
     <ButtonType fx:id="applyButton" buttonData="OK_DONE"
                 text="%Apply"/>
     <ButtonType fx:constant="CANCEL"/>
+    <ButtonType fx:id="resetButton" buttonData="LEFT" text="%Reset" />
 </DialogPane>

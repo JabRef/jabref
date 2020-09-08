@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -30,7 +31,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -135,7 +135,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(ID_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("retmode", "xml");
@@ -206,7 +206,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
             // Separate the IDs with a comma to search multiple entries
-            URL fetchURL = getURLForID(String.join(",", ids));
+            URL fetchURL = getUrlForIdentifier(String.join(",", ids));
             URLConnection data = fetchURL.openConnection();
             ParserResult result = new MedlineImporter().importDatabase(
                     new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));

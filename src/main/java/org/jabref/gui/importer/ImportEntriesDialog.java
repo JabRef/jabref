@@ -21,8 +21,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
@@ -79,7 +79,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
-        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().getDownloadLinkedFiles());
+        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
 
         setResultConverter(button -> {
             if (button == importButton) {

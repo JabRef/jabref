@@ -12,7 +12,6 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -33,6 +32,7 @@ import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -40,7 +40,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -120,8 +119,6 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
-        // Open entry editor for first entry on start up.
-        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
@@ -284,7 +281,14 @@ public class BasePanel extends StackPane {
     private void createMainTable() {
         bibDatabaseContext.getDatabase().registerListener(SpecialFieldDatabaseChangeListener.INSTANCE);
 
-        mainTable = new MainTable(tableModel, frame, this, bibDatabaseContext, preferences.getTablePreferences(), externalFileTypes, preferences.getKeyBindings());
+        mainTable = new MainTable(tableModel,
+                this,
+                bibDatabaseContext,
+                Globals.prefs,
+                dialogService,
+                Globals.stateManager,
+                externalFileTypes,
+                preferences.getKeyBindings());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -294,68 +298,6 @@ public class BasePanel extends StackPane {
                                                          .stream()
                                                          .findFirst()
                                                          .ifPresent(entryEditor::setEntry));
-
-        // TODO: Register these actions globally
-        /*
-        String clearSearch = "clearSearch";
-        mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
-        mainTable.getActionMap().put(clearSearch, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
-                switch (mode) {
-                    case SHOWING_NOTHING:
-                        frame.getGlobalSearchBar().endSearch();
-                        break;
-                    case SHOWING_PREVIEW:
-                        getPreviewPanel().close();
-                        break;
-                    case SHOWING_EDITOR:
-                    case WILL_SHOW_EDITOR:
-                        entryEditorClosing(getEntryEditor());
-                        break;
-                    default:
-                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
-                        break;
-                }
-            }
-        });
-
-        mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.CUT);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not cut", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.COPY, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.COPY);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy", ex);
-                }
-            }
-        });
-        mainTable.getActionMap().put(Actions.PASTE, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    runCommand(Actions.PASTE);
-                } catch (Throwable ex) {
-                    LOGGER.warn("Could not paste", ex);
-                }
-            }
-        });
-        */
     }
 
     public void setupMainPanel() {
@@ -669,7 +611,7 @@ public class BasePanel extends StackPane {
     }
 
     public void paste() {
-        mainTable.paste();
+        mainTable.paste(this.bibDatabaseContext.getMode());
     }
 
     public void cut() {

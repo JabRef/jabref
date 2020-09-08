@@ -19,9 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnection;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;

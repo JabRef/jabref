@@ -18,6 +18,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
@@ -37,6 +38,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  *   <li>active search</li>
  *   <li>active number of search results</li>
  *   <li>focus owner</li>
+ *   <li>dialog window sizes/positions</li>
  * </ul>
  */
 public class StateManager {
@@ -52,10 +54,9 @@ public class StateManager {
     private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> {
         return new Observable[]{task.progressProperty(), task.runningProperty()};
     });
-
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
-
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
+    private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -146,5 +147,13 @@ public class StateManager {
 
     public EasyBinding<Double> getTasksProgress() {
         return tasksProgress;
+    }
+
+    public DialogWindowState getDialogWindowState(String className) {
+        return dialogWindowStates.get(className);
+    }
+
+    public void setDialogWindowState(String className, DialogWindowState state) {
+        dialogWindowStates.put(className, state);
     }
 }
