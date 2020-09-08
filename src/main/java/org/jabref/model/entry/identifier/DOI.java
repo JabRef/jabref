@@ -108,12 +108,12 @@ public class DOI implements Identifier {
         Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {
             // match only group \1
-            this.doi = matcher.group(1);
+            this.doi = matcher.group(1).replaceAll("[^\\w,/,:,-,.,-]|[_]", "");
         } else {
             // Short DOI
             Matcher shortDoiMatcher = EXACT_SHORT_DOI_PATT.matcher(trimmedDoi);
             if (shortDoiMatcher.find()) {
-                this.doi = shortDoiMatcher.group(1);
+                this.doi = shortDoiMatcher.group(1).replaceAll("[^\\w,/,:,-,.,-]|[_]", "");
                 isShortDoi = true;
             } else {
                 throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
@@ -232,15 +232,6 @@ public class DOI implements Identifier {
     @Override
     public String getNormalized() {
         return doi;
-    }
-
-    /**
-     * Compare DOI not fully exact. For example  10.1109/cloud.2017.89 equals /cloud.2017.\_89
-     */
-    public boolean isCompareNotExact(DOI o2) {
-        String s1 = this.doi.replaceAll("[^\\w]", "");
-        String s2 = o2.doi.replaceAll("[^\\w]", "");
-        return s1.equalsIgnoreCase(s2);
     }
 
     /**

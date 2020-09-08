@@ -61,6 +61,7 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.JOURNAL, 2.);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.NOTE, 0.1);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.COMMENT, 0.1);
+        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.DOI, 3.);
     }
 
     private final BibEntryTypesManager entryTypesManager;
@@ -311,7 +312,7 @@ public class DuplicateCheck {
         Optional<DOI> oneDOI = one.getDOI();
         Optional<DOI> twoDOI = two.getDOI();
         if (oneDOI.isPresent() && twoDOI.isPresent()) {
-            return oneDOI.get().isCompareNotExact(twoDOI.get());
+            return oneDOI.get().getDOI().equalsIgnoreCase(twoDOI.get().getDOI());
         }
         // check ISBN
         Optional<ISBN> oneISBN = one.getISBN();
