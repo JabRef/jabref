@@ -8,7 +8,7 @@ Some entry titles are composed of multiple sentences, for example: "Whose Music?
 
 * [Regular expression](https://docs.oracle.com/javase/tutorial/essential/regex/)
 * [OpenNLP](https://opennlp.apache.org/)
-* [ICU4J](http://site.icu-project.org/home) - 
+* [ICU4J](http://site.icu-project.org/home)
 
 ## Decision Outcome
 
@@ -23,3 +23,4 @@ Chosen option: "Regular expression", because we can use Java internal classes (P
 ### Negative Consequences
 
 * Regular expressions can never cover every case, therefore, splitting may not be accurate for every title
+
