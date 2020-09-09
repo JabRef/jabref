@@ -165,7 +165,7 @@ public class DuplicateCheckTest {
     public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates2() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0\\02");
-        BibEntry duplicateWithDifferentType = (BibEntry) unrelatedArticle;
+        BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
@@ -175,7 +175,7 @@ public class DuplicateCheckTest {
     public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates3() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0_02");
-        BibEntry duplicateWithDifferentType = (BibEntry) unrelatedArticle;
+        BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
@@ -185,7 +185,7 @@ public class DuplicateCheckTest {
     public void twoEntriesWithSameISBNButDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.ISBN, "0-123456-47-9");
         unrelatedArticle.setField(StandardField.ISBN, "0-123456-47-9");
-        BibEntry duplicateWithDifferentType = (BibEntry) unrelatedArticle;
+        BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
