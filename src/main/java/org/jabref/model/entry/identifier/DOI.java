@@ -108,12 +108,12 @@ public class DOI implements Identifier {
         Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {
             // match only group \1
-            this.doi = matcher.group(1);
+            this.doi = matcher.group(1).replaceAll("[^\\w,/,:,-,.,-]|[_]", "");
         } else {
             // Short DOI
             Matcher shortDoiMatcher = EXACT_SHORT_DOI_PATT.matcher(trimmedDoi);
             if (shortDoiMatcher.find()) {
-                this.doi = shortDoiMatcher.group(1);
+                this.doi = shortDoiMatcher.group(1).replaceAll("[^\\w,/,:,-,.,-]|[_]", "");
                 isShortDoi = true;
             } else {
                 throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
@@ -253,5 +253,4 @@ public class DOI implements Identifier {
     public int hashCode() {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
-
 }
