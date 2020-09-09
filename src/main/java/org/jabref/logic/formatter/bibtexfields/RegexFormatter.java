@@ -29,7 +29,7 @@ public class RegexFormatter extends Formatter {
      * RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
      */
     private static final Pattern CONSTRUCTOR_ARGUMENT = Pattern.compile(
-            "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*?)\"\\)$");
+            "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*)\"\\)$");
     // Magic arbitrary unicode char, which will never appear in bibtex files
     private static final String PLACEHOLDER_FOR_PROTECTED_GROUP = Character.toString('\u0A14');
     private static final String PLACEHOLDER_FOR_OPENING_CURLY_BRACE = Character.toString('\u0A15');
