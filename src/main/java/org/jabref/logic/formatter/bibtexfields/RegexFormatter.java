@@ -18,16 +18,20 @@ public class RegexFormatter extends Formatter {
     // \\ is required to have the { interpreted as character
     // ? is required to disable the aggressive match
     private static final Pattern PATTERN_ENCLOSED_IN_CURLY_BRACES = Pattern.compile("(\\{.*?})");
+    private static final String REGEX_CAPTURING_GROUP = "regex";
+    private static final String REPLACEMENT_CAPTURING_GROUP = "replacement";
+    /**
+     * Matches a valid argument to the constructor. Two capturing groups are used to parse the {@link
+     * RegexFormatter#regex} and {@link RegexFormatter#replacement} used in {@link RegexFormatter#format(String)}
+     */
+    private static final Pattern CONSTRUCTOR_ARGUMENT = Pattern.compile(
+            "^\\(\"(?<" + REGEX_CAPTURING_GROUP + ">.*?)\" *?, *?\"(?<" + REPLACEMENT_CAPTURING_GROUP + ">.*?)\"\\)$");
     // Magic arbitrary unicode char, which will never appear in bibtex files
     private static final String PLACEHOLDER_FOR_PROTECTED_GROUP = Character.toString('\u0A14');
     private static final String PLACEHOLDER_FOR_OPENING_CURLY_BRACE = Character.toString('\u0A15');
     private static final String PLACEHOLDER_FOR_CLOSING_CURLY_BRACE = Character.toString('\u0A16');
-    private static final String QUOTE_AND_OPENING_BRACE = "\"(";
-    private static final int LENGTH_OF_QUOTE_AND_OPENING_BRACE = QUOTE_AND_OPENING_BRACE.length();
-    private static final String CLOSING_BRACE_AND_QUOTE = ")\"";
-    private static final int LENGTH_OF_CLOSING_BRACE_AND_QUOTE = CLOSING_BRACE_AND_QUOTE.length();
-    private static String regex;
-    private String replacement;
+    private final String regex;
+    private final String replacement;
 
     /**
      * Constructs a new regular expression-based formatter with the given RegEx.
@@ -35,11 +39,16 @@ public class RegexFormatter extends Formatter {
      * @param input the regular expressions for matching and replacing given in the form {@code (<regex>, <replace>)}.
      */
     public RegexFormatter(String input) {
-        // formatting is like ("exp1","exp2"), we want to first remove (" and ")
-        String rexToSet = input.substring(LENGTH_OF_QUOTE_AND_OPENING_BRACE, input.length() - LENGTH_OF_CLOSING_BRACE_AND_QUOTE);
-        String[] parts = rexToSet.split("\",\"");
-        regex = parts[0];
-        replacement = parts[1];
+        Objects.requireNonNull(input);
+        input = input.trim();
+        Matcher constructorArgument = CONSTRUCTOR_ARGUMENT.matcher(input);
+        if (constructorArgument.matches()) {
+            regex = constructorArgument.group(REGEX_CAPTURING_GROUP);
+            replacement = constructorArgument.group(REPLACEMENT_CAPTURING_GROUP);
+        } else {
+            regex = null;
+            replacement = null;
+        }
     }
 
     @Override
@@ -71,7 +80,7 @@ public class RegexFormatter extends Formatter {
     @Override
     public String format(final String input) {
         Objects.requireNonNull(input);
-        if (regex == null) {
+        if (regex == null || replacement == null) {
             return input;
         }
 
