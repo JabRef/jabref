@@ -26,7 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We completed the rebranding of `bibtexkey` as `citationkey` which was started in JabRef 5.1.
 - JabRef no longer opens the entry editor with the first entry on startup [#6855](https://github.com/JabRef/jabref/issues/6855)
 - Fetch by ID: (long) "SAO/NASA Astrophysics Data System" replaced by (short) "SAO/NASA ADS" [#6876](https://github.com/JabRef/jabref/pull/6876)
-- Window "Manage field names and content": same title as the menu (+ localization)
+- Window "Manage field names and content": same title as the menu (+ localization) [#6895](https://github.com/JabRef/jabref/pull/6895)
 
 ### Fixed
 
