@@ -5,13 +5,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-public class RegexFormatter extends Formatter {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class RegexFormatter extends Formatter {
     public static final String KEY = "regex";
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegexFormatter.class);
     private static final Pattern PATTERN_ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
     private static final Pattern PATTERN_ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
     // RegEx to match {...}
@@ -49,6 +53,7 @@ public class RegexFormatter extends Formatter {
         } else {
             regex = null;
             replacement = null;
+            LOGGER.warn("RegexFormatter could not parse the input: " + input);
         }
     }
 
@@ -70,7 +75,13 @@ public class RegexFormatter extends Formatter {
             replaced.add(matcher.group(1));
         }
         String workingString = matcher.replaceAll(PLACEHOLDER_FOR_PROTECTED_GROUP);
-        workingString = workingString.replaceAll(regex, replacement);
+        try {
+            workingString = workingString.replaceAll(regex, replacement);
+        } catch (PatternSyntaxException e) {
+            LOGGER.warn("There is a syntax error in the regular expression, " +
+                    regex + ", used by the regex modifier", e);
+            return input;
+        }
 
         for (String r : replaced) {
             workingString = workingString.replaceFirst(PLACEHOLDER_FOR_PROTECTED_GROUP, r);
