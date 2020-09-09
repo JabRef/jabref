@@ -36,7 +36,8 @@ public class RegexFormatter extends Formatter {
     /**
      * Constructs a new regular expression-based formatter with the given RegEx.
      *
-     * @param input the regular expressions for matching and replacing given in the form {@code (<regex>, <replace>)}.
+     * @param input the regular expressions for matching and replacing given in the form {@code ("<regex>",
+     *              "<replace>")}.
      */
     public RegexFormatter(String input) {
         Objects.requireNonNull(input);
