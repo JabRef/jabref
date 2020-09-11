@@ -18,12 +18,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
@@ -51,6 +54,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     /**
      * Gets a StackPane of related article information to be displayed in the Related Articles tab
+     *
      * @param entry The currently selected BibEntry on the JabRef UI.
      * @return A StackPane with related article information to be displayed in the Related Articles tab.
      */
@@ -61,20 +65,22 @@ public class RelatedArticlesTab extends EntryEditorTab {
         progress.setMaxSize(100, 100);
 
         MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
-                                                  Globals.BUILD_INFO.getVersion());
+                Globals.BUILD_INFO.version);
         BackgroundTask
-                      .wrap(() -> fetcher.performSearch(entry))
-                      .onRunning(() -> progress.setVisible(true))
-                      .onSuccess(relatedArticles -> {
-                          progress.setVisible(false);
-                          root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
-                      })
-                      .onFailure(exception -> {
-                          LOGGER.error("Error while fetching from Mr. DLib", exception);
-                          progress.setVisible(false);
-                          root.getChildren().add(getErrorInfo());
-                      })
-                      .executeWith(Globals.TASK_EXECUTOR);
+                .wrap(() -> fetcher.performSearch(entry))
+                .onRunning(() -> progress.setVisible(true))
+                .onSuccess(relatedArticles -> {
+                    ImportCleanup cleanup = new ImportCleanup(BibDatabaseModeDetection.inferMode(new BibDatabase(List.of(entry))));
+                    cleanup.doPostCleanup(relatedArticles);
+                    progress.setVisible(false);
+                    root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
+                })
+                .onFailure(exception -> {
+                    LOGGER.error("Error while fetching from Mr. DLib", exception);
+                    progress.setVisible(false);
+                    root.getChildren().add(getErrorInfo());
+                })
+                .executeWith(Globals.TASK_EXECUTOR);
 
         root.getChildren().add(progress);
 
@@ -83,6 +89,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     /**
      * Creates a VBox of the related article information to be used in the StackPane displayed in the Related Articles tab
+     *
      * @param list List of BibEntries of related articles
      * @return VBox of related article descriptions to be displayed in the Related Articles tab
      */
@@ -136,6 +143,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     /**
      * Gets a ScrollPane to display error info when recommendations fail.
+     *
      * @return ScrollPane to display in place of recommendations
      */
     private ScrollPane getErrorInfo() {
@@ -154,6 +162,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     /**
      * Returns a consent dialog used to ask permission to send data to Mr. DLib.
+     *
      * @param entry Currently selected BibEntry. (required to allow reloading of pane if accepted)
      * @return StackPane returned to be placed into Related Articles tab.
      */
@@ -170,7 +179,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
 
-        DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(),88d);
+        DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
         Text line1 = new Text(Localization.lang("JabRef requests recommendations from Mr. DLib, which is an external service. To enable Mr. DLib to calculate recommendations, some of your data must be shared with Mr. DLib. Generally, the more data is shared the better recommendations can be calculated. However, we understand that some of your data in JabRef is sensitive, and you may not want to share it. Therefore, Mr. DLib offers a choice of which data you would like to share."));
         line1.wrappingWidthProperty().bind(rootWidth);

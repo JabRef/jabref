@@ -25,10 +25,10 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.Globals;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -54,7 +54,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
-    public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider,
+    public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              JabRefPreferences preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
@@ -66,13 +66,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                   .load();
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                   .withStringTooltip(LinkedFileViewModel::getDescription)
-                   .withGraphic(LinkedFilesEditor::createFileDisplay)
-                   .withContextMenu(this::createContextMenuForFile)
-                   .withOnMouseClickedEvent(this::handleItemMouseClick)
-                   .setOnDragDetected(this::handleOnDragDetected)
-                   .setOnDragDropped(this::handleOnDragDropped)
-                   .setOnDragOver(this::handleOnDragOver);
+                .withStringTooltip(LinkedFileViewModel::getDescription)
+                .withGraphic(LinkedFilesEditor::createFileDisplay)
+                .withContextMenu(this::createContextMenuForFile)
+                .withOnMouseClickedEvent(this::handleItemMouseClick)
+                .setOnDragDetected(this::handleOnDragDetected)
+                .setOnDragDropped(this::handleOnDragDropped)
+                .setOnDragOver(this::handleOnDragOver)
+                .withValidation(LinkedFileViewModel::fileExistsValidationStatus);
 
         listView.setCellFactory(cellFactory);
 
@@ -92,7 +93,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         if (selectedItem != null) {
             ClipboardContent content = new ClipboardContent();
             Dragboard dragboard = listView.startDragAndDrop(TransferMode.MOVE);
-            //We have to use the model class here, as the content of the dragboard must be serializable
+            // We have to use the model class here, as the content of the dragboard must be serializable
             content.put(DragAndDropDataFormats.LINKED_FILE, selectedItem);
             dragboard.setContent(content);
         }
@@ -125,7 +126,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         event.setDropCompleted(success);
         event.consume();
-
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {

@@ -22,9 +22,9 @@ import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +57,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
-                .map(LogEventViewModel::getDetailedText)
-                .collect(Collectors.joining(OS.NEWLINE));
+                       .map(LogEventViewModel::getDetailedText)
+                       .collect(Collectors.joining(OS.NEWLINE));
     }
 
     /**
@@ -92,7 +92,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     public void reportIssue() {
         try {
             // System info
-            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.getVersion(), BuildInfo.OS,
+            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             // Steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";

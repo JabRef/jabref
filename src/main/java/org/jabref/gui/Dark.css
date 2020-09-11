@@ -46,17 +46,20 @@
     -jr-menu-item-foreground: -fx-light-text-color;
     -jr-menu-forground-active: derive(-fx-light-text-color, 50%);
 
-    -jr-scrollbar-thumb: derive(-fx-outer-border, -30%);
+    -jr-scrollbar-thumb: -fx-light-text-color;
     -jr-scrollbar-track: derive(-fx-control-inner-background, -90%);
 
     -fx-focused-text-base-color: -fx-dark-text-color;
 
     -jr-tooltip-fg: derive(-fx-light-text-color, 50%);
+
+    -jr-drag-target: -jr-accent;
+    -jr-drag-target-hover: -jr-accent;
 }
 
-#previewBody{
+#previewBody {
     background-color: #272b38; /* -fx-control-inner-background*/
-    color : #7d8591; /* -fx-mid-text-color*/
+    color: #7d8591; /* -fx-mid-text-color*/
 }
 
 .table-view .groupColumnBackground {

@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.listener.OracleNotificationListener;
-import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -29,7 +28,6 @@ public class OracleProcessor extends DBMSProcessor {
 
     private DatabaseChangeRegistration databaseChangeRegistration;
 
-
     public OracleProcessor(DatabaseConnection connection) {
         super(connection);
     }
@@ -43,10 +41,10 @@ public class OracleProcessor extends DBMSProcessor {
     public void setUp() throws SQLException {
         connection.createStatement().executeUpdate(
                 "CREATE TABLE \"ENTRY\" (" +
-                "\"SHARED_ID\" NUMBER NOT NULL, " +
-                "\"TYPE\" VARCHAR2(255) NULL, " +
-                "\"VERSION\" NUMBER DEFAULT 1, " +
-                "CONSTRAINT \"ENTRY_PK\" PRIMARY KEY (\"SHARED_ID\"))");
+                        "\"SHARED_ID\" NUMBER NOT NULL, " +
+                        "\"TYPE\" VARCHAR2(255) NULL, " +
+                        "\"VERSION\" NUMBER DEFAULT 1, " +
+                        "CONSTRAINT \"ENTRY_PK\" PRIMARY KEY (\"SHARED_ID\"))");
 
         connection.createStatement().executeUpdate("CREATE SEQUENCE \"ENTRY_SEQ\"");
 
@@ -55,16 +53,16 @@ public class OracleProcessor extends DBMSProcessor {
 
         connection.createStatement().executeUpdate(
                 "CREATE TABLE \"FIELD\" (" +
-                "\"ENTRY_SHARED_ID\" NUMBER NOT NULL, " +
-                "\"NAME\" VARCHAR2(255) NOT NULL, " +
-                "\"VALUE\" CLOB NULL, " +
-                "CONSTRAINT \"ENTRY_SHARED_ID_FK\" FOREIGN KEY (\"ENTRY_SHARED_ID\") " +
-                "REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE)");
+                        "\"ENTRY_SHARED_ID\" NUMBER NOT NULL, " +
+                        "\"NAME\" VARCHAR2(255) NOT NULL, " +
+                        "\"VALUE\" CLOB NULL, " +
+                        "CONSTRAINT \"ENTRY_SHARED_ID_FK\" FOREIGN KEY (\"ENTRY_SHARED_ID\") " +
+                        "REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE)");
 
         connection.createStatement().executeUpdate(
                 "CREATE TABLE \"METADATA\" (" +
-                "\"KEY\"  VARCHAR2(255) NULL," +
-                "\"VALUE\"  CLOB NOT NULL)");
+                        "\"KEY\"  VARCHAR2(255) NULL," +
+                        "\"VALUE\"  CLOB NOT NULL)");
     }
 
     @Override
@@ -97,11 +95,9 @@ public class OracleProcessor extends DBMSProcessor {
                 // this execution registers all tables mentioned in selectQuery
                 statement.executeQuery(selectQuery.toString());
             }
-
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
-
     }
 
     @Override
@@ -116,7 +112,7 @@ public class OracleProcessor extends DBMSProcessor {
                                 ") VALUES(?)";
 
                 try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery,
-                        new String[]{"SHARED_ID"})) {
+                        new String[] {"SHARED_ID"})) {
 
                     preparedEntryStatement.setString(1, entry.getType().getName());
                     preparedEntryStatement.executeUpdate();
@@ -139,7 +135,7 @@ public class OracleProcessor extends DBMSProcessor {
             // Inserting into FIELD table
             // Coerce to ArrayList in order to use List.get()
             List<List<Field>> fields = bibEntries.stream().map(entry -> new ArrayList<>(entry.getFields()))
-                    .collect(Collectors.toList());
+                                                 .collect(Collectors.toList());
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT ALL");
             int numFields = 0;
@@ -169,7 +165,8 @@ public class OracleProcessor extends DBMSProcessor {
                         fieldsCompleted += 1;
                     }
                 }
-                preparedFieldStatement.executeUpdate();            }
+                preparedFieldStatement.executeUpdate();
+            }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }

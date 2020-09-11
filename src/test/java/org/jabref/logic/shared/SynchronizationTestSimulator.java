@@ -3,7 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,7 +31,7 @@ public class SynchronizationTestSimulator {
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
     private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
-    private final GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+    private final GlobalCitationKeyPattern pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
 
     private BibEntry getBibEntryExample(int index) {
         return new BibEntry(StandardEntryType.InProceedings)
@@ -69,11 +69,11 @@ public class SynchronizationTestSimulator {
 
     @Test
     public void simulateEntryInsertionAndManualPull() throws Exception {
-        //client A inserts an entry
+        // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
-        //client A inserts another entry
+        // client A inserts another entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(2));
-        //client B pulls the changes
+        // client B pulls the changes
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
@@ -97,18 +97,18 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateEntryDelitionAndManualPull() throws Exception {
         BibEntry bibEntry = getBibEntryExample(1);
-        //client A inserts an entry
+        // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
-        //client B pulls the entry
+        // client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
-        //client A removes the entry
+        // client A removes the entry
         clientContextA.getDatabase().removeEntry(bibEntry);
-        //client B pulls the change
+        // client B pulls the change
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
@@ -118,21 +118,21 @@ public class SynchronizationTestSimulator {
     @Test
     public void simulateUpdateOnNoLongerExistingEntry() throws Exception {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
-        //client A inserts an entry
+        // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);
-        //client B pulls the entry
+        // client B pulls the entry
         clientContextB.getDBMSSynchronizer().pullChanges();
 
         assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
-        //client A removes the entry
+        // client A removes the entry
         clientContextA.getDatabase().removeEntry(bibEntryOfClientA);
 
         assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         assertNull(eventListenerB.getSharedEntriesNotPresentEvent());
-        //client B tries to update the entry
+        // client B tries to update the entry
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField(StandardField.YEAR, "2009");
 

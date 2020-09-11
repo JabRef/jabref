@@ -14,9 +14,19 @@ public class SpecialFieldsPreferences {
         this.serializeSpecialFields = serializeSpecialFields;
     }
 
-    public boolean getSpecialFieldsEnabled() { return specialFieldsEnabled; }
+    public boolean isSpecialFieldsEnabled() {
+        return specialFieldsEnabled;
+    }
 
-    public boolean getAutoSyncSpecialFieldsToKeyWords() { return autoSyncSpecialFieldsToKeyWords; }
+    public boolean shouldAutoSyncSpecialFieldsToKeyWords() {
+        return autoSyncSpecialFieldsToKeyWords;
+    }
 
-    public boolean getSerializeSpecialFields() { return serializeSpecialFields; }
+    public boolean shouldSerializeSpecialFields() {
+        return serializeSpecialFields;
+    }
+
+    public boolean isKeywordSyncEnabled() {
+        return specialFieldsEnabled && autoSyncSpecialFieldsToKeyWords;
+    }
 }

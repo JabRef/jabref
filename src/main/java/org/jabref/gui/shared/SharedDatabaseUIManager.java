@@ -9,9 +9,9 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
@@ -22,6 +22,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnection;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSSynchronizer;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
+import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
@@ -29,8 +31,6 @@ import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesExceptio
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
-import org.jabref.model.database.shared.DatabaseSynchronizer;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
@@ -54,17 +54,16 @@ public class SharedDatabaseUIManager {
         ButtonType closeLibrary = new ButtonType(Localization.lang("Close library"), ButtonData.CANCEL_CLOSE);
 
         Optional<ButtonType> answer = dialogService.showCustomButtonDialogAndWait(AlertType.WARNING,
-                                                                                  Localization.lang("Connection lost"),
-                                                                                  Localization.lang("The connection to the server has been terminated."),
-                                                                                  reconnect,
-                                                                                  workOffline,
-                                                                                  closeLibrary);
+                Localization.lang("Connection lost"),
+                Localization.lang("The connection to the server has been terminated."),
+                reconnect,
+                workOffline,
+                closeLibrary);
 
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
                 jabRefFrame.closeCurrentTab();
                 new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
-
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
                 jabRefFrame.refreshTitleAndTabs();
@@ -111,9 +110,7 @@ public class SharedDatabaseUIManager {
                 dbmsSynchronizer.synchronizeSharedEntry(mergedBibEntry);
                 dbmsSynchronizer.synchronizeLocalDatabase();
             });
-
         }
-
     }
 
     @Subscribe
@@ -126,9 +123,9 @@ public class SharedDatabaseUIManager {
         if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
 
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
-                                                       Localization.lang("The entry you currently work on has been deleted on the shared side.")
-                                                                                                               + "\n"
-                                                                                                               + Localization.lang("You can restore the entry using the \"Undo\" operation."));
+                    Localization.lang("The entry you currently work on has been deleted on the shared side.")
+                            + "\n"
+                            + Localization.lang("You can restore the entry using the \"Undo\" operation."));
             panel.closeBottomPane();
         }
     }
@@ -140,11 +137,11 @@ public class SharedDatabaseUIManager {
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
     public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
-        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
@@ -155,12 +152,12 @@ public class SharedDatabaseUIManager {
     }
 
     public void openSharedDatabaseFromParserResult(ParserResult parserResult)
-        throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
-        NotASharedDatabaseException {
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
+            NotASharedDatabaseException {
 
         Optional<String> sharedDatabaseIDOptional = parserResult.getDatabase().getSharedDatabaseID();
 
-        if (!sharedDatabaseIDOptional.isPresent()) {
+        if (sharedDatabaseIDOptional.isEmpty()) {
             throw new NotASharedDatabaseException();
         }
 
@@ -169,11 +166,11 @@ public class SharedDatabaseUIManager {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
         bibDatabaseContext.setMode(Globals.prefs.getDefaultBibDatabaseMode());
-        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern(), Globals.getFileUpdateMonitor());
+        DBMSSynchronizer synchronizer = new DBMSSynchronizer(bibDatabaseContext, Globals.prefs.getKeywordDelimiter(), Globals.prefs.getGlobalCitationKeyPattern(), Globals.getFileUpdateMonitor());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
 
         bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
-        bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
+        bibDatabaseContext.setDatabasePath(parserResult.getDatabaseContext().getDatabasePath().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(new DBMSConnection(dbmsConnectionProperties));

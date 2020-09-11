@@ -1,7 +1,6 @@
 package org.jabref.logic.pdf;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +8,8 @@ import java.util.Map;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,19 +27,19 @@ public class EntryAnnotationImporterTest {
     @BeforeEach
     public void setUp() {
         entry = new BibEntry();
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs/")));
+        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
     }
 
     @Test
     public void readEntryExampleThesis() {
-        //given
+        // given
         entry.setField(StandardField.FILE, ":thesis-example.pdf:PDF");
         EntryAnnotationImporter entryAnnotationImporter = new EntryAnnotationImporter(entry);
 
-        //when
+        // when
         Map<Path, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext, mock(FilePreferences.class));
 
-        //then
+        // then
         int fileCounter = 0;
         int annotationCounter = 0;
         for (List<FileAnnotation> annotationsOfFile : annotations.values()) {

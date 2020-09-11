@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.database.event.CoarseChangeFilter;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -71,10 +71,10 @@ public class AutosaveManager {
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                .ifPresent(instance -> {
-                    instance.shutdown();
-                    runningInstances.remove(instance);
-                });
+                        .ifPresent(instance -> {
+                            instance.shutdown();
+                            runningInstances.remove(instance);
+                        });
     }
 
     public void registerListener(Object listener) {

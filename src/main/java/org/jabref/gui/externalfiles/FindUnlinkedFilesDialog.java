@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,8 +35,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
@@ -58,9 +57,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI Dialog for the feature "Find unlinked files".
+ * GUI Dialog for the feature "Search for unlinked local files".
  */
-public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
+public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private final BibDatabaseContext databaseContext;
@@ -78,7 +77,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
 
     public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, CountingUndoManager undoManager) {
         super();
-        this.setTitle(Localization.lang("Find unlinked files"));
+        this.setTitle(Localization.lang("Search for unlinked local files"));
         this.dialogService = dialogService;
 
         databaseContext = database;
@@ -86,9 +85,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                 dialogService,
                 databaseContext,
                 ExternalFileTypes.getInstance(),
-                Globals.prefs.getFilePreferences(),
-                Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getUpdateFieldPreferences(),
+                preferences,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
                 Globals.stateManager);
@@ -198,7 +195,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
                     findUnlinkedFilesTask.cancel();
                 }
             }
-            return null;
+            return false;
         });
 
         new ViewModelTreeCellFactory<FileNodeWrapper>()
@@ -306,9 +303,9 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
     }
 
     private Path getSearchDirectory() {
-        Path directory = Paths.get(textfieldDirectoryPath.getText());
+        Path directory = Path.of(textfieldDirectoryPath.getText());
         if (Files.notExists(directory)) {
-            directory = Paths.get(System.getProperty("user.dir"));
+            directory = Path.of(System.getProperty("user.dir"));
             textfieldDirectoryPath.setText(directory.toAbsolutePath().toString());
         }
         if (!Files.isDirectory(directory)) {
@@ -379,11 +376,15 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Void> {
         List<Path> filesList = new ArrayList<>();
         for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
             CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
-            if (child.isLeaf() && child.isSelected()) {
-                Path nodeFile = child.getValue().path;
-                if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
-                    filesList.add(nodeFile);
+            if (child.isLeaf()) {
+                if (child.isSelected()) {
+                    Path nodeFile = child.getValue().path;
+                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
+                        filesList.add(nodeFile);
+                    }
                 }
+            } else {
+                filesList.addAll(getFileListFromNode(child));
             }
         }
         return filesList;

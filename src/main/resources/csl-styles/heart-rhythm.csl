@@ -259,7 +259,7 @@
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="13" et-al-use-first="3" second-field-align="flush">
+  <bibliography et-al-min="7" et-al-use-first="3" second-field-align="flush">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=": " suffix=". ">

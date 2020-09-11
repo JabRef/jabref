@@ -14,6 +14,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -38,7 +39,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
     private static final String API_URL = "http://api.springernature.com/meta/v1/json";
-    private static final String API_KEY = "a98b4a55181ffcd27259bea45edad12e";
+    private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
@@ -159,8 +160,24 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
         uriBuilder.addParameter("q", query); // Search query
         uriBuilder.addParameter("api_key", API_KEY); // API key
         uriBuilder.addParameter("p", "20"); // Number of results to return
-        //uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
+        // uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(constructComplexQueryString(complexSearchQuery));
+    }
+
+    private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("name:" + author));
+        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("title:" + title));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
+        // Since Springer API does not support year range search, we ignore formYear and toYear and use "singleYear" only
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("year:" + year.toString()));
+        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
+        return String.join(" AND ", searchTerms);
     }
 
     @Override

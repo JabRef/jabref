@@ -20,7 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ManageKeywordsDialog extends BaseDialog<Void> {
     private final List<BibEntry> entries;

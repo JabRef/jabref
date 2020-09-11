@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.database.shared.DBMSType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -190,7 +189,7 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(bibEntry);
 
-        //simulate older version
+        // simulate older version
         bibEntry.getSharedBibEntryData().setVersion(0);
         bibEntry.setField(StandardField.YEAR, "1993");
 
@@ -202,7 +201,7 @@ class DBMSProcessorTest {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
-        //simulate older version
+        // simulate older version
         expectedBibEntry.getSharedBibEntryData().setVersion(0);
         dbmsProcessor.updateEntry(expectedBibEntry);
 

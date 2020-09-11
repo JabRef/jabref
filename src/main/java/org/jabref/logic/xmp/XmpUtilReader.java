@@ -1,10 +1,8 @@
 package org.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,13 +24,12 @@ public class XmpUtilReader {
     private static final String END_TAG = "</rdf:Description>";
 
     private XmpUtilReader() {
-        //See: https://pdfbox.apache.org/2.0/getting-started.html
-        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); //To get higher rendering speed on java 8 oder 9 for images
+        // See: https://pdfbox.apache.org/2.0/getting-started.html
+        System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider"); // To get higher rendering speed on java 8 oder 9 for images
     }
 
     /**
-     * Will read the XMPMetadata from the given pdf file, closing the file
-     * afterwards.
+     * Will read the XMPMetadata from the given pdf file, closing the file afterwards.
      *
      * @param path The path to read the XMPMetadata from.
      * @return The XMPMetadata object found in the file
@@ -50,7 +47,7 @@ public class XmpUtilReader {
      * @return BibtexEntryies found in the PDF or an empty list
      */
     public static List<BibEntry> readXmp(String filename, XmpPreferences xmpPreferences) throws IOException {
-        return XmpUtilReader.readXmp(Paths.get(filename), xmpPreferences);
+        return XmpUtilReader.readXmp(Path.of(filename), xmpPreferences);
     }
 
     /**
@@ -107,7 +104,7 @@ public class XmpUtilReader {
      * <p/>
      *
      *
-     * @return empty Optional if no metadata has been found
+     * @return empty List if no metadata has been found, or cannot properly find start or end tag in metadata
      */
     private static List<XMPMetadata> getXmpMetadata(PDDocument document) throws IOException {
         PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -122,6 +119,10 @@ public class XmpUtilReader {
 
         int startDescriptionSection = xmp.indexOf(START_TAG);
         int endDescriptionSection = xmp.lastIndexOf(END_TAG) + END_TAG.length();
+
+        if (startDescriptionSection < 0 || startDescriptionSection > endDescriptionSection || endDescriptionSection == END_TAG.length() - 1) {
+            return metaList;
+        }
 
         // XML header for the xmpDomParser
         String start = xmp.substring(0, startDescriptionSection);
@@ -142,8 +143,7 @@ public class XmpUtilReader {
      * Loads the specified file with the basic pdfbox functionality and uses an empty string as default password.
      *
      * @param path The path to load.
-     * @return
-     * @throws IOException from the underlying {@link PDDocument#load(File)}
+     * @throws IOException from the underlying @link PDDocument#load(File)
      */
     public static PDDocument loadWithAutomaticDecryption(Path path) throws IOException {
         // try to load the document

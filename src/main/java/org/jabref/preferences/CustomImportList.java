@@ -3,7 +3,7 @@ package org.jabref.preferences;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 
@@ -21,7 +21,6 @@ public class CustomImportList extends TreeSet<CustomImporter> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomImportList.class);
 
     private final JabRefPreferences prefs;
-
 
     public CustomImportList(JabRefPreferences prefs) {
         super();
@@ -59,7 +58,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
      * one is replaced.</p>
      *
      * @param customImporter new (version of an) importer
-     * @return  if the importer was contained
+     * @return if the importer was contained
      */
     public boolean replaceImporter(CustomImporter customImporter) {
         boolean wasContained = this.remove(customImporter);

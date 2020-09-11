@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/groupe-danthropologie-et-darcheologie-funeraire</id>
     <link href="http://www.zotero.org/styles/groupe-danthropologie-et-darcheologie-funeraire" rel="self"/>
     <link href="http://www.zotero.org/styles/documents-d-archeologie-francaise" rel="template"/>
-    <link href="https://www.gaaf-asso.fr/wp-content/uploads/Collection-Publication-du-Gaaf_Recommandations_auteurs_DEF-site-Gaaf.pdf" rel="documentation"/>
+    <link href="https://www.gaaf-asso.fr/wp-content/uploads/Collection-Publication-du-Gaaf_Recommandations_auteurs_DEF-V3.pdf" rel="documentation"/>
     <author>
       <name>Francois Capron</name>
       <email>f.capron37@gmail.com</email>
@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="history"/>
     <category field="anthropology"/>
-    <updated>2020-01-22T01:24:22+00:00</updated>
+    <updated>2020-05-08T05:18:48+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -31,7 +31,7 @@
   </locale>
   <macro name="author">
     <names variable="author">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -71,7 +71,7 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -81,7 +81,7 @@
   <macro name="collection-editor">
     <group>
       <names variable="collection-editor">
-        <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+        <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
           <name-part name="family"/>
           <name-part name="given"/>
         </name>
@@ -91,7 +91,7 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name name-as-sort-order="all" sort-separator=", " delimiter=", " initialize-with=". ">
+      <name name-as-sort-order="all" sort-separator=" " delimiter=", " initialize-with=". ">
         <name-part name="family"/>
         <name-part name="given"/>
       </name>
@@ -273,7 +273,7 @@
   <macro name="issue">
     <text variable="volume" prefix=" "/>
     <group delimiter=", ">
-      <text variable="issue" prefix="-"/>
+      <text variable="issue" prefix=" (" suffix=")"/>
       <group delimiter="&#160;">
         <text variable="page" prefix=", "/>
       </group>
@@ -317,17 +317,18 @@
       </if>
     </choose>
   </macro>
-  <macro name="archive">
+  <macro name="accessed">
     <choose>
-      <if type="map" match="any">
-        <text variable="archive"/>
+      <if variable="URL">
+        <group>
+          <text term="accessed"/>
+          <date variable="accessed">
+            <date-part name="day" prefix="&#160;"/>
+            <date-part name="month" prefix="&#160;"/>
+            <date-part name="year" prefix="&#160;"/>
+          </date>
+        </group>
       </if>
-      <else-if type="report">
-        <text variable="archive" prefix=" (" suffix=")"/>
-      </else-if>
-      <else>
-        <text variable="archive"/>
-      </else>
     </choose>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" year-suffix-delimiter=", " after-collapse-delimiter="&#160;; " name-delimiter=", " initialize-with=". " delimiter-precedes-last="never" name-as-sort-order="all" sort-separator=" ">
@@ -371,7 +372,7 @@
                   <text macro="collection"/>
                 </if>
               </choose>
-              <text macro="archive"/>
+              <text variable="archive"/>
               <text macro="URLaccess"/>
               <text macro="publi_place"/>
               <text macro="edition"/>
@@ -383,8 +384,9 @@
             <group delimiter=", ">
               <text macro="title"/>
               <text macro="URLaccess"/>
+              <text macro="accessed"/>
               <text macro="edition"/>
-              <text macro="archive"/>
+              <text variable="archive"/>
             </group>
           </else-if>
           <else-if type="paper-conference chapter entry entry-dictionary entry-encyclopedia" match="any">
@@ -395,7 +397,7 @@
               <text variable="note"/>
               <text macro="publi_place"/>
               <text macro="page"/>
-              <text macro="archive"/>
+              <text variable="archive"/>
               <text macro="URLaccess"/>
             </group>
           </else-if>
@@ -411,7 +413,7 @@
                 <text variable="note"/>
               </group>
               <text macro="URLaccess"/>
-              <text macro="archive"/>
+              <text variable="archive"/>
             </group>
           </else-if>
           <else-if type="post-weblog post webpage" match="any">
@@ -432,8 +434,8 @@
               <text macro="genre"/>
               <text macro="edition" suffix=". "/>
               <group delimiter=", ">
-                <text macro="publi_place"/>
-                <text macro="archive"/>
+                <text macro="publisher"/>
+                <text variable="archive"/>
                 <text variable="note"/>
               </group>
               <text macro="URLaccess"/>
@@ -450,7 +452,7 @@
               <text macro="collection"/>
               <text macro="page"/>
               <text macro="URLaccess"/>
-              <text macro="archive" prefix="(" suffix=")"/>
+              <text variable="archive"/>
             </group>
           </else>
         </choose>

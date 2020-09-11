@@ -14,12 +14,12 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 
-import org.jabref.Globals;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
-import org.jabref.logic.bibtex.DuplicateCheck;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -27,6 +27,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,14 +48,17 @@ public class EntryTypeViewModel {
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
     private final BasePanel basePanel;
     private final DialogService dialogService;
+    private final Validator idFieldValidator;
+    private final StateManager stateManager;
 
-    public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService) {
+    public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService, StateManager stateManager) {
         this.basePanel = basePanel;
         this.prefs = preferences;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
         selectedItemProperty.setValue(getLastSelectedFetcher());
-
+        idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
 
     public BooleanProperty searchSuccesfulProperty() {
@@ -64,6 +71,10 @@ public class EntryTypeViewModel {
 
     public ObjectProperty<IdBasedFetcher> selectedItemProperty() {
         return selectedItemProperty;
+    }
+
+    public ValidationStatus idFieldValidationStatus() {
+        return idFieldValidator.getValidationStatus();
     }
 
     public StringProperty idTextProperty() {
@@ -94,7 +105,6 @@ public class EntryTypeViewModel {
     }
 
     private class FetcherWorker extends Task<Optional<BibEntry>> {
-
         private IdBasedFetcher fetcher = null;
         private String searchID = "";
 
@@ -111,7 +121,6 @@ public class EntryTypeViewModel {
             }
             return bibEntry;
         }
-
     }
 
     public void runFetcherWorker() {
@@ -132,16 +141,17 @@ public class EntryTypeViewModel {
             searchingProperty.set(false);
 
             fetcherWorker = new FetcherWorker();
-
         });
 
         fetcherWorker.setOnSucceeded(evt -> {
             Optional<BibEntry> result = fetcherWorker.getValue();
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
+                ImportCleanup cleanup = new ImportCleanup(basePanel.getBibDatabaseContext().getMode());
+                cleanup.doPostCleanup(entry);
                 Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(basePanel.getDatabase(), entry, basePanel.getBibDatabaseContext().getMode());
                 if ((duplicate.isPresent())) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext());
+                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext(), stateManager);
                     switch (dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:
                             basePanel.getDatabase().removeEntry(duplicate.get());
@@ -160,11 +170,10 @@ public class EntryTypeViewModel {
                     }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new BibtexKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getBibtexKeyPatternPreferences()).generateAndSetKey(entry);
+                    new CitationKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
                     basePanel.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);
-
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
             }
@@ -172,7 +181,6 @@ public class EntryTypeViewModel {
 
             focusAndSelectAllProperty.set(true);
             searchingProperty().setValue(false);
-
         });
     }
 }

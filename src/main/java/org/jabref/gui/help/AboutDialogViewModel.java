@@ -24,7 +24,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     private static final String HOMEPAGE_URL = "https://www.jabref.org";
     private static final String DONATION_URL = "https://donations.jabref.org";
-    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
@@ -43,7 +43,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     public AboutDialogViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
-        String[] version = buildInfo.getVersion().getFullVersion().split("--");
+        String[] version = buildInfo.version.getFullVersion().split("--");
         heading.set("JabRef " + version[0]);
 
         if (version.length == 1) {
@@ -54,11 +54,11 @@ public class AboutDialogViewModel extends AbstractViewModel {
                     Collectors.joining("--"));
             developmentVersion.set(dev);
         }
-        developers.set(buildInfo.getDevelopers());
-        authors.set(buildInfo.getAuthors());
+        developers.set(buildInfo.developers);
+        authors.set(buildInfo.authors);
         license.set(Localization.lang("License") + ":");
-        changelogUrl = buildInfo.getVersion().getChangelogUrl();
-        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.getVersion(), BuildInfo.OS,
+        changelogUrl = buildInfo.version.getChangelogUrl();
+        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
                 BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
     }
 
@@ -155,5 +155,4 @@ public class AboutDialogViewModel extends AbstractViewModel {
             logger.error("Could not open default browser.", e);
         }
     }
-
 }

@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -25,7 +25,7 @@ import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -71,7 +71,6 @@ public class DuplicateSearch extends SimpleCommand {
         BackgroundTask.wrap(this::verifyDuplicates)
                       .onSuccess(this::handleDuplicates)
                       .executeWith(Globals.TASK_EXECUTOR);
-
     }
 
     private void searchPossibleDuplicates(List<BibEntry> entries, BibDatabaseMode databaseMode) {
@@ -132,7 +131,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentBasePanel().getBibDatabaseContext());
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentBasePanel().getBibDatabaseContext(), stateManager);
 
         DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
@@ -176,7 +175,6 @@ public class DuplicateSearch extends SimpleCommand {
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
         compoundEdit.end();
         panel.getUndoManager().addEdit(compoundEdit);
-
     }
 
     /**
@@ -184,7 +182,7 @@ public class DuplicateSearch extends SimpleCommand {
      * Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
      * {@link BibEntry BibEntries} are equal to each other.
      */
-    class DuplicateSearchResult {
+    static class DuplicateSearchResult {
 
         private final Map<Integer, BibEntry> toRemove = new HashMap<>();
         private final List<BibEntry> toAdd = new ArrayList<>();

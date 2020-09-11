@@ -47,11 +47,7 @@
   <macro name="access">
     <choose>
       <if type="article-journal" match="any">
-        <choose>
-          <if variable="volume page" match="none">
-            <text variable="DOI" prefix="doi: "/>
-          </if>
-        </choose>
+        <text variable="DOI" prefix="https://doi.org/"/>
       </if>
       <else-if type="webpage post post-weblog" match="any">
         <group delimiter=" ">
@@ -127,19 +123,19 @@
         </else-if>
         <else>
           <text macro="journal-title"/>
-          <group suffix=";">
+          <group delimiter=";">
             <date variable="issued">
               <date-part name="year"/>
             </date>
-          </group>
-          <group suffix=". ">
-            <text variable="volume"/>
-            <text variable="issue" prefix="(" suffix=")"/>
-            <text variable="page" prefix=":"/>
+            <group>
+              <text variable="volume"/>
+              <text variable="issue" prefix="(" suffix=")"/>
+              <text variable="page" prefix=":"/>
+            </group>
           </group>
         </else>
       </choose>
-      <text macro="access"/>
+      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>

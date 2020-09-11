@@ -274,6 +274,20 @@ all the other tests should have been done... -->
       </choose>
     </group>
   </macro>
+  <macro name="render-legislation">
+    <group delimiter=", ">
+      <!-- if no volume, assume bill -->
+      <group delimiter=" ">
+        <text variable="title" font-style="italic"/>
+        <text variable="references" prefix="(" suffix=")"/>
+      </group>
+      <group delimiter=" ">
+        <text variable="container-title"/>
+        <date form="text" variable="issued" date-parts="year"/>
+      </group>
+      <text variable="section"/>
+    </group>
+  </macro>
   <macro name="render-patent">
     <group delimiter=" ">
       <text variable="title" quotes="true" suffix=","/>
@@ -386,6 +400,11 @@ Not implemented: "cited to" for cases construct short casenames adding ref to ar
             </names>
           </substitute>
         </names>
+        <choose>
+          <if type="article-journal">
+            <text variable="title-short" quotes="true" prefix=", "/>
+          </if>
+        </choose>
       </if>
       <else>
         <choose>
@@ -445,9 +464,12 @@ Not implemented: "cited to" for cases construct short casenames adding ref to ar
           <group>
             <group delimiter=", ">
               <choose>
-                <if type="bill legislation" match="any">
-                  <text macro="render-bill"/>
+                <if type="legislation" match="any">
+                  <text macro="render-legislation"/>
                 </if>
+                <else-if type="bill" match="any">
+                  <text macro="render-bill"/>
+                </else-if>
                 <else-if type="song" match="any">
                   <text macro="render-song"/>
                 </else-if>
@@ -507,9 +529,9 @@ Not implemented: "cited to" for cases construct short casenames adding ref to ar
             <choose>
               <if type="legal_case" match="any">
                 <text variable="references" prefix=", "/>
+                <text variable="title-short" prefix=" [" suffix="]" font-style="italic"/>
               </if>
             </choose>
-            <text variable="title-short" prefix=" [" suffix="]" font-style="italic"/>
           </group>
         </else>
       </choose>

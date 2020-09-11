@@ -5,15 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -97,7 +94,7 @@ public class DefaultAuxParser implements AuxParser {
             if (rootPath != null) {
                 inputFile = rootPath.resolve(inputString);
             } else {
-                inputFile = Paths.get(inputString);
+                inputFile = Path.of(inputString);
             }
 
             if (!fileList.contains(inputFile)) {
@@ -179,12 +176,15 @@ public class DefaultAuxParser implements AuxParser {
      * Insert a clone of each given entry. The clones are each given a new unique ID.
      *
      * @param entries Entries to be cloned
-     * @param result AUX file
+     * @param result the parser result (representing the AUX file)
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();
         for (BibEntry entry : entries) {
-            clonedEntries.add((BibEntry) entry.clone());
+            BibEntry bibEntryToAdd = (BibEntry) entry.clone();
+            // ensure proper "rendering" of the BibTeX code
+            bibEntryToAdd.setChanged(true);
+            clonedEntries.add(bibEntryToAdd);
         }
         result.getGeneratedBibDatabase().insertEntries(clonedEntries);
     }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;

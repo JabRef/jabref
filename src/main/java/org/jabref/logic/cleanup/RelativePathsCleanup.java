@@ -1,6 +1,6 @@
 package org.jabref.logic.cleanup;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,11 +9,10 @@ import java.util.Optional;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class RelativePathsCleanup implements CleanupJob {
 
@@ -37,11 +36,10 @@ public class RelativePathsCleanup implements CleanupJob {
             if (fileEntry.isOnlineLink()) {
                 // keep online link untouched
                 newFileName = oldFileName;
-            }
-            else {
+            } else {
                 // only try to transform local file path to relative one
                 newFileName = FileUtil
-                        .relativize(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
+                        .relativize(Path.of(oldFileName), databaseContext.getFileDirectoriesAsPaths(filePreferences))
                         .toString();
             }
             LinkedFile newFileEntry = fileEntry;

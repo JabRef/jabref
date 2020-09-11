@@ -3,8 +3,8 @@ package org.jabref.gui.importer.actions;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.importer.ImportCustomEntryTypesDialog;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseMode;

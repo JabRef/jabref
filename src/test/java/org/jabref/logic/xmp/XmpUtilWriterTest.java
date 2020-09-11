@@ -2,7 +2,6 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -47,10 +45,10 @@ class XmpUtilWriterTest {
         olly2018.setField(StandardField.COMMENT, "COMMENT");
         olly2018.setField(StandardField.DOI, "10/3212.3123");
         olly2018.setField(StandardField.FILE, ":article_dublinCore.pdf:PDF");
-        olly2018.setField(InternalField.GROUPS, "NO");
+        olly2018.setField(StandardField.GROUPS, "NO");
         olly2018.setField(StandardField.HOWPUBLISHED, "online");
         olly2018.setField(StandardField.KEYWORDS, "k1, k2");
-        olly2018.setField(InternalField.OWNER, "me");
+        olly2018.setField(StandardField.OWNER, "me");
         olly2018.setField(StandardField.REVIEW, "review");
         olly2018.setField(StandardField.URL, "https://www.olly2018.edu");
 
@@ -60,7 +58,7 @@ class XmpUtilWriterTest {
         toral2006.setField(StandardField.BOOKTITLE, "Proceedings of EACL");
         toral2006.setField(StandardField.PAGES, "56--61");
         toral2006.setField(StandardField.EPRINTTYPE, "asdf");
-        toral2006.setField(InternalField.OWNER, "Ich");
+        toral2006.setField(StandardField.OWNER, "Ich");
         toral2006.setField(StandardField.URL, "www.url.de");
 
         vapnik2000 = new BibEntry(StandardEntryType.Book);
@@ -69,7 +67,7 @@ class XmpUtilWriterTest {
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
         vapnik2000.setField(StandardField.DOI, "10.1007/978-1-4757-3264-1");
-        vapnik2000.setField(InternalField.OWNER, "Ich");
+        vapnik2000.setField(StandardField.OWNER, "Ich");
     }
 
     /**
@@ -79,7 +77,7 @@ class XmpUtilWriterTest {
     void setUp() {
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
-        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
+        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
@@ -119,9 +117,9 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
 
-        XmpUtilWriter.writeXmp(Paths.get(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
 
-        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(Path.of(pdfFile.toAbsolutePath().toString()), xmpPreferences);
         assertEquals(3, entryList.size());
     }
 

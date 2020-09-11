@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -62,10 +62,10 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             suffix = "))";
 
             com[com.length - 1] = OS.WINDOWS ?
-            // Windows gnuclient/emacsclient escaping:
-            // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
-            // so cmd receives: (insert \"\\cite{Blah2001}\")
-            // so emacs receives: (insert "\cite{Blah2001}")
+                    // Windows gnuclient/emacsclient escaping:
+                    // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
+                    // so cmd receives: (insert \"\\cite{Blah2001}\")
+                    // so emacs receives: (insert "\cite{Blah2001}")
                     prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
                     // Linux gnuclient/emacslient escaping:
                     // java string: "(insert \"\\\\cite{Blah2001}\")"
@@ -108,12 +108,10 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                     Localization.lang("Could not connect to a running gnuserv process. Make sure that "
                             + "Emacs or XEmacs is running, and that the server has been started "
                             + "(by running the command 'server-start'/'gnuserv-start')."));
-
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
                             + "the emacsclient/gnuclient program installed and available in the PATH."));
-
         } else {
             super.operationCompleted();
         }
@@ -128,5 +126,4 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     protected String getCommandName() {
         return "gnuclient " + Localization.lang("or") + " emacsclient";
     }
-
 }

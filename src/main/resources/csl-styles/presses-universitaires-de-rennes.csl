@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
+  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Presses Universitaires de Rennes (French)</title>
     <id>http://www.zotero.org/styles/presses-universitaires-de-rennes</id>
@@ -9,10 +10,14 @@
       <name>Franziska Heimburger</name>
       <email>zotero@franziska.fr</email>
     </author>
+    <contributor>
+      <name>Laura Ramírez Valencia</name>
+      <email>laura.ramirez-valencia@univ-rennes2.fr</email>
+    </contributor>
     <category citation-format="note"/>
     <category field="social_science"/>
     <category field="generic-base"/>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2019-03-21T13:50:23+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -30,14 +35,14 @@
     <choose>
       <if variable="author">
         <names variable="author">
-          <name form="long" and="text" name-as-sort-order="first" sort-separator=" " initialize-with="." font-style="normal">
+          <name font-style="normal" and="text" delimiter-precedes-last="never" initialize="false" initialize-with=". " name-as-sort-order="all" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
         </names>
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="long" and="text" name-as-sort-order="first" sort-separator=" " initialize-with="." font-style="normal">
+          <name font-style="normal" and="text" initialize-with="." name-as-sort-order="all" sort-separator=" ">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <label form="short" prefix="&#160;(" suffix=".)"/>
@@ -46,8 +51,8 @@
     </choose>
   </macro>
   <macro name="editor">
-    <names variable="editor">
-      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " initialize-with="." font-style="normal">
+    <names variable="editor" font-style="normal" prefix="dans ">
+      <name font-style="normal" and="text" delimiter-precedes-last="never" initialize="false" initialize-with=". " sort-separator=" ">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <label form="short" prefix="&#160;(" suffix=".)"/>
@@ -55,8 +60,8 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal" prefix=" traduit par ">
-        <name-part name="family" font-variant="small-caps"/>
+      <name font-style="normal" prefix=" trad. " and="text" delimiter-precedes-last="never" sort-separator=" ">
+        <name-part name="family" text-case="capitalize-all" font-variant="normal"/>
       </name>
     </names>
   </macro>
@@ -96,7 +101,7 @@
       <else-if type="webpage" match="any">
         <group>
           <text variable="title" text-case="capitalize-first" font-style="italic" suffix=", "/>
-          <text variable="URL" text-decoration="underline"/>
+          <text variable="URL" text-decoration="underline" prefix="[" suffix="]"/>
         </group>
       </else-if>
       <else>
@@ -107,7 +112,7 @@
   <macro name="pub-place">
     <choose>
       <if type="bill book chapter entry-dictionary entry-encyclopedia thesis graphic legal_case manuscript motion_picture paper-conference report song" match="any">
-        <text variable="publisher-place"/>
+        <text variable="publisher-place" form="short"/>
       </if>
     </choose>
   </macro>
@@ -221,12 +226,13 @@
         <group font-style="normal">
           <choose>
             <if variable="issued">
-              <date variable="issued">
+              <text macro="volume"/>
+              <text macro="issue" prefix=", "/>
+              <date variable="issued" prefix=", ">
                 <date-part name="day" suffix=" "/>
                 <date-part name="month" suffix=" "/>
                 <date-part name="year"/>
               </date>
-              <text macro="volume" prefix=", "/>
             </if>
             <else>
               <text macro="volume" text-case="capitalize-first"/>
@@ -235,7 +241,6 @@
         </group>
       </else-if>
     </choose>
-    <text macro="issue" prefix=", "/>
   </macro>
   <macro name="volume">
     <choose>
@@ -261,11 +266,10 @@
   </macro>
   <macro name="collection">
     <choose>
-      <if is-numeric="collection-number">
-        <group prefix=" coll.">
+      <if variable="collection-title">
+        <group prefix=" coll. ">
           <text variable="collection-title" quotes="true"/>
         </group>
-        <text variable="collection-number" prefix=", n˚&#160;"/>
       </if>
       <else>
         <group prefix=" coll.">

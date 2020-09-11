@@ -42,6 +42,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,16 +50,18 @@ import org.slf4j.LoggerFactory;
  * URL download to a string.
  * <p>
  * Example:
+ * <code>
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.asString(ENCODING);
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
+ * </code>
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  */
 public class URLDownload {
 
-    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
     private final URL source;
@@ -86,10 +89,10 @@ public class URLDownload {
      * thrown: sun.security.validator.ValidatorException: PKIX path building failed:
      * sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested
      * target JM > 8u101 may trust the certificate by default according to http://stackoverflow.com/a/34111150/873661
-     *
+     * <p>
      * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
      * security-relevant information this is kind of OK (no, actually it is not...).
-     *
+     * <p>
      * Taken from http://stackoverflow.com/a/6055903/873661 and https://stackoverflow.com/a/19542614/873661
      */
     public static void bypassSSLVerification() {
@@ -169,6 +172,19 @@ public class URLDownload {
         return "";
     }
 
+    /**
+     * Check the connection by using the HEAD request.
+     * UnirestException can be thrown for invalid request.
+     *
+     * @return the status code of the response
+     */
+    public boolean canBeReached() throws UnirestException {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        return statusCode >= 200 && statusCode < 300;
+    }
+
     public boolean isMimeType(String type) {
         String mime = getMimeType();
 
@@ -208,8 +224,7 @@ public class URLDownload {
     }
 
     /**
-     * Downloads the web resource to a String.
-     * Uses UTF-8 as encoding.
+     * Downloads the web resource to a String. Uses UTF-8 as encoding.
      *
      * @return the downloaded string
      */
@@ -253,8 +268,7 @@ public class URLDownload {
     public ProgressInputStream asInputStream() throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) this.openConnection();
 
-        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST))
-        {
+        if ((urlConnection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) || (urlConnection.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST)) {
             LOGGER.error("Response message {} returned for url {}", urlConnection.getResponseMessage(), urlConnection.getURL());
             return new ProgressInputStream(new ByteArrayInputStream(new byte[0]), 0);
         }
@@ -289,8 +303,7 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+        Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
 
             String line;
@@ -311,7 +324,6 @@ public class URLDownload {
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
                 wr.writeBytes(this.postData);
             }
-
         }
 
         if (connection instanceof HttpURLConnection) {
@@ -319,8 +331,8 @@ public class URLDownload {
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
                 if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("location");
                     // open the new connnection again
@@ -334,5 +346,4 @@ public class URLDownload {
 
         return connection;
     }
-
 }

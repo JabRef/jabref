@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - master-release
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
@@ -14,155 +15,160 @@ on:
       - 'src/test/**'
       - 'README.md'
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+  OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
+
 jobs:
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
-         - os: ubuntu-latest
-           displayName: linux
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_linux-x64_bin.tar.gz
-           jdk14Path: /jdk-14
-           archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
-         - os: windows-latest
-           displayName: windows
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_windows-x64_bin.zip
-           jdk14Path: /jdk-14
-           archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
-         - os: macOS-latest
-           displayName: macOS
-           jpackageDownload: https://download.java.net/java/early_access/jdk14/34/GPL/openjdk-14-ea+34_osx-x64_bin.tar.gz
-           jdk14Path: /jdk-14.jdk/Contents/Home
-           archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
-
+          - os: ubuntu-latest
+            displayName: linux
+            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+          - os: windows-latest
+            displayName: windows
+            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
+          - os: macOS-latest
+            displayName: macOS
+            archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
     name: Create installer and portable version for ${{ matrix.displayName }}
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v2-beta
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
-        run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.4
         with:
-            versionSpec: '5.1.2'
+          versionSpec: "5.3.7"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
-      - name: Set up JDK
+        uses: gittools/actions/gitversion/execute@v0.9.4
+      - name: Set up Adotptopen JDK mac
+        uses: joschi/setup-jdk@v2
+        with:
+          # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
+          java-version: 15
+          release_type: ea
+        if: matrix.os == 'macos-latest'
+      - name: Set up JDK for linux and windows
         uses: actions/setup-java@v1
         with:
-          java-version: 13.0.2
-      # configuration based on https://github.com/actions/cache/blob/master/examples.md#java---gradle
-      - uses: actions/cache@v1
-        name: Restore gradle cache
+          java-version: 14
+        if: matrix.os != 'macos-latest'
+      - name: Restore gradle cache
+        uses: actions/cache@master
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Cache gradle wrapper
-        # cache at Mac OS X is 2 GB (too large)
-        if: matrix.displayName == 'linux' || matrix.displayName == 'windows'
+            ${{ runner.os }}-gradle-
+      - name: Setup OSX key chain on OSX
+        if: matrix.os == 'macos-latest'
+        uses: apple-actions/import-codesign-certs@v1
         with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Download jpackage
-        # We need to download jpackage from https://jdk.java.net/jpackage/
-        run: |
-          import tarfile
-          import zipfile
-          import sys
-          if sys.version_info[0] >= 3:
-            from urllib.request import urlretrieve
-          else:
-            from urllib import urlretrieve
-
-          url = "${{ matrix.jpackageDownload }}"
-          tmpfile, headers = urlretrieve(url)
-          if (url.endswith("tar.gz")):
-            tar = tarfile.open(tmpfile)
-            tar.extractall()
-            tar.close()
-          elif (url.endswith("zip")):
-            zip = zipfile.ZipFile(tmpfile)
-            zip.extractall()
-            zip.close()
-        shell: python
+          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
+          p12-password: ${{ secrets.OSX_CERT_PWD }}
+          keychain-password: jabref
+      - name: Setup OSX key chain on OSX for app id cert
+        if: matrix.os == 'macos-latest'
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
+          p12-password: ${{ secrets.OSX_CERT_PWD }}
+          create-keychain: false
+          keychain-password: jabref
       - name: Build runtime image
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
-        run: |
-          export BADASS_JLINK_JPACKAGE_HOME="${GITHUB_WORKSPACE}${{ matrix.jdk14Path }}"
-          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
+      - name: Resign app image for OSX and build dmg
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
+          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/MacOS/JabRef
+          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app
+          jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
+          codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements buildres/mac/myapp.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
+          productsign --sign "Developer ID Installer: Tobias Diez (W2PU6LW5U5)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
+      - name: Notarize dmg and pkg installer
+        if: matrix.os == 'macos-latest' && github.ref == 'refs/heads/master'
+        shell: bash
+        run: |
+          REQUEST_UUID=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
+          while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
+            echo "Verification in progress..."
+            sleep 30
+          done
+          xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          spctl -vvv --assess --type exec build/distribution/JabRef.app
+          codesign -vvv --deep --strict "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          codesign -dvv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          REQUEST_UUID=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" | grep RequestUUID | awk '{print $3}')
+          while xcrun altool --notarization-info "$REQUEST_UUID" -u ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} -p  ${{ secrets.OSX_NOTARIZATION_APP_PWD }} | grep "Status: in progress" > /dev/null; do
+            echo "Verification in progress..."
+            sleep 30
+          done
+          xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
+          rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
+          mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
       - name: Package application image
+        shell: bash
         run: ${{ matrix.archivePortable }}
-        shell: bash
-      - name: Build snap (1) Setup snapcraft
-        uses: jhenstridge/snapcraft-build-action@v1
-        id: snapcraft
-        if: matrix.displayName == 'linux'
-      - name: Build snap (2) Run build
-        run: |
-          mv ${{ steps.snapcraft.outputs.snap }} build/distribution/
-        if: matrix.displayName == 'linux'
-      - name: Build snap (3) Upload snap
-        if: matrix.displayName == 'linux' && github.ref == 'refs/heads/master'
-        env:
-          SNAPCRAFT_LOGIN_FILE: ${{ secrets.SNAPCRAFT_LOGIN_FILE }}
-        run: |
-            mkdir .snapcraft && echo ${SNAPCRAFT_LOGIN_FILE} | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
-            snapcraft push build/distribution/jabref*.snap --release edge || true
-        shell: bash
       - name: Rename files
+        shell: pwsh
         run: |
+          get-childitem -Path build/distribution/*
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
-        shell: pwsh
       - name: Upload to GitHub workflow artifacts store
         uses: actions/upload-artifact@master
         with:
           name: JabRef-${{ matrix.displayName }}
           path: build/distribution
   deploy:
+    strategy:
+      fail-fast: false
     name: Deploy binaries on builds.jabref.org
     runs-on: ubuntu-latest
     needs: [build]
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-      - name: Fetch tags and master for GitVersion
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
         run: |
-          git fetch --tags origin
-          git rev-parse --verify master
-          if (-not $?) {
-            git branch --force --create-reflog master origin/master
-          }
-        shell: pwsh
+          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/setup-gitversion@v0.3
+        uses: gittools/actions/gitversion/setup@v0.9.4
         with:
-            versionSpec: '5.1.2'
+          versionSpec: '5.2.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/execute-gitversion@v0.3
+        uses: gittools/actions/gitversion/execute@v0.9.4
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:
@@ -180,6 +186,7 @@ jobs:
           path: build/distribution/
       - name: Deploy to builds.jabref.org
         id: deploy
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: Pendect/action-rsyncer@v1.1.0
         env:
           DEPLOY_KEY: ${{ secrets.buildJabRefPrivateKey }}

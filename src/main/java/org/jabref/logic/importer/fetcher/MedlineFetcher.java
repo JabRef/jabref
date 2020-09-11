@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
@@ -30,7 +31,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -64,7 +64,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     /**
-     * When using 'esearch.fcgi?db=<database>&term=<query>' we will get a list of IDs matching the query.
+     * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
      * Input: Any text query (&term)
      * Output: List of UIDs matching the query
      *
@@ -80,36 +80,37 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             XMLInputFactory inputFactory = XMLInputFactory.newFactory();
             XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());
 
-            fetchLoop: while (streamReader.hasNext()) {
+            fetchLoop:
+            while (streamReader.hasNext()) {
                 int event = streamReader.getEventType();
 
                 switch (event) {
-                case XMLStreamConstants.START_ELEMENT:
-                    if (streamReader.getName().toString().equals("Count")) {
-                        firstOccurrenceOfCount = true;
-                    }
+                    case XMLStreamConstants.START_ELEMENT:
+                        if (streamReader.getName().toString().equals("Count")) {
+                            firstOccurrenceOfCount = true;
+                        }
 
-                    if (streamReader.getName().toString().equals("IdList")) {
-                        fetchIDs = true;
-                    }
-                    break;
+                        if (streamReader.getName().toString().equals("IdList")) {
+                            fetchIDs = true;
+                        }
+                        break;
 
-                case XMLStreamConstants.CHARACTERS:
-                    if (firstOccurrenceOfCount) {
-                        numberOfResultsFound = Integer.parseInt(streamReader.getText());
-                        firstOccurrenceOfCount = false;
-                    }
+                    case XMLStreamConstants.CHARACTERS:
+                        if (firstOccurrenceOfCount) {
+                            numberOfResultsFound = Integer.parseInt(streamReader.getText());
+                            firstOccurrenceOfCount = false;
+                        }
 
-                    if (fetchIDs) {
-                        idList.add(streamReader.getText());
-                    }
-                    break;
+                        if (fetchIDs) {
+                            idList.add(streamReader.getText());
+                        }
+                        break;
 
-                case XMLStreamConstants.END_ELEMENT:
-                    //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                    if (streamReader.getName().toString().equals("IdList")) {
-                        break fetchLoop;
-                    }
+                    case XMLStreamConstants.END_ELEMENT:
+                        // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+                        if (streamReader.getName().toString().equals("IdList")) {
+                            break fetchLoop;
+                        }
                 }
                 streamReader.next();
             }
@@ -134,7 +135,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(ID_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("retmode", "xml");
@@ -166,7 +167,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } else {
             String searchTerm = replaceCommaWithAND(query);
 
-            //searching for pubmed ids matching the query
+            // searching for pubmed ids matching the query
             List<String> idList = getPubMedIdsFromQuery(searchTerm);
 
             if (idList.isEmpty()) {
@@ -178,7 +179,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                         numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
-            //pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
             entryList = fetchMedline(idList);
 
             return entryList;
@@ -204,8 +205,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
      */
     private List<BibEntry> fetchMedline(List<String> ids) throws FetcherException {
         try {
-            //Separate the IDs with a comma to search multiple entries
-            URL fetchURL = getURLForID(String.join(",", ids));
+            // Separate the IDs with a comma to search multiple entries
+            URL fetchURL = getUrlForIdentifier(String.join(",", ids));
             URLConnection data = fetchURL.openConnection();
             ParserResult result = new MedlineImporter().importDatabase(
                     new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));
@@ -223,5 +224,4 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                     Localization.lang("Error while fetching from %0", "Medline"), e);
         }
     }
-
 }

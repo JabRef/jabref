@@ -24,13 +24,13 @@ import org.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
-import org.jabref.logic.formatter.bibtexfields.NormalizeNewlinesFormatter;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -94,7 +94,7 @@ public abstract class BibDatabaseWriter {
         // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
         comparators.add(new CrossRefEntryComparator());
 
-        if (!saveOrder.isPresent()) {
+        if (saveOrder.isEmpty()) {
             // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
@@ -119,7 +119,7 @@ public abstract class BibDatabaseWriter {
         Objects.requireNonNull(bibDatabaseContext);
         Objects.requireNonNull(entriesToSort);
 
-        //if no meta data are present, simply return in original order
+        // if no meta data are present, simply return in original order
         if (bibDatabaseContext.getMetaData() == null) {
             return new LinkedList<>(entriesToSort);
         }
@@ -139,7 +139,7 @@ public abstract class BibDatabaseWriter {
          * 3. order specified in preferences
          */
 
-        if (preferences.isSaveInOriginalOrder()) {
+        if (preferences.shouldSaveInOriginalOrder()) {
             return Optional.empty();
         }
 
@@ -189,8 +189,8 @@ public abstract class BibDatabaseWriter {
         List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
         List<FieldChange> saveActionChanges = applySaveActions(sortedEntries, bibDatabaseContext.getMetaData());
         saveActionsFieldChanges.addAll(saveActionChanges);
-        if (preferences.generateBibtexKeysBeforeSaving()) {
-            List<FieldChange> keyChanges = generateBibtexKeys(bibDatabaseContext, sortedEntries);
+        if (preferences.getCitationKeyPatternPreferences().shouldGenerateCiteKeysBeforeSaving()) {
+            List<FieldChange> keyChanges = generateCitationKeys(bibDatabaseContext, sortedEntries);
             saveActionsFieldChanges.addAll(keyChanges);
         }
 
@@ -209,13 +209,13 @@ public abstract class BibDatabaseWriter {
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getCitationKeyPatternPreferences().getKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
         }
 
-        //finally write whatever remains of the file, but at least a concluding newline
+        // finally write whatever remains of the file, but at least a concluding newline
         writeEpilogue(bibDatabaseContext.getDatabase().getEpilog());
 
         writer.close();
@@ -230,7 +230,7 @@ public abstract class BibDatabaseWriter {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) throws IOException {
+    protected void writeMetaData(MetaData metaData, GlobalCitationKeyPattern globalCiteKeyPattern) throws IOException {
         Objects.requireNonNull(metaData);
 
         Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
@@ -318,9 +318,9 @@ public abstract class BibDatabaseWriter {
     /**
      * Generate keys for all entries that are lacking keys.
      */
-    protected List<FieldChange> generateBibtexKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+    protected List<FieldChange> generateCitationKeys(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<FieldChange> changes = new ArrayList<>();
-        BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(databaseContext, preferences.getBibtexKeyPatternPreferences());
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCiteKeyOptional();
             if (StringUtil.isBlank(oldKey)) {

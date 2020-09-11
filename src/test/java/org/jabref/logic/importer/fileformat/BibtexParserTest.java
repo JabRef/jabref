@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,17 +11,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
@@ -40,6 +41,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -296,7 +298,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesBibtexKeyWithSpecialCharacters() throws IOException {
+    void parseRecognizesCitationKeyWithSpecialCharacters() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@article{te_st:with-special(characters),author={Ed von Test}}"));
 
@@ -485,8 +487,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 
@@ -513,8 +515,8 @@ class BibtexParserTest {
         assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"),
                 entry.getField(StandardField.BOOKTITLE));
         assertEquals(Optional.of("2005"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("oezbek"), entry.getField(InternalField.OWNER));
-        assertEquals(Optional.of("2006.05.29"), entry.getField(InternalField.TIMESTAMP));
+        assertEquals(Optional.of("oezbek"), entry.getField(StandardField.OWNER));
+        assertEquals(Optional.of("2006.05.29"), entry.getField(StandardField.TIMESTAMP));
         assertEquals(Optional.of("http://james.howison.name/publications.html"), entry.getField(StandardField.URL));
     }
 
@@ -618,19 +620,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesDuplicateBibtexKeys() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{canh05," + "  author={Norton Bar}}"));
-
-        List<String> duplicateKeys = result.getDuplicateKeys();
-
-        assertEquals(1, duplicateKeys.size());
-        assertEquals("canh05", duplicateKeys.get(0));
-    }
-
-    @Test
-    void parseNotWarnsAboutEntryWithoutBibtexKey() throws IOException {
+    void parseNotWarnsAboutEntryWithoutCitationKey() throws IOException {
         BibEntry expected = new BibEntry();
         expected.setField(StandardField.AUTHOR, "Ed von Test");
         expected.setType(StandardEntryType.Article);
@@ -940,9 +930,9 @@ class BibtexParserTest {
     void parseRecognizesStringAndEntry() throws IOException {
         ParserResult result = parser.parse(
                 new StringReader("" + "@string{bourdieu = {Bourdieu, Pierre}}"
-                        + "@book{bourdieu-2002-questions-sociologie, " + "	Address = {Paris}," + "	Author = bourdieu,"
-                        + "	Isbn = 2707318256," + "	Publisher = {Minuit}," + "	Title = {Questions de sociologie},"
-                        + "	Year = 2002" + "}"));
+                        + "@book{bourdieu-2002-questions-sociologie, " + "    Address = {Paris}," + "    Author = bourdieu,"
+                        + "    Isbn = 2707318256," + "    Publisher = {Minuit}," + "    Title = {Questions de sociologie},"
+                        + "    Year = 2002" + "}"));
 
         BibtexString parsedString = result.getDatabase().getStringValues().iterator().next();
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
@@ -1359,11 +1349,11 @@ class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        GlobalBibtexKeyPattern pattern = mock(GlobalBibtexKeyPattern.class);
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
-        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
+        GlobalCitationKeyPattern pattern = mock(GlobalCitationKeyPattern.class);
+        AbstractCitationKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
+        AbstractCitationKeyPattern expectedPattern = new DatabaseCitationKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
-        expectedPattern.addBibtexKeyPattern(StandardEntryType.Article, "articleTest");
+        expectedPattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
 
         assertEquals(expectedPattern, bibtexKeyPattern);
     }
@@ -1398,6 +1388,34 @@ class BibtexParserTest {
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
+    }
+
+    /**
+     * Checks that a TexGroup finally gets the required data, after parsing the library.
+     */
+    @Test
+    void integrationTestTexGroup() throws Exception {
+        ParserResult result = parser.parse(new StringReader(
+             "@comment{jabref-meta: grouping:" + OS.NEWLINE
+                     + "0 AllEntriesGroup:;" + OS.NEWLINE
+                     + "1 TexGroup:cited entries\\;0\\;paper.aux\\;1\\;0x8a8a8aff\\;\\;\\;;"
+                     + "}" + OS.NEWLINE
+           + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectory-"
+                     + System.getProperty("user.name") + "-"
+                     + InetAddress.getLocalHost().getHostName()
+                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+           + "@Comment{jabref-meta: fileDirectoryLatex-"
+                     + System.getProperty("user.name") + "-"
+                     + InetAddress.getLocalHost().getHostName()
+                     + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
+        ));
+
+        GroupTreeNode root = result.getMetaData().getGroups().get();
+
+        assertEquals("src/test/resources/org/jabref/model/groups/paper.aux",
+                ((TexGroup) root.getChildren().get(0).getGroup()).getFilePath().toString());
     }
 
     @Test
@@ -1720,7 +1738,7 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m1, author = kopp # et # kubovy }" );
+                        "@Misc{m1, author = kopp # et # kubovy }");
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
                 .withCiteKey("m1")
@@ -1736,7 +1754,7 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }");
 
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc)
                 .withCiteKey("m2")
@@ -1752,42 +1770,42 @@ class BibtexParserTest {
                 .parseEntries("@String { kopp = \"Kopp, Oliver\" }" +
                         "@String { kubovy = \"Kubovy, Jan\" }" +
                         "@String { et = \" and \" }" +
-                        "@Misc{m2, author = kopp # \" and \" # kubovy }" );
+                        "@Misc{m2, author = kopp # \" and \" # kubovy }");
 
         assertEquals("#kopp# and #kubovy#", parsed.iterator().next().getField(StandardField.AUTHOR).get());
     }
 
     @Test
     void textAprilIsParsedAsMonthApril() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }");
 
         assertEquals(Month.APRIL, result.get().getMonth().get());
     }
 
     @Test
     void textAprilIsDisplayedAsConstant() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = \"apr\" }");
 
         assertEquals("apr", result.get().getField(StandardField.MONTH).get());
     }
 
     @Test
     void bibTeXConstantAprilIsParsedAsMonthApril() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals(Month.APRIL, result.get().getMonth().get());
     }
 
     @Test
     void bibTeXConstantAprilIsDisplayedAsConstant() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals("#apr#", result.get().getField(StandardField.MONTH).get());
     }
 
     @Test
     void bibTeXConstantAprilIsParsedAsStringMonthAprilWhenReadingTheField() throws ParseException {
-        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }" );
+        Optional<BibEntry> result = parser.parseSingleEntry("@Misc{m, month = apr }");
 
         assertEquals(Optional.of("#apr#"), result.get().getField(StandardField.MONTH));
     }

@@ -51,7 +51,7 @@ public class GrobidService {
         urlDownload.setPostData("citations=" + rawCitation + "&consolidateCitations=" + consolidateCitations);
         String httpResponse = urlDownload.asString();
 
-        if (httpResponse == null || httpResponse.equals("@misc{-1,\n\n}\n")) { //This filters empty BibTeX entries
+        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n")) { // This filters empty BibTeX entries
             throw new IOException("The GROBID server response does not contain anything.");
         }
 

@@ -3,10 +3,11 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -39,8 +40,19 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                 entry.clearField(StandardField.YEAR).ifPresent(changes::add);
                 entry.clearField(StandardField.MONTH).ifPresent(changes::add);
             });
+        } else {
+            // If the year from date field is filled and equal to year it should be removed the year field
+            entry.getFieldOrAlias(StandardField.DATE).ifPresent(date -> {
+                Optional<Date> newDate = Date.parse(date);
+                Optional<Date> checkDate = Date.parse(entry.getFieldOrAlias(StandardField.YEAR),
+                        entry.getFieldOrAlias(StandardField.MONTH), Optional.empty());
+
+                if (checkDate.equals(newDate)) {
+                    entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+                    entry.clearField(StandardField.MONTH).ifPresent(changes::add);
+                }
+            });
         }
         return changes;
     }
-
 }

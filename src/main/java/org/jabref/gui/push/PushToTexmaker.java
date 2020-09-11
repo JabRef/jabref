@@ -33,5 +33,4 @@ public class PushToTexmaker extends AbstractPushToApplication implements PushToA
     protected void initParameters() {
         commandPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
     }
-
 }

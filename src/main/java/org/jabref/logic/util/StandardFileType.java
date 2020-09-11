@@ -3,11 +3,13 @@ package org.jabref.logic.util;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jabref.model.util.OptionalUtil;
+
 /**
- *
- * @implNote Enter the extensions without a dot! The dot is added implicitly.
+ * @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
  */
 public enum StandardFileType implements FileType {
+
     BIBTEXML("bibx", "xml"),
     ENDNOTE("ref", "enw"),
     ISI("isi", "txt"),
@@ -21,7 +23,7 @@ public enum StandardFileType implements FileType {
     CITATION_STYLE("csl"),
     CLASS("class"),
     CSV("csv"),
-    HTML("html"),
+    HTML("html", "htm"),
     JAR("jar"),
     JAVA_KEYSTORE("jks"),
     JSTYLE("jstyle"),
@@ -38,7 +40,8 @@ public enum StandardFileType implements FileType {
     XML("xml"),
     JSON("json"),
     XMP("xmp"),
-    ZIP("zip");
+    ZIP("zip"),
+    CSS("css");
 
     private final List<String> extensions;
 
@@ -51,12 +54,12 @@ public enum StandardFileType implements FileType {
         return extensions;
     }
 
-    public static FileType newFileType(String... extensions) {
-        for (int i = 0; i < extensions.length; i++) {
-            if (extensions[i].contains(".")) {
-                extensions[i] = extensions[i].substring(extensions[i].indexOf('.') + 1);
-            }
-        }
-        return () -> Arrays.asList(extensions);
+    public static FileType fromExtensions(String... extensions) {
+        var exts = Arrays.asList(extensions);
+
+        return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
+                                         .filter(field -> field.getExtensions().stream().anyMatch(elem -> exts.contains(elem)))
+                                         .findAny(),
+                new UnknownFileType(extensions));
     }
 }

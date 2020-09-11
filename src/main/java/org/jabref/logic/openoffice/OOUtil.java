@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.layout.Layout;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -25,6 +26,7 @@ import com.sun.star.uno.UnoRuntime;
 /**
  * Utility methods for processing OO Writer documents.
  */
+@AllowedToUseAwt("Requires AWT for changing document properties")
 public class OOUtil {
 
     private static final String CHAR_STRIKEOUT = "CharStrikeout";
@@ -57,17 +59,18 @@ public class OOUtil {
 
     /**
      * Insert a reference, formatted using a Layout, at the position of a given cursor.
-     * @param text The text to insert in.
-     * @param cursor The cursor giving the insert location.
-     * @param layout The Layout to format the reference with.
-     * @param parStyle The name of the paragraph style to use.
-     * @param entry The entry to insert.
-     * @param database The database the entry belongs to.
+     *
+     * @param text       The text to insert in.
+     * @param cursor     The cursor giving the insert location.
+     * @param layout     The Layout to format the reference with.
+     * @param parStyle   The name of the paragraph style to use.
+     * @param entry      The entry to insert.
+     * @param database   The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
                                                             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
-                    throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+            throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
             WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
@@ -95,11 +98,11 @@ public class OOUtil {
     }
 
     /**
-     * Insert a text with formatting indicated by HTML-like tags, into a text at
-     * the position given by a cursor.
-     * @param text The text to insert in.
-     * @param cursor The cursor giving the insert location.
-     * @param lText The marked-up text to insert.
+     * Insert a text with formatting indicated by HTML-like tags, into a text at the position given by a cursor.
+     *
+     * @param text     The text to insert in.
+     * @param cursor   The cursor giving the insert location.
+     * @param lText    The marked-up text to insert.
      * @param parStyle The name of the paragraph style to use.
      * @throws WrappedTargetException
      * @throws PropertyVetoException
@@ -107,8 +110,8 @@ public class OOUtil {
      * @throws IllegalArgumentException
      */
     public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor, String lText,
-            String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
-                    WrappedTargetException, IllegalArgumentException {
+                                                              String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
+            WrappedTargetException, IllegalArgumentException {
 
         XParagraphCursor parCursor = UnoRuntime.queryInterface(
                 XParagraphCursor.class, cursor);
@@ -167,7 +170,6 @@ public class OOUtil {
             }
 
             piv = m.end();
-
         }
 
         if (piv < lText.length()) {
@@ -183,9 +185,9 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            List<Formatting> formatting)
-                    throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
-                    IllegalArgumentException {
+                                                   List<Formatting> formatting)
+            throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
+            IllegalArgumentException {
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
@@ -210,7 +212,7 @@ public class OOUtil {
         if (formatting.contains(Formatting.SMALLCAPS)) {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.SMALLCAPS);
-        }        else {
+        } else {
             xCursorProps.setPropertyValue(CHAR_CASE_MAP,
                     com.sun.star.style.CaseMap.NONE);
         }
@@ -272,7 +274,6 @@ public class OOUtil {
             throw new UndefinedParagraphFormatException(parStyle);
         }
         cursor.collapseToEnd();
-
     }
 
     public static Object getProperty(Object o, String property)

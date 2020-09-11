@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,8 +17,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).
@@ -28,7 +27,7 @@ import org.jabref.model.util.FileHelper;
 public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
-    //We have to mark these properties as transient because they can't be serialized directly
+    // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
     private transient StringProperty link = new SimpleStringProperty();
     private transient StringProperty fileType = new SimpleStringProperty();
@@ -111,6 +110,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Writes serialized object to ObjectOutputStream, automatically called
+     *
      * @param out {@link ObjectOutputStream}
      * @throws IOException
      */
@@ -123,6 +123,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Reads serialized object from ObjectInputStreamm, automatically called
+     *
      * @param in {@link ObjectInputStream}
      * @throws IOException
      */
@@ -134,6 +135,7 @@ public class LinkedFile implements Serializable {
 
     /**
      * Checks if the given String is an online link
+     *
      * @param toCheck The String to check
      * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
      */
@@ -180,7 +182,7 @@ public class LinkedFile implements Serializable {
                 return Optional.empty();
             }
 
-            Path file = Paths.get(link.get());
+            Path file = Path.of(link.get());
             if (file.isAbsolute() || directories.isEmpty()) {
                 if (Files.exists(file)) {
                     return Optional.of(file);
@@ -188,7 +190,7 @@ public class LinkedFile implements Serializable {
                     return Optional.empty();
                 }
             } else {
-                return FileHelper.expandFilenameAsPath(link.get(), directories);
+                return FileHelper.find(link.get(), directories);
             }
         } catch (InvalidPathException ex) {
             return Optional.empty();

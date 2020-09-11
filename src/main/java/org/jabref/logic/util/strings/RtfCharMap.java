@@ -6,7 +6,7 @@ public class RtfCharMap {
 
     private HashMap<String, String> rtfMap = new HashMap<>();
 
-    public RtfCharMap () {
+    public RtfCharMap() {
         put("`a", "\\'e0");
         put("`e", "\\'e8");
         put("`i", "\\'ec");
@@ -54,8 +54,8 @@ public class RtfCharMap {
 
         put("S", "\\u167S"); // Section sign
         put("`!", "\\u161!"); // Inverted exclamation point
-        put("pounds","\\u163?"); // Pound sign
-        put("copyright","\\u169?"); // Copyright sign
+        put("pounds", "\\u163?"); // Pound sign
+        put("copyright", "\\u169?"); // Copyright sign
         put("P", "\\u182P"); // Paragraph sign
         put("`?", "\\u191?"); // Inverted question mark
         put("~A", "\\u195A"); // "Atilde"
@@ -82,7 +82,7 @@ public class RtfCharMap {
         put("TH", "\\u222TH"); // "THORN"
 
         put("ss", "\\u223ss"); // "szlig"
-        //RTFCHARS.put("ss", "AFFEN"); // "szlig"
+        // RTFCHARS.put("ss", "AFFEN"); // "szlig"
 
         put("~a", "\\u227a"); // "atilde"
         put("aa", "\\u229a"); // "aring"
@@ -265,5 +265,4 @@ public class RtfCharMap {
     public String get(String key) {
         return rtfMap.get(key);
     }
-
 }

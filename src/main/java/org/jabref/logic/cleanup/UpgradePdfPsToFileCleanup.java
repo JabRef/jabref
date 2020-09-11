@@ -6,10 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.FieldChange;
-import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -21,7 +20,6 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
     // Field name and file type name (from ExternalFileTypes)
     private final Map<Field, String> fields = new HashMap<>();
-
 
     public UpgradePdfPsToFileCleanup() {
         fields.put(StandardField.PDF, "PDF");

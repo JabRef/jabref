@@ -20,7 +20,7 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     private final BibDatabaseContext database;
     private final FileUpdateMonitor fileMonitor;
     private final List<DatabaseChangeListener> listeners;
-    private TaskExecutor taskExecutor;
+    private final TaskExecutor taskExecutor;
 
     public DatabaseChangeMonitor(BibDatabaseContext database, FileUpdateMonitor fileMonitor, TaskExecutor taskExecutor) {
         this.database = database;
@@ -58,5 +58,4 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
     public void unregister() {
         database.getDatabasePath().ifPresent(file -> fileMonitor.removeListener(file, this));
     }
-
 }

@@ -19,8 +19,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -69,8 +69,8 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
-    private final CodeArea codeArea;
-    private KeyBindingRepository keyBindingRepository;
+    private final KeyBindingRepository keyBindingRepository;
+    private CodeArea codeArea;
 
     private BibEntry previousEntry;
 
@@ -78,25 +78,27 @@ public class SourceTab extends EntryEditorTab {
 
         private final StandardActions command;
 
-        public EditAction(StandardActions command) { this.command = command; }
+        public EditAction(StandardActions command) {
+            this.command = command;
+        }
 
         @Override
         public void execute() {
-                switch (command) {
-                    case COPY:
-                        codeArea.copy();
-                        break;
-                    case CUT:
-                        codeArea.cut();
-                        break;
-                    case PASTE:
-                        codeArea.paste();
-                        break;
-                    case SELECT_ALL:
-                        codeArea.selectAll();
-                        break;
-                }
-                codeArea.requestFocus();
+            switch (command) {
+                case COPY:
+                    codeArea.copy();
+                    break;
+                case CUT:
+                    codeArea.cut();
+                    break;
+                case PASTE:
+                    codeArea.paste();
+                    break;
+                case SELECT_ALL:
+                    codeArea.selectAll();
+                    break;
+            }
+            codeArea.requestFocus();
         }
     }
 
@@ -112,17 +114,11 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.keyBindingRepository = keyBindingRepository;
-        this.codeArea = new CodeArea();
-
-        setupSourceEditor();
-        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
-        this.setContent(scrollableCodeArea);
 
         stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
             searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
             highlightSearchPattern();
         });
-
     }
 
     private void highlightSearchPattern() {
@@ -172,6 +168,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void setupSourceEditor() {
+        codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.setInputMethodRequests(new InputMethodRequestsObject());
         codeArea.setOnInputMethodTextChanged(event -> {
@@ -200,7 +197,7 @@ public class SourceTab extends EntryEditorTab {
             ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
             if (!sourceValidationStatus.isValid()) {
                 sourceValidationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
+                        dialogService.showErrorDialogAndWait(message.getMessage()));
             }
         });
 
@@ -209,6 +206,8 @@ public class SourceTab extends EntryEditorTab {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
+        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
+        this.setContent(scrollableCodeArea);
     }
 
     @Override
@@ -218,6 +217,10 @@ public class SourceTab extends EntryEditorTab {
 
     private void updateCodeArea() {
         DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+            if (codeArea == null) {
+                setupSourceEditor();
+            }
+
             codeArea.clear();
             try {
                 codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
@@ -233,7 +236,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (previousEntry != null) {
+        if (previousEntry != null && codeArea != null) {
             storeSource(previousEntry, codeArea.textProperty().getValue());
         }
         this.previousEntry = entry;

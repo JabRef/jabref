@@ -1,6 +1,6 @@
 package org.jabref.preferences;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class LastFocusedTabPreferences {
@@ -11,21 +11,21 @@ public class LastFocusedTabPreferences {
         this.preferences = Objects.requireNonNull(preferences);
     }
 
-    public void setLastFocusedTab(File file) {
-        if (file == null) {
+    public void setLastFocusedTab(Path path) {
+        if (path == null) {
             return;
         }
 
-        String filePath = file.getAbsolutePath();
+        String filePath = path.toAbsolutePath().toString();
         preferences.put(JabRefPreferences.LAST_FOCUSED, filePath);
     }
 
-    public boolean hadLastFocus(File file) {
-        if (file == null) {
+    public boolean hadLastFocus(Path path) {
+        if (path == null) {
             return false;
         }
 
         String lastFocusedDatabase = preferences.get(JabRefPreferences.LAST_FOCUSED);
-        return file.getAbsolutePath().equals(lastFocusedDatabase);
+        return path.toAbsolutePath().toString().equals(lastFocusedDatabase);
     }
 }

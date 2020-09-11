@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
@@ -23,10 +23,10 @@ public class MetaDataSerializer {
     }
 
     /**
-     * Writes all data in the format <key, serialized data>.
+     * Writes all data in the format &lt;key, serialized data>.
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
-            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+                                                             GlobalCitationKeyPattern globalCiteKeyPattern) {
 
         // First write all meta data except groups
         Map<String, List<String>> stringyMetaData = new HashMap<>();
@@ -47,9 +47,8 @@ public class MetaDataSerializer {
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + "Latex-" + user, Collections.singletonList(path.toString().trim())));
 
-        for (ContentSelector selector: metaData.getContentSelectorList()) {
+        for (ContentSelector selector : metaData.getContentSelectorList()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());
-
         }
 
         Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
@@ -64,7 +63,7 @@ public class MetaDataSerializer {
         for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
             StringBuilder value = new StringBuilder();
             value.append(OS.NEWLINE);
-            for (String line: entry.getValue()) {
+            for (String line : entry.getValue()) {
                 value.append(line.replaceAll(";", "\\\\;") + MetaData.SEPARATOR_STRING + OS.NEWLINE);
             }
             serializedMetaData.put(entry.getKey(), value.toString());
@@ -80,10 +79,10 @@ public class MetaDataSerializer {
             for (String dataItem : metaItem.getValue()) {
                 stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
 
-                //in case of save actions, add an additional newline after the enabled flag
+                // in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)
-                                || FieldFormatterCleanups.DISABLED.equals(dataItem))) {
+                        || FieldFormatterCleanups.DISABLED.equals(dataItem))) {
                     stringBuilder.append(OS.NEWLINE);
                 }
             }
@@ -97,20 +96,20 @@ public class MetaDataSerializer {
         return serializedMetaData;
     }
 
-    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalCitationKeyPattern globalCitationKeyPattern) {
         Map<String, List<String>> stringyPattern = new HashMap<>();
-        AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
-        for (EntryType key : citeKeyPattern.getAllKeys()) {
-            if (!citeKeyPattern.isDefaultValue(key)) {
+        AbstractCitationKeyPattern citationKeyPattern = metaData.getCiteKeyPattern(globalCitationKeyPattern);
+        for (EntryType key : citationKeyPattern.getAllKeys()) {
+            if (!citationKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(citeKeyPattern.getValue(key).get(0));
+                data.add(citationKeyPattern.getValue(key).get(0));
                 String metaDataKey = MetaData.PREFIX_KEYPATTERN + key.getName();
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if ((citeKeyPattern.getDefaultValue() != null) && !citeKeyPattern.getDefaultValue().isEmpty()) {
+        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
-            data.add(citeKeyPattern.getDefaultValue().get(0));
+            data.add(citationKeyPattern.getDefaultValue().get(0));
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
         }
         return stringyPattern;
@@ -127,5 +126,4 @@ public class MetaDataSerializer {
         }
         return stringBuilder.toString();
     }
-
 }

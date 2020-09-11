@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +37,7 @@ class ProtectedTermsLoaderTest {
             loader.removeProtectedTermsList(list);
         }
         assertTrue(loader.getProtectedTermsLists().isEmpty());
-        String filename = Paths.get(
+        String filename = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                                .toFile().getPath();
         loader.addProtectedTermsListFromFile(filename, true);
@@ -47,10 +46,10 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testAddProtectedTermsListFromFile() throws URISyntaxException {
-        String filename = Paths
-                .get(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                                               .toURI())
-                .toFile().getPath();
+        String filename = Path.of(
+                ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
+                                          .toURI())
+                              .toFile().getPath();
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), loader.getProtectedTermsLists().size());
         loader.addProtectedTermsListFromFile(filename, false);
         assertEquals(ProtectedTermsLoader.getInternalLists().size() + 1, loader.getProtectedTermsLists().size());
@@ -58,7 +57,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileReadsDescription() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -67,7 +66,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileDisabledWorks() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
@@ -76,7 +75,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileEnabledWorks() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -85,7 +84,7 @@ class ProtectedTermsLoaderTest {
 
     @Test
     void testReadProtectedTermsListFromFileIsNotInternalList() throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms").toURI())
                          .toFile();
         ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
@@ -95,7 +94,7 @@ class ProtectedTermsLoaderTest {
     @Test
     void testReadProtectedTermsListFromFileNoDescriptionGivesDefaultDescription()
             throws URISyntaxException, FileNotFoundException {
-        File file = Paths.get(
+        File file = Path.of(
                 ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/unnamedterms.terms")
                                           .toURI())
                          .toFile();

@@ -6,9 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
@@ -46,8 +46,8 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
     public void operationCompleted() {
         if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
-                         Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                         + ". [" + commandPath + "]");
+                    Localization.lang("verify that LyX is running and that the lyxpipe is valid")
+                            + ". [" + commandPath + "]");
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(Localization.lang("unable to write to") + " " + commandPath + ".in");
         } else {

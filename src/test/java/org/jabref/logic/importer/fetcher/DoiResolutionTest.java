@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +26,7 @@ class DoiResolutionTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked")
-    void findByDOI() throws IOException {
+    void linkWithPdfInTitleTag() throws IOException {
         entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330");
 
         assertEquals(
@@ -38,16 +36,37 @@ class DoiResolutionTest {
     }
 
     @Test
+    void linkWithPdfStringLeadsToFulltext() throws IOException {
+        entry.setField(StandardField.DOI, "10.1002/acr2.11101");
+        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/epdf/10.1002/acr2.11101")), finder.findFullText(entry));
+    }
+
+    @Test
+    void multipleLinksWithSmallEditDistanceLeadToFulltext() throws IOException {
+        entry.setField(StandardField.DOI, "10.1002/acr2.11101");
+        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/epdf/10.1002/acr2.11101")), finder.findFullText(entry));
+    }
+
+    @Test
     void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
-        entry.setField(StandardField.DOI, "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
+        entry.setField(StandardField.DOI, "10.1109/JXCDC.2019.2911135");
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked")
     void notFoundByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1186/unknown-doi");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.SOURCE, finder.getTrustLevel());
     }
 }

@@ -20,7 +20,7 @@ JabRef version <!-- version as shown in the about box --> on <!-- Windows 10|Ubu
       Please make a backup of your library before you try out this version.
       If you already use a development version, ensure that you use the latest one.
  -->
-- [ ] I have tested the latest development version from http://builds.jabref.org/master/ and the problem persists
+- [ ] **Mandatory**: I have tested the latest development version from http://builds.jabref.org/master/ and the problem persists
 
 <!-- Add a clear and concise description of what the bug is. -->
 

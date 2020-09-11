@@ -52,8 +52,12 @@ public class AutoLinkFilesAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(database, preferences.getFilePreferences(), preferences.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
-        Task<List<BibEntry>> linkFilesTask = new Task<List<BibEntry>>() {
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                database,
+                preferences.getFilePreferences(),
+                preferences.getAutoLinkPreferences(),
+                ExternalFileTypes.getInstance());
+        Task<List<BibEntry>> linkFilesTask = new Task<>() {
 
             @Override
             protected List<BibEntry> call() {
@@ -74,10 +78,10 @@ public class AutoLinkFilesAction extends SimpleCommand {
             }
         };
 
-        dialogService.showProgressDialogAndWait(
-                                                Localization.lang("Automatically setting file links"),
-                                                Localization.lang("Searching for files"),
-                                                linkFilesTask);
+        dialogService.showProgressDialog(
+                Localization.lang("Automatically setting file links"),
+                Localization.lang("Searching for files"),
+                linkFilesTask);
         taskExecutor.execute(linkFilesTask);
     }
 }

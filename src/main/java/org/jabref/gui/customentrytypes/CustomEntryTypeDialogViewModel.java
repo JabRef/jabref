@@ -3,16 +3,12 @@ package org.jabref.gui.customentrytypes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
-import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -38,7 +34,6 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.fxmisc.easybind.EasyBind;
 
 public class CustomEntryTypeDialogViewModel {
 
@@ -55,18 +50,14 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private final ListProperty<BibEntryType> entryTypes;
-    private final ListProperty<Field> fields;
-    private final ObjectProperty<BibEntryType> selectedEntryTypes = new SimpleObjectProperty<>();
-    private final ListProperty<FieldViewModel> fieldsForType;
+    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey());
+    private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
-    private final ObservableList<BibEntryType> allEntryTypes;
-    private final ObservableList<FieldViewModel> allFieldsForType = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.fieldName(), extractor.fieldType()});
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final Map<BibEntryType, List<FieldViewModel>> typesWithFields = new HashMap<>();
-    private final List<BibEntryType> typesToRemove = new ArrayList<>();
+    private final ObservableList<CustomEntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
+    private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final PreferencesService preferencesService;
     private final BibEntryTypesManager entryTypesManager;
@@ -79,40 +70,33 @@ public class CustomEntryTypeDialogViewModel {
         this.preferencesService = preferencesService;
         this.entryTypesManager = entryTypesManager;
 
-        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
-        allTypes.addAll(entryTypesManager.getAllCustomTypes(mode));
-
-        allEntryTypes = FXCollections.observableArrayList(allTypes);
-        entryTypes = new SimpleListProperty<>(allEntryTypes);
-
-        fields = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()));
-
-        for (BibEntryType entryType : allTypes) {
-            List<FieldViewModel> fields = entryType.getAllFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority(), entryType)).collect(Collectors.toList());
-            typesWithFields.put(entryType, fields);
-        }
-
-        this.fieldsForType = new SimpleListProperty<>(allFieldsForType);
-
-        EasyBind.subscribe(selectedEntryTypes, type -> {
-            if (type != null) {
-                allFieldsForType.setAll(typesWithFields.get(type));
-            }
-        });
+        addAllTypes();
 
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
         entryTypeValidator = new FunctionBasedValidator<>(entryTypeToAdd, notEmpty, ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(newFieldToAdd,
-                                                      input -> input != null && !input.getDisplayName().isEmpty(),
+                                                      input -> (input != null) && !input.getDisplayName().isEmpty(),
                                                       ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
-    public ListProperty<BibEntryType> entryTypes() {
-        return this.entryTypes;
+    public void addAllTypes() {
+        if (this.entryTypesWithFields.size() > 0) {
+            this.entryTypesWithFields.clear();
+        }
+        Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
+
+        for (BibEntryType entryType : allTypes) {
+            CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
+            this.entryTypesWithFields.add(viewModel);
+        }
     }
 
-    public ListProperty<Field> fields() {
-        return this.fields;
+    public ObservableList<CustomEntryTypeViewModel> entryTypes() {
+        return this.entryTypesWithFields;
+    }
+
+    public ObservableList<Field> fieldsForAdding() {
+        return this.fieldsForAdding;
     }
 
     public enum FieldType {
@@ -120,7 +104,7 @@ public class CustomEntryTypeDialogViewModel {
         REQUIRED(Localization.lang("Required")),
         OPTIONAL(Localization.lang("Optional"));
 
-        private String name;
+        private final String name;
 
         FieldType(String name) {
             this.name = name;
@@ -138,26 +122,23 @@ public class CustomEntryTypeDialogViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT, selectedEntryTypes.getValue());
-        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> new ArrayList<>()).add(model);
-        allFieldsForType.add(model);
+        FieldViewModel model = new FieldViewModel(field, true, FieldPriority.IMPORTANT);
+        this.selectedEntryType.getValue().addField(model);
         newFieldToAddProperty().setValue(null);
     }
 
-    public void addNewCustomEntryType() {
+    public CustomEntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
-        this.allEntryTypes.add(type);
+        CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
+        this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
-        this.typesWithFields.put(type, new ArrayList<>());
+
+        return viewModel;
     }
 
-    public ObjectProperty<BibEntryType> selectedEntryTypeProperty() {
-        return this.selectedEntryTypes;
-    }
-
-    public ListProperty<FieldViewModel> fieldsforTypesProperty() {
-        return this.fieldsForType;
+    public ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypeProperty() {
+        return this.selectedEntryType;
     }
 
     public ObjectProperty<Field> selectedFieldToAddProperty() {
@@ -180,22 +161,27 @@ public class CustomEntryTypeDialogViewModel {
         return fieldValidator.getValidationStatus();
     }
 
-    public void removeEntryType(BibEntryType focusedItem) {
-        typesToRemove.add(focusedItem);
-        typesWithFields.remove(focusedItem);
-        allEntryTypes.remove(focusedItem);
+    public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
+        entryTypesWithFields.remove(focusedItem);
+        entryTypesToDelete.add(focusedItem.entryType().getValue());
     }
 
     public void removeField(FieldViewModel focusedItem) {
-        typesWithFields.computeIfAbsent(selectedEntryTypes.getValue(), key -> new ArrayList<>()).remove(focusedItem);
-        allFieldsForType.remove(focusedItem);
+       selectedEntryType.getValue().removeField(focusedItem);
+    }
+
+    public void resetAllCustomEntryTypes() {
+        entryTypesManager.clearAllCustomEntryTypes(mode);
+        preferencesService.clearBibEntryTypes(mode);
+        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
+                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
 
     public void apply() {
 
-        for (var typeWithField : typesWithFields.entrySet()) {
-            BibEntryType type = typeWithField.getKey();
-            List<FieldViewModel> allFields = typeWithField.getValue();
+        for (var typeWithField : entryTypesWithFields) {
+            BibEntryType type = typeWithField.entryType().getValue();
+            List<FieldViewModel> allFields = typeWithField.fields();
 
             List<OrFields> requiredFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.REQUIRED).map(FieldViewModel::getField).map(OrFields::new).collect(Collectors.toList());
             List<BibField> otherFields = allFields.stream().filter(field -> field.getFieldType() == FieldType.OPTIONAL).map(bibField -> new BibField(bibField.getField(), bibField.getFieldPriority())).collect(Collectors.toList());
@@ -204,13 +190,13 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.addCustomOrModifiedType(newType, mode);
         }
 
-        for (var type : typesToRemove) {
-            entryTypesManager.removeCustomOrModifiedEntryType(type, mode);
+        for (var entryType : entryTypesToDelete) {
+            entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
-        preferencesService.saveCustomEntryTypes();
-        //Reload types from preferences to make sure any modifications are present when reopening the dialog
+
+        preferencesService.saveCustomEntryTypes(entryTypesManager);
+        // Reload types from preferences to make sure any modifications are present when reopening the dialog
         entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                                                    preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
-
 }

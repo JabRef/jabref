@@ -32,7 +32,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme.JabRefIcons;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
@@ -42,7 +42,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class MergeEntries extends BorderPane {
 
@@ -52,12 +52,13 @@ public class MergeEntries extends BorderPane {
     private final ComboBox<DiffMode> diffMode = new ComboBox<>();
 
     // Headings
-    private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
-                                                              Localization.lang("Left entry"),
-                                                              "left icon",
-                                                              Localization.lang("None"),
-                                                              "right icon",
-                                                              Localization.lang("Right entry"));
+    private final List<String> columnHeadings = Arrays.asList(
+            Localization.lang("Field"),
+            Localization.lang("Left entry"),
+            "left icon",
+            Localization.lang("None"),
+            "right icon",
+            Localization.lang("Right entry"));
     private final Set<Field> identicalFields = new HashSet<>();
     private final Set<Field> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
@@ -76,10 +77,10 @@ public class MergeEntries extends BorderPane {
     /**
      * Constructor with optional column captions for the two entries
      *
-     * @param entryLeft    Left entry
-     * @param entryRight   Right entry
-     * @param headingLeft  Heading for left entry
-     * @param headingRight Heading for right entry
+     * @param entryLeft                       Left entry
+     * @param entryRight                      Right entry
+     * @param headingLeft                     Heading for left entry
+     * @param headingRight                    Heading for right entry
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
@@ -107,8 +108,8 @@ public class MergeEntries extends BorderPane {
     /**
      * Constructor taking two entries
      *
-     * @param entryLeft Left entry
-     * @param entryRight Right entry
+     * @param entryLeft                       Left entry
+     * @param entryRight                      Right entry
      * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
@@ -121,12 +122,11 @@ public class MergeEntries extends BorderPane {
     /**
      * Constructor taking two entries
      *
-     * @param entryLeft Left entry
+     * @param entryLeft  Left entry
      * @param entryRight Right entry
      */
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight) {
         this(entryLeft, entryRight, DefaultRadioButtonSelectionMode.LEFT);
-
     }
 
     private static String getDisplayText(DiffMode mode) {
@@ -272,7 +272,7 @@ public class MergeEntries extends BorderPane {
                 mergePanel.add(button, 2 + k, rowIndex);
             }
             if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
-                typeRadioButtons.get(1).setSelected(true); //This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+                typeRadioButtons.get(1).setSelected(true); // This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
                 rightRadioButtons.add(typeRadioButtons.get(1));
             } else {
                 typeRadioButtons.get(0).setSelected(true);
@@ -301,15 +301,14 @@ public class MergeEntries extends BorderPane {
                 colHeading.setMinWidth(USE_PREF_SIZE);
                 mergePanel.add(colHeading, i, 0);
             }
-
         }
     }
 
     private void fillDiffModes() {
         diffMode.setItems(FXCollections.observableList(Arrays.asList(DiffMode.values())));
         new ViewModelListCellFactory<DiffMode>()
-                                                .withText(MergeEntries::getDisplayText)
-                                                .install(diffMode);
+                .withText(MergeEntries::getDisplayText)
+                .install(diffMode);
         DiffMode diffModePref = Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
                                              .flatMap(DiffMode::parse)
                                              .orElse(DiffMode.WORD);

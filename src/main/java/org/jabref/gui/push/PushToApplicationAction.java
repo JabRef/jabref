@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.SimpleCommand;
@@ -31,8 +31,8 @@ public class PushToApplicationAction extends SimpleCommand {
 
     private PushToApplication application;
 
-    public PushToApplicationAction(StateManager stateManager, PushToApplicationsManager pushToApplicationsManager, DialogService dialogService) {
-        this.application = Objects.requireNonNull(Globals.prefs.getActivePushToApplication(pushToApplicationsManager));
+    public PushToApplicationAction(PushToApplication application, StateManager stateManager, DialogService dialogService) {
+        this.application = application;
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
@@ -74,7 +74,7 @@ public class PushToApplicationAction extends SimpleCommand {
         boolean first = true;
         for (BibEntry bes : entries) {
             citeKey = bes.getCiteKeyOptional();
-            if (!(citeKey.isPresent()) || citeKey.get().isEmpty()) {
+            if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
                 // Should never occur, because we made sure that all entries have keys
                 continue;
             }
@@ -90,13 +90,13 @@ public class PushToApplicationAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        // If required, check that all entries have BibTeX keys defined:
-        if (application.requiresBibtexKeys()) {
+        // If required, check that all entries have citation keys defined:
+        if (application.requiresCitationKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
                 if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
                     dialogService.showErrorDialogAndWait(
                             application.getApplicationName(),
-                            Localization.lang("This operation requires all selected entries to have BibTeX keys defined."));
+                            Localization.lang("This operation requires all selected entries to have citation keys defined."));
 
                     return;
                 }

@@ -10,7 +10,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -20,12 +20,11 @@ public class FieldCheckers {
     private final Multimap<Field, ValueChecker> fieldChecker;
 
     public FieldCheckers(BibDatabaseContext databaseContext, FilePreferences filePreferences,
-                         JournalAbbreviationRepository abbreviationRepository,
-                         boolean enforceLegalKey, boolean allowIntegerEdition) {
-        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, enforceLegalKey, allowIntegerEdition);
+                         JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
+        fieldChecker = getAllMap(databaseContext, filePreferences, abbreviationRepository, allowIntegerEdition);
     }
 
-    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean enforceLegalKey, boolean allowIntegerEdition) {
+    private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
         for (Field field : FieldFactory.getJournalNameFields()) {
@@ -40,7 +39,7 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.BOOKTITLE, new BooktitleChecker());
         fieldCheckers.put(StandardField.TITLE, new BracketChecker());
         fieldCheckers.put(StandardField.TITLE, new TitleChecker(databaseContext));
-        fieldCheckers.put(StandardField.DOI, new DOIValidityChecker());
+        fieldCheckers.put(StandardField.DOI, new DoiValidityChecker());
         fieldCheckers.put(StandardField.EDITION, new EditionChecker(databaseContext, allowIntegerEdition));
         fieldCheckers.put(StandardField.FILE, new FileChecker(databaseContext, filePreferences));
         fieldCheckers.put(StandardField.HOWPUBLISHED, new HowPublishedChecker(databaseContext));
@@ -52,8 +51,8 @@ public class FieldCheckers {
         fieldCheckers.put(StandardField.PAGES, new PagesChecker(databaseContext));
         fieldCheckers.put(StandardField.URL, new UrlChecker());
         fieldCheckers.put(StandardField.YEAR, new YearChecker());
-        fieldCheckers.put(StandardField.KEY, new ValidBibtexKeyChecker(enforceLegalKey));
-        fieldCheckers.put(InternalField.KEY_FIELD, new ValidBibtexKeyChecker(enforceLegalKey));
+        fieldCheckers.put(StandardField.KEY, new ValidCitationKeyChecker());
+        fieldCheckers.put(InternalField.KEY_FIELD, new ValidCitationKeyChecker());
 
         if (databaseContext.isBiblatexMode()) {
             fieldCheckers.put(StandardField.DATE, new DateChecker());

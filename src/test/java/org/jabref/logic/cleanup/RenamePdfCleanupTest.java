@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +35,13 @@ class RenamePdfCleanupTest {
         Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
-        context.setDatabaseFile(path);
+        context.setDatabasePath(path);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
 
         filePreferences = mock(FilePreferences.class);
-        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
+        when(filePreferences.isBibLocationAsPrimary()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         cleanup = new RenamePdfCleanup(false, context, filePreferences);
     }
 
@@ -82,7 +82,7 @@ class RenamePdfCleanupTest {
     }
 
     @Test
-    void cleanupRenamePdfRenamesFileStartingWithBibtexKey(@TempDir Path testFolder) throws IOException {
+    void cleanupRenamePdfRenamesFileStartingWithCitationKey(@TempDir Path testFolder) throws IOException {
         Path path = testFolder.resolve("Toot.tmp");
         Files.createFile(path);
 
