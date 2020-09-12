@@ -81,7 +81,7 @@ class CleanupWorkerTest {
     @Test
     void cleanupDoesNothingByDefault(@TempDir Path bibFolder) throws IOException {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("Toot");
+        entry.setCitationKey("Toot");
         entry.setField(StandardField.PDF, "aPdfFile");
         entry.setField(new UnknownField("some"), "1st");
         entry.setField(StandardField.DOI, "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
@@ -257,7 +257,7 @@ class CleanupWorkerTest {
         Files.createFile(path);
         File tempFile = path.toFile();
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("Toot");
+        entry.setCitationKey("Toot");
         LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
 

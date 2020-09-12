@@ -27,7 +27,7 @@ class ConvertLegacyExplicitGroupsTest {
         action = new ConvertLegacyExplicitGroups();
 
         entry = new BibEntry();
-        entry.setCiteKey("Entry1");
+        entry.setCitationKey("Entry1");
         group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, ',');
         group.addLegacyEntryKey("Entry1");
     }

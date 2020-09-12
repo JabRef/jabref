@@ -79,7 +79,7 @@ class BibEntryWriterTest {
 
         BibEntry entry = new BibEntry(new UnknownEntryType("other"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -173,7 +173,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry();
         entry.setType(new UnknownEntryType("ReallyUnknownType"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();

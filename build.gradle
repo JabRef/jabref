@@ -13,10 +13,10 @@ plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.1'
-    id 'com.github.ben-manes.versions' version '0.29.0'
+    id 'com.github.ben-manes.versions' version '0.30.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.21.3'
+    id 'org.beryx.jlink' version '2.21.4'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -105,8 +105,8 @@ dependencies {
     // Include all jar-files in the 'lib' folder as dependencies
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
-    implementation 'org.apache.pdfbox:pdfbox:2.0.20'
-    implementation 'org.apache.pdfbox:fontbox:2.0.20'
+    implementation 'org.apache.pdfbox:pdfbox:2.0.21'
+    implementation 'org.apache.pdfbox:fontbox:2.0.21'
     implementation 'org.apache.pdfbox:xmpbox:2.0.20'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
@@ -137,7 +137,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.1') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.2') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
@@ -207,7 +207,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.14'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.5.7'
+    testImplementation 'org.mockito:mockito-core:3.5.10'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.14.1'

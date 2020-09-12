@@ -17,7 +17,7 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     public EntryAddChangeViewModel(BibEntry entry) {
         super();
-        this.name = entry.getCiteKeyOptional()
+        this.name = entry.getCitationKey()
                          .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
                          .orElse(Localization.lang("Added entry"));
         this.entry = entry;

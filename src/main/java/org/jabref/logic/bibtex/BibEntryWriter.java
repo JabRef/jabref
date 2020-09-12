@@ -147,7 +147,7 @@ public class BibEntryWriter {
     }
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getCiteKeyOptional().orElse(""));
+        String keyField = StringUtil.shaveString(entry.getCitationKey().orElse(""));
         out.write(keyField + ',' + OS.NEWLINE);
     }
 
@@ -168,7 +168,7 @@ public class BibEntryWriter {
             try {
                 out.write(fieldWriter.write(field, value.get()));
             } catch (InvalidFieldValueException ex) {
-                throw new IOException("Error in field '" + field + " of entry " + entry.getCiteKeyOptional().orElse("") + "': " + ex.getMessage(), ex);
+                throw new IOException("Error in field '" + field + " of entry " + entry.getCitationKey().orElse("") + "': " + ex.getMessage(), ex);
             }
             out.write(',' + OS.NEWLINE);
         }

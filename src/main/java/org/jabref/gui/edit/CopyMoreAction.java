@@ -104,8 +104,8 @@ public class CopyMoreAction extends SimpleCommand {
 
         // Collect all non-null keys.
         List<String> keys = entries.stream()
-                                   .filter(entry -> entry.getCiteKeyOptional().isPresent())
-                                   .map(entry -> entry.getCiteKeyOptional().get())
+                                   .filter(entry -> entry.getCitationKey().isPresent())
+                                   .map(entry -> entry.getCitationKey().get())
                                    .collect(Collectors.toList());
 
         if (keys.isEmpty()) {
@@ -131,8 +131,8 @@ public class CopyMoreAction extends SimpleCommand {
 
         // Collect all non-null keys.
         List<String> keys = entries.stream()
-                                   .filter(entry -> entry.getCiteKeyOptional().isPresent())
-                                   .map(entry -> entry.getCiteKeyOptional().get())
+                                   .filter(entry -> entry.getCitationKey().isPresent())
+                                   .map(entry -> entry.getCitationKey().get())
                                    .collect(Collectors.toList());
 
         if (keys.isEmpty()) {
@@ -161,7 +161,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // ToDo: this string should be configurable to allow arbitrary exports
-        StringReader layoutString = new StringReader("\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
+        StringReader layoutString = new StringReader("\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
         Layout layout;
         try {
             layout = new LayoutHelper(layoutString, preferencesService.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository)).getLayoutFromText();
@@ -175,7 +175,7 @@ public class CopyMoreAction extends SimpleCommand {
         int entriesWithKeys = 0;
         // Collect all non-null keys.
         for (BibEntry entry : entries) {
-            if (entry.hasCiteKey()) {
+            if (entry.hasCitationKey()) {
                 entriesWithKeys++;
                 keyAndTitle.append(layout.doLayout(entry, stateManager.getActiveDatabase().get().getDatabase()));
             }
@@ -209,7 +209,7 @@ public class CopyMoreAction extends SimpleCommand {
         StringBuilder keyAndLink = new StringBuilder();
 
         List<BibEntry> entriesWithKey = entries.stream()
-                                               .filter(BibEntry::hasCiteKey)
+                                               .filter(BibEntry::hasCitationKey)
                                                .collect(Collectors.toList());
 
         if (entriesWithKey.isEmpty()) {
@@ -218,7 +218,7 @@ public class CopyMoreAction extends SimpleCommand {
         }
 
         for (BibEntry entry : entriesWithKey) {
-            String key = entry.getCiteKeyOptional().get();
+            String key = entry.getCitationKey().get();
             String url = entry.getField(StandardField.URL).orElse("");
             keyAndLink.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
             keyAndLink.append(OS.NEWLINE);
