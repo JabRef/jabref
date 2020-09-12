@@ -41,7 +41,7 @@ class XmpUtilReaderTest {
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
-        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
+        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 

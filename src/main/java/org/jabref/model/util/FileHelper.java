@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;

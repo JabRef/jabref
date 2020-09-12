@@ -9,7 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -17,7 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -40,13 +40,14 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     @FXML private Label proxyPasswordLabel;
     @FXML private CustomPasswordField proxyPassword;
     @FXML private Label proxyAttentionLabel;
+    @FXML private Button checkConnectionButton;
 
     private String proxyPasswordText = "";
     private int proxyPasswordCaretPosition = 0;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public NetworkTabView(JabRefPreferences preferences) {
+    public NetworkTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -62,7 +63,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
     public void initialize() {
         this.viewModel = new NetworkTabViewModel(dialogService, preferences);
 
-        remoteLabel.setVisible(preferences.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS));
+        remoteLabel.setVisible(preferences.getGeneralPreferences().shouldShowAdvancedHints());
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
@@ -119,5 +120,10 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
             proxyPasswordText = "";
             proxyPasswordCaretPosition = 0;
         }
+    }
+
+    @FXML
+    void checkConnection() {
+        viewModel.checkConnection();
     }
 }

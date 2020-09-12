@@ -43,7 +43,7 @@ public class IacrEprintFetcherTest {
 
         abram2017 = new BibEntry();
         abram2017.setType(StandardEntryType.Misc);
-        abram2017.setCiteKey("cryptoeprint:2017:1118");
+        abram2017.setCitationKey("cryptoeprint:2017:1118");
         abram2017.setField(StandardField.ABSTRACT, "dummy");
         abram2017.setField(StandardField.AUTHOR, "Ittai Abraham and Dahlia Malkhi and Kartik Nayak and Ling Ren and Alexander Spiegelman");
         abram2017.setField(StandardField.DATE, "2017-11-18");
@@ -56,7 +56,7 @@ public class IacrEprintFetcherTest {
 
         beierle2016 = new BibEntry();
         beierle2016.setType(StandardEntryType.Misc);
-        beierle2016.setCiteKey("cryptoeprint:2016:119");
+        beierle2016.setCitationKey("cryptoeprint:2016:119");
         beierle2016.setField(StandardField.ABSTRACT, "dummy");
         beierle2016.setField(StandardField.AUTHOR, "Christof Beierle and Thorsten Kranz and Gregor Leander");
         beierle2016.setField(StandardField.DATE, "2017-02-17");
@@ -69,7 +69,7 @@ public class IacrEprintFetcherTest {
 
         delgado2017 = new BibEntry();
         delgado2017.setType(StandardEntryType.Misc);
-        delgado2017.setCiteKey("cryptoeprint:2017:1095");
+        delgado2017.setCitationKey("cryptoeprint:2017:1095");
         delgado2017.setField(StandardField.ABSTRACT, "dummy");
         delgado2017.setField(StandardField.AUTHOR, "Sergi Delgado-Segura and Cristina Pérez-Solà and Guillermo Navarro-Arribas and Jordi Herrera-Joancomartí");
         delgado2017.setField(StandardField.DATE, "2018-01-19");

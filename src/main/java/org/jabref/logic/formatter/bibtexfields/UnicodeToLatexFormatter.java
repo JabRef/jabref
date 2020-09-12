@@ -3,10 +3,10 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.cleanup.Formatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

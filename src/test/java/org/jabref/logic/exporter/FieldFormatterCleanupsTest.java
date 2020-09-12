@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.IdentityFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -29,7 +29,7 @@ public class FieldFormatterCleanupsTest {
     public void setUp() {
         entry = new BibEntry();
         entry.setType(StandardEntryType.InProceedings);
-        entry.setCiteKey("6055279");
+        entry.setCitationKey("6055279");
         entry.setField(StandardField.TITLE, "Educational session 1");
         entry.setField(StandardField.BOOKTITLE, "Custom Integrated Circuits Conference (CICC), 2011 IEEE");
         entry.setField(StandardField.YEAR, "2011");

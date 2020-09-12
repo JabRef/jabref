@@ -9,6 +9,7 @@ import java.util.Set;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
+import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
@@ -18,6 +19,7 @@ import org.jabref.gui.util.Theme;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
@@ -27,6 +29,7 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
@@ -34,13 +37,12 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XmpPreferences;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
@@ -48,8 +50,6 @@ public interface PreferencesService {
     void setProtectedTermsPreferences(ProtectedTermsLoader loader);
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
-
-    Character getKeywordDelimiter();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
 
@@ -63,23 +63,19 @@ public interface PreferencesService {
 
     FieldWriterPreferences getFieldWriterPreferences();
 
+    FileHistory getFileHistory();
+
+    void storeFileHistory(FileHistory history);
+
     FieldContentFormatterPreferences getFieldContentParserPreferences();
-
-    XmpPreferences getXMPPreferences();
-
-    AutoLinkPreferences getAutoLinkPreferences();
 
     Path getWorkingDir();
 
     void setWorkingDir(Path dir);
 
-    String setLastPreferencesExportPath();
-
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
-
-    PreviewPreferences getPreviewPreferences();
 
     List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
@@ -89,9 +85,9 @@ public interface PreferencesService {
 
     ImportFormatPreferences getImportFormatPreferences();
 
-    boolean isKeywordSyncEnabled();
+    SavePreferences getSavePreferencesForExport();
 
-    SavePreferences loadForExportFromPreferences();
+    SavePreferences getSavePreferences();
 
     String getExportWorkingDirectory();
 
@@ -120,6 +116,9 @@ public interface PreferencesService {
     CleanupPreset getCleanupPreset();
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
+
+    @Deprecated
+    String getDefaultsDefaultCitationKeyPattern();
 
     //*************************************************************************************************************
     // GeneralPreferences
@@ -154,8 +153,14 @@ public interface PreferencesService {
     void storeTimestampPreferences(TimestampPreferences preferences);
 
     //*************************************************************************************************************
-    // ToDo: GroupPreferences
+    // GroupsPreferences
     //*************************************************************************************************************
+
+    Character getKeywordDelimiter();
+
+    GroupsPreferences getGroupsPreferences();
+
+    void storeGroupsPreferences(GroupsPreferences preferences);
 
     GroupViewMode getGroupViewMode();
 
@@ -244,8 +249,54 @@ public interface PreferencesService {
     void storeAppearancePreference(AppearancePreferences preferences);
 
     //*************************************************************************************************************
-    // ToDo: Misc preferences
+    // File preferences
     //*************************************************************************************************************
+
+    boolean shouldOpenLastFilesOnStartup();
+
+    void storeOpenLastFilesOnStartup(boolean openLastFilesOnStartup);
+
+    NewLineSeparator getNewLineSeparator();
+
+    void storeNewLineSeparator(NewLineSeparator newLineSeparator);
+
+    void storeLastPreferencesExportPath(Path exportFile);
+
+    String getLastPreferencesExportPath();
+
+    AutoLinkPreferences getAutoLinkPreferences();
+
+    void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
+
+    ImportExportPreferences getImportExportPreferences();
+
+    void storeImportExportPreferences(ImportExportPreferences importExportPreferences);
+
+    boolean getShouldAutosave();
+
+    void storeShouldAutosave(boolean shouldAutosave);
+
+    //*************************************************************************************************************
+    // Preview preferences
+    //*************************************************************************************************************
+
+    PreviewPreferences getPreviewPreferences();
+
+    void updatePreviewPreferences();
+
+    void storePreviewPreferences(PreviewPreferences previewPreferences);
+
+    //*************************************************************************************************************
+    // Misc preferences
+    //*************************************************************************************************************
+
+    XmpPreferences getXmpPreferences();
+
+    void storeXmpPreferences(XmpPreferences preferences);
+
+    NameFormatterPreferences getNameFormatterPreferences();
+
+    void storeNameFormatterPreferences(NameFormatterPreferences preferences);
 
     AutoCompletePreferences getAutoCompletePreferences();
 

@@ -3,8 +3,6 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.Objects;
 
-import org.jabref.model.database.shared.DBMSType;
-
 /**
  * This class provides helping methods for database tests. Furthermore it determines database systems which are ready to
  * be used for tests.

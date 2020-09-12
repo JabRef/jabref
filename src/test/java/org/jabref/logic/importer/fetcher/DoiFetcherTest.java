@@ -31,7 +31,7 @@ public class DoiFetcherTest {
 
         bibEntryBurd2011 = new BibEntry();
         bibEntryBurd2011.setType(StandardEntryType.Book);
-        bibEntryBurd2011.setCiteKey("Burd_2011");
+        bibEntryBurd2011.setCitationKey("Burd_2011");
         bibEntryBurd2011.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
         bibEntryBurd2011.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
         bibEntryBurd2011.setField(StandardField.YEAR, "2011");
@@ -41,7 +41,7 @@ public class DoiFetcherTest {
 
         bibEntryDecker2007 = new BibEntry();
         bibEntryDecker2007.setType(StandardEntryType.InProceedings);
-        bibEntryDecker2007.setCiteKey("Decker_2007");
+        bibEntryDecker2007.setCitationKey("Decker_2007");
         bibEntryDecker2007.setField(StandardField.AUTHOR, "Gero Decker and Oliver Kopp and Frank Leymann and Mathias Weske");
         bibEntryDecker2007.setField(StandardField.BOOKTITLE, "{IEEE} International Conference on Web Services ({ICWS} 2007)");
         bibEntryDecker2007.setField(StandardField.MONTH, "jul");

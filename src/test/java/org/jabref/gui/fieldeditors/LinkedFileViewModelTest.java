@@ -22,7 +22,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
@@ -49,14 +49,14 @@ class LinkedFileViewModelTest {
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
-    private ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
-    private FilePreferences filePreferences = mock(FilePreferences.class);
-    private XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+    private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
         entry = new BibEntry();
-        entry.setCiteKey("asdf");
+        entry.setCitationKey("asdf");
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
@@ -157,7 +157,7 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 

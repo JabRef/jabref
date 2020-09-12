@@ -9,7 +9,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -17,7 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -31,7 +31,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
     @FXML private TextField addFormatterString;
     @FXML private Button formatterHelp;
 
-    public NameFormatterTabView(JabRefPreferences preferences) {
+    public NameFormatterTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

@@ -21,7 +21,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -33,7 +33,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -63,6 +63,14 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
+    public PreviewTabView(PreferencesService preferences) {
+        this.preferences = preferences;
+
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+    }
+
     private class EditAction extends SimpleCommand {
 
         private final StandardActions command;
@@ -75,30 +83,14 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         public void execute() {
             if (editArea != null) {
                 switch (command) {
-                    case COPY:
-                        editArea.copy();
-                        break;
-                    case CUT:
-                        editArea.cut();
-                        break;
-                    case PASTE:
-                        editArea.paste();
-                        break;
-                    case SELECT_ALL:
-                        editArea.selectAll();
-                        break;
+                    case COPY -> editArea.copy();
+                    case CUT -> editArea.cut();
+                    case PASTE -> editArea.paste();
+                    case SELECT_ALL -> editArea.selectAll();
                 }
                 editArea.requestFocus();
             }
         }
-    }
-
-    public PreviewTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
-
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
     }
 
     @Override

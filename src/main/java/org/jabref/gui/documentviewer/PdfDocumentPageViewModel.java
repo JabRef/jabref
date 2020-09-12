@@ -8,6 +8,8 @@ import java.util.Objects;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
+import org.jabref.architecture.AllowedToUseAwt;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
@@ -17,6 +19,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 /**
  * Represents the view model of a pdf page backed by a {@link PDPage}.
  */
+@AllowedToUseAwt("Requires AWT due to PDFBox")
 public class PdfDocumentPageViewModel extends DocumentPageViewModel {
 
     private final PDPage page;
