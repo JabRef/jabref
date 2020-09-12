@@ -61,6 +61,7 @@ jobs:
           # reason: https://bugs.openjdk.java.net/browse/JDK-8238184
           java-version: 15
           release_type: ea
+          release: "jdk15u-2020-09-12-03-29"
       - name: Restore gradle cache
         uses: actions/cache@master
         with:
