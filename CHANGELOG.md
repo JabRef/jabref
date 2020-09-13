@@ -35,7 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
 - We fixed an issue where the sort order of the entry table was reset after a restart of JabRef [#6898](https://github.com/JabRef/jabref/pull/6898)
-- We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat" .
+- We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat"[#6907](https://github.com/JabRef/jabref/pull/60907).
 
 ### Removed
 
