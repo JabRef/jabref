@@ -1,5 +1,6 @@
 package org.jabref.gui.importer;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,41 +11,29 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.groups.GroupTreeNodeViewModel;
-import org.jabref.gui.groups.UndoableAddOrRemoveGroup;
-import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntries;
-import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.database.DatabaseMerger;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.metadata.FilePreferences;
-import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class ImportEntriesViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -61,7 +50,14 @@ public class ImportEntriesViewModel extends AbstractViewModel {
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
      */
-    public ImportEntriesViewModel(BackgroundTask<ParserResult> task, TaskExecutor taskExecutor, BibDatabaseContext databaseContext, DialogService dialogService, UndoManager undoManager, PreferencesService preferences, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor) {
+    public ImportEntriesViewModel(BackgroundTask<ParserResult> task,
+                                  TaskExecutor taskExecutor,
+                                  BibDatabaseContext databaseContext,
+                                  DialogService dialogService,
+                                  UndoManager undoManager,
+                                  PreferencesService preferences,
+                                  StateManager stateManager,
+                                  FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -94,9 +90,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     public boolean hasDuplicate(BibEntry entry) {
-        return findInternalDuplicate(entry).isPresent()
-                ||
-                new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
+        return findInternalDuplicate(entry).isPresent() ||
+                new DuplicateCheck(Globals.entryTypesManager)
+                .containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
     }
 
     /**
@@ -132,71 +128,33 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         }
 
         // Remember the selection in the dialog
-        FilePreferences filePreferences = preferences.getFilePreferences();
-        filePreferences.setShouldDownloadLinkedFiles(shouldDownloadFiles);
+        FilePreferences filePreferences = preferences.getFilePreferences()
+                                                     .withShouldDownloadLinkedFiles(shouldDownloadFiles);
         preferences.storeFilePreferences(filePreferences);
 
         if (shouldDownloadFiles) {
             for (BibEntry bibEntry : entriesToImport) {
                 for (LinkedFile linkedFile : bibEntry.getFiles()) {
-                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(linkedFile, bibEntry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), filePreferences, ExternalFileTypes.getInstance());
+                    LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
+                            linkedFile,
+                            bibEntry,
+                            databaseContext,
+                            taskExecutor,
+                            dialogService,
+                            preferences.getXmpPreferences(),
+                            filePreferences,
+                            ExternalFileTypes.getInstance());
                     linkedFileViewModel.download();
                 }
             }
         }
 
-        NamedCompound namedCompound = new NamedCompound(Localization.lang("Import file"));
-        namedCompound.addEdit(new UndoableInsertEntries(databaseContext.getDatabase(), entriesToImport));
+        new DatabaseMerger().mergeStrings(databaseContext.getDatabase(), parserResult.getDatabase());
+        new DatabaseMerger().mergeMetaData(databaseContext.getMetaData(),
+                parserResult.getMetaData(),
+                parserResult.getFile().map(File::getName).orElse("unknown"),
+                parserResult.getDatabase().getEntries());
 
-        // merge strings into target database
-        for (BibtexString bibtexString : parserResult.getDatabase().getStringValues()) {
-            String bibtexStringName = bibtexString.getName();
-            if (databaseContext.getDatabase().hasStringByName(bibtexStringName)) {
-                String importedContent = bibtexString.getContent();
-                String existingContent = databaseContext.getDatabase().getStringByName(bibtexStringName).get().getContent();
-                if (!importedContent.equals(existingContent)) {
-                    LOGGER.warn("String contents differ for {}: {} != {}", bibtexStringName, importedContent, existingContent);
-                    // TODO: decide what to do here (in case the same string exits)
-                }
-            } else {
-                databaseContext.getDatabase().addString(bibtexString);
-                // FIXME: this prevents this method to be moved to logic - we need to implement a new undo/redo data model
-                namedCompound.addEdit(new UndoableInsertString(databaseContext.getDatabase(), bibtexString));
-            }
-        }
-
-        // copy content selectors to target database
-        MetaData targetMetada = databaseContext.getMetaData();
-        parserResult.getMetaData()
-                    .getContentSelectorList()
-                    .forEach(targetMetada::addContentSelector);
-        // TODO undo of content selectors (currently not implemented)
-
-        // copy groups to target database
-        parserResult.getMetaData().getGroups().ifPresent(
-                newGroupsTreeNode -> {
-                    if (targetMetada.getGroups().isPresent()) {
-                        GroupTreeNode groupTreeNode = targetMetada.getGroups().get();
-                        newGroupsTreeNode.moveTo(groupTreeNode);
-                        namedCompound.addEdit(
-                                new UndoableAddOrRemoveGroup(
-                                        new GroupTreeNodeViewModel(groupTreeNode),
-                                        new GroupTreeNodeViewModel(newGroupsTreeNode),
-                                        UndoableAddOrRemoveGroup.ADD_NODE));
-                    } else {
-                        // target does not contain any groups, so we can just use the new groups
-                        targetMetada.setGroups(newGroupsTreeNode);
-                        namedCompound.addEdit(
-                                new UndoableAddOrRemoveGroup(
-                                        new GroupTreeNodeViewModel(newGroupsTreeNode),
-                                        new GroupTreeNodeViewModel(newGroupsTreeNode),
-                                        UndoableAddOrRemoveGroup.ADD_NODE));
-                    }
-                }
-        );
-
-        namedCompound.end();
-        Globals.undoManager.addEdit(namedCompound);
         JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
     }
 

@@ -10,13 +10,6 @@
         <property name="header" value=""/>
     </module>
 
-    <!-- BeforeExecutionFileFilters is required for sources that are based on java14 -->
-    <module name="BeforeExecutionExclusionFileFilter">
-        <property
-                name="fileNamePattern"
-                value="AuthorAndsReplacer.java|EntryTypeView.java|IEEE.java|MainTableFieldValueFormatter.java|Ordinal.java"/>
-    </module>
-
     <module name="SuppressionFilter">
         <property name="file" value="${config_loc}/suppressions.xml"/>
     </module>

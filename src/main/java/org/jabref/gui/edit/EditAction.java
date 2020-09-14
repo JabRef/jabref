@@ -7,7 +7,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.maintable.MainTable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,11 @@ public class EditAction extends SimpleCommand {
         this.frame = frame;
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
+        if (action == StandardActions.PASTE) {
+            this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        } else {
+            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
+        }
     }
 
     @Override
@@ -40,6 +43,7 @@ public class EditAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
+            LOGGER.debug("EditAction - focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
             if (focusOwner instanceof TextInputControl) {
                 // Focus is on text field -> copy/paste/cut selected text
                 TextInputControl textInput = (TextInputControl) focusOwner;
@@ -61,9 +65,9 @@ public class EditAction extends SimpleCommand {
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
 
-            } else if (focusOwner instanceof MainTable) {
+            } else {
 
-                LOGGER.debug("I am a Maintable in Edit action");
+                LOGGER.debug("EditAction - Else: {}", frame.getCurrentBasePanel().getTabTitle());
                 // Not sure what is selected -> copy/paste/cut selected entries
 
                 // ToDo: Should be handled by BibDatabaseContext instead of BasePanel

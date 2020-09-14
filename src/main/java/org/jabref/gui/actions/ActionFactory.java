@@ -136,6 +136,7 @@ public class ActionFactory {
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
+        button.setFocusTraversable(false); // Prevent the buttons from stealing the focus
         return button;
     }
 

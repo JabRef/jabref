@@ -8,8 +8,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -83,8 +83,9 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        // Default Implementation behaves like getURLForQuery using the default field as query
-        return this.getURLForQuery(complexSearchQuery.getDefaultField().orElse(""));
+        // Default implementation behaves as getURLForQuery using the default field phrases as query
+        List<String> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
+        return this.getURLForQuery(String.join(" ", defaultPhrases));
     }
 
     /**

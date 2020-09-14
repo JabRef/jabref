@@ -50,7 +50,7 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey());
+    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
     private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");

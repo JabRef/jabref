@@ -2,8 +2,8 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.Date;
 
 /**

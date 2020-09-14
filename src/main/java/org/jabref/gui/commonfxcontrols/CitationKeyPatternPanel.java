@@ -13,11 +13,11 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -32,7 +32,7 @@ public class CitationKeyPatternPanel extends TableView<CitationKeyPatternPanelIt
     private long lastKeyPressTime;
     private String tableSearchTerm;
 
-    public CitationKeyPatternPanel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
+    public CitationKeyPatternPanel(PreferencesService preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern keyPattern) {
         super();
 
         viewModel = new CitationKeyPatternPanelViewModel(preferences, entryTypeList, keyPattern);

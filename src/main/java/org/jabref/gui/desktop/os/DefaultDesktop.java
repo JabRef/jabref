@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.jabref.architecture.AllowedToUseAwt;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires AWT to open a file")
 public class DefaultDesktop implements NativeDesktop {
     private static final Logger LOGGER = LoggerFactory.getLogger(NativeDesktop.class);
 

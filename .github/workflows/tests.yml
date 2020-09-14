@@ -17,6 +17,10 @@ jobs:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
@@ -253,7 +257,7 @@ jobs:
         uses: unsplash/comment-on-pr@master
         if: steps.authors_check.outputs.newauthor == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_COMMENT_ON_PR }}
         with:
           msg: "${{ steps.authors_check.outputs.message }}"
           check_for_duplicate_msg: true

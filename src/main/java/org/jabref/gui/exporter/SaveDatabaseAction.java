@@ -28,11 +28,11 @@ import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -166,7 +166,7 @@ public class SaveDatabaseAction {
 
     private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
-        if (!databasePath.isPresent()) {
+        if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
             if (!savePath.isPresent()) {
                 return false;
@@ -216,10 +216,10 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SavePreferences preferences = this.preferences.loadForSaveFromPreferences()
+        SavePreferences preferences = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
                                                       .withSaveType(saveType);
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.makeBackup())) {
+        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.shouldMakeBackup())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {

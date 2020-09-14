@@ -16,8 +16,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -54,7 +54,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(this.preferences.get(JabRefPreferences.FX_THEME));
+        previewView.setTheme(this.preferences.getTheme());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 

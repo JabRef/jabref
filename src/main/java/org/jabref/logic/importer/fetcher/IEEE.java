@@ -236,11 +236,15 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
-        complexSearchQuery.getDefaultField().ifPresent(defaultField -> uriBuilder.addParameter("querytext", defaultField));
-        complexSearchQuery.getAuthors().ifPresent(authors ->
-                uriBuilder.addParameter("author", String.join(" AND ", authors)));
-        complexSearchQuery.getTitlePhrases().ifPresent(articleTitlePhrases ->
-                uriBuilder.addParameter("article_title", String.join(" AND ", articleTitlePhrases)));
+        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
+            uriBuilder.addParameter("querytext", String.join(" AND ", complexSearchQuery.getDefaultFieldPhrases()));
+        }
+        if (!complexSearchQuery.getAuthors().isEmpty()) {
+            uriBuilder.addParameter("author", String.join(" AND ", complexSearchQuery.getAuthors()));
+        }
+        if (!complexSearchQuery.getAuthors().isEmpty()) {
+            uriBuilder.addParameter("article_title", String.join(" AND ", complexSearchQuery.getTitlePhrases()));
+        }
         complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
         complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
         complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));

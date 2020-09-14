@@ -19,7 +19,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseButton;
 
-import org.jabref.Globals;
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.importer.FetcherException;
@@ -37,6 +37,7 @@ import org.jabref.model.util.OptionalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires ava.awt.datatransfer.Clipboard")
 public class ClipBoardManager {
 
     public static final DataFormat XML = new DataFormat("application/xml");

@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.Globals;
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * are opened. This feature is disabled by default and can be switched on at
  * preferences/external programs
  */
+@AllowedToUseAwt("Requires AWT to send an email")
 public class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);

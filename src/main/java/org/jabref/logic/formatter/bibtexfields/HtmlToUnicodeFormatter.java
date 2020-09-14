@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.cleanup.Formatter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 

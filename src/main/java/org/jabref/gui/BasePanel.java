@@ -12,7 +12,6 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -33,6 +32,7 @@ import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -40,7 +40,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntriesAddedEvent;
 import org.jabref.model.database.event.EntriesRemovedEvent;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -120,8 +119,6 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
-        // Open entry editor for first entry on start up.
-        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
@@ -614,7 +611,7 @@ public class BasePanel extends StackPane {
     }
 
     public void paste() {
-        mainTable.paste();
+        mainTable.paste(this.bibDatabaseContext.getMode());
     }
 
     public void cut() {

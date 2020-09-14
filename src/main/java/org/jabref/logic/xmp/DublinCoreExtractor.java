@@ -331,7 +331,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * All others (+ bibtex key) get packaged in the relation attribute
+     * All others (+ citation key) get packaged in the relation attribute
      *
      * @param field Key of the metadata attribute
      * @param value Value of the metadata attribute
@@ -342,7 +342,7 @@ public class DublinCoreExtractor {
 
     public void fillDublinCoreSchema() {
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
+        boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();
 
         Set<Entry<Field, String>> fieldValues = new TreeSet<>(Comparator.comparing(fieldStringEntry -> fieldStringEntry.getKey().getName()));
         fieldValues.addAll(bibEntry.getFieldMap().entrySet());

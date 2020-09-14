@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;

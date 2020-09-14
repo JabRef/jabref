@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -82,7 +80,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private static String getAppendix(int number) {
         if (number >= APPENDIX_CHARACTERS.length()) {
             int lastChar = number % APPENDIX_CHARACTERS.length();
-            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.substring(lastChar, lastChar + 1);
+            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);
         } else {
             return APPENDIX_CHARACTERS.substring(number, number + 1);
         }
@@ -157,8 +155,8 @@ public class CitationKeyGenerator extends BracketedPattern {
             key = key.replaceAll(regex, replacement);
         }
 
-        String oldKey = entry.getCiteKeyOptional().orElse(null);
-        long occurrences = database.getNumberOfKeyOccurrences(key);
+        String oldKey = entry.getCitationKey().orElse(null);
+        long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -182,7 +180,7 @@ public class CitationKeyGenerator extends BracketedPattern {
                 moddedKey = key + getAppendix(number);
                 number++;
 
-                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getNumberOfCitationKeyOccurrences(moddedKey);
                 // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
@@ -202,6 +200,6 @@ public class CitationKeyGenerator extends BracketedPattern {
      */
     public Optional<FieldChange> generateAndSetKey(BibEntry entry) {
         String newKey = generateKey(entry);
-        return entry.setCiteKey(newKey);
+        return entry.setCitationKey(newKey);
     }
 }
