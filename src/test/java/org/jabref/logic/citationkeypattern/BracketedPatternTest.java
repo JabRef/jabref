@@ -26,7 +26,7 @@ class BracketedPatternTest {
                                  .withField(StandardField.PAGES, "213--216");
 
         dbentry = new BibEntry(StandardEntryType.Article)
-                .withCiteKey("HipKro03")
+                .withCitationKey("HipKro03")
                 .withField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh")
                 .withField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science")
                 .withField(StandardField.JOURNAL, "Organization Science")
