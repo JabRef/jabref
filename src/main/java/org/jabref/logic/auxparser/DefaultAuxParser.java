@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -128,8 +126,8 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
 
         for (String key : result.getUniqueKeys()) {
-            if (!result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
-                Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
+            if (!result.getGeneratedBibDatabase().getEntryByCitationKey(key).isPresent()) {
+                Optional<BibEntry> entry = masterDatabase.getEntryByCitationKey(key);
                 if (entry.isPresent()) {
                     entriesToInsert.add(entry.get());
                 } else {
@@ -157,8 +155,8 @@ public class DefaultAuxParser implements AuxParser {
         List<BibEntry> entriesToInsert = new ArrayList<>();
         for (BibEntry entry : entries) {
             entry.getField(StandardField.CROSSREF).ifPresent(crossref -> {
-                if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
-                    Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
+                if (!result.getGeneratedBibDatabase().getEntryByCitationKey(crossref).isPresent()) {
+                    Optional<BibEntry> refEntry = masterDatabase.getEntryByCitationKey(crossref);
 
                     if (refEntry.isPresent()) {
                         if (!entriesToInsert.contains(refEntry.get())) {
@@ -178,12 +176,15 @@ public class DefaultAuxParser implements AuxParser {
      * Insert a clone of each given entry. The clones are each given a new unique ID.
      *
      * @param entries Entries to be cloned
-     * @param result AUX file
+     * @param result the parser result (representing the AUX file)
      */
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();
         for (BibEntry entry : entries) {
-            clonedEntries.add((BibEntry) entry.clone());
+            BibEntry bibEntryToAdd = (BibEntry) entry.clone();
+            // ensure proper "rendering" of the BibTeX code
+            bibEntryToAdd.setChanged(true);
+            clonedEntries.add(bibEntryToAdd);
         }
         result.getGeneratedBibDatabase().insertEntries(clonedEntries);
     }

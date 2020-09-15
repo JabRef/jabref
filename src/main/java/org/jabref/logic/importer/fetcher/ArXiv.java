@@ -158,7 +158,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
-        throws FetcherException {
+            throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
 
@@ -253,6 +253,25 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return searchForEntries(query).stream().map(
                 (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                       .collect(Collectors.toList());
+    }
+
+    /**
+     * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
+     *
+     * @param complexSearchQuery the search query defining all fielded search parameters
+     * @return A list of entries matching the complex query
+     */
+    @Override
+    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
+        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
+        // Since ArXiv API does not support year search, we ignore the year related terms
+        complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
+        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
+        String complexQueryString = String.join(" AND ", searchTerms);
+        return performSearch(complexQueryString);
     }
 
     @Override

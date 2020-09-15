@@ -2,8 +2,8 @@ package org.jabref.logic.formatter.minifier;
 
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
 /**
  * Replaces three or more authors with and others

@@ -9,8 +9,10 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -61,11 +63,14 @@ public class CompositeSearchBasedFetcherTest {
     @MethodSource("performSearchParameters")
     public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
+        ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
 
         List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                Assertions.assertTrue(compositeResult.containsAll(fetcher.performSearch("quantum")));
+                List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
+                fetcherResult.forEach(cleanup::doPostCleanup);
+                Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {
                 /* We catch the Fetcher exception here, since the failing fetcher also fails in the CompositeFetcher
                  * and just leads to no additional results in the returned list. Therefore the test should not fail

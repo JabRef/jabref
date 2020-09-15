@@ -8,11 +8,17 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 
+import org.fxmisc.richtext.CodeArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
  * Globals.focusListener, and we call the action stored under the relevant name in its action map.
  */
 public class EditAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
     private final JabRefFrame frame;
     private final StandardActions action;
@@ -23,7 +29,11 @@ public class EditAction extends SimpleCommand {
         this.frame = frame;
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
+        if (action == StandardActions.PASTE) {
+            this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        } else {
+            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
+        }
     }
 
     @Override
@@ -34,6 +44,7 @@ public class EditAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getFocusOwner().ifPresent(focusOwner -> {
+            LOGGER.debug("EditAction - focusOwner: {}; Action: {}", focusOwner.toString(), action.getText());
             if (focusOwner instanceof TextInputControl) {
                 // Focus is on text field -> copy/paste/cut selected text
                 TextInputControl textInput = (TextInputControl) focusOwner;
@@ -45,7 +56,7 @@ public class EditAction extends SimpleCommand {
                         textInput.cut();
                         break;
                     case PASTE:
-                        // handled by FX in TextInputControl#paste
+                        textInput.paste();
                         break;
                     case DELETE_ENTRY:
                         // DELETE_ENTRY in text field should do forward delete
@@ -54,7 +65,10 @@ public class EditAction extends SimpleCommand {
                     default:
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
-            } else {
+
+            } else if (!(focusOwner instanceof CodeArea)) {
+
+                LOGGER.debug("EditAction - Else: {}", frame.getCurrentBasePanel().getTabTitle());
                 // Not sure what is selected -> copy/paste/cut selected entries
 
                 // ToDo: Should be handled by BibDatabaseContext instead of BasePanel

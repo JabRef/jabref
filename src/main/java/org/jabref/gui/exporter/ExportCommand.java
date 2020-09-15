@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -53,8 +53,8 @@ public class ExportCommand extends SimpleCommand {
     public void execute() {
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
-        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
 
         // Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()

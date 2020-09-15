@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.Optional;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -9,10 +10,12 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T> {
 
@@ -36,7 +39,10 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
         setDialogIcon(IconTheme.getJabRefImageFX());
         setResizable(true);
-        Globals.getThemeLoader().installCss(getDialogPane().getScene(), Globals.prefs);
+
+        EasyBind.wrapNullable(dialogPaneProperty())
+                .mapObservable(Node::sceneProperty)
+                .subscribeToValues(scene -> Globals.prefs.getTheme().installCss(scene));
     }
 
     private Optional<Button> getDefaultButton() {

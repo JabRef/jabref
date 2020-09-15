@@ -9,11 +9,11 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class CitationKeyPatternPanelViewModel {
 
@@ -38,9 +38,9 @@ public class CitationKeyPatternPanelViewModel {
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
     private final AbstractCitationKeyPattern initialKeyPattern;
     private final Collection<BibEntryType> bibEntryTypeList;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public CitationKeyPatternPanelViewModel(JabRefPreferences preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
+    public CitationKeyPatternPanelViewModel(PreferencesService preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
         this.preferences = preferences;
         this.bibEntryTypeList = entryTypeList;
         this.initialKeyPattern = initialKeyPattern;
@@ -72,12 +72,12 @@ public class CitationKeyPatternPanelViewModel {
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
-        item.setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
+        item.setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern((String) preferences.defaults.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN));
+        defaultItemProperty.getValue().setPattern(preferences.getDefaultsDefaultCitationKeyPattern());
     }
 
     public ListProperty<CitationKeyPatternPanelItemModel> patternListProperty() {

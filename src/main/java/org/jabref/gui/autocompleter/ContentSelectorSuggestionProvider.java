@@ -1,5 +1,7 @@
 package org.jabref.gui.autocompleter;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,5 +23,15 @@ public class ContentSelectorSuggestionProvider extends StringSuggestionProvider 
     @Override
     public Stream<String> getSource() {
         return Stream.concat(contentSelectorValues.stream(), suggestionProvider.getSource());
+    }
+
+    @Override
+    public Collection<String> getPossibleSuggestions() {
+        List<String> suggestions = new ArrayList<>();
+        if (suggestionProvider != null) {
+            suggestions.addAll(suggestionProvider.getPossibleSuggestions());
+        }
+        suggestions.addAll(contentSelectorValues);
+        return suggestions;
     }
 }

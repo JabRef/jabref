@@ -6,10 +6,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -20,10 +21,12 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
     @FXML public Spinner<Integer> fontSize;
     @FXML public RadioButton themeLight;
     @FXML public RadioButton themeDark;
+    @FXML public RadioButton customTheme;
+    @FXML public TextField customThemePath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AppearanceTabView(JabRefPreferences preferences) {
+    public AppearanceTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -49,8 +52,18 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
+        customTheme.selectedProperty().bindBidirectional(viewModel.customThemeProperty());
+        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize));
+        Platform.runLater(() -> {
+            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
+            validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
+        });
+    }
+
+    @FXML
+    void importTheme() {
+        viewModel.importCSSFile();
     }
 }

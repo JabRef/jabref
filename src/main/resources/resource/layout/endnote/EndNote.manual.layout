@@ -4,22 +4,22 @@
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E
-%B 
+%B
 %C \address
 %I \organization
-%V 
+%V
 %6
-%N 
+%N
 %P \format[FormatPagesForHTML]{\pages}
-%& 
-%Y 
-%S 
+%&
+%Y
+%S
 %7 \edition
 %8 \month
 %9
-%? 
+%?
 %! \shorttitle
-%Z 
+%Z
 %@ \isbn
 %(
 %)
@@ -32,7 +32,7 @@
 %4 \crossref
 %# \owner
 %$ \key
-%F \bibtexkey
+%F \citationkey
 %K \keywords
 %X \abstract
 %Z \note

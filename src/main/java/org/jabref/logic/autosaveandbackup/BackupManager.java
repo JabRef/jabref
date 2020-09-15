@@ -15,11 +15,11 @@ import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -131,10 +131,9 @@ public class BackupManager {
     private void performBackup(Path backupPath) {
         try {
             Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-            SavePreferences savePreferences = preferences
-                    .loadForSaveFromPreferences()
-                    .withEncoding(charset)
-                    .withMakeBackup(false);
+            SavePreferences savePreferences = preferences.getSavePreferences()
+                                                         .withEncoding(charset)
+                                                         .withMakeBackup(false);
             new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {

@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -48,6 +48,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {

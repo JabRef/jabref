@@ -2,7 +2,7 @@ package org.jabref.cli;
 
 import java.util.List;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.cli.CommandLine;

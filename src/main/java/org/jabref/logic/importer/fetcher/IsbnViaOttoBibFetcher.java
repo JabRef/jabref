@@ -64,6 +64,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
+        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry));
         return entry;
     }
 }

@@ -27,14 +27,14 @@ public class EntryLinkChecker implements EntryChecker {
         for (Entry<Field, String> field : entry.getFieldMap().entrySet()) {
             Set<FieldProperty> properties = field.getKey().getProperties();
             if (properties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                if (database.getEntryByKey(field.getValue()).isEmpty()) {
+                if (database.getEntryByCitationKey(field.getValue()).isEmpty()) {
                     result.add(new IntegrityMessage(Localization.lang("Referenced citation key does not exist"), entry,
                             field.getKey()));
                 }
             } else if (properties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
                 List<String> keys = new ArrayList<>(Arrays.asList(field.getValue().split(",")));
                 for (String key : keys) {
-                    if (database.getEntryByKey(key).isEmpty()) {
+                    if (database.getEntryByCitationKey(key).isEmpty()) {
                         result.add(new IntegrityMessage(
                                 Localization.lang("Referenced citation key does not exist") + ": " + key, entry,
                                 field.getKey()));

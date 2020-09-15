@@ -15,14 +15,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
@@ -81,10 +81,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
 
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
     private boolean registered;
 
-    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
         searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
@@ -116,11 +116,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
     }
 
-    public void setTheme(String theme) {
-        if (theme.equals(ThemeLoader.DARK_CSS)) {
+    public void setTheme(Theme theme) {
+        if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
             // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
-            URL url = JabRefFrame.class.getResource(ThemeLoader.DARK_CSS);
+            URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
@@ -206,7 +206,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask
                 .wrap(() -> {
-                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
+                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCitationKey).orElse("NO ENTRY"));
                     previewView.getEngine().print(job);
                     job.endJob();
                 })

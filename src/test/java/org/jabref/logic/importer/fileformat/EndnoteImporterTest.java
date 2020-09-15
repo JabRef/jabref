@@ -112,7 +112,7 @@ public class EndnoteImporterTest {
         BibEntry fifth = bibEntries.get(4);
         assertEquals(StandardEntryType.MastersThesis, fifth.getType());
         assertEquals(Optional.of("testX"), fifth.getField(StandardField.ABSTRACT));
-        assertEquals(Optional.of("testF"), fifth.getCiteKeyOptional());
+        assertEquals(Optional.of("testF"), fifth.getCitationKey());
         assertEquals(Optional.of("testR"), fifth.getField(StandardField.DOI));
         assertEquals(Optional.of("testK"), fifth.getField(StandardField.KEYWORDS));
         assertEquals(Optional.of("testO1"), fifth.getField(StandardField.NOTE));

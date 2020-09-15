@@ -105,7 +105,7 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        if (preferences.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
+        if (preferences.getSpecialFieldsPreferences().isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
             SpecialFieldsUtils.synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
         }
 
@@ -125,11 +125,9 @@ public class ManageKeywordsViewModel {
 
             // put keywords back
             Optional<FieldChange> change = entry.putKeywords(keywords, preferences.getKeywordDelimiter());
-            if (change.isPresent()) {
-                ce.addEdit(new UndoableFieldChange(change.get()));
-            }
+            change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
 
-            if (preferences.isKeywordSyncEnabled()) {
+            if (preferences.getSpecialFieldsPreferences().isKeywordSyncEnabled()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, preferences.getKeywordDelimiter());
             }
         }

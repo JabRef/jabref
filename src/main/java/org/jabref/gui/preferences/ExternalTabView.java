@@ -12,7 +12,7 @@ import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -37,7 +37,7 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTabView(JabRefPreferences preferences, PushToApplicationsManager pushToApplicationsManager) {
+    public ExternalTabView(PreferencesService preferences, PushToApplicationsManager pushToApplicationsManager) {
         this.preferences = preferences;
         this.pushToApplicationsManager = pushToApplicationsManager;
 

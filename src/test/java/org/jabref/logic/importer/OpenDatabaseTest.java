@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -39,8 +38,7 @@ class OpenDatabaseTest {
         bibWrongHeader = Path.of(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
         bibHeader = Path.of(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
         bibHeaderAndSignature = Path.of(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
-        bibEncodingWithoutNewline = Paths
-                .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
+        bibEncodingWithoutNewline = Path.of(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
     }
 
     @BeforeEach
@@ -82,7 +80,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -92,7 +90,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -102,7 +100,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     /**
@@ -120,6 +118,6 @@ class OpenDatabaseTest {
         assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        assertEquals(Optional.of("testArticle"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("testArticle"), entry.getCitationKey());
     }
 }

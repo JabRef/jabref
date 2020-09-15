@@ -1,8 +1,8 @@
-dist: bionic
+dist: focal
 language: ruby
 cache: bundler
 rvm:
-- 2.6.5
+- 2.7.1
 install:
 - bundle install --jobs=3 --retry=3 --path=${BUNDLE_PATH:-vendor/bundle}
 - bundle update sheldon

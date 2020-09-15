@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.texparser.LatexParser;
 import org.jabref.model.texparser.LatexParserResult;
 
 import org.slf4j.Logger;

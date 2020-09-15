@@ -11,16 +11,16 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class FileHistoryMenu extends Menu {
 
     private final FileHistory history;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final OpenDatabaseAction openDatabaseAction;
 
-    public FileHistoryMenu(JabRefPreferences preferences, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {
+    public FileHistoryMenu(PreferencesService preferences, DialogService dialogService, OpenDatabaseAction openDatabaseAction) {
         setText(Localization.lang("Recent libraries"));
 
         this.preferences = preferences;

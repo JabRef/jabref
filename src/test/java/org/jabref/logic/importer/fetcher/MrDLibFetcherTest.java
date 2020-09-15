@@ -35,7 +35,7 @@ public class MrDLibFetcherTest {
     @Test
     public void testPerformSearchForHornecker2006() throws FetcherException {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setCiteKey("Hornecker:2006:GGT:1124772.1124838");
+        bibEntry.setCitationKey("Hornecker:2006:GGT:1124772.1124838");
         bibEntry.setField(StandardField.ADDRESS, "New York, NY, USA");
         bibEntry.setField(StandardField.AUTHOR, "Hornecker, Eva and Buur, Jacob");
         bibEntry.setField(StandardField.BOOKTITLE, "Proceedings of the SIGCHI Conference on Human Factors in Computing Systems");

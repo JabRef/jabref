@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
+@AllowedToUseAwt("Requires AWT to open a file")
 public class OSX implements NativeDesktop {
 
     @Override

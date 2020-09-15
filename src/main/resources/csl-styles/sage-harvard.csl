@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/sage-harvard</id>
     <link href="http://www.zotero.org/styles/sage-harvard" rel="self"/>
     <link href="http://www.zotero.org/styles/the-open-university-harvard" rel="template"/>
-    <link href="http://www.uk.sagepub.com/repository/binaries/pdf/SAGE_Harvard_reference_style.pdf" rel="documentation"/>
+    <link href="https://uk.sagepub.com/sites/default/files/sage_harvard_reference_style_0.pdf" rel="documentation"/>
     <author>
       <name>Joseph Reagle</name>
     </author>
@@ -27,6 +27,12 @@
     <names variable="editor" delimiter=", ">
       <name and="text" initialize-with="" delimiter=", " sort-separator=" " name-as-sort-order="all"/>
       <label form="short" prefix=" (" suffix=")"/>
+    </names>
+  </macro>
+  <macro name="editor-translator">
+    <names variable="editor translator" delimiter="; ">
+      <label form="short" suffix=" "/>
+      <name and="text" initialize-with="" delimiter=", "/>
     </names>
   </macro>
   <macro name="proceedings-editor">
@@ -88,7 +94,10 @@
   <macro name="title">
     <choose>
       <if type="book">
-        <text variable="title" font-style="italic" text-case="title"/>
+        <group delimiter=" ">
+          <text variable="title" font-style="italic" text-case="title"/>
+          <text macro="editor-translator" prefix="(" suffix=")"/>
+        </group>
       </if>
       <else-if type="bill graphic legal_case motion_picture report song thesis" match="any">
         <text variable="title" font-style="italic"/>
@@ -220,11 +229,11 @@
           </group>
         </group>
       </else-if>
-      <else-if type="webpage" match="none">
+      <else-if type="webpage book" match="none">
         <group delimiter=", ">
           <group delimiter=" ">
-            <text macro="editor"/>
             <text variable="container-title" font-style="italic"/>
+            <text macro="editor"/>
           </group>
           <choose>
             <if type="article-newspaper article-magazine" match="any">

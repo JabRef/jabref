@@ -26,6 +26,9 @@ public class HTMLCharsTest {
         assertEquals("Réflexions sur le timing de la quantité",
                 layout.format("Réflexions sur le timing de la quantité"));
 
+        assertEquals("%%%", layout.format("\\%\\%\\%"));
+        assertEquals("People remember 10%, 20%…Oh Really?", layout.format("{{People remember 10\\%, 20\\%…Oh Really?}}"));
+
         assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
         assertEquals("&imath; &imath;", layout.format("\\i \\i"));

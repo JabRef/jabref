@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -55,7 +55,7 @@ public class Benchmarks {
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {
             BibEntry entry = new BibEntry();
-            entry.setCiteKey("id" + i);
+            entry.setCitationKey("id" + i);
             entry.setField(StandardField.TITLE, "This is my title " + i);
             entry.setField(StandardField.AUTHOR, "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
             entry.setField(StandardField.JOURNAL, "Journal Title " + i);

@@ -13,8 +13,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,10 @@ public class LinkedFileHandler {
 
     private final LinkedFile fileEntry;
 
-    public LinkedFileHandler(LinkedFile fileEntry, BibEntry entry, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public LinkedFileHandler(LinkedFile fileEntry,
+                             BibEntry entry,
+                             BibDatabaseContext databaseContext,
+                             FilePreferences filePreferences) {
         this.fileEntry = fileEntry;
         this.entry = entry;
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -38,22 +41,25 @@ public class LinkedFileHandler {
 
     public boolean moveToDefaultDirectory() throws IOException {
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
-        if (!targetDirectory.isPresent()) {
+        if (targetDirectory.isEmpty()) {
             return false;
         }
 
         Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
-        if (!oldFile.isPresent()) {
+        if (oldFile.isEmpty()) {
             // Could not find file
             return false;
         }
 
-        String targetDirName = "";
-        if (!filePreferences.getFileDirPattern().isEmpty()) {
-            targetDirName = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirPattern());
+        String targetDirectoryName = "";
+        if (!filePreferences.getFileDirectoryPattern().isEmpty()) {
+            targetDirectoryName = FileUtil.createDirNameFromPattern(
+                    databaseContext.getDatabase(),
+                    entry,
+                    filePreferences.getFileDirectoryPattern());
         }
 
-        Path targetPath = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getFileName());
+        Path targetPath = targetDirectory.get().resolve(targetDirectoryName).resolve(oldFile.get().getFileName());
         if (Files.exists(targetPath)) {
             // We do not overwrite already existing files
             LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldFile.get(), targetPath);
@@ -77,7 +83,7 @@ public class LinkedFileHandler {
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
         Optional<Path> oldFile = fileEntry.findIn(databaseContext, filePreferences);
-        if (!oldFile.isPresent()) {
+        if (oldFile.isEmpty()) {
             return false;
         }
 

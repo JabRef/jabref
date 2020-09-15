@@ -45,10 +45,10 @@ import org.jabref.logic.xmp.XmpUtilWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.FilePreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -427,12 +427,29 @@ public class LinkedFileViewModel extends AbstractViewModel {
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
                 LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
-                entry.addFile(0, newLinkedFile);
+
+                List<LinkedFile> linkedFiles = entry.getFiles();
+                int oldFileIndex = -1;
+                int i = 0;
+                while (i < linkedFiles.size() && oldFileIndex == -1) {
+                    LinkedFile file = linkedFiles.get(i);
+                    // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
+                    if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+                        oldFileIndex = i;
+                    }
+                    i++;
+                }
+                if (oldFileIndex == -1) {
+                    linkedFiles.add(0, newLinkedFile);
+                } else {
+                    linkedFiles.set(oldFileIndex, newLinkedFile);
+                }
+                entry.setFiles(linkedFiles);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             downloadTask.titleProperty().set(Localization.lang("Downloading"));
             downloadTask.messageProperty().set(
-                    Localization.lang("Fulltext for") + ": " + entry.getCiteKeyOptional().orElse(Localization.lang("New entry")));
+                    Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {
@@ -448,7 +465,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String suggestedTypeName = externalFileType.getName();
                     linkedFile.setFileType(suggestedTypeName);
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
-                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirPattern());
+                    String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());
                     suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })

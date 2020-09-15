@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -19,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,9 +52,9 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
         List<BibEntry> searchResult = fetcher.performSearch("jabref");
 
         BibEntry firstBibEntry = new BibEntry(StandardEntryType.InProceedings)
-                .withCiteKey("conf/ecsa/OlssonEW17")
+                .withCitationKey("conf/ecsa/OlssonEW17")
                 .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
-                .withField(StandardField.EDITOR, "Rog{\\~A}{\\copyright}rio de Lemos")
+                .withField(StandardField.EDITOR, "Rog{\\'e}rio de Lemos")
                 .withField(StandardField.ISBN, "978-1-4503-5217-8")
                 .withField(StandardField.PAGES, "152--158")
                 .withField(StandardField.PUBLISHER, "ACM")
@@ -65,8 +66,11 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(new UnknownField("bibdate"), "2018-11-06");
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
-                .withCiteKey("oai:DiVA.org:lnu-68408")
-                .withField(new UnknownField("identifier"), "urn:isbn:978-1-4503-5217-8; doi:10.1145/3129790.3129810; ISI:000426556400034")
+                .withCitationKey("oai:DiVA.org:lnu-68408")
+                .withField(StandardField.ISBN, "978-1-4503-5217-8")
+                .withField(StandardField.DOI, "10.1145/3129790.3129810")
+                .withField(new UnknownField("ISI"), "000505046100032")
+                .withField(new UnknownField("Scopus"), "2-s2.0-85037741580")
                 .withField(new UnknownField("subject"), "Software Architecture; Code Churn; Open Source; Architecrual Erosion; Technical Debt; Software Engineering; Programvaruteknik")
                 .withField(new UnknownField("relation"), "ACM International Conference Proceeding Series; ECSA '17~Proceedings of the 11th European Conference on Software Architecture : Companion Proceedings, p. 152-158")
                 .withField(StandardField.ABSTRACT, "The open source application JabRef has existed since" +
@@ -104,9 +108,11 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                 .withField(StandardField.YEAR, "2017");
 
-        // Checking entries in the set as the query is generic and returns a changing result set
-        assertTrue(searchResult.contains(firstBibEntry));
-        assertTrue(searchResult.contains(secondBibEntry));
+        // Checking a subset, because the query "jabref" is generic and returns a changing result set
+        assertEquals(Set.of(firstBibEntry, secondBibEntry), searchResult.stream().filter(bibEntry -> {
+            String citeKey = bibEntry.getCitationKey().get();
+            return (citeKey.equals(firstBibEntry.getCitationKey().get()) || citeKey.equals(secondBibEntry.getCitationKey().get()));
+        }).collect(Collectors.toSet()));
     }
 
     @Test

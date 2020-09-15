@@ -9,16 +9,16 @@ public class ParsedEntryLink {
 
     private String key;
     private Optional<BibEntry> linkedEntry;
-    private BibDatabase dataBase;
+    private BibDatabase database;
 
-    public ParsedEntryLink(String key, BibDatabase dataBase) {
+    public ParsedEntryLink(String key, BibDatabase database) {
         this.key = key;
-        this.linkedEntry = dataBase.getEntryByKey(this.key);
-        this.dataBase = dataBase;
+        this.linkedEntry = database.getEntryByCitationKey(this.key);
+        this.database = database;
     }
 
     public ParsedEntryLink(BibEntry bibEntry) {
-        this.key = bibEntry.getCiteKeyOptional().orElse("");
+        this.key = bibEntry.getCitationKey().orElse("");
         this.linkedEntry = Optional.of(bibEntry);
     }
 
@@ -32,7 +32,7 @@ public class ParsedEntryLink {
 
     public void setKey(String newKey) {
         this.key = newKey;
-        this.linkedEntry = getDataBase().getEntryByKey(this.key);
+        this.linkedEntry = getDatabase().getEntryByCitationKey(this.key);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ParsedEntryLink {
         return Objects.equals(key, other.key) && Objects.equals(linkedEntry, other.linkedEntry);
     }
 
-    public BibDatabase getDataBase() {
-        return dataBase;
+    public BibDatabase getDatabase() {
+        return database;
     }
 }

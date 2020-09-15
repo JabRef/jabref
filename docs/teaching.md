@@ -4,7 +4,7 @@ With JabRef students can level-up their coding and GitHub skills. When taking pa
 
 JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engienering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
 
-We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time <sup>[1](teaching.md#Ayaankazerouni)</sup>.
+We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time [1](teaching.md#Ayaankazerouni).
 
 ## Notes for instructors
 
@@ -12,8 +12,13 @@ We recommend to start early and constantly, since students working earlier and m
 2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
 3. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](getting-into-the-code/development-strategy.md) for more details.
 4. Choose tasks from one of the following boards. Write a comment on each issue so that it can be reserved for your course.
+   * Candidates for university projects: [https://github.com/JabRef/jabref/projects/9](https://github.com/JabRef/jabref/projects/9)
+     * This board categorizes in small, medium, and large features
    * Feature Board: [https://github.com/JabRef/jabref/projects/7](https://github.com/JabRef/jabref/projects/7)
+     * This is a general feature board. Recommended, if the board above is empty or you did not find something suitable
    * Bug Board: [https://github.com/JabRef/jabref/projects/5](https://github.com/JabRef/jabref/projects/5)
+     * This is an excellent board to find issues training the maintainance knowledge which is essential for industry work
+   * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the projectd boards listed above.
 5. Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
 6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
 
@@ -29,19 +34,19 @@ There is no special process for student contributions. We want to discuss it nev
 
 The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) modeled using [bpmn.io](https://bpmn.io/).
 
-[![process](.gitbook/assets/contribution-process-reviews.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
+[![process](.gitbook/assets/contribution-process-reviews%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
 
 In short, the contribution is **reviewed by two JabRef developers**. Typically, they have constructive feedback on their contribution. This means, that the contributors get comments on their contribution enabling them to level-up their coding skill. Incorporating improvements takes time, too. The benefit is two-fold: a\) contributors improve their coding skills and b\) JabRef's code quality improves. All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
 
 GitHub describes that in their page [Unterstanding the GitHub flow](https://guides.github.com/introduction/flow/):
 
-[![GitHub flow](.gitbook/assets/github-flow.png)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
+[![GitHub flow](.gitbook/assets/github-flow%20%281%29.png)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
 
 ## Process for Java newcomers
 
 Newcomers contributing in the context of a university teaching experience are invited to follow the process described above. In case the capacity of the instructing university allows, we propose a three-step approach. First, the contributors prepare their contribution as usual. Then, they submit the pull request _to a separate repository_. There, the instructor reviews the pull request and provides feedback. This happens in a loop until the instructor shows the green light. Then, the pull request can be submitted to the main JabRef repository. This will help to reduce the load on the JabRef team and improve the quality of the initial pull request.
 
-[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
+[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
 
 ## Past courses
 

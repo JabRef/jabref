@@ -37,7 +37,7 @@ public enum KeyBinding {
     ENTRY_EDITOR_PREVIOUS_PANEL("Entry editor, previous panel", Localization.lang("Entry editor, previous panel"), "ctrl+shift+TAB", KeyBindingCategory.VIEW),
     FILE_LIST_EDITOR_MOVE_ENTRY_DOWN("File list editor, move entry down", Localization.lang("File list editor, move entry down"), "ctrl+DOWN", KeyBindingCategory.VIEW),
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "ctrl+UP", KeyBindingCategory.VIEW),
-    FIND_UNLINKED_FILES("Find unlinked files", Localization.lang("Find unlinked files"), "shift+F7", KeyBindingCategory.QUALITY),
+    FIND_UNLINKED_FILES("Search for unlinked local files", Localization.lang("Search for unlinked local files"), "shift+F7", KeyBindingCategory.QUALITY),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt+1", KeyBindingCategory.VIEW),
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_DATABASE("Import into current library", Localization.lang("Import into current library"), "ctrl+I", KeyBindingCategory.FILE),

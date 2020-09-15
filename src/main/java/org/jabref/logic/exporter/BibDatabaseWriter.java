@@ -25,12 +25,12 @@ import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.bibtex.comparator.IdComparator;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.formatter.bibtexfields.NormalizeNewlinesFormatter;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.cleanup.NormalizeNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -139,7 +139,7 @@ public abstract class BibDatabaseWriter {
          * 3. order specified in preferences
          */
 
-        if (preferences.isSaveInOriginalOrder()) {
+        if (preferences.shouldSaveInOriginalOrder()) {
             return Optional.empty();
         }
 
@@ -322,7 +322,7 @@ public abstract class BibDatabaseWriter {
         List<FieldChange> changes = new ArrayList<>();
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
-            Optional<String> oldKey = bes.getCiteKeyOptional();
+            Optional<String> oldKey = bes.getCitationKey();
             if (StringUtil.isBlank(oldKey)) {
                 Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
                 change.ifPresent(changes::add);

@@ -16,8 +16,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;

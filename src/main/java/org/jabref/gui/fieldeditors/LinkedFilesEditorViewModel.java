@@ -27,14 +27,14 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
@@ -101,7 +101,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
 
         LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes);
-        return new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes);
+        return new LinkedFileViewModel(
+                linkedFile,
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences.getXmpPreferences(),
+                preferences.getFilePreferences(),
+                externalFileTypes);
     }
 
     public boolean isFulltextLookupInProgress() {
@@ -114,7 +122,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
-                              .map(linkedFile -> new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes))
+                              .map(linkedFile -> new LinkedFileViewModel(
+                                      linkedFile,
+                                      entry,
+                                      databaseContext,
+                                      taskExecutor,
+                                      dialogService,
+                                      preferences.getXmpPreferences(),
+                                      preferences.getFilePreferences(),
+                                      externalFileTypes))
                               .collect(Collectors.toList());
     }
 
@@ -137,7 +153,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
-            files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes));
+            files.add(new LinkedFileViewModel(
+                    newLinkedFile,
+                    entry,
+                    databaseContext,
+                    taskExecutor,
+                    dialogService,
+                    preferences.getXmpPreferences(),
+                    preferences.getFilePreferences(),
+                    externalFileTypes));
         });
     }
 
@@ -159,11 +183,23 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
         List<LinkedFileViewModel> result = new ArrayList<>();
 
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, preferences.getFilePreferences(), preferences.getAutoLinkPreferences(), ExternalFileTypes.getInstance());
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                databaseContext,
+                preferences.getFilePreferences(),
+                preferences.getAutoLinkPreferences(),
+                ExternalFileTypes.getInstance());
         try {
             List<LinkedFile> linkedFiles = util.findAssociatedNotLinkedFiles(entry);
             for (LinkedFile linkedFile : linkedFiles) {
-                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes);
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(
+                        linkedFile,
+                        entry,
+                        databaseContext,
+                        taskExecutor,
+                        dialogService,
+                        preferences.getXmpPreferences(),
+                        preferences.getFilePreferences(),
+                        externalFileTypes);
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
             }
@@ -206,7 +242,15 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     private void addFromURL(URL url) {
-        LinkedFileViewModel onlineFile = new LinkedFileViewModel(new LinkedFile(url, ""), entry, databaseContext, taskExecutor, dialogService, preferences.getXMPPreferences(), preferences.getFilePreferences(), externalFileTypes);
+        LinkedFileViewModel onlineFile = new LinkedFileViewModel(
+                new LinkedFile(url, ""),
+                entry,
+                databaseContext,
+                taskExecutor,
+                dialogService,
+                preferences.getXmpPreferences(),
+                preferences.getFilePreferences(),
+                externalFileTypes);
         files.add(onlineFile);
         onlineFile.download();
     }

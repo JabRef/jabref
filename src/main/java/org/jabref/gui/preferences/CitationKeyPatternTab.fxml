@@ -56,8 +56,9 @@
         <HBox HBox.hgrow="ALWAYS"/>
         <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
     </HBox>
+    <Label text="%( Note: Press return to commit changes in the table! )"/>
     <AnchorPane>
-        <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="220.0"/>
+        <HBox fx:id="keyPatternContainer" prefWidth="650.0" prefHeight="180.0"/>
         <Button text="%Reset All" onAction="#resetAllKeyPatterns" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
     </AnchorPane>
 </fx:root>

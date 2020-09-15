@@ -2,7 +2,7 @@ package org.jabref.gui.util;
 
 import javafx.util.StringConverter;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;

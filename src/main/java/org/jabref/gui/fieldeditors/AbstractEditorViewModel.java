@@ -7,13 +7,14 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.integrity.ValueChecker;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -63,10 +64,15 @@ public class AbstractEditorViewModel extends AbstractViewModel {
                 fieldBinding,
                 newValue -> {
                     if (newValue != null) {
-                        String oldValue = entry.getField(field).orElse(null);
-                        entry.setField(field, newValue);
-                        UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
-                        undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                        // Controlsfx uses hardcoded \n for multiline fields, but JabRef stores them in OS Newlines format
+                        String oldValue = entry.getField(field).map(value -> value.replace(OS.NEWLINE, "\n").trim()).orElse(null);
+                        // Autosave and save action trigger the entry editor to reload the fields, so we have to
+                        // check for changes here, otherwise the cursor position is annoyingly reset every few seconds
+                        if (!(newValue.trim()).equals(oldValue)) {
+                            entry.setField(field, newValue);
+                            UndoManager undoManager = JabRefGUI.getMainFrame().getUndoManager();
+                            undoManager.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
+                        }
                     }
                 });
     }

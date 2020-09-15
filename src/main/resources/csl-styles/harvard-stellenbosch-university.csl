@@ -280,6 +280,7 @@
               <text term="in"/>
               <text variable="container-title" font-style="italic"/>
               <text macro="book-details"/>
+              <text macro="editor-translator"/>
             </group>
             <text variable="page"/>
           </else-if>

@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * Here all PDF files attached to a BibEntry are scanned for annotations using a PdfAnnotationImporter.

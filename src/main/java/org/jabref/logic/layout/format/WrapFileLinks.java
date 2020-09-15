@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
-import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 

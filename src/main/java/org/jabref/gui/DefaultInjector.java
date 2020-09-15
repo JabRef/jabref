@@ -4,8 +4,6 @@ import java.util.function.Function;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;

@@ -6,9 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.shared.listener.PostgresSQLNotificationListener;
-import org.jabref.model.database.shared.DatabaseConnection;
 import org.jabref.model.entry.BibEntry;
 
 import org.postgresql.PGConnection;
