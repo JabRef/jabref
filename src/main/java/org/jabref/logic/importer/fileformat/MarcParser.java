@@ -16,7 +16,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
@@ -67,11 +66,7 @@ public class MarcParser implements Parser {
     }
 
     private BibEntry parseEntry(Element e) {
-        EntryType entryType = StandardEntryType.Misc; // Default
-
-        // Alle relevanten Informationen einsammeln
-
-        BibEntry bibEntry = new BibEntry(entryType);
+        BibEntry bibEntry = new BibEntry(StandardEntryType.Misc);
 
         List<Element> datafields = getChildren("datafield", e);
         for (Element datafield : datafields) {
@@ -79,8 +74,28 @@ public class MarcParser implements Parser {
             LOGGER.debug("tag: " + tag);
 
             switch (tag) {
-                case "020" -> {
-                    // "a" - ISBN check for ISBN13 superseeds ISBN10
+                case "020" -> { // ISBN
+                    String isbn = getSubfield("a", datafield);
+                    if (StringUtil.isNullOrEmpty(isbn)) {
+                        LOGGER.debug("Empty ISBN recieved");
+                        break;
+                    }
+
+                    int length = isbn.length();
+                    if (length != 10 && length != 13) {
+                        LOGGER.debug("Malformed ISBN recieved, lenght: " + length);
+                        break;
+                    }
+
+                    Optional<String> field = bibEntry.getField(StandardField.ISBN);
+                    if (field.isPresent()) {
+                        // Only overwrite the field, if it's ISBN13
+                        if (field.get().length() == 13) {
+                            bibEntry.setField(StandardField.ISBN, isbn);
+                        }
+                    } else {
+                        bibEntry.setField(StandardField.ISBN, isbn);
+                    }
                 }
                 case "100", "700", "710" -> { // Author, Editor, Publisher
                     String author = getSubfield("a", datafield);
@@ -93,25 +108,33 @@ public class MarcParser implements Parser {
                                 switch (relation) {
                                     case "aut" -> StandardField.AUTHOR;
                                     case "edt" -> StandardField.EDITOR;
-                                    case "pbl" -> StandardField.PUBLISHER; // ToDo: with ind1==2 should be with curly brackets
+                                    case "pbl" -> StandardField.PUBLISHER;
                                     default -> null;
                                 });
 
-                        field.ifPresent(presentField -> {
-                            if (bibEntry.getField(presentField).isPresent()) {
-                                bibEntry.setField(presentField, bibEntry.getField(presentField).get().concat(" and " + name.getAsLastFirstNamesWithAnd(false)));
+                        if (field.isPresent()) {
+                            String ind1 = datafield.getAttribute("ind1");
+                            String brackedName;
+                            if (field.get() == StandardField.PUBLISHER && StringUtil.isNotBlank(ind1) && ind1.equals("2")) {
+                                // ind == 2 -> Corporate publisher
+                                brackedName = "{" + name.getAsFirstLastNamesWithAnd() + "}";
                             } else {
-                                bibEntry.setField(presentField, name.getAsLastFirstNamesWithAnd(false));
+                                brackedName = name.getAsLastFirstNamesWithAnd(false);
                             }
-                        });
+
+                            if (bibEntry.getField(field.get()).isPresent()) {
+                                bibEntry.setField(field.get(), bibEntry.getField(field.get()).get().concat(" and " + brackedName));
+                            } else {
+                                bibEntry.setField(field.get(), brackedName);
+                            }
+                        }
                     }
                 }
                 case "245" -> { // Title, Subtitle
                     String title = getSubfield("a", datafield);
                     String subtitle = getSubfield("b", datafield);
                     String responsibility = getSubfield("c", datafield);
-
-                    // "n" number of part
+                    String number = getSubfield("n", datafield);
 
                     if (StringUtil.isNotBlank(title)) {
                         bibEntry.setField(StandardField.TITLE, title);
@@ -120,39 +143,112 @@ public class MarcParser implements Parser {
                     if (StringUtil.isNotBlank(subtitle)) {
                         bibEntry.setField(StandardField.SUBTITLE, subtitle);
                     }
+
+                    if (StringUtil.isNotBlank(responsibility)) {
+                        bibEntry.setField(StandardField.TITLEADDON, responsibility);
+                    }
+
+                    if (StringUtil.isNotBlank(number)) {
+                        bibEntry.setField(StandardField.NUMBER, number);
+                    }
                 }
-                case "250" -> {
-                    // "a" - Edition '1st ed. 2020'
-                    // "b" - Remainder of edition statement e.g. 'revised by N.N.'
+                case "250" -> { // Edition
+                    String edition = getSubfield("a", datafield); // e.g. '1st ed. 2020'
+                    String editionaddendum = getSubfield("b", datafield); // e.g. 'revised by N.N.'
+
+                    if (StringUtil.isNullOrEmpty(edition)) {
+                        break;
+                    }
+
+                    if (StringUtil.isNotBlank(editionaddendum)) {
+                        edition = edition.concat(", " + editionaddendum);
+                    }
+
+                    bibEntry.setField(StandardField.EDITION, edition);
                 }
-                case "264" -> { // Publisher (ind2==1)
-                    // "a" - Place of production, publication, disturibution manufacture
-                    // "b" - Name of Publisher ...
-                    // "c" - Date of publication
+                case "264" -> { // ind2 == 1 -> Publisher
+                    String ind2 = datafield.getAttribute("ind2");
+                    if (StringUtil.isNotBlank(ind2) && ind2.equals("1")) {
+                        String place = getSubfield("a", datafield);
+                        String name = getSubfield("b", datafield);
+                        String date = getSubfield("c", datafield);
+
+                        if (StringUtil.isNotBlank(place)) {
+                            bibEntry.setField(StandardField.LOCATION, place);
+                        }
+
+                        if (StringUtil.isNotBlank(name)) {
+                            String ind1 = datafield.getAttribute("ind1");
+                            AuthorList parsedName = AuthorList.parse(name);
+                            String brackedName;
+                            if (StringUtil.isNotBlank(ind1) && ind1.equals("2")) {
+                                // ind == 2 -> Corporate publisher
+                                brackedName = "{" + parsedName.getAsFirstLastNamesWithAnd() + "}";
+                            } else {
+                                brackedName = parsedName.getAsLastFirstNamesWithAnd(false);
+                            }
+
+                            bibEntry.setField(StandardField.PUBLISHER, brackedName);
+                        }
+
+                        if (StringUtil.isNotBlank(date)) {
+                            bibEntry.setField(StandardField.DATE, date);
+                        }
+                    }
                 }
                 case "490", "830" -> { // Series
-                    // "a" - Series statement
-                    // "v" - Series volume
+                    String name = getSubfield("a", datafield);
+                    String volume = getSubfield("v", datafield);
+
+                    if (StringUtil.isNotBlank(name)) {
+                        bibEntry.setField(StandardField.SERIES, name);
+                    }
+
+                    if (StringUtil.isNotBlank(volume)) {
+                        bibEntry.setField(StandardField.VOLUME, volume);
+                    }
                 }
                 case "520" -> { // Summary
-                    // "a" - Abstract (ind1==3) - kann sich mehrfach ergänzen
+                    String summary = getSubfield("a", datafield);
 
+                    String ind1 = datafield.getAttribute("ind1");
+                    if (StringUtil.isNotBlank(summary) && StringUtil.isNotBlank(ind1) && ind1.equals("3")) { // Abstract
+                        if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {
+                            bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));
+                        } else {
+                            bibEntry.setField(StandardField.ABSTRACT, summary);
+                        }
+                    }
                 }
                 case "546" -> { // -- 599
                     // Notes
                 }
                 case "653" -> { // "a" - keywords
+                    String keyword = getSubfield("a", datafield);
 
+                    Optional<String> keywords = bibEntry.getField(StandardField.KEYWORDS);
+                    if (keywords.isPresent()) {
+                        bibEntry.setField(StandardField.KEYWORDS, keywords.get() + ", " + keyword);
+                    } else {
+                        bibEntry.setField(StandardField.KEYWORDS, keyword);
+                    }
                 }
                 case "856" -> { // electronic location (ind1==4, ind==0)
                     // "u" - url resource
                     // ind2 = related
+
+                    // ind2="4" ind2="0" subfield3="Volltext"
                 }
                 case "966" -> {
                     // "u" -  doi (ind1==e)
                 }
+                // 966 ind1=e
+                //  subfield u url
+                //  subfield 3 "Volltext"
             }
         }
+
+        // summary
 
             /*
             // mak
@@ -168,17 +264,6 @@ public class MarcParser implements Parser {
                 ppn = getSubfield("0", datafield);
             }
 
-            // publisher and address
-            if ("033A".equals(tag)) {
-                publisher = getSubfield("n", datafield);
-                address = getSubfield("p", datafield);
-            }
-
-            // year
-            if ("011@".equals(tag)) {
-                year = getSubfield("a", datafield);
-            }
-
             // year, volume, number, pages (year bei Zeitschriften (evtl. redundant mit 011@))
             if ("031A".equals(tag)) {
                 year = getSubfield("j", datafield);
@@ -186,25 +271,6 @@ public class MarcParser implements Parser {
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
                 pages = getSubfield("h", datafield);
-            }
-
-            // 036D seems to contain more information than the other fields
-            // overwrite information using that field
-            // 036D also contains information normally found in 036E
-            if ("036D".equals(tag)) {
-                // 021 might have been present
-                if (title != null) {
-                    // convert old title (contained in "a" of 021A) to volume
-                    if (title.startsWith("@")) {
-                        // "@" indicates a number
-                        title = title.substring(1);
-                    }
-                    number = title;
-                }
-                // title and subtitle
-                title = getSubfield("a", datafield);
-                subtitle = getSubfield("d", datafield);
-                volume = getSubfield("l", datafield);
             }
 
             // series and number
@@ -221,25 +287,6 @@ public class MarcParser implements Parser {
             // note
             if ("037A".equals(tag)) {
                 note = getSubfield("a", datafield);
-            }
-
-            // edition
-            if ("032@".equals(tag)) {
-                edition = getSubfield("a", datafield);
-            }
-
-            // isbn
-            if ("004A".equals(tag)) {
-                final String isbn10 = getSubfield("0", datafield);
-                final String isbn13 = getSubfield("A", datafield);
-
-                if (isbn10 != null) {
-                    isbn = isbn10;
-                }
-
-                if (isbn13 != null) {
-                    isbn = isbn13;
-                }
             }
 
             // Hochschulschriftenvermerk
@@ -317,25 +364,6 @@ public class MarcParser implements Parser {
                     || "05".equals(datafield.getAttribute("occurrence"))) && (url == null)) {
                 url = getSubfield("a", datafield);
             }
-        }
-
-        // Abfangen von Nulleintraegen
-        if (quelle == null) {
-            quelle = "";
-        }
-
-        // Nichtsortierzeichen entfernen
-        if (author != null) {
-            author = removeSortCharacters(author);
-        }
-        if (editor != null) {
-            editor = removeSortCharacters(editor);
-        }
-        if (title != null) {
-            title = removeSortCharacters(title);
-        }
-        if (subtitle != null) {
-            subtitle = removeSortCharacters(subtitle);
         }
 
         // Dokumenttyp bestimmen und Eintrag anlegen
