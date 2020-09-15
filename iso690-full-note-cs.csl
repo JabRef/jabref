@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Czech ISO-690, full note.</summary>
-    <updated>2020-05-30T10:00:00+00:00</updated>
+    <updated>2020-09-14T21:56:33+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -170,7 +170,7 @@
     <choose>
       <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
         <text term="in" text-case="capitalize-first" suffix=": "/>
-        <text macro="container-contributors" suffix=" "/>
+        <text macro="container-contributors" suffix=". "/>
         <choose>
           <if variable="container-title">
             <text variable="container-title" font-style="italic"/>
@@ -192,7 +192,7 @@
     <choose>
       <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
         <text term="in" text-case="capitalize-first" suffix=": "/>
-        <text macro="container-contributors-full" suffix=" "/>
+        <text macro="container-contributors-full" suffix=". "/>
         <choose>
           <if variable="container-title">
             <text variable="container-title" font-style="italic"/>
