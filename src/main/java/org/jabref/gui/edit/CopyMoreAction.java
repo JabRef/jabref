@@ -227,7 +227,7 @@ public class CopyMoreAction extends SimpleCommand {
             fallbackString.append(OS.NEWLINE);
         }
 
-        clipBoardManager.setHtmlContent(keyAndLink.toString(),fallbackString.toString());
+        clipBoardManager.setHtmlContent(keyAndLink.toString(), fallbackString.toString());
 
         if (entriesWithKey.size() == entries.size()) {
             // All entries had keys.
