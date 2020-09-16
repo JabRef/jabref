@@ -23,5 +23,5 @@ fix checkstyle in adr
 * [ADR-0017](https://github.com/JabRef/jabref/tree/master/docs/adr/0017-allow-model-access-logic.md) - Allow org.jabref.model to access org.jabref.logic
 
 
-For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/98e9fc3ddc7b59ca35101c7f37b183ca2e69d8a0/docs/adr/template.md) as basis. More information on the used format is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/). Then add them to the above list.
+For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/master/docs/adr/template.md) as basis. More information on the used format is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/). Then add them to the above list.
 
