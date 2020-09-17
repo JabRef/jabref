@@ -117,7 +117,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+
+        /* KEEP for debugging purposes
+        for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
+            for (var col : this.getColumns()) {
+                var tablecColModel = ((MainTableColumn<?>) col).getModel();
+                if (tablecColModel.equals(colModel)) {
+                    LOGGER.debug("Adding sort order for col {} ", col);
+                    this.getSortOrder().add(col);
+                    break;
+                }
+            }
+        }
+        */
+       mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))

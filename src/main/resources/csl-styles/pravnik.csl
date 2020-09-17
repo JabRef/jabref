@@ -15,7 +15,7 @@
     <category field="law"/>
     <issn>0231-6625</issn>
     <summary>Suitable for Právník - a journal published by the Institute of State and Law of the Czech Academy of Sciences.</summary>
-    <updated>2020-08-23T10:00:00+00:00</updated>
+    <updated>2020-09-14T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -155,7 +155,7 @@
     <choose>
       <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
         <text term="in" text-case="capitalize-first" suffix=":&#160;"/>
-        <text macro="container-contributors" suffix=" "/>
+        <text macro="container-contributors" suffix=". "/>
         <choose>
           <if variable="container-title">
             <text variable="container-title" font-style="italic"/>
@@ -177,7 +177,7 @@
     <choose>
       <if type="chapter entry entry-dictionary entry-encyclopedia webpage" match="any">
         <text term="in" text-case="capitalize-first" suffix=": "/>
-        <text macro="container-contributors-full" suffix=" "/>
+        <text macro="container-contributors-full" suffix=". "/>
         <choose>
           <if variable="container-title">
             <text variable="container-title" font-style="italic"/>

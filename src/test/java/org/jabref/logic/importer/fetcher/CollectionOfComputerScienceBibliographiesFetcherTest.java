@@ -52,7 +52,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
         List<BibEntry> searchResult = fetcher.performSearch("jabref");
 
         BibEntry firstBibEntry = new BibEntry(StandardEntryType.InProceedings)
-                .withCiteKey("conf/ecsa/OlssonEW17")
+                .withCitationKey("conf/ecsa/OlssonEW17")
                 .withField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist")
                 .withField(StandardField.EDITOR, "Rog{\\'e}rio de Lemos")
                 .withField(StandardField.ISBN, "978-1-4503-5217-8")
@@ -66,7 +66,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(new UnknownField("bibdate"), "2018-11-06");
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
-                .withCiteKey("oai:DiVA.org:lnu-68408")
+                .withCitationKey("oai:DiVA.org:lnu-68408")
                 .withField(StandardField.ISBN, "978-1-4503-5217-8")
                 .withField(StandardField.DOI, "10.1145/3129790.3129810")
                 .withField(new UnknownField("ISI"), "000505046100032")
@@ -110,8 +110,8 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
         // Checking a subset, because the query "jabref" is generic and returns a changing result set
         assertEquals(Set.of(firstBibEntry, secondBibEntry), searchResult.stream().filter(bibEntry -> {
-            String citeKey = bibEntry.getCiteKeyOptional().get();
-            return (citeKey.equals(firstBibEntry.getCiteKeyOptional().get()) || citeKey.equals(secondBibEntry.getCiteKeyOptional().get()));
+            String citeKey = bibEntry.getCitationKey().get();
+            return (citeKey.equals(firstBibEntry.getCitationKey().get()) || citeKey.equals(secondBibEntry.getCitationKey().get()));
         }).collect(Collectors.toSet()));
     }
 

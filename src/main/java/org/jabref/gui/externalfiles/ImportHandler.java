@@ -117,7 +117,7 @@ public class ImportHandler {
                 preferencesService.getOwnerPreferences(),
                 preferencesService.getTimestampPreferences());
 
-        // Generate bibtex keys
+        // Generate citation keys
         generateKeys(entries);
 
         // Add to group

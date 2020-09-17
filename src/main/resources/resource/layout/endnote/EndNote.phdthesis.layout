@@ -3,24 +3,24 @@
 %A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E 
-%B 
+%E
+%B
 %C \address
 %I \school
-%V 
+%V
 %6
-%N 
+%N
 %P \format[FormatPagesForHTML]{\pages}
-%& 
-%Y 
-%S 
+%&
+%Y
+%S
 %7
 %8 \month
 %9 \type
-%? 
+%?
 %! \shorttitle
-%Z 
-%@ 
+%Z
+%@
 %(
 %)
 %*
@@ -32,7 +32,7 @@
 %4 \crossref
 %# \owner
 %$ \key
-%F \bibtexkey
+%F \citationkey
 %K \keywords
 %X \abstract
 %Z \note

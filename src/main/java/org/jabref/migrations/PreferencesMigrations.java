@@ -247,13 +247,13 @@ public class PreferencesMigrations {
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[] {
+            String[] oldStylePatterns = new String[]{
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[] {"[bibtexkey]",
-                    "[bibtexkey] - [title]"};
+            String[] newStylePatterns = new String[]{"[citationkey]",
+                    "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
