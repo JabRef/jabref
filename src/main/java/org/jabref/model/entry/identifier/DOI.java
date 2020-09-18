@@ -94,7 +94,6 @@ public class DOI implements Identifier {
     private static final Pattern SHORT_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // DOI
     private final String doi;
-    private boolean isAmbiguous = false;
     // Short DOI
     private boolean isShortDoi = false;
 
@@ -133,7 +132,6 @@ public class DOI implements Identifier {
             if (shortDoiMatcher.find()) {
                 this.doi = shortDoiMatcher.group(1);
                 isShortDoi = true;
-                checkForAmbiguousShortDOI(); // can only happen in this case
             } else {
                 // Shortcut DOI without the "10/" as in "doi.org/d8dn"
                 Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(trimmedDoi);
@@ -144,22 +142,6 @@ public class DOI implements Identifier {
                     throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
                 }
             }
-        }
-    }
-
-    /**
-     * checks whether the DOI might as well be something else, like:
-     * "10/2012" or " 10:as23 ".
-     *
-     * sets the property "isAmbiguous" accordingly. ( NOT USED YET! )
-     *
-     */
-    private void checkForAmbiguousShortDOI() {
-        Pattern ambiPattern = Pattern.compile("10[/:%][a-z0-9]{4,8}$",Pattern.CASE_INSENSITIVE); // eg "10/2012" or " 10:as23 "
-        Matcher ambiMatcher = ambiPattern.matcher(this.doi);
-        this.isAmbiguous = false;
-        if (ambiMatcher.find()){
-            this.isAmbiguous = true;
         }
     }
 
@@ -239,13 +221,6 @@ public class DOI implements Identifier {
     public boolean isShortDoi() {
         return isShortDoi;
     }
-
-    /**
-     * Determines whether DOI is ambiguous: eg "10/2012"
-     *
-     * @return true if DOI is ambiguous, false otherwise
-     */
-    public boolean isAmbiguous() { return isAmbiguous; }
 
     /**
      * Return a URI presentation for the DOI/Short DOI
