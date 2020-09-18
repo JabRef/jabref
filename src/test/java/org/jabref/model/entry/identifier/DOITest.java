@@ -88,8 +88,6 @@ public class DOITest {
         assertEquals("10/gf4gqc", new DOI("doi:10/gf4gqc").getDOI());
     }
 
-
-
     @Test
     public void acceptURNPrefix() {
         assertEquals("10.123/456", new DOI("urn:10.123/456").getDOI());
@@ -97,8 +95,6 @@ public class DOITest {
         // : is also allowed as divider, will be replaced by RESOLVER
         assertEquals("10.123:456ABC/zyz", new DOI("http://doi.org/urn:doi:10.123:456ABC%2Fzyz").getDOI());
     }
-
-
 
     @Test
     public void acceptShortcutShortDoi() {
@@ -108,7 +104,6 @@ public class DOITest {
         assertEquals("10/d8dn", new DOI("www.doi.org/d8dn").getDOI());
         assertEquals("10/d8dn", new DOI("  doi.org/d8dn ").getDOI());
     }
-
 
     @Test
     public void acceptURNPrefixInShortDoi() {

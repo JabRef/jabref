@@ -141,7 +141,6 @@ public class DOI implements Identifier {
                     this.doi = "10/"+shortcutDoiMatcher.group(1);
                     isShortDoi = true;
                 } else {
-
                     throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
                 }
             }
