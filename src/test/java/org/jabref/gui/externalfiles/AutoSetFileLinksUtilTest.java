@@ -37,7 +37,7 @@ public class AutoSetFileLinksUtilTest {
     public void setUp(@TempDir Path folder) throws Exception {
         path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
-        entry.setCiteKey("CiteKey");
+        entry.setCitationKey("CiteKey");
         when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes()));
     }
 

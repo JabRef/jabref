@@ -22,8 +22,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
     private final JabRefPreferences preferences;
-    @FXML private CitationKeyEditorViewModel viewModel;
-    @FXML private Button generateCiteKeyButton;
+    @FXML private final CitationKeyEditorViewModel viewModel;
+    @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
     public CitationKeyEditor(Field field,
@@ -61,12 +61,12 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
 
-        // Configure cite key button
+        // Configure button to generate citation key
         new ActionFactory(preferences.getKeyBindingRepository())
                 .configureIconButton(
                         StandardActions.GENERATE_CITE_KEY,
                         viewModel.getGenerateCiteKeyCommand(),
-                        generateCiteKeyButton);
+                        generateCitationKeyButton);
     }
 
     @Override

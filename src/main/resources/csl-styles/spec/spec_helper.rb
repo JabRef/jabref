@@ -33,6 +33,7 @@ UNUSED_MACROS_FILTER = %w{
   chicago-library-list chicago-note-bibliography-16th-edition
   chicago-note-bibliography-with-ibid
   chicago-note-bibliography taylor-and-francis-chicago-author-date
+  turabian-author-date
 }
 
 # These files and directories are ignored when checking for extra files

@@ -263,7 +263,7 @@ public class DuplicateCheckTest {
     @Test
     public void sameBooksWithDifferentEditionsAreNotDuplicates() {
         BibEntry editionTwo = new BibEntry(StandardEntryType.Book);
-        editionTwo.setCiteKey("Sutton17reinfLrnIntroBook");
+        editionTwo.setCitationKey("Sutton17reinfLrnIntroBook");
         editionTwo.setField(StandardField.TITLE, "Reinforcement learning:An introduction");
         editionTwo.setField(StandardField.PUBLISHER, "MIT Press");
         editionTwo.setField(StandardField.YEAR, "2017");
@@ -274,7 +274,7 @@ public class DuplicateCheckTest {
         editionTwo.setField(StandardField.URL, "https://webdocs.cs.ualberta.ca/~sutton/book/the-book-2nd.html");
 
         BibEntry editionOne = new BibEntry(StandardEntryType.Book);
-        editionOne.setCiteKey("Sutton98reinfLrnIntroBook");
+        editionOne.setCitationKey("Sutton98reinfLrnIntroBook");
         editionOne.setField(StandardField.TITLE, "Reinforcement learning: An introduction");
         editionOne.setField(StandardField.PUBLISHER, "MIT press Cambridge");
         editionOne.setField(StandardField.YEAR, "1998");
