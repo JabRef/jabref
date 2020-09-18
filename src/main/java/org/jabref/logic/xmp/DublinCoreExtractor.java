@@ -331,7 +331,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * All others (+ bibtex key) get packaged in the relation attribute
+     * All others (+ citation key) get packaged in the relation attribute
      *
      * @param field Key of the metadata attribute
      * @param value Value of the metadata attribute

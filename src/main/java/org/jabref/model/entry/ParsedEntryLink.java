@@ -13,12 +13,12 @@ public class ParsedEntryLink {
 
     public ParsedEntryLink(String key, BibDatabase database) {
         this.key = key;
-        this.linkedEntry = database.getEntryByKey(this.key);
+        this.linkedEntry = database.getEntryByCitationKey(this.key);
         this.database = database;
     }
 
     public ParsedEntryLink(BibEntry bibEntry) {
-        this.key = bibEntry.getCiteKeyOptional().orElse("");
+        this.key = bibEntry.getCitationKey().orElse("");
         this.linkedEntry = Optional.of(bibEntry);
     }
 
@@ -32,7 +32,7 @@ public class ParsedEntryLink {
 
     public void setKey(String newKey) {
         this.key = newKey;
-        this.linkedEntry = getDatabase().getEntryByKey(this.key);
+        this.linkedEntry = getDatabase().getEntryByCitationKey(this.key);
     }
 
     @Override

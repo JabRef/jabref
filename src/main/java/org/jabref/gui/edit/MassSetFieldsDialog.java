@@ -62,7 +62,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
         this.undoManager = undoManager;
 
         init();
-        this.setTitle("Set/clear/append/rename fields");
+        this.setTitle(Localization.lang("Manage field names & content"));
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
         this.setResultConverter(button -> {
             if (button == ButtonType.OK) {

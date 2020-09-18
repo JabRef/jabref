@@ -62,7 +62,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             keysUsedInAux = auxResult.getUniqueKeys();
         }
 
-        return entry.getCiteKeyOptional().map(keysUsedInAux::contains).orElse(false);
+        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
     }
 
     @Override

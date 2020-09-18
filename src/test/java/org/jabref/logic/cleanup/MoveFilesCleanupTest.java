@@ -56,7 +56,7 @@ class MoveFilesCleanupTest {
         databaseContext.setDatabasePath(bibFolder.resolve("test.bib"));
 
         entry = new BibEntry();
-        entry.setCiteKey("Toot");
+        entry.setCitationKey("Toot");
         entry.setField(StandardField.TITLE, "test title");
         entry.setField(StandardField.YEAR, "1989");
         LinkedFile fileField = new LinkedFile("", fileBefore.toAbsolutePath().toString(), "");

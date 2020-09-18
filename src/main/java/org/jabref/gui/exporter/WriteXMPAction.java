@@ -117,7 +117,7 @@ public class WriteXMPAction extends SimpleCommand {
                                     .collect(Collectors.toList());
 
             Platform.runLater(() -> optionsDialog.getProgressArea()
-                                                 .appendText(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
+                                                 .appendText(entry.getCitationKey().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
