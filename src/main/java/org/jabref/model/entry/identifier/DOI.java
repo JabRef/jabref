@@ -50,7 +50,7 @@ public class DOI implements Identifier {
 
     // Regex (Short DOI)
     private static final String SHORT_DOI_SHORTCUT = ""
-            +"^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
+            + "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
     private static final String SHORT_DOI_EXP_PREFIX = ""
             + "^(?:" // can begin with...
             + "\\s*(?:https?://)?(?:www\\.)?"   // optional url parts "http(s)://"+"www."
@@ -89,7 +89,7 @@ public class DOI implements Identifier {
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
     private static final Pattern DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // Pattern (short DOI)
-    private static final Pattern EXACT_SHORT_DOI_SHORTCUT = Pattern.compile(SHORT_DOI_SHORTCUT , Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no "10/")
+    private static final Pattern EXACT_SHORT_DOI_SHORTCUT = Pattern.compile(SHORT_DOI_SHORTCUT, Pattern.CASE_INSENSITIVE); // eg doi.org/bfrhmx (no "10/")
     private static final Pattern EXACT_SHORT_DOI_PATT = Pattern.compile(SHORT_DOI_EXP_PREFIX + SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);
     private static final Pattern SHORT_DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_SHORT_DOI_EXP, Pattern.CASE_INSENSITIVE);
     // DOI
@@ -136,7 +136,7 @@ public class DOI implements Identifier {
                 // Shortcut DOI without the "10/" as in "doi.org/d8dn"
                 Matcher shortcutDoiMatcher = EXACT_SHORT_DOI_SHORTCUT.matcher(trimmedDoi);
                 if (shortcutDoiMatcher.find()) {
-                    this.doi = "10/"+shortcutDoiMatcher.group(1);
+                    this.doi = "10/" + shortcutDoiMatcher.group(1);
                     isShortDoi = true;
                 } else {
                     throw new IllegalArgumentException(trimmedDoi + " is not a valid DOI/Short DOI.");
