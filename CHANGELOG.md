@@ -27,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - JabRef no longer opens the entry editor with the first entry on startup [#6855](https://github.com/JabRef/jabref/issues/6855)
 - Fetch by ID: (long) "SAO/NASA Astrophysics Data System" replaced by (short) "SAO/NASA ADS" [#6876](https://github.com/JabRef/jabref/pull/6876)
 - We changed the title of the window  "Manage field names and content":  to have the same title as the corresponding menu item  [#6895](https://github.com/JabRef/jabref/pull/6895)
+- Improved detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 
 ### Fixed
 
