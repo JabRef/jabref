@@ -1094,12 +1094,4 @@ class CitationKeyGeneratorTest {
 
         assertEquals(4, generateKey(bibEntry, "[auth4_1]").length());
     }
-
-    @Test
-    void generateKeyCorrectlyWithBracketsInRegexModifier() {
-        BibEntry bibEntry = new BibEntry().withField(StandardField.YEAR, "2020");
-
-        // Tests that generateKey doesn't blindly parse tokens with [].
-        assertEquals("aa", generateKey(bibEntry, "[year:regex(\"[0-9]\", \"a\"):truncate2]"));
-    }
 }
