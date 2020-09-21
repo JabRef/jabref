@@ -53,7 +53,7 @@ public class RegexFormatter extends Formatter {
         } else {
             regex = null;
             replacement = null;
-            LOGGER.warn("RegexFormatter could not parse the input: " + input);
+            LOGGER.warn("RegexFormatter could not parse the input: {}", input);
         }
     }
 
