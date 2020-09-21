@@ -2,7 +2,7 @@
 
 ## Context and Problem Statement
 
-Some entry titles are composed of multiple sentences, for example: "Whose Music? A Sociology of Musical Language", therefore, it is necessary to first split the title into sentences and process them individually to ensure proper formatting using 'Sentence Case' or 'Title Case'
+Some entry titles are composed of multiple sentences, for example: "Whose Music? A Sociology of Musical Language", therefore, it is necessary to first split the title into sentences and process them individually to ensure proper formatting using '[Sentence Case](https://en.wiktionary.org/wiki/sentence_case)' or '[Title Case](https://en.wiktionary.org/wiki/title_case#English)'
 
 ## Considered Options
 
