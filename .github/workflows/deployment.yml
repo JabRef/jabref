@@ -55,8 +55,8 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
-      - name: Set up Adotptopen JDK mac
-        uses: joschi/setup-jdk@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
         with:
           java-version: 15
       - name: Restore gradle cache
