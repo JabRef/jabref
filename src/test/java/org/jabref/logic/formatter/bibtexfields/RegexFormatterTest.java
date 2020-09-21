@@ -73,4 +73,10 @@ class RegexFormatterTest {
         formatter = new RegexFormatter("(\"[A-Z]\", \"\")");
         assertEquals("abc", formatter.format("AaBbCc"));
     }
+
+    @Test
+    void formatWithSyntaxErrorReturnUnchangedString() {
+        formatter = new RegexFormatter("(\"(\", \"\")");
+        assertEquals("AaBbCc", formatter.format("AaBbCc"));
+    }
 }
