@@ -524,7 +524,7 @@ public class BracketedPattern {
                         resultingLabel = modifier.substring(1, modifier.length() - 1);
                     }
                 } else {
-                    LOGGER.warn("Key generator warning: unknown modifier '" + modifier + "'.");
+                    LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);
                 }
             }
         }
