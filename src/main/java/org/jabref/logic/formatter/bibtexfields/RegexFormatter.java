@@ -78,8 +78,7 @@ public class RegexFormatter extends Formatter {
         try {
             workingString = workingString.replaceAll(regex, replacement);
         } catch (PatternSyntaxException e) {
-            LOGGER.warn("There is a syntax error in the regular expression, " +
-                    regex + ", used by the regex modifier", e);
+            LOGGER.warn("There is a syntax error in the regular expression \"{}\" used by the regex modifier", regex, e);
             return input;
         }
 
