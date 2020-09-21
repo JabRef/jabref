@@ -16,12 +16,13 @@ import org.slf4j.LoggerFactory;
 public class RegexFormatter extends Formatter {
     public static final String KEY = "regex";
     private static final Logger LOGGER = LoggerFactory.getLogger(RegexFormatter.class);
-    private static final Pattern PATTERN_ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
-    private static final Pattern PATTERN_ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
-    // RegEx to match {...}
-    // \\ is required to have the { interpreted as character
-    // ? is required to disable the aggressive match
-    private static final Pattern PATTERN_ENCLOSED_IN_CURLY_BRACES = Pattern.compile("(\\{.*?})");
+    private static final Pattern ESCAPED_OPENING_CURLY_BRACE = Pattern.compile("\\\\\\{");
+    private static final Pattern ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile("\\\\\\}");
+    /**
+     * Matches text enclosed in curly brackets. The capturing group is used to prevent part of the input from being
+     * replaced.
+     */
+    private static final Pattern ENCLOSED_IN_CURLY_BRACES = Pattern.compile("\\{.*?}");
     private static final String REGEX_CAPTURING_GROUP = "regex";
     private static final String REPLACEMENT_CAPTURING_GROUP = "replacement";
     /**
@@ -68,11 +69,11 @@ public class RegexFormatter extends Formatter {
     }
 
     private String replaceHonoringProtectedGroups(final String input) {
-        Matcher matcher = PATTERN_ENCLOSED_IN_CURLY_BRACES.matcher(input);
+        Matcher matcher = ENCLOSED_IN_CURLY_BRACES.matcher(input);
 
         List<String> replaced = new ArrayList<>();
         while (matcher.find()) {
-            replaced.add(matcher.group(1));
+            replaced.add(matcher.group());
         }
         String workingString = matcher.replaceAll(PLACEHOLDER_FOR_PROTECTED_GROUP);
         try {
@@ -95,15 +96,15 @@ public class RegexFormatter extends Formatter {
             return input;
         }
 
-        Matcher matcherOpeningCurlyBrace = PATTERN_ESCAPED_OPENING_CURLY_BRACE.matcher(input);
-        final String openingCurlyBraceReplaced = matcherOpeningCurlyBrace.replaceAll(PLACEHOLDER_FOR_OPENING_CURLY_BRACE);
+        Matcher escapedOpeningCurlyBrace = ESCAPED_OPENING_CURLY_BRACE.matcher(input);
+        String inputWithPlaceholder = escapedOpeningCurlyBrace.replaceAll(PLACEHOLDER_FOR_OPENING_CURLY_BRACE);
 
-        Matcher matcherClosingCurlyBrace = PATTERN_ESCAPED_CLOSING_CURLY_BRACE.matcher(openingCurlyBraceReplaced);
-        final String closingCurlyBraceReplaced = matcherClosingCurlyBrace.replaceAll(PLACEHOLDER_FOR_CLOSING_CURLY_BRACE);
+        Matcher escapedClosingCurlyBrace = ESCAPED_CLOSING_CURLY_BRACE.matcher(inputWithPlaceholder);
+        inputWithPlaceholder = escapedClosingCurlyBrace.replaceAll(PLACEHOLDER_FOR_CLOSING_CURLY_BRACE);
 
-        final String regexApplied = replaceHonoringProtectedGroups(closingCurlyBraceReplaced);
+        final String regexMatchesReplaced = replaceHonoringProtectedGroups(inputWithPlaceholder);
 
-        return regexApplied
+        return regexMatchesReplaced
                 .replaceAll(PLACEHOLDER_FOR_OPENING_CURLY_BRACE, "\\\\{")
                 .replaceAll(PLACEHOLDER_FOR_CLOSING_CURLY_BRACE, "\\\\}");
     }
