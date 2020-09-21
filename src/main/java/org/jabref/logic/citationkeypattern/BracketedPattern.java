@@ -232,7 +232,7 @@ public class BracketedPattern {
         if (!foundClosingBracket) {
             LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
         } else if (bracketContent.length() == 0) {
-            LOGGER.warn("Found empty brackets \"[]\" in '" + pattern + "'");
+            LOGGER.warn("Found empty brackets \"[]\" in '{}'", pattern);
         }
         return bracketContent.toString();
     }
