@@ -42,6 +42,7 @@ public class ComplexSearchQuery {
                 case "year" -> builder.singleYear(Integer.valueOf(termText));
                 case "year-range" -> builder.parseYearRange(termText);
                 case "default" -> builder.defaultFieldPhrase(termText);
+                default -> builder.defaultFieldPhrase(term.field() + ":" + termText);
             }
         });
         return builder.build();
