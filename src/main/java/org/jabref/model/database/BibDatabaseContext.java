@@ -136,7 +136,6 @@ public class BibDatabaseContext {
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
-            Objects.requireNonNull(dbPath, "dbPath is null");
             Path parentPath = dbPath.getParent();
             if (parentPath == null) {
                 parentPath = Path.of(System.getProperty("user.dir"));
@@ -146,6 +145,8 @@ public class BibDatabaseContext {
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentPath);
+            } else {
+                fileDirs.add(parentPath);
             }
         });
 
