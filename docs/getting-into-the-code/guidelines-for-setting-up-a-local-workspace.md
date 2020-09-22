@@ -265,4 +265,3 @@ There might be problems with building if you have opejfx libraries in local mave
          file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/14/javafx-fxml-14-mac.jar
 ```
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.
- 
