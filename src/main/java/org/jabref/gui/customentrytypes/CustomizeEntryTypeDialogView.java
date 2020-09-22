@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -49,9 +50,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
     private final BibDatabaseMode mode;
     private final BibEntryTypesManager entryTypesManager;
 
-    @FXML private TableView<CustomEntryTypeViewModel> entryTypes;
-    @FXML private TableColumn<CustomEntryTypeViewModel, String> entryTypColumn;
-    @FXML private TableColumn<CustomEntryTypeViewModel, String> entryTypeActionsColumn;
+    @FXML private TableView<EntryTypeViewModel> entryTypes;
+    @FXML private TableColumn<EntryTypeViewModel, String> entryTypColumn;
+    @FXML private TableColumn<EntryTypeViewModel, String> entryTypeActionsColumn;
     @FXML private TextField addNewEntryType;
     @FXML private TableView<FieldViewModel> fields;
     @FXML private TableColumn<FieldViewModel, String> fieldNameColumn;
@@ -117,10 +118,25 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypeActionsColumn.setSortable(false);
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
-        new ValueTableCellFactory<CustomEntryTypeViewModel, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove entry type") + " " + name)
-                .withOnMouseClickedEvent(item -> evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem()))
+        new ValueTableCellFactory<EntryTypeViewModel, String>()
+                .withGraphic((type, name) -> {
+                    if (type instanceof CustomEntryTypeViewModel)
+                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                    else
+                        return null;
+                })
+                .withTooltip((type, name) -> {
+                    if (type instanceof CustomEntryTypeViewModel)
+                        return (Localization.lang("Remove entry type") + " " + name);
+                    else
+                        return null;
+                })
+                .withOnMouseClickedEvent((type, name) -> {
+                    if (type instanceof CustomEntryTypeViewModel)
+                        return evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem());
+                    else
+                        return evt -> {};
+                })
                 .install(entryTypeActionsColumn);
 
         fieldTypeColumn.setCellFactory(cellData -> new RadioButtonCell<>(EnumSet.allOf(FieldType.class)));
@@ -210,7 +226,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
     @FXML
     void addEntryType() {
-        CustomEntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
+        EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();
         this.entryTypes.getSelectionModel().select(newlyAdded);
         this.entryTypes.scrollTo(newlyAdded);
     }
