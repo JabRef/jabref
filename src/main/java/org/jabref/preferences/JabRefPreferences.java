@@ -387,7 +387,7 @@ public class JabRefPreferences implements PreferencesService {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public List<String> fileDirForDatabase;
+    public List<Path> fileDirForDatabase;
     private final Preferences prefs;
 
     /**

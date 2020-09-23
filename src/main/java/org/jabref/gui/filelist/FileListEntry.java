@@ -1,5 +1,6 @@
 package org.jabref.gui.filelist;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public class FileListEntry {
     }
 
     public LinkedFile toParsedFileField() {
-        return new LinkedFile(getDescription(), getLink(), getType().isPresent() ? getType().get().getName() : "");
+        return new LinkedFile(getDescription(), Path.of(getLink()), getType().isPresent() ? getType().get().getName() : "");
     }
 
     public String getDescription() {

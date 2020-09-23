@@ -426,7 +426,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
+                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
 
                 List<LinkedFile> linkedFiles = entry.getFiles();
                 int oldFileIndex = -1;

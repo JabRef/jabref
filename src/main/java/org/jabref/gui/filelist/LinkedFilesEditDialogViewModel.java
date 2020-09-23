@@ -125,11 +125,11 @@ public class LinkedFilesEditDialogViewModel extends AbstractViewModel {
     }
 
     public LinkedFile getNewLinkedFile() {
-        return new LinkedFile(description.getValue(), link.getValue(), monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse(""));
+        return new LinkedFile(description.getValue(), Path.of(link.getValue()), monadicSelectedExternalFileType.getValue().map(ExternalFileType::toString).orElse(""));
     }
 
     private String relativize(Path filePath) {
-        List<Path> fileDirectories = database.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        List<Path> fileDirectories = database.getFileDirectories(preferences.getFilePreferences());
         return FileUtil.relativize(filePath, fileDirectories).toString();
     }
 }

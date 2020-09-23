@@ -44,8 +44,8 @@ public class AutoSetFileLinksUtilTest {
     @Test
     public void testFindAssociatedNotLinkedFilesSuccess() throws Exception {
         // Due to mocking the externalFileType class, the file extension will not be found
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(path.getParent()));
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(path.getParent()));
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of("CiteKey.pdf"), ""));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);

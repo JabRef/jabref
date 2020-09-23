@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -118,7 +119,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
                 urls.forEach(data -> {
                     JSONObject url = (JSONObject) data;
                     if (url.optString("format").equalsIgnoreCase("pdf")) {
-                        entry.addFile(new LinkedFile("online", url.optString("value"), "PDF"));
+                        entry.addFile(new LinkedFile("online", Path.of(url.optString("value")), "PDF"));
                     }
                 });
             }

@@ -55,7 +55,7 @@ public class JabRefDesktop {
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<Path> directories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectories(Globals.prefs.getFilePreferences());
 
             Optional<Path> file = FileHelper.find(link, directories);
 
