@@ -90,7 +90,7 @@ public class CustomEntryTypeDialogViewModel {
             if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
                 viewModel = new CustomEntryTypeViewModel(entryType);
             } else {
-                viewModel = new StandardEntryTypeViewModel(entryType);
+                viewModel = new EntryTypeViewModel(entryType);
             }
             this.entryTypesWithFields.add(viewModel);
         }

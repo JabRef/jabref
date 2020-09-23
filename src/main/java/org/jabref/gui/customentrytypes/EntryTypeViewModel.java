@@ -11,12 +11,12 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.BibEntryType;
 
-public abstract class EntryTypeViewModel {
+public class EntryTypeViewModel {
 
     private final ObjectProperty<BibEntryType> entryType = new SimpleObjectProperty<>();
     private final ObservableList<FieldViewModel> fields;
 
-    protected EntryTypeViewModel(BibEntryType entryType) {
+    public EntryTypeViewModel(BibEntryType entryType) {
         this.entryType.set(entryType);
 
         List<FieldViewModel> allFieldsForType = entryType.getAllBibFields().stream().map(bibField -> new FieldViewModel(bibField.getField(), entryType.isRequired(bibField.getField()), bibField.getPriority())).collect(Collectors.toList());
