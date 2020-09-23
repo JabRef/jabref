@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -587,7 +588,7 @@ public class StringUtil {
      * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
-        String result = s;
+        String result = Normalizer.normalize(s, Normalizer.Form.NFC);
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
