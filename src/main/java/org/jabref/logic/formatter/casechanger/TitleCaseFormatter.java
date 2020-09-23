@@ -29,24 +29,19 @@ public class TitleCaseFormatter extends Formatter {
                 .stream()
                 .map(sentence -> {
                     Title title = new Title(sentence);
-                    
+
                     title.getWords().stream().filter(Word::isSmallerWord).forEach(Word::toLowerCase);
-                    
                     title.getWords().stream().filter(Word::isLargerWord).forEach(Word::toUpperFirst);
-                    
-                    
+
                     title.getFirstWord().ifPresent(Word::toUpperFirst);
-                    
                     title.getLastWord().ifPresent(Word::toUpperFirst);
-                    
+
                     for (int i = 0; i < (title.getWords().size() - 2); i++) {
                         if (title.getWords().get(i).endsWithColon()) {
-                            
                             title.getWords().get(i + 1).toUpperFirst();
-                        
                         }
                     }
-                    
+
                     return title.toString();
                 })
                 .collect(Collectors.joining(" "));
