@@ -87,10 +87,11 @@ public class CustomEntryTypeDialogViewModel {
 
         for (BibEntryType entryType : allTypes) {
             EntryTypeViewModel viewModel;
-            if (entryTypesManager.isCustomType(entryType.getType(), mode))
+            if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
                 viewModel = new CustomEntryTypeViewModel(entryType);
-            else
+            } else {
                 viewModel = new StandardEntryTypeViewModel(entryType);
+            }
             this.entryTypesWithFields.add(viewModel);
         }
     }

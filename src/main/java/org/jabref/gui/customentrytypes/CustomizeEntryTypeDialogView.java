@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -120,22 +119,26 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
         new ValueTableCellFactory<EntryTypeViewModel, String>()
                 .withGraphic((type, name) -> {
-                    if (type instanceof CustomEntryTypeViewModel)
+                    if (type instanceof CustomEntryTypeViewModel) {
                         return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                    else
+                    } else {
                         return null;
+                    }
                 })
                 .withTooltip((type, name) -> {
-                    if (type instanceof CustomEntryTypeViewModel)
+                    if (type instanceof CustomEntryTypeViewModel) {
                         return (Localization.lang("Remove entry type") + " " + name);
-                    else
+                    } else {
                         return null;
+                    }
                 })
                 .withOnMouseClickedEvent((type, name) -> {
-                    if (type instanceof CustomEntryTypeViewModel)
+                    if (type instanceof CustomEntryTypeViewModel) {
                         return evt -> viewModel.removeEntryType(entryTypes.getSelectionModel().getSelectedItem());
-                    else
-                        return evt -> {};
+                    } else {
+                        return evt -> {
+                        };
+                    }
                 })
                 .install(entryTypeActionsColumn);
 
@@ -162,7 +165,9 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
         new ValueTableCellFactory<FieldViewModel, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-                .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
+                .withOnMouseClickedEvent(item -> evt -> {
+                    viewModel.removeField(fields.getSelectionModel().getSelectedItem());
+                })
                 .install(fieldTypeActionColumn);
 
         viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());
