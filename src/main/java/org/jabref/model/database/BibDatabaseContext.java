@@ -135,20 +135,16 @@ public class BibDatabaseContext {
         preferences.getFileDirectory().ifPresent(fileDirs::add);
 
         // 4. BIB file directory
-        getDatabasePath().ifPresent(dbPath -> {
-            Path parentPath = dbPath.getParent();
-            if (parentPath == null) {
-                parentPath = Path.of(System.getProperty("user.dir"));
-            }
-            Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (preferences.isBibLocationAsPrimary()) {
+        if (preferences.shouldStoreFilesRelativeToBib()) {
+            getDatabasePath().ifPresent(dbPath -> {
+                Path parentPath = dbPath.getParent();
+                if (parentPath == null) {
+                    parentPath = Path.of(System.getProperty("user.dir"));
+                }
+                Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                 fileDirs.add(0, parentPath);
-            } else {
-                fileDirs.add(parentPath);
-            }
-        });
+            });
+        }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
     }

@@ -26,7 +26,7 @@ class BibDatabaseContextTest {
     void setUp() {
         fileDirPrefs = mock(FilePreferences.class);
         currentWorkingDir = Path.of(System.getProperty("user.dir"));
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
     }
 
     @Test

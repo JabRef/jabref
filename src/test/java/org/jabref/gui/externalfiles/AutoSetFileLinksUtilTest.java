@@ -53,7 +53,7 @@ public class AutoSetFileLinksUtilTest {
 
     @Test
     public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(Collections.emptyList(), actual);

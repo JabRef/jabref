@@ -61,8 +61,8 @@ class CleanupWorkerTest {
         context.setDatabasePath(bibFolder.resolve("test.bib"));
 
         FilePreferences fileDirPrefs = mock(FilePreferences.class, Answers.RETURNS_SMART_NULLS);
-        // Biblocation as Primary overwrites all other dirs
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
+        // Search and store files relative to bib file overwrites all other dirs
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
 
         worker = new CleanupWorker(context,
                 new CleanupPreferences(mock(LayoutFormatterPreferences.class), fileDirPrefs));
