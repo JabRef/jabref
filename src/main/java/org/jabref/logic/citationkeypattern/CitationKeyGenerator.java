@@ -32,6 +32,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final AbstractCitationKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
@@ -43,6 +44,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
+        this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
     @Deprecated
@@ -82,6 +84,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         } else {
             return APPENDIX_CHARACTERS.substring(number, number + 1);
         }
+    }
+
+    public static String removeDefaultUnwantedCharacters(String key) {
+        return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);
     }
 
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
@@ -124,13 +130,13 @@ public class CitationKeyGenerator extends BracketedPattern {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     Character delimiter = citationKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
-                    String label = expandBrackets(pattern, delimiter, entry, database);
+                    String label = removeUnwantedCharacters(expandBrackets(pattern, delimiter, entry, database), unwantedCharacters);
                     // apply modifier if present
                     if (parts.size() > 1) {
-                        label = applyModifiers(label, parts, 1);
+                        label = removeUnwantedCharacters(applyModifiers(label, parts, 1), unwantedCharacters);
                     }
                     // Remove all illegal characters from the label.
-                    label = cleanKey(label, citationKeyPatternPreferences.getUnwantedCharacters());
+                    label = cleanKey(label, unwantedCharacters);
                     stringBuilder.append(label);
                 } else {
                     stringBuilder.append(typeListEntry);
