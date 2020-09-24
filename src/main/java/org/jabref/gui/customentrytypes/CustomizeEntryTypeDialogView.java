@@ -141,6 +141,7 @@ public class CustomizeEntryTypeDialogView extends BaseDialog<Void> {
 
         fieldTypeActionColumn.setSortable(false);
         fieldTypeActionColumn.setReorderable(false);
+        fieldTypeActionColumn.setEditable(false);
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().fieldName());
 
         new ValueTableCellFactory<FieldViewModel, String>()
