@@ -35,7 +35,7 @@ public class DoiResolution implements FulltextFetcher {
     /**
      * Hosts for which tailored fetchers exist, so this fetcher is not needed.
      */
-    private static final List<String> excludedHosts = Arrays.asList("link.springer.com", "ieeexplore.ieee.org");
+    private final List<String> excludedHosts = Arrays.asList("link.springer.com", "ieeexplore.ieee.org");
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
