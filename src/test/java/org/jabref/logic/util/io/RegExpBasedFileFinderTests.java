@@ -1,5 +1,6 @@
 package org.jabref.logic.util.io;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -95,10 +96,13 @@ class RegExpBasedFileFinderTests {
 
         // when
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+        List<Path> expected = Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf"));
 
         // then
-        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
-                result);
+        assertEquals(expected.size(), result.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertTrue(Files.isSameFile(expected.get(i), result.get(i)));
+        }
     }
 
     @Test

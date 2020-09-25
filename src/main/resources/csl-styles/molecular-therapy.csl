@@ -12,12 +12,16 @@
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
     </contributor>
+    <contributor>
+      <name>Ulrik Stervbo</name>
+      <email>ulrik.stervbo@gmail.com</email>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="science"/>
     <category field="biology"/>
     <issn>1525-0016</issn>
     <eissn>1525-0024</eissn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2020-09-07T16:20:53+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="title">
@@ -46,7 +50,7 @@
     <choose>
       <if variable="volume"/>
       <else-if variable="DOI">
-        <text variable="DOI" prefix="doi:"/>
+        <text variable="DOI" prefix=" doi:"/>
       </else-if>
       <else-if variable="URL">
         <text term="at"/>
