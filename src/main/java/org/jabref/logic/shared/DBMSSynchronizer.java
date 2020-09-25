@@ -78,8 +78,12 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+            synchronizeLocalMetaData();
             pullWithLastEntry();
+            synchronizeLocalDatabase();
             dbmsProcessor.insertEntries(event.getBibEntries());
+            // Reset last changed entry because it just has already been synchronized -> Why necessary?
+            lastEntryChanged = Optional.empty();
         }
     }
 
@@ -95,9 +99,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
         if (isPresentLocalBibEntry(bibEntry) && isEventSourceAccepted(event) && checkCurrentConnection() && !event.isFilteredOut()) {
             synchronizeLocalMetaData();
+            pullWithLastEntry();
             synchronizeSharedEntry(bibEntry);
             synchronizeLocalDatabase(); // Pull changes for the case that there were some
-            lastEntryChanged = Optional.empty();
         } else {
             // Set new BibEntry that has been changed last
             lastEntryChanged = Optional.of(bibEntry);
@@ -115,9 +119,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
-            List<BibEntry> entries = event.getBibEntries();
-            dbmsProcessor.removeEntries(entries);
+            synchronizeLocalMetaData();
             pullWithLastEntry();
+            dbmsProcessor.removeEntries(event.getBibEntries());
+            synchronizeLocalDatabase();
         }
     }
 
@@ -317,7 +322,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         if (!checkCurrentConnection()) {
             return;
         }
+        // First synchronize entry, then synchronize database
         pullWithLastEntry();
+        synchronizeLocalDatabase();
+        synchronizeLocalMetaData();
     }
 
     // Synchronizes local BibEntries only if last entry changes still remain
@@ -326,21 +334,18 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             if (!checkCurrentConnection()) {
                 return;
             }
+            synchronizeLocalMetaData();
             pullWithLastEntry();
-            // Reset last entry that has been changed
-            lastEntryChanged = Optional.empty();
+            synchronizeLocalDatabase(); // Pull changes for the case that there were some
         }
     }
 
     // Synchronizes local BibEntries and pulls remaining last entry changes
     private void pullWithLastEntry() {
-        synchronizeLocalMetaData();
-        if (!lastEntryChanged.isEmpty()) {
+        if (!lastEntryChanged.isEmpty() && isPresentLocalBibEntry(lastEntryChanged.get())) {
             synchronizeSharedEntry(lastEntryChanged.get());
-            // Reset last entry that has been changed
-            lastEntryChanged = Optional.empty();
         }
-        synchronizeLocalDatabase(); // Pull changes for the case that there were some
+        lastEntryChanged = Optional.empty();
     }
 
     /**

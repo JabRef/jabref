@@ -21,7 +21,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.event.EntriesEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;

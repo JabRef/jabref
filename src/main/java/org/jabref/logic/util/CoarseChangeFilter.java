@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 
@@ -19,6 +20,7 @@ public class CoarseChangeFilter {
     private final EventBus eventBus = new EventBus();
 
     private Optional<Field> lastFieldChanged;
+    private Optional<BibEntry> lastEntryChanged;
     private int totalDelta;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
@@ -27,7 +29,7 @@ public class CoarseChangeFilter {
         context.getDatabase().registerListener(this);
         context.getMetaData().registerListener(this);
         this.lastFieldChanged = Optional.empty();
-        this.totalDelta = 0;
+        this.lastEntryChanged = Optional.empty();
     }
 
     @Subscribe
@@ -36,36 +38,26 @@ public class CoarseChangeFilter {
         if (event instanceof FieldChangedEvent) {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-            // Sum up change delta
-            totalDelta += fieldChange.getDelta();
 
             // If editing is started
-            boolean isNewEdit = lastFieldChanged.isEmpty();
-            // If other field is edited
-            boolean isEditChanged = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
-            // Only deltas of 1 registered by fieldChange, major change means editing much content
-            boolean isMajorChange = totalDelta >= 30;
+            boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
+            // If other field or entry is edited
+            boolean isChangedField = lastFieldChanged.filter(f -> !f.equals(fieldChange.getField())).isPresent();
+            boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
+            boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
+            // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
+            boolean isMajorChange = fieldChange.getDelta() > 1;
 
             // Event is filtered out if neither the edited field has changed nor a major change has occurred
             fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
-            // Post every FieldChangedEvent, but some have been marked (filtered)
-            eventPost(fieldChange);
-            // Set new last field
+            // Post each FieldChangedEvent - even the ones being marked as "filtered"
+            eventBus.post(fieldChange);
+            // Set new last field and entry
             lastFieldChanged = Optional.of(fieldChange.getField());
-
+            lastEntryChanged = Optional.of(fieldChange.getBibEntry());
+        } else {
+            eventBus.post(event);
         }
-        else {
-            eventPost(event);
-        }
-    }
-
-    private void eventPost(BibDatabaseContextChangedEvent event) {
-        // Reset total change delta
-        totalDelta = 0;
-        // Reset last field that changed
-        lastFieldChanged = Optional.empty();
-        // Post event
-        eventBus.post(event);
     }
 
     public void registerListener(Object listener) {
