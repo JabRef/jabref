@@ -5,14 +5,12 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.util.BuildInfo;
@@ -119,7 +117,11 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
                 urls.forEach(data -> {
                     JSONObject url = (JSONObject) data;
                     if (url.optString("format").equalsIgnoreCase("pdf")) {
-                        entry.addFile(new LinkedFile("online", Path.of(url.optString("value")), "PDF"));
+                        try {
+                            entry.addFile(new LinkedFile(new URL(url.optString("value")), "PDF"));
+                        } catch (MalformedURLException e) {
+                            LOGGER.info("Malformed URL: {}", url.optString("value"));
+                        }
                     }
                 });
             }
@@ -156,7 +158,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", query); // Search query
         uriBuilder.addParameter("api_key", API_KEY); // API key
@@ -166,7 +168,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
         return getURLForQuery(constructComplexQueryString(complexSearchQuery));
     }
 
