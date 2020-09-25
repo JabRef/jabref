@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -254,9 +255,9 @@ class BibEntryTest {
     @Test
     void testGetAndAddToLinkedFileList() {
         List<LinkedFile> files = entry.getFiles();
-        files.add(new LinkedFile("", "", ""));
+        files.add(new LinkedFile("", Path.of(""), ""));
         entry.setFiles(files);
-        assertEquals(Arrays.asList(new LinkedFile("", "", "")), entry.getFiles());
+        assertEquals(Arrays.asList(new LinkedFile("", Path.of(""), "")), entry.getFiles());
     }
 
     @Test

@@ -192,7 +192,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
-                result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                result.getDatabaseContext().clearDatabasePath(); // do not open the original file
                 result.getDatabase().clearSharedDatabaseID();
                 LOGGER.error("Connection error", e);
 
