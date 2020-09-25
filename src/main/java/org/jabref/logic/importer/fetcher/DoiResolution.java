@@ -121,6 +121,6 @@ public class DoiResolution implements FulltextFetcher {
 
     @Override
     public TrustLevel getTrustLevel() {
-        return TrustLevel.SOURCE;
+        return TrustLevel.META_SEARCH;
     }
 }
