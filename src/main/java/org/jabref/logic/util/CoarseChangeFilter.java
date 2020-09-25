@@ -39,20 +39,19 @@ public class CoarseChangeFilter {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
 
-            // If editing is started
+            // If editing has started
             boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
-            // If other field or entry is edited
+
             boolean isChangedField = lastFieldChanged.filter(f -> !f.equals(fieldChange.getField())).isPresent();
             boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
             boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
             // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
             boolean isMajorChange = fieldChange.getDelta() > 1;
 
-            // Event is filtered out if neither the edited field has changed nor a major change has occurred
             fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
             // Post each FieldChangedEvent - even the ones being marked as "filtered"
             eventBus.post(fieldChange);
-            // Set new last field and entry
+
             lastFieldChanged = Optional.of(fieldChange.getField());
             lastEntryChanged = Optional.of(fieldChange.getBibEntry());
         } else {
