@@ -1,4 +1,4 @@
-package org.jabref.gui.filelist;
+package org.jabref.gui.linkedfile;
 
 import java.nio.file.Path;
 import java.util.Optional;

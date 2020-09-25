@@ -29,9 +29,9 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
-import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -187,7 +187,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         observables.add(downloadOngoing);
         observables.add(downloadProgress);
         observables.add(isAutomaticallyFound);
-        return observables.toArray(new Observable[observables.size()]);
+        return observables.toArray(new Observable[0]);
     }
 
     public void open() {
