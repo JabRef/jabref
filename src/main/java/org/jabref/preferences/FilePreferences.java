@@ -11,7 +11,7 @@ public class FilePreferences {
 
     private final String user;
     private final String mainFileDirectory;
-    private final boolean bibLocationAsPrimary;
+    private final boolean shouldStoreFilesRelativeToBibFile;
     private final String fileNamePattern;
     private final String fileDirPattern;
     private boolean shouldDownloadLinkedFiles;
@@ -20,7 +20,7 @@ public class FilePreferences {
 
     public FilePreferences(String user,
                            String mainFileDirectory,
-                           boolean bibLocationAsPrimary,
+                           boolean shouldStoreFilesRelativeToBibFile,
                            String fileNamePattern,
                            String fileDirPattern,
                            boolean shouldDownloadLinkedFiles,
@@ -28,7 +28,7 @@ public class FilePreferences {
                            boolean shouldOpenBrowseOnCreate) {
         this.user = user;
         this.mainFileDirectory = mainFileDirectory;
-        this.bibLocationAsPrimary = bibLocationAsPrimary;
+        this.shouldStoreFilesRelativeToBibFile = shouldStoreFilesRelativeToBibFile;
         this.fileNamePattern = fileNamePattern;
         this.fileDirPattern = fileDirPattern;
         this.shouldDownloadLinkedFiles = shouldDownloadLinkedFiles;
@@ -48,8 +48,8 @@ public class FilePreferences {
         }
     }
 
-    public boolean isBibLocationAsPrimary() {
-        return bibLocationAsPrimary;
+    public boolean shouldStoreFilesRelativeToBib() {
+        return shouldStoreFilesRelativeToBibFile;
     }
 
     public String getFileNamePattern() {

@@ -145,7 +145,7 @@ public class JabRefGUI {
                     new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
-                    pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                    pr.getDatabaseContext().clearDatabasePath(); // do not open the original file
                     pr.getDatabase().clearSharedDatabaseID();
 
                     LOGGER.error("Connection error", e);
