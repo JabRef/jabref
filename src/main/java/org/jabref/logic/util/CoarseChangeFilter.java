@@ -48,7 +48,7 @@ public class CoarseChangeFilter {
 
             // Event is filtered out if neither the edited field has changed nor a major change has occurred
             fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
-            // Post every FieldChangedEvent, but some have been marked (filtered)
+            // Post each FieldChangedEvent - even the ones being marked as "filtered"
             eventPost(fieldChange);
             // Set new last field
             lastFieldChanged = Optional.of(fieldChange.getField());
