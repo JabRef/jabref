@@ -162,23 +162,14 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates2() {
+    public void twoEntriesWithDoiContainingUnderscoresAreNotEqual() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
-        unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0\\02");
-        BibEntry duplicateWithDifferentType = unrelatedArticle;
-        duplicateWithDifferentType.setType(StandardEntryType.InCollection);
-
-        assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
-    }
-
-    @Test
-    public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates3() {
-        simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
+        // An underscore in a DOI can indicate a totally different DOI
         unrelatedArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.0_02");
         BibEntry duplicateWithDifferentType = unrelatedArticle;
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
-        assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
+        assertFalse(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
     @Test

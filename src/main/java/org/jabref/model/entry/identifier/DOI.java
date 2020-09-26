@@ -127,12 +127,12 @@ public class DOI implements Identifier {
         Matcher matcher = EXACT_DOI_PATT.matcher(trimmedDoi);
         if (matcher.find()) {
             // match only group \1
-            this.doi = matcher.group(1).replaceAll("[^\\w/:-.-_]", "");
+            this.doi = matcher.group(1);
         } else {
             // Short DOI
             Matcher shortDoiMatcher = EXACT_SHORT_DOI_PATT.matcher(trimmedDoi);
             if (shortDoiMatcher.find()) {
-                this.doi = shortDoiMatcher.group(1).replaceAll("[^\\w,/,:,-,.,-]|[_]", "");
+                this.doi = shortDoiMatcher.group(1);
                 isShortDoi = true;
             } else {
                 // Shortcut DOI without the "10/" as in "doi.org/d8dn"
