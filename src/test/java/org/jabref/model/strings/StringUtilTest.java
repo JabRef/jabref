@@ -297,7 +297,10 @@ class StringUtilTest {
     void testReplaceSpecialCharacters() {
         assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
         assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
-        // https://github.com/JabRef/jabref/issues/6583
+    }
+
+    @Test
+    void replaceSpecialCharactersWithNonNormalizedUnicode() {
         assertEquals("Modele", StringUtil.replaceSpecialCharacters("Modèle"));
     }
 
