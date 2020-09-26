@@ -1094,4 +1094,11 @@ class CitationKeyGeneratorTest {
 
         assertEquals(4, generateKey(bibEntry, "[auth4_1]").length());
     }
+
+    @Test
+    void generateKeyWithNonNormalizedUnicode() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Modèle et outil pour soutenir la scénarisation pédagogique de MOOC connectivistes");
+
+        assertEquals("Modele", generateKey(bibEntry, "[veryshorttitle]"));
+    }
 }
