@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -11,8 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
@@ -147,7 +145,7 @@ public class JabRefGUI {
                     new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
                 } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                         NotASharedDatabaseException e) {
-                    pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                    pr.getDatabaseContext().clearDatabasePath(); // do not open the original file
                     pr.getDatabase().clearSharedDatabaseID();
 
                     LOGGER.error("Connection error", e);

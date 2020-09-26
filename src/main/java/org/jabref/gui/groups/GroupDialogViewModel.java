@@ -22,8 +22,8 @@ import javafx.event.Event;
 import javafx.scene.control.ButtonType;
 import javafx.scene.paint.Color;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;

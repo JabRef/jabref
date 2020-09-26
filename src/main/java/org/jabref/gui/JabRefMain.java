@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.gui;
 
 import java.net.Authenticator;
 
@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.cli.JabRefCLI;
-import org.jabref.gui.FXDialog;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.journals.JournalAbbreviationLoader;

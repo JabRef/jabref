@@ -31,7 +31,7 @@ class XmpUtilWriterTest {
 
     private void initBibEntries() {
         olly2018 = new BibEntry(StandardEntryType.Article);
-        olly2018.setCiteKey("Olly2018");
+        olly2018.setCitationKey("Olly2018");
         olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
         olly2018.setField(StandardField.TITLE, "Stefan's palace");
         olly2018.setField(StandardField.JOURNAL, "Test Journal");
@@ -62,7 +62,7 @@ class XmpUtilWriterTest {
         toral2006.setField(StandardField.URL, "www.url.de");
 
         vapnik2000 = new BibEntry(StandardEntryType.Book);
-        vapnik2000.setCiteKey("vapnik2000");
+        vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
@@ -93,7 +93,7 @@ class XmpUtilWriterTest {
 
         // read a bib entry from the tests before
         BibEntry entry = vapnik2000;
-        entry.setCiteKey("WriteXMPTest");
+        entry.setCitationKey("WriteXMPTest");
         entry.setId("ID4711");
 
         // write the changed bib entry to the PDF

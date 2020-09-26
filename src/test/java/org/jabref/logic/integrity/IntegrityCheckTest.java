@@ -179,7 +179,7 @@ class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
-        when(filePreferencesMock.isBibLocationAsPrimary()).thenReturn(true);
+        when(filePreferencesMock.shouldStoreFilesRelativeToBib()).thenReturn(true);
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 filePreferencesMock,
                 createCitationKeyPatternPreferences(),

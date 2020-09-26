@@ -1,7 +1,7 @@
 package org.jabref.gui.dialogs;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 

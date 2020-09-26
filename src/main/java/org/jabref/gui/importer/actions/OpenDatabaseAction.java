@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
@@ -192,7 +192,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
             } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
                     NotASharedDatabaseException e) {
-                result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                result.getDatabaseContext().clearDatabasePath(); // do not open the original file
                 result.getDatabase().clearSharedDatabaseID();
                 LOGGER.error("Connection error", e);
 

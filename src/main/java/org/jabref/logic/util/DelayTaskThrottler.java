@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.gui.JabRefExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,8 @@ public class DelayTaskThrottler {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelayTaskThrottler.class);
 
     private final ScheduledThreadPoolExecutor executor;
-    private final int delay;
+
+    private int delay;
 
     private ScheduledFuture<?> scheduledTask;
 
@@ -41,7 +42,7 @@ public class DelayTaskThrottler {
 
     public ScheduledFuture<?> schedule(Runnable command) {
         if (scheduledTask != null) {
-            scheduledTask.cancel(false);
+            cancel();
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
@@ -51,9 +52,20 @@ public class DelayTaskThrottler {
         return scheduledTask;
     }
 
+    // Execute scheduled Runnable early
+    public void execute(Runnable command) {
+        delay = 0;
+        schedule(command);
+    }
+
+    // Cancel scheduled Runnable gracefully
+    public void cancel() {
+        scheduledTask.cancel(false);
+    }
+
     public <T> ScheduledFuture<?> scheduleTask(Callable<?> command) {
         if (scheduledTask != null) {
-            scheduledTask.cancel(false);
+            cancel();
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);

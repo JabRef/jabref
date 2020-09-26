@@ -50,13 +50,13 @@ public class CustomEntryTypeDialogViewModel {
         }
     };
 
-    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFielsdsWithBibTexKey());
-    private final ObjectProperty<CustomEntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
+    private final ObservableList<Field> fieldsForAdding = FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey());
+    private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final ObjectProperty<Field> selectedFieldToAdd = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
     private final BibDatabaseMode mode;
-    private final ObservableList<CustomEntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
+    private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final PreferencesService preferencesService;
@@ -86,12 +86,17 @@ public class CustomEntryTypeDialogViewModel {
         Collection<BibEntryType> allTypes = entryTypesManager.getAllTypes(mode);
 
         for (BibEntryType entryType : allTypes) {
-            CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(entryType);
+            EntryTypeViewModel viewModel;
+            if (entryTypesManager.isCustomType(entryType.getType(), mode)) {
+                viewModel = new CustomEntryTypeViewModel(entryType);
+            } else {
+                viewModel = new EntryTypeViewModel(entryType);
+            }
             this.entryTypesWithFields.add(viewModel);
         }
     }
 
-    public ObservableList<CustomEntryTypeViewModel> entryTypes() {
+    public ObservableList<EntryTypeViewModel> entryTypes() {
         return this.entryTypesWithFields;
     }
 
@@ -127,17 +132,17 @@ public class CustomEntryTypeDialogViewModel {
         newFieldToAddProperty().setValue(null);
     }
 
-    public CustomEntryTypeViewModel addNewCustomEntryType() {
+    public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
         BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
-        CustomEntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
+        EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");
 
         return viewModel;
     }
 
-    public ObjectProperty<CustomEntryTypeViewModel> selectedEntryTypeProperty() {
+    public ObjectProperty<EntryTypeViewModel> selectedEntryTypeProperty() {
         return this.selectedEntryType;
     }
 
@@ -161,7 +166,7 @@ public class CustomEntryTypeDialogViewModel {
         return fieldValidator.getValidationStatus();
     }
 
-    public void removeEntryType(CustomEntryTypeViewModel focusedItem) {
+    public void removeEntryType(EntryTypeViewModel focusedItem) {
         entryTypesWithFields.remove(focusedItem);
         entryTypesToDelete.add(focusedItem.entryType().getValue());
     }

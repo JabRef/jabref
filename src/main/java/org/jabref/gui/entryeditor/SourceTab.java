@@ -19,8 +19,8 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -278,10 +278,10 @@ public class SourceTab extends EntryEditorTab {
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKeyOptional().orElse(null);
+            String newKey = newEntry.getCitationKey().orElse(null);
 
             if (newKey != null) {
-                outOfFocusEntry.setCiteKey(newKey);
+                outOfFocusEntry.setCitationKey(newKey);
             } else {
                 outOfFocusEntry.clearCiteKey();
             }

@@ -36,12 +36,12 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
     @Override
     public void undo() {
         super.undo();
-        entry.setCiteKey(oldValue);
+        entry.setCitationKey(oldValue);
     }
 
     @Override
     public void redo() {
         super.redo();
-        entry.setCiteKey(newValue);
+        entry.setCitationKey(newValue);
     }
 }

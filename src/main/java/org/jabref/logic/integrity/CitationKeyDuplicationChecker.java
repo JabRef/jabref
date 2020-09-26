@@ -20,12 +20,12 @@ public class CitationKeyDuplicationChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> citeKey = entry.getCiteKeyOptional();
+        Optional<String> citeKey = entry.getCitationKey();
         if (citeKey.isEmpty()) {
             return Collections.emptyList();
         }
 
-        boolean isDuplicate = database.isDuplicateCiteKeyExisting(citeKey.get());
+        boolean isDuplicate = database.isDuplicateCitationKeyExisting(citeKey.get());
         if (isDuplicate) {
             return Collections.singletonList(
                     new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));

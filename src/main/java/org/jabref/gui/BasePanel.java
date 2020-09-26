@@ -12,7 +12,6 @@ import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.StackPane;
 
-import org.jabref.Globals;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -120,8 +119,6 @@ public class BasePanel extends StackPane {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
-        // Open entry editor for first entry on start up.
-        Platform.runLater(this::clearAndSelectFirst);
     }
 
     @Subscribe
@@ -614,7 +611,7 @@ public class BasePanel extends StackPane {
     }
 
     public void paste() {
-        mainTable.paste();
+        mainTable.paste(this.bibDatabaseContext.getMode());
     }
 
     public void cut() {
