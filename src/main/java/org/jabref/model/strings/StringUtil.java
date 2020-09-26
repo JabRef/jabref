@@ -588,6 +588,11 @@ public class StringUtil {
      * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
+        /* Some unicode characters can be encoded in multiple ways. This uses <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
+         * to re-encode the characters so that these characters can be found.
+         * Most people expect Unicode to work similar to NFC, i.e., if characters looks the same, it is likely that they are equivalent.
+         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
+         * A more holistic approach should likely start with the <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">compatibility equivalence</a>. */
         String result = Normalizer.normalize(s, Normalizer.Form.NFC);
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
