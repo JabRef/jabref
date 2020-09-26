@@ -2,7 +2,6 @@ package org.jabref.gui.exporter;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,7 +50,6 @@ import org.slf4j.LoggerFactory;
 public class SaveDatabaseAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
-    private static Set<SaveDatabaseAction> runningInstances = new HashSet<>();
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -218,8 +216,8 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-
         GlobalSaveManager manager = GlobalSaveManager.create(panel, preferences, entryTypesManager);
+
         SavePreferences preferences = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
                                                       .withSaveType(saveType);
@@ -229,7 +227,7 @@ public class SaveDatabaseAction {
         var future = manager.save(file, selectedOnly, encoding, saveType, panel.getBibDatabaseContext(), consumer);
         Set<Character> characters;
         try {
-            characters =future.get();
+            characters = future.get();
             if (!characters.isEmpty()) {
                 saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), characters, saveType);
             }
@@ -241,7 +239,6 @@ public class SaveDatabaseAction {
         return true;
 
     }
-
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {
         DialogPane pane = new DialogPane();
@@ -271,10 +268,10 @@ public class SaveDatabaseAction {
 
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                        ((context.getLocation() == DatabaseLocation.LOCAL)
-                                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
-                        &&
-                        context.getDatabasePath().isPresent();
+                ((context.getLocation() == DatabaseLocation.LOCAL)
+                 && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+               &&
+               context.getDatabasePath().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {

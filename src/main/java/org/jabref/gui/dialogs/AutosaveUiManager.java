@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
  * the given {@link BasePanel}.
  */
 public class AutosaveUiManager {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
 
     private final BasePanel panel;
@@ -25,7 +26,7 @@ public class AutosaveUiManager {
     @Subscribe
     public void listen(@SuppressWarnings("unused") AutosaveEvent event) {
         try {
-            SaveDatabaseAction saveAction =  new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
+            SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
             saveAction.save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occurred while saving.", e);

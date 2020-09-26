@@ -54,7 +54,7 @@ public class GlobalSaveManager {
 
     }
 
-    public Future<Set<Character>> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, BibDatabaseContext context, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
+    public Future<Set<Character>> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, BibDatabaseContext context, Consumer<List<FieldChange>> consumeFieldChanges) {
         return throttler.scheduleTask(() -> saveThrotteld(file, selectedOnly, encoding, saveType, context, consumeFieldChanges));
     }
 
