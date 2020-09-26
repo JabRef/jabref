@@ -43,8 +43,8 @@
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
 
     <Label styleClass="sectionHeader" text="%Entry owner"/>
+    <CheckBox fx:id="markOwner" text="%Mark new entries with owner name"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="markOwner" text="%Mark new entries with owner name"/>
         <TextField fx:id="markOwnerName" HBox.hgrow="ALWAYS"/>
         <CheckBox fx:id="markOwnerOverwrite" text="%Overwrite">
             <tooltip>

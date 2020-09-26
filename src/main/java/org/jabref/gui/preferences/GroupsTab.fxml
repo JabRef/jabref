@@ -23,8 +23,8 @@
     <CheckBox fx:id="autoAssignGroup" text="%Automatically assign new entry to selected groups"/>
     <CheckBox fx:id="displayGroupCount" text="%Display count of items in group"/>
 
+    <Label text="%Keyword seperator"/>
     <HBox spacing="4" alignment="CENTER_LEFT">
-        <Label text="%Keyword separator"/>
         <TextField fx:id="keywordSeparator" minWidth="30.0" maxWidth="30.0"/>
     </HBox>
 </fx:root>
