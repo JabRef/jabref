@@ -318,7 +318,7 @@ public class DuplicateCheck {
         Optional<ISBN> oneISBN = one.getISBN();
         Optional<ISBN> twoISBN = two.getISBN();
         if (oneISBN.isPresent() && twoISBN.isPresent()) {
-            return oneISBN.get().equals(twoISBN.get());
+            return Objects.equals(oneISBN, twoISBN);
         }
 
         if (haveDifferentEntryType(one, two) ||
