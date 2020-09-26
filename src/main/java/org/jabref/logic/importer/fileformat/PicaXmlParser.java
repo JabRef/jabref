@@ -26,8 +26,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class GvkParser implements Parser {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GvkParser.class);
+public class PicaXmlParser implements Parser {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {

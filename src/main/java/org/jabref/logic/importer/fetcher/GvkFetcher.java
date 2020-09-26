@@ -15,7 +15,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fileformat.GvkParser;
+import org.jabref.logic.importer.fileformat.PicaXmlParser;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -84,6 +84,6 @@ public class GvkFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new GvkParser();
+        return new PicaXmlParser();
     }
 }

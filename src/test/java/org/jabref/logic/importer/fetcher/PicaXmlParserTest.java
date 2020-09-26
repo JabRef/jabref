@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.importer.fileformat.GvkParser;
+import org.jabref.logic.importer.fileformat.PicaXmlParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
@@ -18,17 +18,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @FetcherTest
-public class GvkParserTest {
+public class PicaXmlParserTest {
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
-        try (InputStream is = GvkParserTest.class.getResourceAsStream(xmlName)) {
-            GvkParser parser = new GvkParser();
+        try (InputStream is = PicaXmlParserTest.class.getResourceAsStream(xmlName)) {
+            PicaXmlParser parser = new PicaXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
             assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibEntryAssert.assertEquals(GvkParserTest.class, resourceName, entries.get(i));
+                BibEntryAssert.assertEquals(PicaXmlParserTest.class, resourceName, entries.get(i));
                 i++;
             }
         }
@@ -51,8 +51,8 @@ public class GvkParserTest {
 
     @Test
     public void subTitleTest() throws Exception {
-        try (InputStream is = GvkParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
-            GvkParser parser = new GvkParser();
+        try (InputStream is = PicaXmlParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
+            PicaXmlParser parser = new PicaXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
             assertNotNull(entries);
             assertEquals(5, entries.size());

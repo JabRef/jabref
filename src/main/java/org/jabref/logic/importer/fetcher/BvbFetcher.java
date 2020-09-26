@@ -7,11 +7,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fileformat.MarcParser;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.logic.importer.fileformat.MarcXmlParser;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -19,13 +17,23 @@ public class BvbFetcher implements SearchBasedParserFetcher {
 
     private static final String URL_PATTERN = "http://bvbr.bib-bvb.de:5661/bvb01sru?";
 
+    @Override
+    public String getName() {
+        return "BVB";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.empty();
+    }
+
     protected String getSearchQueryString(String query) {
         Objects.requireNonNull(query);
         return query;
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
         String gvkQuery = getSearchQueryString(query);
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
@@ -38,21 +46,6 @@ public class BvbFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new MarcParser();
-    }
-
-    @Override
-    public String getName() {
-        return "BVBFetcher";
-    }
-
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-
-    }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.empty();
+        return new MarcXmlParser();
     }
 }
