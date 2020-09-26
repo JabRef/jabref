@@ -37,15 +37,15 @@ public class AutoSetFileLinksUtilTest {
     public void setUp(@TempDir Path folder) throws Exception {
         path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
-        entry.setCiteKey("CiteKey");
+        entry.setCitationKey("CiteKey");
         when(externalFileTypes.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes()));
     }
 
     @Test
     public void testFindAssociatedNotLinkedFilesSuccess() throws Exception {
         // Due to mocking the externalFileType class, the file extension will not be found
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(path.getParent()));
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(path.getParent()));
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of("CiteKey.pdf"), ""));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
@@ -53,7 +53,7 @@ public class AutoSetFileLinksUtilTest {
 
     @Test
     public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(Collections.emptyList(), actual);

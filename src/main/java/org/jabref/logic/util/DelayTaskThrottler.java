@@ -28,7 +28,8 @@ public class DelayTaskThrottler<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelayTaskThrottler.class);
 
     private final ScheduledThreadPoolExecutor executor;
-    private final int delay;
+
+    private int delay;
 
     private ScheduledFuture<T> scheduledTask;
 
@@ -44,7 +45,7 @@ public class DelayTaskThrottler<T> {
 
     public ScheduledFuture<T> scheduleTask(Callable<T> command) {
         if (scheduledTask != null) {
-            scheduledTask.cancel(false);
+            cancel();
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
@@ -53,6 +54,17 @@ public class DelayTaskThrottler<T> {
             LOGGER.debug("Rejecting while another process is already running.");
         }
         return scheduledTask;
+    }
+
+    // Execute scheduled Runnable early
+    public void execute(Runnable command) {
+        delay = 0;
+        schedule(command);
+    }
+
+    // Cancel scheduled Runnable gracefully
+    public void cancel() {
+        scheduledTask.cancel(false);
     }
 
     public ScheduledFuture<?> schedule(Runnable command) {

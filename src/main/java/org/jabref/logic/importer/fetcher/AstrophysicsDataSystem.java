@@ -74,7 +74,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public String getName() {
-        return "SAO/NASA Astrophysics Data System";
+        return "SAO/NASA ADS";
     }
 
     /**

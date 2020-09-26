@@ -28,7 +28,7 @@ class CrossrefTest {
     @BeforeEach
     void setup() {
         parent = new BibEntry(StandardEntryType.Proceedings);
-        parent.setCiteKey("parent");
+        parent.setCitationKey("parent");
         parent.setField(StandardField.IDS, "parent_IDS");
         parent.setField(StandardField.XREF, "parent_XREF");
         parent.setField(StandardField.ENTRYSET, "parent_ENTRYSET");

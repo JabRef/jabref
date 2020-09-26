@@ -156,7 +156,9 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        startBackupTask();
+        if (!event.isFilteredOut()) {
+            startBackupTask();
+        }
     }
 
     private void startBackupTask() {

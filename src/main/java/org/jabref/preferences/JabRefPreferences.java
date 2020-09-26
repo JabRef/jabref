@@ -240,7 +240,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
-    public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
+        // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
+    public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
     public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
@@ -386,7 +387,7 @@ public class JabRefPreferences implements PreferencesService {
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
-    public List<String> fileDirForDatabase;
+    public List<Path> fileDirForDatabase;
     private final Preferences prefs;
 
     /**
@@ -496,7 +497,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:bibtexkey");
+        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:citationkey");
         defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;100");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
@@ -622,7 +623,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.TRUE);
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
-        defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
+        defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
         defaults.put(DB_CONNECT_HOSTNAME, "localhost");
         defaults.put(DB_CONNECT_DATABASE, "jabref");
@@ -642,7 +643,7 @@ public class JabRefPreferences implements PreferencesService {
 
         customImports = new CustomImportList(this);
 
-        String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
+        String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
 
@@ -666,8 +667,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">"
-                        + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                        + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                        + "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>"
+                        + "\\end{citationkey}</b><br>__NEWLINE__"
                         + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
                         + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
                         + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
@@ -2265,7 +2266,7 @@ public class JabRefPreferences implements PreferencesService {
         return new FilePreferences(
                 getUser(),
                 get(MAIN_FILE_DIRECTORY),
-                getBoolean(BIB_LOC_AS_PRIMARY_DIR),
+                getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
@@ -2276,7 +2277,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeFilePreferences(FilePreferences filePreferences) {
         put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(BIB_LOC_AS_PRIMARY_DIR, filePreferences.isBibLocationAsPrimary());
+        putBoolean(STORE_RELATIVE_TO_BIB, filePreferences.shouldStoreFilesRelativeToBib());
         put(IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
         put(IMPORT_FILEDIRPATTERN, filePreferences.getFileDirectoryPattern());
         putBoolean(DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());

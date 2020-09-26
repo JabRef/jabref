@@ -8,6 +8,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class EditAction extends SimpleCommand {
                         throw new IllegalStateException("Only cut/copy/paste supported in TextInputControl but got " + action);
                 }
 
-            } else {
+            } else if (!(focusOwner instanceof CodeArea)) {
 
                 LOGGER.debug("EditAction - Else: {}", frame.getCurrentBasePanel().getTabTitle());
                 // Not sure what is selected -> copy/paste/cut selected entries

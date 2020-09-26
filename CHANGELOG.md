@@ -22,7 +22,14 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
 - Synchronization of SpecialFields to keywords is now disabled by default. [#6621](https://github.com/JabRef/jabref/issues/6621)
-- JabRef no longer opens the entry editor with the first entry on startup [6855](https://github.com/JabRef/jabref/issues/6855)
+- JabRef no longer opens the entry editor with the first entry on startup [#6855](https://github.com/JabRef/jabref/issues/6855)
+- We completed the rebranding of `bibtexkey` as `citationkey` which was started in JabRef 5.1.
+- JabRef no longer opens the entry editor with the first entry on startup [#6855](https://github.com/JabRef/jabref/issues/6855)
+- Fetch by ID: (long) "SAO/NASA Astrophysics Data System" replaced by (short) "SAO/NASA ADS" [#6876](https://github.com/JabRef/jabref/pull/6876)
+- We changed the title of the window "Manage field names and content" to have the same title as the corresponding menu item [#6895](https://github.com/JabRef/jabref/pull/6895)
+- We renamed the menus "View -> Previous citation style" and "View -> Next citation style" into "View -> Previous preview style" and "View -> Next preview style" and renamed the "Preview" style to "Customized preview style". [#6899](https://github.com/JabRef/jabref/pull/6899)
+- We changed the default preference option "Search and store files relative to library file location" to on, as this seems to be a more intuitive behaviour. [#6863](https://github.com/JabRef/jabref/issues/6863)
+- Improved detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 
 ### Fixed
 
@@ -30,9 +37,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
 - We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
+- We fixed an issue where the sort order of the entry table was reset after a restart of JabRef. [#6898](https://github.com/JabRef/jabref/pull/6898)
+- We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat". [#6907](https://github.com/JabRef/jabref/pull/60907).
+- We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog [#6934](https://github.com/JabRef/jabref/issues/6934)
+- We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog [6906](https://github.com/JabRef/jabref/issues/6906)
 
 ### Removed
-
 
 ## [5.1] – 2020-08-30
 

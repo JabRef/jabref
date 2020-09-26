@@ -1,4 +1,4 @@
-package org.jabref.gui.filelist;
+package org.jabref.gui.linkedfile;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -60,7 +60,7 @@ public class AttachFileAction extends SimpleCommand {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(newFile,
-                    databaseContext.getFileDirectoriesAsPaths(preferencesService.getFilePreferences()),
+                    databaseContext.getFileDirectories(preferencesService.getFilePreferences()),
                     ExternalFileTypes.getInstance());
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
