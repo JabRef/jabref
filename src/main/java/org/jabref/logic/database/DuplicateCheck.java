@@ -312,7 +312,7 @@ public class DuplicateCheck {
         Optional<DOI> oneDOI = one.getDOI();
         Optional<DOI> twoDOI = two.getDOI();
         if (oneDOI.isPresent() && twoDOI.isPresent()) {
-            return oneDOI.get().getDOI().equalsIgnoreCase(twoDOI.get().getDOI());
+            return Objects.equals(oneDOI, twoDOI);
         }
         // check ISBN
         Optional<ISBN> oneISBN = one.getISBN();
