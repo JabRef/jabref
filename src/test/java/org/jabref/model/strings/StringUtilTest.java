@@ -300,6 +300,11 @@ class StringUtilTest {
     }
 
     @Test
+    void replaceSpecialCharactersWithNonNormalizedUnicode() {
+        assertEquals("Modele", StringUtil.replaceSpecialCharacters("Modèle"));
+    }
+
+    @Test
     void testRepeatSpaces() {
         assertEquals("", StringUtil.repeatSpaces(0));
         assertEquals(" ", StringUtil.repeatSpaces(1));
