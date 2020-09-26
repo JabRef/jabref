@@ -122,6 +122,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
@@ -445,7 +446,7 @@ public class JabRefFrame extends BorderPane {
                 context.getDBMSSynchronizer().closeSharedDatabase();
                 context.clearDBMSSynchronizer();
             }
-            SaveDatabaseAction.shutdown(context);
+            GlobalSaveManager.shutdown(context);
             BackupManager.shutdown(context);
             context.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).ifPresent(filenames::add);
         }
@@ -1255,7 +1256,7 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = SaveDatabaseAction.create(panel, Globals.prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
 
                 if (saveAction.save()) {
                     return true;
@@ -1295,7 +1296,7 @@ public class JabRefFrame extends BorderPane {
             removeTab(panel);
         }
 
-        SaveDatabaseAction.shutdown(context);
+        GlobalSaveManager.shutdown(context);
         BackupManager.shutdown(context);
     }
 
