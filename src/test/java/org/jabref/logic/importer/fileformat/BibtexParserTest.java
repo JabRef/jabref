@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1414,8 +1415,8 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals("src/test/resources/org/jabref/model/groups/paper.aux",
-                ((TexGroup) root.getChildren().get(0).getGroup()).getFilePath().toString());
+        assertEquals(((TexGroup) root.getChildren().get(0).getGroup()).getFilePath(),
+                Path.of("src/test/resources/org/jabref/model/groups/paper.aux"));
     }
 
     @Test

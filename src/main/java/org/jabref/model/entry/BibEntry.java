@@ -299,7 +299,10 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        return result.map(resultText -> BibDatabase.getText(resultText, database));
+
+        return (database == null || result.isEmpty()) ?
+                result :
+                Optional.of(database.resolveForStrings(result.get()));
     }
 
     /**

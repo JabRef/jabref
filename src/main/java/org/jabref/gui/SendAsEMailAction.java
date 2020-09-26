@@ -90,7 +90,7 @@ public class SendAsEMailAction extends SimpleCommand {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(Globals.prefs.getFilePreferences()));
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {

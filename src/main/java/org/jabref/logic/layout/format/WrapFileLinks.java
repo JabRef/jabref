@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
@@ -196,18 +195,18 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             sb.append(piv);
                             break;
                         case FILE_PATH:
-                            List<String> dirs;
+                            List<Path> dirs;
                             // We need to resolve the file directory from the database's metadata,
                             // but that is not available from a formatter. Therefore, as an
                             // ugly hack, the export routine has set a global variable before
                             // starting the export, which contains the database's file directory:
                             if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                                dirs = Collections.singletonList(prefs.getMainFileDirectory());
+                                dirs = Collections.singletonList(Path.of(prefs.getMainFileDirectory()));
                             } else {
                                 dirs = prefs.getFileDirForDatabase();
                             }
 
-                            String pathString = flEntry.findIn(dirs.stream().map(Path::of).collect(Collectors.toList()))
+                            String pathString = flEntry.findIn(dirs)
                                                        .map(path -> path.toAbsolutePath().toString())
                                                        .orElse(flEntry.getLink());
 

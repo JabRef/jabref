@@ -160,7 +160,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
-                            databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences()),
+                            databaseContext.getFileDirectories(preferences.getFilePreferences()),
                             ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",

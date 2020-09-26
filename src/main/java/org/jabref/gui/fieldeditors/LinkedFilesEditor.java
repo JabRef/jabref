@@ -54,7 +54,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
-    public LinkedFilesEditor(Field field, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, SuggestionProvider<?> suggestionProvider,
+    public LinkedFilesEditor(Field field,
+                             DialogService dialogService,
+                             BibDatabaseContext databaseContext,
+                             TaskExecutor taskExecutor,
+                             SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              JabRefPreferences preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);

@@ -27,7 +27,7 @@ public class EntryAnnotationImporterTest {
     @BeforeEach
     public void setUp() {
         entry = new BibEntry();
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
     }
 
     @Test
