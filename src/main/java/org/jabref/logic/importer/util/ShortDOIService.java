@@ -53,7 +53,7 @@ public class ShortDOIService {
         URLDownload urlDownload = new URLDownload(url);
 
         try {
-            JSONObject resultAsJSON =  JsonReader.toJsonObject(urlDownload.asInputStream());
+            JSONObject resultAsJSON = JsonReader.toJsonObject(urlDownload.asInputStream());
             if (resultAsJSON.isEmpty()) {
                 throw new ShortDOIServiceException("Cannot get short DOI");
             }
