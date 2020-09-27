@@ -135,9 +135,7 @@ import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
@@ -182,7 +180,6 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
-        this.executorService = JabRefExecutorService.INSTANCE;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -1251,36 +1248,6 @@ public class JabRefFrame extends BorderPane {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    /**
-     * Return a boolean, if the selected entry have file
-     *
-     * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains file. false, if multiple entries are selected or the selected entry
-     * doesn't contains file
-     */
-    private boolean isExistFile(List<BibEntry> selectEntryList) {
-        if (selectEntryList.size() == 1) {
-            BibEntry selectedEntry = selectEntryList.get(0);
-            return selectedEntry.getField(StandardField.FILE).isPresent();
-        }
-        return false;
-    }
-
-    /**
-     * Return a boolean, if the selected entry have url or doi
-     *
-     * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains url or doi. false, if multiple entries are selected or the selected
-     * entry doesn't contains url or doi
-     */
-    private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
-        if (selectEntryList.size() == 1) {
-            BibEntry selectedEntry = selectEntryList.get(0);
-            return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
-        }
-        return false;
     }
 
     /**

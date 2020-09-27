@@ -32,7 +32,6 @@ import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -149,10 +148,6 @@ public class BasePanel extends StackPane {
         return frame;
     }
 
-    public void output(String s) {
-        dialogService.notify(s);
-    }
-
     /**
      * Removes the selected entries from the database
      *
@@ -182,7 +177,7 @@ public class BasePanel extends StackPane {
         ensureNotShowingBottomPanel(entries);
 
         markBaseChanged();
-        this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();

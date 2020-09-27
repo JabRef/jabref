@@ -58,6 +58,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
 
     private final BasePanel panel;
+    private final DialogService dialogService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -78,6 +79,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
 
         this.panel = panel;
+        this.dialogService = dialogService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
         UndoManager undoManager = panel.getUndoManager();
@@ -221,7 +223,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (!selectedEntries.isEmpty()) {
             try {
                 Globals.clipboardManager.setContent(selectedEntries);
-                panel.output(panel.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+                dialogService.notify(panel.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
             }
@@ -348,29 +350,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Different actions depending on where the user releases the drop in the target row
             // Bottom + top -> import entries
             // Center -> link files to entry
+            // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP:
-                case BOTTOM:
-                    importHandler.importAsNewEntries(files);
-                    break;
-                case CENTER:
-                    // Depending on the pressed modifier, move/copy/link files to drop target
+                case TOP, BOTTOM -> importHandler.importAsNewEntries(files);
+                case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
-                        case LINK:
+                        case LINK -> {
                             LOGGER.debug("Mode LINK"); // shift on win or no modifier
                             importHandler.getLinker().addFilesToEntry(entry, files);
-                            break;
-                        case MOVE:
+                        }
+                        case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
                             importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                            break;
-                        case COPY:
+                        }
+                        case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
                             importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                            break;
+                        }
                     }
-                    break;
+                }
             }
 
             success = true;
