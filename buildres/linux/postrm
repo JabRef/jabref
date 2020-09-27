@@ -19,13 +19,17 @@ set -e
 
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-		for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
+        # Remove the native-messaging hosts script only if relative to the deb package
+        for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"; do
-		    if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
-		        rm $NATIVE_MESSAGING_JSON
-		    fi
-		done
+            if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
+                rm $NATIVE_MESSAGING_JSON
+            fi
+        done
+        # Remove the auto-install triggers of the browser addon for chrom/chromium
+        rm /opt/google/chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
+        rm /usr/share/google-chrome/extensions/bifehkofibaamoeaopjglfkddgkijdlh.json
     ;;
 
     *)

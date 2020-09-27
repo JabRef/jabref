@@ -9,8 +9,10 @@ public class FieldContentFormatterPreferences {
 
     private final List<Field> nonWrappableFields;
 
+    /**
+     * Constructor defining that there are not any non-wrappable fields
+     */
     public FieldContentFormatterPreferences() {
-        // This constructor is only to allow an empty constructor in SavePreferences
         this.nonWrappableFields = Collections.emptyList();
     }
 
@@ -21,5 +23,4 @@ public class FieldContentFormatterPreferences {
     public List<Field> getNonWrappableFields() {
         return nonWrappableFields;
     }
-
 }

@@ -1,72 +1,43 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
 public class SuggestionProviders {
 
-    /**
-     * key: field name
-     */
-    private final Map<Field, AutoCompleteSuggestionProvider<?>> providers = new HashMap<>();
+    private final boolean isEmpty;
+    private BibDatabase database;
+    private JournalAbbreviationRepository abbreviationRepository;
 
-    /**
-     * Empty
-     */
+    public SuggestionProviders(BibDatabase database, JournalAbbreviationRepository abbreviationRepository) {
+        this.database = database;
+        this.abbreviationRepository = abbreviationRepository;
+        this.isEmpty = false;
+    }
+
     public SuggestionProviders() {
-
+        this.isEmpty = true;
     }
 
-    public SuggestionProviders(AutoCompletePreferences preferences,
-            JournalAbbreviationLoader abbreviationLoader) {
-        Objects.requireNonNull(preferences);
-
-        Set<Field> completeFields = preferences.getCompleteFields();
-        for (Field field : completeFields) {
-            AutoCompleteSuggestionProvider<?> autoCompleter = initalizeSuggestionProvider(field, preferences, abbreviationLoader);
-            providers.put(field, autoCompleter);
+    public SuggestionProvider<?> getForField(Field field) {
+        if (isEmpty) {
+            return new EmptySuggestionProvider();
         }
-    }
 
-    public AutoCompleteSuggestionProvider<?> getForField(Field field) {
-        return providers.get(field);
-    }
-
-    public void indexDatabase(BibDatabase database) {
-        for (BibEntry entry : database.getEntries()) {
-            indexEntry(entry);
-        }
-    }
-
-    /**
-     * This methods assures all information in the given entry is included as suggestions.
-     */
-    public void indexEntry(BibEntry bibEntry) {
-        for (AutoCompleteSuggestionProvider<?> autoCompleter : providers.values()) {
-            autoCompleter.indexEntry(bibEntry);
-        }
-    }
-
-    private AutoCompleteSuggestionProvider<?> initalizeSuggestionProvider(Field field, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         Set<FieldProperty> fieldProperties = field.getProperties();
         if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonNameSuggestionProvider(field);
-        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new BibEntrySuggestionProvider();
-        } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)
-                || StandardField.PUBLISHER.equals(field)) {
-            return new JournalsSuggestionProvider(field, preferences, abbreviationLoader);
+            return new PersonNameSuggestionProvider(field, database);
+        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            return new BibEntrySuggestionProvider(database);
+        } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME) || StandardField.PUBLISHER.equals(field)) {
+            return new JournalsSuggestionProvider(field, database, abbreviationRepository);
         } else {
-            return new WordSuggestionProvider(field);
+            return new WordSuggestionProvider(field, database);
         }
     }
 }

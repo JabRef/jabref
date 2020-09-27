@@ -2,28 +2,24 @@ package org.jabref.gui.search;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
 import javafx.event.Event;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Skin;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyEvent;
@@ -31,24 +27,22 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.util.Duration;
 
-import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.search.rules.describer.SearchDescribers;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -57,16 +51,17 @@ import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.Author;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
-import org.fxmisc.easybind.EasyBind;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
@@ -82,26 +77,25 @@ public class GlobalSearchBar extends HBox {
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
-    private final JabRefFrame frame;
-
-    private final TextField searchField = SearchTextField.create();
-    private final ToggleButton caseSensitive;
-    private final ToggleButton regularExp;
-    private final Button searchModeButton = new Button();
+    private final CustomTextField searchField = SearchTextField.create();
+    private final ToggleButton caseSensitiveButton;
+    private final ToggleButton regularExpressionButton;
+    // private final Button searchModeButton;
     private final Label currentResults = new Label("");
     private final Tooltip tooltip = new Tooltip();
+
     private final StateManager stateManager;
-    private SearchDisplayMode searchDisplayMode;
-    private Validator regexValidator;
+    private final PreferencesService preferencesService;
+    private final Validator regexValidator;
 
-    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager) {
+    private SearchPreferences searchPreferences;
+
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService) {
         super();
-        this.frame = Objects.requireNonNull(frame);
         this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
+        this.searchPreferences = preferencesService.getSearchPreferences();
 
-        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
-        searchDisplayMode = searchPreferences.getSearchMode();
-        
         this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
@@ -127,100 +121,107 @@ public class GlobalSearchBar extends HBox {
 
         ClipBoardManager.addX11Support(searchField);
 
-        regularExp = IconTheme.JabRefIcons.REG_EX.asToggleButton();
-        regularExp.setSelected(searchPreferences.isRegularExpression());
-        regularExp.setTooltip(new Tooltip(Localization.lang("regular expression")));
-        regularExp.setOnAction(event -> {
-            searchPreferences.setRegularExpression(regularExp.isSelected());
-            performSearch();
-        });
+        regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
+        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
+        // searchModeButton = new Button();
+        initSearchModifierButtons();
 
-        caseSensitive = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
-        caseSensitive.setSelected(searchPreferences.isCaseSensitive());
-        caseSensitive.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
-        caseSensitive.setOnAction(event -> {
-            searchPreferences.setCaseSensitive(caseSensitive.isSelected());
-            performSearch();
-        });
+        BooleanBinding focusBinding = searchField.focusedProperty()
+                                                 .or(regularExpressionButton.focusedProperty()
+                                                                            .or(caseSensitiveButton.focusedProperty()));
+        regularExpressionButton.visibleProperty().unbind();
+        regularExpressionButton.visibleProperty().bind(focusBinding);
+        caseSensitiveButton.visibleProperty().unbind();
+        caseSensitiveButton.visibleProperty().bind(focusBinding);
 
-        updateSearchModeButtonText();
-        searchModeButton.setOnAction(event -> toggleSearchModeAndSearch());
-
-        int initialSize = 400;
-        int expandedSize = 700;
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
+        modifierButtons.setAlignment(Pos.CENTER);
+        searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
         searchField.setMinWidth(100);
-        searchField.setMaxWidth(initialSize);
         HBox.setHgrow(searchField, Priority.ALWAYS);
 
         regexValidator = new FunctionBasedValidator<>(
                 searchField.textProperty(),
-                query -> !(regularExp.isSelected() && !validRegex()),
+                query -> !(regularExpressionButton.isSelected() && !validRegex()),
                 ValidationMessage.error(Localization.lang("Invalid regular expression"))
         );
         ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
         visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
-        Platform.runLater(() -> { visualizer.initVisualization(regexValidator.getValidationStatus(), searchField); });
-
-        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
-
-        EasyBind.subscribe(searchField.focusedProperty(), isFocused -> {
-            if (isFocused) {
-                KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), expandedSize);
-                KeyFrame keyFrame = new KeyFrame(Duration.millis(600), widthValue);
-                Timeline timeline = new Timeline(keyFrame);
-                timeline.play();
-            } else {
-                KeyValue widthValue = new KeyValue(searchField.maxWidthProperty(), initialSize);
-                KeyFrame keyFrame = new KeyFrame(Duration.millis(400), widthValue);
-                Timeline timeline = new Timeline(keyFrame);
-                timeline.play();
-            }
-        });
+        Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
 
         this.getChildren().addAll(searchField, currentResults);
-
+        this.setSpacing(4.0);
         this.setAlignment(Pos.CENTER_LEFT);
 
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
         BindingsHelper.bindBidirectional(
                 stateManager.activeSearchQueryProperty(),
                 searchField.textProperty(),
                 searchTerm -> {
-                    performSearch();
+                    // Async update
+                    searchTask.restart();
                 },
                 query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
         );
 
         EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
-
             searchQuery.ifPresent(query -> {
                 updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
-                              query.isGrammarBasedSearch());
+                        query.isGrammarBasedSearch());
             });
         });
     }
 
-    private void toggleSearchModeAndSearch() {
-        int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
-        searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
-        new SearchPreferences(Globals.prefs).setSearchMode(searchDisplayMode);
-        updateSearchModeButtonText();
-        performSearch();
-    }
+    private void initSearchModifierButtons() {
+        regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
+        regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
+        regularExpressionButton.setCursor(Cursor.DEFAULT);
+        regularExpressionButton.setMinHeight(28);
+        regularExpressionButton.setMaxHeight(28);
+        regularExpressionButton.setMinWidth(28);
+        regularExpressionButton.setMaxWidth(28);
+        regularExpressionButton.setPadding(new Insets(1.0));
+        regularExpressionButton.managedProperty().bind(searchField.editableProperty());
+        regularExpressionButton.visibleProperty().bind(searchField.editableProperty());
+        regularExpressionButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
+            performSearch();
+        });
 
-    private void updateSearchModeButtonText() {
-        searchModeButton.setText(searchDisplayMode.getDisplayName());
-        searchModeButton.setTooltip(new Tooltip(searchDisplayMode.getToolTipText()));
-    }
+        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
+        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
+        caseSensitiveButton.setCursor(Cursor.DEFAULT);
+        caseSensitiveButton.setMinHeight(28);
+        caseSensitiveButton.setMaxHeight(28);
+        caseSensitiveButton.setMinWidth(28);
+        caseSensitiveButton.setMaxWidth(28);
+        caseSensitiveButton.setPadding(new Insets(1.0));
+        caseSensitiveButton.managedProperty().bind(searchField.editableProperty());
+        caseSensitiveButton.visibleProperty().bind(searchField.editableProperty());
+        caseSensitiveButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
+            performSearch();
+        });
 
-    public void endSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel != null) {
-            searchField.setText("");
-            MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-            mainTable.requestFocus();
-        }
+        // ToDo: Reimplement searchMode (searchModeButton)
+        /* searchModeButton.setText(searchPreferences.getSearchDisplayMode().getDisplayName());
+        searchModeButton.setTooltip(new Tooltip(searchPreferences.getSearchDisplayMode().getToolTipText()));
+        searchModeButton.setOnAction(event -> {
+            SearchDisplayMode searchDisplayMode = searchPreferences.getSearchDisplayMode();
+            int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
+            searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
+
+            searchPreferences = searchPreferences..withSearchDisplayMode(searchDisplayMode);
+            preferencesService.storeSearchPreferences(searchPreferences);
+
+            searchModeButton.setText(searchDisplayMode.getDisplayName());
+            searchModeButton.setTooltip(new Tooltip(searchDisplayMode.getToolTipText()));
+
+            performSearch();
+        }); */
     }
 
     /**
@@ -250,7 +251,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.isCaseSensitive(), searchPreferences.isRegularExpression());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
@@ -277,12 +278,12 @@ public class GlobalSearchBar extends HBox {
         currentResults.setText(illegalSearch);
     }
 
-    public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
+    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
+        if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
             AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
-                                                                                                              searchCompleter,
-                                                                                                              new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
-                                                                                                              new AppendPersonNamesStrategy());
+                    searchCompleter::provideSuggestions,
+                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+                    new AppendPersonNamesStrategy());
             AutoCompletePopup<Author> popup = getPopup(autoComplete);
             popup.setSkin(new SearchPopupSkin<>(popup));
         }
@@ -317,14 +318,14 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
         } else {
             // TODO: switch Icon color
-            //searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
         setHintTooltip(description);
     }
 
     private void setHintTooltip(TextFlow description) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS)) {
+        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
             genericDescription = genericDescription.replace("<p>", "\n");
             List<Text> genericDescriptionTexts = TooltipTextUtil.formatToTexts(genericDescription, new TooltipTextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
@@ -342,7 +343,7 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void updateHintVisibility() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_ADVANCED_HINTS)) {
+        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
             searchField.setTooltip(tooltip);
         } else {
             searchField.setTooltip(null);
@@ -375,11 +376,8 @@ public class GlobalSearchBar extends HBox {
             this.suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
             this.suggestionList.minWidthProperty().bind(control.minWidthProperty());
 
-            ToolBar toolBar = new ToolBar(regularExp, caseSensitive, searchModeButton);
-
             this.container = new BorderPane();
             this.container.setCenter(suggestionList);
-            this.container.setBottom(toolBar);
 
             this.registerEventListener();
         }
@@ -425,7 +423,7 @@ public class GlobalSearchBar extends HBox {
 
         @Override
         public void dispose() {
-            //empty
+            // empty
         }
     }
 }

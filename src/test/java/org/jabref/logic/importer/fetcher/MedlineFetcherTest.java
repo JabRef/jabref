@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -21,7 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;
-    private BibEntry entryWijedasa, entryEndharti, bibEntryIchikawa, bibEntrySari;
+    private BibEntry entryWijedasa;
+    private BibEntry entryEndharti;
+    private BibEntry bibEntryIchikawa;
+    private BibEntry bibEntrySari;
 
     @BeforeEach
     public void setUp() throws InterruptedException {
@@ -41,7 +43,7 @@ public class MedlineFetcherTest {
         entryWijedasa.setField(StandardField.JOURNAL, "Global change biology");
         entryWijedasa.setField(StandardField.MONTH, "#mar#");
         entryWijedasa.setField(new UnknownField("nlm-id"), "9888746");
-        entryWijedasa.setField(InternalField.OWNER, "NLM");
+        entryWijedasa.setField(StandardField.OWNER, "NLM");
         entryWijedasa.setField(StandardField.PAGES, "977--982");
         entryWijedasa.setField(StandardField.PMID, "27670948");
         entryWijedasa.setField(new UnknownField("pubmodel"), "Print-Electronic");
@@ -65,7 +67,7 @@ public class MedlineFetcherTest {
         entryEndharti.setField(StandardField.JOURNAL, "BMC complementary and alternative medicine");
         entryEndharti.setField(StandardField.KEYWORDS, "CAC; Dendrophtoe pentandra; IL-22; MPO; Proliferation; p53");
         entryEndharti.setField(new UnknownField("nlm-id"), "101088661");
-        entryEndharti.setField(InternalField.OWNER, "NLM");
+        entryEndharti.setField(StandardField.OWNER, "NLM");
         entryEndharti.setField(StandardField.PAGES, "374");
         entryEndharti.setField(StandardField.MONTH, "#sep#");
         entryEndharti.setField(StandardField.PMID, "27670445");
@@ -92,7 +94,7 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField(StandardField.KEYWORDS, "Animals; Antibodies, Protozoan, blood; Antigens, Protozoan, immunology; Cattle, parasitology; Cattle Diseases, epidemiology, parasitology; Enzyme-Linked Immunosorbent Assay, veterinary; Geography; Humans; Indonesia, epidemiology; Livestock, immunology, parasitology; Meat, parasitology; Protozoan Proteins, immunology; Seroepidemiologic Studies; Swine, parasitology; Swine Diseases, epidemiology, parasitology; Toxoplasma, immunology; Toxoplasmosis, Animal, epidemiology, immunology, parasitology; Cattle; ELISA; Indonesia; Pig; TgGRA7; Toxoplasma gondii");
         bibEntryIchikawa.setField(StandardField.MONTH, "#dec#");
         bibEntryIchikawa.setField(new UnknownField("nlm-id"), "9708549");
-        bibEntryIchikawa.setField(InternalField.OWNER, "NLM");
+        bibEntryIchikawa.setField(StandardField.OWNER, "NLM");
         bibEntryIchikawa.setField(StandardField.PAGES, "484--486");
         bibEntryIchikawa.setField(new UnknownField("pii"), "S1383-5769(15)00124-5");
         bibEntryIchikawa.setField(StandardField.PMID, "26197440");
@@ -117,7 +119,7 @@ public class MedlineFetcherTest {
         bibEntrySari.setField(StandardField.PUBSTATE, "ppublish");
         bibEntrySari.setField(new UnknownField("revised"), "2018-12-02");
         bibEntrySari.setField(new UnknownField("nlm-id"), "0266303");
-        bibEntrySari.setField(InternalField.OWNER, "NLM");
+        bibEntrySari.setField(StandardField.OWNER, "NLM");
         bibEntrySari.setField(StandardField.PAGES, "977--985");
         bibEntrySari.setField(StandardField.PMID, "26867355");
         bibEntrySari.setField(new UnknownField("pubmodel"), "Print");
@@ -132,42 +134,45 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-online-bibliographic-database/medline", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void testSearchByIDWijedasa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
-        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
+        assertTrue(fetchedEntry.isPresent());
+
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(entryWijedasa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDEndharti() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
-        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
+        assertTrue(fetchedEntry.isPresent());
+
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(entryEndharti), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDIchikawa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
-        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
+        assertTrue(fetchedEntry.isPresent());
+
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(bibEntryIchikawa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDSari() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
-        fetchedEntry.get().clearField(StandardField.ABSTRACT); //Remove abstract due to copyright
+        assertTrue(fetchedEntry.isPresent());
+
+        fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(bibEntrySari), fetchedEntry);
     }
 
     @Test
     public void testMultipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
-        entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright);
+        entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
     }

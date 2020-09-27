@@ -8,8 +8,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.net.URLDownload;
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -28,9 +27,10 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
 
     /**
      * Constructs a URL based on the query.
+     *
      * @param identifier the ID
      */
-    URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -48,6 +48,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {
@@ -60,7 +61,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.empty();
         }
 
-        try (InputStream stream = new URLDownload(getURLForID(identifier)).asInputStream()) {
+        try (InputStream stream = getUrlDownload(getUrlForIdentifier(identifier)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {

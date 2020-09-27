@@ -133,5 +133,4 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     private void createIssue() {
         viewModel.reportIssue();
     }
-
 }

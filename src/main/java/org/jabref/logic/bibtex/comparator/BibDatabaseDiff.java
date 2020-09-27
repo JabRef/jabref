@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -110,7 +110,7 @@ public class BibDatabaseDiff {
                 differences.add(new BibEntryDiff(originalEntry, null));
             }
         }
-        
+
         // Finally, look if there are still untouched entries in the new database. These may have been added.
         for (int i = 0; i < newEntries.size(); i++) {
             if (!used.contains(i)) {

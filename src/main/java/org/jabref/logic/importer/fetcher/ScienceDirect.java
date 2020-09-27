@@ -20,21 +20,19 @@ import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect.
- *
- * @see 'https://dev.elsevier.com/'
+ * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect. See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";
+
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
@@ -62,22 +60,30 @@ public class ScienceDirect implements FulltextFetcher {
                         return Optional.of(new URL(link));
                     }
 
-                    // Retrieve PDF link (old page)
-                    // TODO: can possibly be removed
-                    Element link = html.getElementById("pdfLink");
+                    URL url = new URL(sciLink);
+                    String protocol = url.getProtocol();
+                    String authority = url.getAuthority();
 
-                    if (link != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (old page).");
-                        Optional<URL> pdfLink = Optional.of(new URL(link.attr("pdfurl")));
-                        return pdfLink;
-                    }
-                    // Retrieve PDF link (new page)
-                    // TODO: can possibly be removed
-                    String url = html.getElementsByClass("pdf-download-btn-link").attr("href");
-
-                    if (url != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (new page).");
-                        Optional<URL> pdfLink = Optional.of(new URL("http://www.sciencedirect.com" + url));
+                    Optional<String> fullLinkToPdf = html
+                            .getElementsByAttributeValue("type", "application/json")
+                            .stream()
+                            .flatMap(element -> element.getElementsByTag("script").stream())
+                            // get the text element
+                            .map(element -> element.childNode(0))
+                            .map(element -> element.toString())
+                            .map(text -> new JSONObject(text))
+                            .filter(json -> json.has("article"))
+                            .map(json -> json.getJSONObject("article"))
+                            .filter(json -> json.has("pdfDownload"))
+                            .map(json -> json.getJSONObject("pdfDownload"))
+                            .filter(json -> json.has("linkToPdf"))
+                            .map(json -> json.getString("linkToPdf"))
+                            .map(linkToPdf -> String.format("%s://%s%s", protocol, authority, linkToPdf))
+                            .findAny();
+                    if (fullLinkToPdf.isPresent()) {
+                        LOGGER.info("Fulltext PDF found at ScienceDirect.");
+                        // new URL may through "MalformedURLException", thus using "isPresent()" above and ".get()"
+                        Optional<URL> pdfLink = Optional.of(new URL(fullLinkToPdf.get()));
                         return pdfLink;
                     }
                 }

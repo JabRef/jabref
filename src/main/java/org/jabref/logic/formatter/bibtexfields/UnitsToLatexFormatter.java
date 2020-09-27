@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.strings.StringLengthComparator;
-import org.jabref.model.cleanup.Formatter;
 
 public class UnitsToLatexFormatter extends Formatter {
 
@@ -41,7 +41,7 @@ public class UnitsToLatexFormatter extends Formatter {
             "cd", // candela
             "dB", // decibel
             "dBm", // decibel
-            "dBc", //decibel
+            "dBc", // decibel
             "eV", // electron volts
             "inch", // inch
             "kat", // katal

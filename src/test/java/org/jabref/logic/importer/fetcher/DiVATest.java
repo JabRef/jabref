@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -34,15 +33,10 @@ public class DiVATest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals(HelpFile.FETCHER_DIVA, HelpFile.FETCHER_DIVA);
-    }
-
-    @Test
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
-        entry.setCiteKey("Gustafsson260746");
+        entry.setCitationKey("Gustafsson260746");
         entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
         entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");
         entry.setField(StandardField.JOURNAL,

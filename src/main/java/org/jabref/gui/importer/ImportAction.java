@@ -1,21 +1,22 @@
 package org.jabref.gui.importer;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
-import org.jabref.JabRefException;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.Importer;
@@ -23,12 +24,13 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.KeyCollisionException;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexString;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ImportAction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
     private final JabRefFrame frame;
     private final boolean openInNew;
@@ -46,11 +48,12 @@ public class ImportAction {
 
     /**
      * Automatically imports the files given as arguments.
+     *
      * @param filenames List of files to import
      */
     public void automatedImport(List<String> filenames) {
-        List<Path> files = filenames.stream().map(Paths::get).collect(Collectors.toList());
-        BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> {
+        List<Path> files = filenames.stream().map(Path::of).collect(Collectors.toList());
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> {
             List<ImportFormatReader.UnknownFormatImport> imports = doImport(files);
             // Ok, done. Then try to gather in all we have found. Since we might
             // have found
@@ -61,22 +64,23 @@ public class ImportAction {
             // TODO: show parserwarnings, if any (not here)
             // for (ImportFormatReader.UnknownFormatImport p : imports) {
             //    ParserResultWarningDialog.showParserResultWarningDialog(p.parserResult, frame);
-            //}
-            if (bibtexResult == null) {
+            // }
+            if (bibtexResult.isEmpty()) {
                 if (importError == null) {
+                    // TODO: No control flow using exceptions
                     throw new JabRefException(Localization.lang("No entries found. Please make sure you are using the correct import filter."));
                 } else {
                     throw importError;
                 }
             }
 
-            return bibtexResult.getDatabase().getEntries();
+            return bibtexResult;
         });
 
         if (openInNew) {
-            task.onSuccess(entries -> {
-                frame.addTab(new BibDatabaseContext(new BibDatabase(entries)), true);
-                dialogService.notify(Localization.lang("Imported entries") + ": " + entries.size());
+            task.onSuccess(parserResult -> {
+                frame.addTab(parserResult.getDatabaseContext(), true);
+                dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
             })
                 .executeWith(taskExecutor);
         } else {
@@ -114,62 +118,34 @@ public class ImportAction {
         return imports;
     }
 
+    /**
+     * TODO: Move this to logic package. Blocked by undo functionality.
+     */
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
-        BibDatabase database = new BibDatabase();
-        ParserResult directParserResult = null;
-        boolean anythingUseful = false;
+        BibDatabase resultDatabase = new BibDatabase();
+        ParserResult result = new ParserResult(resultDatabase);
 
         for (ImportFormatReader.UnknownFormatImport importResult : imports) {
             if (importResult == null) {
                 continue;
             }
+            ParserResult parserResult = importResult.parserResult;
+            resultDatabase.insertEntries(parserResult.getDatabase().getEntries());
+
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
-                // Bibtex result. We must merge it into our main base.
-                ParserResult pr = importResult.parserResult;
-
-                anythingUseful = anythingUseful || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
-
-                // Record the parserResult, as long as this is the first bibtex result:
-                if (directParserResult == null) {
-                    directParserResult = pr;
-                }
-                // Merge entries:
-                database.insertEntries(pr.getDatabase().getEntries());
-
-                // Merge strings:
-                for (BibtexString bs : pr.getDatabase().getStringValues()) {
-                    try {
-                        database.addString((BibtexString) bs.clone());
-                    } catch (KeyCollisionException e) {
-                        // TODO: This means a duplicate string name exists, so it's not
-                        // a very exceptional situation. We should maybe give a warning...?
-                    }
-                }
-            } else {
-
-                ParserResult pr = importResult.parserResult;
-                List<BibEntry> entries = pr.getDatabase().getEntries();
-
-                anythingUseful = anythingUseful | !entries.isEmpty();
-
-                // set timestamp and owner
-                UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
-
-                database.insertEntries(entries);
+                // additional treatment of BibTeX
+                new DatabaseMerger().mergeMetaData(
+                        result.getMetaData(),
+                        parserResult.getMetaData(),
+                        importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
+                        parserResult.getDatabase().getEntries());
             }
+            // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }
 
-        if (!anythingUseful) {
-            return null;
-        }
+        // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), Globals.prefs.getOwnerPreferences(), Globals.prefs.getTimestampPreferences()); // set timestamp and owner
 
-        if ((imports.size() == 1) && (directParserResult != null)) {
-            return directParserResult;
-        } else {
-
-            return new ParserResult(database);
-
-        }
+        return result;
     }
-
 }

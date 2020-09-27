@@ -19,9 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnection;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -136,10 +133,10 @@ public abstract class DBMSProcessor {
      * For use in test only. Inserts the BibEntry into the shared database.
      *
      * @param bibEntry {@link BibEntry} to be inserted.
-     * */
-     public void insertEntry(BibEntry bibEntry) {
-         insertEntries(Collections.singletonList(bibEntry));
-     }
+     */
+    public void insertEntry(BibEntry bibEntry) {
+        insertEntries(Collections.singletonList(bibEntry));
+    }
 
     /**
      * Inserts the List of BibEntry into the shared database.
@@ -173,7 +170,7 @@ public abstract class DBMSProcessor {
         }
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[]{"SHARED_ID"})) {
+                new String[] {"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -228,8 +225,8 @@ public abstract class DBMSProcessor {
         }
         return bibEntries.stream().filter((entry) ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
-                .collect(Collectors.toList());
-        }
+                         .collect(Collectors.toList());
+    }
 
     /**
      * Inserts the given list of BibEntry into FIELD table.

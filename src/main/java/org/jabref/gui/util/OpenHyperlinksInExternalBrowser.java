@@ -61,5 +61,4 @@ public class OpenHyperlinksInExternalBrowser implements ChangeListener<Worker.St
         }
         event.preventDefault();
     }
-
 }

@@ -3,20 +3,17 @@ package org.jabref.gui.autocompleter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.jabref.model.entry.BibEntry;
-
-import org.controlsfx.control.textfield.AutoCompletionBinding;
+import java.util.stream.Stream;
 
 /**
  * Enriches a suggestion provider by a given set of content selector values.
  */
-public class ContentSelectorSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
+public class ContentSelectorSuggestionProvider extends StringSuggestionProvider {
 
-    private final AutoCompleteSuggestionProvider<String> suggestionProvider;
+    private final SuggestionProvider<String> suggestionProvider;
     private final List<String> contentSelectorValues;
 
-    public ContentSelectorSuggestionProvider(AutoCompleteSuggestionProvider<String> suggestionProvider,
+    public ContentSelectorSuggestionProvider(SuggestionProvider<String> suggestionProvider,
                                              List<String> contentSelectorValues) {
 
         this.suggestionProvider = suggestionProvider;
@@ -24,17 +21,17 @@ public class ContentSelectorSuggestionProvider implements AutoCompleteSuggestion
     }
 
     @Override
-    public Collection<String> call(AutoCompletionBinding.ISuggestionRequest request) {
-        List<String> suggestions = new ArrayList<>();
-        if (suggestionProvider != null) {
-            suggestions.addAll(suggestionProvider.call(request));
-        }
-        suggestions.addAll(contentSelectorValues);
-        return suggestions;
+    public Stream<String> getSource() {
+        return Stream.concat(contentSelectorValues.stream(), suggestionProvider.getSource());
     }
 
     @Override
-    public void indexEntry(BibEntry entry) {
-        suggestionProvider.indexEntry(entry);
+    public Collection<String> getPossibleSuggestions() {
+        List<String> suggestions = new ArrayList<>();
+        if (suggestionProvider != null) {
+            suggestions.addAll(suggestionProvider.getPossibleSuggestions());
+        }
+        suggestions.addAll(contentSelectorValues);
+        return suggestions;
     }
 }

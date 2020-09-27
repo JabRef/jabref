@@ -13,7 +13,6 @@ import org.jabref.logic.l10n.Localization;
 public class BackupUIManager {
 
     private BackupUIManager() {
-
     }
 
     public static void showRestoreBackupDialog(DialogService dialogService, Path originalPath) {
@@ -25,7 +24,7 @@ public class BackupUIManager {
                 .append(Localization.lang("Do you want to recover the library from the backup file?"))
                 .toString();
 
-        boolean restoreClicked = DefaultTaskExecutor.runInJavaFXThread(()-> dialogService.showConfirmationDialogAndWait(
+        boolean restoreClicked = DefaultTaskExecutor.runInJavaFXThread(() -> dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Backup found"), content,
                 Localization.lang("Restore from backup"),
                 Localization.lang("Ignore backup")));
@@ -33,6 +32,5 @@ public class BackupUIManager {
         if (restoreClicked) {
             BackupManager.restoreBackup(originalPath);
         }
-
     }
 }

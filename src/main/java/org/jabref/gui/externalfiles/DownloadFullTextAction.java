@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -100,7 +100,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value ->
                 downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Download full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
@@ -126,7 +126,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 addLinkedFileFromURL(databaseContext, result.get(), entry, dir.get());
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                        entry.getCitationKey().orElse(Localization.lang("undefined"))));
             }
         }
     }
@@ -150,7 +150,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     databaseContext,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferences.getXMPPreferences(),
+                    preferences.getXmpPreferences(),
                     preferences.getFilePreferences(),
                     ExternalFileTypes.getInstance());
 
@@ -160,19 +160,23 @@ public class DownloadFullTextAction extends SimpleCommand {
                 downloadTask.onSuccess(destination -> {
                     LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
                             destination,
-                            databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences()),
+                            databaseContext.getFileDirectories(preferences.getFilePreferences()),
                             ExternalFileTypes.getInstance());
                     entry.addFile(downloadedFile);
                     dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                            entry.getCitationKey().orElse(Localization.lang("undefined"))));
                 });
+                downloadTask.titleProperty().set(Localization.lang("Downloading"));
+                downloadTask.messageProperty().set(
+                        Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
+                downloadTask.showToUser(true);
                 Globals.TASK_EXECUTOR.execute(downloadTask);
             } catch (MalformedURLException exception) {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
             }
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
-                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                    entry.getCitationKey().orElse(Localization.lang("undefined"))));
         }
     }
 }

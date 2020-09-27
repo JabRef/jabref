@@ -20,7 +20,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class KeyBindingsDialogView extends BaseDialog<Void> {
 
@@ -54,9 +54,9 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(
-                EasyBind.monadic(keyBindingsTable.selectionModelProperty())
-                        .flatMap(SelectionModel::selectedItemProperty)
-                        .selectProperty(TreeItem::valueProperty)
+                EasyBind.wrapNullable(keyBindingsTable.selectionModelProperty())
+                        .mapObservable(SelectionModel::selectedItemProperty)
+                        .mapObservable(TreeItem::valueProperty)
         );
         keyBindingsTable.setOnKeyPressed(evt -> viewModel.setNewBindingForCurrent(evt));
         keyBindingsTable.rootProperty().bind(

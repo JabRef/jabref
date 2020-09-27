@@ -30,8 +30,8 @@ public class CanonicalBibEntry {
 
         sb.append(entry.getUserComments());
 
-        // generate first line: type and bibtex key
-        String citeKey = entry.getCiteKeyOptional().orElse("");
+        // generate first line: type and citation key
+        String citeKey = entry.getCitationKey().orElse("");
         sb.append(String.format("@%s{%s,", entry.getType().getName(), citeKey)).append('\n');
 
         // we have to introduce a new Map as fields are stored case-sensitive in JabRef (see https://github.com/koppor/jabref/issues/45).

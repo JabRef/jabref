@@ -13,16 +13,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
@@ -46,7 +48,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
-    @Inject private JournalAbbreviationLoader journalAbbreviationLoader;
+    @Inject private JournalAbbreviationRepository abbreviationRepository;
     private ManageJournalAbbreviationsViewModel viewModel;
 
     public ManageJournalAbbreviationsView() {
@@ -59,7 +61,7 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, abbreviationRepository);
 
         setButtonStyles();
         setUpTable();
@@ -145,7 +147,11 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void saveAbbreviationsAndCloseDialog() {
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
+
+        // Update journal abbreviation repository
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+
         close();
     }
 

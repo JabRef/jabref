@@ -13,7 +13,7 @@ ISSN_FILTER = %w{
   0036-8075 1095-9203 1359-4184 1476-5578 1097-6256 1047-7594
   1546-1726 2108-6419 0035-2969 1958-5691 0943-8610 2194-508X
   0223-5099 0322-8916 1805-6555 1899-0665 0305-1048 1362-4962
-  0042-7306 1783-1830 1438-5627
+  0042-7306 1783-1830 1438-5627 0353-6483 1855-8399
 }
 
 # These titles are ignored when checking for duplicate titles
@@ -33,6 +33,7 @@ UNUSED_MACROS_FILTER = %w{
   chicago-library-list chicago-note-bibliography-16th-edition
   chicago-note-bibliography-with-ibid
   chicago-note-bibliography taylor-and-francis-chicago-author-date
+  turabian-author-date
 }
 
 # These files and directories are ignored when checking for extra files

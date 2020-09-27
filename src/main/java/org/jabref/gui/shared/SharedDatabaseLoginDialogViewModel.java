@@ -3,7 +3,6 @@ package org.jabref.gui.shared;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
@@ -20,10 +19,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
@@ -33,22 +32,22 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
 import org.jabref.logic.shared.DBMSConnectionPropertiesBuilder;
+import org.jabref.logic.shared.DBMSType;
+import org.jabref.logic.shared.DatabaseLocation;
+import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseLocation;
-import org.jabref.model.database.shared.DatabaseNotSupportedException;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +92,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         });
 
         Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
-        Predicate<String> fileExists = input -> Files.exists(Paths.get(input));
+        Predicate<String> fileExists = input -> Files.exists(Path.of(input));
         Predicate<String> notEmptyAndfilesExist = notEmpty.and(fileExists);
 
         databaseValidator = new FunctionBasedValidator<>(database, notEmpty, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Library"))));
@@ -144,7 +143,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
         }
 
         if (autosave.get()) {
-            Path localFilePath = Paths.get(folder.getValue());
+            Path localFilePath = Path.of(folder.getValue());
 
             if (Files.exists(localFilePath) && !Files.isDirectory(localFilePath)) {
 
@@ -167,7 +166,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).saveAs(Paths.get(folder.getValue()));
+                    new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }

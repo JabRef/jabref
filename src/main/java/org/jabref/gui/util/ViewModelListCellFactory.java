@@ -22,7 +22,8 @@ import javafx.util.Callback;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
 
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.Subscription;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 
 /**
  * Constructs a {@link ListCell} based on the view model of the row and a bunch of specified converter methods.
@@ -30,6 +31,8 @@ import org.fxmisc.easybind.Subscription;
  * @param <T> cell value
  */
 public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCell<T>> {
+
+    private static final PseudoClass INVALID_PSEUDO_CLASS = PseudoClass.getPseudoClass("invalid");
 
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
@@ -42,7 +45,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private BiConsumer<T, ? super DragEvent> toOnDragEntered;
     private BiConsumer<T, ? super DragEvent> toOnDragExited;
     private BiConsumer<T, ? super DragEvent> toOnDragOver;
-    private Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
+    private final Map<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClasses = new HashMap<>();
+    private Callback<T, ValidationStatus> validationStatusProperty;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -66,10 +70,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     }
 
     public ViewModelListCellFactory<T> withIcon(Callback<T, JabRefIcon> toIcon, Callback<T, Color> toColor) {
-        this.toGraphic = viewModel -> {
-
-            return toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
-        };
+        this.toGraphic = viewModel -> toIcon.call(viewModel).withColor(toColor.call(viewModel)).getGraphicNode();
         return this;
     }
 
@@ -134,6 +135,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> withValidation(Callback<T, ValidationStatus> validationStatusProperty) {
+        this.validationStatusProperty = validationStatusProperty;
+        return this;
+    }
+
     public void install(ComboBox<T> comboBox) {
         comboBox.setButtonCell(this.call(null));
         comboBox.setCellFactory(this);
@@ -146,9 +152,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     @Override
     public ListCell<T> call(ListView<T> param) {
 
-        return new ListCell<T>() {
+        return new ListCell<>() {
 
-            List<Subscription> subscriptions = new ArrayList<>();
+            final List<Subscription> subscriptions = new ArrayList<>();
 
             @Override
             protected void updateItem(T item, boolean empty) {
@@ -164,6 +170,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     setGraphic(null);
                     setOnMouseClicked(null);
                     setTooltip(null);
+                    pseudoClassStateChanged(INVALID_PSEUDO_CLASS, false);
                 } else {
                     if (toText != null) {
                         setText(toText.call(viewModel));
@@ -200,8 +207,20 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);
-                        Subscription subscription = BindingsHelper.includePseudoClassWhen(this, pseudoClassWithCondition.getKey(), condition);
-                        subscriptions.add(subscription);
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                pseudoClassWithCondition.getKey(),
+                                condition));
+                    }
+                    if (validationStatusProperty != null) {
+                        validationStatusProperty.call(viewModel)
+                                                .getHighestMessage()
+                                                .ifPresent(message -> setTooltip(new Tooltip(message.getMessage())));
+
+                        subscriptions.add(BindingsHelper.includePseudoClassWhen(
+                                this,
+                                INVALID_PSEUDO_CLASS,
+                                validationStatusProperty.call(viewModel).validProperty().not()));
                     }
                 }
             }

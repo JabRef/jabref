@@ -8,9 +8,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <?import org.jabref.gui.icon.JabRefIconView?>
-
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/11.0.1"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.NameFormatterTabView">
     <Label styleClass="titleHeader" text="%Special name formatters"/>
@@ -23,7 +21,7 @@
                     <TableColumn fx:id="formatterStringColumn"
                                  minWidth="50.0" prefWidth="368" sortable="false" text="%Format string"/>
                     <TableColumn fx:id="actionsColumn" maxWidth="30.0" minWidth="30.0" prefWidth="30.0"
-                                 editable="false" resizable="false"/>
+                                 editable="false" resizable="false" reorderable="false"/>
                 </columns>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

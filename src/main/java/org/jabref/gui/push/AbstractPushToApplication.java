@@ -3,8 +3,8 @@ package org.jabref.gui.push;
 import java.io.IOException;
 import java.util.List;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
@@ -81,13 +81,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                 ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
                 processBuilder.start();
             }
-        }
-
-        // In case it did not work
-        catch (IOException excep) {
+        } catch (IOException excep) {
+            LOGGER.warn("Error: Could not call executable '{}'", commandPath, excep);
             couldNotCall = true;
-
-            LOGGER.warn("Error: Could not call executable '" + commandPath + "'.", excep);
         }
     }
 
@@ -111,7 +107,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @Override
-    public boolean requiresBibtexKeys() {
+    public boolean requiresCitationKeys() {
         return true;
     }
 

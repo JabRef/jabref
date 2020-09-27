@@ -14,13 +14,12 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final String oldValue;
     private int delta = 0;
 
-
     /**
-     * @param bibEntry  Affected BibEntry object
-     * @param field Name of field which has been changed
-     * @param oldValue  old field value
-     * @param newValue  new field value
-     * @param location  location Location affected by this event
+     * @param bibEntry Affected BibEntry object
+     * @param field    Name of field which has been changed
+     * @param oldValue old field value
+     * @param newValue new field value
+     * @param location location Location affected by this event
      */
     public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue,
                              EntriesEventSource location) {
@@ -28,31 +27,31 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     /**
-     * @param bibEntry  Affected BibEntry object
-     * @param field Name of field which has been changed
-     * @param newValue  new field value
+     * @param bibEntry Affected BibEntry object
+     * @param field    Name of field which has been changed
+     * @param newValue new field value
      */
     public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {
         super(bibEntry);
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     /**
-     * @param location  location Location affected by this event
+     * @param location location Location affected by this event
      */
     public FieldChangedEvent(FieldChange fieldChange, EntriesEventSource location) {
         super(fieldChange.getEntry(), location);
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        delta = computeDelta(oldValue, newValue);
+        this.delta = computeDelta(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
@@ -86,5 +85,4 @@ public class FieldChangedEvent extends EntryChangedEvent {
     public int getDelta() {
         return delta;
     }
-
 }

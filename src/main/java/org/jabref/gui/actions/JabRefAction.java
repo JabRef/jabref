@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javafx.beans.binding.Bindings;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -31,6 +31,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
 
     /**
      * especially for the track execute when the action run the same function but from different source.
+     *
      * @param source is a string contains the source, for example "button"
      */
     public JabRefAction(Action action, Command command, KeyBindingRepository keyBindingRepository, Sources source) {
@@ -58,7 +59,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
             return action.getText();
         } else {
             String commandName = command.getClass().getSimpleName();
-            if ( commandName.contains("EditAction")
+            if (commandName.contains("EditAction")
                     || commandName.contains("CopyMoreAction")
                     || commandName.contains("CopyCitationAction")
                     || commandName.contains("PreviewSwitchAction")

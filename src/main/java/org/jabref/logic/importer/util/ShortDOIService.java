@@ -15,9 +15,7 @@ import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Class for obtaining shortened DOI names.
- *
- * @see 'https://shortdoi.org'
+ * Class for obtaining shortened DOI names. See <a href="https://shortdoi.org">https://shortdoi.org</a>.
  */
 public class ShortDOIService {
 
@@ -55,7 +53,11 @@ public class ShortDOIService {
         URLDownload urlDownload = new URLDownload(url);
 
         try {
-            return JsonReader.toJsonObject(urlDownload.asInputStream());
+            JSONObject resultAsJSON = JsonReader.toJsonObject(urlDownload.asInputStream());
+            if (resultAsJSON.isEmpty()) {
+                throw new ShortDOIServiceException("Cannot get short DOI");
+            }
+            return resultAsJSON;
         } catch (ParseException | IOException | JSONException e) {
             throw new ShortDOIServiceException("Cannot get short DOI", e);
         }

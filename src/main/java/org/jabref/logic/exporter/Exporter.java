@@ -55,5 +55,4 @@ public abstract class Exporter {
      * @param entries         a list containing all entries that should be exported
      */
     public abstract void export(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries) throws Exception;
-
 }

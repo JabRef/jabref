@@ -3,8 +3,8 @@ package org.jabref.gui.specialfields;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -34,14 +34,13 @@ public class SpecialFieldAction extends SimpleCommand {
     /**
      * @param nullFieldIfValueIsTheSame - false also causes that doneTextPattern has two place holders %0 for the value and %1 for the sum of entries
      */
-    public SpecialFieldAction(
-            JabRefFrame frame,
-            SpecialField specialField,
-            String value,
-            boolean nullFieldIfValueIsTheSame,
-            String undoText,
-            DialogService dialogService,
-            StateManager stateManager) {
+    public SpecialFieldAction(JabRefFrame frame,
+                              SpecialField specialField,
+                              String value,
+                              boolean nullFieldIfValueIsTheSame,
+                              String undoText,
+                              DialogService dialogService,
+                              StateManager stateManager) {
         this.frame = frame;
         this.specialField = specialField;
         this.value = value;
@@ -61,10 +60,17 @@ public class SpecialFieldAction extends SimpleCommand {
                 return;
             }
             NamedCompound ce = new NamedCompound(undoText);
-            for (BibEntry be : bes) {
+            for (BibEntry bibEntry : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                List<FieldChange> changes = SpecialFieldsUtils.updateField(specialField, value, be, nullFieldIfValueIsTheSame, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
-                for (FieldChange change: changes) {
+                List<FieldChange> changes = SpecialFieldsUtils.updateField(
+                        specialField,
+                        value,
+                        bibEntry,
+                        nullFieldIfValueIsTheSame,
+                        Globals.prefs.getSpecialFieldsPreferences().isKeywordSyncEnabled(),
+                        Globals.prefs.getKeywordDelimiter());
+
+                for (FieldChange change : changes) {
                     ce.addEdit(new UndoableFieldChange(change));
                 }
             }
@@ -80,10 +86,9 @@ public class SpecialFieldAction extends SimpleCommand {
                     outText = getTextDone(specialField, value, Integer.toString(bes.size()));
                 }
                 dialogService.notify(outText);
-            } else {
-                // if user does not change anything with his action, we do not do anything either
-                // even no output message
             }
+
+            // if user does not change anything with his action, we do not do anything either, even no output message
         } catch (Throwable ex) {
             LOGGER.error("Problem setting special fields", ex);
         }
@@ -110,5 +115,4 @@ public class SpecialFieldAction extends SimpleCommand {
             return "";
         }
     }
-
 }

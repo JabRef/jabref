@@ -4,9 +4,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -18,7 +20,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -34,7 +35,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 /**
  * A class for fetching DOIs from CrossRef
- *
+ * <p>
  * See https://github.com/CrossRef/rest-api-doc
  */
 public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
@@ -69,7 +70,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
         return uriBuilder.build().toURL();
     }
@@ -77,23 +78,30 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     @Override
     public Parser getParser() {
         return inputStream -> {
-            JSONObject response = JsonReader.toJsonObject(inputStream).getJSONObject("message");
-
-            List<BibEntry> entries = new ArrayList<>();
-            if (response.has("items")) {
-                // Response contains a list
-                JSONArray items = response.getJSONArray("items");
-                for (int i = 0; i < items.length(); i++) {
-                    JSONObject item = items.getJSONObject(i);
-                    BibEntry entry = jsonItemToBibEntry(item);
-                    entries.add(entry);
-                }
-            } else {
-                // Singleton response
-                BibEntry entry = jsonItemToBibEntry(response);
-                entries.add(entry);
+            JSONObject response = JsonReader.toJsonObject(inputStream);
+            if (response.isEmpty()) {
+                return Collections.emptyList();
             }
 
+            response = response.getJSONObject("message");
+            if (response.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            if (!response.has("items")) {
+                // Singleton response
+                BibEntry entry = jsonItemToBibEntry(response);
+                return Collections.singletonList(entry);
+            }
+
+            // Response contains a list
+            JSONArray items = response.getJSONArray("items");
+            List<BibEntry> entries = new ArrayList<>(items.length());
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                BibEntry entry = jsonItemToBibEntry(item);
+                entries.add(entry);
+            }
             return entries;
         };
     }

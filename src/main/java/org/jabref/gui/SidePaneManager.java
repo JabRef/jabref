@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jabref.Globals;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
@@ -176,7 +175,7 @@ public class SidePaneManager {
     /**
      * Helper class for sorting visible components based on their preferred position.
      */
-    private class PreferredIndexSort implements Comparator<SidePaneComponent> {
+    private static class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
         private final Map<SidePaneType, Integer> preferredPositions;
 

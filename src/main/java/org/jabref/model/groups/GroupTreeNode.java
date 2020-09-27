@@ -77,7 +77,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         boolean shouldAdd = shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
         if (shouldAdd || shouldRemove) {
             List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)
-                    .collect(Collectors.toList());
+                                                                       .collect(Collectors.toList());
             if (shouldRemove) {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) oldGroup;
                 changes.addAll(entryChanger.remove(entriesMatchedByOldGroup));
@@ -116,7 +116,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot() && (originalContext
                 != GroupHierarchyType.INCLUDING)) {
-            //noinspection OptionalGetWithoutIsPresent
+            // noinspection OptionalGetWithoutIsPresent
             searchRule.addRule(getParent().get().getSearchMatcher(originalContext));
         }
         return searchRule;
@@ -194,7 +194,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     public List<BibEntry> getEntriesInGroup(List<BibEntry> entries) {
         List<BibEntry> result = new ArrayList<>();
-        for (BibEntry entry: entries) {
+        for (BibEntry entry : entries) {
             if (this.group.contains(entry)) {
                 result.add(entry);
             }
@@ -218,24 +218,26 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Determines the number of entries in the specified list which are matched by this group.
+     * Determines the entries in the specified list which are matched by this group.
+     *
      * @param entries list of entries to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public long calculateNumberOfMatches(List<BibEntry> entries) {
+    public List<BibEntry> findMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
         return entries.stream()
                       .filter(matcher::isMatch)
-                      .count();
+                      .collect(Collectors.toList());
     }
 
     /**
-     * Determines the number of entries in the specified database which are matched by this group.
+     * Determines the entries in the specified database which are matched by this group.
+     *
      * @param database database to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public long calculateNumberOfMatches(BibDatabase database) {
-        return calculateNumberOfMatches(database.getEntries());
+    public List<BibEntry> findMatches(BibDatabase database) {
+        return findMatches(database.getEntries());
     }
 
     /**
@@ -248,14 +250,14 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     /**
      * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELEMITER}.
-     *
+     * <p>
      * The name of the root is not included.
      */
     public String getPath() {
         return getPathFromRoot().stream()
-                .skip(1) // Skip root
-                .map(GroupTreeNode::getName)
-                .collect(Collectors.joining(PATH_DELEMITER));
+                                .skip(1) // Skip root
+                                .map(GroupTreeNode::getName)
+                                .collect(Collectors.joining(PATH_DELEMITER));
     }
 
     @Override
@@ -274,7 +276,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public Optional<GroupTreeNode> getChildByPath(String pathToSource) {
         GroupTreeNode present = this;
         for (String groupName : pathToSource.split(PATH_DELEMITER)) {
-            Optional<GroupTreeNode> childWithName = present.getChildren().stream()
+            Optional<GroupTreeNode> childWithName = present
+                    .getChildren().stream()
                     .filter(group -> Objects.equals(group.getName(), groupName))
                     .findFirst();
             if (childWithName.isPresent()) {

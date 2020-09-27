@@ -14,9 +14,13 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
@@ -136,7 +140,7 @@ public class VM implements Warn {
             stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? VM.TRUE : VM.FALSE);
         });
 
-        /* Analogous. */
+        /* Analogous to >. */
         buildInFunctions.put("<", context -> {
             if (stack.size() < 2) {
                 throw new VMException("Not enough operands on stack for operation <");
@@ -270,7 +274,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Call.type$ can only be called from within a context (ITERATE or REVERSE).");
             }
-            VM.this.execute(context.getBibtexEntry().getType().getName(), context);
+            VM.this.execute(context.entry.getType().getName(), context);
         });
 
         buildInFunctions.put("change.case$", new ChangeCaseFunction(this));
@@ -303,7 +307,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
+            stack.push(context.entry.getCitationKey().orElse(null));
         });
 
         /*
@@ -506,10 +510,9 @@ public class VM implements Warn {
          */
         buildInFunctions.put("stack$", context -> {
             while (!stack.empty()) {
-                LOGGER.debug("Stack entry", stack.pop());
+                LOGGER.debug("Stack entry {}", stack.pop());
             }
         });
-
 
         /*
          * Pops the top three literals (they are the two integers literals
@@ -570,7 +573,7 @@ public class VM implements Warn {
         /*
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
-        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry", stack.pop()));
+        buildInFunctions.put("top$", context -> LOGGER.debug("Stack entry {}", stack.pop()));
 
         /*
          * Pushes the current entry's type (book, article, etc.), but pushes
@@ -581,7 +584,7 @@ public class VM implements Warn {
                 throw new VMException("type$ need a context.");
             }
 
-            stack.push(context.getBibtexEntry().getType().getName());
+            stack.push(context.entry.getType().getName());
         });
 
         /*
@@ -681,10 +684,10 @@ public class VM implements Warn {
                     }
                     // end
                 }
-            }
-            // else if (str_pool[sp_ptr-1] = right_brace) then
-            // begin
-            else if (c[i - 1] == '}') {
+
+                // else if (str_pool[sp_ptr-1] = right_brace) then
+                // begin
+            } else if (c[i - 1] == '}') {
                 // if (sp_brace_level > 0) then
                 if (braceLevel > 0) {
                     // decr(sp_brace_level);
@@ -843,11 +846,14 @@ public class VM implements Warn {
     }
 
     /**
-     * @param bibtex      list of entries to convert
+     * Transforms the given list of BibEntries to a rendered list of references using the underlying bst file
+     *
+     * @param bibEntries  list of entries to convert
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+     * @return list of references in plain text form
      */
-    public String run(Collection<BibEntry> bibtex, BibDatabase bibDatabase) {
-        Objects.requireNonNull(bibtex);
+    public String run(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
+        Objects.requireNonNull(bibEntries);
 
         // Reset
         bbl = new StringBuilder();
@@ -864,8 +870,8 @@ public class VM implements Warn {
         stack = new Stack<>();
 
         // Create entries
-        entries = new ArrayList<>(bibtex.size());
-        for (BibEntry entry : bibtex) {
+        entries = new ArrayList<>(bibEntries.size());
+        for (BibEntry entry : bibEntries) {
             entries.add(new BstEntry(entry));
         }
 
@@ -921,17 +927,40 @@ public class VM implements Warn {
      * @param bibDatabase
      */
     private void read(BibDatabase bibDatabase) {
+        FieldWriter fieldWriter = new FieldWriter(new FieldWriterPreferences());
         for (BstEntry e : entries) {
-            for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
+            for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());
-                String fieldValue = e.getBibtexEntry().getResolvedFieldOrAlias(field, bibDatabase).orElse(null);
+                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bibDatabase)
+                                           .map(content -> {
+                                               try {
+                                                   String result = fieldWriter.write(field, content);
+                                                   if (result.startsWith("{")) {
+                                                       // Strip enclosing {} from the output
+                                                       return result.substring(1, result.length() - 1);
+                                                   }
+                                                   if (field == StandardField.MONTH) {
+                                                       // We don't have the internal BibTeX strings at hand.
+                                                       // We nevertheless want to have the full month name.
+                                                       // Thus, we lookup the full month name here.
+                                                       return Month.parse(result)
+                                                                   .map(month -> month.getFullName())
+                                                                   .orElse(result);
+                                                   }
+                                                   return result;
+                                               } catch (InvalidFieldValueException invalidFieldValueException) {
+                                                   // in case there is something wrong with the content, just return the content itself
+                                                   return content;
+                                               }
+                                           })
+                                           .orElse(null);
                 mEntry.setValue(fieldValue);
             }
         }
 
         for (BstEntry e : entries) {
-            if (!e.getFields().containsKey(StandardField.CROSSREF.getName())) {
-                e.getFields().put(StandardField.CROSSREF.getName(), null);
+            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {
+                e.fields.put(StandardField.CROSSREF.getName(), null);
             }
         }
     }
@@ -978,7 +1007,7 @@ public class VM implements Warn {
             String name = t.getChild(i).getText();
 
             for (BstEntry entry : entries) {
-                entry.getFields().put(name, null);
+                entry.fields.put(name, null);
             }
         }
 
@@ -1103,8 +1132,8 @@ public class VM implements Warn {
 
         if (context != null) {
 
-            if (context.getFields().containsKey(name)) {
-                stack.push(context.getFields().get(name));
+            if (context.fields.containsKey(name)) {
+                stack.push(context.fields.get(name));
                 return;
             }
             if (context.localStrings.containsKey(name)) {
@@ -1171,24 +1200,17 @@ public class VM implements Warn {
 
     public static class BstEntry {
 
-        private final BibEntry entry;
+        public final BibEntry entry;
 
-        private final Map<String, String> localStrings = new HashMap<>();
+        public final Map<String, String> localStrings = new HashMap<>();
 
-        private final Map<String, String> fields = new HashMap<>();
+        // keys filled by org.jabref.logic.bst.VM.entry based on the contents of the bst file
+        public final Map<String, String> fields = new HashMap<>();
 
-        private final Map<String, Integer> localIntegers = new HashMap<>();
+        public final Map<String, Integer> localIntegers = new HashMap<>();
 
         public BstEntry(BibEntry e) {
             this.entry = e;
-        }
-
-        public Map<String, String> getFields() {
-            return fields;
-        }
-
-        public BibEntry getBibtexEntry() {
-            return entry;
         }
     }
 

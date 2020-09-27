@@ -12,13 +12,14 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
     private Path testFile5EntriesWithDuplicate;
     private JournalAbbreviationPreferences abbreviationPreferences;
     private DialogService dialogService;
+    private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
@@ -55,13 +57,12 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        JournalAbbreviationLoader journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repository);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE;T" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
         testFile4Entries = createTestFile(tempFolder, "testFile4Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "Entry;En;E" + NEWLINE + "");
-        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv","Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
+        testFile5EntriesWithDuplicate = createTestFile(tempFolder, "testFile5Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "Test Entry;TE;T" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "EntryEntry;EE" + NEWLINE + "");
     }
 
     @Test
@@ -195,27 +196,11 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
 
     @Test
     void testBuiltInListsIncludeAllBuiltInAbbreviations() {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(false);
-        viewModel.addBuiltInLists();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
+        viewModel.addBuiltInList();
+        assertEquals(1, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getBuiltInAbbreviations());
-        ObservableList<Abbreviation> actualAbbreviations = FXCollections
-                .observableArrayList(viewModel.abbreviationsProperty().stream()
-                                              .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
-
-        assertEquals(expected, actualAbbreviations);
-    }
-
-    @Test
-    void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
-        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(true);
-        viewModel.addBuiltInLists();
-        viewModel.selectLastJournalFile();
-        assertEquals(2, viewModel.journalFilesProperty().getSize());
-        ObservableList<Abbreviation> expected = FXCollections
-                .observableArrayList(JournalAbbreviationLoader.getOfficialIEEEAbbreviations());
+                .observableArrayList(repository.getAllLoaded());
         ObservableList<Abbreviation> actualAbbreviations = FXCollections
                 .observableArrayList(viewModel.abbreviationsProperty().stream()
                                               .map(AbbreviationViewModel::getAbbreviationObject).collect(Collectors.toList()));
@@ -418,16 +403,16 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
                 "Abbreviations;Abb;A",
                 "Test Entry;TE;T",
                 "MoreEntries;ME;M",
-                "JabRefTestEntry;JTE");
+                "JabRefTestEntry;JTE;JTE");
         List<String> actual = Files.readAllLines(testFile4Entries, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
 
         expected = Arrays.asList(
-                "EntryEntry;EE",
+                "EntryEntry;EE;EE",
                 "Abbreviations;Abb;A",
                 "Test Entry;TE;T",
-                "SomeOtherEntry;SOE");
+                "SomeOtherEntry;SOE;SOE");
         actual = Files.readAllLines(testFile5EntriesWithDuplicate, StandardCharsets.UTF_8);
 
         assertEquals(expected, actual);
@@ -464,7 +449,7 @@ class ManageJournalAbbreviationsViewModelWithShortestUniqueAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        viewModel.save();
     }
 
     /**

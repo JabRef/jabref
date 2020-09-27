@@ -16,14 +16,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final BooleanProperty liveMode = new SimpleBooleanProperty();
     private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
-
 
     public DocumentViewerViewModel(StateManager stateManager) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -57,7 +56,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         });
 
         maxPages.bindBidirectional(
-                EasyBind.monadic(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
+                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
 
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }

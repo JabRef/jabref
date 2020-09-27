@@ -7,17 +7,26 @@ on:
   pull_request:
     # always run on pull requests
 
+env:
+  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
+
 jobs:
   checkstyle:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{ github.token }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13.0.2
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
@@ -34,6 +43,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Run checkstyle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Run markdown-lint
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
+          config: '.markdownlint.yml'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -43,7 +57,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -87,7 +101,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -133,7 +147,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -167,12 +181,23 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "CODECOV_TOKEN" == "" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 13
+          java-version: 14
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -188,9 +213,10 @@ jobs:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
       - name: Update test coverage metrics
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
-          CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
+          CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation
@@ -201,3 +227,34 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
+  checkauthors:
+    name: "Validate AUTHORS"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # full checkout needed for authors generation
+          fetch-depth: 0
+      - name: "All authors of this PR listed in AUTHORS"
+        id: authors_check
+        shell: bash
+        run: |
+          git config user.name "JabRef Author Checker [bot]"
+          git config user.email "noreply@jabref.org"
+          ./scripts/generate-authors.sh
+          set +o pipefail
+          added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
+          if [ -z "$added" ]; then
+            echo "No authors added"
+            exit 0
+          fi
+          echo "Authors found in this PR not listed in the AUTHORS file."
+          echo
+          echo "The JabRef maintainers will add the following name to the AUTHORS file"
+          echo
+          echo -e "$added"
+          echo
+          echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
+          echo
+          echo "Background: Information about the AUTHORS file can be found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
+          exit 1

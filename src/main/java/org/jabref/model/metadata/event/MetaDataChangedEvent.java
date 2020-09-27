@@ -14,6 +14,7 @@ public class MetaDataChangedEvent extends BibDatabaseContextChangedEvent {
      * @param metaData Affected instance
      */
     public MetaDataChangedEvent(MetaData metaData) {
+        super();
         this.metaData = metaData;
     }
 

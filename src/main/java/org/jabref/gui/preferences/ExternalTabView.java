@@ -1,19 +1,21 @@
 package org.jabref.gui.preferences;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
 
@@ -23,28 +25,21 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
 
-    @FXML private RadioButton useTerminalDefault;
-    @FXML private RadioButton useTerminalSpecial;
-    @FXML private TextField useTerminalCommand;
-    @FXML private Button useTerminalBrowse;
+    @FXML private CheckBox useCustomTerminal;
+    @FXML private TextField customTerminalCommand;
+    @FXML private Button customTerminalBrowse;
 
-    @FXML private RadioButton usePDFAcrobat;
-    @FXML private TextField usePDFAcrobatCommand;
-    @FXML private Button usePDFAcrobatBrowse;
-    @FXML private RadioButton usePDFSumatra;
-    @FXML private TextField usePDFSumatraCommand;
-    @FXML private Button usePDFSumatraBrowse;
+    @FXML private CheckBox useCustomFileBrowser;
+    @FXML private TextField customFileBrowserCommand;
+    @FXML private Button customFileBrowserBrowse;
 
-    @FXML private RadioButton useFileBrowserDefault;
-    @FXML private RadioButton useFileBrowserSpecial;
-    @FXML private TextField useFileBrowserSpecialCommand;
-    @FXML private Button useFileBrowserSpecialBrowse;
+    private final PushToApplicationsManager pushToApplicationsManager;
 
-    private final JabRefFrame frame;
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTabView(JabRefPreferences preferences, JabRefFrame frame) {
+    public ExternalTabView(PreferencesService preferences, PushToApplicationsManager pushToApplicationsManager) {
         this.preferences = preferences;
-        this.frame = frame;
+        this.pushToApplicationsManager = pushToApplicationsManager;
 
         ViewLoader.view(this)
                   .root(this)
@@ -52,10 +47,12 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
     }
 
     @Override
-    public String getTabName() { return Localization.lang("External programs"); }
+    public String getTabName() {
+        return Localization.lang("External programs");
+    }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferences, frame);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferences, pushToApplicationsManager);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getApplicationName)
@@ -69,44 +66,40 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
         pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());
         citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());
 
-        useTerminalDefault.selectedProperty().bindBidirectional(viewModel.useTerminalDefaultProperty());
-        useTerminalSpecial.selectedProperty().bindBidirectional(viewModel.useTerminalSpecialProperty());
-        useTerminalCommand.textProperty().bindBidirectional(viewModel.useTerminalCommandProperty());
-        useTerminalCommand.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
-        useTerminalBrowse.disableProperty().bind(useTerminalSpecial.selectedProperty().not());
+        useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());
+        customTerminalCommand.textProperty().bindBidirectional(viewModel.customTerminalCommandProperty());
+        customTerminalCommand.disableProperty().bind(useCustomTerminal.selectedProperty().not());
+        customTerminalBrowse.disableProperty().bind(useCustomTerminal.selectedProperty().not());
 
-        usePDFAcrobat.selectedProperty().bindBidirectional(viewModel.usePDFAcrobatProperty());
-        usePDFAcrobatCommand.textProperty().bindBidirectional(viewModel.usePDFAcrobatCommandProperty());
-        usePDFAcrobatCommand.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
-        usePDFAcrobatBrowse.disableProperty().bind(usePDFAcrobat.selectedProperty().not());
+        useCustomFileBrowser.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserProperty());
+        customFileBrowserCommand.textProperty().bindBidirectional(viewModel.customFileBrowserCommandProperty());
+        customFileBrowserCommand.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
+        customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());
 
-        usePDFSumatra.selectedProperty().bindBidirectional(viewModel.usePDFSumatraProperty());
-        usePDFSumatraCommand.textProperty().bindBidirectional(viewModel.usePDFSumatraCommandProperty());
-        usePDFSumatraCommand.disableProperty().bind(usePDFSumatra.selectedProperty().not());
-        usePDFSumatraBrowse.disableProperty().bind(usePDFSumatra.selectedProperty().not());
-
-        useFileBrowserDefault.selectedProperty().bindBidirectional(viewModel.useFileBrowserDefaultProperty());
-        useFileBrowserSpecial.selectedProperty().bindBidirectional(viewModel.useFileBrowserSpecialProperty());
-        useFileBrowserSpecialCommand.textProperty().bindBidirectional(viewModel.useFileBrowserSpecialCommandProperty());
-        useFileBrowserSpecialCommand.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
-        useFileBrowserSpecialBrowse.disableProperty().bind(useFileBrowserSpecial.selectedProperty().not());
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        Platform.runLater(() -> {
+            validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);
+            validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);
+        });
     }
 
     @FXML
-    void pushToApplicationSettings() { viewModel.pushToApplicationSettings(); }
+    void pushToApplicationSettings() {
+        viewModel.pushToApplicationSettings();
+    }
 
     @FXML
-    void manageExternalFileTypes() { viewModel.manageExternalFileTypes(); }
+    void manageExternalFileTypes() {
+        viewModel.manageExternalFileTypes();
+    }
 
     @FXML
-    void useTerminalCommandBrowse() { viewModel.useTerminalCommandBrowse(); }
+    void useTerminalCommandBrowse() {
+        viewModel.customTerminalBrowse();
+    }
 
     @FXML
-    void usePDFAcrobatCommandBrowse() { viewModel.usePDFAcrobatCommandBrowse(); }
-
-    @FXML
-    void usePDFSumatraCommandBrowse() { viewModel.usePDFSumatraCommandBrowse(); }
-
-    @FXML
-    void useFileBrowserSpecialCommandBrowse() { viewModel.useFileBrowserSpecialCommandBrowse(); }
+    void useFileBrowserSpecialCommandBrowse() {
+        viewModel.customFileBrowserBrowse();
+    }
 }

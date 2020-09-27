@@ -3,7 +3,6 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -85,11 +84,9 @@ public class GroupsParser {
     /**
      * Re-create a group instance from a textual representation.
      *
-     * @param s The result from the group's toString() method.
-     * @param fileMonitor
+     * @param s           The result from the group's toString() method.
      * @return New instance of the encoded group.
-     * @throws ParseException If an error occurred and a group could not be created,
-     *                        e.g. due to a malformed regular expression.
+     * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
     public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
             throws ParseException {
@@ -128,7 +125,7 @@ public class GroupsParser {
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         try {
-            Path path = Paths.get(tok.nextToken());
+            Path path = Path.of(tok.nextToken());
             try {
                 TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
                 addGroupDetails(tok, newGroup);
@@ -181,8 +178,7 @@ public class GroupsParser {
     /**
      * Parses s and recreates the KeywordGroup from it.
      *
-     * @param s The String representation obtained from
-     *          KeywordGroup.toString()
+     * @param s The String representation obtained from KeywordGroup.toString()
      */
     private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
@@ -266,8 +262,7 @@ public class GroupsParser {
     /**
      * Parses s and recreates the SearchGroup from it.
      *
-     * @param s The String representation obtained from
-     *          SearchGroup.toString(), or null if incompatible
+     * @param s The String representation obtained from SearchGroup.toString(), or null if incompatible
      */
     private static AbstractGroup searchGroupFromString(String s) {
         if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {

@@ -1,7 +1,7 @@
 package org.jabref.testutils;
 
-import org.jabref.JabRefGUI;
-import org.jabref.JabRefMain;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.JabRefMain;
 
 public class TestUtils {
 
@@ -22,6 +22,7 @@ public class TestUtils {
      */
     public static void closeJabRef() {
         if (JabRefGUI.getMainFrame() != null) {
+            // TODO
         }
     }
 }

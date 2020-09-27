@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.UnicodeLigaturesMap;
-import org.jabref.model.cleanup.Formatter;
 
 public class ReplaceUnicodeLigaturesFormatter extends Formatter implements LayoutFormatter {
 
-    private Map<Pattern, String> ligaturesMap;
+    private final Map<Pattern, String> ligaturesMap;
 
     public ReplaceUnicodeLigaturesFormatter() {
         ligaturesMap = new HashMap<>();

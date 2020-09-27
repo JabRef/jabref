@@ -6,7 +6,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -34,7 +34,6 @@ public class ImportCustomEntryTypesDialogViewModel {
                 }
             }
         }
-
     }
 
     public ObservableList<BibEntryType> newTypes() {
@@ -48,12 +47,11 @@ public class ImportCustomEntryTypesDialogViewModel {
     public void importBibEntryTypes(List<BibEntryType> checkedUnknownEntryTypes, List<BibEntryType> checkedDifferentEntryTypes) {
         if (!checkedUnknownEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.saveCustomEntryTypes();
+            preferencesService.saveCustomEntryTypes(Globals.entryTypesManager);
         }
         if (!checkedDifferentEntryTypes.isEmpty()) {
             checkedUnknownEntryTypes.forEach(type -> Globals.entryTypesManager.addCustomOrModifiedType(type, mode));
-            preferencesService.saveCustomEntryTypes();
+            preferencesService.saveCustomEntryTypes(Globals.entryTypesManager);
         }
-
     }
 }

@@ -10,7 +10,7 @@ To submit a style, please follow the following steps (for locale files, follow t
 
 #### 1. Check that your style meets all our [style requirements](https://github.com/citation-style-language/styles/wiki/Style-Requirements)
 
-#### 2. [Validate](https://github.com/citation-style-language/styles/wiki/Validation) your style against the CSL schema, and correct any validation errors
+#### 2. [Validate](https://validator.citationstyles.org/) your style against the CSL schema, and correct any validation errors
 
 #### 3. Create a pull request
 
@@ -33,7 +33,7 @@ To start, create a GitHub account and sign in.
 ##### 3b. Submitting changes to an existing style
 
 1. Visit https://github.com/citation-style-language/styles and find the style you wish to change (dependent styles are stored in the [dependent](https://github.com/citation-style-language/styles/tree/master/dependent) subdirectory).
-   To search by file name press "t" (this activates GitHub’s [File Finder](https://github.com/blog/793-introducing-the-file-finder)) and start typing.
+   To search the repository by file name, click the "Find file" button or press <kbd>t</kbd> to activate GitHub’s [file finder](https://help.github.com/en/github/searching-for-information-on-github/finding-files-on-github) and start typing.
 2. Click on the style name, which will bring you to a page like https://github.com/citation-style-language/styles/blob/master/apa.csl.
 3. Click the edit icon (in the shape of a pencil).
    This opens a code editor in which you can make your changes (you can for example copy and paste your modified style into this window).
@@ -52,30 +52,30 @@ We often request you to make some changes to your pull request.
 Don't create a new pull request right away if your original submission has issues.
 It's much easier for us if you update your original pull request instead.
 
-After you create a pull request, our @csl-bot will first automatically run a number of tests to check whether your style validates and follows our style requirements.
+After you create a pull request, our [@csl-bot](https://github.com/csl-bot) will first automatically run a number of tests to check whether your style validates and follows our style requirements.
 These tests usually finish within a few minutes.
-If there are problems, @csl-bot will give a link to the test report, which contains the identified errors.
+If there are problems, [@csl-bot](https://github.com/csl-bot) will leave a comment with the identified errors.
 If you have trouble understanding these errors, please post a comment in the pull request and ask for help.
 
-We also have a handful of volunteers who review pull requests, usually within a day or two.
+We also have a handful of volunteers who review pull requests, usually within a week or two.
 
 To update your pull request:
 
 1. Visit the "Files changed" tab of your pull request.
-2. Click the edit (pencil) icon at the top-right of your style.
+2. Click the ellipsis button at the top-right of your style, and select "Edit file" in the ellipsis menu.
 3. Make your changes, and click the "Commit changes" button.
 
 Any changes made this way will automatically appear in the pull request, and each commit will trigger a new test report.
 
 Once we are satisfied, we will **merge** your pull request.
-This can take hours or days, depending on how busy we are, and on how much back and forth is needed to get your style in acceptable shape.
+This can take days or weeks, depending on how busy we are, and on how much back and forth is needed to get your style in acceptable shape.
 
 #### 5. Make additional changes after merging
 
 Once a pull request has been merged, it can no longer be used to submit further changes.
 So, if you wish to make additional changes, just create a new pull request.
 
-Please always start from the latest version of the style from our repository, because we often perform maintenance on the repository styles.
+Please always start from the latest version of the style from our repository, because we may have performed maintenance on your style or accepted corrections from other contributors.
 
 ## Asking for help
 

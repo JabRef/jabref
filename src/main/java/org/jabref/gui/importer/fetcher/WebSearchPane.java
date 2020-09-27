@@ -25,7 +25,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class WebSearchPane extends SidePaneComponent {
 
@@ -70,7 +70,16 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Create text field for query input
         TextField query = SearchTextField.create();
-        query.setOnAction(event -> viewModel.search());
+        query.getStyleClass().add("searchBar");
+        query.textProperty().addListener((observable, oldValue, newValue) -> viewModel.validateQueryStringAndGiveColorFeedback(query, newValue));
+        query.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                viewModel.validateQueryStringAndGiveColorFeedback(query, query.getText());
+            } else {
+                viewModel.setPseudoClassToValid(query);
+            }
+        });
+
         viewModel.queryProperty().bind(query.textProperty());
 
         // Create button that triggers search

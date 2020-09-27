@@ -7,9 +7,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -21,7 +21,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,21 +36,18 @@ public class AbbreviateAction extends SimpleCommand {
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final PreferencesService preferences;
 
     private AbbreviationType abbreviationType;
 
     public AbbreviateAction(StandardActions action,
                             JabRefFrame frame,
                             DialogService dialogService,
-                            StateManager stateManager,
-                            PreferencesService preferences) {
+                            StateManager stateManager) {
 
         this.action = action;
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.preferences = preferences;
 
         switch (action) {
             case ABBREVIATE_DEFAULT:
@@ -97,7 +93,7 @@ public class AbbreviateAction extends SimpleCommand {
 
     private String abbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
-                Globals.journalAbbreviationLoader.getRepository(preferences.getJournalAbbreviationPreferences()),
+                Globals.journalAbbreviationRepository,
                 abbreviationType);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
@@ -131,8 +127,7 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationLoader
-                .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationRepository);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = entries.stream().mapToInt(entry ->

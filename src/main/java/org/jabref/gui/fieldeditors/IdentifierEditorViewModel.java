@@ -8,9 +8,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
@@ -23,17 +23,17 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.identifier.Identifier;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class IdentifierEditorViewModel extends AbstractEditorViewModel {
-    private BooleanProperty validIdentifierIsNotPresent = new SimpleBooleanProperty(true);
-    private BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
-    private BooleanProperty idFetcherAvailable = new SimpleBooleanProperty(true);
-    private ObjectProperty<Optional<? extends Identifier>> identifier = new SimpleObjectProperty<>();
-    private TaskExecutor taskExecutor;
-    private DialogService dialogService;
+    private final BooleanProperty validIdentifierIsNotPresent = new SimpleBooleanProperty(true);
+    private final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
+    private final BooleanProperty idFetcherAvailable = new SimpleBooleanProperty(true);
+    private final ObjectProperty<Optional<? extends Identifier>> identifier = new SimpleObjectProperty<>();
+    private final TaskExecutor taskExecutor;
+    private final DialogService dialogService;
 
-    public IdentifierEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
+    public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
 
         this.taskExecutor = taskExecutor;
@@ -76,7 +76,6 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                     }
                 }
         );
-
     }
 
     public boolean getIdentifierLookupInProgress() {

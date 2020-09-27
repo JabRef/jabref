@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -18,6 +18,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -64,6 +65,8 @@ public class FetchAndMergeEntry {
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {
+                                      ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
+                                      cleanup.doPostCleanup(entry);
                                       String type = field.getDisplayName();
                                       if (fetchedEntry.isPresent()) {
                                           showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
@@ -147,6 +150,8 @@ public class FetchAndMergeEntry {
         BackgroundTask.wrap(() -> fetcher.performSearch(entry).stream().findFirst())
                       .onSuccess(fetchedEntry -> {
                           if (fetchedEntry.isPresent()) {
+                              ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
+                              cleanup.doPostCleanup(fetchedEntry.get());
                               showMergeDialog(entry, fetchedEntry.get(), fetcher);
                           } else {
                               dialogService.notify(Localization.lang("Could not find any bibliographic information."));

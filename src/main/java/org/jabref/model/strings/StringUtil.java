@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +29,6 @@ public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
-    public static final String EMPTY = "";
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
@@ -41,12 +41,10 @@ public class StringUtil {
     /**
      * Quote special characters.
      *
-     * @param toQuote         The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting
-     *                  character itself, which is automatically quoted.
+     * @param toQuote   The String which may contain special characters.
+     * @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
      * @param quoteChar The quoting character.
-     * @return A String with every special character (including the quoting
-     * character itself) quoted.
+     * @return A String with every special character (including the quoting character itself) quoted.
      */
     public static String quote(String toQuote, String specials, char quoteChar) {
         if (toQuote == null) {
@@ -193,20 +191,19 @@ public class StringUtil {
     }
 
     /**
-     * Formats field contents for output. Must be "symmetric" with the parse method above,
-     * so stored and reloaded fields are not mangled.
+     * Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
+     * are not mangled.
      *
-     * @param in
-     * @param wrapAmount
-     * @param newline
-     * @return the wrapped String.
+     * @param in         the string to wrap
+     * @param wrapAmount the number of characters belonging to a line of text
+     * @param newline    the newline character(s)
+     * @return the wrapped string
      */
     public static String wrap(String in, int wrapAmount, String newline) {
-
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline); // See
+        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
@@ -225,12 +222,21 @@ public class StringUtil {
         return result.toString();
     }
 
-    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newline) {
+    /**
+     * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
+     * Wrapping is done using newline and tab character.
+     *
+     * @param line          the line of text to be wrapped and appended
+     * @param wrapAmount    the number of characters belonging to a line of text
+     * @param newlineString a string containing the newline character(s)
+     */
+    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
         // Add the line, unmodified:
         result.append(line);
 
+        // insert newlines and one tab character at each position, where wrapping is necessary
         while (length < result.length()) {
             int current = result.indexOf(" ", length + wrapAmount);
             if ((current < 0) || (current >= result.length())) {
@@ -238,9 +244,8 @@ public class StringUtil {
             }
 
             result.deleteCharAt(current);
-            result.insert(current, newline + "\t");
-            length = current + newline.length();
-
+            result.insert(current, newlineString + "\t");
+            length = current + newlineString.length();
         }
     }
 
@@ -309,8 +314,7 @@ public class StringUtil {
      * braces. Ignore letters within a pair of # character, as these are part of
      * a string label that should not be modified.
      *
-     * @param s
-     *            The string to modify.
+     * @param s The string to modify.
      * @return The resulting string after wrapping capitals.
      */
     public static String putBracesAroundCapitals(String s) {
@@ -351,7 +355,6 @@ public class StringUtil {
 
             // Check if we are entering an escape sequence:
             escaped = (c == '\\') && !escaped;
-
         }
         // Check if we have an unclosed brace:
         if (isBracing) {
@@ -366,8 +369,7 @@ public class StringUtil {
      * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
      * pairs of braces are removed.
      *
-     * @param s
-     *            The String to analyze.
+     * @param s The String to analyze.
      * @return A new String with braces removed.
      */
     public static String removeBracesAroundCapitals(String s) {
@@ -384,8 +386,7 @@ public class StringUtil {
      * of braces, e.g. "{AB}". All these are replaced by only the capitals in
      * between the braces.
      *
-     * @param s
-     *            The String to analyze.
+     * @param s The String to analyze.
      * @return A new String with braces removed.
      */
     private static String removeSingleBracesAroundCapitals(String s) {
@@ -401,7 +402,7 @@ public class StringUtil {
 
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
-     *
+     * <p>
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
      * <example>
@@ -443,7 +444,6 @@ public class StringUtil {
             }
             return false;
         }
-
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
@@ -464,12 +464,12 @@ public class StringUtil {
 
     /**
      * Optimized method for converting a String into an Integer
-     *
+     * <p>
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
-     * @throws NumberFormatException if str cannot be parsed to an int
      * @return the int value of str
+     * @throws NumberFormatException if str cannot be parsed to an int
      */
     public static int intValueOf(String str) {
         int idx = 0;
@@ -482,7 +482,7 @@ public class StringUtil {
         }
 
         int ival = 0;
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return sign ? ival : -ival;
@@ -495,7 +495,7 @@ public class StringUtil {
 
     /**
      * Optimized method for converting a String into an Integer
-     *
+     * <p>
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
@@ -512,7 +512,7 @@ public class StringUtil {
         }
 
         int ival = 0;
-        for (;; ival *= 10) {
+        for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
                 return Optional.of(sign ? ival : -ival);
@@ -554,10 +554,10 @@ public class StringUtil {
     }
 
     /*
-         * @param  buf       String to be tokenized
-         * @param  delimstr  Delimiter string
-         * @return list      {@link java.util.List} of <tt>String</tt>
-         */
+     * @param  buf       String to be tokenized
+     * @param  delimstr  Delimiter string
+     * @return list      {@link java.util.List} of <tt>String</tt>
+     */
     public static List<String> tokenizeToList(String buf, String delimstr) {
         List<String> list = new ArrayList<>();
         String buffer = buf + '\n';
@@ -588,7 +588,12 @@ public class StringUtil {
      * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
-        String result = s;
+        /* Some unicode characters can be encoded in multiple ways. This uses <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
+         * to re-encode the characters so that these characters can be found.
+         * Most people expect Unicode to work similar to NFC, i.e., if characters looks the same, it is likely that they are equivalent.
+         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
+         * A more holistic approach should likely start with the <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">compatibility equivalence</a>. */
+        String result = Normalizer.normalize(s, Normalizer.Form.NFC);
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
@@ -620,7 +625,6 @@ public class StringUtil {
         }
 
         return resultSB.toString();
-
     }
 
     public static boolean isNullOrEmpty(String toTest) {
@@ -668,7 +672,7 @@ public class StringUtil {
     /**
      * Unquote special characters.
      *
-     * @param toUnquote         The String which may contain quoted special characters.
+     * @param toUnquote The String which may contain quoted special characters.
      * @param quoteChar The quoting character.
      * @return A String with all quoted characters unquoted.
      */

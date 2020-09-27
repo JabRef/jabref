@@ -34,7 +34,7 @@ public class DBLPFetcherTest {
         entry = new BibEntry();
 
         entry.setType(StandardEntryType.Article);
-        entry.setCiteKey("DBLP:journals/stt/GeigerHL16");
+        entry.setCitationKey("DBLP:journals/stt/GeigerHL16");
         entry.setField(StandardField.TITLE,
                 "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
         entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
@@ -58,7 +58,7 @@ public class DBLPFetcherTest {
 
     @Test
     public void findSingleEntryUsingComplexOperators() throws FetcherException {
-        String query = "geiger harrer betsy$ softw.trends"; //-wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
+        String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
         assertEquals(Collections.singletonList(entry), result);

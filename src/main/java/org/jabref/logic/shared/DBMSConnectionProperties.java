@@ -8,8 +8,6 @@ import java.util.Properties;
 
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

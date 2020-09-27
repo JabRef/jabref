@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
@@ -22,7 +23,10 @@ import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
@@ -33,13 +37,15 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = "file" + FilePreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
 
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -91,12 +97,12 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
         Objects.requireNonNull(globalPattern);
-        AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
+        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addBibtexKeyPattern);
+        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
         getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
 
         return bibtexKeyPattern;
@@ -108,7 +114,7 @@ public class MetaData {
      * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
      *                         is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
+    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
@@ -266,7 +272,7 @@ public class MetaData {
     }
 
     /**
-     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
      */
     public void setEncoding(Charset encoding, ChangePropagation postChanges) {
         this.encoding = Objects.requireNonNull(encoding);
