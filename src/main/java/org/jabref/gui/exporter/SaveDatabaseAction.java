@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
@@ -35,7 +36,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,19 +55,22 @@ public class SaveDatabaseAction {
     private final BasePanel panel;
     private final JabRefFrame frame;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
+
+    private final  GlobalSaveManager saveManager;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(BasePanel panel, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
         this.panel = panel;
         this.frame = panel.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.saveManager = GlobalSaveManager.create(Globals.stateManager, preferences, entryTypesManager);
     }
 
     public boolean save() {
@@ -157,7 +161,7 @@ public class SaveDatabaseAction {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                                                                                                .addExtensionFilter(StandardFileType.BIBTEX_DB)
                                                                                                .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                                                                                               .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                                                                                               .withInitialDirectory(preferences.getWorkingDir())
                                                                                                .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
@@ -216,7 +220,7 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        GlobalSaveManager manager = GlobalSaveManager.create(panel, preferences, entryTypesManager);
+
 
         SavePreferences preferences = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
@@ -224,7 +228,7 @@ public class SaveDatabaseAction {
 
         Consumer<List<FieldChange>> consumer = fieldChanges -> panel.registerUndoableChanges(fieldChanges);
 
-        var future = manager.save(file, selectedOnly, encoding, saveType, panel.getBibDatabaseContext(), consumer);
+        var future = saveManager.save(file, selectedOnly, encoding, saveType, consumer);
         Set<Character> characters;
         try {
             characters = future.get();
@@ -268,10 +272,10 @@ public class SaveDatabaseAction {
 
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL)
-                 && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                (((context.getLocation() == DatabaseLocation.LOCAL)
+                 && preferences.getShouldAutosave())
                &&
-               context.getDatabasePath().isPresent();
+               context.getDatabasePath().isPresent()));
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class AutosaveUiManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
-
     private final BasePanel panel;
 
     public AutosaveUiManager(BasePanel panel) {

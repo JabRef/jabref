@@ -11,14 +11,14 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class GlobalSaveManager {
 
@@ -26,15 +26,15 @@ public class GlobalSaveManager {
 
     private final DelayTaskThrottler<Set<Character>> throttler = new DelayTaskThrottler<>(1500);
     private final BibDatabaseContext bibDatabaseContext;
-    private final List<BibEntry> selectedEntries;
-    private final JabRefPreferences preferences;
-    private final BibEntryTypesManager entryTypesManager;
 
-    private GlobalSaveManager(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
-        this.bibDatabaseContext = panel.getBibDatabaseContext();
-        this.selectedEntries = panel.getSelectedEntries();
-        this.preferences = preferences;
-        this.entryTypesManager = entryTypesManager;
+    private final StateManager stateManager;
+
+    private final PreferencesService preferencesService;
+
+    private GlobalSaveManager(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+        this.bibDatabaseContext=  stateManager.getActiveDatabase().get();
+        this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
 
     }
 
@@ -43,8 +43,8 @@ public class GlobalSaveManager {
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == context);
     }
 
-    public static GlobalSaveManager create(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
-        GlobalSaveManager saveAction = new GlobalSaveManager(panel, preferences, entryTypesManager);
+    public static GlobalSaveManager create(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+        GlobalSaveManager saveAction = new GlobalSaveManager(stateManager, preferencesService, entryTypesManager);
         runningInstances.add(saveAction);
         return saveAction;
     }
@@ -54,22 +54,23 @@ public class GlobalSaveManager {
 
     }
 
-    public Future<Set<Character>> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, BibDatabaseContext context, Consumer<List<FieldChange>> consumeFieldChanges) {
-        return throttler.scheduleTask(() -> saveThrotteld(file, selectedOnly, encoding, saveType, context, consumeFieldChanges));
+    public Future<Set<Character>> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, Consumer<List<FieldChange>> consumeFieldChanges) {
+        return throttler.scheduleTask(() -> saveThrottled(file, selectedOnly, encoding, saveType, consumeFieldChanges));
     }
 
-    private Set<Character> saveThrotteld(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, BibDatabaseContext context, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
-        SavePreferences savePrefs = this.preferences.getSavePreferences()
+    private Set<Character> saveThrottled(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
+
+        SavePreferences savePrefs = this.preferencesService.getSavePreferences()
                                                     .withEncoding(encoding)
                                                     .withSaveType(saveType);
 
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, savePrefs.getEncoding(), savePrefs.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePrefs, entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePrefs, Globals.entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(context, selectedEntries);
+                databaseWriter.savePartOfDatabase(this.bibDatabaseContext, this.stateManager.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(context);
+                databaseWriter.saveDatabase(this.bibDatabaseContext);
             }
 
             consumeFieldChanges.accept(databaseWriter.getSaveActionsFieldChanges());
