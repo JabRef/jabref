@@ -19,19 +19,19 @@
     </fx:define>
 
     <CheckBox fx:id="openLastStartup" text="%Open last edited libraries at startup"/>
-    <Label text="%Do not wrap the following fields when saving"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Do not wrap the following fields when saving"/>
         <TextField fx:id="noWrapFiles" HBox.hgrow="ALWAYS"/>
     </HBox>
     <RadioButton fx:id="resolveStringsBibTex" text="%Resolve strings for standard BibTeX fields only"
                  toggleGroup="$stringsResolveToggleGroup"/>
-    <RadioButton fx:id="resolveStringsAll" text="%Resolve strings for all fields except"
-                 toggleGroup="$stringsResolveToggleGroup"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
-         <TextField fx:id="resolveStringsExcept" HBox.hgrow="ALWAYS"/>
+        <RadioButton fx:id="resolveStringsAll" text="%Resolve strings for all fields except"
+                     toggleGroup="$stringsResolveToggleGroup"/>
+        <TextField fx:id="resolveStringsExcept" HBox.hgrow="ALWAYS"/>
     </HBox>
-    <Label alignment="TOP_LEFT" text="%Newline separator"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label alignment="TOP_LEFT" text="%Newline separator"/>
         <ComboBox fx:id="newLineSeparator" prefWidth="120.0"/>
     </HBox>
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat BIB file on save and export"/>

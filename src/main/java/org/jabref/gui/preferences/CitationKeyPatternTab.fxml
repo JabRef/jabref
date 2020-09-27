@@ -46,13 +46,14 @@
             <Insets left="20.0"/>
         </padding>
     </HBox>
-    <Label text="%Remove the following characters:"/>
+
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Remove the following characters:"/>
         <TextField fx:id="unwantedCharacters" HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <Label styleClass="sectionHeader" text="%Key patterns"/>
     <HBox prefWidth="650.0">
+        <Label styleClass="sectionHeader" text="%Key patterns"/>
         <HBox HBox.hgrow="ALWAYS"/>
         <Button fx:id="keyPatternHelp" prefWidth="20.0"/>
     </HBox>

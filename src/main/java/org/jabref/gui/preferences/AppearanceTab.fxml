@@ -34,8 +34,8 @@
     <Label styleClass="sectionHeader" text="%Visual theme"/>
     <RadioButton fx:id="themeLight" text="%Light theme" toggleGroup="$theme"/>
     <RadioButton fx:id="themeDark" text="%Dark theme" toggleGroup="$theme"/>
-    <RadioButton fx:id="customTheme" text="%Custom theme" toggleGroup="$theme"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
+        <RadioButton fx:id="customTheme" text="%Custom theme" toggleGroup="$theme"/>
         <TextField fx:id="customThemePath" prefWidth="350.0" disable="${!customTheme.selected}"/>
         <Button onAction="#importTheme" disable="${!customTheme.selected}"
                 styleClass="icon-button,narrow"

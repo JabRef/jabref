@@ -79,7 +79,7 @@ class PreferencesSearchHandler {
             if (builder instanceof Parent) {
                 Parent parentBuilder = (Parent) builder;
                 scanInputControls(parentBuilder, prefsTabLabelMap, preferencesTab);
-                
+
             }
         }
         return prefsTabLabelMap;
@@ -89,7 +89,7 @@ class PreferencesSearchHandler {
         return filteredPreferenceTabs;
     }
 
-    private void scanInputControls(Parent parent, ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap, PreferencesTab preferencesTab) {
+    private static void scanInputControls(Parent parent, ArrayListMultimap<PreferencesTab, Labeled> prefsTabLabelMap, PreferencesTab preferencesTab) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (!(child instanceof Labeled)) {
 

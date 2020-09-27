@@ -20,8 +20,9 @@
         <ToggleGroup fx:id="autolinkToggleGroup"/>
     </fx:define>
     <Label styleClass="titleHeader" text="%Linked files"/>
-    <Label text="%Main file directory"/>
+
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="%Main file directory"/>
         <TextField fx:id="mainFileDirectory" HBox.hgrow="ALWAYS"/>
         <Button onAction="#mainFileDirBrowse" text="%Browse"/>
     </HBox>
@@ -38,9 +39,9 @@
                  toggleGroup="$autolinkToggleGroup"/>
     <RadioButton fx:id="autolinkFileExactBibtex" text="%Autolink only files that match the citation key"
                  toggleGroup="$autolinkToggleGroup"/>
-    <RadioButton fx:id="autolinkUseRegex" text="%Use regular expression search"
-                 toggleGroup="$autolinkToggleGroup"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <RadioButton fx:id="autolinkUseRegex" text="%Use regular expression search"
+                     toggleGroup="$autolinkToggleGroup"/>
         <TextField fx:id="autolinkRegexKey" HBox.hgrow="ALWAYS"/>
         <Button fx:id="autolinkRegexHelp"/>
     </HBox>
