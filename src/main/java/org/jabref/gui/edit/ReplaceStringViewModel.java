@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
@@ -22,7 +22,7 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private String findString;
     private String replaceString;
     private Set<Field> fields;
-    private BasePanel panel;
+    private LibraryTab panel;
 
     private StringProperty findStringProperty = new SimpleStringProperty();
     private StringProperty replaceStringProperty = new SimpleStringProperty();
@@ -30,9 +30,9 @@ public class ReplaceStringViewModel extends AbstractViewModel {
     private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
     private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
-    public ReplaceStringViewModel(BasePanel basePanel) {
-        Objects.requireNonNull(basePanel);
-        this.panel = basePanel;
+    public ReplaceStringViewModel(LibraryTab libraryTab) {
+        Objects.requireNonNull(libraryTab);
+        this.panel = libraryTab;
     }
 
     public int replace() {

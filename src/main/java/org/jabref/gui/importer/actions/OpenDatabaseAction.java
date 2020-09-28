@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -60,14 +60,14 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param panel  The BasePanel where the database is shown.
+     * @param libraryTab  The BasePanel where the database is shown.
      * @param result The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult result) {
+    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(panel, result);
-                panel.frame().showBasePanel(panel);
+                action.performAction(libraryTab, result);
+                libraryTab.frame().showLibraryTab(libraryTab);
             }
         }
     }
@@ -91,7 +91,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (frame.getBasePanelCount() == 0) {
             return Globals.prefs.getWorkingDir();
         } else {
-            Optional<Path> databasePath = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabasePath();
+            Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
             return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
         }
     }
@@ -111,7 +111,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
     public void openFiles(List<Path> filesToOpen, boolean raisePanel) {
-        BasePanel toRaise = null;
+        LibraryTab toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
 
@@ -119,17 +119,17 @@ public class OpenDatabaseAction extends SimpleCommand {
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-                BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
-                        && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
+                LibraryTab libraryTab = frame.getLibraryTabAt(i);
+                if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
+                        && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
-                    // raise the BasePanel in question:
+                    // raise the LibraryTab in question:
                     if (removed == initialCount) {
-                        toRaise = basePanel;
+                        toRaise = libraryTab;
                     }
-                    // no more bps to check, we found a matching one
+                    // no more LibraryTabs to check, we found a matching one
                     break;
                 }
             }
@@ -151,7 +151,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         } else if (toRaise != null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
-            frame.showBasePanel(toRaise);
+            frame.showLibraryTab(toRaise);
         }
     }
 
@@ -164,8 +164,8 @@ public class OpenDatabaseAction extends SimpleCommand {
 
             BackgroundTask.wrap(() -> loadDatabase(file))
                           .onSuccess(result -> {
-                              BasePanel panel = addNewDatabase(result, file, raisePanel);
-                              OpenDatabaseAction.performPostOpenActions(panel, result);
+                              LibraryTab libraryTab = addNewDatabase(result, file, raisePanel);
+                              OpenDatabaseAction.performPostOpenActions(libraryTab, result);
                           })
                           .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
                                   ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened.")))
@@ -202,13 +202,13 @@ public class OpenDatabaseAction extends SimpleCommand {
         return result;
     }
 
-    private BasePanel addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
+    private LibraryTab addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
         if (result.hasWarnings()) {
             ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
         }
 
-        BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
-        frame.addTab(basePanel, raisePanel);
-        return basePanel;
+        LibraryTab libraryTab = new LibraryTab(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+        frame.addTab(libraryTab, raisePanel);
+        return libraryTab;
     }
 }

@@ -82,16 +82,16 @@ public class ExportCommand extends SimpleCommand {
         List<BibEntry> entries;
         if (selectedOnly) {
             // Selected entries
-            entries = frame.getCurrentBasePanel().getSelectedEntries();
+            entries = frame.getCurrentLibraryTab().getSelectedEntries();
         } else {
             // All entries
-            entries = frame.getCurrentBasePanel().getDatabase().getEntries();
+            entries = frame.getCurrentLibraryTab().getDatabase().getEntries();
         }
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentLibraryTab()
                                                 .getBibDatabaseContext()
                                                 .getFileDirectories(Globals.prefs.getFilePreferences());
 
@@ -103,9 +103,9 @@ public class ExportCommand extends SimpleCommand {
         final List<BibEntry> finEntries = entries;
         BackgroundTask
                 .wrap(() -> {
-                    format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                    format.export(frame.getCurrentLibraryTab().getBibDatabaseContext(),
                             file,
-                            frame.getCurrentBasePanel()
+                            frame.getCurrentLibraryTab()
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()

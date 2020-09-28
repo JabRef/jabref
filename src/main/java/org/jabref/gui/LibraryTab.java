@@ -10,7 +10,7 @@ import javafx.application.Platform;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Tab;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -52,9 +52,9 @@ import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasePanel extends StackPane {
+public class LibraryTab extends Tab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
@@ -82,12 +82,12 @@ public class BasePanel extends StackPane {
     // Used to track whether the base has changed since last save.
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
-    @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
+    public LibraryTab(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
         this.preferences = Objects.requireNonNull(preferences);
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
@@ -296,7 +296,7 @@ public class BasePanel extends StackPane {
                 this.baseChanged = true;
             }
             changePane = null;
-            getChildren().add(splitPane);
+            this.setContent(splitPane);
         }
     }
 
@@ -565,7 +565,7 @@ public class BasePanel extends StackPane {
 
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
-        this.getChildren().setAll(changePane);
+        this.setContent(changePane);
     }
 
     public void copy() {

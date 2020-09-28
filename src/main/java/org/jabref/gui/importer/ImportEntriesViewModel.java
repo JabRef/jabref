@@ -155,7 +155,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getFile().map(File::getName).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
-        JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
+        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {

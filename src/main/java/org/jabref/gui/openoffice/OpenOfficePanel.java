@@ -28,10 +28,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -317,11 +317,11 @@ public class OpenOfficePanel {
     private List<BibDatabase> getBaseList() {
         List<BibDatabase> databases = new ArrayList<>();
         if (ooPrefs.getUseAllDatabases()) {
-            for (BasePanel basePanel : frame.getBasePanelList()) {
-                databases.add(basePanel.getDatabase());
+            for (LibraryTab libraryTab : frame.getLibraryTabs()) {
+                databases.add(libraryTab.getDatabase());
             }
         } else {
-            databases.add(frame.getCurrentBasePanel().getDatabase());
+            databases.add(frame.getCurrentLibraryTab().getDatabase());
         }
 
         return databases;
@@ -337,7 +337,7 @@ public class OpenOfficePanel {
             Task<Void> taskConnectIfInstalled = new Task<>() {
 
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() {
                     updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                     boolean installed = officeInstallation.isInstalled();
@@ -469,10 +469,10 @@ public class OpenOfficePanel {
             }
         }
 
-        BasePanel panel = frame.getCurrentBasePanel();
-        if (panel != null) {
-            final BibDatabase database = panel.getDatabase();
-            List<BibEntry> entries = panel.getSelectedEntries();
+        LibraryTab libraryTab = frame.getCurrentLibraryTab();
+        if (libraryTab != null) {
+            final BibDatabase database = libraryTab.getDatabase();
+            List<BibEntry> entries = libraryTab.getSelectedEntries();
             if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
 
                 try {
@@ -514,7 +514,7 @@ public class OpenOfficePanel {
         // Check if there are empty keys
         boolean emptyKeys = false;
         for (BibEntry entry : entries) {
-            if (!entry.getCitationKey().isPresent()) {
+            if (entry.getCitationKey().isEmpty()) {
                 // Found one, no need to look further for now
                 emptyKeys = true;
                 break;
@@ -532,22 +532,22 @@ public class OpenOfficePanel {
                 Localization.lang("Generate keys"),
                 Localization.lang("Cancel"));
 
-        BasePanel panel = frame.getCurrentBasePanel();
-        if (citePressed && (panel != null)) {
+        LibraryTab libraryTab = frame.getCurrentLibraryTab();
+        if (citePressed && (libraryTab != null)) {
             // Generate keys
             CitationKeyPatternPreferences prefs = jabRefPreferences.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (!entry.getCitationKey().isPresent()) {
+                if (entry.getCitationKey().isEmpty()) {
                     // Generate key
-                    new CitationKeyGenerator(panel.getBibDatabaseContext(), prefs)
+                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), prefs)
                             .generateAndSetKey(entry)
                             .ifPresent(change -> undoCompound.addEdit(new UndoableKeyChange(change)));
                 }
             }
             undoCompound.end();
             // Add all undos
-            panel.getUndoManager().addEdit(undoCompound);
+            libraryTab.getUndoManager().addEdit(undoCompound);
             // Now every entry has a key
             return true;
         } else {

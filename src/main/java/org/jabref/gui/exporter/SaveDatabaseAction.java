@@ -14,9 +14,9 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
-    private final BasePanel panel;
+    private final LibraryTab panel;
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -59,9 +59,9 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
-        this.panel = panel;
-        this.frame = panel.frame();
+    public SaveDatabaseAction(LibraryTab libraryTab, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+        this.panel = libraryTab;
+        this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
@@ -168,7 +168,7 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            if (!savePath.isPresent()) {
+            if (savePath.isEmpty()) {
                 return false;
             }
             return saveAs(savePath.get(), mode);

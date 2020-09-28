@@ -62,12 +62,12 @@ public class EditAction extends SimpleCommand {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries
 
-                // ToDo: Should be handled by BibDatabaseContext instead of BasePanel
+                // ToDo: Should be handled by BibDatabaseContext instead of LibraryTab
                 switch (action) {
-                    case COPY -> frame.getCurrentBasePanel().copy();
-                    case CUT -> frame.getCurrentBasePanel().cut();
-                    case PASTE -> frame.getCurrentBasePanel().paste();
-                    case DELETE_ENTRY -> frame.getCurrentBasePanel().delete(false);
+                    case COPY -> frame.getCurrentLibraryTab().copy();
+                    case CUT -> frame.getCurrentLibraryTab().cut();
+                    case PASTE -> frame.getCurrentLibraryTab().paste();
+                    case DELETE_ENTRY -> frame.getCurrentLibraryTab().delete(false);
                     default -> throw new IllegalStateException("Only cut/copy/paste supported but got " + action);
                 }
             }

@@ -23,9 +23,9 @@ public class PreviewSwitchAction extends SimpleCommand {
     @Override
     public void execute() {
         if (direction == Direction.NEXT) {
-            frame.getCurrentBasePanel().getEntryEditor().nextPreviewStyle();
+            frame.getCurrentLibraryTab().getEntryEditor().nextPreviewStyle();
         } else {
-            frame.getCurrentBasePanel().getEntryEditor().previousPreviewStyle();
+            frame.getCurrentLibraryTab().getEntryEditor().previousPreviewStyle();
         }
     }
 }

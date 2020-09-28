@@ -150,7 +150,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
         manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
 
-        frame.getBasePanelList().forEach(panel -> panel.getMainTable().getTableModel().refresh());
+        frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**

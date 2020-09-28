@@ -101,7 +101,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 frame.getUndoManager().addEdit(compound);
             }
 
-            frame.getCurrentBasePanel().markBaseChanged();
+            frame.getCurrentLibraryTab().markBaseChanged();
             dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
         });
     }
