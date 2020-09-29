@@ -51,7 +51,6 @@ public class AutoSetFileLinksUtilTest {
         assertEquals(expected, actual);
     }
 
-
     @Test
     public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false);
