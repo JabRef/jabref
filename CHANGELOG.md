@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat". [#6907](https://github.com/JabRef/jabref/pull/60907).
 - We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog [#6934](https://github.com/JabRef/jabref/issues/6934)
 - We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog [6906](https://github.com/JabRef/jabref/issues/6906)
+- We fixed and issue when identity column header had incorrect foreground color [#6796](https://github.com/JabRef/jabref/issues/6796) 
 
 ### Removed
 

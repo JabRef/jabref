@@ -130,6 +130,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
+        header.getStyleClass().add("text-unchanged");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
