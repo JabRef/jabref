@@ -33,6 +33,7 @@ import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
 import org.jabref.logic.importer.fileformat.endnote.Notes;
+import org.jabref.logic.importer.fileformat.endnote.Number;
 import org.jabref.logic.importer.fileformat.endnote.Pages;
 import org.jabref.logic.importer.fileformat.endnote.PdfUrls;
 import org.jabref.logic.importer.fileformat.endnote.Record;
@@ -189,7 +190,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .map(Style::getContent)
                 .ifPresent(value -> entry.setField(StandardField.PAGES, value));
         Optional.ofNullable(record.getNumber())
-                .map(org.jabref.logic.importer.fileformat.endnote.Number::getStyle)
+                .map(Number::getStyle)
                 .map(Style::getContent)
                 .ifPresent(value -> entry.setField(StandardField.NUMBER, value));
         Optional.ofNullable(record.getVolume())
