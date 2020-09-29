@@ -279,5 +279,4 @@ public class DOI implements Identifier {
     public int hashCode() {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
-
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,6 +23,8 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 
 import com.google.common.collect.Sets;
 import org.slf4j.Logger;
@@ -57,6 +60,9 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.EDITOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.TITLE, 3.);
         DuplicateCheck.FIELD_WEIGHTS.put(StandardField.JOURNAL, 2.);
+        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.NOTE, 0.1);
+        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.COMMENT, 0.1);
+        DuplicateCheck.FIELD_WEIGHTS.put(StandardField.DOI, 3.);
     }
 
     private final BibEntryTypesManager entryTypesManager;
@@ -301,6 +307,19 @@ public class DuplicateCheck {
     public boolean isDuplicate(final BibEntry one, final BibEntry two, final BibDatabaseMode bibDatabaseMode) {
         if (haveSameIdentifier(one, two)) {
             return true;
+        }
+
+        // check DOI
+        Optional<DOI> oneDOI = one.getDOI();
+        Optional<DOI> twoDOI = two.getDOI();
+        if (oneDOI.isPresent() && twoDOI.isPresent()) {
+            return Objects.equals(oneDOI, twoDOI);
+        }
+        // check ISBN
+        Optional<ISBN> oneISBN = one.getISBN();
+        Optional<ISBN> twoISBN = two.getISBN();
+        if (oneISBN.isPresent() && twoISBN.isPresent()) {
+            return Objects.equals(oneISBN, twoISBN);
         }
 
         if (haveDifferentEntryType(one, two) ||

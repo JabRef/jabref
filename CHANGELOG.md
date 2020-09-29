@@ -29,7 +29,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the title of the window "Manage field names and content" to have the same title as the corresponding menu item [#6895](https://github.com/JabRef/jabref/pull/6895)
 - We renamed the menus "View -> Previous citation style" and "View -> Next citation style" into "View -> Previous preview style" and "View -> Next preview style" and renamed the "Preview" style to "Customized preview style". [#6899](https://github.com/JabRef/jabref/pull/6899)
 - We changed the default preference option "Search and store files relative to library file location" to on, as this seems to be a more intuitive behaviour. [#6863](https://github.com/JabRef/jabref/issues/6863)
-- Improved detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
+- We changed the title of the window  "Manage field names and content":  to have the same title as the corresponding menu item  [#6895](https://github.com/JabRef/jabref/pull/6895)
+- We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
+- We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
 
 ### Fixed
 
@@ -37,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
 - We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
+- We fixed the failure to Copy citation key and link. [#5835](https://github.com/JabRef/jabref/issues/5835)
 - We fixed an issue where the sort order of the entry table was reset after a restart of JabRef. [#6898](https://github.com/JabRef/jabref/pull/6898)
 - We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat". [#6907](https://github.com/JabRef/jabref/pull/60907).
 - We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog [#6934](https://github.com/JabRef/jabref/issues/6934)

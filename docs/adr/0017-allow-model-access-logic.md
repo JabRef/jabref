@@ -24,6 +24,10 @@ Chosen option: "`org.jabref.model` may use `org.jabref.logic` in defined cases",
 
 ### `org.jabref.model` uses `org.jabref.model` (and external libraries) only
 
+The model package does not access logic or other packages of JabRef.
+Access to classes of external libraries is allowed.
+The logic package may use the model package.
+
 - Good, because clear separation of model and logic
 - Bad, because this leads to an [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html)
 
