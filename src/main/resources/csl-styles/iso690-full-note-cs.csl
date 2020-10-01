@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Czech ISO-690, full note.</summary>
-    <updated>2020-09-14T21:56:33+00:00</updated>
+    <updated>2020-09-18T10:00:11+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -101,10 +101,10 @@
     <choose>
       <if variable="author" type="book" match="all">
         <names variable="editor translator" delimiter=", ">
-          <label text-case="capitalize-first" suffix=" "/>
           <name sort-separator=", " delimiter=", " delimiter-precedes-last="never" and="text">
             <name-part name="family" text-case="uppercase"/>
           </name>
+          <label form="short" prefix=", "/>
         </names>
       </if>
     </choose>
