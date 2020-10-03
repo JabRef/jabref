@@ -1,13 +1,17 @@
 package org.jabref.logic.openoffice;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -33,19 +37,17 @@ public class OpenOfficeFileSearch {
     }
 
     private static List<Path> findOpenOfficeDirectories(List<Path> programDirectories) {
-        List<Path> result = new ArrayList<>();
 
-        for (Path programDir : programDirectories) {
-            File[] subDirs = programDir.toFile().listFiles(File::isDirectory);
-            if (subDirs != null) {
-                for (File dir : subDirs) {
-                    if (dir.getPath().toLowerCase(Locale.ROOT).contains("openoffice") || dir.getPath().toLowerCase(Locale.ROOT).contains("libreoffice")) {
-                        result.add(dir.toPath());
-                    }
-                }
+        BiPredicate<Path, BasicFileAttributes> filePredicate = (path, attr) -> attr.isDirectory() && (path.toString().toLowerCase(Locale.ROOT).contains("openoffice")
+                                                                               || path.toString().toLowerCase(Locale.ROOT).contains("libreoffice"));
+
+        return programDirectories.stream().flatMap(dirs -> {
+            try {
+                return Files.find(dirs, 1, filePredicate);
+            } catch (IOException e) {
+                return Stream.empty();
             }
-        }
-        return result;
+        }).collect(Collectors.toList());
     }
 
     private static List<Path> findWindowsOpenOfficeDirs() {
