@@ -17,6 +17,9 @@ updates:
   - dependency-name: de.jensd:fontawesomefx-materialdesignfont
     versions:
     - "> 1.7.22-4" # Strange versioning format
+  - dependency-name: org.fxmisc.richtext:richtextfx
+    versions:
+    - "> 0.10.4" # Blocked by https://github.com/FXMisc/RichTextFX/issues/967
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
