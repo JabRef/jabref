@@ -16,7 +16,12 @@ import java.util.stream.Stream;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class OpenOfficeFileSearch {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeFileSearch.class);
+
     /**
      * Detects existing installation of OpenOffice and LibreOffice.
      *
@@ -45,6 +50,7 @@ public class OpenOfficeFileSearch {
             try {
                 return Files.find(dirs, 1, filePredicate);
             } catch (IOException e) {
+                LOGGER.error("Problem searching for openoffice/libreoffice install directory", e);
                 return Stream.empty();
             }
         }).collect(Collectors.toList());
