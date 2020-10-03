@@ -259,9 +259,11 @@ In rare cases you might encounter problems due to out-dated automatically genera
 ### Problems with openjfx libraries in local maven repository
 
 There might be problems with building if you have opejfx libraries in local maven repository, resulting in errors like this:
+
 ```text
  > Could not find javafx-fxml-14-mac.jar (org.openjfx:javafx-fxml:14).
      Searched in the following locations:
          file:<your local maven repository path>/repository/org/openjfx/javafx-fxml/14/javafx-fxml-14-mac.jar
 ```
+
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.
