@@ -10,10 +10,10 @@ updates:
   ignore:
   - dependency-name: com.microsoft.azure:applicationinsights-core
     versions:
-    - ">= 2.5.a, <= 2.6.1" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+    - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
   - dependency-name: com.microsoft.azure:applicationinsights-logging-log4j2
     versions:
-    - ">= 2.5.a, <= 2.6.1" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
+    - ">= 2.5.a" # Blocked by https://github.com/microsoft/ApplicationInsights-Java/issues/1155
   - dependency-name: de.jensd:fontawesomefx-materialdesignfont
     versions:
     - "> 1.7.22-4" # Strange versioning format
