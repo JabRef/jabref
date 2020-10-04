@@ -77,7 +77,7 @@ public class BibTeXMLExporter extends Exporter {
         for (BibEntry bibEntry : entries) {
             Entry entry = new Entry();
 
-            bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
+            bibEntry.getCitationKey().ifPresent(entry::setId);
 
             EntryType i = bibEntry.getType();
             if (StandardEntryType.Article.equals(i)) {

@@ -59,7 +59,7 @@ public class DocBook5ExporterTest {
         entry.setField(StandardField.TITLE, "my paper title");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez");
         entry.setField(StandardField.ISBN, "1-2-34");
-        entry.setCiteKey("mykey");
+        entry.setCitationKey("mykey");
         entry.setDate(new org.jabref.model.entry.Date(myDate));
         entries = Collections.singletonList(entry);
     }

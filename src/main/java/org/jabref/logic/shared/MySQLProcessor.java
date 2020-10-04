@@ -2,8 +2,6 @@ package org.jabref.logic.shared;
 
 import java.sql.SQLException;
 
-import org.jabref.model.database.shared.DatabaseConnection;
-
 /**
  * Processes all incoming or outgoing bib data to MySQL Database and manages its structure.
  */

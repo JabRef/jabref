@@ -264,7 +264,7 @@ public class FileUtil {
         String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
         if (targetName.isEmpty()) {
-            targetName = entry.getCiteKeyOptional().orElse("default");
+            targetName = entry.getCitationKey().orElse("default");
         }
 
         // Removes illegal characters from filename

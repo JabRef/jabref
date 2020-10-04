@@ -1,6 +1,6 @@
 package org.jabref.gui.logging;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.logging.LogMessages;
 
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;

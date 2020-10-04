@@ -115,8 +115,8 @@ public enum StandardActions implements Action {
 
     EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
     SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
-    NEXT_PREVIEW_STYLE(Localization.lang("Next citation style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
-    PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous citation style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
+    NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
+    PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous preview style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.lang("Select all"), KeyBinding.SELECT_ALL),
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),

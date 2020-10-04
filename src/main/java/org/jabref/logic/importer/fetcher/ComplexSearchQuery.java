@@ -42,6 +42,7 @@ public class ComplexSearchQuery {
                 case "year" -> builder.singleYear(Integer.valueOf(termText));
                 case "year-range" -> builder.parseYearRange(termText);
                 case "default" -> builder.defaultFieldPhrase(termText);
+                default -> builder.defaultFieldPhrase(term.field() + ":" + termText);
             }
         });
         return builder.build();
@@ -122,6 +123,19 @@ public class ComplexSearchQuery {
         result = 31 * result + (getSingleYear().isPresent() ? getSingleYear().hashCode() : 0);
         result = 31 * result + (getJournal().isPresent() ? getJournal().hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringRepresentation = new StringBuilder();
+        getSingleYear().ifPresent(singleYear -> stringRepresentation.append(singleYear).append(" "));
+        getFromYear().ifPresent(fromYear -> stringRepresentation.append(fromYear).append(" "));
+        getToYear().ifPresent(toYear -> stringRepresentation.append(toYear).append(" "));
+        getJournal().ifPresent(journal -> stringRepresentation.append(journal).append(" "));
+        stringRepresentation.append(String.join(" ", getTitlePhrases()))
+                            .append(String.join(" ", getDefaultFieldPhrases()))
+                            .append(String.join(" ", getAuthors()));
+        return stringRepresentation.toString();
     }
 
     public static class ComplexSearchQueryBuilder {

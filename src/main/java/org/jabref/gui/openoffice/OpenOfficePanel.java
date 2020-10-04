@@ -28,9 +28,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -48,6 +48,7 @@ import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -266,7 +267,7 @@ public class OpenOfficePanel {
         HBox hbox = new HBox();
         hbox.getChildren().addAll(connect, manualConnect, selectDocument, update, help);
         hbox.getChildren().forEach(btn -> HBox.setHgrow(btn, Priority.ALWAYS));
-        
+
         FlowPane flow = new FlowPane();
         flow.setPadding(new Insets(5, 5, 5, 5));
         flow.setVgap(4);
@@ -430,9 +431,13 @@ public class OpenOfficePanel {
             throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS + " in " + configurationPath);
         }
 
-        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
+        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size() + 1);
         for (Optional<Path> jarPath : filePaths) {
             jarURLs.add((jarPath.get().toUri().toURL()));
+            // For Mac OSX we need to add the "Contents/MacOS", because otherwise we cannot connect to LO
+            if (OS.OS_X) {
+                jarURLs.add(configurationPath.resolve("Contents/MacOS/").toUri().toURL());
+            }
         }
         return jarURLs;
     }
@@ -514,7 +519,7 @@ public class OpenOfficePanel {
         // Check if there are empty keys
         boolean emptyKeys = false;
         for (BibEntry entry : entries) {
-            if (!entry.getCiteKeyOptional().isPresent()) {
+            if (!entry.getCitationKey().isPresent()) {
                 // Found one, no need to look further for now
                 emptyKeys = true;
                 break;
@@ -538,7 +543,7 @@ public class OpenOfficePanel {
             CitationKeyPatternPreferences prefs = jabRefPreferences.getCitationKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (!entry.getCiteKeyOptional().isPresent()) {
+                if (!entry.getCitationKey().isPresent()) {
                     // Generate key
                     new CitationKeyGenerator(panel.getBibDatabaseContext(), prefs)
                             .generateAndSetKey(entry)

@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
@@ -116,6 +118,7 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
  * K."
  * </ol>
  */
+@AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
@@ -142,11 +145,11 @@ public class AuthorList {
      *
      * @param authors the list of authors which should underlie this instance
      */
-    protected AuthorList(List<Author> authors) {
+    public AuthorList(List<Author> authors) {
         this.authors = Objects.requireNonNull(authors);
     }
 
-    protected AuthorList(Author author) {
+    public AuthorList(Author author) {
         this(Collections.singletonList(author));
     }
 

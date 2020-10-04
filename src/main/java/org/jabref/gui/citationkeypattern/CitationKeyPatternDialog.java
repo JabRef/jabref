@@ -2,11 +2,11 @@ package org.jabref.gui.citationkeypattern;
 
 import javafx.scene.control.ButtonType;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
 import org.jabref.model.metadata.MetaData;
 
 public class CitationKeyPatternDialog extends BaseDialog<Void> {

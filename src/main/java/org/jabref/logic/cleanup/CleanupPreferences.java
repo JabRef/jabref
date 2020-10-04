@@ -1,7 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class CleanupPreferences {
 

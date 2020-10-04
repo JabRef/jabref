@@ -16,15 +16,6 @@
     <updated>2019-09-26T09:18:08+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <macro name="author-short">
-    <names variable="author">
-      <name form="short" and="text"/>
-      <substitute>
-        <names variable="editor"/>
-        <names variable="translator"/>
-      </substitute>
-    </names>
-  </macro>
   <macro name="author">
     <names variable="author">
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
@@ -54,11 +45,6 @@
         <text variable="edition"/>
       </else>
     </choose>
-  </macro>
-  <macro name="year">
-    <date variable="issued">
-      <date-part name="year"/>
-    </date>
   </macro>
   <macro name="title">
     <choose>
@@ -91,10 +77,6 @@
     </layout>
   </citation>
   <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
-    <sort>
-      <key macro="author-short"/>
-      <key macro="year"/>
-    </sort>
     <layout suffix=".">
       <text variable="citation-number" prefix="[" suffix="]"/>
       <group delimiter=" ">

@@ -1,4 +1,4 @@
-<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\citationkey">
    <authorgroup>
 <!--AUTHORS-->
 \begin{author}       \format[CreateDocBook5Authors]{\author} \end{author}
@@ -7,7 +7,7 @@
    </authorgroup>
    <!--TITLE-->
     \begin{title}       <citetitle pubwork="book">\format[XMLChars,RemoveLatexCommands]{\title}</citetitle> \end{title}
-    
+
 <!--BOOK booktitle, edition, (pages), publisher-->
     <biblioset relation="book">\n
         \begin{booktitle}<booktitle>\format[XMLChars,RemoveLatexCommands]{\booktitle}</booktitle>\end{booktitle}
@@ -19,8 +19,8 @@
         <address>\address</address>
         \begin{publisher}</publisher>\end{publisher}
 	</biblioset>
-    
-    
+
+
 <!-- IDENTIFIERS-->
     \begin{url}
         <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>

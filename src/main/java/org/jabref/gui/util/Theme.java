@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import javafx.scene.Scene;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -94,7 +94,7 @@ public class Theme {
      * StyleTester does not create a Globals object, so we need to wrap this method so the style tester can provide
      * its own fileUpdateMonitor, but the main codebase is not spammed.
      *
-     * @deprecated Remove as soon {@link org.jabref.Globals} refactored.
+     * @deprecated Remove as soon {@link Globals} refactored.
      *
      * @param scene the scene the css should be applied to.
      */

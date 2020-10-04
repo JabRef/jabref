@@ -13,8 +13,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +117,7 @@ public class LinkedFileHandler {
     }
 
     private String relativize(Path path) {
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(filePreferences);
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
         return FileUtil.relativize(path, fileDirectories).toString();
     }
 

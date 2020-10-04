@@ -8,8 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.FieldChange;
-import org.jabref.model.bibtexkeypattern.AbstractCitationKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,6 +32,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     private final AbstractCitationKeyPattern citeKeyPattern;
     private final BibDatabase database;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final String unwantedCharacters;
 
     public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
         this(bibDatabaseContext.getMetaData().getCiteKeyPattern(citationKeyPatternPreferences.getKeyPattern()),
@@ -45,6 +44,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);
         this.database = Objects.requireNonNull(database);
         this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);
+        this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();
     }
 
     @Deprecated
@@ -80,10 +80,14 @@ public class CitationKeyGenerator extends BracketedPattern {
     private static String getAppendix(int number) {
         if (number >= APPENDIX_CHARACTERS.length()) {
             int lastChar = number % APPENDIX_CHARACTERS.length();
-            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.substring(lastChar, lastChar + 1);
+            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);
         } else {
             return APPENDIX_CHARACTERS.substring(number, number + 1);
         }
+    }
+
+    public static String removeDefaultUnwantedCharacters(String key) {
+        return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);
     }
 
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
@@ -126,13 +130,13 @@ public class CitationKeyGenerator extends BracketedPattern {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     Character delimiter = citationKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
-                    String label = expandBrackets(pattern, delimiter, entry, database);
+                    String label = removeUnwantedCharacters(expandBrackets(pattern, delimiter, entry, database), unwantedCharacters);
                     // apply modifier if present
                     if (parts.size() > 1) {
-                        label = applyModifiers(label, parts, 1);
+                        label = removeUnwantedCharacters(applyModifiers(label, parts, 1), unwantedCharacters);
                     }
                     // Remove all illegal characters from the label.
-                    label = cleanKey(label, citationKeyPatternPreferences.getUnwantedCharacters());
+                    label = cleanKey(label, unwantedCharacters);
                     stringBuilder.append(label);
                 } else {
                     stringBuilder.append(typeListEntry);
@@ -151,8 +155,8 @@ public class CitationKeyGenerator extends BracketedPattern {
             key = key.replaceAll(regex, replacement);
         }
 
-        String oldKey = entry.getCiteKeyOptional().orElse(null);
-        long occurrences = database.getNumberOfKeyOccurrences(key);
+        String oldKey = entry.getCitationKey().orElse(null);
+        long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -176,7 +180,7 @@ public class CitationKeyGenerator extends BracketedPattern {
                 moddedKey = key + getAppendix(number);
                 number++;
 
-                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getNumberOfCitationKeyOccurrences(moddedKey);
                 // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
@@ -196,6 +200,6 @@ public class CitationKeyGenerator extends BracketedPattern {
      */
     public Optional<FieldChange> generateAndSetKey(BibEntry entry) {
         String newKey = generateKey(entry);
-        return entry.setCiteKey(newKey);
+        return entry.setCitationKey(newKey);
     }
 }
