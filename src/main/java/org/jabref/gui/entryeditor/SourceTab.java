@@ -133,7 +133,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
         new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
@@ -224,6 +224,7 @@ public class SourceTab extends EntryEditorTab {
             codeArea.clear();
             try {
                 codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
+                codeArea.setEditable(true);
                 highlightSearchPattern();
             } catch (IOException ex) {
                 codeArea.setEditable(false);
@@ -231,6 +232,7 @@ public class SourceTab extends EntryEditorTab {
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }
+
         });
     }
 
