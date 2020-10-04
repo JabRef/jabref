@@ -232,7 +232,6 @@ public class SourceTab extends EntryEditorTab {
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 LOGGER.debug("Incorrect entry", ex);
             }
-
         });
     }
 
