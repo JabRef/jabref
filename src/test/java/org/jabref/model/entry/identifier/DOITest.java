@@ -25,6 +25,7 @@ public class DOITest {
         assertEquals("10/gf4gqc", new DOI("10/gf4gqc").getDOI());
         assertEquals("10/1000", new DOI("10/1000").getDOI());
         assertEquals("10/aaaa", new DOI("10/aaaa").getDOI());
+        assertEquals("10/adc", new DOI("10/adc").getDOI());
     }
 
     @Test
