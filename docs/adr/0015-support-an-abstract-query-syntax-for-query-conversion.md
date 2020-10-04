@@ -14,9 +14,9 @@ Which features should the syntax support?
 
 ## Decision Outcome
 
-Chosen option: "Use a syntax that is derived of the lucene query syntax", because only option that is already known, and easy to implemenent.
+Chosen option: "Use a syntax that is derived of the lucene query syntax", because only option that is already known, and easy to implement.
 Furthermore parsers for lucene already exist and are tested.
-For simplicitly, and lack of universal capabilities across fetchers, only basic query features and therefor syntax is supported:
+For simplicity, and lack of universal capabilities across fetchers, only basic query features and therefor syntax is supported:
 
 * All terms in the query are whitespace separated and will be ANDed
 * Default and certain fielded terms are supported

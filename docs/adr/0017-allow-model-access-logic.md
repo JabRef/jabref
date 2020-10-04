@@ -7,7 +7,7 @@
 
 ## Decision Drivers
 
-- New comers should find the architecture "split" natural
+- Newcomers should find the architecture "split" natural
 - The architecture should be a help (and not a burden)
 
 ## Considered Options
@@ -35,7 +35,7 @@ The logic package may use the model package.
 
 - Good, because model and logic are still separated
 - Neutral, because each exception has to be discussed and agreed
-- Bad, because new comers have to be informed that there are certain (agreed) exceptions for model to access logic
+- Bad, because newcomers have to be informed that there are certain (agreed) exceptions for model to access logic
 
 ### `org.jabref.model` and `org.jabref.logic` may access each other freely
 

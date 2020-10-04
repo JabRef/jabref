@@ -45,7 +45,7 @@ Chosen option: "Separate URL creation", because comes out best \(see below\).
     }
 ```
 
-* Good, because exceptions thrown at method are directly catched
+* Good, because exceptions thrown at method are directly caught
 * Good, because exceptions in different statements belong to different catch blocks
 * Good, because code to determine URL is written once
 * OK, because "Java by Comparison" does not state anything about it
