@@ -42,9 +42,11 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed the failure to Copy citation key and link. [#5835](https://github.com/JabRef/jabref/issues/5835)
 - We fixed an issue where the sort order of the entry table was reset after a restart of JabRef. [#6898](https://github.com/JabRef/jabref/pull/6898)
 - We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat". [#6907](https://github.com/JabRef/jabref/pull/60907).
-- We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog [#6934](https://github.com/JabRef/jabref/issues/6934)
-- We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog [6906](https://github.com/JabRef/jabref/issues/6906)
-- We fixed and issue when identity column header had incorrect foreground color [#6796](https://github.com/JabRef/jabref/issues/6796) 
+- We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog. [#6934](https://github.com/JabRef/jabref/issues/6934)
+- We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog. [6906](https://github.com/JabRef/jabref/issues/6906)
+- We fixed an issue where it was impossible to connect to OpenOffice/LibreOffice on Mac OSX. [#6970](https://github.com/JabRef/jabref/pull/6970)
+- We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
+- We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796) 
 
 ### Removed
 

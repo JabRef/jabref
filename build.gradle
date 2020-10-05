@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.33.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.22.0'
+    id 'org.beryx.jlink' version '2.22.1'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -141,7 +141,7 @@ dependencies {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
 
     implementation 'org.postgresql:postgresql:42.2.16'
 
@@ -164,7 +164,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.1.0'
     implementation 'org.fxmisc.flowless:flowless:0.6.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.0.2'
