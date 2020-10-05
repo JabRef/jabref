@@ -123,7 +123,7 @@
                     </VBox>
                     <VBox visible="${autoRadioButton.selected}" spacing="10.0">
                         <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
-                                     text="Generate groups from keywords in a BibTeX field"/>
+                                     text="Generate groups from keywords in the following field"/>
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets left="20.0"/>
