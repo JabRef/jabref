@@ -1188,3 +1188,7 @@ TextFlow * {
     -fx-background-color: rgba(255, 159, 67, 0.5);
 
 }
+
+.mainTable-header{
+    -fx-fill: -fx-mid-text-color;
+}
