@@ -33,7 +33,10 @@ public class DoiResolution implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
 
     /**
-     * Hosts for which tailored fetchers exist, so this fetcher is not needed.
+     * A DOI leads to the page of the paper. We assume that there is the PDF of the paper.
+     * Thus, the DOI fetcher is ranked highest (see {@link TrustLevel}).
+     * Some publishers do not publish the PDF of the paper, but the full proceedings on the page
+     * of the paper. For these publishers, we need to skip the DOI search.
      */
     private final List<String> excludedHosts = Arrays.asList("link.springer.com", "ieeexplore.ieee.org");
 
