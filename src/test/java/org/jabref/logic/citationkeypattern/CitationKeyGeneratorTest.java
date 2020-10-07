@@ -1101,4 +1101,11 @@ class CitationKeyGeneratorTest {
 
         assertEquals("Modele", generateKey(bibEntry, "[veryshorttitle]"));
     }
+
+    @Test
+    void generateKeyWithModifierContainingRegexCharacterCkass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
+
+        assertEquals("Wickedness.Managing", generateKey(bibEntry, "[title:regex(\"[:]+\",\".\")]"));
+    }
 }

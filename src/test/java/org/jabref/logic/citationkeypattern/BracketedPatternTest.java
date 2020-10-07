@@ -278,4 +278,11 @@ class BracketedPatternTest {
                 .withField(StandardField.AUTHOR, "Patrik {\\v{S}}pan{\\v{e}}l and Kseniya Dryahina and David Smith");
         assertEquals("ŠpanělEtAl", BracketedPattern.expandBrackets("[authEtAl:latex_to_unicode]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
+
+        assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
+    }
 }
