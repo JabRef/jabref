@@ -116,7 +116,7 @@ public class CitationKeyGenerator extends BracketedPattern {
         newKey = replaceWithRegex(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
 
-        return newKey;
+        return cleanKey(newKey, unwantedCharacters);
     }
 
     private String appendLettersToKey(String key, String oldKey) {

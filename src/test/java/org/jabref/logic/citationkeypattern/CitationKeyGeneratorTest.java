@@ -80,8 +80,7 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue(pattern);
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -1070,7 +1069,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
+        assertEquals("Newton2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
@@ -1078,7 +1077,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac")
                                        .withField(StandardField.YEAR, "2019");
 
-        assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
+        assertEquals("newt2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test
