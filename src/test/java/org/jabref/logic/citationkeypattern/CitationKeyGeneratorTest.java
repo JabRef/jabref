@@ -1103,9 +1103,9 @@ class CitationKeyGeneratorTest {
     }
 
     @Test
-    void generateKeyWithModifierContainingRegexCharacterCkass() {
-        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness_Managing");
+    void generateKeyWithModifierContainingRegexCharacterClass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
 
-        assertEquals("Wickedness.Managing", generateKey(bibEntry, "[title:regex(\"[_]+\",\".\")]"));
+        assertEquals("WM", generateKey(bibEntry, "[title:regex(\"[a-z]+\",\"\")]"));
     }
 }
