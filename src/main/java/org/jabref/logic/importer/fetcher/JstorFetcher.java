@@ -1,20 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import com.google.common.base.Charsets;
-import com.microsoft.applicationinsights.core.dependencies.apachecommons.io.IOUtils;
-import org.apache.http.client.utils.URIBuilder;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.util.OS;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,15 +8,34 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.OS;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
+
+import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 /**
  * Fetcher for jstor.org
  **/
-public class JstorFetcher implements SearchBasedParserFetcher {
+public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
 
-    private static final String SEARCH_HOST = "https://www.jstor.org/open/search/";
-    private static final String CITE_HOST = "https://www.jstor.org/citation/text";
+    private static final String HOST = "https://www.jstor.org";
+    private static final String SEARCH_HOST = HOST + "/open/search/";
+    private static final String CITE_HOST = HOST + "/citation/text";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -59,7 +63,7 @@ public class JstorFetcher implements SearchBasedParserFetcher {
                 BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
                 String id = element.attr("href").replace("citation/info/", "");
                 try {
-                    String data = IOUtils.toString(new URL(CITE_HOST + id), Charsets.UTF_8);
+                    String data = new URLDownload(CITE_HOST + id).asString();
                     entries.addAll(parser.parseEntries(data));
                 } catch (IOException e) {
                     throw new ParseException("could not download data from jstor.org", e);
@@ -72,5 +76,34 @@ public class JstorFetcher implements SearchBasedParserFetcher {
     @Override
     public String getName() {
         return "JSTOR";
+    }
+
+    @Override
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+        if(entry.getTitle().isEmpty()) {
+            return Optional.empty();
+        }
+
+        try {
+            URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
+            uriBuilder.addParameter("Query", "ti:" + entry.getTitle());
+
+            String data = new URLDownload(uriBuilder.build().toURL()).asString();
+
+            Document doc = Jsoup.parse(data);
+
+            List<Element> elements = doc.body().getElementsByClass("pdfLink");
+
+            if(elements.size() != 1) {
+                return Optional.empty();
+            }
+            String url = HOST + elements.get(0).attr("href");
+
+            return Optional.of(new URL(url));
+
+        } catch (URISyntaxException ignored) {
+
+        }
+       return Optional.empty();
     }
 }

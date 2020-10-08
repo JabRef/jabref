@@ -1,16 +1,18 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
@@ -34,7 +36,7 @@ public class JstorFetcherTest {
                 .withField(StandardField.URL, "http://www.jstor.org/stable/90002164")
                 .withField(StandardField.YEAR, "2017");
 
-        List<BibEntry> entries = fetcher.performSearch("Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test");
-        assertTrue(entries.contains(expected));
+        List<BibEntry> entries = fetcher.performSearch("ti: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
+        assertEquals(Collections.singletonList(expected), entries);
     }
 }
