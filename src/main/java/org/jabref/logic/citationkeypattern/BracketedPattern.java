@@ -223,8 +223,9 @@ public class BracketedPattern {
                 case "\\" -> {
                     if (parsedPattern.hasMoreTokens()) {
                         expandedPattern.append(parsedPattern.nextToken());
+                    } else {
+                        LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
-                    // FIXME: else -> raise exception or log? (S.G.)
                 }
                 default -> expandedPattern.append(token);
             }
