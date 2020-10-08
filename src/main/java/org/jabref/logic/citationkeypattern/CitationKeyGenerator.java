@@ -1,11 +1,11 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -108,54 +108,17 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     public String generateKey(BibEntry entry) {
-        String key;
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            // get the type of entry
-            EntryType entryType = entry.getType();
-            // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
-            if (!typeList.isEmpty()) {
-                typeList.remove(0);
-            }
-            boolean field = false;
-            for (String typeListEntry : typeList) {
-                if ("[".equals(typeListEntry)) {
-                    field = true;
-                } else if ("]".equals(typeListEntry)) {
-                    field = false;
-                } else if (field) {
-                    // check whether there is a modifier on the end such as
-                    // ":lower"
-                    List<String> parts = parseFieldMarker(typeListEntry);
-                    Character delimiter = citationKeyPatternPreferences.getKeywordDelimiter();
-                    String pattern = "[" + parts.get(0) + "]";
-                    String label = removeUnwantedCharacters(expandBrackets(pattern, delimiter, entry, database), unwantedCharacters);
-                    // apply modifier if present
-                    if (parts.size() > 1) {
-                        label = removeUnwantedCharacters(applyModifiers(label, parts, 1), unwantedCharacters);
-                    }
-                    // Remove all illegal characters from the label.
-                    label = cleanKey(label, unwantedCharacters);
-                    stringBuilder.append(label);
-                } else {
-                    stringBuilder.append(typeListEntry);
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Cannot make label", e);
-        }
+        Objects.requireNonNull(entry);
+        String currentKey = entry.getCitationKey().orElse(null);
 
-        key = stringBuilder.toString();
+        String newKey = createCitationKeyFromPattern(entry);
+        newKey = replaceWithRegex(newKey);
+        newKey = appendLettersToKey(newKey, currentKey);
 
-        // Remove Regular Expressions while generating Keys
-        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
-        if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
-            key = key.replaceAll(regex, replacement);
-        }
+        return newKey;
+    }
 
-        String oldKey = entry.getCitationKey().orElse(null);
+    private String appendLettersToKey(String key, String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
@@ -165,14 +128,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()
                 == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
 
-        boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
-                == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
-
-        String newKey;
-        if (!alwaysAddLetter && (occurrences == 0)) {
-            newKey = key;
-        } else {
+        if (alwaysAddLetter || occurrences != 0) {
             // The key is already in use, so we must modify it.
+            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
+                    == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
             String moddedKey;
 
@@ -187,9 +147,48 @@ public class CitationKeyGenerator extends BracketedPattern {
                 }
             } while (occurrences > 0);
 
-            newKey = moddedKey;
+            key = moddedKey;
         }
-        return newKey;
+        return key;
+    }
+
+    private String replaceWithRegex(String key) {
+        // Remove Regular Expressions while generating Keys
+        String regex = citationKeyPatternPreferences.getKeyPatternRegex();
+        if ((regex != null) && !regex.trim().isEmpty()) {
+            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
+            key = key.replaceAll(regex, replacement);
+        }
+        return key;
+    }
+
+    private String createCitationKeyFromPattern(BibEntry entry) {
+        // get the type of entry
+        EntryType entryType = entry.getType();
+        // Get the arrayList corresponding to the type
+        List<String> citationKeyPattern = citeKeyPattern.getValue(entryType);
+        if (citationKeyPattern.isEmpty()) {
+            return "";
+        }
+        return expandBrackets(citationKeyPattern.get(0), expandBracketContent(entry));
+    }
+
+    private Function<String, String> expandBracketContent(BibEntry entry) {
+        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();
+
+        return (String bracket) -> {
+            String expandedPattern;
+            List<String> fieldParts = parseFieldAndModifiers(bracket);
+
+            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database), unwantedCharacters);
+            // check whether there is a modifier on the end such as
+            // ":lower":
+            if (fieldParts.size() > 1) {
+                // apply modifiers:
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+            }
+            return cleanKey(expandedPattern, unwantedCharacters);
+        };
     }
 
     /**
