@@ -172,6 +172,43 @@ public class BracketedPattern {
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
+        return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
+    }
+
+    /**
+     * Utility method creating a function taking the string representation of the content of a bracketed expression and
+     * expanding it.
+     *
+     * @param keywordDelimiter The keyword delimiter to use
+     * @param entry            The {@link BibEntry} to use for expansion
+     * @param database         The {@link BibDatabase} for field resolving. May be null.
+     * @return a function accepting a bracketed expression and returning the result of expanding it
+     */
+    private static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        return (String bracket) -> {
+            String expandedPattern;
+            List<String> fieldParts = parseFieldAndModifiers(bracket);
+            // check whether there is a modifier on the end such as
+            // ":lower":
+            expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+            if (fieldParts.size() > 1) {
+                // apply modifiers:
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+            }
+            return expandedPattern;
+        };
+    }
+
+    /**
+     * Expands a pattern.
+     *
+     * @param pattern               The pattern to expand
+     * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
+     *                              and expanding it
+     * @return The expanded pattern. Not null.
+     */
+    public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
+        Objects.requireNonNull(pattern);
         StringBuilder expandedPattern = new StringBuilder();
         StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
 
@@ -181,17 +218,7 @@ public class BracketedPattern {
                 case "\"" -> appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
                     String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
-
-                    List<String> fieldParts = parseFieldMarker(fieldMarker);
-                    // check whether there is a modifier on the end such as
-                    // ":lower":
-                    if (fieldParts.size() <= 1) {
-                        expandedPattern.append(getFieldValue(entry, fieldMarker, keywordDelimiter, database));
-                    } else {
-                        // apply modifiers:
-                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
-                        expandedPattern.append(applyModifiers(fieldValue, fieldParts, 1));
-                    }
+                    expandedPattern.append(bracketContentHandler.apply(fieldMarker));
                 }
                 case "\\" -> {
                     if (parsedPattern.hasMoreTokens()) {
@@ -1069,7 +1096,7 @@ public class BracketedPattern {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    protected static List<String> parseFieldMarker(String arg) {
+    protected static List<String> parseFieldAndModifiers(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
