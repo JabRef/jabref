@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.PatternSyntaxException;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -14,10 +15,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
     /*
      * All single characters that we can use for extending a key to make it unique.
      */
@@ -153,7 +158,11 @@ public class CitationKeyGenerator extends BracketedPattern {
         String regex = citationKeyPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
             String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();
-            key = key.replaceAll(regex, replacement);
+            try {
+                key = key.replaceAll(regex, replacement);
+            } catch (PatternSyntaxException e) {
+                LOGGER.warn("There is a syntax error in the regular expression \"{}\" used to generate a citation key", regex, e);
+            }
         }
         return key;
     }
