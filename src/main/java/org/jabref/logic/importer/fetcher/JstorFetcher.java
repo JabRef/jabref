@@ -81,7 +81,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        if(entry.getField(StandardField.URL).isEmpty()) {
+        if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }
 
@@ -90,7 +90,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
         Document doc = Jsoup.parse(page);
 
         List<Element> elements = doc.getElementsByAttribute("data-doi");
-        if(elements.size() != 1) {
+        if (elements.size() != 1) {
             return Optional.empty();
         }
 
