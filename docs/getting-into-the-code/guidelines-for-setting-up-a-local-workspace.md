@@ -8,7 +8,7 @@ In case you know how to install JDK15 with JavaFX support and to fork JabRef's c
         please scroll down to the IDE setup.
 ```
 
-For a complete step-by-step guide for Linux using IntellJ IDEA as the IDE, have a look at the following video instructions:
+For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
 
 [![YouTube video showing the step-by-step guide](https://img.youtube.com/vi/JkFVJ6p0urw/mqdefault.jpg)](https://youtu.be/JkFVJ6p0urw)
 
@@ -35,9 +35,9 @@ Proposals for account names:
 * Use your last name prefixed by the first letter of your first name. Example: `okopp`
 * Use `firstname.lastname`. Example: `oliver.kopp`
 
-You can hide your email adress by following the recommendations at [https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/](https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/).
+You can hide your email address by following the recommendations at [https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/](https://saraford.net/2017/02/19/how-to-hide-your-email-address-in-your-git-commits-but-still-get-contributions-to-show-up-on-your-github-profile-050/).
 
-Most developers, though, do not hide their email adress. They use one mich may get public. Mostly, they create a new email account for development only. That account then be used for develoment mailing lists, mail exchange with other developers, etc.
+Most developers, though, do not hide their email address. They use one which may get public. Mostly, they create a new email account for development only. That account then be used for development mailing lists, mail exchange with other developers, etc.
 
 Examples:
 
@@ -159,7 +159,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
     ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29.png)
 
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`\). Otherwise, you will see folowing error:
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`\). Otherwise, you will see following error:
 
   ```text
   Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
@@ -173,7 +173,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
-In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independet of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
 
 #### Using JabRef's code style
 
@@ -278,7 +278,7 @@ In rare cases you might encounter problems due to out-dated automatically genera
 
 ### Problems with openjfx libraries in local maven repository
 
-There might be problems with building if you have opejfx libraries in local maven repository, resulting in errors like this:
+There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
 
 ```text
  > Could not find javafx-fxml-15-mac.jar (org.openjfx:javafx-fxml:15).
