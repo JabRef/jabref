@@ -21,6 +21,7 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -34,7 +35,7 @@ import org.jsoup.nodes.Element;
 public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
 
     private static final String HOST = "https://www.jstor.org";
-    private static final String SEARCH_HOST = HOST + "/open/search/";
+    private static final String SEARCH_HOST = HOST + "/open/search";
     private static final String CITE_HOST = HOST + "/citation/text";
 
     private final ImportFormatPreferences importFormatPreferences;
@@ -80,30 +81,25 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        if(entry.getTitle().isEmpty()) {
+        if(entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }
 
-        try {
-            URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
-            uriBuilder.addParameter("Query", "ti:" + entry.getTitle());
+        String page = new URLDownload(entry.getField(StandardField.URL).get()).asString();
 
-            String data = new URLDownload(uriBuilder.build().toURL()).asString();
+        Document doc = Jsoup.parse(page);
 
-            Document doc = Jsoup.parse(data);
-
-            List<Element> elements = doc.body().getElementsByClass("pdfLink");
-
-            if(elements.size() != 1) {
-                return Optional.empty();
-            }
-            String url = HOST + elements.get(0).attr("href");
-
-            return Optional.of(new URL(url));
-
-        } catch (URISyntaxException ignored) {
-
+        List<Element> elements = doc.getElementsByAttribute("data-doi");
+        if(elements.size() != 1) {
+            return Optional.empty();
         }
-       return Optional.empty();
+
+        String url = elements.get(0).attr("href");
+        return Optional.of(new URL(url));
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 }

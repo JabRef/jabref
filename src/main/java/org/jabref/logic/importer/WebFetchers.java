@@ -167,8 +167,8 @@ public class WebFetchers {
         fetchers.add(new ArXiv(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences));
         fetchers.add(new ApsFetcher());
-        fetchers.add(new JstorFetcher(importFormatPreferences));
         // Meta search
+        fetchers.add(new JstorFetcher(importFormatPreferences));
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
 
