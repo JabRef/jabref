@@ -46,7 +46,7 @@ jobs:
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
-          checkstyle_config: 'config/checkstyle/checkstyle.xml'
+          checkstyle_config: 'config/checkstyle/'
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
