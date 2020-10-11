@@ -13,14 +13,14 @@
     <category citation-format="author-date"/>
     <category field="linguistics"/>
     <issn>2102-5401</issn>
-    <updated>2020-09-09T10:31:22+00:00</updated>
+    <updated>2020-09-16T11:07:45+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
     <names variable="editor translator" delimiter=", ">
       <name and="symbol" delimiter-precedes-last="never" name-as-sort-order="all"/>
       <et-al font-style="italic"/>
-      <label form="short" strip-periods="true" prefix=" (" suffix=")"/>
+      <label form="short" strip-periods="false" prefix=" (" suffix=")"/>
     </names>
   </macro>
   <macro name="author">
@@ -123,7 +123,6 @@
           </if>
           <else-if type="chapter paper-conference" match="any">
             <group delimiter=". ">
-              <text macro="title" prefix=" "/>
               <group delimiter=", ">
                 <text variable="container-title" font-style="italic"/>
                 <text macro="editor-translator"/>
@@ -138,17 +137,18 @@
             <text macro="access"/>
           </else-if>
           <else>
-            <group suffix=".">
-              <text macro="title" prefix=" "/>
+            <group delimiter=". ">
               <text macro="editor-translator" prefix=" "/>
-            </group>
-            <group prefix=" " suffix=".">
-              <text variable="container-title" font-style="italic"/>
-              <group prefix=" ">
-                <text variable="volume"/>
-                <text variable="issue" prefix="(" suffix=")"/>
+              <group delimiter=": ">
+                <group delimiter=" " prefix=" ">
+                  <text variable="container-title" font-style="italic"/>
+                  <group>
+                    <text variable="volume"/>
+                    <text variable="issue" prefix="(" suffix=")"/>
+                  </group>
+                </group>
+                <text variable="page"/>
               </group>
-              <text variable="page" prefix=": "/>
             </group>
           </else>
         </choose>

@@ -64,7 +64,7 @@ public class DOI implements Identifier {
             + "("                               // begin group \1
             + "10"                              // directory indicator
             + "[/%:]"                           // divider
-            + "[a-zA-Z0-9]{4,}"                 // at least 4 characters
+            + "[a-zA-Z0-9]{3,}"                 // at least 3 characters
             + ")"                               // end group  \1
             + "\\s*$";                          // must be the end
     private static final String FIND_SHORT_DOI_EXP = ""
@@ -279,5 +279,4 @@ public class DOI implements Identifier {
     public int hashCode() {
         return Objects.hash(doi.toLowerCase(Locale.ENGLISH));
     }
-
 }

@@ -48,6 +48,7 @@ import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -430,9 +431,13 @@ public class OpenOfficePanel {
             throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS + " in " + configurationPath);
         }
 
-        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
+        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size() + 1);
         for (Optional<Path> jarPath : filePaths) {
             jarURLs.add((jarPath.get().toUri().toURL()));
+            // For Mac OSX we need to add the "Contents/MacOS", because otherwise we cannot connect to LO
+            if (OS.OS_X) {
+                jarURLs.add(configurationPath.resolve("Contents/MacOS/").toUri().toURL());
+            }
         }
         return jarURLs;
     }

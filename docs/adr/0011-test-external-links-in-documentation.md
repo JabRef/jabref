@@ -26,18 +26,18 @@ Chosen option: "\[option 1\]", because \[justification. e.g., only option, which
 
 ### Negative Consequences
 
-* Some external sites need to [be disabled](https://github.com/JabRef/jabref/pull/6542/files). For isntance, GitHub.com always returns "forbidden". A [filter for status is future work of the used tool](https://github.com/tcort/markdown-link-check/issues/94#issuecomment-634947466).
+* Some external sites need to [be disabled](https://github.com/JabRef/jabref/pull/6542/files). For instance, GitHub.com always returns "forbidden". A [filter for status is future work of the used tool](https://github.com/tcort/markdown-link-check/issues/94#issuecomment-634947466).
 
 ## Pros and Cons of the Options
 
 ### Check external links once a month
 
-* Good, because does not interfer with the normal development workflow
+* Good, because does not interfere with the normal development workflow
 * Bad, because an additional workflow is required
 
 ### Check external links in the "checkstyle" task
 
-* Good, because no seperate workflow is required
+* Good, because no separate workflow is required
 * Bad, because checks fail independent of the PR (because external web sites can go down and go up independent of a PR)
 
 ### Do not check external links

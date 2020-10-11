@@ -1,4 +1,4 @@
-# Add Native Support for BibLatex-Sotware
+# Add Native Support for BibLatex-Software
 
 * Deciders: Oliver Kopp
 
@@ -6,8 +6,8 @@ Technical Story: [6574-Adding support for biblatex-software](https://github.com/
 
 ## Context and Problem Statement
 
-JabRef does not right now have support for Biblatex-Software out of the box, users have to add custome entry type.
-With citing software becoming fairly common , native support is helpful.
+Right now, JabRef does not have support for Biblatex-Software out of the box, users have to add custom entry types.
+With citing software becoming fairly common, native support is helpful.
 
 ## Decision Drivers
 
