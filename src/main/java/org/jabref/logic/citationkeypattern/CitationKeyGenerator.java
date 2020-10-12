@@ -107,6 +107,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
 
+    /**
+     * Generate a citation key for the given {@link BibEntry}.
+     *
+     * @param entry a {@link BibEntry}
+     * @return a citation key based on the user's preferences
+     */
     public String generateKey(BibEntry entry) {
         Objects.requireNonNull(entry);
         String currentKey = entry.getCitationKey().orElse(null);
@@ -118,6 +124,13 @@ public class CitationKeyGenerator extends BracketedPattern {
         return cleanKey(newKey, unwantedCharacters);
     }
 
+    /**
+     * A letter will be appended to the key based on the user's preferences, either always or to prevent duplicated keys.
+     *
+     * @param key    the new key
+     * @param oldKey the old key
+     * @return a key, if needed, with an appended letter
+     */
     private String appendLettersToKey(String key, String oldKey) {
         long occurrences = database.getNumberOfCitationKeyOccurrences(key);
 
@@ -152,6 +165,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         return key;
     }
 
+    /**
+     * Using preferences, replace matches to the provided regex with a string.
+     *
+     * @param key the citation key
+     * @return the citation key where matches to the regex are replaced
+     */
     private String replaceWithRegex(String key) {
         // Remove Regular Expressions while generating Keys
         String regex = citationKeyPatternPreferences.getKeyPatternRegex();
@@ -177,6 +196,12 @@ public class CitationKeyGenerator extends BracketedPattern {
         return expandBrackets(citationKeyPattern.get(0), expandBracketContent(entry));
     }
 
+    /**
+     * A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
+     *
+     * @param entry the {@link BibEntry} that a citation key is generated for
+     * @return a cleaned citation key for the given {@link BibEntry}
+     */
     private Function<String, String> expandBracketContent(BibEntry entry) {
         Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();
 
