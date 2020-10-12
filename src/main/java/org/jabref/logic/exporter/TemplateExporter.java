@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -34,14 +33,6 @@ import org.slf4j.LoggerFactory;
 public class TemplateExporter extends Exporter {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
-
-    /**
-     * A regular expression that matches blank lines
-     *
-     * ?m activates "multimode", which makes ^ match line starts/ends.
-     * \\s simply marks any whitespace character
-     */
-    private static final Pattern BLANK_LINE_MATCHER = Pattern.compile("(?m)^\\s");
     private static final String LAYOUT_EXTENSION = ".layout";
     private static final String FORMATTERS_EXTENSION = ".formatters";
     private static final String BEGIN_INFIX = ".begin";
@@ -58,8 +49,7 @@ public class TemplateExporter extends Exporter {
     private boolean deleteBlankLines;
 
     /**
-     * Initialize another export format based on templates stored in dir with
-     * layoutFile lfFilename.
+     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
      * @param displayName Name to display to the user.
      * @param consoleName Name to call this format in the console.
@@ -72,8 +62,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * Initialize another export format based on templates stored in dir with
-     * layoutFile lfFilename.
+     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
      * @param name              to display to the user and to call this format in the console.
      * @param lfFileName        Name of the main layout file.
@@ -87,8 +76,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * Initialize another export format based on templates stored in dir with
-     * layoutFile lfFilename.
+     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
      * @param displayName       Name to display to the user.
      * @param consoleName       Name to call this format in the console.
@@ -112,27 +100,33 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * Initialize another export format based on templates stored in dir with
-     * layoutFile lfFilename.
-     * The display name is automatically derived from the FileType
+     * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
      *
+     * @param displayName       Name to display to the user.
      * @param consoleName       Name to call this format in the console.
      * @param lfFileName        Name of the main layout file.
      * @param directory         Directory in which to find the layout file.
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
      * @param savePreferences   Preferences for saving
-     * @param deleteBlankLines  If blank lines should be remove (default: false)
+     * @param deleteBlankLines  if blank lines should be removed (default: false)
      */
-    public TemplateExporter(String consoleName, String lfFileName, String directory, StandardFileType extension, LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
-        this(consoleName, consoleName, lfFileName, directory, extension, layoutPreferences, savePreferences);
+    public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
+                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
+        super(consoleName, displayName, extension);
+        if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
+            this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
+        } else {
+            this.lfFileName = lfFileName;
+        }
+        this.directory = directory;
+        this.layoutPreferences = layoutPreferences;
+        this.savePreferences = savePreferences;
         this.deleteBlankLines = deleteBlankLines;
     }
 
     /**
-     * Indicate whether this is a custom export. A custom export looks for its
-     * layout files using a normal file path, while a built-in export looks in
-     * the classpath.
+     * Indicate whether this is a custom export. A custom export looks for its layout files using a normal file path, while a built-in export looks in the classpath.
      *
      * @param custom true to indicate a custom export format.
      */
@@ -141,8 +135,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * Set an encoding which will be used in preference to the default value
-     * obtained from the basepanel.
+     * Set an encoding which will be used in preference to the default value obtained from the basepanel.
      *
      * @param encoding The name of the encoding to use.
      */
@@ -152,11 +145,9 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * This method should return a reader from which the given layout file can
-     * be read.
+     * This method should return a reader from which the given layout file can be read.
      * <p>
-     * Subclasses of TemplateExporter are free to override and provide their own
-     * implementation.
+     * Subclasses of TemplateExporter are free to override and provide their own implementation.
      *
      * @param filename the filename
      * @return a newly created reader
@@ -278,8 +269,12 @@ public class TemplateExporter extends Exporter {
                 // Write the entry
                 if (layout != null) {
                     if (deleteBlankLines) {
-                        String withoutBlankLines = BLANK_LINE_MATCHER.matcher(layout.doLayout(entry, databaseContext.getDatabase())).replaceAll("");
-                        ps.write(withoutBlankLines);
+                        String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split("\n");
+                        for (String line : lines) {
+                            if (!line.isBlank() && !line.isEmpty()) {
+                                ps.write(line);
+                            }
+                        }
                     } else {
                         ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
                     }
@@ -316,9 +311,7 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * See if there is a name formatter file bundled with this export format. If so, read
-     * all the name formatters so they can be used by the filter layouts.
-     *
+     * See if there is a name formatter file bundled with this export format. If so, read all the name formatters so they can be used by the filter layouts.
      */
     private void readFormatterFile() {
         File formatterFile = new File(lfFileName + FORMATTERS_EXTENSION);
