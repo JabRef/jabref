@@ -1,6 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;

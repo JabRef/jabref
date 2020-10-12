@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class CitationKeyGenerator extends BracketedPattern {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
     /*
      * All single characters that we can use for extending a key to make it unique.
      */
     public static final String APPENDIX_CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
     public static final String DEFAULT_UNWANTED_CHARACTERS = "-`ʹ:!;?^+";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
     // Source of disallowed characters : https://tex.stackexchange.com/a/408548/9075
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
     private final AbstractCitationKeyPattern citeKeyPattern;
@@ -72,8 +72,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     }
 
     /**
-     * Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az,
-     * ba-bz, etc.
+     * Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
      *
      * @param number The appendix number.
      * @return The String to append.
