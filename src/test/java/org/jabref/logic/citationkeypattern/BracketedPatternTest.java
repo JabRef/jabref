@@ -285,4 +285,11 @@ class BracketedPatternTest {
 
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsEmptyStringFromEmptyBrackets() {
+        BibEntry bibEntry = new BibEntry();
+
+        assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
+    }
 }
