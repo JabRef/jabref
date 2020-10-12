@@ -1106,4 +1106,24 @@ class CitationKeyGeneratorTest {
 
         assertEquals("WM", generateKey(bibEntry, "[title:regex(\"[a-z]+\",\"\")]"));
     }
+
+    @Test
+    void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
+        String pattern = "[title]";
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "[", // Invalid regexp
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                ',');
+
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
+        assertEquals("WickednessManaging",
+                new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
+    }
 }
