@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796) 
 - We fixed an issue where the RIS exporter added extra blank lines.[#7007](https://github.com/JabRef/jabref/pull/7007/files)
 
+
 ### Removed
 
 ## [5.1] – 2020-08-30
