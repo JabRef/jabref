@@ -113,8 +113,10 @@ public class KeyBindingRepository {
 
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()) {
-            if (checkKeyCombinationEquality(binding, keyEvent)) {
-                return Optional.of(binding);
+            if (!binding.getDefaultKeyBinding().isEmpty()){
+                if (checkKeyCombinationEquality(binding, keyEvent)) {
+                    return Optional.of(binding);
+                }
             }
         }
         return Optional.empty();
