@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -133,7 +132,6 @@ import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -186,6 +184,20 @@ public class JabRefFrame extends BorderPane {
                     this.fileHistory.getParentMenu().hide();
                 }
             }
+        });
+
+        Platform.runLater(() -> {
+            EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
+                if (tab != null) {
+                    LibraryTab libraryTab = (LibraryTab) tab;
+                    StringBuilder windowTitle = new StringBuilder(libraryTab.nameProperty().get());
+                    windowTitle.append(" \u2013 ");
+                    windowTitle.append(FRAME_TITLE);
+                    mainStage.setTitle(windowTitle.toString());
+                } else {
+                    mainStage.setTitle(FRAME_TITLE);
+                }
+            });
         });
     }
 
@@ -306,129 +318,6 @@ public class JabRefFrame extends BorderPane {
         Globals.prefs.askedToCollectTelemetry();
 
         return null;
-    }
-
-    /**
-     * Determines the titles of all tabs - and the window title.
-     *
-     * We aim for following in a tab:
-     *
-     *   filename (datbase-mode) – path-fragment – JabRef
-     *
-     * path-fragment is only shown if filename is not (globally) unique
-     *
-     * Example:
-     *
-     *   jabref-authors.bib (BibLaTeX) – testbib – JabRef
-     *
-     * For the JabRef window, it should be
-     *
-     *   full-path (database-mode) – JabRef
-     *
-     * Example:
-     *
-     *   C:\git-repositories\jabref\src\test\resources\testbib\jabref-authors.bib (BibLaTeX) – JabRef
-     */
-    public void refreshWindowAndTabTitles() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            int selectedTabIndex = tabbedPane.getSelectionModel().getSelectedIndex();
-            boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
-
-            List<String> uniquePathParts = getUniquePathParts();
-            for (int i = 0; i < getBasePanelCount(); i++) {
-                LibraryTab libraryTab = getLibraryTabAt(i);
-                BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();
-                DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
-                Optional<Path> file = bibDatabaseContext.getDatabasePath();
-
-                StringBuilder tabTitle = new StringBuilder();
-                StringBuilder toolTipText = new StringBuilder();
-                StringBuilder windowTitle = new StringBuilder();
-
-                if (file.isPresent()) {
-                    Path databasePath = file.get();
-                    String fileName = databasePath.getFileName().toString();
-                    tabTitle.append(fileName);
-                    windowTitle.append(fileName);
-                    toolTipText.append(databasePath.toAbsolutePath().toString());
-                    if (libraryTab.isModified() && !isAutosaveEnabled) {
-                        tabTitle.append('*');
-                        windowTitle.append('*');
-                    }
-
-                    if (databaseLocation == DatabaseLocation.SHARED) {
-                        tabTitle.append(" \u2013 ");
-                        addSharedDbInformation(tabTitle, bibDatabaseContext);
-                        toolTipText.append(' ');
-                        addSharedDbInformation(toolTipText, bibDatabaseContext);
-                        windowTitle.append(" \u2013 ");
-                        addSharedDbInformation(windowTitle, bibDatabaseContext);
-                    }
-
-                    addModeInfo(toolTipText, bibDatabaseContext);
-                    addModeInfo(windowTitle, bibDatabaseContext);
-
-                    if (libraryTab.isModified() && !isAutosaveEnabled) {
-                        addChangedInformation(toolTipText, fileName);
-                    }
-
-                    String uniquePath = uniquePathParts.get(i);
-                    if (!uniquePath.equals(fileName) && uniquePath.contains(File.separator)) {
-                        // remove filename
-                        uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
-                        tabTitle.append(" \u2013 ").append(uniquePath);
-                        windowTitle.append(" \u2013 ").append(uniquePath);
-                    }
-                } else {
-                    if (databaseLocation == DatabaseLocation.LOCAL) {
-                        tabTitle.append(Localization.lang("untitled"));
-                        windowTitle.append(Localization.lang("untitled"));
-                        if (bibDatabaseContext.getDatabase().hasEntries()) {
-                            // if the database is not empty and no file is assigned,
-                            // the database came from an import and has to be treated somehow
-                            // -> mark as changed
-                            tabTitle.append('*');
-                            windowTitle.append('*');
-                        }
-                    } else {
-                        addSharedDbInformation(tabTitle, bibDatabaseContext);
-                        addSharedDbInformation(toolTipText, bibDatabaseContext);
-                    }
-                    addModeInfo(toolTipText, bibDatabaseContext);
-                    addModeInfo(windowTitle, bibDatabaseContext);
-                    if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
-                        addChangedInformation(toolTipText, Localization.lang("untitled"));
-                    }
-                }
-
-                tabbedPane.getTabs().get(i).setText(tabTitle.toString());
-                tabbedPane.getTabs().get(i).setTooltip(new Tooltip(toolTipText.toString()));
-
-                if (i == selectedTabIndex) {
-                    windowTitle.append(" \u2013 ");
-                    windowTitle.append(FRAME_TITLE);
-                    mainStage.setTitle(windowTitle.toString());
-                }
-            }
-        });
-    }
-
-    private void addChangedInformation(StringBuilder text, String fileName) {
-        text.append(". ");
-        text.append(Localization.lang("Library '%0' has changed.", fileName));
-    }
-
-    private void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
-        String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
-        text.append(modeInfo);
-    }
-
-    private void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
-        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
-        text.append(" [");
-        text.append(Localization.lang("shared"));
-        text.append("]");
     }
 
     /**
@@ -746,7 +635,7 @@ public class JabRefFrame extends BorderPane {
             // We need to refresh the window title only
             // There is currently no optimized method to set the title only (because that lead to code duplication)
             // Thus, we refresh everything
-            refreshWindowAndTabTitles();
+            // refreshWindowAndTabTitles();
 
             // Update search autocompleter with information for the correct database:
             newLibraryTab.updateSearchManager();
@@ -1125,7 +1014,7 @@ public class JabRefFrame extends BorderPane {
         });
     }
 
-    private List<String> collectDatabaseFilePaths() {
+    public List<String> collectDatabaseFilePaths() {
         List<String> dbPaths = new ArrayList<>(getBasePanelCount());
 
         for (LibraryTab libraryTab : getLibraryTabs()) {
@@ -1137,11 +1026,6 @@ public class JabRefFrame extends BorderPane {
             }
         }
         return dbPaths;
-    }
-
-    private List<String> getUniquePathParts() {
-        List<String> dbPaths = collectDatabaseFilePaths();
-        return FileUtil.uniquePathSubstrings(dbPaths);
     }
 
     private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
@@ -1172,7 +1056,7 @@ public class JabRefFrame extends BorderPane {
 
         libraryTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
 
-        refreshWindowAndTabTitles();
+        // refreshWindowAndTabTitles();
 
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -1304,7 +1188,7 @@ public class JabRefFrame extends BorderPane {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             libraryTab.cleanUp();
             tabbedPane.getTabs().remove(libraryTab);
-            this.refreshWindowAndTabTitles();
+            // this.refreshWindowAndTabTitles();
         });
     }
 

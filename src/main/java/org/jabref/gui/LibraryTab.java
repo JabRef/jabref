@@ -7,10 +7,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -32,7 +37,9 @@ import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -77,9 +84,12 @@ public class LibraryTab extends Tab {
     private DatabaseChangePane changePane;
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
-    private boolean baseChanged;
-    private boolean nonUndoableChange;
+
+    private BooleanProperty baseChanged = new SimpleBooleanProperty(false);
+    private BooleanProperty nonUndoableChange = new SimpleBooleanProperty(false);
     // Used to track whether the base has changed since last save.
+
+    private StringProperty nameProperty = new SimpleStringProperty();
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
     @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
@@ -118,11 +128,124 @@ public class LibraryTab extends Tab {
         this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+
+        EasyBind.subscribe(baseChanged, this::refreshTabTitle);
+    }
+
+    /**
+     * Determines the title of the tab
+     *
+     * We aim for following in a tab:
+     *
+     *   filename (datbase-mode) – path-fragment – JabRef
+     *
+     * path-fragment is only shown if filename is not (globally) unique
+     *
+     * Example:
+     *
+     *   jabref-authors.bib (BibLaTeX) – testbib – JabRef
+     *
+     * For the JabRef window, it should be
+     *
+     *   full-path (database-mode) – JabRef
+     *
+     * Example:
+     *
+     *   C:\git-repositories\jabref\src\test\resources\testbib\jabref-authors.bib (BibLaTeX) – JabRef
+     */
+    private void refreshTabTitle(boolean isChanged) {
+        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+
+        DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+
+        StringBuilder tabTitle = new StringBuilder();
+        StringBuilder toolTipText = new StringBuilder();
+        StringBuilder tabName = new StringBuilder();
+
+        if (file.isPresent()) {
+            Path databasePath = file.get();
+            String fileName = databasePath.getFileName().toString();
+            tabTitle.append(fileName);
+            tabName.append(fileName);
+            toolTipText.append(databasePath.toAbsolutePath().toString());
+            if (isChanged && !isAutosaveEnabled) {
+                tabTitle.append('*');
+            }
+
+            if (databaseLocation == DatabaseLocation.SHARED) {
+                tabTitle.append(" \u2013 ");
+                addSharedDbInformation(tabTitle, bibDatabaseContext);
+                toolTipText.append(' ');
+                addSharedDbInformation(toolTipText, bibDatabaseContext);
+                tabName.append(" \u2013 ");
+                addSharedDbInformation(tabName, bibDatabaseContext);
+            }
+
+            addModeInfo(toolTipText, bibDatabaseContext);
+            addModeInfo(tabName, bibDatabaseContext);
+
+            if (isChanged && !isAutosaveEnabled) {
+                addChangedInformation(toolTipText, fileName);
+            }
+
+            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(frame.collectDatabaseFilePaths());
+
+            // String uniquePath = uniquePathParts.get(i);
+            /* if (!uniquePath.equals(fileName) && uniquePath.contains(File.separator)) {
+                // remove filename
+                uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
+                tabTitle.append(" \u2013 ").append(uniquePath);
+                tabName.append(" \u2013 ").append(uniquePath);
+            } */
+        } else {
+            if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append(Localization.lang("untitled"));
+                tabName.append(Localization.lang("untitled"));
+                if (bibDatabaseContext.getDatabase().hasEntries()) {
+                    // if the database is not empty and no file is assigned,
+                    // the database came from an import and has to be treated somehow
+                    // -> mark as changed
+                    tabTitle.append('*');
+                    tabName.append('*');
+                }
+            } else {
+                addSharedDbInformation(tabTitle, bibDatabaseContext);
+                addSharedDbInformation(toolTipText, bibDatabaseContext);
+            }
+            addModeInfo(toolTipText, bibDatabaseContext);
+            addModeInfo(tabName, bibDatabaseContext);
+            if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
+                addChangedInformation(toolTipText, Localization.lang("untitled"));
+            }
+        }
+
+        textProperty().setValue(tabTitle.toString());
+        nameProperty.setValue(tabName.toString());
+        setTooltip(new Tooltip(toolTipText.toString()));
+    }
+
+    private static void addChangedInformation(StringBuilder text, String fileName) {
+        text.append(". ");
+        text.append(Localization.lang("Library '%0' has changed.", fileName));
+    }
+
+    private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        String mode = bibDatabaseContext.getMode().getFormattedName();
+        String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
+        text.append(modeInfo);
+    }
+
+    private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
+        text.append(" [");
+        text.append(Localization.lang("shared"));
+        text.append("]");
     }
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.markBaseChanged();
+        this.baseChanged.setValue(true);
     }
 
     /**
@@ -133,7 +256,7 @@ public class LibraryTab extends Tab {
     }
 
     public boolean isModified() {
-        return baseChanged;
+        return baseChanged.getValue();
     }
 
     public BasePanelMode getMode() {
@@ -176,7 +299,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().removeEntries(entries);
         ensureNotShowingBottomPanel(entries);
 
-        markBaseChanged();
+        this.baseChanged.setValue(true);
         dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
@@ -227,7 +350,7 @@ public class LibraryTab extends Tab {
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
-            markBaseChanged(); // The database just changed.
+            this.baseChanged.setValue(true); // The database just changed.
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 showAndEdit(entries.get(0));
             }
@@ -293,7 +416,7 @@ public class LibraryTab extends Tab {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.baseChanged = true;
+                this.baseChanged.setValue(true);
             }
             changePane = null;
             this.setContent(splitPane);
@@ -425,24 +548,20 @@ public class LibraryTab extends Tab {
      * Put an asterisk behind the filename to indicate the database has changed.
      */
     public void markBaseChanged() {
-        baseChanged = true;
-        frame.refreshWindowAndTabTitles();
+        this.baseChanged.setValue(true);
     }
 
     public void markNonUndoableBaseChanged() {
-        nonUndoableChange = true;
-        markBaseChanged();
+        this.nonUndoableChange.setValue(true);
+        this.baseChanged.setValue(true);
     }
 
     public synchronized void markChangedOrUnChanged() {
         if (getUndoManager().hasChanged()) {
-            if (!baseChanged) {
-                markBaseChanged();
-            }
-        } else if (baseChanged && !nonUndoableChange) {
-            baseChanged = false;
+            this.baseChanged.setValue(true);
+        } else if (baseChanged.getValue() && !nonUndoableChange.getValue()) {
+            this.baseChanged.setValue(false);
         }
-        frame.refreshWindowAndTabTitles();
     }
 
     public BibDatabase getDatabase() {
@@ -509,11 +628,11 @@ public class LibraryTab extends Tab {
     }
 
     public void setNonUndoableChange(boolean nonUndoableChange) {
-        this.nonUndoableChange = nonUndoableChange;
+        this.nonUndoableChange.setValue(nonUndoableChange);
     }
 
     public void setBaseChanged(boolean baseChanged) {
-        this.baseChanged = baseChanged;
+        this.baseChanged.setValue(baseChanged);
     }
 
     public boolean isSaving() {
@@ -578,6 +697,10 @@ public class LibraryTab extends Tab {
 
     public void cut() {
         mainTable.cut();
+    }
+
+    public StringProperty nameProperty() {
+        return nameProperty;
     }
 
     private class GroupTreeListener {

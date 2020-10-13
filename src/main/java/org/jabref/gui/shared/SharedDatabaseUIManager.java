@@ -66,7 +66,7 @@ public class SharedDatabaseUIManager {
                 new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
-                jabRefFrame.refreshWindowAndTabTitles();
+                // jabRefFrame.refreshWindowAndTabTitles();
                 jabRefFrame.getDialogService().notify(Localization.lang("Working offline."));
             }
         } else {
