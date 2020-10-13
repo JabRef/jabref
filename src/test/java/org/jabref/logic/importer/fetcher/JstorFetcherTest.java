@@ -8,20 +8,21 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
-public class JstorFetcherTest {
+public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     private final JstorFetcher fetcher = new JstorFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
@@ -48,7 +49,33 @@ public class JstorFetcherTest {
     @Test
     void fetchPDF() throws IOException, FetcherException {
         Optional<URL> url = fetcher.findFullText(bibEntry);
-        assertTrue(url.isPresent());
-        assertEquals(new URL("https://www.jstor.org/stable/pdf/90002164.pdf"), url.get());
+        assertEquals(Optional.of(new URL("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
+    }
+
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return fetcher;
+    }
+
+    @Override
+    public List<String> getTestAuthors() {
+        return List.of("Haman", "Medlin");
+    }
+
+    @Override
+    public String getTestJournal() {
+        return "Test";
+    }
+
+    @Disabled("jstor does not support search only based on year")
+    @Override
+    public void supportsYearRangeSearch() throws Exception {
+
+    }
+
+    @Disabled("jstor does not support search only based on year")
+    @Override
+    public void supportsYearSearch() throws Exception {
+
     }
 }

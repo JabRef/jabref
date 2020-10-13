@@ -1,15 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -19,7 +16,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -52,23 +48,58 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
     }
 
     @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
+            stringBuilder.append(complexSearchQuery.getDefaultFieldPhrases());
+        }
+        if (!complexSearchQuery.getAuthors().isEmpty()) {
+            for (String author : complexSearchQuery.getAuthors()) {
+                stringBuilder.append("au:").append(author);
+            }
+        }
+        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
+            for (String title : complexSearchQuery.getTitlePhrases()) {
+                stringBuilder.append("ti:").append(title);
+            }
+        }
+        if (complexSearchQuery.getJournal().isPresent()) {
+            stringBuilder.append("pt:").append(complexSearchQuery.getJournal().get());
+        }
+        if (complexSearchQuery.getSingleYear().isPresent()) {
+            uriBuilder.addParameter("sd", String.valueOf(complexSearchQuery.getSingleYear().get()));
+            uriBuilder.addParameter("ed", String.valueOf(complexSearchQuery.getSingleYear().get()));
+        }
+        if (complexSearchQuery.getFromYear().isPresent()) {
+            uriBuilder.addParameter("sd", String.valueOf(complexSearchQuery.getFromYear().get()));
+        }
+        if (complexSearchQuery.getToYear().isPresent()) {
+            uriBuilder.addParameter("ed", String.valueOf(complexSearchQuery.getToYear().get()));
+        }
+
+        uriBuilder.addParameter("Query", stringBuilder.toString());
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
     public Parser getParser() {
         return inputStream -> {
-            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
-            List<BibEntry> entries = new ArrayList<>();
+            List<BibEntry> entries;
+            try {
+                Document doc = Jsoup.parse(inputStream, null, HOST);
+                List<Element> elements = doc.body().getElementsByClass("cite-this-item");
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Element element : elements) {
+                    String id = element.attr("href").replace("citation/info/", "");
 
-            Document doc = Jsoup.parse(response);
-
-            List<Element> elements = doc.body().getElementsByClass("cite-this-item");
-            for (Element element : elements) {
-                BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-                String id = element.attr("href").replace("citation/info/", "");
-                try {
                     String data = new URLDownload(CITE_HOST + id).asString();
-                    entries.addAll(parser.parseEntries(data));
-                } catch (IOException e) {
-                    throw new ParseException("could not download data from jstor.org", e);
+                    stringBuilder.append(data);
                 }
+                BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+                entries = new ArrayList<>(parser.parseEntries(stringBuilder.toString()));
+            } catch (IOException e) {
+                throw new ParseException("Could not download data from jstor.org", e);
             }
             return entries;
         };
