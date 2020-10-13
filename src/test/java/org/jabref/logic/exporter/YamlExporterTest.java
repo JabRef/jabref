@@ -52,12 +52,12 @@ public class YamlExporterTest {
 
     @Test
     public final void exportCorrectContent(@TempDir Path tempFile) throws Exception {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.withCitationKey("test");
-        entry.withField(StandardField.AUTHOR, "Test Author");
-        entry.withField(StandardField.TITLE, "Test Title");
-        entry.withField(StandardField.URL, "http://example.com");
-        entry.withField(StandardField.YEAR, "2020");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+          .withCitationKey("test")
+          .withField(StandardField.AUTHOR, "Test Author")
+          .withField(StandardField.TITLE, "Test Title")
+          .withField(StandardField.URL, "http://example.com")
+          .withField(StandardField.YEAR, "2020");
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
