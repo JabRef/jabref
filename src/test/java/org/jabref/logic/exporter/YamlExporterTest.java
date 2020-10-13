@@ -63,16 +63,16 @@ public class YamlExporterTest {
         Files.createFile(file);
         yamlExporter.export(databaseContext, file, charset, Collections.singletonList(entry));
 
-        List<String> lines = new ArrayList<>();
-        lines.add("---");
-        lines.add("references:");
-        lines.add("- id: test");
-        lines.add("  author:");
-        lines.add("  - literal: \"Test Author\"");
-        lines.add("  title: \"Test Title\"");
-        lines.add("  issued: 2020");
-        lines.add("  url: http://example.com");
-        lines.add("---");
+        List<String> lines = List.of(
+          "---",
+         "references:",
+         "- id: test",
+         "  author:",
+         "  - literal: \"Test Author\"",
+         "  title: \"Test Title\"",
+         "  issued: 2020",
+         "  url: http://example.com",
+         "---");
 
         assertEquals(lines, Files.readAllLines(file));
     }
