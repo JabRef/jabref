@@ -165,7 +165,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         buttonOptionCollapseAll.setOnAction(event -> {
             CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) tree.getRoot();
             expandTree(root, false);
-            root.setExpanded(true);
+            root.setExpanded(false);
         });
 
         textfieldDirectoryPath = new TextField();
