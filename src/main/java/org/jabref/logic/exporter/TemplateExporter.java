@@ -109,7 +109,7 @@ public class TemplateExporter extends Exporter {
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
      * @param savePreferences   Preferences for saving
-     * @param deleteBlankLines  if blank lines should be removed (default: false)
+     * @param deleteBlankLines  If blank lines should be removed (default: false)
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
                             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
