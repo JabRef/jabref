@@ -16,7 +16,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.33.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.22.0'
+    id 'org.beryx.jlink' version '2.22.1'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -137,13 +137,13 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.2') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.3') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.6.2'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
 
-    implementation 'org.postgresql:postgresql:42.2.16'
+    implementation 'org.postgresql:postgresql:42.2.17'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -163,14 +163,14 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.1.0'
-    implementation 'org.fxmisc.flowless:flowless:0.6.1'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.5'
+    implementation 'org.fxmisc.flowless:flowless:0.6.2'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.00'
+    implementation 'com.konghq:unirest-java:3.11.01'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -204,7 +204,7 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.0'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.16'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.17'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.5.13'

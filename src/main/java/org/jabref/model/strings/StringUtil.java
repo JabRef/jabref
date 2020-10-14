@@ -726,6 +726,15 @@ public class StringUtil {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
 
+    /**
+     * Returns a list of sentences contained in the given text.
+     */
+    public static List<String> getStringAsSentences(String text) {
+        // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
+        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
+        return Arrays.asList(splitTextPattern.split(text));
+    }
+
     @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
