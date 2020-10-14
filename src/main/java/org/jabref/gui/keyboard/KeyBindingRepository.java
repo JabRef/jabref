@@ -112,7 +112,7 @@ public class KeyBindingRepository {
     }
 
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
-        for (KeyBinding binding : KeyBinding.values()) {
+        for (KeyBinding binding : KeyBinding.values()){
             if (!binding.getDefaultKeyBinding().isEmpty()){
                 if (checkKeyCombinationEquality(binding, keyEvent)) {
                     return Optional.of(binding);
@@ -127,7 +127,6 @@ public class KeyBindingRepository {
         if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");
         }
-
         return KeyCombination.valueOf(binding);
     }
 

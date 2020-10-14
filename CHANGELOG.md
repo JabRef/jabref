@@ -54,7 +54,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
 - We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
 - We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
-
+- We fixed an issue, when pulling changes from shared database via shortcut caused creation a new new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
 ### Removed
 
 ## [5.1] – 2020-08-30
