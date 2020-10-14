@@ -275,6 +275,9 @@ public class JabRefFrame extends BorderPane {
                     case NEW_UNPUBLISHED:
                         new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
+                    case NEW_INPROCEEDINGS:
+                        new NewEntryAction(this, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
+                        break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
                             // Extra workaround for CodeArea, which does not inherit from TextInputControl

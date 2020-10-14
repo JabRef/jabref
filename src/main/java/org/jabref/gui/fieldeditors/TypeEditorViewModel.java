@@ -10,7 +10,7 @@ import com.google.common.collect.HashBiMap;
 
 public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    private BiMap<String, String> itemMap = HashBiMap.create(8);
+    private BiMap<String, String> itemMap = HashBiMap.create(9);
 
     public TypeEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
@@ -23,6 +23,7 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
         itemMap.put("software", Localization.lang("Software"));
         itemMap.put("datacd", Localization.lang("Data CD"));
         itemMap.put("audiocd", Localization.lang("Audio CD"));
+        itemMap.put("inproceedings", Localization.lang("InProceedings"));
     }
 
     @Override
