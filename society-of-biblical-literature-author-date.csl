@@ -20,6 +20,10 @@
   <locale xml:lang="en">
     <terms>
       <term name="editor" form="verb-short">ed.</term>
+      <term name="section" form="short">
+        <single>§</single>
+        <multiple>§§</multiple>
+      </term>
       <term name="translator" form="verb-short">trans.</term>
       <term name="translator" form="short">trans.</term>
       <term name="editortranslator" form="verb-short">ed. and trans.</term>
