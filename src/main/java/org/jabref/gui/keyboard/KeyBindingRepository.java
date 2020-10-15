@@ -113,21 +113,22 @@ public class KeyBindingRepository {
 
     public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
         for (KeyBinding binding : KeyBinding.values()){
-            if (!binding.getDefaultKeyBinding().isEmpty()){
-                if (checkKeyCombinationEquality(binding, keyEvent)) {
-                    return Optional.of(binding);
-                }
+            if (checkKeyCombinationEquality(binding, keyEvent)) {
+                return Optional.of(binding);
             }
         }
         return Optional.empty();
     }
 
-    public KeyCombination getKeyCombination(KeyBinding bindName) {
+    public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
+        if (binding.isEmpty()){
+            return Optional.empty();
+        }
         if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");
         }
-        return KeyCombination.valueOf(binding);
+        return Optional.of(KeyCombination.valueOf(binding));
     }
 
     /**
@@ -138,8 +139,11 @@ public class KeyBindingRepository {
      * @return true if matching, else false
      */
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
-        KeyCombination keyCombination = getKeyCombination(binding);
-        return checkKeyCombinationEquality(keyCombination, keyEvent);
+        Optional<KeyCombination> keyCombination = getKeyCombination(binding);
+        if (!keyCombination.isPresent()){
+            return false;
+        }
+        return checkKeyCombinationEquality(keyCombination.get(), keyEvent);
     }
 
     public List<String> getBindNames() {
