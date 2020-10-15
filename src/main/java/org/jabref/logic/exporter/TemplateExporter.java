@@ -19,6 +19,7 @@ import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TemplateExporter extends Exporter {
 
+    private static final String BLANK_LINE_PATTERN = "\\r\\n|\\n";
     private static final String LAYOUT_PREFIX = "/resource/layout/";
     private static final String LAYOUT_EXTENSION = ".layout";
     private static final String FORMATTERS_EXTENSION = ".formatters";
@@ -269,10 +271,10 @@ public class TemplateExporter extends Exporter {
                 // Write the entry
                 if (layout != null) {
                     if (deleteBlankLines) {
-                        String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split("\n");
+                        String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split(BLANK_LINE_PATTERN);
                         for (String line : lines) {
                             if (!line.isBlank() && !line.isEmpty()) {
-                                ps.write(line);
+                                ps.write(line + OS.NEWLINE);
                             }
                         }
                     } else {

@@ -1,5 +1,5 @@
 - id: \citationkey
-\begin{type}  type: \type\end{type}
+\begin{entrytype}  type: \format[CSLType]{\entrytype}\end{entrytype}
 \begin{author}
   author:
   - literal: "\author"
