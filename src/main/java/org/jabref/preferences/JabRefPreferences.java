@@ -1526,10 +1526,10 @@ public class JabRefPreferences implements PreferencesService {
         put(DEFAULT_ENCODING, preferences.getDefaultEncoding().name());
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
-        putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
+        putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
-        setShouldCollectTelemetry(preferences.isCollectTelemetry());
+        setShouldCollectTelemetry(preferences.shouldCollectTelemetry());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
 

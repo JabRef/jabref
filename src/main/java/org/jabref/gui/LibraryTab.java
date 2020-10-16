@@ -51,7 +51,6 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -114,10 +113,10 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), Globals.prefs, Globals.stateManager);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
@@ -130,7 +129,7 @@ public class LibraryTab extends Tab {
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
 
-        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
+        this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
 
@@ -159,7 +158,7 @@ public class LibraryTab extends Tab {
      *   C:\git-repositories\jabref\src\test\resources\testbib\jabref-authors.bib (BibLaTeX) – JabRef
      */
     private void refreshTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+        boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -352,7 +351,7 @@ public class LibraryTab extends Tab {
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
             this.changedProperty.setValue(true); // The database just changed.
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
                 showAndEdit(entries.get(0));
             }
             clearAndSelect(entries.get(0));
@@ -374,7 +373,7 @@ public class LibraryTab extends Tab {
         mainTable = new MainTable(tableModel,
                 this,
                 bibDatabaseContext,
-                Globals.prefs,
+                preferencesService,
                 dialogService,
                 Globals.stateManager,
                 externalFileTypes,
@@ -544,7 +543,7 @@ public class LibraryTab extends Tab {
     }
 
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
+        if (preferencesService.getGeneralPreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
             String okButton = Localization.lang("Delete entry");
@@ -561,7 +560,8 @@ public class LibraryTab extends Tab {
                     okButton,
                     cancelButton,
                     Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
+                    optOut -> preferencesService.storeGeneralPreferences(
+                            preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
         } else {
             return true;
         }
@@ -702,7 +702,7 @@ public class LibraryTab extends Tab {
             }
 
             // Automatically add new entries to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
+            if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
