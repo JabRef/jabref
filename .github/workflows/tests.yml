@@ -44,7 +44,10 @@ jobs:
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
-          checkstyle_config: 'config/checkstyle/checkstyle.xml'
+          reporter: github-pr-review
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
+        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
         with:
