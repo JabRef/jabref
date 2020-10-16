@@ -46,7 +46,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
-        //remove any newlines and spaces.
+        // remove any newlines and spaces.
         identifier = NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
