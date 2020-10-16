@@ -41,8 +41,6 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
-        run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
