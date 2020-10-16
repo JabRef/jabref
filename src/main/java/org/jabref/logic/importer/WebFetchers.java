@@ -26,6 +26,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -104,6 +105,7 @@ public class WebFetchers {
         set.add(new IEEE(importFormatPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
+        set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
 
@@ -166,6 +168,7 @@ public class WebFetchers {
         fetchers.add(new IEEE(importFormatPreferences));
         fetchers.add(new ApsFetcher());
         // Meta search
+        fetchers.add(new JstorFetcher(importFormatPreferences));
         fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
 
