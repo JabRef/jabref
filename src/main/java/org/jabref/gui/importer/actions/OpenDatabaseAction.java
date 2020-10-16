@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -207,7 +206,7 @@ public class OpenDatabaseAction extends SimpleCommand {
             ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
         }
 
-        LibraryTab libraryTab = new LibraryTab(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
+        LibraryTab libraryTab = new LibraryTab(frame, Globals.prefs, result.getDatabaseContext(), ExternalFileTypes.getInstance());
         frame.addTab(libraryTab, raisePanel);
         return libraryTab;
     }

@@ -1735,7 +1735,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR));
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getDouble(ENTRY_EDITOR_HEIGHT));
     }
 
     @Override
@@ -1747,6 +1748,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+        putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
     //*************************************************************************************************************

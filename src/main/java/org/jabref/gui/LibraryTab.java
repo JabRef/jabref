@@ -52,6 +52,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -77,8 +78,9 @@ public class LibraryTab extends Tab {
 
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+
     private MainTable mainTable;
-    private BasePanelPreferences preferences;
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
@@ -97,13 +99,16 @@ public class LibraryTab extends Tab {
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    public LibraryTab(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public LibraryTab(JabRefFrame frame,
+                      PreferencesService preferencesService,
+                      BibDatabaseContext bibDatabaseContext,
+                      ExternalFileTypes externalFileTypes) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
+        this.preferencesService = Objects.requireNonNull(preferencesService);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
@@ -255,8 +260,6 @@ public class LibraryTab extends Tab {
         return suggestionProviders;
     }
 
-
-
     public BasePanelMode getMode() {
         return mode;
     }
@@ -342,8 +345,8 @@ public class LibraryTab extends Tab {
                 UpdateField.setAutomaticFields(entry,
                         true,
                         true,
-                        Globals.prefs.getOwnerPreferences(),
-                        Globals.prefs.getTimestampPreferences());
+                        preferencesService.getOwnerPreferences(),
+                        preferencesService.getTimestampPreferences());
             }
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
@@ -375,7 +378,7 @@ public class LibraryTab extends Tab {
                 dialogService,
                 Globals.stateManager,
                 externalFileTypes,
-                preferences.getKeyBindings());
+                Globals.getKeyPrefs());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -388,11 +391,8 @@ public class LibraryTab extends Tab {
     }
 
     public void setupMainPanel() {
-        preferences = BasePanelPreferences.from(Globals.prefs);
-
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
-        adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         createMainTable();
 
@@ -425,7 +425,7 @@ public class LibraryTab extends Tab {
      * Set up auto completion for this database
      */
     private void setupAutoCompletion() {
-        AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
+        AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository);
         } else {
@@ -437,12 +437,6 @@ public class LibraryTab extends Tab {
 
     public void updateSearchManager() {
         frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
-    }
-
-    private void adjustSplitter() {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
-            splitPane.setDividerPositions(preferences.getEntryEditorDividerPosition());
-        }
     }
 
     public EntryEditor getEntryEditor() {
@@ -477,7 +471,8 @@ public class LibraryTab extends Tab {
             splitPane.getItems().add(1, pane);
         }
         mode = newMode;
-        adjustSplitter();
+
+        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
     }
 
     /**
@@ -578,7 +573,8 @@ public class LibraryTab extends Tab {
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            preferences.setEntryEditorDividerPosition(position.doubleValue());
+            preferencesService.storeEntryEditorPreferences(
+                    preferencesService.getEntryEditorPreferences().withDividerPosition(position.doubleValue()));
         }
     }
 

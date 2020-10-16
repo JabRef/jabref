@@ -1087,9 +1087,9 @@ public class JabRefFrame extends BorderPane {
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        LibraryTab bp = new LibraryTab(this, BasePanelPreferences.from(Globals.prefs), databaseContext, ExternalFileTypes.getInstance());
-        addTab(bp, raisePanel);
-        return bp;
+        LibraryTab libraryTab = new LibraryTab(this, prefs, databaseContext, ExternalFileTypes.getInstance());
+        addTab(libraryTab, raisePanel);
+        return libraryTab;
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
