@@ -85,8 +85,8 @@ public class LibraryTab extends Tab {
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
 
-    private BooleanProperty baseChanged = new SimpleBooleanProperty(false);
-    private BooleanProperty nonUndoableChange = new SimpleBooleanProperty(false);
+    private BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     // Used to track whether the base has changed since last save.
 
     private StringProperty nameProperty = new SimpleStringProperty();
@@ -129,7 +129,7 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
 
-        EasyBind.subscribe(baseChanged, this::refreshTabTitle);
+        EasyBind.subscribe(changedProperty, this::refreshTabTitle);
     }
 
     /**
@@ -245,7 +245,7 @@ public class LibraryTab extends Tab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.baseChanged.setValue(true);
+        this.changedProperty.setValue(true);
     }
 
     /**
@@ -255,9 +255,7 @@ public class LibraryTab extends Tab {
         return suggestionProviders;
     }
 
-    public boolean isModified() {
-        return baseChanged.getValue();
-    }
+
 
     public BasePanelMode getMode() {
         return mode;
@@ -299,7 +297,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().removeEntries(entries);
         ensureNotShowingBottomPanel(entries);
 
-        this.baseChanged.setValue(true);
+        this.changedProperty.setValue(true);
         dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
@@ -350,7 +348,7 @@ public class LibraryTab extends Tab {
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
-            this.baseChanged.setValue(true); // The database just changed.
+            this.changedProperty.setValue(true); // The database just changed.
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 showAndEdit(entries.get(0));
             }
@@ -416,7 +414,7 @@ public class LibraryTab extends Tab {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.baseChanged.setValue(true);
+                this.changedProperty.setValue(true);
             }
             changePane = null;
             this.setContent(splitPane);
@@ -498,16 +496,6 @@ public class LibraryTab extends Tab {
         mainTable.clearAndSelect(bibEntry);
     }
 
-    /**
-     * Select and open entry editor for first entry in main table.
-     */
-    private void clearAndSelectFirst() {
-        mainTable.clearAndSelectFirst();
-        if (!mainTable.getSelectedEntries().isEmpty()) {
-            showAndEdit(mainTable.getSelectedEntries().get(0));
-        }
-    }
-
     public void selectPreviousEntry() {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }
@@ -547,20 +535,12 @@ public class LibraryTab extends Tab {
     /**
      * Put an asterisk behind the filename to indicate the database has changed.
      */
-    public void markBaseChanged() {
-        this.baseChanged.setValue(true);
-    }
-
-    public void markNonUndoableBaseChanged() {
-        this.nonUndoableChange.setValue(true);
-        this.baseChanged.setValue(true);
-    }
 
     public synchronized void markChangedOrUnChanged() {
         if (getUndoManager().hasChanged()) {
-            this.baseChanged.setValue(true);
-        } else if (baseChanged.getValue() && !nonUndoableChange.getValue()) {
-            this.baseChanged.setValue(false);
+            this.changedProperty.setValue(true);
+        } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
+            this.changedProperty.setValue(false);
         }
     }
 
@@ -625,14 +605,6 @@ public class LibraryTab extends Tab {
 
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
-    }
-
-    public void setNonUndoableChange(boolean nonUndoableChange) {
-        this.nonUndoableChange.setValue(nonUndoableChange);
-    }
-
-    public void setBaseChanged(boolean baseChanged) {
-        this.baseChanged.setValue(baseChanged);
     }
 
     public boolean isSaving() {
@@ -701,6 +673,27 @@ public class LibraryTab extends Tab {
 
     public StringProperty nameProperty() {
         return nameProperty;
+    }
+
+    public BooleanProperty changedProperty() {
+        return changedProperty;
+    }
+
+    public boolean isModified() {
+        return changedProperty.getValue();
+    }
+
+    public void markBaseChanged() {
+        this.changedProperty.setValue(true);
+    }
+
+    public BooleanProperty nonUndoableChangeProperty() {
+        return nonUndoableChangeProperty;
+    }
+
+    public void markNonUndoableBaseChanged() {
+        this.nonUndoableChangeProperty.setValue(true);
+        this.changedProperty.setValue(true);
     }
 
     private class GroupTreeListener {

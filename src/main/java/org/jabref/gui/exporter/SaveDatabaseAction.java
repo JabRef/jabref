@@ -197,8 +197,8 @@ public class SaveDatabaseAction {
             if (success) {
                 panel.getUndoManager().markUnchanged();
                 // After a successful save the following statement marks that the base is unchanged since last save
-                panel.setNonUndoableChange(false);
-                panel.setBaseChanged(false);
+                panel.nonUndoableChangeProperty().setValue(false);
+                panel.changedProperty().setValue(false);
 
                 // frame.refreshWindowAndTabTitles();
             }
