@@ -86,11 +86,11 @@ public class LibraryTab extends Tab {
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
 
-    private BooleanProperty changedProperty = new SimpleBooleanProperty(false);
-    private BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     // Used to track whether the base has changed since last save.
 
-    private StringProperty nameProperty = new SimpleStringProperty();
+    private final StringProperty nameProperty = new SimpleStringProperty();
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
     @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
