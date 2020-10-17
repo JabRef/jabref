@@ -44,6 +44,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 public class StateManager {
 
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
+    private final ReadOnlyListWrapper<BibDatabaseContext> openDatabases = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -62,6 +63,10 @@ public class StateManager {
 
     public CustomLocalDragboard getLocalDragboard() {
         return localDragboard;
+    }
+
+    public ReadOnlyListProperty<BibDatabaseContext> openDatabases() {
+        return openDatabases.getReadOnlyProperty();
     }
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {

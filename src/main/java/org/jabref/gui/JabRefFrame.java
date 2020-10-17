@@ -18,6 +18,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -574,12 +575,13 @@ public class JabRefFrame extends BorderPane {
 
         initDragAndDrop();
 
-        // setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        // WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
-        //        JabRefPreferences.SIZE_Y);
-        // pw.displayWindowAtStoredLocation();
-
         // Bind global state
+        stateManager.openDatabases().bindContent(
+                tabbedPane.getTabs().stream()
+                          .map(tab -> (LibraryTab) tab)
+                          .map(LibraryTab::getBibDatabaseContext)
+                          .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
                         selectedTab -> Optional.ofNullable(selectedTab)
@@ -1002,20 +1004,6 @@ public class JabRefFrame extends BorderPane {
                 DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
             }
         });
-    }
-
-    public List<String> collectDatabaseFilePaths() {
-        List<String> dbPaths = new ArrayList<>(getBasePanelCount());
-
-        for (LibraryTab libraryTab : getLibraryTabs()) {
-            // db file exists
-            if (libraryTab.getBibDatabaseContext().getDatabasePath().isPresent()) {
-                dbPaths.add(libraryTab.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
-            } else {
-                dbPaths.add("");
-            }
-        }
-        return dbPaths;
     }
 
     private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {

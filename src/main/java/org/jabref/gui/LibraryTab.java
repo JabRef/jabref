@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -133,7 +134,9 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
 
-        EasyBind.subscribe(changedProperty, this::refreshTabTitle);
+        Platform.runLater(() ->
+                EasyBind.subscribe(changedProperty, this::refreshTabTitle)
+        );
     }
 
     /**
@@ -193,7 +196,7 @@ public class LibraryTab extends Tab {
                 addChangedInformation(toolTipText, fileName);
             }
 
-            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(frame.collectDatabaseFilePaths());
+            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
 
             // String uniquePath = uniquePathParts.get(i);
             /* if (!uniquePath.equals(fileName) && uniquePath.contains(File.separator)) {
@@ -245,6 +248,16 @@ public class LibraryTab extends Tab {
         text.append(" [");
         text.append(Localization.lang("shared"));
         text.append("]");
+    }
+
+    private List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        Globals.stateManager.openDatabases().stream()
+                            .map(BibDatabaseContext::getDatabasePath)
+                            .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                    path -> list.add(path.toAbsolutePath().toString()),
+                                    () -> list.add("")));
+        return list;
     }
 
     @Subscribe
