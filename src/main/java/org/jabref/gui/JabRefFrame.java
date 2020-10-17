@@ -13,6 +13,9 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -184,20 +187,6 @@ public class JabRefFrame extends BorderPane {
                     this.fileHistory.getParentMenu().hide();
                 }
             }
-        });
-
-        Platform.runLater(() -> {
-            EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
-                if (tab != null) {
-                    LibraryTab libraryTab = (LibraryTab) tab;
-                    StringBuilder windowTitle = new StringBuilder(libraryTab.nameProperty().get());
-                    windowTitle.append(" \u2013 ");
-                    windowTitle.append(FRAME_TITLE);
-                    mainStage.setTitle(windowTitle.toString());
-                } else {
-                    mainStage.setTitle(FRAME_TITLE);
-                }
-            });
         });
     }
 
@@ -547,7 +536,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * Returns the indexed BasePanel.
+     * Returns the indexed LibraryTab.
      *
      * @param i Index of base
      */
@@ -556,7 +545,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * Returns a list of all BasePanels in this frame.
+     * Returns a list of all LibraryTabs in this frame.
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
@@ -616,32 +605,33 @@ public class JabRefFrame extends BorderPane {
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
                 stateManager.setSelectedEntries(Collections.emptyList());
+                mainStage.titleProperty().unbind();
+                mainStage.setTitle(FRAME_TITLE);
                 return;
             }
 
-            LibraryTab newLibraryTab = (LibraryTab) tab;
+            LibraryTab libraryTab = (LibraryTab) tab;
 
             // Poor-mans binding to global state
-            stateManager.setSelectedEntries(newLibraryTab.getSelectedEntries());
+            stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
 
             // Update active search query when switching between databases
-            stateManager.activeSearchQueryProperty().set(newLibraryTab.getCurrentSearchQuery());
-
-            // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-            // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-            // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
-
-            // We need to refresh the window title only
-            // There is currently no optimized method to set the title only (because that lead to code duplication)
-            // Thus, we refresh everything
-            // refreshWindowAndTabTitles();
+            stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
 
             // Update search autocompleter with information for the correct database:
-            newLibraryTab.updateSearchManager();
+            libraryTab.updateSearchManager();
 
-            newLibraryTab.getUndoManager().postUndoRedoEvent();
-            newLibraryTab.getMainTable().requestFocus();
+            libraryTab.getUndoManager().postUndoRedoEvent();
+            libraryTab.getMainTable().requestFocus();
+
+            // Set window title
+            ArrayList<Observable> observables = new ArrayList<>(List.of(libraryTab.changedProperty(), libraryTab.nameProperty()));
+            StringBinding windowTitle = Bindings.createStringBinding(() ->
+                            (libraryTab.changedProperty().getValue() ? "*" : "")
+                                    + libraryTab.nameProperty().getValue() + " \u2013 "
+                                    + FRAME_TITLE,
+                    observables.toArray(Observable[]::new));
+            mainStage.titleProperty().bind(windowTitle);
         });
         initShowTrackingNotification();
     }
