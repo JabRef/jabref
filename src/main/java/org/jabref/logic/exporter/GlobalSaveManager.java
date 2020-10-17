@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -20,9 +21,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GlobalSaveManager {
 
     private static Set<GlobalSaveManager> runningInstances = new HashSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSaveManager.class);
 
     private final DelayTaskThrottler<Set<Character>> throttler = new DelayTaskThrottler<>(1500);
     private final BibDatabaseContext bibDatabaseContext;
@@ -32,7 +37,7 @@ public class GlobalSaveManager {
     private final PreferencesService preferencesService;
 
     private GlobalSaveManager(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
-        this.bibDatabaseContext=  stateManager.getActiveDatabase().get();
+        this.bibDatabaseContext = stateManager.getActiveDatabase().get();
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
@@ -43,8 +48,13 @@ public class GlobalSaveManager {
         runningInstances.removeIf(instance -> instance.bibDatabaseContext == context);
     }
 
-    public static GlobalSaveManager create(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
+    public static GlobalSaveManager start(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
         GlobalSaveManager saveAction = new GlobalSaveManager(stateManager, preferencesService, entryTypesManager);
+
+        if(runningInstances.contains(saveAction))
+        {
+           LOGGER.debug("I have an instance "+saveAction);
+        }
         runningInstances.add(saveAction);
         return saveAction;
     }
@@ -61,8 +71,8 @@ public class GlobalSaveManager {
     private Set<Character> saveThrottled(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
 
         SavePreferences savePrefs = this.preferencesService.getSavePreferences()
-                                                    .withEncoding(encoding)
-                                                    .withSaveType(saveType);
+                                                           .withEncoding(encoding)
+                                                           .withSaveType(saveType);
 
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, savePrefs.getEncoding(), savePrefs.shouldMakeBackup())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePrefs, Globals.entryTypesManager);
@@ -86,4 +96,29 @@ public class GlobalSaveManager {
 
         return Collections.emptySet();
     }
+
+    @Override
+    public String toString() {
+        return "Global save manager for " + bibDatabaseContext;
+    }
+
+    @Override
+    public int hashCode() {
+       return Objects.hash(bibDatabaseContext);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+        GlobalSaveManager other = (GlobalSaveManager) o;
+        return Objects.equals(bibDatabaseContext, other.bibDatabaseContext);
+    }
+
+
 }

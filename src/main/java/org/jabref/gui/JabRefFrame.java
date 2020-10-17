@@ -1148,7 +1148,7 @@ public class JabRefFrame extends BorderPane {
         basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
-        GlobalSaveManager manager = GlobalSaveManager.create(stateManager, prefs, Globals.entryTypesManager);
+        GlobalSaveManager manager = GlobalSaveManager.start(stateManager, prefs, Globals.entryTypesManager);
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);

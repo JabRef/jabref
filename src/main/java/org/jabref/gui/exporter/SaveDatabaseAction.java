@@ -58,7 +58,6 @@ public class SaveDatabaseAction {
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
 
-    private final  GlobalSaveManager saveManager;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -70,7 +69,7 @@ public class SaveDatabaseAction {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
-        this.saveManager = GlobalSaveManager.create(Globals.stateManager, preferences, entryTypesManager);
+        //this.saveManager = GlobalSaveManager.start(Globals.stateManager, preferences, entryTypesManager);
     }
 
     public boolean save() {
@@ -221,6 +220,7 @@ public class SaveDatabaseAction {
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
 
+        var saveManager = GlobalSaveManager.start(Globals.stateManager, this.preferences, entryTypesManager);
 
         SavePreferences preferences = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
