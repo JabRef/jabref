@@ -28,7 +28,6 @@
       </substitute>
     </names>
   </macro>
-
   <macro name="editor">
     <names variable="editor">
       <label form="verb" suffix=" "/>

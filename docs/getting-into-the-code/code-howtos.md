@@ -53,7 +53,7 @@ TODO: Usage of status bar and Swing Dialogs
 
 ### What the EventSystem is used for
 
-Many times there is a need to provide an object on many locations simultaneously. This design pattern is quite similar to Java's Observer, but it is much simplier and readable while having the same functional sense.
+Many times there is a need to provide an object on many locations simultaneously. This design pattern is quite similar to Java's Observer, but it is much simpler and readable while having the same functional sense.
 
 ### Main principle
 
@@ -61,7 +61,7 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Register to the `EventBus`
 
-Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using differnt parameter types.
+Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
 
 ### Posting an object
 
@@ -111,7 +111,7 @@ public class Main {
 
 ### Event handling in JabRef
 
-The `event` package contains some specific events which occure in JabRef.
+The `event` package contains some specific events which occur in JabRef.
 
 For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent through the `eventBus` which is located in `BibDatabase`.
 
@@ -175,7 +175,7 @@ The tests check whether translation strings appear correctly in the resource bun
 1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.l10n\)
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-4. Please do not add tranlsations for other languages direclty in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
+4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
 ## Cleanup and Formatters
 
@@ -300,7 +300,7 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 }
 ```
 
-To test that a preferences migration works succesfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
 
 ## UI
 

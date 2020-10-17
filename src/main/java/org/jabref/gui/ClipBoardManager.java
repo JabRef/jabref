@@ -73,7 +73,7 @@ public class ClipBoardManager {
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
                 observable -> Platform.runLater(() -> {
                     String newValue = input.getSelectedText();
-                    if (!newValue.isEmpty() && primary != null) {
+                    if (!newValue.isEmpty() && (primary != null)) {
                         primary.setContents(new StringSelection(newValue), null);
                     }
                 }));
@@ -105,7 +105,7 @@ public class ClipBoardManager {
     public static String getContentsPrimary() {
         if (primary != null) {
             Transferable contents = primary.getContents(null);
-            if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 try {
                     return (String) contents.getTransferData(DataFlavor.stringFlavor);
                 } catch (UnsupportedFlavorException | IOException e) {
@@ -137,9 +137,10 @@ public class ClipBoardManager {
         }
     }
 
-    public void setHtmlContent(String html) {
+    public void setHtmlContent(String html, String fallbackPlain) {
         final ClipboardContent content = new ClipboardContent();
         content.putHtml(html);
+        content.putString(fallbackPlain);
         clipboard.setContent(content);
         setPrimaryClipboardContent(content);
     }
@@ -181,7 +182,7 @@ public class ClipBoardManager {
     }
 
     private List<BibEntry> handleStringData(String data) {
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }
 

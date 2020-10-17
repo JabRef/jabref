@@ -15,9 +15,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a query parser and mapping layer to enable conversion of queries formulated in simplified lucene syntax by the user into api queries. [#6799](https://github.com/JabRef/jabref/pull/6799)
 - We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
+- We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 
 ### Changed
 
+- We changed the default preferences for OpenOffice/LibreOffice integration to automatically sync the bibliography when
+inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://github.com/JabRef/jabref/issues/6957)
 - We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
@@ -29,18 +32,28 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the title of the window "Manage field names and content" to have the same title as the corresponding menu item [#6895](https://github.com/JabRef/jabref/pull/6895)
 - We renamed the menus "View -> Previous citation style" and "View -> Next citation style" into "View -> Previous preview style" and "View -> Next preview style" and renamed the "Preview" style to "Customized preview style". [#6899](https://github.com/JabRef/jabref/pull/6899)
 - We changed the default preference option "Search and store files relative to library file location" to on, as this seems to be a more intuitive behaviour. [#6863](https://github.com/JabRef/jabref/issues/6863)
-- Improved detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
+- We changed the title of the window  "Manage field names and content":  to have the same title as the corresponding menu item  [#6895](https://github.com/JabRef/jabref/pull/6895)
+- We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
+- We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
+- We changed in the group interface "Generate groups from keywords in a BibTeX field" by "Generate groups from keywords in the following field". [#6983](https://github.com/JabRef/jabref/issues/6983)
+- We changed the name of a group type from "Searching for keywords" to "Searching for a keyword". [6995](https://github.com/JabRef/jabref/pull/6995)
 
 ### Fixed
 
-- We fixed an issue changing the icon link_variation_off that is not meaningful. [#6834][https://github.com/JabRef/jabref/issues/6834]
+- We fixed an issue changing the icon link_variation_off that is not meaningful. [#6834](https://github.com/JabRef/jabref/issues/6834)
 - We fixed an issue where the `.sav` file was not deleted upon exiting JabRef. [#6109](https://github.com/JabRef/jabref/issues/6109)
 - We fixed a linked identifier icon inconsistency. [#6705](https://github.com/JabRef/jabref/issues/6705)
 - We fixed the wrong behavior that font size changes are not reflected in dialogs. [#6039](https://github.com/JabRef/jabref/issues/6039)
+- We fixed the failure to Copy citation key and link. [#5835](https://github.com/JabRef/jabref/issues/5835)
 - We fixed an issue where the sort order of the entry table was reset after a restart of JabRef. [#6898](https://github.com/JabRef/jabref/pull/6898)
 - We fixed an issue where no longer a warning was displayed when inserting references into LibreOffice with an invalid "ReferenceParagraphFormat". [#6907](https://github.com/JabRef/jabref/pull/60907).
-- We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog [#6934](https://github.com/JabRef/jabref/issues/6934)
-- We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog [6906](https://github.com/JabRef/jabref/issues/6906)
+- We fixed an issue where a selected field was not removed after the first click in the custom entry types dialog. [#6934](https://github.com/JabRef/jabref/issues/6934)
+- We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog. [#6906](https://github.com/JabRef/jabref/issues/6906)
+- We fixed an issue where it was impossible to connect to OpenOffice/LibreOffice on Mac OSX. [#6970](https://github.com/JabRef/jabref/pull/6970)
+- We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
+- We fixed an issue where spaces and newlines in an isbn would generate an exception. [#6456](https://github.com/JabRef/jabref/issues/6456)
+- We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
+- We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
 
 ### Removed
 

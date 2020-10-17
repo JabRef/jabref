@@ -69,7 +69,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" initialize-with=". "/>
+      <name form="short" and="text" initialize-with=". " et-al-min="3" et-al-use-first="1"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -347,8 +347,8 @@
       <if type="article-journal article-magazine" match="any">
         <group prefix=", " delimiter=", ">
           <group>
-            <text variable="volume" font-style="normal" prefix="Vol. "/>
-            <text variable="issue" prefix=", No. "/>
+            <text variable="volume"/>
+            <text variable="issue" prefix=", "/>
           </group>
         </group>
         <choose>
@@ -478,13 +478,13 @@
   <macro name="pages">
     <text variable="page"/>
   </macro>
-  <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" givenname-disambiguation-rule="primary-name">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort"/>
     </sort>
     <layout delimiter=", " prefix="[" suffix="]">
-      <group delimiter=" ">
+      <group delimiter=", ">
         <text macro="author-short"/>
         <text macro="issued-year"/>
         <text macro="citation-locator"/>
@@ -499,7 +499,7 @@
     </sort>
     <layout>
       <group suffix=".">
-        <group delimiter=" " prefix="[" suffix="] ">
+        <group delimiter=", " prefix="[" suffix="] ">
           <text macro="author-short"/>
           <text macro="issued-year"/>
         </group>
@@ -514,9 +514,8 @@
           <text macro="event"/>
           <text macro="publisher"/>
         </group>
-        <text macro="issued"/>
-        <group>
-          <label prefix=", " suffix=" " variable="page" form="short"/>
+        <group delimiter=", ">
+          <text macro="issued"/>
           <text macro="pages"/>
         </group>
       </group>
