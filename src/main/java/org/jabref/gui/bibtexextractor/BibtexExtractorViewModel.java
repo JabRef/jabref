@@ -22,6 +22,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
