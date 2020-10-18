@@ -47,11 +47,11 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
-            LOGGER.warn(msg, e);
+            LOGGER.debug(msg, e);
             throw new RuntimeException(msg, e);
         } catch (IOException e) {
             String msg = "Could not process citation. " + e.getMessage();
-            LOGGER.warn(msg, e);
+            LOGGER.debug(msg, e);
             throw new RuntimeException(msg, e);
         }
     }
