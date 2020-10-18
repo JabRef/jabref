@@ -708,6 +708,11 @@ public class LibraryTab extends Tab {
         this.changedProperty.setValue(true);
     }
 
+    public void resetChangedProperties() {
+        this.nonUndoableChangeProperty.setValue(false);
+        this.changedProperty.setValue(false);
+    }
+
     private class GroupTreeListener {
 
         @Subscribe

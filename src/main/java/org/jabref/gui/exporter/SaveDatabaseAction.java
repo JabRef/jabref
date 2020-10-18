@@ -196,9 +196,7 @@ public class SaveDatabaseAction {
 
             if (success) {
                 libraryTab.getUndoManager().markUnchanged();
-                // After a successful save the following statement marks that the base is unchanged since last save
-                libraryTab.nonUndoableChangeProperty().setValue(false);
-                libraryTab.changedProperty().setValue(false);
+                libraryTab.resetChangedProperties();
             }
             return success;
         } catch (SaveException ex) {
