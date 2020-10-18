@@ -319,7 +319,7 @@ public class URLDownload {
 
     private URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
-        connection.setConnectTimeout((int) connectTimeout.getSeconds() * 1000);
+        connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }

@@ -19,8 +19,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -113,11 +112,8 @@ public class GrobidCitationFetcherTest {
         when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new IOException("Any IO Exception"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
-        try {
+        assertThrows(UncheckedIOException.class, () -> {
             grobidCitationFetcher.performSearch("any text");
-            fail("performSearch should throw an UncheckedIOException, when there are underlying IOException.");
-        } catch (UncheckedIOException expected) {
-            // expected
-        }
+        }, "performSearch should throw an UncheckedIOException, when there are underlying IOException.");
     }
 }
