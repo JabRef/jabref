@@ -1,10 +1,13 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -17,7 +20,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class GrobidCitationFetcherTest {
@@ -100,4 +107,17 @@ public class GrobidCitationFetcherTest {
         assertEquals(Collections.emptyList(), entries);
     }
 
+    @Test
+    public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
+        GrobidService grobidServiceMock = mock(GrobidService.class);
+        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new IOException("Any IO Exception"));
+        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
+
+        try {
+            grobidCitationFetcher.performSearch("any text");
+            fail("performSearch should throw an UncheckedIOException, when there are underlying IOException.");
+        } catch (UncheckedIOException expected) {
+            // expected
+        }
+    }
 }

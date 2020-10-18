@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,19 +15,19 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
     private static final String GROBID_URL = "http://grobid.jabref.org:8070";
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new GrobidService(GROBID_URL));
+    }
+
+    GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {
         this.importFormatPreferences = importFormatPreferences;
-        this.grobidService = new GrobidService(GROBID_URL);
+        this.grobidService = grobidService;
     }
 
     /**
@@ -39,8 +40,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         try {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
         } catch (IOException e) {
-            LOGGER.debug("Could not process citation", e);
-            return Optional.empty();
+            throw new UncheckedIOException("Could not process citation. " + e.getMessage(), e);
         }
     }
 
@@ -69,5 +69,9 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     @Override
     public String getName() {
         return "GROBID";
+    }
+
+    public String getServerUrl() {
+        return GROBID_URL;
     }
 }

@@ -1,5 +1,6 @@
 package org.jabref.gui.bibtexextractor;
 
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +22,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BibtexExtractorViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
     private DialogService dialogService;
@@ -58,6 +63,16 @@ public class BibtexExtractorViewModel {
     public void startParsing() {
         BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
+                      .onFailure((e) -> {
+                          if (e instanceof UncheckedIOException) {
+                              String msg = Localization.lang("There are connection issues with the %0 server. Detailed information: %1.",
+                                      currentCitationfetcher.getServerUrl(),
+                                      e.getMessage());
+                              dialogService.notify(msg);
+                          } else {
+                              LOGGER.warn("Missing exception handling.", e);
+                          }
+                      })
                       .onSuccess(parsedEntries -> {
                           dialogService.notify(Localization.lang("%0 entries were parsed from your query.", String.valueOf(parsedEntries.size())));
                           importHandler.importEntries(parsedEntries);
