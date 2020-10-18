@@ -44,7 +44,7 @@ jobs:
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
-          reporter: github-pr-review
+          reporter: github-pr-check
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
