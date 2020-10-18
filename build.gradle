@@ -97,7 +97,7 @@ configurations {
 }
 
 javafx {
-    version = "14"
+    version = "15"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -664,6 +664,7 @@ jlink {
                     '--win-dir-chooser',
                     '--win-shortcut',
                     '--win-menu',
+                    '--win-menu-group', "JabRef",
                     '--temp', "$buildDir/installer",
                     '--resource-dir', "${projectDir}/buildres/windows",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"

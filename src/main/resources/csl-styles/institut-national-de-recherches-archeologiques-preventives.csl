@@ -238,7 +238,7 @@
       <key variable="issued"/>
     </sort>
     <layout suffix=".">
-      <group font-weight="bold" delimiter=" " suffix="&#xD;">
+      <group font-weight="bold" delimiter=" " suffix="&#13;">
         <text macro="author-short"/>
         <text macro="year-date"/>
       </group>
