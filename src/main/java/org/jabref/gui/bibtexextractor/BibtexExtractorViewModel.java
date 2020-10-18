@@ -1,6 +1,5 @@
 package org.jabref.gui.bibtexextractor;
 
-import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +15,7 @@ import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -65,9 +65,8 @@ public class BibtexExtractorViewModel {
         BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
-                          if (e instanceof UncheckedIOException) {
-                              String msg = Localization.lang("There are connection issues with the %0 server. Detailed information: %1.",
-                                      currentCitationfetcher.getServerUrl(),
+                          if (e instanceof FetcherException) {
+                              String msg = Localization.lang("There are connection issues with a JabRef server. Detailed information: %0.",
                                       e.getMessage());
                               dialogService.notify(msg);
                           } else {

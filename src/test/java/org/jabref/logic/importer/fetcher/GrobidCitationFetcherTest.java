@@ -1,11 +1,11 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
@@ -19,7 +19,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -82,26 +83,26 @@ public class GrobidCitationFetcherTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideExamplesForCorrectResultTest")
-    public void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) {
+    public void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
         assertEquals(List.of(expectedBibEntry), entries);
     }
 
     @Test
-    public void grobidPerformSearchCorrectlySplitsStringTest() {
+    public void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
         assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
     }
 
     @Test
-    public void grobidPerformSearchWithEmptyStringsTest() {
+    public void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
         assertEquals(Collections.emptyList(), entries);
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidInput")
-    public void grobidPerformSearchWithInvalidDataTest(String invalidInput) {
+    public void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
         List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
         assertEquals(Collections.emptyList(), entries);
     }
@@ -112,8 +113,8 @@ public class GrobidCitationFetcherTest {
         when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new IOException("Any IO Exception"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
-        assertThrows(UncheckedIOException.class, () -> {
+        assertThrows(FetcherException.class, () -> {
             grobidCitationFetcher.performSearch("any text");
-        }, "performSearch should throw an UncheckedIOException, when there are underlying IOException.");
+        }, "performSearch should throw an FetcherException, when there are underlying IOException.");
     }
 }
