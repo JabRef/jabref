@@ -140,7 +140,7 @@ public class KeyBindingRepository {
      */
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
         Optional<KeyCombination> keyCombination = getKeyCombination(binding);
-        if (!keyCombination.isPresent()){
+        if (!keyCombination.isPresent()) {
             return false;
         }
         return checkKeyCombinationEquality(keyCombination.get(), keyEvent);
