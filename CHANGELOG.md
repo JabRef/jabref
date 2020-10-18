@@ -58,6 +58,8 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 
 ### Removed
 
+- We removed the menu entry "Manage external file types" because it's already in 'Preferences' dialog [#6991](https://github.com/JabRef/jabref/issues/6991)
+
 ## [5.1] – 2020-08-30
 
 ### Added
