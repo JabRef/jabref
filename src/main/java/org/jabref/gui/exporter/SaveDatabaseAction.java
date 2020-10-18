@@ -131,8 +131,8 @@ public class SaveDatabaseAction {
             context.setDatabasePath(file);
 
             // Hack: Mock a change event, so the tab title is redrawn
-            libraryTab.changedProperty().setValue(true);
-            libraryTab.changedProperty().setValue(false);
+            libraryTab.changedProperty().setValue(!libraryTab.changedProperty().getValue());
+            libraryTab.changedProperty().setValue(!libraryTab.changedProperty().getValue());
 
             // Reinstall AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitorAndChangePane();

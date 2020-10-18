@@ -18,7 +18,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.Group;
@@ -570,17 +569,11 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
         initLayout();
-
         initKeyBindings();
-
         initDragAndDrop();
 
         // Bind global state
-        stateManager.openDatabases().bindContent(
-                tabbedPane.getTabs().stream()
-                          .map(tab -> (LibraryTab) tab)
-                          .map(LibraryTab::getBibDatabaseContext)
-                          .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+        EasyBind.bindContent(stateManager.getOpenTabs(), tabbedPane.getTabs());
 
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
@@ -1023,8 +1016,6 @@ public class JabRefFrame extends BorderPane {
     }
 
     public void addTab(LibraryTab libraryTab, boolean raisePanel) {
-        // "" is passed as title, because it is updated below at "refreshWindowAndTabTitles()"
-
         tabbedPane.getTabs().add(libraryTab);
 
         libraryTab.setOnCloseRequest(event -> {
@@ -1033,8 +1024,6 @@ public class JabRefFrame extends BorderPane {
         });
 
         libraryTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
-
-        // refreshWindowAndTabTitles();
 
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
@@ -1166,7 +1155,6 @@ public class JabRefFrame extends BorderPane {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             libraryTab.cleanUp();
             tabbedPane.getTabs().remove(libraryTab);
-            // this.refreshWindowAndTabTitles();
         });
     }
 

@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -134,31 +136,29 @@ public class LibraryTab extends Tab {
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
 
-        Platform.runLater(() ->
-                EasyBind.subscribe(changedProperty, this::refreshTabTitle)
-        );
+        Platform.runLater(() -> {
+            EasyBind.subscribe(changedProperty, this::refreshTabTitle);
+            // FIXME: currently the tab titles are not refreshed after a tab is closed
+            EasyBind.subscribe(Bindings.size(Globals.stateManager.getOpenTabs()),
+                  (databases) -> refreshTabTitle(changedProperty.getValue()));
+        });
     }
 
     /**
-     * Determines the title of the tab
+     * Sets the title of the tab
+     *   filename modification-asterisk (database-mode) – path-fragment
      *
-     * We aim for following in a tab:
-     *
-     *   filename (datbase-mode) – path-fragment – JabRef
-     *
-     * path-fragment is only shown if filename is not (globally) unique
+     * (path-fragment is only shown if filename is not (globally) unique)
+     * The modification-asterisk (*) is shown if the file was modified since last save
      *
      * Example:
+     *   jabref-authors.bib* (BibLaTeX) – testbib
      *
-     *   jabref-authors.bib (BibLaTeX) – testbib – JabRef
-     *
-     * For the JabRef window, it should be
-     *
-     *   full-path (database-mode) – JabRef
+     * For the JabRef window, the variable nameProperty is proviced, consisting if      *
+     *   filename (database-mode) - path-fragment
      *
      * Example:
-     *
-     *   C:\git-repositories\jabref\src\test\resources\testbib\jabref-authors.bib (BibLaTeX) – JabRef
+     *   jabref-authors.bib (BibLaTeX) - testbib
      */
     private void refreshTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
@@ -196,15 +196,19 @@ public class LibraryTab extends Tab {
                 addChangedInformation(toolTipText, fileName);
             }
 
+            // Add unique path fragment
             List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
-
-            // String uniquePath = uniquePathParts.get(i);
-            /* if (!uniquePath.equals(fileName) && uniquePath.contains(File.separator)) {
+            Optional<String> uniquePathPart = uniquePathParts.stream()
+                                                         .filter(part -> databasePath.toString().contains(part)
+                                                                 && !part.equals(fileName) && part.contains(File.separator))
+                                                         .findFirst();
+            if (uniquePathPart.isPresent()) {
+                String uniquePath = uniquePathPart.get();
                 // remove filename
                 uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
                 tabTitle.append(" \u2013 ").append(uniquePath);
                 tabName.append(" \u2013 ").append(uniquePath);
-            } */
+            }
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));
@@ -252,7 +256,9 @@ public class LibraryTab extends Tab {
 
     private List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
-        Globals.stateManager.openDatabases().stream()
+        Globals.stateManager.getOpenTabs().stream()
+                            .map(tab -> (LibraryTab) tab)
+                            .map(LibraryTab::getBibDatabaseContext)
                             .map(BibDatabaseContext::getDatabasePath)
                             .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
                                     path -> list.add(path.toAbsolutePath().toString()),
