@@ -139,7 +139,7 @@ public class LibraryTab extends Tab {
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::refreshTabTitle);
             // FIXME: currently the tab titles are not refreshed after a tab is closed
-            EasyBind.subscribe(Bindings.size(Globals.stateManager.getOpenTabs()),
+            EasyBind.subscribe(Bindings.size(Globals.stateManager.getOpenDatabases()),
                   (databases) -> refreshTabTitle(changedProperty.getValue()));
         });
     }
@@ -256,9 +256,7 @@ public class LibraryTab extends Tab {
 
     private List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
-        Globals.stateManager.getOpenTabs().stream()
-                            .map(tab -> (LibraryTab) tab)
-                            .map(LibraryTab::getBibDatabaseContext)
+        Globals.stateManager.getOpenDatabases().stream()
                             .map(BibDatabaseContext::getDatabasePath)
                             .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
                                     path -> list.add(path.toAbsolutePath().toString()),

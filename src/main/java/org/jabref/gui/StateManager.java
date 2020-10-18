@@ -16,7 +16,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
 
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
@@ -45,7 +44,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 public class StateManager {
 
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
-    private final ObservableList<Tab> openTabs = FXCollections.observableArrayList();
+    private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -66,8 +65,8 @@ public class StateManager {
         return localDragboard;
     }
 
-    public ObservableList<Tab> getOpenTabs() {
-        return openTabs;
+    public ObservableList<BibDatabaseContext> getOpenDatabases() {
+        return openDatabases;
     }
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {

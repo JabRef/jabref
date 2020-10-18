@@ -143,6 +143,7 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 import org.fxmisc.richtext.CodeArea;
@@ -163,6 +164,8 @@ public class JabRefFrame extends BorderPane {
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager, prefs);
 
     private final FileHistoryMenu fileHistory;
+
+    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -573,7 +576,10 @@ public class JabRefFrame extends BorderPane {
         initDragAndDrop();
 
         // Bind global state
-        EasyBind.bindContent(stateManager.getOpenTabs(), tabbedPane.getTabs());
+
+        // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
+        openDatabaseList = EasyBind.map(tabbedPane.getTabs(), tab -> ((LibraryTab) tab).getBibDatabaseContext());
+        EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
