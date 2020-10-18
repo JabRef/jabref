@@ -67,10 +67,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private long lastKeyPressTime;
     private String columnSearchTerm;
 
-
-
-    //test for reviewdog
-
     public MainTable(MainTableDataModel model,
                      BasePanel panel,
                      BibDatabaseContext database,
