@@ -122,7 +122,7 @@ public class KeyBindingRepository {
 
     public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
-        if (binding.isEmpty()){
+        if (binding.isEmpty()) {
             return Optional.empty();
         }
         if (OS.OS_X) {
