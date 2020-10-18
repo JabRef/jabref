@@ -556,7 +556,7 @@ public class JabRefFrame extends BorderPane {
                          .collect(Collectors.toList());
     }
 
-    public void showBasePanelAt(int i) {
+    public void showLibraryTabAt(int i) {
         tabbedPane.getSelectionModel().select(i);
     }
 

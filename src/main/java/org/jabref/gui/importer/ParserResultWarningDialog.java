@@ -45,7 +45,7 @@ public class ParserResultWarningDialog {
 
         // Switch tab if asked to do so
         if (dataBaseNumber >= 0) {
-            jabRefFrame.showBasePanelAt(dataBaseNumber);
+            jabRefFrame.showLibraryTabAt(dataBaseNumber);
         }
 
         // Generate string with warning texts
@@ -59,10 +59,10 @@ public class ParserResultWarningDialog {
 
         // Generate dialog title
         String dialogTitle;
-        if (dataBaseNumber < 0) {
+        if (dataBaseNumber < 0 || parserResult.getPath().isEmpty()) {
             dialogTitle = Localization.lang("Warnings");
         } else {
-            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().get().getName() + ")";
+            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getPath().get().getFileName() + ")";
         }
 
         // Show dialog

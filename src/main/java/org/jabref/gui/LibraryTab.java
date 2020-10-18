@@ -9,11 +9,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
@@ -137,10 +137,9 @@ public class LibraryTab extends Tab {
         this.entryEditor = new EntryEditor(this, externalFileTypes);
 
         Platform.runLater(() -> {
-            EasyBind.subscribe(changedProperty, this::refreshTabTitle);
-            // FIXME: currently the tab titles are not refreshed after a tab is closed
-            EasyBind.subscribe(Bindings.size(Globals.stateManager.getOpenDatabases()),
-                  (databases) -> refreshTabTitle(changedProperty.getValue()));
+            EasyBind.subscribe(changedProperty, this::updateTabTitle);
+            Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+                    updateTabTitle(changedProperty.getValue()));
         });
     }
 
@@ -160,7 +159,7 @@ public class LibraryTab extends Tab {
      * Example:
      *   jabref-authors.bib (BibLaTeX) - testbib
      */
-    private void refreshTabTitle(boolean isChanged) {
+    public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
