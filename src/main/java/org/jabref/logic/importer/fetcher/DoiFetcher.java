@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -28,14 +29,15 @@ import org.jabref.model.util.OptionalUtil;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
-    private static final String APS_JOURNAL_ORG_DOI_ID = "1103";
-
     public static final String NAME = "DOI";
+
+    private static final String APS_JOURNAL_ORG_DOI_ID = "1103";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
