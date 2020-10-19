@@ -217,13 +217,13 @@ public class LibraryTab extends Tab {
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
-        text.append(". ");
+        text.append("\n");
         text.append(Localization.lang("Library '%0' has changed.", fileName));
     }
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
         String mode = bibDatabaseContext.getMode().getFormattedName();
-        String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
+        String modeInfo = String.format("\n%s", Localization.lang("%0 mode", mode));
         text.append(modeInfo);
     }
 
