@@ -13,7 +13,6 @@ import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
@@ -625,13 +624,10 @@ public class JabRefFrame extends BorderPane {
             libraryTab.getUndoManager().postUndoRedoEvent();
             libraryTab.getMainTable().requestFocus();
 
-            // Set window title
-            ArrayList<Observable> observables = new ArrayList<>(List.of(libraryTab.changedProperty(), libraryTab.nameProperty()));
-            StringBinding windowTitle = Bindings.createStringBinding(() ->
-                            (libraryTab.changedProperty().getValue() ? "*" : "")
-                                    + libraryTab.nameProperty().getValue() + " \u2013 "
-                                    + FRAME_TITLE,
-                    observables.toArray(Observable[]::new));
+            // Set window title - copy tab title
+            StringBinding windowTitle = Bindings.createStringBinding(
+                    () -> libraryTab.textProperty().getValue() + " \u2013 " + FRAME_TITLE,
+                    libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
         initShowTrackingNotification();

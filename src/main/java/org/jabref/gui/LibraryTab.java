@@ -11,8 +11,6 @@ import java.util.Optional;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -93,7 +91,6 @@ public class LibraryTab extends Tab {
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     // Used to track whether the base has changed since last save.
 
-    private final StringProperty nameProperty = new SimpleStringProperty();
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
     @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
@@ -145,19 +142,13 @@ public class LibraryTab extends Tab {
 
     /**
      * Sets the title of the tab
-     *   filename modification-asterisk (database-mode) – path-fragment
+     *   modification-asterisk filename – path-fragment
      *
-     * (path-fragment is only shown if filename is not (globally) unique)
      * The modification-asterisk (*) is shown if the file was modified since last save
+     * (path-fragment is only shown if filename is not (globally) unique)
      *
      * Example:
-     *   jabref-authors.bib* (BibLaTeX) – testbib
-     *
-     * For the JabRef window, the variable nameProperty is proviced, consisting if      *
-     *   filename (database-mode) - path-fragment
-     *
-     * Example:
-     *   jabref-authors.bib (BibLaTeX) - testbib
+     *   *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
@@ -167,13 +158,11 @@ public class LibraryTab extends Tab {
 
         StringBuilder tabTitle = new StringBuilder();
         StringBuilder toolTipText = new StringBuilder();
-        StringBuilder tabName = new StringBuilder();
 
         if (file.isPresent()) {
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
-            tabName.append(fileName);
             toolTipText.append(databasePath.toAbsolutePath().toString());
             if (isChanged && !isAutosaveEnabled) {
                 tabTitle.append('*');
@@ -184,12 +173,9 @@ public class LibraryTab extends Tab {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 toolTipText.append(' ');
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
-                tabName.append(" \u2013 ");
-                addSharedDbInformation(tabName, bibDatabaseContext);
             }
 
             addModeInfo(toolTipText, bibDatabaseContext);
-            addModeInfo(tabName, bibDatabaseContext);
 
             if (isChanged && !isAutosaveEnabled) {
                 addChangedInformation(toolTipText, fileName);
@@ -206,32 +192,27 @@ public class LibraryTab extends Tab {
                 // remove filename
                 uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
                 tabTitle.append(" \u2013 ").append(uniquePath);
-                tabName.append(" \u2013 ").append(uniquePath);
             }
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append(Localization.lang("untitled"));
-                tabName.append(Localization.lang("untitled"));
                 if (bibDatabaseContext.getDatabase().hasEntries()) {
                     // if the database is not empty and no file is assigned,
                     // the database came from an import and has to be treated somehow
                     // -> mark as changed
                     tabTitle.append('*');
-                    tabName.append('*');
                 }
             } else {
                 addSharedDbInformation(tabTitle, bibDatabaseContext);
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
             addModeInfo(toolTipText, bibDatabaseContext);
-            addModeInfo(tabName, bibDatabaseContext);
             if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText, Localization.lang("untitled"));
             }
         }
 
         textProperty().setValue(tabTitle.toString());
-        nameProperty.setValue(tabName.toString());
         setTooltip(new Tooltip(toolTipText.toString()));
     }
 
@@ -681,10 +662,6 @@ public class LibraryTab extends Tab {
 
     public void cut() {
         mainTable.cut();
-    }
-
-    public StringProperty nameProperty() {
-        return nameProperty;
     }
 
     public BooleanProperty changedProperty() {
