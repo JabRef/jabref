@@ -16,6 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
 - We added support for exporting to YAML. [#6974](https://github.com/JabRef/jabref/issues/6974)
+- We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 
 ### Changed
 
@@ -36,6 +37,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 - We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
 - We changed in the group interface "Generate groups from keywords in a BibTeX field" by "Generate groups from keywords in the following field". [#6983](https://github.com/JabRef/jabref/issues/6983)
+- We changed the name of a group type from "Searching for keywords" to "Searching for a keyword". [6995](https://github.com/JabRef/jabref/pull/6995)
 
 ### Fixed
 

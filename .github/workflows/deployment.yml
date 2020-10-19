@@ -55,10 +55,16 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.4
-      - name: Set up JDK
+      - name: Set up JDK 15 for linux and mac
         uses: actions/setup-java@v1
         with:
           java-version: 15
+        if: matrix.os != 'windows-latest'
+      - name: Set up JDK 14 for windows
+        uses: actions/setup-java@v1
+        with:
+          java-version: 14
+        if: matrix.os == 'windows-latest'
       - name: Restore gradle cache
         uses: actions/cache@master
         with:
