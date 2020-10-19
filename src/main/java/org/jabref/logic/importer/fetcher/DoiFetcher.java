@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
-
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -34,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
+
+    private static final String APS_JOURNAL_ORG_DOI_ID = "1103";
+
     public static final String NAME = "DOI";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
@@ -143,8 +144,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         if (!entry.getType().equals(StandardEntryType.Article)) {
             return false;
         }
-        Pattern apsJournalSuffixPattern = Pattern.compile("([\\w]+\\.)([\\w]+\\.)([\\w]+)");
-        String suffix = doiAsString.substring(doiAsString.lastIndexOf('/') + 1);
-        return apsJournalSuffixPattern.matcher(suffix).matches();
+        String organizationId = doiAsString.substring(doiAsString.indexOf('.') + 1, doiAsString.indexOf('/'));
+        return organizationId.equals(APS_JOURNAL_ORG_DOI_ID);
     }
 }
