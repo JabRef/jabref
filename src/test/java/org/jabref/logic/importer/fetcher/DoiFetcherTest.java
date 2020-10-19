@@ -83,22 +83,6 @@ public class DoiFetcherTest {
         bibEntryStenzel2020.setField(StandardField.PAGES, "023315");
         bibEntryStenzel2020.setField(StandardField.NUMBER, "2");
 
-        /*
-         *
-         *     @Article{Stenzel2020,
-        author = {L. Stenzel and A. L. C. Hayward and U. Schollwöck and F. Heidrich-Meisner},
-        journal = {Physical Review A},
-        title = {Topological phases in the Fermi-Hofstadter-Hubbard model on hybrid-space ladders},
-        year = {2020},
-        month = {aug},
-        number = {2},
-        volume = {102},
-        doi = {10.1103/physreva.102.023315},
-        publisher = {American Physical Society ({APS})},
-        }
-
-         */
-
     }
 
     @Test
