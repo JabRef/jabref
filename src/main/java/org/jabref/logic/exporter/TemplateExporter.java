@@ -40,6 +40,7 @@ public class TemplateExporter extends Exporter {
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
 
     private final String lfFileName;
@@ -48,7 +49,7 @@ public class TemplateExporter extends Exporter {
     private final SavePreferences savePreferences;
     private Charset encoding; // If this value is set, it will be used to override the default encoding for the getCurrentBasePanel.
     private boolean customExport;
-    private boolean deleteBlankLines;
+    private BlankLineBehaviour blankLineBehaviour;
 
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -111,10 +112,11 @@ public class TemplateExporter extends Exporter {
      * @param extension         Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
      * @param savePreferences   Preferences for saving
-     * @param deleteBlankLines  If blank lines should be removed (default: false)
+     * @param blankLineBehaviour how to behave regarding blank lines.
      */
     public TemplateExporter(String displayName, String consoleName, String lfFileName, String directory, FileType extension,
-                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences, boolean deleteBlankLines) {
+                            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences,
+                            BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
         if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
@@ -124,11 +126,13 @@ public class TemplateExporter extends Exporter {
         this.directory = directory;
         this.layoutPreferences = layoutPreferences;
         this.savePreferences = savePreferences;
-        this.deleteBlankLines = deleteBlankLines;
+        this.blankLineBehaviour = blankLineBehaviour;
     }
 
     /**
-     * Indicate whether this is a custom export. A custom export looks for its layout files using a normal file path, while a built-in export looks in the classpath.
+     * Indicate whether this is a custom export.
+     * A custom export looks for its layout files using a normal file path,
+     * while a built-in export looks in the classpath.
      *
      * @param custom true to indicate a custom export format.
      */
@@ -270,7 +274,7 @@ public class TemplateExporter extends Exporter {
 
                 // Write the entry
                 if (layout != null) {
-                    if (deleteBlankLines) {
+                    if (blankLineBehaviour == BlankLineBehaviour.DELETE_BLANKS) {
                         String[] lines = layout.doLayout(entry, databaseContext.getDatabase()).split(BLANK_LINE_PATTERN);
                         for (String line : lines) {
                             if (!line.isBlank() && !line.isEmpty()) {
@@ -313,7 +317,8 @@ public class TemplateExporter extends Exporter {
     }
 
     /**
-     * See if there is a name formatter file bundled with this export format. If so, read all the name formatters so they can be used by the filter layouts.
+     * See if there is a name formatter file bundled with this export format.
+     * If so, read all the name formatters so they can be used by the filter layouts.
      */
     private void readFormatterFile() {
         File formatterFile = new File(lfFileName + FORMATTERS_EXTENSION);
