@@ -20,7 +20,7 @@ plugins {
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '2.1.0'
+    id 'com.adarshr.test-logger' version '2.1.1'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -143,14 +143,14 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
 
-    implementation 'org.postgresql:postgresql:42.2.17'
+    implementation 'org.postgresql:postgresql:42.2.18'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:29.0-jre') {
+    implementation ('com.google.guava:guava:30.0-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
@@ -170,7 +170,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.2'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.01'
+    implementation 'com.konghq:unirest-java:3.11.02'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -674,6 +674,7 @@ jlink {
         if (OperatingSystem.current().isLinux()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/JabRef-icon-64.png",
+                    '--app-version', "${project.version}",
             ]
             installerOptions = [
                     '--verbose',

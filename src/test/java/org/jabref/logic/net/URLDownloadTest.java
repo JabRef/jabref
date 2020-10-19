@@ -109,4 +109,12 @@ public class URLDownloadTest {
         assertThrows(UnirestException.class, nonsense::canBeReached);
     }
 
+    @Test
+    public void connectTimeoutIsNeverNull() throws MalformedURLException {
+        URLDownload urlDownload = new URLDownload(new URL("http://www.example.com"));
+        assertNotNull(urlDownload.getConnectTimeout(), "there's a non-null default by the constructor");
+
+        urlDownload.setConnectTimeout(null);
+        assertNotNull(urlDownload.getConnectTimeout(), "no null value can be set");
+    }
 }
