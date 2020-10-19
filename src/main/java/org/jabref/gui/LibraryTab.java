@@ -160,13 +160,16 @@ public class LibraryTab extends Tab {
         StringBuilder toolTipText = new StringBuilder();
 
         if (file.isPresent()) {
+            // Modification asterisk
+            if (isChanged && !isAutosaveEnabled) {
+                tabTitle.append('*');
+            }
+
+            // Filename
             Path databasePath = file.get();
             String fileName = databasePath.getFileName().toString();
             tabTitle.append(fileName);
             toolTipText.append(databasePath.toAbsolutePath().toString());
-            if (isChanged && !isAutosaveEnabled) {
-                tabTitle.append('*');
-            }
 
             if (databaseLocation == DatabaseLocation.SHARED) {
                 tabTitle.append(" \u2013 ");
@@ -175,13 +178,15 @@ public class LibraryTab extends Tab {
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
 
+            // Database mode
             addModeInfo(toolTipText, bibDatabaseContext);
 
+            // Changed information (tooltip)
             if (isChanged && !isAutosaveEnabled) {
                 addChangedInformation(toolTipText, fileName);
             }
 
-            // Add unique path fragment
+            // Unique path fragment
             List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
             Optional<String> uniquePathPart = uniquePathParts.stream()
                                                          .filter(part -> databasePath.toString().contains(part)
