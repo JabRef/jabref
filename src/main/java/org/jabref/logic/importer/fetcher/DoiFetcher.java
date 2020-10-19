@@ -5,9 +5,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
-import org.jabref.logic.cleanup.PageFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -23,6 +23,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -76,6 +77,14 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
+                // Check if the entry is an APS journal and add the article id as the page count if page field is missing
+                if (fetchedEntry.isPresent() && fetchedEntry.get().hasField(StandardField.DOI)) {
+                    BibEntry entry = fetchedEntry.get();
+                    if (isAPSJournal(entry, entry.getField(StandardField.DOI).get()) && !entry.hasField(StandardField.PAGES)) {
+                        setPageCountToArticleId(entry, entry.getField(StandardField.DOI).get());
+                    }
+                }
+
                 return fetchedEntry;
             } else {
                 throw new FetcherException(Localization.lang("Invalid DOI: '%0'.", identifier));
@@ -90,7 +99,6 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     private void doPostCleanup(BibEntry entry) {
-        new PageFieldCleanup().cleanup(entry);
         new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
     }
@@ -124,5 +132,19 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         }
 
         return agency;
+    }
+
+    private void setPageCountToArticleId(BibEntry entry, String doiAsString) {
+        String articleId = doiAsString.substring(doiAsString.lastIndexOf('.') + 1);
+        entry.setField(StandardField.PAGES, articleId);
+    }
+
+    private boolean isAPSJournal(BibEntry entry, String doiAsString) {
+        if (!entry.getType().equals(StandardEntryType.Article)) {
+            return false;
+        }
+        Pattern apsJournalSuffixPattern = Pattern.compile("([\\w]+\\.)([\\w]+\\.)([\\w]+)");
+        String suffix = doiAsString.substring(doiAsString.lastIndexOf('/') + 1);
+        return apsJournalSuffixPattern.matcher(suffix).matches();
     }
 }
