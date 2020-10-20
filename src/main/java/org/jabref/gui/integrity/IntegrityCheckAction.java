@@ -76,7 +76,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 dialog.showAndWait();
             }
         });
-        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
+        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
 
         dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),

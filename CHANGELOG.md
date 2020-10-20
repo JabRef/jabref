@@ -17,9 +17,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
 - We added a DOI format and organization check to detect [American Physical Society](https://journals.aps.org/) journals to copy the article ID
 to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
+- We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 
 ### Changed
 
+- We changed the default preferences for OpenOffice/LibreOffice integration to automatically sync the bibliography when
+inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://github.com/JabRef/jabref/issues/6957)
 - We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
@@ -35,6 +38,8 @@ to the page field for cases where the page numbers are missing. [#7019](https://
 - We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 - We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
 - We changed in the group interface "Generate groups from keywords in a BibTeX field" by "Generate groups from keywords in the following field". [#6983](https://github.com/JabRef/jabref/issues/6983)
+- We changed the name of a group type from "Searching for keywords" to "Searching for a keyword". [6995](https://github.com/JabRef/jabref/pull/6995)
+- We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
 
 ### Fixed
 
@@ -49,9 +54,15 @@ to the page field for cases where the page numbers are missing. [#7019](https://
 - We fixed an issue where a remove icon was shown for standard entry types in the custom entry types dialog. [#6906](https://github.com/JabRef/jabref/issues/6906)
 - We fixed an issue where it was impossible to connect to OpenOffice/LibreOffice on Mac OSX. [#6970](https://github.com/JabRef/jabref/pull/6970)
 - We fixed an issue with the python script used by browser plugins that failed to locate JabRef if not installed in its default location. [#6963](https://github.com/JabRef/jabref/pull/6963/files)
+- We fixed an issue where spaces and newlines in an isbn would generate an exception. [#6456](https://github.com/JabRef/jabref/issues/6456)
 - We fixed an issue where identity column header had incorrect foreground color in the  Dark theme. [#6796](https://github.com/JabRef/jabref/issues/6796)
+- We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
+- We fixed an issue, when pulling changes from shared database via shortcut caused creation a new new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
+- We fixed an issue where the JabRef GUI does not highlight the "All entries" group on start-up [#6691](https://github.com/JabRef/jabref/issues/6691)
 
 ### Removed
+
+- We removed the menu entry "Manage external file types" because it's already in 'Preferences' dialog [#6991](https://github.com/JabRef/jabref/issues/6991)
 
 ## [5.1] – 2020-08-30
 
