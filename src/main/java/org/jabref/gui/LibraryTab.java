@@ -1,16 +1,22 @@
 package org.jabref.gui;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -34,6 +40,7 @@ import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.UpdateField;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -45,7 +52,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -53,9 +60,9 @@ import com.tobiasdiez.easybind.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasePanel extends StackPane {
+public class LibraryTab extends Tab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BasePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
@@ -71,39 +78,45 @@ public class BasePanel extends StackPane {
 
     private final EntryEditor entryEditor;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+
     private MainTable mainTable;
-    private BasePanelPreferences preferences;
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private SplitPane splitPane;
     private DatabaseChangePane changePane;
     private boolean saving;
     private PersonNameSuggestionProvider searchAutoCompleter;
-    private boolean baseChanged;
-    private boolean nonUndoableChange;
+
+    private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
     // Used to track whether the base has changed since last save.
+
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
-    @SuppressWarnings({"FieldCanBeLocal", "unused"}) private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
-    public BasePanel(JabRefFrame frame, BasePanelPreferences preferences, BibDatabaseContext bibDatabaseContext, ExternalFileTypes externalFileTypes) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public LibraryTab(JabRefFrame frame,
+                      PreferencesService preferencesService,
+                      BibDatabaseContext bibDatabaseContext,
+                      ExternalFileTypes externalFileTypes) {
         this.frame = Objects.requireNonNull(frame);
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.undoManager = frame.getUndoManager();
         this.dialogService = frame.getDialogService();
+        this.preferencesService = Objects.requireNonNull(preferencesService);
 
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), Globals.prefs, Globals.stateManager);
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext, Globals.prefs.getFilePreferences());
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
 
         setupMainPanel();
         setupAutoCompletion();
@@ -116,14 +129,129 @@ public class BasePanel extends StackPane {
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
 
-        this.getDatabase().registerListener(new UpdateTimestampListener(Globals.prefs));
+        this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
 
         this.entryEditor = new EntryEditor(this, externalFileTypes);
+
+        Platform.runLater(() -> {
+            EasyBind.subscribe(changedProperty, this::updateTabTitle);
+            Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+                    updateTabTitle(changedProperty.getValue()));
+        });
+    }
+
+    /**
+     * Sets the title of the tab
+     *   modification-asterisk filename – path-fragment
+     *
+     * The modification-asterisk (*) is shown if the file was modified since last save
+     * (path-fragment is only shown if filename is not (globally) unique)
+     *
+     * Example:
+     *   *jabref-authors.bib – testbib
+     */
+    public void updateTabTitle(boolean isChanged) {
+        boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
+
+        DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
+        Optional<Path> file = bibDatabaseContext.getDatabasePath();
+
+        StringBuilder tabTitle = new StringBuilder();
+        StringBuilder toolTipText = new StringBuilder();
+
+        if (file.isPresent()) {
+            // Modification asterisk
+            if (isChanged && !isAutosaveEnabled) {
+                tabTitle.append('*');
+            }
+
+            // Filename
+            Path databasePath = file.get();
+            String fileName = databasePath.getFileName().toString();
+            tabTitle.append(fileName);
+            toolTipText.append(databasePath.toAbsolutePath().toString());
+
+            if (databaseLocation == DatabaseLocation.SHARED) {
+                tabTitle.append(" \u2013 ");
+                addSharedDbInformation(tabTitle, bibDatabaseContext);
+                toolTipText.append(' ');
+                addSharedDbInformation(toolTipText, bibDatabaseContext);
+            }
+
+            // Database mode
+            addModeInfo(toolTipText, bibDatabaseContext);
+
+            // Changed information (tooltip)
+            if (isChanged && !isAutosaveEnabled) {
+                addChangedInformation(toolTipText, fileName);
+            }
+
+            // Unique path fragment
+            List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
+            Optional<String> uniquePathPart = uniquePathParts.stream()
+                                                         .filter(part -> databasePath.toString().contains(part)
+                                                                 && !part.equals(fileName) && part.contains(File.separator))
+                                                         .findFirst();
+            if (uniquePathPart.isPresent()) {
+                String uniquePath = uniquePathPart.get();
+                // remove filename
+                uniquePath = uniquePath.substring(0, uniquePath.lastIndexOf(File.separator));
+                tabTitle.append(" \u2013 ").append(uniquePath);
+            }
+        } else {
+            if (databaseLocation == DatabaseLocation.LOCAL) {
+                tabTitle.append(Localization.lang("untitled"));
+                if (bibDatabaseContext.getDatabase().hasEntries()) {
+                    // if the database is not empty and no file is assigned,
+                    // the database came from an import and has to be treated somehow
+                    // -> mark as changed
+                    tabTitle.append('*');
+                }
+            } else {
+                addSharedDbInformation(tabTitle, bibDatabaseContext);
+                addSharedDbInformation(toolTipText, bibDatabaseContext);
+            }
+            addModeInfo(toolTipText, bibDatabaseContext);
+            if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
+                addChangedInformation(toolTipText, Localization.lang("untitled"));
+            }
+        }
+
+        textProperty().setValue(tabTitle.toString());
+        setTooltip(new Tooltip(toolTipText.toString()));
+    }
+
+    private static void addChangedInformation(StringBuilder text, String fileName) {
+        text.append("\n");
+        text.append(Localization.lang("Library '%0' has changed.", fileName));
+    }
+
+    private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        String mode = bibDatabaseContext.getMode().getFormattedName();
+        String modeInfo = String.format("\n%s", Localization.lang("%0 mode", mode));
+        text.append(modeInfo);
+    }
+
+    private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());
+        text.append(" [");
+        text.append(Localization.lang("shared"));
+        text.append("]");
+    }
+
+    private List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        Globals.stateManager.getOpenDatabases().stream()
+                            .map(BibDatabaseContext::getDatabasePath)
+                            .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                    path -> list.add(path.toAbsolutePath().toString()),
+                                    () -> list.add("")));
+        return list;
     }
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.markBaseChanged();
+        this.changedProperty.setValue(true);
     }
 
     /**
@@ -131,39 +259,6 @@ public class BasePanel extends StackPane {
      */
     public SuggestionProviders getSuggestionProviders() {
         return suggestionProviders;
-    }
-
-    public String getTabTitle() {
-        StringBuilder title = new StringBuilder();
-        DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
-        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
-
-        if (databaseLocation == DatabaseLocation.LOCAL) {
-            if (this.bibDatabaseContext.getDatabasePath().isPresent()) {
-                title.append(this.bibDatabaseContext.getDatabasePath().get().getFileName());
-                if (isModified() && !isAutosaveEnabled) {
-                    title.append("*");
-                }
-            } else {
-                title.append(Localization.lang("untitled"));
-
-                if (getDatabase().hasEntries()) {
-                    // if the database is not empty and no file is assigned,
-                    // the database came from an import and has to be treated somehow
-                    // -> mark as changed
-                    // This also happens internally at basepanel to ensure consistency line 224
-                    title.append('*');
-                }
-            }
-        } else if (databaseLocation == DatabaseLocation.SHARED) {
-            title.append(this.bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
-        }
-
-        return title.toString();
-    }
-
-    public boolean isModified() {
-        return baseChanged;
     }
 
     public BasePanelMode getMode() {
@@ -176,10 +271,6 @@ public class BasePanel extends StackPane {
 
     public JabRefFrame frame() {
         return frame;
-    }
-
-    public void output(String s) {
-        dialogService.notify(s);
     }
 
     /**
@@ -210,8 +301,8 @@ public class BasePanel extends StackPane {
         bibDatabaseContext.getDatabase().removeEntries(entries);
         ensureNotShowingBottomPanel(entries);
 
-        markBaseChanged();
-        this.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+        this.changedProperty.setValue(true);
+        dialogService.notify(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
@@ -255,14 +346,14 @@ public class BasePanel extends StackPane {
                 UpdateField.setAutomaticFields(entry,
                         true,
                         true,
-                        Globals.prefs.getOwnerPreferences(),
-                        Globals.prefs.getTimestampPreferences());
+                        preferencesService.getOwnerPreferences(),
+                        preferencesService.getTimestampPreferences());
             }
             // Create an UndoableInsertEntries object.
             getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
 
-            markBaseChanged(); // The database just changed.
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
+            this.changedProperty.setValue(true); // The database just changed.
+            if (preferencesService.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
                 showAndEdit(entries.get(0));
             }
             clearAndSelect(entries.get(0));
@@ -284,11 +375,11 @@ public class BasePanel extends StackPane {
         mainTable = new MainTable(tableModel,
                 this,
                 bibDatabaseContext,
-                Globals.prefs,
+                preferencesService,
                 dialogService,
                 Globals.stateManager,
                 externalFileTypes,
-                preferences.getKeyBindings());
+                Globals.getKeyPrefs());
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
@@ -301,11 +392,8 @@ public class BasePanel extends StackPane {
     }
 
     public void setupMainPanel() {
-        preferences = BasePanelPreferences.from(Globals.prefs);
-
         splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.VERTICAL);
-        adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         createMainTable();
 
@@ -327,10 +415,10 @@ public class BasePanel extends StackPane {
                 // if the database is not empty and no file is assigned,
                 // the database came from an import and has to be treated somehow
                 // -> mark as changed
-                this.baseChanged = true;
+                this.changedProperty.setValue(true);
             }
             changePane = null;
-            getChildren().add(splitPane);
+            this.setContent(splitPane);
         }
     }
 
@@ -338,7 +426,7 @@ public class BasePanel extends StackPane {
      * Set up auto completion for this database
      */
     private void setupAutoCompletion() {
-        AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();
+        AutoCompletePreferences autoCompletePreferences = preferencesService.getAutoCompletePreferences();
         if (autoCompletePreferences.shouldAutoComplete()) {
             suggestionProviders = new SuggestionProviders(getDatabase(), Globals.journalAbbreviationRepository);
         } else {
@@ -350,12 +438,6 @@ public class BasePanel extends StackPane {
 
     public void updateSearchManager() {
         frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
-    }
-
-    private void adjustSplitter() {
-        if (mode == BasePanelMode.SHOWING_EDITOR) {
-            splitPane.setDividerPositions(preferences.getEntryEditorDividerPosition());
-        }
     }
 
     public EntryEditor getEntryEditor() {
@@ -390,7 +472,8 @@ public class BasePanel extends StackPane {
             splitPane.getItems().add(1, pane);
         }
         mode = newMode;
-        adjustSplitter();
+
+        splitPane.setDividerPositions(preferencesService.getEntryEditorPreferences().getDividerPosition());
     }
 
     /**
@@ -407,16 +490,6 @@ public class BasePanel extends StackPane {
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
-    }
-
-    /**
-     * Select and open entry editor for first entry in main table.
-     */
-    private void clearAndSelectFirst() {
-        mainTable.clearAndSelectFirst();
-        if (!mainTable.getSelectedEntries().isEmpty()) {
-            showAndEdit(mainTable.getSelectedEntries().get(0));
-        }
     }
 
     public void selectPreviousEntry() {
@@ -455,32 +528,16 @@ public class BasePanel extends StackPane {
         }
     }
 
-    public void markBaseChanged() {
-        baseChanged = true;
-        // Put an asterisk behind the filename to indicate the database has changed.
-        frame.setWindowTitle();
-        DefaultTaskExecutor.runInJavaFXThread(frame::updateAllTabTitles);
-    }
-
-    public void markNonUndoableBaseChanged() {
-        nonUndoableChange = true;
-        markBaseChanged();
-    }
+    /**
+     * Put an asterisk behind the filename to indicate the database has changed.
+     */
 
     public synchronized void markChangedOrUnChanged() {
         if (getUndoManager().hasChanged()) {
-            if (!baseChanged) {
-                markBaseChanged();
-            }
-        } else if (baseChanged && !nonUndoableChange) {
-            baseChanged = false;
-            if (getBibDatabaseContext().getDatabasePath().isPresent()) {
-                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
-            } else {
-                frame.setTabTitle(this, Localization.lang("untitled"), null);
-            }
+            this.changedProperty.setValue(true);
+        } else if (changedProperty.getValue() && !nonUndoableChangeProperty.getValue()) {
+            this.changedProperty.setValue(false);
         }
-        frame.setWindowTitle();
     }
 
     public BibDatabase getDatabase() {
@@ -488,7 +545,7 @@ public class BasePanel extends StackPane {
     }
 
     private boolean showDeleteConfirmationDialog(int numberOfEntries) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE)) {
+        if (preferencesService.getGeneralPreferences().shouldConfirmDelete()) {
             String title = Localization.lang("Delete entry");
             String message = Localization.lang("Really delete the selected entry?");
             String okButton = Localization.lang("Delete entry");
@@ -505,7 +562,8 @@ public class BasePanel extends StackPane {
                     okButton,
                     cancelButton,
                     Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, !optOut));
+                    optOut -> preferencesService.storeGeneralPreferences(
+                            preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
         } else {
             return true;
         }
@@ -517,7 +575,8 @@ public class BasePanel extends StackPane {
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            preferences.setEntryEditorDividerPosition(position.doubleValue());
+            preferencesService.storeEntryEditorPreferences(
+                    preferencesService.getEntryEditorPreferences().withDividerPosition(position.doubleValue()));
         }
     }
 
@@ -544,14 +603,6 @@ public class BasePanel extends StackPane {
 
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
-    }
-
-    public void setNonUndoableChange(boolean nonUndoableChange) {
-        this.nonUndoableChange = nonUndoableChange;
-    }
-
-    public void setBaseChanged(boolean baseChanged) {
-        this.baseChanged = baseChanged;
     }
 
     public boolean isSaving() {
@@ -603,7 +654,7 @@ public class BasePanel extends StackPane {
 
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
-        this.getChildren().setAll(changePane);
+        this.setContent(changePane);
     }
 
     public void copy() {
@@ -618,6 +669,32 @@ public class BasePanel extends StackPane {
         mainTable.cut();
     }
 
+    public BooleanProperty changedProperty() {
+        return changedProperty;
+    }
+
+    public boolean isModified() {
+        return changedProperty.getValue();
+    }
+
+    public void markBaseChanged() {
+        this.changedProperty.setValue(true);
+    }
+
+    public BooleanProperty nonUndoableChangeProperty() {
+        return nonUndoableChangeProperty;
+    }
+
+    public void markNonUndoableBaseChanged() {
+        this.nonUndoableChangeProperty.setValue(true);
+        this.changedProperty.setValue(true);
+    }
+
+    public void resetChangedProperties() {
+        this.nonUndoableChangeProperty.setValue(false);
+        this.changedProperty.setValue(false);
+    }
+
     private class GroupTreeListener {
 
         @Subscribe
@@ -628,7 +705,7 @@ public class BasePanel extends StackPane {
             }
 
             // Automatically add new entries to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
+            if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }

@@ -76,9 +76,9 @@ public class SpecialFieldAction extends SimpleCommand {
             }
             ce.end();
             if (ce.hasEdits()) {
-                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
-                frame.getCurrentBasePanel().markBaseChanged();
-                frame.getCurrentBasePanel().updateEntryEditorIfShowing();
+                frame.getCurrentLibraryTab().getUndoManager().addEdit(ce);
+                frame.getCurrentLibraryTab().markBaseChanged();
+                frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));

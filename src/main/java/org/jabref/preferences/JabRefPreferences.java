@@ -1526,10 +1526,10 @@ public class JabRefPreferences implements PreferencesService {
         put(DEFAULT_ENCODING, preferences.getDefaultEncoding().name());
         putBoolean(BIBLATEX_DEFAULT_MODE, (preferences.getDefaultBibDatabaseMode() == BibDatabaseMode.BIBLATEX));
         putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, preferences.isWarnAboutDuplicatesInInspection());
-        putBoolean(CONFIRM_DELETE, preferences.isConfirmDelete());
-        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.isAllowIntegerEditionBibtex());
+        putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
+        putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
-        setShouldCollectTelemetry(preferences.isCollectTelemetry());
+        setShouldCollectTelemetry(preferences.shouldCollectTelemetry());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
     }
 
@@ -1735,7 +1735,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
-                getBoolean(VALIDATE_IN_ENTRY_EDITOR));
+                getBoolean(VALIDATE_IN_ENTRY_EDITOR),
+                getDouble(ENTRY_EDITOR_HEIGHT));
     }
 
     @Override
@@ -1747,6 +1748,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
         putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+        putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
     //*************************************************************************************************************

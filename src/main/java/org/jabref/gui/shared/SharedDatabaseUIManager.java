@@ -9,10 +9,10 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
@@ -66,7 +66,7 @@ public class SharedDatabaseUIManager {
                 new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
-                jabRefFrame.refreshTitleAndTabs();
+                // jabRefFrame.refreshWindowAndTabTitles();
                 jabRefFrame.getDialogService().notify(Localization.lang("Working offline."));
             }
         } else {
@@ -115,10 +115,10 @@ public class SharedDatabaseUIManager {
 
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
-        BasePanel panel = jabRefFrame.getCurrentBasePanel();
-        EntryEditor entryEditor = panel.getEntryEditor();
+        LibraryTab libraryTab = jabRefFrame.getCurrentLibraryTab();
+        EntryEditor entryEditor = libraryTab.getEntryEditor();
 
-        panel.getUndoManager().addEdit(new UndoableRemoveEntries(panel.getDatabase(), event.getBibEntries()));
+        libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.getBibEntries()));
 
         if (Objects.nonNull(entryEditor) && (event.getBibEntries().contains(entryEditor.getEntry()))) {
 
@@ -126,7 +126,7 @@ public class SharedDatabaseUIManager {
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
                             + Localization.lang("You can restore the entry using the \"Undo\" operation."));
-            panel.closeBottomPane();
+            libraryTab.closeBottomPane();
         }
     }
 
@@ -136,7 +136,7 @@ public class SharedDatabaseUIManager {
      * @param dbmsConnectionProperties Connection data
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
-    public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
+    public LibraryTab openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
