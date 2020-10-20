@@ -1,4 +1,5 @@
 package org.jabref.logic.util.strings;
+
 import org.jabref.model.util.ResultingEmacsState;
 
 public class EmacsStringManipulator {

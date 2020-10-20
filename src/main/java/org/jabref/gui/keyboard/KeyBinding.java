@@ -15,9 +15,9 @@ public enum KeyBinding {
     EMACS_CAPITALIZE("Emacs capitalize word", Localization.lang("Capitalize current word"), "alt+C", KeyBindingCategory.EDIT),
     EMACS_LOWERCASE("Emacs lowercase word", Localization.lang("Make current word lowercase"), "alt+L", KeyBindingCategory.EDIT),
     EMACS_UPPERCASE("Emacs uppercase word", Localization.lang("Make current word uppercase"), "alt+U", KeyBindingCategory.EDIT),
-    EMACS_KILLLINE("Emacs remove line", Localization.lang("Remove line after caret"), "ctrl+K", KeyBindingCategory.EDIT),
-    EMACS_KILLWORD("Emacs remove word forwards", Localization.lang("Remove current word forwards"), "alt+D", KeyBindingCategory.EDIT),
-    EMACS_BACKWARDKILLWORD("Emacs remove word backwards", Localization.lang("Remove the current word backwards"), "alt+DELETE", KeyBindingCategory.EDIT),
+    EMACS_KILL_LINE("Emacs remove all characters caret to end of line", Localization.lang("Remove line after caret"), "ctrl+K", KeyBindingCategory.EDIT),
+    EMACS_KILL_WORD("Emacs remove characters until next word", Localization.lang("Remove characters until next word"), "alt+D", KeyBindingCategory.EDIT),
+    EMACS_KILL_WORD_BACKWARD("Emacs characters until previous word", Localization.lang("Remove the current word backwards"), "alt+DELETE", KeyBindingCategory.EDIT),
 
     ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl+alt+A", KeyBindingCategory.TOOLS),
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "ctrl+G", KeyBindingCategory.QUALITY),
