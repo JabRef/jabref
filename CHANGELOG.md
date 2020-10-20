@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a query parser and mapping layer to enable conversion of queries formulated in simplified lucene syntax by the user into api queries. [#6799](https://github.com/JabRef/jabref/pull/6799)
 - We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
+- We added a DOI format and organization check to detect [American Physical Society](https://journals.aps.org/) journals to copy the article ID
+to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
 - We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 
 ### Changed
