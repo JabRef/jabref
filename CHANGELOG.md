@@ -59,6 +59,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We fixed an issue where clicking on Collapse All button in the Search for Unlinked Local Files expanded the directory structure erroneously [#6848](https://github.com/JabRef/jabref/issues/6848)
 - We fixed an issue, when pulling changes from shared database via shortcut caused creation a new new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
 - We fixed an issue where the JabRef GUI does not highlight the "All entries" group on start-up [#6691](https://github.com/JabRef/jabref/issues/6691)
+- We fixed an issue, when JabRef tried to pull changes from shared database, when you are connected to local db [#6959](https://github.com/JabRef/jabref/issues/6959)
 
 ### Removed
 
