@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -16,6 +17,7 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -86,6 +88,12 @@ public class JabRefGUI {
 
         Scene scene = new Scene(root, 800, 800);
         Globals.prefs.getTheme().installCss(scene);
+
+        // Handle Emacs key bindings
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            EmacsKeyBindings.executeEmacs(scene, event, Globals.prefs);
+        });
+
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
         mainStage.setScene(scene);
@@ -219,14 +227,13 @@ public class JabRefGUI {
      */
     private void debugLogWindowState(Stage mainStage) {
         if (LOGGER.isDebugEnabled()) {
-            StringBuilder debugLogString = new StringBuilder();
-            debugLogString.append("SCREEN DATA:");
-            debugLogString.append("mainStage.WINDOW_MAXIMISED: ").append(mainStage.isMaximized()).append("\n");
-            debugLogString.append("mainStage.POS_X: ").append(mainStage.getX()).append("\n");
-            debugLogString.append("mainStage.POS_Y: ").append(mainStage.getY()).append("\n");
-            debugLogString.append("mainStage.SIZE_X: ").append(mainStage.getWidth()).append("\n");
-            debugLogString.append("mainStages.SIZE_Y: ").append(mainStage.getHeight()).append("\n");
-            LOGGER.debug(debugLogString.toString());
+            String debugLogString = "SCREEN DATA:" +
+                    "mainStage.WINDOW_MAXIMISED: " + mainStage.isMaximized() + "\n" +
+                    "mainStage.POS_X: " + mainStage.getX() + "\n" +
+                    "mainStage.POS_Y: " + mainStage.getY() + "\n" +
+                    "mainStage.SIZE_X: " + mainStage.getWidth() + "\n" +
+                    "mainStages.SIZE_Y: " + mainStage.getHeight() + "\n";
+            LOGGER.debug(debugLogString);
         }
     }
 

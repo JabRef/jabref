@@ -43,6 +43,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.keyboard.EmacsKeyPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -175,6 +176,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
+    public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CN = "editorEMACSkeyBindingsRebindCN";
+    public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_AU = "editorEMACSkeyBindingsRebindAU";
+    public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -527,6 +531,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CN, Boolean.TRUE);
+        defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_AU, Boolean.TRUE);
         defaults.put(AUTO_COMPLETE, Boolean.FALSE);
         defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
@@ -2448,6 +2454,25 @@ public class JabRefPreferences implements PreferencesService {
     public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
         putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
         putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
+    }
+
+    @Override
+    public EmacsKeyPreferences getEmacsKeyPreferences() {
+        return new EmacsKeyPreferences(
+                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS),
+                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA),
+                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF),
+                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN),
+                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU));
+    }
+
+    @Override
+    public void storeEmacsKeyPreferences(EmacsKeyPreferences preferences) {
+        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, preferences.useEmacsKeyBindings());
+        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, preferences.shouldRebindCA());
+        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, preferences.shouldRebindCF());
+        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN, preferences.shouldRebindCN());
+        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU, preferences.shouldRebindAU());
     }
 
     @Override

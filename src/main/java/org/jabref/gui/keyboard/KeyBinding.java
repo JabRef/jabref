@@ -3,6 +3,21 @@ package org.jabref.gui.keyboard;
 import org.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
+    EMACS_DELETE("Emacs delete", Localization.lang("Delete text"), "ctrl+D", KeyBindingCategory.EDIT),
+    EMACS_BACKWARD("Emacs move caret left", Localization.lang("Move caret left"), "ctrl+B", KeyBindingCategory.EDIT),
+    EMACS_FORWARD("Emacs move caret right", Localization.lang("Move caret right"), "ctrl+F", KeyBindingCategory.EDIT),
+    EMACS_BEGINNING("Emacs move caret to beginning of line", Localization.lang("Move caret to beginning of line"), "ctrl+A", KeyBindingCategory.EDIT),
+    EMACS_END("Emacs move caret to  of line", Localization.lang("Move caret to end of line"), "ctrl+E", KeyBindingCategory.EDIT),
+    EMACS_BEGINNING_DOC("Emacs move caret to beginning of text", Localization.lang("Move the caret to the beginning of text"), "alt+LESS", KeyBindingCategory.EDIT),
+    EMACS_END_DOC("Emacs move caret to end of text", Localization.lang("Move the caret to the end of text"), "alt+shift+LESS", KeyBindingCategory.EDIT),
+    EMACS_UP("Emacs move caret up", Localization.lang("Move the caret up"), "ctrl+P", KeyBindingCategory.EDIT),
+    EMACS_DOWN("Emacs move caret down", Localization.lang("Move the caret down"), "ctrl+N", KeyBindingCategory.EDIT),
+    EMACS_CAPITALIZE("Emacs capitalize word", Localization.lang("Capitalize current word"), "alt+C", KeyBindingCategory.EDIT),
+    EMACS_LOWERCASE("Emacs lowercase word", Localization.lang("Make current word lowercase"), "alt+L", KeyBindingCategory.EDIT),
+    EMACS_UPPERCASE("Emacs uppercase word", Localization.lang("Make current word uppercase"), "alt+U", KeyBindingCategory.EDIT),
+    EMACS_KILLLINE("Emacs remove line", Localization.lang("Remove line after caret"), "ctrl+K", KeyBindingCategory.EDIT),
+    EMACS_KILLWORD("Emacs remove word forwards", Localization.lang("Remove current word forwards"), "alt+D", KeyBindingCategory.EDIT),
+    EMACS_BACKWARDKILLWORD("Emacs remove word backwards", Localization.lang("Remove the current word backwards"), "alt+DELETE", KeyBindingCategory.EDIT),
 
     ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl+alt+A", KeyBindingCategory.TOOLS),
     AUTOGENERATE_CITATION_KEYS("Autogenerate citation keys", Localization.lang("Autogenerate citation keys"), "ctrl+G", KeyBindingCategory.QUALITY),

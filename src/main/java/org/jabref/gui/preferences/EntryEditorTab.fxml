@@ -27,7 +27,27 @@
     </CheckBox>
     <CheckBox fx:id="enableLatexCitationsTab" text="%Show 'LaTeX Citations' tab"/>
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
-
+    <CheckBox fx:id="enableEmacsKeyBindings" text="%Use Emacs key bindings"/>
+    <CheckBox fx:id="enableEmacsRebindCA" text="%Rebind C-a" disable="${!enableEmacsKeyBindings.selected}">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </CheckBox>
+    <CheckBox fx:id="enableEmacsRebindCF" text="%Rebind C-f" disable="${!enableEmacsKeyBindings.selected}">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </CheckBox>
+    <CheckBox fx:id="enableEmacsRebindCN" text="%Rebind C-n" disable="${!enableEmacsKeyBindings.selected}">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </CheckBox>
+    <CheckBox fx:id="enableEmacsRebindAU" text="%Rebind A-u" disable="${!enableEmacsKeyBindings.selected}">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </CheckBox>
     <Label styleClass="sectionHeader" text="%Autocompletion"/>
     <CheckBox fx:id="enableAutoComplete" text="%Use autocompletion"/>
     <VBox spacing="10.0">
