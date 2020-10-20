@@ -104,7 +104,6 @@ public enum StandardActions implements Action {
     MANAGE_CUSTOM_IMPORTS(Localization.lang("Manage custom imports")),
     CUSTOMIZE_ENTRY_TYPES(Localization.lang("Customize entry types")),
     SETUP_GENERAL_FIELDS(Localization.lang("Set up general fields")),
-    MANAGE_EXTERNAL_FILETYPES(Localization.lang("Manage external file types")),
     MANAGE_PROTECTED_TERMS(Localization.lang("Manage protected terms")),
     CITATION_KEY_PATTERN(Localization.lang("Citation key patterns")),
     SHOW_PREFS(Localization.lang("Preferences")),

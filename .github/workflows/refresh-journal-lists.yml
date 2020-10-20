@@ -1,9 +1,6 @@
 name: Refresh Journal Lists
 
 on:
-  schedule:
-    # run on 1st and 15th of each month
-    - cron: '2 20 1,15 * *'
   workflow_dispatch:
     # Allow to run manually
 
