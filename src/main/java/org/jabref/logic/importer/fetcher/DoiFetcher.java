@@ -39,6 +39,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     private static final String APS_JOURNAL_ORG_DOI_ID = "1103";
     private static final String APS_SUFFIX = "([\\w]+\\.)([\\w]+\\.)([\\w]+)";
+    private static final Pattern APS_SUFFIX_PATTERN = Pattern.compile(APS_SUFFIX);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
@@ -148,9 +149,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         if (!entry.getType().equals(StandardEntryType.Article)) {
             return false;
         }
-        Pattern apsSuffixPattern = Pattern.compile(APS_SUFFIX);
         String suffix = doiAsString.substring(doiAsString.lastIndexOf('/') + 1);
         String organizationId = doiAsString.substring(doiAsString.indexOf('.') + 1, doiAsString.indexOf('/'));
-        return organizationId.equals(APS_JOURNAL_ORG_DOI_ID) && apsSuffixPattern.matcher(suffix).matches();
+        return organizationId.equals(APS_JOURNAL_ORG_DOI_ID) && APS_SUFFIX_PATTERN.matcher(suffix).matches();
     }
 }
