@@ -40,7 +40,6 @@ public class TemplateExporter extends Exporter {
     private static final String BEGIN_INFIX = ".begin";
     private static final String END_INFIX = ".end";
 
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TemplateExporter.class);
 
     private final String lfFileName;

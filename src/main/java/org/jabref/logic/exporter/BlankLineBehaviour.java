@@ -1,7 +1,7 @@
 package org.jabref.logic.exporter;
 
 /**
- this enum represents the behaviour for blank lines in {@link TemplateExporter}
+ * This enum represents the behaviour for blank lines in {@link TemplateExporter}
  */
 public enum BlankLineBehaviour {
     KEEP_BLANKS,
