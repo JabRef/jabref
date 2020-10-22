@@ -32,6 +32,7 @@ import org.jabref.logic.layout.format.AuthorLastFirstOxfordCommas;
 import org.jabref.logic.layout.format.AuthorNatBib;
 import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
+import org.jabref.logic.layout.format.CSLType;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBook4Authors;
@@ -539,6 +540,8 @@ class LayoutEntry {
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
             case "Markdown":
                 return new MarkdownFormatter();
+            case "CSLType":
+                return new CSLType();
             default:
                 return null;
         }
