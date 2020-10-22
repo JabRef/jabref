@@ -1,5 +1,7 @@
 package org.jabref.logic.util.strings;
 
+import java.util.regex.Pattern;
+
 import org.jabref.model.util.ResultingEmacsState;
 
 public class EmacsStringManipulator {
@@ -13,7 +15,9 @@ public class EmacsStringManipulator {
         NEXT, PREVIOUS
     }
 
-    private static ResultingEmacsState setNextWordsCase(String text, int pos, LetterCase targetCase) {
+    Pattern WORDCHAR = Pattern.compile("\\w");
+
+    private ResultingEmacsState setNextWordsCase(String text, int pos, LetterCase targetCase) {
         StringBuilder res = new StringBuilder();
 
         boolean firstLetter = true;
@@ -22,18 +26,18 @@ public class EmacsStringManipulator {
         StringBuilder newWordBuilder = new StringBuilder();
         for (; i < text.length(); i++) {
             // Swallow whitespace
-            while (firstLoop && i < text.length() && !String.valueOf(text.charAt(i)).matches("\\w")) {
+            while (firstLoop && i < text.length() && !WORDCHAR.matcher(String.valueOf(text.charAt(i))).matches()) {
                 newWordBuilder.append(text.charAt(i));
                 i++;
             }
             if (i >= text.length()) {
                 break;
             }
-            if (firstLoop) {
-                firstLoop = false;
-            }
+
+            firstLoop = false;
+
             char currentChar = text.charAt(i);
-            if (String.valueOf(currentChar).matches("\\w")) {
+            if (WORDCHAR.matcher(String.valueOf(currentChar)).matches()) {
                 switch (targetCase) {
                     case UPPER:
                         newWordBuilder.append(Character.toUpperCase(currentChar));
@@ -70,7 +74,7 @@ public class EmacsStringManipulator {
      * @param dir The direction to search.
      * @return The resulting text and caret position.
      */
-    public static ResultingEmacsState deleteUntilWordBoundary(int pos, String text, Direction dir) {
+    public ResultingEmacsState deleteUntilWordBoundary(int pos, String text, Direction dir) {
         StringBuilder res = new StringBuilder();
         int offset;
         int wordBreak;
@@ -97,7 +101,7 @@ public class EmacsStringManipulator {
                     i += offset;
                 }
             }
-            if (!(i < text.length() && i >= 0) || !String.valueOf(text.charAt(i)).matches("\\w")) {
+            if (!(i < text.length() && i >= 0) || !WORDCHAR.matcher(String.valueOf(text.charAt(i))).matches()) {
                 wordBreak = i;
                 break;
             }
@@ -128,7 +132,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public static ResultingEmacsState capitalize(int pos, String text) {
+    public ResultingEmacsState capitalize(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.CAPITALIZED);
     }
 
@@ -139,7 +143,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public static ResultingEmacsState uppercase(int pos, String text) {
+    public ResultingEmacsState uppercase(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.UPPER);
     }
 
@@ -150,7 +154,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public static ResultingEmacsState lowercase(int pos, String text) {
+    public ResultingEmacsState lowercase(int pos, String text) {
         return setNextWordsCase(text, pos, LetterCase.LOWER);
     }
 
@@ -161,7 +165,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public static ResultingEmacsState killWord(int pos, String text) {
+    public ResultingEmacsState killWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.NEXT);
     }
 
@@ -172,7 +176,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public static ResultingEmacsState backwardKillWord(int pos, String text) {
+    public ResultingEmacsState backwardKillWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.PREVIOUS);
     }
 }
