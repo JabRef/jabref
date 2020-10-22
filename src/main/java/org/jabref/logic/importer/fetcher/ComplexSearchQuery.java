@@ -15,15 +15,17 @@ public class ComplexSearchQuery {
     private final List<String> defaultField;
     private final List<String> authors;
     private final List<String> titlePhrases;
+    private final List<String> abstractPhrases;
     private final Integer fromYear;
     private final Integer toYear;
     private final Integer singleYear;
     private final String journal;
 
-    private ComplexSearchQuery(List<String> defaultField, List<String> authors, List<String> titlePhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal) {
+    private ComplexSearchQuery(List<String> defaultField, List<String> authors, List<String> titlePhrases, List<String> abstractPhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal) {
         this.defaultField = defaultField;
         this.authors = authors;
         this.titlePhrases = titlePhrases;
+        this.abstractPhrases = abstractPhrases;
         this.fromYear = fromYear;
         // Some APIs do not support, or not fully support, year based search. In these cases, the non applicable parameters are ignored.
         this.toYear = toYear;
@@ -38,6 +40,7 @@ public class ComplexSearchQuery {
             switch (term.field().toLowerCase()) {
                 case "author" -> builder.author(termText);
                 case "title" -> builder.titlePhrase(termText);
+                case "abstract" -> builder.abstractPhrase(termText);
                 case "journal" -> builder.journal(termText);
                 case "year" -> builder.singleYear(Integer.valueOf(termText));
                 case "year-range" -> builder.parseYearRange(termText);
@@ -58,6 +61,10 @@ public class ComplexSearchQuery {
 
     public List<String> getTitlePhrases() {
         return titlePhrases;
+    }
+
+    public List<String> getAbstractPhrases() {
+        return abstractPhrases;
     }
 
     public Optional<Integer> getFromYear() {
@@ -101,6 +108,9 @@ public class ComplexSearchQuery {
         if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) && that.getTitlePhrases().containsAll(getTitlePhrases()))) {
             return false;
         }
+        if (!(getAbstractPhrases().containsAll(that.getAbstractPhrases()) && that.getAbstractPhrases().containsAll(getAbstractPhrases()))) {
+            return false;
+        }
         if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent()) {
             return false;
         }
@@ -118,6 +128,7 @@ public class ComplexSearchQuery {
         int result = defaultField != null ? defaultField.hashCode() : 0;
         result = 31 * result + (getAuthors() != null ? getAuthors().hashCode() : 0);
         result = 31 * result + (getTitlePhrases() != null ? getTitlePhrases().hashCode() : 0);
+        result = 31 * result + (getAbstractPhrases() != null ? getTitlePhrases().hashCode() : 0);
         result = 31 * result + (getFromYear().isPresent() ? getFromYear().hashCode() : 0);
         result = 31 * result + (getToYear().isPresent() ? getToYear().hashCode() : 0);
         result = 31 * result + (getSingleYear().isPresent() ? getSingleYear().hashCode() : 0);
@@ -134,7 +145,8 @@ public class ComplexSearchQuery {
         getJournal().ifPresent(journal -> stringRepresentation.append(journal).append(" "));
         stringRepresentation.append(String.join(" ", getTitlePhrases()))
                             .append(String.join(" ", getDefaultFieldPhrases()))
-                            .append(String.join(" ", getAuthors()));
+                            .append(String.join(" ", getAuthors()))
+                            .append(String.join(" ", getAbstractPhrases()));
         return stringRepresentation.toString();
     }
 
@@ -142,6 +154,7 @@ public class ComplexSearchQuery {
         private List<String> defaultFieldPhrases = new ArrayList<>();
         private List<String> authors = new ArrayList<>();
         private List<String> titlePhrases = new ArrayList<>();
+        private List<String> abstractPhrases = new ArrayList<>();
         private String journal;
         private Integer fromYear;
         private Integer toYear;
@@ -183,6 +196,18 @@ public class ComplexSearchQuery {
             return this;
         }
 
+        /**
+         * Adds abstract phrase and wraps it in quotes
+         */
+        public ComplexSearchQueryBuilder abstractPhrase(String abstractPhrase) {
+            if (Objects.requireNonNull(abstractPhrase).isBlank()) {
+                throw new IllegalArgumentException("Parameter must not be blank");
+            }
+            // Strip all quotes before wrapping
+            this.titlePhrases.add(String.format("\"%s\"", abstractPhrase.replace("\"", "")));
+            return this;
+        }
+
         public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
             if (Objects.nonNull(singleYear)) {
                 throw new IllegalArgumentException("You can not use single year and year range search.");
@@ -214,6 +239,7 @@ public class ComplexSearchQuery {
                 switch (term.field().toLowerCase()) {
                     case "author" -> this.author(termText);
                     case "title" -> this.titlePhrase(termText);
+                    case "abstract" -> this.abstractPhrase(termText);
                     case "journal" -> this.journal(termText);
                     case "year" -> this.singleYear(Integer.valueOf(termText));
                     case "year-range" -> this.parseYearRange(termText);
@@ -235,7 +261,7 @@ public class ComplexSearchQuery {
             if (textSearchFieldsAndYearFieldsAreEmpty()) {
                 throw new IllegalStateException("At least one text field has to be set");
             }
-            return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, fromYear, toYear, singleYear, journal);
+            return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, abstractPhrases, fromYear, toYear, singleYear, journal);
         }
 
         void parseYearRange(String termText) {
@@ -259,7 +285,7 @@ public class ComplexSearchQuery {
 
         private boolean textSearchFieldsAndYearFieldsAreEmpty() {
             return this.stringListIsBlank(defaultFieldPhrases) && this.stringListIsBlank(titlePhrases) &&
-                    this.stringListIsBlank(authors) && StringUtil.isBlank(journal) && yearFieldsAreEmpty();
+                    this.stringListIsBlank(authors) && this.stringListIsBlank(abstractPhrases) && StringUtil.isBlank(journal) && yearFieldsAreEmpty();
         }
 
         private boolean yearFieldsAreEmpty() {
