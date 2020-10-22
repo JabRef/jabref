@@ -32,11 +32,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty firstNameModeAbbreviatedProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeFullProperty = new SimpleBooleanProperty();
     private final BooleanProperty firstNameModeBothProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableEmacsKeyBindingsProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableEmacsRebindCAProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableEmacsRebindCFProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableEmacsRebindCNProperty = new SimpleBooleanProperty();
-    private final BooleanProperty enableEmacsRebindAUProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
