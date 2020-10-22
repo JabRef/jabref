@@ -176,6 +176,10 @@ public class EntryTypeViewModel {
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
+            } else if (result.isEmpty()) {
+                String fetcher = selectedItemProperty().getValue().getName();
+                String searchId = idText.getValue();
+                dialogService.showErrorDialogAndWait(Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId));
             }
             fetcherWorker = new FetcherWorker();
 

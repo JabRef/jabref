@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import javafx.scene.control.Alert.AlertType;
-
-import org.jabref.gui.FXDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -60,13 +57,6 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             LOGGER.debug("No entry found at ebook.de; trying ottobib");
             IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
             bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
-        }
-
-        // nothing found at ebook.de and ottobib
-        if (!bibEntry.isPresent()) {
-            FXDialog noEntryFoundDialog = new FXDialog(AlertType.ERROR);
-            noEntryFoundDialog.setContentText("No entry found for ISBN: " + identifier + ".");
-            noEntryFoundDialog.show();
         }
 
         return bibEntry;

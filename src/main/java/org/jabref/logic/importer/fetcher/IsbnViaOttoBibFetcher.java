@@ -60,9 +60,9 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
         Element textArea = html.select("textarea").first();
 
         // inspect the "no results" error message (if there is one)
-        Element potentialErrorMessageDiv = html.select("div#flash-notice.notice.add-bottom").first();
-        if (potentialErrorMessageDiv.hasText() && potentialErrorMessageDiv.text().contains("No Results")) {
-            LOGGER.error("ISBN " + identifier + " not found at ottobib");
+        Optional<Element> potentialErrorMessageDiv = Optional.ofNullable((html.select("div#flash-notice.notice.add-bottom").first()));
+        if (potentialErrorMessageDiv.isPresent() && potentialErrorMessageDiv.get().text().contains("No Results")) {
+            LOGGER.error("ISBN {} not found at ottobib", identifier);
         }
 
         Optional<BibEntry> entry = Optional.empty();
