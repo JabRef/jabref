@@ -1,10 +1,11 @@
 package org.jabref.logic.util.strings;
 
-import java.util.regex.Pattern;
+import org.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
+import org.jabref.model.util.ResultingStringState;
 
-import org.jabref.model.util.ResultingEmacsState;
-
-public class EmacsStringManipulator {
+public class StringManipulator {
     private enum LetterCase {
         UPPER,
         LOWER,
@@ -15,55 +16,40 @@ public class EmacsStringManipulator {
         NEXT, PREVIOUS
     }
 
-    Pattern WORDCHAR = Pattern.compile("\\w");
-
-    private ResultingEmacsState setNextWordsCase(String text, int pos, LetterCase targetCase) {
-        StringBuilder res = new StringBuilder();
-
-        boolean firstLetter = true;
+    private static ResultingStringState setWordCase(String text, int pos, LetterCase targetCase) {
+        StringBuilder result = new StringBuilder();
         int i = pos;
-        boolean firstLoop = true;
-        StringBuilder newWordBuilder = new StringBuilder();
-        for (; i < text.length(); i++) {
-            // Swallow whitespace
-            while (firstLoop && i < text.length() && !WORDCHAR.matcher(String.valueOf(text.charAt(i))).matches()) {
-                newWordBuilder.append(text.charAt(i));
-                i++;
-            }
+
+        // swallow whitespaces
+        while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
+            result.append(text.charAt(i));
+            i++;
+        }
+        if (i >= text.length()) {
+            return new ResultingStringState(i, text);
+        }
+
+        StringBuilder nextWord = new StringBuilder();
+        // read next word
+        char currentChar = text.charAt(i);
+        while ((Character.isLetterOrDigit(currentChar) || Character.toString(currentChar).equals("_"))) {
+            nextWord.append(currentChar);
+            i++;
+
             if (i >= text.length()) {
                 break;
             }
-
-            firstLoop = false;
-
-            char currentChar = text.charAt(i);
-            if (WORDCHAR.matcher(String.valueOf(currentChar)).matches()) {
-                switch (targetCase) {
-                    case UPPER:
-                        newWordBuilder.append(Character.toUpperCase(currentChar));
-                        break;
-                    case LOWER:
-                        newWordBuilder.append(Character.toLowerCase(currentChar));
-                        break;
-                    case CAPITALIZED:
-                        if (firstLetter) {
-                            newWordBuilder.append(Character.toUpperCase(currentChar));
-                            firstLetter = false;
-                        } else {
-                            newWordBuilder.append(Character.toLowerCase(currentChar));
-                        }
-                        break;
-                }
-            } else {
-                // We have reached the word boundary.
-                break;
-            }
+            currentChar = text.charAt(i);
         }
-        res.append(text, 0, pos);
-        res.append(newWordBuilder);
-        res.append(text, i, text.length());
 
-        return new ResultingEmacsState(i, res.toString());
+        String changedString = switch (targetCase) {
+            case UPPER -> (new UpperCaseFormatter()).format(nextWord.toString());
+            case LOWER -> (new LowerCaseFormatter()).format(nextWord.toString());
+            case CAPITALIZED -> (new CapitalizeFormatter()).format(nextWord.toString());
+        };
+
+        String res = text.substring(0, pos) + result.toString() + changedString + text.substring(i);
+        return new ResultingStringState(i, res);
     }
 
     /**
@@ -74,7 +60,7 @@ public class EmacsStringManipulator {
      * @param dir The direction to search.
      * @return The resulting text and caret position.
      */
-    public ResultingEmacsState deleteUntilWordBoundary(int pos, String text, Direction dir) {
+    public static ResultingStringState deleteUntilWordBoundary(int pos, String text, Direction dir) {
         StringBuilder res = new StringBuilder();
         int offset;
         int wordBreak;
@@ -101,7 +87,7 @@ public class EmacsStringManipulator {
                     i += offset;
                 }
             }
-            if (!(i < text.length() && i >= 0) || !WORDCHAR.matcher(String.valueOf(text.charAt(i))).matches()) {
+            if (!(i < text.length() && i >= 0) || Character.isWhitespace(text.charAt(i))) {
                 wordBreak = i;
                 break;
             }
@@ -122,7 +108,7 @@ public class EmacsStringManipulator {
                 caretPosition = 0;
             }
         }
-        return new ResultingEmacsState(caretPosition, res.toString());
+        return new ResultingStringState(caretPosition, res.toString());
     }
 
     /**
@@ -132,8 +118,8 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public ResultingEmacsState capitalize(int pos, String text) {
-        return setNextWordsCase(text, pos, LetterCase.CAPITALIZED);
+    public static ResultingStringState capitalize(int pos, String text) {
+        return setWordCase(text, pos, LetterCase.CAPITALIZED);
     }
 
     /**
@@ -143,8 +129,8 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public ResultingEmacsState uppercase(int pos, String text) {
-        return setNextWordsCase(text, pos, LetterCase.UPPER);
+    public static ResultingStringState uppercase(int pos, String text) {
+        return setWordCase(text, pos, LetterCase.UPPER);
     }
 
     /**
@@ -154,8 +140,8 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public ResultingEmacsState lowercase(int pos, String text) {
-        return setNextWordsCase(text, pos, LetterCase.LOWER);
+    public static ResultingStringState lowercase(int pos, String text) {
+        return setWordCase(text, pos, LetterCase.LOWER);
     }
 
     /**
@@ -165,7 +151,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public ResultingEmacsState killWord(int pos, String text) {
+    public static ResultingStringState killWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.NEXT);
     }
 
@@ -176,7 +162,7 @@ public class EmacsStringManipulator {
      * @param text String to analyze
      * @return String The resulting text and caret position.
      */
-    public ResultingEmacsState backwardKillWord(int pos, String text) {
+    public static ResultingStringState backwardKillWord(int pos, String text) {
         return deleteUntilWordBoundary(pos, text, Direction.PREVIOUS);
     }
 }

@@ -12,7 +12,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
-import org.jabref.gui.keyboard.EmacsKeyPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
@@ -42,7 +41,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final EntryEditorPreferences initialEntryEditorPreferences;
-    private final EmacsKeyPreferences initialEmacsKeyPreferences;
     private final AutoCompletePreferences initialAutoCompletePreferences;
 
     private final List<String> restartWarnings = new ArrayList<>();
@@ -51,7 +49,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialEntryEditorPreferences = preferencesService.getEntryEditorPreferences();
-        this.initialEmacsKeyPreferences = preferencesService.getEmacsKeyPreferences();
         this.initialAutoCompletePreferences = preferencesService.getAutoCompletePreferences();
     }
 
@@ -66,12 +63,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
         enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(initialEntryEditorPreferences.isEnableValidation());
-
-        enableEmacsKeyBindingsProperty.setValue(initialEmacsKeyPreferences.useEmacsKeyBindings());
-        enableEmacsRebindCAProperty.setValue(initialEmacsKeyPreferences.shouldRebindCA());
-        enableEmacsRebindCFProperty.setValue(initialEmacsKeyPreferences.shouldRebindCF());
-        enableEmacsRebindCNProperty.setValue(initialEmacsKeyPreferences.shouldRebindCN());
-        enableEmacsRebindAUProperty.setValue(initialEmacsKeyPreferences.shouldRebindAU());
 
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
@@ -102,13 +93,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 defaultSourceProperty.getValue(),
                 enableValidationProperty.getValue(),
                 initialEntryEditorPreferences.getDividerPosition()));
-
-        preferencesService.storeEmacsKeyPreferences(new EmacsKeyPreferences(
-                enableEmacsKeyBindingsProperty.getValue(),
-                enableEmacsRebindCAProperty.getValue(),
-                enableEmacsRebindCFProperty.getValue(),
-                enableEmacsRebindCNProperty.getValue(),
-                enableEmacsRebindAUProperty.getValue()));
 
         // default
         AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;
@@ -207,19 +191,4 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     public BooleanProperty firstNameModeBothProperty() {
         return firstNameModeBothProperty;
     }
-
-    public BooleanProperty enableEmacsKeyBindingsProperty() {
-        return enableEmacsKeyBindingsProperty; }
-
-    public BooleanProperty enableEmacsRebindCAProperty() {
-        return enableEmacsRebindCAProperty; }
-
-    public BooleanProperty enableEmacsRebindCFProperty() {
-        return enableEmacsRebindCFProperty; }
-
-    public BooleanProperty enableEmacsRebindCNProperty() {
-        return enableEmacsRebindCNProperty; }
-
-    public BooleanProperty enableEmacsRebindAUProperty() {
-        return enableEmacsRebindAUProperty; }
 }

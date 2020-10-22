@@ -10,7 +10,6 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
-import org.jabref.gui.keyboard.EmacsKeyPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
@@ -298,10 +297,6 @@ public interface PreferencesService {
     NameFormatterPreferences getNameFormatterPreferences();
 
     void storeNameFormatterPreferences(NameFormatterPreferences preferences);
-
-    EmacsKeyPreferences getEmacsKeyPreferences();
-
-    void storeEmacsKeyPreferences(EmacsKeyPreferences preferences);
 
     AutoCompletePreferences getAutoCompletePreferences();
 

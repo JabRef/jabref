@@ -3,7 +3,7 @@ package org.jabref.logic.bst;
 import java.util.Locale;
 import java.util.Stack;
 
-import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
+import org.jabref.logic.bst.BibtexCaseChanger.FormatMode;
 import org.jabref.logic.bst.VM.BstEntry;
 import org.jabref.logic.bst.VM.BstFunction;
 
@@ -60,6 +60,6 @@ public class ChangeCaseFunction implements BstFunction {
         char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
         String s = (String) o2;
 
-        stack.push(BibtexCaseChanger.changeCase(s, FORMAT_MODE.getFormatModeForBSTFormat(format)));
+        stack.push(BibtexCaseChanger.changeCase(s, FormatMode.getFormatModeForBSTFormat(format)));
     }
 }

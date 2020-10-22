@@ -12,7 +12,7 @@ public enum KeyBindingCategory {
     BIBTEX(BibDatabaseMode.BIBTEX.getFormattedName()),
     QUALITY(Localization.lang("Quality")),
     TOOLS(Localization.lang("Tools")),
-    EMACS(Localization.lang("Emacs"));
+    EDITOR(Localization.lang("Text editor"));
 
     private final String name;
 

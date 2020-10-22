@@ -43,7 +43,6 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
-import org.jabref.gui.keyboard.EmacsKeyPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -2454,25 +2453,6 @@ public class JabRefPreferences implements PreferencesService {
     public void storeNameFormatterPreferences(NameFormatterPreferences preferences) {
         putStringList(NAME_FORMATER_KEY, preferences.getNameFormatterKey());
         putStringList(NAME_FORMATTER_VALUE, preferences.getNameFormatterValue());
-    }
-
-    @Override
-    public EmacsKeyPreferences getEmacsKeyPreferences() {
-        return new EmacsKeyPreferences(
-                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS),
-                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA),
-                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF),
-                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN),
-                getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU));
-    }
-
-    @Override
-    public void storeEmacsKeyPreferences(EmacsKeyPreferences preferences) {
-        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS, preferences.useEmacsKeyBindings());
-        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA, preferences.shouldRebindCA());
-        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF, preferences.shouldRebindCF());
-        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CN, preferences.shouldRebindCN());
-        putBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_AU, preferences.shouldRebindAU());
     }
 
     @Override

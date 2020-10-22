@@ -7,88 +7,89 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.Globals;
-import org.jabref.logic.util.strings.EmacsStringManipulator;
-import org.jabref.model.util.ResultingEmacsState;
+import org.jabref.logic.util.strings.StringManipulator;
+import org.jabref.model.util.ResultingStringState;
 import org.jabref.preferences.PreferencesService;
 
-public class EmacsKeyBindings {
+public class EditorKeyBindings {
 
-    public static void executeEmacs(Scene scene, KeyEvent event, PreferencesService preferencesService) {
-        if (preferencesService.getEmacsKeyPreferences().useEmacsKeyBindings()
-                && scene.focusOwnerProperty().get() instanceof TextInputControl) {
+    public static void call(Scene scene, KeyEvent event, PreferencesService preferencesService) {
+        if (scene.focusOwnerProperty().get() instanceof TextInputControl) {
 
             KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
             TextInputControl focusedTextField = (TextInputControl) scene.focusOwnerProperty().get();
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             keyBinding.ifPresent(binding -> {
-                if (binding.equals(KeyBinding.EMACS_DELETE)) {
-                    focusedTextField.deletePreviousChar();
+                if (binding.equals(KeyBinding.EDITOR_DELETE)) {
+                    focusedTextField.deleteNextChar();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_BACKWARD) {
+                } else if (binding == KeyBinding.EDITOR_BACKWARD) {
                     focusedTextField.backward();
                     event.consume();
-                } else if (preferencesService.getEmacsKeyPreferences().shouldRebindCF()
-                        && binding == KeyBinding.EMACS_FORWARD) {
+                } else if (binding == KeyBinding.EDITOR_FORWARD) {
                     focusedTextField.forward();
                     event.consume();
-                } else if (preferencesService.getEmacsKeyPreferences().shouldRebindCA()
-                        && binding == KeyBinding.EMACS_BEGINNING) {
+                } else if (binding == KeyBinding.EDITOR_WORD_BACKWARD) {
+                    focusedTextField.previousWord();
+                    event.consume();
+                } else if (binding == KeyBinding.EDITOR_WORD_FORWARD) {
+                    focusedTextField.nextWord();
+                    event.consume();
+                } else if (binding == KeyBinding.EDITOR_BEGINNING) {
                     focusedTextField.home();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_END) {
+                } else if (binding == KeyBinding.EDITOR_END) {
                     focusedTextField.end();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_BEGINNING_DOC) {
+                } else if (binding == KeyBinding.EDITOR_BEGINNING_DOC) {
                     focusedTextField.home();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_END_DOC) {
+                } else if (binding == KeyBinding.EDITOR_END_DOC) {
                     focusedTextField.end();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_UP) {
+                } else if (binding == KeyBinding.EDITOR_UP) {
                     focusedTextField.home();
                     event.consume();
-                } else if (preferencesService.getEmacsKeyPreferences().shouldRebindCN()
-                        && binding == KeyBinding.EMACS_DOWN) {
+                } else if (binding == KeyBinding.EDITOR_DOWN) {
                     focusedTextField.end();
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_CAPITALIZE) {
+                } else if (binding == KeyBinding.EDITOR_CAPITALIZE) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
-                    ResultingEmacsState res = EmacsStringManipulator.capitalize(pos, text);
+                    ResultingStringState res = StringManipulator.capitalize(pos, text);
                     focusedTextField.setText(res.text);
                     focusedTextField.positionCaret(res.caretPos);
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_LOWERCASE) {
+                } else if (binding == KeyBinding.EDITOR_LOWERCASE) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
-                    ResultingEmacsState res = EmacsStringManipulator.lowercase(pos, text);
+                    ResultingStringState res = StringManipulator.lowercase(pos, text);
                     focusedTextField.setText(res.text);
                     focusedTextField.positionCaret(res.caretPos);
                     event.consume();
-                } else if (preferencesService.getEmacsKeyPreferences().shouldRebindAU()
-                        && binding == KeyBinding.EMACS_UPPERCASE) {
+                } else if (binding == KeyBinding.EDITOR_UPPERCASE) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
-                    ResultingEmacsState res = EmacsStringManipulator.uppercase(pos, text);
+                    ResultingStringState res = StringManipulator.uppercase(pos, text);
                     focusedTextField.setText(res.text);
                     focusedTextField.positionCaret(res.caretPos);
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_KILL_LINE) {
+                } else if (binding == KeyBinding.EDITOR_KILL_LINE) {
                     int pos = focusedTextField.getCaretPosition();
                     focusedTextField.setText(focusedTextField.getText(0, pos));
                     focusedTextField.positionCaret(pos);
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_KILL_WORD) {
+                } else if (binding == KeyBinding.EDITOR_KILL_WORD) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
-                    ResultingEmacsState res = EmacsStringManipulator.killWord(pos, text);
+                    ResultingStringState res = StringManipulator.killWord(pos, text);
                     focusedTextField.setText(res.text);
                     focusedTextField.positionCaret(res.caretPos);
                     event.consume();
-                } else if (binding == KeyBinding.EMACS_KILL_WORD_BACKWARD) {
+                } else if (binding == KeyBinding.EDITOR_KILL_WORD_BACKWARD) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
-                    ResultingEmacsState res = EmacsStringManipulator.backwardKillWord(pos, text);
+                    ResultingStringState res = StringManipulator.backwardKillWord(pos, text);
                     focusedTextField.setText(res.text);
                     focusedTextField.positionCaret(res.caretPos);
                     event.consume();
