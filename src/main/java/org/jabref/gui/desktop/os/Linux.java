@@ -1,5 +1,6 @@
 package org.jabref.gui.desktop.os;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +21,22 @@ public class Linux implements NativeDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
+    private void nativeOpenFile(String filePath) {
+        if (Desktop.isDesktopSupported()) {
+            new Thread(() -> {
+                try {
+                    File file = new File(filePath);
+                    Desktop.getDesktop().open(file);
+                    LOGGER.info("Opened file with Desktop integration");
+                } catch (Exception e) {
+                    LOGGER.error("Open operation not successful: " + e.getMessage());
+                }
+            }).start();
+        } else {
+            LOGGER.error("No operation possible");
+        }
+    }
+
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
@@ -27,16 +44,16 @@ public class Linux implements NativeDesktop {
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             viewer = type.get().getOpenWithApplication();
-        } else {
-            viewer = "xdg-open";
-        }
-        ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
-        Process process = processBuilder.start();
-        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+            ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
+            Process process = processBuilder.start();
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
 
-        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+        } else {
+            nativeOpenFile(filePath);
+        }
     }
 
     @Override
@@ -45,21 +62,22 @@ public class Linux implements NativeDesktop {
         String[] openWith;
         if ((application != null) && !application.isEmpty()) {
             openWith = application.split(" ");
+            LOGGER.info("Opening with " + openWith);
+            String[] cmdArray = new String[openWith.length + 1];
+            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+            cmdArray[cmdArray.length - 1] = filePath;
+
+            ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
-            openWith = new String[] {"xdg-open"};
+            nativeOpenFile(filePath);
         }
-        String[] cmdArray = new String[openWith.length + 1];
-        System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-        cmdArray[cmdArray.length - 1] = filePath;
-
-        ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
-        Process process = processBuilder.start();
-
-        StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
-        StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
-
-        JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
-        JabRefExecutorService.INSTANCE.execute(streamGobblerError);
     }
 
     @Override
