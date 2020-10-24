@@ -41,7 +41,12 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
