@@ -74,6 +74,7 @@ import org.jabref.logic.layout.format.Replace;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
@@ -542,6 +543,8 @@ class LayoutEntry {
                 return new MarkdownFormatter();
             case "CSLType":
                 return new CSLType();
+            case "ShortMonth":
+                return new ShortMonthFormatter();
             default:
                 return null;
         }
