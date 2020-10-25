@@ -61,10 +61,12 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private int computeDelta(String oldValue, String newValue) {
         if (oldValue == newValue) {
             return 0;
-        } else if (oldValue == null && newValue != null) {
+        } else if ((oldValue == null) && (newValue != null)) {
             return newValue.length();
-        } else if (newValue == null && oldValue != null) {
+        } else if ((newValue == null) && (oldValue != null)) {
             return oldValue.length();
+        } else if ((Math.abs(newValue.length() - oldValue.length()) == 0) && !oldValue.equals(newValue)) {
+            return newValue.length();
         } else {
             return Math.abs(newValue.length() - oldValue.length());
         }
