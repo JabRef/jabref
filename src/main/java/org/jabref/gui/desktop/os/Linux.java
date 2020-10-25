@@ -9,6 +9,9 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.swing.SwingUtilities;
+
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -21,20 +24,25 @@ public class Linux implements NativeDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
+    @AllowedToUseAwt("")
     private void nativeOpenFile(String filePath) {
-        if (Desktop.isDesktopSupported()) {
-            new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                File file = new File(filePath);
+                Desktop.getDesktop().open(file);
+                System.out.println("Open file in default application with Desktop integration");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Fail back to xdg-open");
                 try {
-                    File file = new File(filePath);
-                    Desktop.getDesktop().open(file);
-                    LOGGER.info("Opened file with Desktop integration");
-                } catch (Exception e) {
-                    LOGGER.error("Open operation not successful: " + e.getMessage());
+                    String cmd = "xdg-open " + filePath;
+                    Runtime.getRuntime().exec(cmd);
+                } catch (Exception e2) {
+                    System.out.println("Open operation not successful: " + e2);
                 }
-            }).start();
-        } else {
-            LOGGER.error("No operation possible");
-        }
+            } catch (IOException e) {
+                System.out.println("Native open operation not successful: " + e);
+            }
+        });
     }
 
     @Override
@@ -62,7 +70,6 @@ public class Linux implements NativeDesktop {
         String[] openWith;
         if ((application != null) && !application.isEmpty()) {
             openWith = application.split(" ");
-            LOGGER.info("Opening with " + openWith);
             String[] cmdArray = new String[openWith.length + 1];
             System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
             cmdArray[cmdArray.length - 1] = filePath;
