@@ -9,8 +9,6 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
-
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -26,7 +24,7 @@ public class Linux implements NativeDesktop {
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
     private void nativeOpenFile(String filePath) {
-        SwingUtilities.invokeLater(() -> {
+        new Thread(() -> {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
@@ -42,7 +40,7 @@ public class Linux implements NativeDesktop {
             } catch (IOException e) {
                 System.out.println("Native open operation not successful: " + e);
             }
-        });
+        }).start();
     }
 
     @Override
