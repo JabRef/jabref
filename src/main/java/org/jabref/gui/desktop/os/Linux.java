@@ -20,11 +20,11 @@ import org.jabref.gui.util.StreamGobbler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
-    @AllowedToUseAwt("")
     private void nativeOpenFile(String filePath) {
         SwingUtilities.invokeLater(() -> {
             try {
