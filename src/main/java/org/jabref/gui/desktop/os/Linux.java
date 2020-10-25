@@ -24,7 +24,7 @@ public class Linux implements NativeDesktop {
     private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
 
     private void nativeOpenFile(String filePath) {
-        new Thread(() -> {
+        JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 File file = new File(filePath);
                 Desktop.getDesktop().open(file);
@@ -32,7 +32,7 @@ public class Linux implements NativeDesktop {
             } catch (IllegalArgumentException e) {
                 System.out.println("Fail back to xdg-open");
                 try {
-                    String cmd = "xdg-open " + filePath;
+                    String[] cmd = {"xdg-open", filePath};
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e2) {
                     System.out.println("Open operation not successful: " + e2);
@@ -40,7 +40,7 @@ public class Linux implements NativeDesktop {
             } catch (IOException e) {
                 System.out.println("Native open operation not successful: " + e);
             }
-        }).start();
+        });
     }
 
     @Override
