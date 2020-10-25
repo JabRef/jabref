@@ -38,7 +38,7 @@ public class FileFieldWriterTest {
     public void parseCorrectOnlineInput() throws MalformedURLException {
         String input = ":http\\://arxiv.org/pdf/2010.08497v1:PDF";
         String inputURL = "http://arxiv.org/pdf/2010.08497v1";
-        List<LinkedFile> expected =  Collections.singletonList(new LinkedFile(new URL(inputURL), "PDF"));
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile(new URL(inputURL), "PDF"));
 
         assertEquals(expected, FileFieldParser.parse(input));
     }
