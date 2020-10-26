@@ -65,7 +65,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
             return newValue.length();
         } else if ((newValue == null) && (oldValue != null)) {
             return oldValue.length();
-        } else if ((Math.abs(newValue.length() - oldValue.length()) == 0) && !oldValue.equals(newValue)) {
+        } else if ((oldValue.length() == newValue.length()) && !oldValue.equals(newValue)) {
             return newValue.length();
         } else {
             return Math.abs(newValue.length() - oldValue.length());
