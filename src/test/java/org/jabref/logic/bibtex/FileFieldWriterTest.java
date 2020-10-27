@@ -44,7 +44,7 @@ public class FileFieldWriterTest {
     }
 
     @Test
-    public void parseFaultyOnlineInput(){
+    public void parseFaultyOnlineInput() {
         String input = ":htt\\://arxiv.org/pdf/2010.08497v1:PDF";
         String inputURL = "htt://arxiv.org/pdf/2010.08497v1";
         List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of(inputURL), "PDF"));
