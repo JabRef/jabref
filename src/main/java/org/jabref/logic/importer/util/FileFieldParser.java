@@ -73,10 +73,11 @@ public class FileFieldParser {
             try {
                 field = new LinkedFile(new URL(entry.get(1)), entry.get(2));
             } catch (MalformedURLException ignored) {
+                // ignored
             }
         }
 
-        if (field == null){
+        if (field == null) {
             field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
         }
 
