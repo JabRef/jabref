@@ -67,14 +67,16 @@ public class FileFieldParser {
         while (entry.size() < 3) {
             entry.add("");
         }
-        LinkedFile field;
+
+        LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
                 field = new LinkedFile(new URL(entry.get(1)), entry.get(2));
-            } catch (MalformedURLException e) {
-                field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
+            } catch (MalformedURLException ignored) {
             }
-        } else {
+        }
+
+        if (field == null){
             field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
         }
 
