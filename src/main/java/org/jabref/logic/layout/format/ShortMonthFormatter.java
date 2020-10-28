@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.Month;
 
-public class ShortMonthFormatter implements ParamLayoutFormatter {
+public class ShortMonthFormatter implements LayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
