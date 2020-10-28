@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +67,20 @@ public class FileFieldParser {
         while (entry.size() < 3) {
             entry.add("");
         }
-        LinkedFile field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
+
+        LinkedFile field = null;
+        if (LinkedFile.isOnlineLink(entry.get(1))) {
+            try {
+                field = new LinkedFile(new URL(entry.get(1)), entry.get(2));
+            } catch (MalformedURLException ignored) {
+                // ignored
+            }
+        }
+
+        if (field == null) {
+            field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
+        }
+
         // link is only mandatory field
         if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
             field = new LinkedFile("", Path.of(field.getFileType()), "");
