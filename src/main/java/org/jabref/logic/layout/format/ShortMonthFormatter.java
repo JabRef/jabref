@@ -2,7 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.Optional;
 
-import org.jabref.logic.layout.ParamLayoutFormatter;
+import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.Month;
 
 public class ShortMonthFormatter implements LayoutFormatter {

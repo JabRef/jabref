@@ -543,11 +543,8 @@ class LayoutEntry {
                 return new MarkdownFormatter();
             case "CSLType":
                 return new CSLType();
-<<<<<<< HEAD
             case "ShortMonth":
                 return new ShortMonthFormatter();
-=======
->>>>>>> a1107ed890bb562ca6f5b64f26ae7aecceb6f92d
             default:
                 return null;
         }

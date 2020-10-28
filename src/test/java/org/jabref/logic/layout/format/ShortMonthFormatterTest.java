@@ -1,6 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.ParamLayoutFormatter;
+import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ShortMonthFormatterTest {
 
-    private ParamLayoutFormatter formatter;
+    private LayoutFormatter formatter;
 
     @BeforeEach
     public void setUp() {
