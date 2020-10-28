@@ -8,11 +8,6 @@ import org.jabref.model.entry.Month;
 public class ShortMonthFormatter implements LayoutFormatter {
 
     @Override
-    public void setArgument(String arg) {
-        // no effect
-    }
-
-    @Override
     public String format(String fieldText) {
         Optional<Month> month = Month.parse(fieldText);
         return month.map(Month::getShortName).orElse("");
