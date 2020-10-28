@@ -21,6 +21,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty openOnNewEntryProperty = new SimpleBooleanProperty();
     private final BooleanProperty defaultSourceProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableRelatedArticlesTabProperty = new SimpleBooleanProperty();
+    private final BooleanProperty enableCitationRelationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty acceptRecommendationsProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableLatexCitationsTabProperty = new SimpleBooleanProperty();
     private final BooleanProperty enableValidationProperty = new SimpleBooleanProperty();
@@ -55,6 +56,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         openOnNewEntryProperty.setValue(initialEntryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(initialEntryEditorPreferences.showSourceTabByDefault());
         enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
+        enableCitationRelationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowCitationRelationsTab());
         acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
         enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
         enableValidationProperty.setValue(initialEntryEditorPreferences.isEnableValidation());
@@ -89,6 +91,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 initialEntryEditorPreferences.getEntryEditorTabList(),
                 openOnNewEntryProperty.getValue(),
                 enableRelatedArticlesTabProperty.getValue(),
+                enableCitationRelationsTabProperty.getValue(),
                 acceptRecommendationsProperty.getValue(),
                 enableLatexCitationsTabProperty.getValue(),
                 defaultSourceProperty.getValue(),
@@ -146,6 +149,10 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableRelatedArticlesTabProperty() {
         return enableRelatedArticlesTabProperty;
+    }
+
+    public BooleanProperty enableCitationRelationsTabProperty() {
+        return enableCitationRelationsTabProperty;
     }
 
     public BooleanProperty acceptRecommendationsProperty() {

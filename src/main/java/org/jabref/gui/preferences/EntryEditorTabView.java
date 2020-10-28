@@ -15,6 +15,7 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
     @FXML private CheckBox openOnNewEntry;
     @FXML private CheckBox defaultSource;
     @FXML private CheckBox enableRelatedArticlesTab;
+    @FXML private CheckBox enableCitationRelationsTab;
     @FXML private CheckBox acceptRecommendations;
     @FXML private CheckBox enableLatexCitationsTab;
     @FXML private CheckBox enableValidation;
@@ -46,6 +47,7 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());
         enableRelatedArticlesTab.selectedProperty().bindBidirectional(viewModel.enableRelatedArticlesTabProperty());
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
+        enableCitationRelationsTab.selectedProperty().bindBidirectional(viewModel.enableCitationRelationsTabProperty());
         enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         enableAutoComplete.selectedProperty().bindBidirectional(viewModel.enableAutoCompleteProperty());

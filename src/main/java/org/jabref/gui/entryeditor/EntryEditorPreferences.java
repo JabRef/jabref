@@ -10,6 +10,7 @@ public class EntryEditorPreferences {
     private final Map<String, Set<Field>> entryEditorTabList;
     private boolean shouldOpenOnNewEntry;
     private final boolean shouldShowRecommendationsTab;
+    private final boolean shouldShowCitationRelationsTab;
     private final boolean isMrdlibAccepted;
     private final boolean shouldShowLatexCitationsTab;
     private boolean showSourceTabByDefault;
@@ -18,6 +19,7 @@ public class EntryEditorPreferences {
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
+                                  boolean shouldShowCitationRelationsTab,
                                   boolean isMrdlibAccepted,
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
@@ -26,6 +28,7 @@ public class EntryEditorPreferences {
         this.entryEditorTabList = entryEditorTabList;
         this.shouldOpenOnNewEntry = shouldOpenOnNewEntry;
         this.shouldShowRecommendationsTab = shouldShowRecommendationsTab;
+        this.shouldShowCitationRelationsTab = shouldShowCitationRelationsTab;
         this.isMrdlibAccepted = isMrdlibAccepted;
         this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
         this.showSourceTabByDefault = showSourceTabByDefault;
@@ -42,6 +45,10 @@ public class EntryEditorPreferences {
 
     public boolean shouldShowRecommendationsTab() {
         return shouldShowRecommendationsTab;
+    }
+
+    public boolean shouldShowCitationRelationsTab() {
+        return shouldShowCitationRelationsTab;
     }
 
     public boolean isMrdlibAccepted() {
