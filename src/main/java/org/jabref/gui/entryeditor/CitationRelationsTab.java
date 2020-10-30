@@ -37,8 +37,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private HBox citedByHBox;
     private Label citingLabel;
     private Label citedByLabel;
-    private ListView<String> citingListView;
-    private ListView<String> citedByListView;
+    private ListView<BibEntry> citingListView;
+    private ListView<BibEntry> citedByListView;
     private StackPane citingStackPane;
     private StackPane citedByStackPane;
     private Button startCitingButton;
@@ -66,7 +66,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByLabel = new Label("Cited By");
         citedByLabel.setStyle("-fx-padding: 5px");
         citingListView = new ListView<>();
+        citingListView.setCellFactory(listView -> new CitationRelationListCell());
+        citingListView.setOnMouseClicked(event -> onCitingListClicked());
         citedByListView = new ListView<>();
+        citedByListView.setCellFactory(listView -> new CitationRelationListCell());
+        citedByListView.setOnMouseClicked(event -> onCitedByListClicked());
         citingStackPane = new StackPane();
         citedByStackPane = new StackPane();
         startCitingButton = new Button("Search");
@@ -119,6 +123,18 @@ public class CitationRelationsTab extends EntryEditorTab {
         return container;
     }
 
+    private void onCitedByListClicked() {
+        if (!citedByListView.getItems().isEmpty()) {
+            System.out.println("Clicked on: " + citedByListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
+        }
+    }
+
+    private void onCitingListClicked() {
+        if (!citingListView.getItems().isEmpty()) {
+            System.out.println("Clicked on: " + citingListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
+        }
+    }
+
     @Override
     public boolean shouldShow(BibEntry entry) {
         return preferences.shouldShowCitationRelationsTab();
@@ -126,32 +142,28 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        // Ask for consent to send data
         setContent(getPane(entry));
-        /*if (preferences.isMrdlibAccepted()) {
-            setContent(getRelatedArticlesPane(entry));
-        } else {
-            setContent(getPrivacyDialog(entry));
-        }*/
     }
 
     private void citingClicked(BibEntry entry) {
-        ObservableList<String> citingList = FXCollections.observableArrayList();
+        ObservableList<BibEntry> citingList = FXCollections.observableArrayList();
         startCitingButton.setVisible(false);
         CitationRelationFetcher fetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITING, citingListView);
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> {
+                    citingListView.getItems().clear();
                     citingProgress.setVisible(true);
                     refreshCitingButton.setVisible(false);
                 })
                 .onSuccess(fetchedList -> {
                     citingProgress.setVisible(false);
-                    for(BibEntry e : fetchedList) {
-                        e.getField(StandardField.TITLE).ifPresent(citingList::add);
-                    }
+                    citingList.addAll(fetchedList);
                     if (citingList.isEmpty()) {
-                        citingList.add("No articles found.");
+                        BibEntry emptyEntry = new BibEntry();
+                        emptyEntry.setField(StandardField.TITLE, "No Articles Found");
+                        emptyEntry.setField(StandardField.AUTHOR, "-");
+                        citingList.add(emptyEntry);
                     }
                     citingListView.setItems(citingList);
                     refreshCitingButton.setVisible(true);
@@ -166,22 +178,24 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void citedByClicked(BibEntry entry) {
-        ObservableList<String> citedByList = FXCollections.observableArrayList();
+        ObservableList<BibEntry> citedByList = FXCollections.observableArrayList();
         startCitedByButton.setVisible(false);
         CitationRelationFetcher fetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITEDBY, citedByListView);
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> {
+                    citedByListView.getItems().clear();
                     citedByProgress.setVisible(true);
                     refreshCitedByButton.setVisible(false);
                 })
                 .onSuccess(fetchedList -> {
                     citedByProgress.setVisible(false);
-                    for(BibEntry e : fetchedList) {
-                        e.getField(StandardField.TITLE).ifPresent(citedByList::add);
-                    }
+                    citedByList.addAll(fetchedList);
                     if (citedByList.isEmpty()) {
-                        citedByList.add("No articles found.");
+                        BibEntry emptyEntry = new BibEntry();
+                        emptyEntry.setField(StandardField.TITLE, "No Articles Found");
+                        emptyEntry.setField(StandardField.AUTHOR, "-");
+                        citedByList.add(emptyEntry);
                     }
                     citedByListView.setItems(citedByList);
                     refreshCitedByButton.setVisible(true);

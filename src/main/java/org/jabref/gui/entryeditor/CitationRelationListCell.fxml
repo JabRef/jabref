@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.jabref.gui.icon.JabRefIconView?>
+<Pane fx:id="cellPane" prefHeight="30.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="titleLabel" layoutX="14.0" layoutY="6.0" text="Label" maxWidth="390"/>
+      <Label fx:id="authorLabel" layoutX="411.0" layoutY="6.0" text="Label" maxWidth="291"/>
+       <Button fx:id="detailsButton" layoutX="754.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button,narrow">
+           <graphic>
+               <JabRefIconView glyph="MAKE_KEY"/>
+           </graphic>
+       </Button>
+       <Button fx:id="addButton" layoutX="702.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button,narrow">
+           <graphic>
+               <JabRefIconView glyph="MAKE_KEY"/>
+           </graphic>
+       </Button>
+   </children>
+</Pane>

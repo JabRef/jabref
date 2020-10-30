@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.scene.control.ListView;
@@ -27,7 +28,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         CITEDBY
     }
 
-    public CitationRelationFetcher(SearchType searchType, ListView<String> listView) {
+    public CitationRelationFetcher(SearchType searchType, ListView<BibEntry> listView) {
         this.searchType = searchType;
     }
 
@@ -47,18 +48,29 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
     private List<BibEntry> getCiting(String doi) {
         List<BibEntry> list = new ArrayList<>();
         try {
+            System.out.println(BASIC_URL + doi);
             JSONArray json = readJsonFromUrl(BASIC_URL + doi);
             System.out.println(json.toString());
-            for (int i = 0; i < json.length(); i++) {
-                String citingDoi = json.getJSONObject(i).getString("cited");
-                System.out.println(citingDoi.substring(8));
-                if (!doi.equals(citingDoi.substring(8))) {
+            String[] items = json.getJSONObject(0).getString("reference").split("; ");
+            for (String item : items) {
+                System.out.println(item);
+                if (!doi.equals(item) && !item.equals("")) {
                     DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
                     try {
-                        doiFetcher.performSearchById(citingDoi.substring(8)).ifPresent(list::add);
+                        doiFetcher.performSearchById(item).ifPresent(list::add);
                     } catch (FetcherException fetcherException) {
 
                     }
+                    /*try {
+                        JSONArray article = readJsonFromUrl(BASIC_URL + item);
+                        BibEntry newEntry = new BibEntry();
+                        newEntry.setField(StandardField.TITLE, article.getJSONObject(0).getString("title"));
+                        newEntry.setField(StandardField.AUTHOR, article.getJSONObject(0).getString("author"));
+                        newEntry.setField(StandardField.DOI, article.getJSONObject(0).getString("doi"));
+                        list.add(newEntry);
+                    } catch (JSONException jsonException) {
+
+                    }*/
                 }
             }
             System.out.println("Finished.");
@@ -71,18 +83,29 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
     private List<BibEntry> getCitedBy(String doi) {
         List<BibEntry> list = new ArrayList<>();
         try {
+            System.out.println(BASIC_URL + doi);
             JSONArray json = readJsonFromUrl(BASIC_URL + doi);
             System.out.println(json.toString());
-            for (int i = 0; i < json.length(); i++) {
-                String citedByDoi = json.getJSONObject(i).getString("citing");
-                System.out.println(citedByDoi.substring(8));
-                if (!doi.equals(citedByDoi.substring(8))) {
+            String[] items = json.getJSONObject(0).getString("citation").split("; ");
+            for (String item : items) {
+                System.out.println(item);
+                if (!doi.equals(item) && !item.equals("")) {
                     DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
                     try {
-                        doiFetcher.performSearchById(citedByDoi.substring(8)).ifPresent(list::add);
+                        doiFetcher.performSearchById(item).ifPresent(list::add);
                     } catch (FetcherException fetcherException) {
 
                     }
+                    /*try {
+                        JSONArray article = readJsonFromUrl(BASIC_URL + item);
+                        BibEntry newEntry = new BibEntry();
+                        newEntry.setField(StandardField.TITLE, article.getJSONObject(0).getString("title"));
+                        newEntry.setField(StandardField.AUTHOR, article.getJSONObject(0).getString("author"));
+                        newEntry.setField(StandardField.DOI, article.getJSONObject(0).getString("doi"));
+                        list.add(newEntry);
+                    } catch (JSONException jsonException) {
+
+                    }*/
                 }
             }
             System.out.println("Finished.");
