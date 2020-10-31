@@ -14,5 +14,7 @@ install -d /Library/Application\ Support/Chromium/NativeMessagingHosts/
 install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Application\ Support/Chromium/NativeMessagingHosts/org.jabref.jabref.json
 install -d /Library/Google/Chrome/NativeMessagingHosts/
 install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Google/Chrome/NativeMessagingHosts/org.jabref.jabref.json
+install -d /Library/Microsoft/Edge/NativeMessagingHosts/
+install -m0755 /Applications/JabRef.app/Contents/Resources/native-messaging-host/chromium/org.jabref.jabref.json /Library/Microsoft/Edge/NativeMessagingHosts/org.jabref.jabref.json
 
 exit 0
