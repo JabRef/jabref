@@ -5,10 +5,8 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -18,15 +16,12 @@ import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
 import org.jabref.model.entry.field.StandardField;
-
-import com.sun.star.sdb.DatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI for tab displaying an articles citation relations based on the currently selected BibEntry
+ * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
@@ -46,120 +41,128 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final BibDatabaseContext databaseContext;
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService, BibDatabaseContext databaseContext) {
-        setText(Localization.lang("Citation relations"));
-        setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
+        setText(Localization.lang("Citation relations"));
+        setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
     }
 
+    /**
+     * Method to create main SplitPane holding all lists, buttons and labels for tab
+     *
+     * @param entry BibEntry which is currently selected in JabRef Database
+     * @return SplitPane to display
+     */
     private SplitPane getPane(BibEntry entry) {
+
+        //Create Layout Containers
         VBox citingVBox = new VBox();
         VBox citedByVBox = new VBox();
-
+        citingVBox.setFillWidth(true);
+        citedByVBox.setFillWidth(true);
+        citingVBox.setAlignment(Pos.TOP_CENTER);
+        citedByVBox.setAlignment(Pos.TOP_CENTER);
         AnchorPane citingHBox = new AnchorPane();
         AnchorPane citedByHBox = new AnchorPane();
-
-        Label citingLabel = new Label("Citing");
-        citingLabel.setStyle("-fx-padding: 5px");
-        citingLabel.setAlignment(Pos.CENTER);
-        AnchorPane.setTopAnchor(citingLabel, 0.0);
-        AnchorPane.setLeftAnchor(citingLabel, 0.0);
-        AnchorPane.setBottomAnchor(citingLabel, 0.0);
-        AnchorPane.setRightAnchor(citingLabel, 0.0);
-
-        Label citedByLabel = new Label("Cited By");
-        citedByLabel.setStyle("-fx-padding: 5px");
-        citedByLabel.setAlignment(Pos.CENTER);
-        AnchorPane.setTopAnchor(citedByLabel, 0.0);
-        AnchorPane.setLeftAnchor(citedByLabel, 0.0);
-        AnchorPane.setBottomAnchor(citedByLabel, 0.0);
-        AnchorPane.setRightAnchor(citedByLabel, 0.0);
-
-        citingListView = new ListView<>();
-        citingListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
-        //citingListView.setOnMouseClicked(event -> onCitingListClicked());
-        citedByListView = new ListView<>();
-        citedByListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
-        //citedByListView.setOnMouseClicked(event -> onCitedByListClicked());
-
         citingStackPane = new StackPane();
         citedByStackPane = new StackPane();
+
+        //Create Heading Labels
+        Label citingLabel = new Label("Citing");
+        styleLabel(citingLabel);
+        Label citedByLabel = new Label("Cited By");
+        styleLabel(citedByLabel);
+
+        //Create ListViews
+        citingListView = new ListView<>();
+        citingListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
+        citedByListView = new ListView<>();
+        citedByListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
+
+        //Create Start Buttons
         startCitingButton = new Button();
         startCitingButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
         startCitedByButton = new Button();
         startCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
 
+        //Create refresh Buttons for both sides
         refreshCitingButton = new Button();
-        refreshCitingButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
-        refreshCitingButton.setVisible(false);
-        refreshCitingButton.setAlignment(Pos.CENTER_RIGHT);
-        AnchorPane.setTopAnchor(refreshCitingButton, 0.0);
-        AnchorPane.setBottomAnchor(refreshCitingButton, 0.0);
-        AnchorPane.setRightAnchor(refreshCitingButton, 20.0);
-
+        styleRefreshButton(refreshCitingButton);
         refreshCitedByButton = new Button();
-        refreshCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
-        refreshCitedByButton.setVisible(false);
-        refreshCitedByButton.setAlignment(Pos.CENTER_RIGHT);
-        AnchorPane.setTopAnchor(refreshCitedByButton, 0.0);
-        AnchorPane.setBottomAnchor(refreshCitedByButton, 0.0);
-        AnchorPane.setRightAnchor(refreshCitedByButton, 20.0);
+        styleRefreshButton(refreshCitedByButton);
 
-        citedByStackPane.getChildren().add(citedByListView);
-        citingStackPane.getChildren().add(citingListView);
-        citedByStackPane.getChildren().add(startCitedByButton);
-        citingStackPane.getChildren().add(startCitingButton);
-
+        //Create Progress Indicators
         citingProgress = new ProgressIndicator();
         citingProgress.setMaxSize(50, 50);
         citingProgress.setVisible(false);
-
         citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(50, 50);
         citedByProgress.setVisible(false);
 
+        //Add nodes to parent layout containers
+        citedByStackPane.getChildren().add(citedByListView);
+        citingStackPane.getChildren().add(citingListView);
+        citedByStackPane.getChildren().add(startCitedByButton);
+        citingStackPane.getChildren().add(startCitingButton);
         citingStackPane.getChildren().add(citingProgress);
         citedByStackPane.getChildren().add(citedByProgress);
-
-        citingVBox.setFillWidth(true);
-        citedByVBox.setFillWidth(true);
-
         citingHBox.getChildren().add(citingLabel);
         citedByHBox.getChildren().add(citedByLabel);
         citingHBox.getChildren().add(refreshCitingButton);
         citedByHBox.getChildren().add(refreshCitedByButton);
-
         citingVBox.getChildren().add(citingHBox);
         citingVBox.getChildren().add(citingStackPane);
         citedByVBox.getChildren().add(citedByHBox);
         citedByVBox.getChildren().add(citedByStackPane);
-        citingVBox.setAlignment(Pos.TOP_CENTER);
-        citedByVBox.setAlignment(Pos.TOP_CENTER);
 
-        startCitingButton.setOnMouseClicked(event -> citingClicked(entry));
-        startCitedByButton.setOnMouseClicked(event -> citedByClicked(entry));
-        refreshCitingButton.setOnMouseClicked(event -> citingClicked(entry));
-        refreshCitedByButton.setOnMouseClicked(event -> citedByClicked(entry));
+        //Specify click methods for buttons
+        startCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane));
+        startCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane));
 
+        //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
         setContent(container);
 
         return container;
     }
 
-    private void onCitedByListClicked() {
-        if (!citedByListView.getItems().isEmpty() && citedByListView.getSelectionModel().getSelectedItem() != null) {
-            System.out.println("Clicked on: " + citedByListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
-        }
+    /**
+     * Method to style heading labels
+     *
+     * @param label label to style
+     */
+    private void styleLabel(Label label) {
+        label.setStyle("-fx-padding: 5px");
+        label.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(label, 0.0);
+        AnchorPane.setLeftAnchor(label, 0.0);
+        AnchorPane.setBottomAnchor(label, 0.0);
+        AnchorPane.setRightAnchor(label, 0.0);
     }
 
-    private void onCitingListClicked() {
-        if (!citingListView.getItems().isEmpty() && citingListView.getSelectionModel().getSelectedItem() != null) {
-            System.out.println("Clicked on: " + citingListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
-        }
+    /**
+     * Method to style refresh buttons
+     *
+     * @param button button to style
+     */
+    private void styleRefreshButton(Button button) {
+        button.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+        button.setVisible(false);
+        button.setAlignment(Pos.CENTER_RIGHT);
+        AnchorPane.setTopAnchor(button, 0.0);
+        AnchorPane.setBottomAnchor(button, 0.0);
+        AnchorPane.setRightAnchor(button, 20.0);
     }
 
+    /**
+     * Determines if tab should be shown according to preferences
+     *
+     * @param entry Currently selected BibEntry
+     * @return boolean if tab should be shown
+     */
     @Override
     public boolean shouldShow(BibEntry entry) {
         return preferences.shouldShowCitationRelationsTab();
@@ -170,66 +173,50 @@ public class CitationRelationsTab extends EntryEditorTab {
         setContent(getPane(entry));
     }
 
-    private void citingClicked(BibEntry entry) {
-        ObservableList<BibEntry> citingList = FXCollections.observableArrayList();
-        startCitingButton.setVisible(false);
-        CitationRelationFetcher fetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITING, citingListView);
-        BackgroundTask
-                .wrap(() -> fetcher.performSearch(entry))
-                .onRunning(() -> {
-                    citingListView.getItems().clear();
-                    citingProgress.setVisible(true);
-                    refreshCitingButton.setVisible(false);
-                })
-                .onSuccess(fetchedList -> {
-                    citingProgress.setVisible(false);
-                    citingList.addAll(fetchedList);
-                    if (citingList.isEmpty()) {
-                        BibEntry emptyEntry = new BibEntry();
-                        emptyEntry.setField(StandardField.TITLE, "No articles found");
-                        emptyEntry.setField(StandardField.AUTHOR, "-");
-                        citingList.add(emptyEntry);
-                    }
-                    citingListView.setItems(citingList);
-                    refreshCitingButton.setVisible(true);
-                })
-                .onFailure(exception -> {
-                    LOGGER.error("Error while fetching citing Articles", exception);
-                    citingProgress.setVisible(false);
-                    citingStackPane.getChildren().add(new Label("Error"));
-                    refreshCitingButton.setVisible(true);
-                })
-                .executeWith(Globals.TASK_EXECUTOR);
-    }
+    /**
+     * Method to start search for relations and display them
+     * in the associated ListView
+     * @param entry BibEntry currently selected in Jabref Database
+     * @param startButton start button to use
+     * @param listView ListView to use
+     * @param progress ProgressIndicator to use
+     * @param refreshButton refresh Button to use
+     * @param searchType type of search (CITING / CITEDBY)
+     * @param stackPane StackPane to use
+     */
+    private void searchForRelations(BibEntry entry, Button startButton, ListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane) {
+        //Create ObservableList to display in ListView
+        ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
+        startButton.setVisible(false);
 
-    private void citedByClicked(BibEntry entry) {
-        ObservableList<BibEntry> citedByList = FXCollections.observableArrayList();
-        startCitedByButton.setVisible(false);
-        CitationRelationFetcher fetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITEDBY, citedByListView);
+        //New Instance of CitationRelationsFetcher with correct searchType
+        CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView);
+
+        //Perform search in background and deal with success or failure
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> {
-                    citedByListView.getItems().clear();
-                    citedByProgress.setVisible(true);
-                    refreshCitedByButton.setVisible(false);
+                    listView.getItems().clear();
+                    progress.setVisible(true);
+                    refreshButton.setVisible(false);
                 })
                 .onSuccess(fetchedList -> {
-                    citedByProgress.setVisible(false);
-                    citedByList.addAll(fetchedList);
-                    if (citedByList.isEmpty()) {
+                    progress.setVisible(false);
+                    observableList.addAll(fetchedList);
+                    if (observableList.isEmpty()) {
                         BibEntry emptyEntry = new BibEntry();
                         emptyEntry.setField(StandardField.TITLE, "No articles found");
                         emptyEntry.setField(StandardField.AUTHOR, "-");
-                        citedByList.add(emptyEntry);
+                        observableList.add(emptyEntry);
                     }
-                    citedByListView.setItems(citedByList);
-                    refreshCitedByButton.setVisible(true);
+                    listView.setItems(observableList);
+                    refreshButton.setVisible(true);
                 })
                 .onFailure(exception -> {
                     LOGGER.error("Error while fetching citing Articles", exception);
-                    citedByProgress.setVisible(false);
-                    citedByStackPane.getChildren().add(new Label("Error"));
-                    refreshCitedByButton.setVisible(true);
+                    progress.setVisible(false);
+                    stackPane.getChildren().add(new Label("Error"));
+                    refreshButton.setVisible(true);
                 })
                 .executeWith(Globals.TASK_EXECUTOR);
     }

@@ -4,9 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
 import javafx.scene.control.ListView;
 
 import kong.unirest.json.JSONArray;
@@ -18,103 +16,77 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
+/**
+ * Class to fetch for an articles citation relations on opencitations.net's API
+ */
 public class CitationRelationFetcher implements EntryBasedFetcher {
 
-    private final SearchType searchType;
+    private String searchType = null;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
+    /**
+     * Possible search methods
+     */
     public enum SearchType {
         CITING,
         CITEDBY
     }
 
     public CitationRelationFetcher(SearchType searchType, ListView<BibEntry> listView) {
-        this.searchType = searchType;
+        if (searchType.equals(SearchType.CITING)) {
+            this.searchType = "reference";
+        } else if (searchType.equals(SearchType.CITEDBY)) {
+            this.searchType = "citation";
+        }
     }
 
+    /**
+     * Executes the search method associated with searchType
+     * @param entry Entry to search relations for
+     * @return List of BibEntries found
+     */
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         String doi = entry.getField(StandardField.DOI).orElse("");
+        if (searchType != null) {
+            List<BibEntry> list = new ArrayList<>();
+            try {
+                System.out.println(BASIC_URL + doi);
+                JSONArray json = readJsonFromUrl(BASIC_URL + doi);
+                System.out.println(json.toString());
+                String[] items = json.getJSONObject(0).getString(searchType).split("; ");
+                for (String item : items) {
+                    System.out.println(item);
+                    if (!doi.equals(item) && !item.equals("")) {
+                        DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+                        try {
+                            doiFetcher.performSearchById(item).ifPresent(list::add);
+                        } catch (FetcherException fetcherException) {
 
-        if (searchType.equals(SearchType.CITING)) {
-            return getCiting(doi);
-        } else if (searchType.equals(SearchType.CITEDBY)) {
-            return getCitedBy(doi);
+                        }
+                    }
+                }
+                System.out.println("Finished.");
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+            }
+            return list;
         } else {
             return null;
         }
     }
 
-    private List<BibEntry> getCiting(String doi) {
-        List<BibEntry> list = new ArrayList<>();
-        try {
-            System.out.println(BASIC_URL + doi);
-            JSONArray json = readJsonFromUrl(BASIC_URL + doi);
-            System.out.println(json.toString());
-            String[] items = json.getJSONObject(0).getString("reference").split("; ");
-            for (String item : items) {
-                System.out.println(item);
-                if (!doi.equals(item) && !item.equals("")) {
-                    DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                    try {
-                        doiFetcher.performSearchById(item).ifPresent(list::add);
-                    } catch (FetcherException fetcherException) {
-
-                    }
-                    //Alternatively get infos from api
-                    /*try {
-                        JSONArray article = readJsonFromUrl(BASIC_URL + item);
-                        BibEntry newEntry = new BibEntry();
-                        newEntry.setField(StandardField.TITLE, article.getJSONObject(0).getString("title"));
-                        newEntry.setField(StandardField.AUTHOR, article.getJSONObject(0).getString("author"));
-                        newEntry.setField(StandardField.DOI, article.getJSONObject(0).getString("doi"));
-                        list.add(newEntry);
-                    } catch (JSONException jsonException) {
-
-                    }*/
-                }
-            }
-            System.out.println("Finished.");
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
+    /**
+     * Method to read JSON files from URL
+     * @param url API URL to search
+     * @return JSONArray containing the response of the API
+     */
+    public static JSONArray readJsonFromUrl(String url) throws IOException, JSONException {
+        try (InputStream is = new URL(url).openStream()) {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String jsonText = readAll(rd);
+            return new JSONArray(jsonText);
         }
-        return list;
-    }
-
-    private List<BibEntry> getCitedBy(String doi) {
-        List<BibEntry> list = new ArrayList<>();
-        try {
-            System.out.println(BASIC_URL + doi);
-            JSONArray json = readJsonFromUrl(BASIC_URL + doi);
-            System.out.println(json.toString());
-            String[] items = json.getJSONObject(0).getString("citation").split("; ");
-            for (String item : items) {
-                System.out.println(item);
-                if (!doi.equals(item) && !item.equals("")) {
-                    DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                    try {
-                        doiFetcher.performSearchById(item).ifPresent(list::add);
-                    } catch (FetcherException fetcherException) {
-
-                    }
-                    //Alternatively get infos from api
-                    /*try {
-                        JSONArray article = readJsonFromUrl(BASIC_URL + item);
-                        BibEntry newEntry = new BibEntry();
-                        newEntry.setField(StandardField.TITLE, article.getJSONObject(0).getString("title"));
-                        newEntry.setField(StandardField.AUTHOR, article.getJSONObject(0).getString("author"));
-                        newEntry.setField(StandardField.DOI, article.getJSONObject(0).getString("doi"));
-                        list.add(newEntry);
-                    } catch (JSONException jsonException) {
-
-                    }*/
-                }
-            }
-            System.out.println("Finished.");
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     private static String readAll(Reader rd) throws IOException {
@@ -124,14 +96,6 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
             sb.append((char) cp);
         }
         return sb.toString();
-    }
-
-    public static JSONArray readJsonFromUrl(String url) throws IOException, JSONException {
-        try (InputStream is = new URL(url).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-            String jsonText = readAll(rd);
-            return new JSONArray(jsonText);
-        }
     }
 
     @Override
