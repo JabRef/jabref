@@ -3,20 +3,29 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import org.jabref.gui.icon.JabRefIconView?>
-<Pane fx:id="cellPane" prefHeight="30.0" prefWidth="780.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Label fx:id="titleLabel" layoutX="14.0" layoutY="6.0" text="Label" maxWidth="390"/>
-      <Label fx:id="authorLabel" layoutX="411.0" layoutY="6.0" text="Label" maxWidth="291"/>
-       <Button fx:id="detailsButton" layoutX="754.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button,narrow">
-           <graphic>
-               <JabRefIconView glyph="MAKE_KEY"/>
-           </graphic>
-       </Button>
-       <Button fx:id="addButton" layoutX="702.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button,narrow">
-           <graphic>
-               <JabRefIconView glyph="MAKE_KEY"/>
-           </graphic>
-       </Button>
-   </children>
-</Pane>
+<?import javafx.geometry.Insets?>
+<GridPane fx:id="cellPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <columnConstraints>
+        <ColumnConstraints percentWidth="45"  />
+        <ColumnConstraints percentWidth="45"  />
+        <ColumnConstraints percentWidth="10"  />
+    </columnConstraints>
+    <children>
+        <HBox alignment="CENTER" GridPane.columnIndex="2">
+            <children>
+                <Button fx:id="detailsButton" layoutX="754.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button"/>
+                <Button fx:id="addButton" layoutX="702.0" layoutY="2.0" prefWidth="30" mnemonicParsing="false" styleClass="icon-button"/>
+            </children>
+        </HBox>
+        <Label fx:id="titleLabel" text="Label">
+            <GridPane.margin>
+                <Insets left="15.0" />
+            </GridPane.margin>
+        </Label>
+        <Label fx:id="authorLabel" text="Label" GridPane.columnIndex="1">
+            <GridPane.margin>
+                <Insets left="15.0" />
+            </GridPane.margin>
+        </Label>
+    </children>
+</GridPane>
