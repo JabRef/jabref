@@ -714,7 +714,7 @@ if (OperatingSystem.current().isWindows()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/windows") {
-                include "jabref.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
+                include "jabref-firefox.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
             }
             into "$buildDir/distribution/JabRef"
         }
