@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -15,10 +16,12 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.jabref.model.entry.field.StandardField;
 
+import com.sun.star.sdb.DatabaseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +32,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.gui.entryeditor.CitationRelationsTab.class);
     private final EntryEditorPreferences preferences;
-    private final EntryEditor entryEditor;
     private final DialogService dialogService;
-    private VBox citingVBox;
-    private VBox citedByVBox;
-    private HBox citingHBox;
-    private HBox citedByHBox;
-    private Label citingLabel;
-    private Label citedByLabel;
     private ListView<BibEntry> citingListView;
     private ListView<BibEntry> citedByListView;
     private StackPane citingStackPane;
@@ -47,58 +43,87 @@ public class CitationRelationsTab extends EntryEditorTab {
     private Button refreshCitedByButton;
     private ProgressIndicator citingProgress;
     private ProgressIndicator citedByProgress;
+    private final BibDatabaseContext databaseContext;
 
-    public CitationRelationsTab(EntryEditor entryEditor, EntryEditorPreferences preferences, DialogService dialogService) {
+    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService, BibDatabaseContext databaseContext) {
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-        this.entryEditor = entryEditor;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.databaseContext = databaseContext;
     }
 
     private SplitPane getPane(BibEntry entry) {
-        citingVBox = new VBox();
-        citedByVBox = new VBox();
-        citingHBox = new HBox();
-        citedByHBox = new HBox();
-        citingLabel = new Label("Citing");
+        VBox citingVBox = new VBox();
+        VBox citedByVBox = new VBox();
+
+        AnchorPane citingHBox = new AnchorPane();
+        AnchorPane citedByHBox = new AnchorPane();
+
+        Label citingLabel = new Label("Citing");
         citingLabel.setStyle("-fx-padding: 5px");
-        citedByLabel = new Label("Cited By");
+        citingLabel.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(citingLabel, 0.0);
+        AnchorPane.setLeftAnchor(citingLabel, 0.0);
+        AnchorPane.setBottomAnchor(citingLabel, 0.0);
+        AnchorPane.setRightAnchor(citingLabel, 0.0);
+
+        Label citedByLabel = new Label("Cited By");
         citedByLabel.setStyle("-fx-padding: 5px");
+        citedByLabel.setAlignment(Pos.CENTER);
+        AnchorPane.setTopAnchor(citedByLabel, 0.0);
+        AnchorPane.setLeftAnchor(citedByLabel, 0.0);
+        AnchorPane.setBottomAnchor(citedByLabel, 0.0);
+        AnchorPane.setRightAnchor(citedByLabel, 0.0);
+
         citingListView = new ListView<>();
-        citingListView.setCellFactory(listView -> new CitationRelationListCell());
-        citingListView.setOnMouseClicked(event -> onCitingListClicked());
+        citingListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
+        //citingListView.setOnMouseClicked(event -> onCitingListClicked());
         citedByListView = new ListView<>();
-        citedByListView.setCellFactory(listView -> new CitationRelationListCell());
-        citedByListView.setOnMouseClicked(event -> onCitedByListClicked());
+        citedByListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
+        //citedByListView.setOnMouseClicked(event -> onCitedByListClicked());
+
         citingStackPane = new StackPane();
         citedByStackPane = new StackPane();
-        startCitingButton = new Button("Search");
-        startCitedByButton = new Button("Search");
+        startCitingButton = new Button();
+        startCitingButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
+        startCitedByButton = new Button();
+        startCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
+
         refreshCitingButton = new Button();
         refreshCitingButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
         refreshCitingButton.setVisible(false);
+        refreshCitingButton.setAlignment(Pos.CENTER_RIGHT);
+        AnchorPane.setTopAnchor(refreshCitingButton, 0.0);
+        AnchorPane.setBottomAnchor(refreshCitingButton, 0.0);
+        AnchorPane.setRightAnchor(refreshCitingButton, 20.0);
+
         refreshCitedByButton = new Button();
         refreshCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
         refreshCitedByButton.setVisible(false);
+        refreshCitedByButton.setAlignment(Pos.CENTER_RIGHT);
+        AnchorPane.setTopAnchor(refreshCitedByButton, 0.0);
+        AnchorPane.setBottomAnchor(refreshCitedByButton, 0.0);
+        AnchorPane.setRightAnchor(refreshCitedByButton, 20.0);
 
         citedByStackPane.getChildren().add(citedByListView);
         citingStackPane.getChildren().add(citingListView);
         citedByStackPane.getChildren().add(startCitedByButton);
         citingStackPane.getChildren().add(startCitingButton);
+
         citingProgress = new ProgressIndicator();
         citingProgress.setMaxSize(50, 50);
         citingProgress.setVisible(false);
+
         citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(50, 50);
         citedByProgress.setVisible(false);
+
         citingStackPane.getChildren().add(citingProgress);
         citedByStackPane.getChildren().add(citedByProgress);
 
         citingVBox.setFillWidth(true);
         citedByVBox.setFillWidth(true);
-        citingHBox.setAlignment(Pos.CENTER);
-        citedByHBox.setAlignment(Pos.CENTER);
 
         citingHBox.getChildren().add(citingLabel);
         citedByHBox.getChildren().add(citedByLabel);
@@ -124,13 +149,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void onCitedByListClicked() {
-        if (!citedByListView.getItems().isEmpty()) {
+        if (!citedByListView.getItems().isEmpty() && citedByListView.getSelectionModel().getSelectedItem() != null) {
             System.out.println("Clicked on: " + citedByListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
         }
     }
 
     private void onCitingListClicked() {
-        if (!citingListView.getItems().isEmpty()) {
+        if (!citingListView.getItems().isEmpty() && citingListView.getSelectionModel().getSelectedItem() != null) {
             System.out.println("Clicked on: " + citingListView.getSelectionModel().getSelectedItem().getField(StandardField.TITLE));
         }
     }
@@ -161,7 +186,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     citingList.addAll(fetchedList);
                     if (citingList.isEmpty()) {
                         BibEntry emptyEntry = new BibEntry();
-                        emptyEntry.setField(StandardField.TITLE, "No Articles Found");
+                        emptyEntry.setField(StandardField.TITLE, "No articles found");
                         emptyEntry.setField(StandardField.AUTHOR, "-");
                         citingList.add(emptyEntry);
                     }
@@ -193,7 +218,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     citedByList.addAll(fetchedList);
                     if (citedByList.isEmpty()) {
                         BibEntry emptyEntry = new BibEntry();
-                        emptyEntry.setField(StandardField.TITLE, "No Articles Found");
+                        emptyEntry.setField(StandardField.TITLE, "No articles found");
                         emptyEntry.setField(StandardField.AUTHOR, "-");
                         citedByList.add(emptyEntry);
                     }

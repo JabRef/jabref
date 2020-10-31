@@ -251,7 +251,7 @@ public class EntryEditor extends BorderPane {
         entryEditorTabs.add(new MathSciNetTab());
         entryEditorTabs.add(new FileAnnotationTab(panel.getAnnotationCache()));
         entryEditorTabs.add(new RelatedArticlesTab(this, entryEditorPreferences, dialogService));
-        entryEditorTabs.add(new CitationRelationsTab(this, entryEditorPreferences, dialogService));
+        entryEditorTabs.add(new CitationRelationsTab(entryEditorPreferences, dialogService, databaseContext));
 
         // Source tab
         sourceTab = new SourceTab(

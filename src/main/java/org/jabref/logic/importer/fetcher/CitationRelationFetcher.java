@@ -61,6 +61,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                     } catch (FetcherException fetcherException) {
 
                     }
+                    //Alternatively get infos from api
                     /*try {
                         JSONArray article = readJsonFromUrl(BASIC_URL + item);
                         BibEntry newEntry = new BibEntry();
@@ -96,6 +97,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                     } catch (FetcherException fetcherException) {
 
                     }
+                    //Alternatively get infos from api
                     /*try {
                         JSONArray article = readJsonFromUrl(BASIC_URL + item);
                         BibEntry newEntry = new BibEntry();
