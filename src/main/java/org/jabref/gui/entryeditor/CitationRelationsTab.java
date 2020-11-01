@@ -36,6 +36,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     private Button startCitedByButton;
     private Button refreshCitingButton;
     private Button refreshCitedByButton;
+    private Label errorLabel;
     private ProgressIndicator citingProgress;
     private ProgressIndicator citedByProgress;
     private final BibDatabaseContext databaseContext;
@@ -126,6 +127,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
         setContent(container);
 
+        errorLabel = new Label();
+
         return container;
     }
 
@@ -199,6 +202,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     listView.getItems().clear();
                     progress.setVisible(true);
                     refreshButton.setVisible(false);
+                    stackPane.getChildren().remove(errorLabel);
                 })
                 .onSuccess(fetchedList -> {
                     progress.setVisible(false);
@@ -215,7 +219,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .onFailure(exception -> {
                     LOGGER.error("Error while fetching citing Articles", exception);
                     progress.setVisible(false);
-                    stackPane.getChildren().add(new Label("Error"));
+                    errorLabel.setText(exception.getMessage());
+                    stackPane.getChildren().add(errorLabel);
                     refreshButton.setVisible(true);
                 })
                 .executeWith(Globals.TASK_EXECUTOR);

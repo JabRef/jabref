@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.*;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,20 +55,24 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
             try {
                 System.out.println(BASIC_URL + doi);
                 JSONArray json = readJsonFromUrl(BASIC_URL + doi);
-                System.out.println(json.toString());
-                String[] items = json.getJSONObject(0).getString(searchType).split("; ");
-                for (String item : items) {
-                    System.out.println(item);
-                    if (!doi.equals(item) && !item.equals("")) {
-                        DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                        try {
-                            doiFetcher.performSearchById(item).ifPresent(list::add);
-                        } catch (FetcherException fetcherException) {
-
+                if (json != null) {
+                    System.out.println(json.toString());
+                    String[] items = json.getJSONObject(0).getString(searchType).split("; ");
+                    for (String item : items) {
+                        System.out.println(item);
+                        if (!doi.equals(item) && !item.equals("")) {
+                            DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+                            try {
+                                doiFetcher.performSearchById(item).ifPresent(list::add);
+                            } catch (FetcherException fetcherException) {
+                                // No information for doi found
+                            }
                         }
                     }
+                    System.out.println("Finished.");
+                } else {
+                    throw new FetcherException("No internet connection! Please try again.");
                 }
-                System.out.println("Finished.");
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
@@ -86,6 +92,8 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String jsonText = readAll(rd);
             return new JSONArray(jsonText);
+        } catch (UnknownHostException | SocketException exception) {
+            return null;
         }
     }
 
