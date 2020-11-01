@@ -188,41 +188,48 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param stackPane StackPane to use
      */
     private void searchForRelations(BibEntry entry, Button startButton, ListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane) {
-        //Create ObservableList to display in ListView
-        ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
-        startButton.setVisible(false);
 
-        //New Instance of CitationRelationsFetcher with correct searchType
-        CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView);
+        //Check if current entry has DOI Number required for searching
+        if (entry.getField(StandardField.DOI).isPresent()) {
 
-        //Perform search in background and deal with success or failure
-        BackgroundTask
-                .wrap(() -> fetcher.performSearch(entry))
-                .onRunning(() -> {
-                    listView.getItems().clear();
-                    progress.setVisible(true);
-                    refreshButton.setVisible(false);
-                    stackPane.getChildren().remove(errorLabel);
-                })
-                .onSuccess(fetchedList -> {
-                    progress.setVisible(false);
-                    observableList.addAll(fetchedList);
-                    if (observableList.isEmpty()) {
-                        BibEntry emptyEntry = new BibEntry();
-                        emptyEntry.setField(StandardField.TITLE, "No articles found");
-                        emptyEntry.setField(StandardField.AUTHOR, "-");
-                        observableList.add(emptyEntry);
-                    }
-                    listView.setItems(observableList);
-                    refreshButton.setVisible(true);
-                })
-                .onFailure(exception -> {
-                    LOGGER.error("Error while fetching citing Articles", exception);
-                    progress.setVisible(false);
-                    errorLabel.setText(exception.getMessage());
-                    stackPane.getChildren().add(errorLabel);
-                    refreshButton.setVisible(true);
-                })
-                .executeWith(Globals.TASK_EXECUTOR);
+            //Create ObservableList to display in ListView
+            ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
+            startButton.setVisible(false);
+
+            //New Instance of CitationRelationsFetcher with correct searchType
+            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView);
+
+            //Perform search in background and deal with success or failure
+            BackgroundTask
+                    .wrap(() -> fetcher.performSearch(entry))
+                    .onRunning(() -> {
+                        listView.getItems().clear();
+                        progress.setVisible(true);
+                        refreshButton.setVisible(false);
+                        stackPane.getChildren().remove(errorLabel);
+                    })
+                    .onSuccess(fetchedList -> {
+                        progress.setVisible(false);
+                        observableList.addAll(fetchedList);
+                        if (observableList.isEmpty()) {
+                            BibEntry emptyEntry = new BibEntry();
+                            emptyEntry.setField(StandardField.TITLE, "No articles found");
+                            emptyEntry.setField(StandardField.AUTHOR, "-");
+                            observableList.add(emptyEntry);
+                        }
+                        listView.setItems(observableList);
+                        refreshButton.setVisible(true);
+                    })
+                    .onFailure(exception -> {
+                        LOGGER.error("Error while fetching citing Articles", exception);
+                        progress.setVisible(false);
+                        errorLabel.setText(exception.getMessage());
+                        stackPane.getChildren().add(errorLabel);
+                        refreshButton.setVisible(true);
+                    })
+                    .executeWith(Globals.TASK_EXECUTOR);
+        } else {
+            dialogService.showInformationDialogAndWait("DOI-Number required", "Please add DOI-Number to entry before searching.");
+        }
     }
 }
