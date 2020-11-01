@@ -37,6 +37,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private Button refreshCitingButton;
     private Button refreshCitedByButton;
     private Label errorLabel;
+    private Label citingProgressLabel;
+    private Label citedByProgressLabel;
     private ProgressIndicator citingProgress;
     private ProgressIndicator citedByProgress;
     private final BibDatabaseContext databaseContext;
@@ -95,11 +97,13 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         //Create Progress Indicators
         citingProgress = new ProgressIndicator();
-        citingProgress.setMaxSize(50, 50);
+        citingProgress.setMaxSize(60, 60);
         citingProgress.setVisible(false);
         citedByProgress = new ProgressIndicator();
-        citedByProgress.setMaxSize(50, 50);
+        citedByProgress.setMaxSize(60, 60);
         citedByProgress.setVisible(false);
+        citingProgressLabel = new Label();
+        citedByProgressLabel = new Label();
 
         //Add nodes to parent layout containers
         citedByStackPane.getChildren().add(citedByListView);
@@ -108,6 +112,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingStackPane.getChildren().add(startCitingButton);
         citingStackPane.getChildren().add(citingProgress);
         citedByStackPane.getChildren().add(citedByProgress);
+        citingStackPane.getChildren().add(citingProgressLabel);
+        citedByStackPane.getChildren().add(citedByProgressLabel);
         citingHBox.getChildren().add(citingLabel);
         citedByHBox.getChildren().add(citedByLabel);
         citingHBox.getChildren().add(refreshCitingButton);
@@ -118,10 +124,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByVBox.getChildren().add(citedByStackPane);
 
         //Specify click methods for buttons
-        startCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane));
-        startCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane));
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane));
+        startCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel));
+        startCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel));
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
@@ -187,7 +193,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param searchType type of search (CITING / CITEDBY)
      * @param stackPane StackPane to use
      */
-    private void searchForRelations(BibEntry entry, Button startButton, ListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane) {
+    private void searchForRelations(BibEntry entry, Button startButton, ListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane, Label progressLabel) {
 
         //Check if current entry has DOI Number required for searching
         if (entry.getField(StandardField.DOI).isPresent()) {
@@ -197,7 +203,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             startButton.setVisible(false);
 
             //New Instance of CitationRelationsFetcher with correct searchType
-            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView);
+            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView, progressLabel);
 
             //Perform search in background and deal with success or failure
             BackgroundTask
@@ -207,9 +213,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                         progress.setVisible(true);
                         refreshButton.setVisible(false);
                         stackPane.getChildren().remove(errorLabel);
+                        progressLabel.setVisible(true);
                     })
                     .onSuccess(fetchedList -> {
                         progress.setVisible(false);
+                        progressLabel.setVisible(false);
                         observableList.addAll(fetchedList);
                         if (observableList.isEmpty()) {
                             BibEntry emptyEntry = new BibEntry();
@@ -223,6 +231,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     .onFailure(exception -> {
                         LOGGER.error("Error while fetching citing Articles", exception);
                         progress.setVisible(false);
+                        progressLabel.setVisible(false);
                         errorLabel.setText(exception.getMessage());
                         stackPane.getChildren().add(errorLabel);
                         refreshButton.setVisible(true);

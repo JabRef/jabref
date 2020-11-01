@@ -7,6 +7,9 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 import kong.unirest.json.JSONArray;
@@ -24,6 +27,7 @@ import org.jabref.preferences.JabRefPreferences;
 public class CitationRelationFetcher implements EntryBasedFetcher {
 
     private String searchType = null;
+    private Label progressLabel;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
     /**
@@ -34,12 +38,13 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         CITEDBY
     }
 
-    public CitationRelationFetcher(SearchType searchType, ListView<BibEntry> listView) {
+    public CitationRelationFetcher(SearchType searchType, ListView<BibEntry> listView, Label progressLabel) {
         if (searchType.equals(SearchType.CITING)) {
             this.searchType = "reference";
         } else if (searchType.equals(SearchType.CITEDBY)) {
             this.searchType = "citation";
         }
+        this.progressLabel = progressLabel;
     }
 
     /**
@@ -58,7 +63,10 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                 if (json != null) {
                     System.out.println(json.toString());
                     String[] items = json.getJSONObject(0).getString(searchType).split("; ");
+                    int i = 1;
                     for (String item : items) {
+                        int finalI = i;
+                        Platform.runLater(() -> progressLabel.setText(finalI + "/" + items.length));
                         System.out.println(item);
                         if (!doi.equals(item) && !item.equals("")) {
                             DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
@@ -68,6 +76,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                                 // No information for doi found
                             }
                         }
+                        i++;
                     }
                     System.out.println("Finished.");
                 } else {
