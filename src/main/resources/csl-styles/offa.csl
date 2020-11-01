@@ -2,30 +2,25 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" demote-non-dropping-particle="sort-only">
   <!-- Polyglot; journal publishes in English, German, and occasionally in other languages -->
   <info>
-    <title>Journal of Neolithic Archaeology</title>
-    <title-short>JNA</title-short>
-    <id>http://www.zotero.org/styles/journal-of-neolithic-archaeology</id>
-    <link href="http://www.zotero.org/styles/journal-of-neolithic-archaeology" rel="self"/>
-    <link href="http://www.zotero.org/styles/deutsches-archaologisches-institut" rel="template"/>
-    <link href="http://www.jna.uni-kiel.de/index.php/jna/about/submissions" rel="documentation"/>
+    <title>Offa - Berichte und Mitteilungen zur Urgeschichte, Frühgeschichte und Mittelalterarchäologie</title>
+    <title-short>Offa</title-short>
+    <id>http://www.zotero.org/styles/offa</id>
+    <link href="http://www.zotero.org/styles/offa" rel="self"/>
+    <link href="http://www.zotero.org/styles/journal-of-neolithic-archaeology" rel="template"/>
+    <link href="https://www.ufg.uni-kiel.de/de/schriften/verlinkte-dateien/offa-richtlinien-2018" rel="documentation"/>
     <author>
-      <name>Martin Hinz</name>
-      <email>martin.hinz@ufg.uni-kiel.de</email>
-    </author>
-    <contributor>
-      <name>Journal of Neolithic Archaeology</name>
-      <email>jna@ufg.uni-kiel.de</email>
-    </contributor>
-    <contributor>
       <name>Nils Müller-Scheeßel</name>
       <email>nils.mueller-scheessel@ufg.uni-kiel.de</email>
+    </author>
+    <contributor>
+      <name>Offa</name>
+      <email>offa@ufg.uni-kiel.de</email>
     </contributor>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
-    <issn>2364-3676</issn>
-    <eissn>2197-649X</eissn>
-    <summary>Author-date style meeting citation specifications provided by JNA. Based on the DAI style.</summary>
-    <updated>2020-10-11T23:58:34+00:00</updated>
+    <issn>0078-3714</issn>
+    <summary>Author-date style meeting citation specifications provided by Offa. Based on the JNA style.</summary>
+    <updated>2020-10-12T00:09:05+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -40,24 +35,6 @@
       <term name="reviewed-author" form="verb">Rez. zu</term>
       <term name="presented at">Vortrag</term>
       <term name="accessed">Zugriff: </term>
-    </terms>
-  </locale>
-  <locale xml:lang="it">
-    <terms>
-      <term name="reviewed-author" form="verb">recens. di</term>
-      <term name="presented at">presentazione</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fr">
-    <terms>
-      <term name="reviewed-author" form="verb">rec. de</term>
-      <term name="presented at">conférence</term>
-    </terms>
-  </locale>
-  <locale xml:lang="es">
-    <terms>
-      <term name="reviewed-author" form="verb">recensión de</term>
-      <term name="presented at">conferencia</term>
     </terms>
   </locale>
   <macro name="short-container-contributors">
@@ -114,28 +91,30 @@
   </macro>
   <macro name="contributors">
     <group suffix=", ">
-      <choose>
-        <if variable="author">
-          <names variable="author">
-            <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with=". "/>
-          </names>
-        </if>
-        <else-if variable="editor">
-          <text macro="editor"/>
-        </else-if>
-      </choose>
+    <choose>
+      <if variable="author">
+        <names variable="author">
+          <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with=". "/>
+        </names>
+      </if>
+      <else-if variable="editor">
+        <text macro="editor"/>
+      </else-if>
+    </choose>
     </group>
   </macro>
   <macro name="contributors-short-citation">
     <choose>
       <if variable="author">
         <names variable="author">
-          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1" font-variant="small-caps" initialize-with=". " name-as-sort-order="all"/>
+          <et-al font-variant="normal"/>
         </names>
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1" font-variant="small-caps" initialize-with=". " name-as-sort-order="all"/>
+          <et-al font-variant="normal"/>
         </names>
       </else-if>
       <else>
@@ -147,12 +126,12 @@
     <choose>
       <if variable="author">
         <names variable="author">
-          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" et-al-min="3" et-al-use-first="1" initialize-with=". " name-as-sort-order="all"/>
         </names>
       </if>
       <else-if variable="editor">
         <names variable="editor">
-          <name form="short" delimiter="/" delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1"/>
+          <name form="short" delimiter="/" delimiter-precedes-last="always" et-al-min="3" et-al-use-first="1" initialize-with=". " name-as-sort-order="all"/>
         </names>
       </else-if>
       <else>
@@ -233,28 +212,31 @@
       <if type="book thesis chapter paper-conference" match="any">
         <choose>
           <if match="none" variable="edition">
-            <text value=" "/>
+            <text value=""/>
           </if>
         </choose>
-        <group delimiter=" " prefix=" (" suffix=")">
-          <choose>
-            <if type="thesis" match="any">
-              <text variable="genre" suffix=" "/>
-              <text variable="publisher"/>
-            </if>
-            <else>
-              <choose>
-                <if match="any" variable="original-date original-publisher-place">
-                  <text variable="original-publisher-place"/>
-                  <date date-parts="year" form="text" variable="original-date" prefix=" "/>
-                  <text value="; "/>
-                </if>
-              </choose>
-              <text variable="publisher-place"/>
-            </else>
-          </choose>
-          <text macro="date"/>
+        <group delimiter="" prefix=" (" suffix=")">
+          <group delimiter=" ">
+            <choose>
+              <if type="thesis" match="any">
+                <text variable="genre" suffix=" "/>
+                <text variable="publisher"/>
+              </if>
+              <else>
+                <text variable="publisher-place"/>
+              </else>
+            </choose>
+            <text macro="date"/>
+          </group>
           <text macro="edition"/>
+          <choose>
+            <if match="any" variable="original-date original-publisher-place">
+              <group prefix=" [Originalausgabe: " suffix="]">
+                <text variable="original-publisher-place"/>
+                <date date-parts="year" form="text" variable="original-date" prefix=" "/>
+              </group>
+            </if>
+          </choose>
         </group>
       </if>
     </choose>
@@ -327,7 +309,7 @@
     </choose>
   </macro>
   <macro name="doi">
-    <text variable="DOI" prefix=". DOI: https://doi.org/"/>
+  <text variable="DOI" prefix=". DOI: https://doi.org/"/>
   </macro>
   <macro name="review">
     <choose>
@@ -377,7 +359,7 @@
       </if>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-givenname="true" givenname-disambiguation-rule="all-names-with-initials" disambiguate-add-year-suffix="true">
     <sort>
       <key variable="issued"/>
       <key macro="contributors-short-citation"/>
@@ -392,7 +374,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="false" line-spacing="1" entry-spacing="0">
+  <bibliography hanging-indent="false" line-spacing="1" entry-spacing="1">
     <sort>
       <key macro="contributors-short-biblio"/>
       <key variable="issued"/>
@@ -429,7 +411,7 @@
             </else>
           </choose>
           <choose>
-            <if variable="DOI" match="any">
+          <if variable="DOI" match="any">
               <text macro="doi"/>
             </if>
             <else>
