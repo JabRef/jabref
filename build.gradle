@@ -128,7 +128,7 @@ dependencies {
     libreoffice 'org.libreoffice:ridl:6.4.3'
     libreoffice 'org.libreoffice:unoil:6.4.3'
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.8'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
