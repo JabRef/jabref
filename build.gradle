@@ -115,7 +115,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.66'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.67'
 
     implementation 'commons-cli:commons-cli:1.4'
 
@@ -128,7 +128,7 @@ dependencies {
     libreoffice 'org.libreoffice:ridl:6.4.3'
     libreoffice 'org.libreoffice:unoil:6.4.3'
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.8'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
@@ -167,7 +167,7 @@ dependencies {
     implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.0.2'
+    implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.konghq:unirest-java:3.11.02'
@@ -207,7 +207,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.17'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.5.13'
+    testImplementation 'org.mockito:mockito-core:3.6.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.7.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.7.0'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.14.1'
@@ -216,7 +216,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.36.2'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.37'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
     jython 'org.python:jython-standalone:2.7.2'
 }

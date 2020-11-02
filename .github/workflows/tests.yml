@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
+        uses: styfle/cancel-workflow-action@0.6.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
@@ -41,7 +41,12 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1

@@ -19,9 +19,9 @@ Chosen option: "Gradle", because it is lean and fits our development style.
 ### Maven
 
 * Good, because [there is a plugin for almost everything](https://www.slant.co/versus/2107/11592/~apache-maven_vs_gradle)
-* Good, because [it has good integration with third party tools](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
-* Good, because [it has robust performance](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
-* Good, because [it has a high popularity](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
+* Good, because [it has good integration with third party tools](https://fdocuments.us/reader/full/java-build-tools-part-2)
+* Good, because [it has robust performance](https://fdocuments.us/reader/full/java-build-tools-part-2)
+* Good, because [it has a high popularity](https://fdocuments.us/reader/full/java-build-tools-part-2)
 * Good, [if one favors declarative over imperative](https://www.slant.co/versus/2107/11592/~apache-maven_vs_gradle)
 * Bad, because [getting a dependency list is not straight forward](https://stackoverflow.com/q/1677473/873282)
 * Bad, because [it based on a fixed and linear model of phases](https://dzone.com/articles/gradle-vs-maven)
@@ -34,7 +34,7 @@ Chosen option: "Gradle", because it is lean and fits our development style.
 * Good, because [its build scripts are short](https://technologyconversations.com/2014/06/18/build-tools/)
 * Good, because [it follows the convention over configuration approach](https://www.safaribooksonline.com/library/view/building-and-testing/9781449306816/ch04.html)
 * Good, because [it offers a graph-based task dependencies](https://dzone.com/articles/gradle-vs-maven)
-* Good, because [it is easy to customize](http://pages.zeroturnaround.com/rs/zeroturnaround/images/java-build-tools-part-2.pdf)
+* Good, because [it is easy to customize](https://fdocuments.us/reader/full/java-build-tools-part-2)
 * Good, because [it offers custom dependency scopes](https://gradle.org/maven-vs-gradle/)
 * Good, because [it has good community support](https://linuxhint.com/ant-vs-maven-vs-gradle/)
 * Good, because [its performance can be 100 times more than maven's performance](https://gradle.org/gradle-vs-maven-performance/).

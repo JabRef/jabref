@@ -15,11 +15,8 @@ architectures:
   - build-on: amd64
 
 plugs:
-  desktop:
-  desktop-legacy:
-  wayland:
-  unity7:
   home:
+  unity7:
   opengl:
   network-bind:
   removable-media:
@@ -46,6 +43,7 @@ apps:
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
+  GTK_USE_PORTAL: "1"
 
 parts:
   jabref:

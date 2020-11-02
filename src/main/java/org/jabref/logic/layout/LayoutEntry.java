@@ -32,6 +32,7 @@ import org.jabref.logic.layout.format.AuthorLastFirstOxfordCommas;
 import org.jabref.logic.layout.format.AuthorNatBib;
 import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
+import org.jabref.logic.layout.format.CSLType;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBook4Authors;
@@ -73,6 +74,7 @@ import org.jabref.logic.layout.format.Replace;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
@@ -539,6 +541,10 @@ class LayoutEntry {
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
             case "Markdown":
                 return new MarkdownFormatter();
+            case "CSLType":
+                return new CSLType();
+            case "ShortMonth":
+                return new ShortMonthFormatter();
             default:
                 return null;
         }
