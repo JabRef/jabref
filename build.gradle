@@ -167,7 +167,7 @@ dependencies {
     implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.0.2'
+    implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.konghq:unirest-java:3.11.02'
