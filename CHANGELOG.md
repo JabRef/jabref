@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
 - We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 - We added an error message in the New Entry dialog that is shown in case the fetcher did not find anything . [#7000](https://github.com/JabRef/jabref/issues/7000)
+- We added a new formatter to output shorthand month format. [#6579](https://github.com/JabRef/jabref/issues/6579)
 
 ### Changed
 
@@ -43,6 +44,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We changed the name of a group type from "Searching for keywords" to "Searching for a keyword". [6995](https://github.com/JabRef/jabref/pull/6995)
 - We changed the way JabRef displays the title of a tab and of the window. [4161](https://github.com/JabRef/jabref/issues/4161)
 - We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
+- We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined packages. [7037](https://github.com/JabRef/jabref/pull/7037)
 
 ### Fixed
 
