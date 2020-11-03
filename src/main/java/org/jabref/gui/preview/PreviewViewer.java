@@ -127,8 +127,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
             previewView.getEngine().setUserStyleSheetLocation(dataUrl);
-        }
-        else if (theme.getType() != Theme.Type.LIGHT) {
+        } else if (theme.getType() != Theme.Type.LIGHT) {
             try {
                 previewView.getEngine().setUserStyleSheetLocation(theme.getPath().toUri().toURL().toExternalForm());
             } catch (MalformedURLException ex) {
