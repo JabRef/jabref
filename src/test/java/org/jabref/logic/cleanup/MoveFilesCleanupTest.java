@@ -130,6 +130,20 @@ class MoveFilesCleanupTest {
     }
 
     @Test
+    void movesFileWithFileDirPatternAndDir() {
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("PDFs/[entrytype]/");
+        cleanup.cleanup(entry);
+
+        Path fileAfter = defaultFileFolder.resolve("Pdfs/Misc").resolve("test.pdf");
+        assertEquals(
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", Path.of("PDFs/Misc/test.pdf"), ""))),
+                entry.getField(StandardField.FILE));
+        assertFalse(Files.exists(fileBefore));
+        assertTrue(Files.exists(fileAfter));
+    }
+
+
+    @Test
     void movesFileWithSubdirectoryPattern() {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]/[year]/[auth]");
         cleanup.cleanup(entry);
