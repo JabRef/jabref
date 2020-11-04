@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.Globals;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -42,7 +42,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
     private JabRefFrame frame;
     private final DialogService dialogService;
-    private BasePanel panel;
+    private LibraryTab panel;
     private final List<BibEntry> entries = new ArrayList<>();
     private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
@@ -56,7 +56,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
+    public ExportToClipboardAction(LibraryTab panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
@@ -67,7 +67,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     @Override
     public void execute() {
         if (panel == null) {
-            panel = frame.getCurrentBasePanel();
+            panel = frame.getCurrentLibraryTab();
         }
 
         if (panel.getSelectedEntries().isEmpty()) {
@@ -103,7 +103,8 @@ public class ExportToClipboardAction extends SimpleCommand {
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()).stream().map(Path::toString).collect(Collectors.toList());
+        Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext()
+                                                .getFileDirectories(Globals.prefs.getFilePreferences());
 
         // Add chosen export type to last used pref, to become default
         Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());

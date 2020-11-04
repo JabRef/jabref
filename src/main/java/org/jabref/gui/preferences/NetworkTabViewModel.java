@@ -10,8 +10,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;

@@ -7,8 +7,8 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.JabRefGUI;
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.BindingsHelper;

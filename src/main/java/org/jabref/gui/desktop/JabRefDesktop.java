@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -55,7 +55,7 @@ public class JabRefDesktop {
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<Path> directories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectories(Globals.prefs.getFilePreferences());
 
             Optional<Path> file = FileHelper.find(link, directories);
 

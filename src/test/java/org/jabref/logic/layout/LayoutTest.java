@@ -3,6 +3,7 @@ package org.jabref.logic.layout;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.jabref.logic.layout.format.FileLinkPreferences;
@@ -135,9 +136,9 @@ class LayoutTest {
     @Test
     void wrapFileLinksExpandFile() throws IOException {
         when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
-                new FileLinkPreferences("", Collections.singletonList("src/test/resources/pdfs/")));
+                new FileLinkPreferences("", Collections.singletonList(Path.of("src/test/resources/pdfs/"))));
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.addFile(new LinkedFile("Test file", "encrypted.pdf", "PDF"));
+        entry.addFile(new LinkedFile("Test file", Path.of("encrypted.pdf"), "PDF"));
 
         String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}", entry);
 

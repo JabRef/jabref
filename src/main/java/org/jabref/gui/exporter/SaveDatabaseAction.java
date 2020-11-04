@@ -14,9 +14,9 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
 
-    private final BasePanel panel;
+    private final LibraryTab libraryTab;
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
@@ -59,20 +59,20 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(BasePanel panel, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
-        this.panel = panel;
-        this.frame = panel.frame();
+    public SaveDatabaseAction(LibraryTab libraryTab, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+        this.libraryTab = libraryTab;
+        this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
     }
 
     public boolean save() {
-        return save(panel.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
+        return save(libraryTab.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);
     }
 
     public boolean save(SaveDatabaseMode mode) {
-        return save(panel.getBibDatabaseContext(), mode);
+        return save(libraryTab.getBibDatabaseContext(), mode);
     }
 
     /**
@@ -105,7 +105,7 @@ public class SaveDatabaseAction {
      * @return true on successful save
      */
     boolean saveAs(Path file, SaveDatabaseMode mode) {
-        BibDatabaseContext context = panel.getBibDatabaseContext();
+        BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
         // Close AutosaveManager and BackupManager for original library
         Optional<Path> databasePath = context.getDatabasePath();
@@ -129,13 +129,13 @@ public class SaveDatabaseAction {
             // we managed to successfully save the file
             // thus, we can store the store the path into the context
             context.setDatabasePath(file);
-            frame.refreshTitleAndTabs();
+            // FIXME: We need to refresh the tab titles
 
             // Reinstall AutosaveManager and BackupManager for the new file name
-            panel.resetChangeMonitorAndChangePane();
+            libraryTab.resetChangeMonitorAndChangePane();
             if (readyForAutosave(context)) {
                 AutosaveManager autosaver = AutosaveManager.start(context);
-                autosaver.registerListener(new AutosaveUiManager(panel));
+                autosaver.registerListener(new AutosaveUiManager(libraryTab));
             }
             if (readyForBackup(context)) {
                 BackupManager.start(context, entryTypesManager, preferences);
@@ -168,7 +168,7 @@ public class SaveDatabaseAction {
         Optional<Path> databasePath = bibDatabaseContext.getDatabasePath();
         if (databasePath.isEmpty()) {
             Optional<Path> savePath = askForSavePath();
-            if (!savePath.isPresent()) {
+            if (savePath.isEmpty()) {
                 return false;
             }
             return saveAs(savePath.get(), mode);
@@ -182,27 +182,21 @@ public class SaveDatabaseAction {
             dialogService.notify(String.format("%s...", Localization.lang("Saving library")));
         }
 
-        panel.setSaving(true);
+        libraryTab.setSaving(true);
         try {
-            Charset encoding = panel.getBibDatabaseContext()
-                                    .getMetaData()
-                                    .getEncoding()
-                                    .orElse(preferences.getDefaultEncoding());
+            Charset encoding = libraryTab.getBibDatabaseContext()
+                                         .getMetaData()
+                                         .getEncoding()
+                                         .orElse(preferences.getDefaultEncoding());
             // Make sure to remember which encoding we used.
-            panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
+            libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
 
             // Save the database
             boolean success = saveDatabase(targetPath, false, encoding, SavePreferences.DatabaseSaveType.ALL);
 
             if (success) {
-                panel.getUndoManager().markUnchanged();
-                // After a successful save the following statement marks that the base is unchanged since last save
-                panel.setNonUndoableChange(false);
-                panel.setBaseChanged(false);
-
-                frame.setTabTitle(panel, panel.getTabTitle(), targetPath.toAbsolutePath().toString());
-                frame.setWindowTitle();
-                frame.updateAllTabTitles();
+                libraryTab.getUndoManager().markUnchanged();
+                libraryTab.resetChangedProperties();
             }
             return success;
         } catch (SaveException ex) {
@@ -211,7 +205,7 @@ public class SaveDatabaseAction {
             return false;
         } finally {
             // release panel from save status
-            panel.setSaving(false);
+            libraryTab.setSaving(false);
         }
     }
 
@@ -223,12 +217,12 @@ public class SaveDatabaseAction {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
 
             if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries());
+                databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
             } else {
-                databaseWriter.saveDatabase(panel.getBibDatabaseContext());
+                databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
             }
 
-            panel.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
+            libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
 
             if (fileWriter.hasEncodingProblems()) {
                 saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), fileWriter.getEncodingProblems(), saveType);
@@ -262,7 +256,7 @@ public class SaveDatabaseAction {
             Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
                 // Make sure to remember which encoding we used.
-                panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
+                libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
 
                 saveDatabase(file, selectedOnly, newEncoding.get(), saveType);
             }

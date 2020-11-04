@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javafx.beans.binding.Bindings;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import de.saxsys.mvvmfx.utils.commands.Command;
@@ -20,7 +20,7 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         action.getIcon()
               .ifPresent(icon -> setGraphic(icon.getGraphicNode()));
         action.getKeyBinding()
-              .ifPresent(keyBinding -> setAccelerator(keyBindingRepository.getKeyCombination(keyBinding)));
+              .ifPresent(keyBinding -> keyBindingRepository.getKeyCombination(keyBinding).ifPresent(combination -> setAccelerator(combination)));
 
         setLongText(action.getDescription());
     }

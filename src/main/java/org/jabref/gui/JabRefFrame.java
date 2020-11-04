@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,8 +10,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -46,8 +48,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -83,7 +83,6 @@ import org.jabref.gui.exporter.WriteXMPAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
-import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
@@ -125,6 +124,7 @@ import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.IdFetcher;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
@@ -133,19 +133,18 @@ import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyObservableList;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,7 +153,6 @@ import org.slf4j.LoggerFactory;
  */
 public class JabRefFrame extends BorderPane {
 
-    // Frame titles.
     public static final String FRAME_TITLE = "JabRef";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
@@ -165,12 +163,13 @@ public class JabRefFrame extends BorderPane {
 
     private final FileHistoryMenu fileHistory;
 
+    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
+
     private final Stage mainStage;
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
     private final PushToApplicationsManager pushToApplicationsManager;
     private final DialogService dialogService;
-    private final JabRefExecutorService executorService;
     private SidePaneManager sidePaneManager;
     private TabPane tabbedPane;
     private SidePane sidePane;
@@ -183,7 +182,6 @@ public class JabRefFrame extends BorderPane {
         this.pushToApplicationsManager = new PushToApplicationsManager(dialogService, stateManager, prefs);
         this.undoManager = Globals.undoManager;
         this.fileHistory = new FileHistoryMenu(prefs, dialogService, getOpenDatabaseAction());
-        this.executorService = JabRefExecutorService.INSTANCE;
         this.setOnKeyTyped(key -> {
             if (this.fileHistory.isShowing()) {
                 if (this.fileHistory.openFileByKey(key)) {
@@ -191,10 +189,6 @@ public class JabRefFrame extends BorderPane {
                 }
             }
         });
-    }
-
-    private static BasePanel getBasePanel(Tab tab) {
-        return (BasePanel) tab.getContent();
     }
 
     private void initDragAndDrop() {
@@ -218,9 +212,7 @@ public class JabRefFrame extends BorderPane {
                 }
             });
 
-            this.getScene().setOnDragExited(event -> {
-                tabbedPane.getTabs().remove(dndIndicator);
-            });
+            this.getScene().setOnDragExited(event -> tabbedPane.getTabs().remove(dndIndicator));
 
             this.getScene().setOnDragDropped(event -> {
                 tabbedPane.getTabs().remove(dndIndicator);
@@ -239,7 +231,7 @@ public class JabRefFrame extends BorderPane {
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
                     case FOCUS_ENTRY_TABLE:
-                        getCurrentBasePanel().getMainTable().requestFocus();
+                        getCurrentLibraryTab().getMainTable().requestFocus();
                         event.consume();
                         break;
                     case NEXT_LIBRARY:
@@ -277,9 +269,15 @@ public class JabRefFrame extends BorderPane {
                     case NEW_UNPUBLISHED:
                         new NewEntryAction(this, StandardEntryType.Unpublished, dialogService, prefs, stateManager).execute();
                         break;
+                    case NEW_INPROCEEDINGS:
+                        new NewEntryAction(this, StandardEntryType.InProceedings, dialogService, prefs, stateManager).execute();
+                        break;
                     case PASTE:
                         if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
-                            event.consume();
+                            // Extra workaround for CodeArea, which does not inherit from TextInputControl
+                            if (!(stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea))) {
+                                event.consume();
+                            }
                             break;
                         }
                     default:
@@ -313,43 +311,6 @@ public class JabRefFrame extends BorderPane {
         Globals.prefs.askedToCollectTelemetry();
 
         return null;
-    }
-
-    public void refreshTitleAndTabs() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-
-            setWindowTitle();
-            updateAllTabTitles();
-        });
-    }
-
-    /**
-     * Sets the title of the main window.
-     */
-    public void setWindowTitle() {
-        BasePanel panel = getCurrentBasePanel();
-
-        // no database open
-        if (panel == null) {
-            // setTitle(FRAME_TITLE);
-            return;
-        }
-
-        String mode = panel.getBibDatabaseContext().getMode().getFormattedName();
-        String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
-        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
-
-        if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
-            String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
-            String databaseFile = panel.getBibDatabaseContext()
-                                       .getDatabasePath()
-                                       .map(Path::toString)
-                                       .orElse(Localization.lang("untitled"));
-            // setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
-        } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            // setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
-            //        + Localization.lang("shared") + "]" + modeInfo);
-        }
     }
 
     /**
@@ -391,7 +352,7 @@ public class JabRefFrame extends BorderPane {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                Path focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabasePath().orElse(null);
+                Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
         }
@@ -431,12 +392,12 @@ public class JabRefFrame extends BorderPane {
         // Then ask if the user really wants to close, if the library has not been saved since last save.
         List<String> filenames = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            BasePanel panel = getBasePanelAt(i);
-            final BibDatabaseContext context = panel.getBibDatabaseContext();
+            LibraryTab libraryTab = getLibraryTabAt(i);
+            final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-            if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+            if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
                 tabbedPane.getSelectionModel().select(i);
-                if (!confirmClose(panel)) {
+                if (!confirmClose(libraryTab)) {
                     return false;
                 }
             } else if (context.getLocation() == DatabaseLocation.SHARED) {
@@ -450,7 +411,7 @@ public class JabRefFrame extends BorderPane {
         }
 
         WaitForSaveFinishedDialog waitForSaveFinishedDialog = new WaitForSaveFinishedDialog(dialogService);
-        waitForSaveFinishedDialog.showAndWait(getBasePanelList());
+        waitForSaveFinishedDialog.showAndWait(getLibraryTabs());
 
         // Good bye!
         tearDownJabRef(filenames);
@@ -579,31 +540,29 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * Returns the indexed BasePanel.
+     * Returns the indexed LibraryTab.
      *
      * @param i Index of base
      */
-    public BasePanel getBasePanelAt(int i) {
-        return (BasePanel) tabbedPane.getTabs().get(i).getContent();
+    public LibraryTab getLibraryTabAt(int i) {
+        return (LibraryTab) tabbedPane.getTabs().get(i);
     }
 
     /**
-     * Returns a list of BasePanel.
+     * Returns a list of all LibraryTabs in this frame.
      */
-    public List<BasePanel> getBasePanelList() {
-        List<BasePanel> returnList = new ArrayList<>();
-        for (int i = 0; i < getBasePanelCount(); i++) {
-            returnList.add(getBasePanelAt(i));
-        }
-        return returnList;
+    public List<LibraryTab> getLibraryTabs() {
+        return tabbedPane.getTabs().stream()
+                         .map(tab -> (LibraryTab) tab)
+                         .collect(Collectors.toList());
     }
 
-    public void showBasePanelAt(int i) {
+    public void showLibraryTabAt(int i) {
         tabbedPane.getSelectionModel().select(i);
     }
 
-    public void showBasePanel(BasePanel bp) {
-        tabbedPane.getSelectionModel().select(getTab(bp));
+    public void showLibraryTab(LibraryTab libraryTab) {
+        tabbedPane.getSelectionModel().select(libraryTab);
     }
 
     public void init() {
@@ -614,26 +573,26 @@ public class JabRefFrame extends BorderPane {
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
         initLayout();
-
         initKeyBindings();
-
         initDragAndDrop();
 
-        // setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        // WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
-        //        JabRefPreferences.SIZE_Y);
-        // pw.displayWindowAtStoredLocation();
-
         // Bind global state
+
+        // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
+        openDatabaseList = EasyBind.map(tabbedPane.getTabs(), tab -> ((LibraryTab) tab).getBibDatabaseContext());
+        EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
-                        tab -> Optional.ofNullable(tab).map(JabRefFrame::getBasePanel).map(BasePanel::getBibDatabaseContext)));
+                        selectedTab -> Optional.ofNullable(selectedTab)
+                                               .map(tab -> (LibraryTab) tab)
+                                               .map(LibraryTab::getBibDatabaseContext)));
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
                 query -> {
-                    if (getCurrentBasePanel() != null) {
-                        getCurrentBasePanel().setCurrentSearchQuery(query);
+                    if (getCurrentLibraryTab() != null) {
+                        getCurrentLibraryTab().setCurrentSearchQuery(query);
                     }
                 });
 
@@ -648,29 +607,30 @@ public class JabRefFrame extends BorderPane {
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (tab == null) {
                 stateManager.setSelectedEntries(Collections.emptyList());
+                mainStage.titleProperty().unbind();
+                mainStage.setTitle(FRAME_TITLE);
                 return;
             }
 
-            BasePanel newBasePanel = getBasePanel(tab);
-            if (newBasePanel != null) {
-                // Poor-mans binding to global state
-                stateManager.setSelectedEntries(newBasePanel.getSelectedEntries());
+            LibraryTab libraryTab = (LibraryTab) tab;
 
-                // Update active search query when switching between databases
-                stateManager.activeSearchQueryProperty().set(newBasePanel.getCurrentSearchQuery());
+            // Poor-mans binding to global state
+            stateManager.setSelectedEntries(libraryTab.getSelectedEntries());
 
-                // groupSidePane.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
-                // previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-                // generalFetcher.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(WebSearchPane.class));
-                // openOfficePanel.getToggleCommand().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
+            // Update active search query when switching between databases
+            stateManager.activeSearchQueryProperty().set(libraryTab.getCurrentSearchQuery());
 
-                setWindowTitle();
-                // Update search autocompleter with information for the correct database:
-                newBasePanel.updateSearchManager();
+            // Update search autocompleter with information for the correct database:
+            libraryTab.updateSearchManager();
 
-                newBasePanel.getUndoManager().postUndoRedoEvent();
-                newBasePanel.getMainTable().requestFocus();
-            }
+            libraryTab.getUndoManager().postUndoRedoEvent();
+            libraryTab.getMainTable().requestFocus();
+
+            // Set window title - copy tab title
+            StringBinding windowTitle = Bindings.createStringBinding(
+                    () -> libraryTab.textProperty().getValue() + " \u2013 " + FRAME_TITLE,
+                    libraryTab.textProperty());
+            mainStage.titleProperty().bind(windowTitle);
         });
         initShowTrackingNotification();
     }
@@ -678,11 +638,11 @@ public class JabRefFrame extends BorderPane {
     /**
      * Returns the currently viewed BasePanel.
      */
-    public BasePanel getCurrentBasePanel() {
+    public LibraryTab getCurrentLibraryTab() {
         if ((tabbedPane == null) || (tabbedPane.getSelectionModel().getSelectedItem() == null)) {
             return null;
         }
-        return getBasePanel(tabbedPane.getSelectionModel().getSelectedItem());
+        return (LibraryTab) tabbedPane.getSelectionModel().getSelectedItem();
     }
 
     /**
@@ -692,29 +652,12 @@ public class JabRefFrame extends BorderPane {
         return tabbedPane.getTabs().size();
     }
 
-    private Tab getTab(BasePanel comp) {
-        for (Tab tab : tabbedPane.getTabs()) {
-            if (tab.getContent() == comp) {
-                return tab;
-            }
-        }
-        return null;
-    }
-
     /**
      * @deprecated do not operate on tabs but on BibDatabaseContexts
      */
     @Deprecated
     public TabPane getTabbedPane() {
         return tabbedPane;
-    }
-
-    public void setTabTitle(BasePanel comp, String title, String toolTip) {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            Tab tab = getTab(comp);
-            tab.setText(title);
-            tab.setTooltip(new Tooltip(toolTip));
-        });
     }
 
     private MenuBar createMenu() {
@@ -792,7 +735,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.MASS_SET_FIELDS, new MassSetFieldsAction(stateManager, dialogService, undoManager))
         );
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+        if (Globals.prefs.getSpecialFieldsPreferences().isSpecialFieldsEnabled()) {
             edit.getItems().addAll(
                     new SeparatorMenuItem(),
                     // ToDo: SpecialField needs the active BasePanel to mark it as changed.
@@ -908,7 +851,6 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SETUP_GENERAL_FIELDS, new SetupGeneralFieldsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_IMPORTS, new ManageCustomImportsAction()),
                 factory.createMenuItem(StandardActions.MANAGE_CUSTOM_EXPORTS, new ManageCustomExportsAction()),
-                factory.createMenuItem(StandardActions.MANAGE_EXTERNAL_FILETYPES, new EditExternalFileTypesAction()),
                 factory.createMenuItem(StandardActions.MANAGE_JOURNALS, new ManageJournalsAction()),
                 factory.createMenuItem(StandardActions.CUSTOMIZE_KEYBINDING, new CustomizeKeyBindingAction()),
                 factory.createMenuItem(StandardActions.MANAGE_PROTECTED_TERMS, new ManageProtectedTermsAction()),
@@ -1023,21 +965,23 @@ public class JabRefFrame extends BorderPane {
     public void addParserResult(ParserResult parserResult, boolean focusPanel) {
         if (parserResult.toOpenTab()) {
             // Add the entries to the open tab.
-            BasePanel panel = getCurrentBasePanel();
-            if (panel == null) {
+            LibraryTab libraryTab = getCurrentLibraryTab();
+            if (libraryTab == null) {
                 // There is no open tab to add to, so we create a new tab:
                 addTab(parserResult.getDatabaseContext(), focusPanel);
             } else {
-                addImportedEntries(panel, parserResult);
+                addImportedEntries(libraryTab, parserResult);
             }
         } else {
             // only add tab if DB is not already open
-            Optional<BasePanel> panel = getBasePanelList().stream()
-                                                          .filter(p -> p.getBibDatabaseContext().getDatabasePath().equals(parserResult.getFile()))
-                                                          .findFirst();
+            Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
+                                                              .filter(p -> p.getBibDatabaseContext()
+                                                                            .getDatabasePath()
+                                                                            .equals(parserResult.getPath()))
+                                                              .findFirst();
 
-            if (panel.isPresent()) {
-                tabbedPane.getSelectionModel().select(getTab(panel.get()));
+            if (libraryTab.isPresent()) {
+                tabbedPane.getSelectionModel().select(libraryTab.get());
             } else {
                 addTab(parserResult.getDatabaseContext(), focusPanel);
             }
@@ -1045,66 +989,17 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * This method causes all open BasePanels to set up their tables anew. When called from PrefsDialog3, this updates
-     * to the new settings.
-     */
+     * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
+     * this updates to the new settings.
+     * We need to notify all tabs about the changes to avoid problems when changing the column set.
+     * */
     public void setupAllTables() {
-        // This action can be invoked without an open database, so
-        // we have to check if we have one before trying to invoke
-        // methods to execute changes in the preferences.
-
-        // We want to notify all tabs about the changes to
-        // avoid problems when changing the column set.
-        for (int i = 0; i < tabbedPane.getTabs().size(); i++) {
-            BasePanel bf = getBasePanelAt(i);
-
-            // Update tables:
-            if (bf.getDatabase() != null) {
-                DefaultTaskExecutor.runInJavaFXThread(bf::setupMainPanel);
+        tabbedPane.getTabs().forEach(tab -> {
+            LibraryTab libraryTab = (LibraryTab) tab;
+            if (libraryTab.getDatabase() != null) {
+                DefaultTaskExecutor.runInJavaFXThread(libraryTab::setupMainPanel);
             }
-        }
-    }
-
-    private List<String> collectDatabaseFilePaths() {
-        List<String> dbPaths = new ArrayList<>(getBasePanelCount());
-
-        for (BasePanel basePanel : getBasePanelList()) {
-            // db file exists
-            if (basePanel.getBibDatabaseContext().getDatabasePath().isPresent()) {
-                dbPaths.add(basePanel.getBibDatabaseContext().getDatabasePath().get().toAbsolutePath().toString());
-            } else {
-                dbPaths.add("");
-            }
-        }
-        return dbPaths;
-    }
-
-    private List<String> getUniquePathParts() {
-        List<String> dbPaths = collectDatabaseFilePaths();
-
-        return FileUtil.uniquePathSubstrings(dbPaths);
-    }
-
-    public void updateAllTabTitles() {
-        List<String> paths = getUniquePathParts();
-        for (int i = 0; i < getBasePanelCount(); i++) {
-            String uniqPath = paths.get(i);
-            Optional<Path> file = getBasePanelAt(i).getBibDatabaseContext().getDatabasePath();
-
-            if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getFileName()) && uniqPath.contains(File.separator)) {
-                    // remove filename
-                    uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
-                } else {
-                    // set original filename (again)
-                    tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
-                }
-            } else {
-                tabbedPane.getTabs().get(i).setText(getBasePanelAt(i).getTabTitle());
-            }
-            tabbedPane.getTabs().get(i).setTooltip(new Tooltip(file.map(Path::toAbsolutePath).map(Path::toString).orElse(null)));
-        }
+        });
     }
 
     private ContextMenu createTabContextMenu(KeyBindingRepository keyBindingRepository) {
@@ -1123,55 +1018,48 @@ public class JabRefFrame extends BorderPane {
         return contextMenu;
     }
 
-    public void addTab(BasePanel basePanel, boolean raisePanel) {
-        // add tab
-        Tab newTab = new Tab(basePanel.getTabTitle(), basePanel);
-        tabbedPane.getTabs().add(newTab);
-        newTab.setOnCloseRequest(event -> {
-            closeTab((BasePanel) newTab.getContent());
+    public void addTab(LibraryTab libraryTab, boolean raisePanel) {
+        tabbedPane.getTabs().add(libraryTab);
+
+        libraryTab.setOnCloseRequest(event -> {
+            closeTab(libraryTab);
             event.consume();
         });
 
-        // add tab context menu
-        newTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
-
-        // update all tab titles
-        updateAllTabTitles();
+        libraryTab.setContextMenu(createTabContextMenu(Globals.getKeyPrefs()));
 
         if (raisePanel) {
-            tabbedPane.getSelectionModel().select(newTab);
+            tabbedPane.getSelectionModel().select(libraryTab);
         }
 
-        // Register undo/redo listener
-        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+        libraryTab.getUndoManager().registerListener(new UndoRedoEventManager());
 
-        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+        BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
         if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
-            autosaver.registerListener(new AutosaveUiManager(basePanel));
+            autosaver.registerListener(new AutosaveUiManager(libraryTab));
         }
 
         BackupManager.start(context, Globals.entryTypesManager, prefs);
 
-        // Track opening
-        trackOpenNewDatabase(basePanel);
+        trackOpenNewDatabase(libraryTab);
     }
 
-    private void trackOpenNewDatabase(BasePanel basePanel) {
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
         Map<String, String> properties = new HashMap<>();
         Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) basePanel.getBibDatabaseContext().getDatabase().getEntryCount());
+        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
 
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
-    public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
+    public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
 
-        BasePanel bp = new BasePanel(this, BasePanelPreferences.from(Globals.prefs), databaseContext, ExternalFileTypes.getInstance());
-        addTab(bp, raisePanel);
-        return bp;
+        LibraryTab libraryTab = new LibraryTab(this, prefs, databaseContext, ExternalFileTypes.getInstance());
+        addTab(libraryTab, raisePanel);
+        return libraryTab;
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
@@ -1187,8 +1075,10 @@ public class JabRefFrame extends BorderPane {
      * @param panel        The BasePanel to add to.
      * @param parserResult The entries to add.
      */
-    private void addImportedEntries(final BasePanel panel, final ParserResult parserResult) {
+    private void addImportedEntries(final LibraryTab panel, final ParserResult parserResult) {
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
+        ImportCleanup cleanup = new ImportCleanup(panel.getBibDatabaseContext().getMode());
+        cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
         dialog.showAndWait();
@@ -1199,46 +1089,16 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * Return a boolean, if the selected entry have file
-     *
-     * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains file. false, if multiple entries are selected or the selected entry
-     * doesn't contains file
-     */
-    private boolean isExistFile(List<BibEntry> selectEntryList) {
-        if (selectEntryList.size() == 1) {
-            BibEntry selectedEntry = selectEntryList.get(0);
-            return selectedEntry.getField(StandardField.FILE).isPresent();
-        }
-        return false;
-    }
-
-    /**
-     * Return a boolean, if the selected entry have url or doi
-     *
-     * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains url or doi. false, if multiple entries are selected or the selected
-     * entry doesn't contains url or doi
-     */
-    private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
-        if (selectEntryList.size() == 1) {
-            BibEntry selectedEntry = selectEntryList.get(0);
-            return (selectedEntry.getField(StandardField.URL).isPresent() || selectedEntry.getField(StandardField.DOI).isPresent());
-        }
-        return false;
-    }
-
-    /**
      * Ask if the user really wants to close the given database
      *
      * @return true if the user choose to close the database
      */
-    private boolean confirmClose(BasePanel panel) {
-        String filename = panel.getBibDatabaseContext()
-                               .getDatabasePath()
-                               .map(Path::toAbsolutePath)
-                               .map(Path::toString)
-                               .orElse(Localization.lang("untitled"));
+    private boolean confirmClose(LibraryTab libraryTab) {
+        String filename = libraryTab.getBibDatabaseContext()
+                                    .getDatabasePath()
+                                    .map(Path::toAbsolutePath)
+                                    .map(Path::toString)
+                                    .orElse(Localization.lang("untitled"));
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
@@ -1252,7 +1112,7 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -1268,17 +1128,17 @@ public class JabRefFrame extends BorderPane {
         return response.isEmpty() || !response.get().equals(cancel);
     }
 
-    private void closeTab(BasePanel panel) {
+    private void closeTab(LibraryTab libraryTab) {
         // empty tab without database
-        if (panel == null) {
+        if (libraryTab == null) {
             return;
         }
 
-        final BibDatabaseContext context = panel.getBibDatabaseContext();
+        final BibDatabaseContext context = libraryTab.getBibDatabaseContext();
 
-        if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
-            if (confirmClose(panel)) {
-                removeTab(panel);
+        if (libraryTab.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+            if (confirmClose(libraryTab)) {
+                removeTab(libraryTab);
             } else {
                 return;
             }
@@ -1286,26 +1146,23 @@ public class JabRefFrame extends BorderPane {
             context.convertToLocalDatabase();
             context.getDBMSSynchronizer().closeSharedDatabase();
             context.clearDBMSSynchronizer();
-            removeTab(panel);
+            removeTab(libraryTab);
         } else {
-            removeTab(panel);
+            removeTab(libraryTab);
         }
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context);
     }
 
-    private void removeTab(BasePanel panel) {
+    private void removeTab(LibraryTab libraryTab) {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            panel.cleanUp();
-            tabbedPane.getTabs().remove(getTab(panel));
-            setWindowTitle();
-            // update tab titles
-            updateAllTabTitles();
+            libraryTab.cleanUp();
+            tabbedPane.getTabs().remove(libraryTab);
         });
     }
 
     public void closeCurrentTab() {
-        removeTab(getCurrentBasePanel());
+        removeTab(getCurrentLibraryTab());
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
@@ -1347,7 +1204,7 @@ public class JabRefFrame extends BorderPane {
 
         @Override
         public void execute() {
-            closeTab(getCurrentBasePanel());
+            closeTab(getCurrentLibraryTab());
         }
     }
 
@@ -1359,11 +1216,11 @@ public class JabRefFrame extends BorderPane {
 
         @Override
         public void execute() {
-            BasePanel currentBasePanel = getCurrentBasePanel();
+            LibraryTab currentLibraryTab = getCurrentLibraryTab();
             for (Tab tab : tabbedPane.getTabs()) {
-                BasePanel basePanel = getBasePanel(tab);
-                if (basePanel != currentBasePanel) {
-                    closeTab(basePanel);
+                LibraryTab libraryTab = (LibraryTab) tab;
+                if (libraryTab != currentLibraryTab) {
+                    closeTab(libraryTab);
                 }
             }
         }
@@ -1374,8 +1231,7 @@ public class JabRefFrame extends BorderPane {
         @Override
         public void execute() {
             for (Tab tab : tabbedPane.getTabs()) {
-                BasePanel basePanel = getBasePanel(tab);
-                closeTab(basePanel);
+                closeTab((LibraryTab) tab);
             }
         }
     }
@@ -1399,7 +1255,7 @@ public class JabRefFrame extends BorderPane {
         @Subscribe
         public void listen(UndoRedoEvent event) {
             updateTexts(event);
-            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
+            JabRefFrame.this.getCurrentLibraryTab().updateEntryEditorIfShowing();
         }
 
         @Subscribe

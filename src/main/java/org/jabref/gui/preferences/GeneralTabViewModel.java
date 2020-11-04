@@ -103,8 +103,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         selectedBiblatexModeProperty.setValue(initialGeneralPreferences.getDefaultBibDatabaseMode());
 
         inspectionWarningDuplicateProperty.setValue(initialGeneralPreferences.isWarnAboutDuplicatesInInspection());
-        confirmDeleteProperty.setValue(initialGeneralPreferences.isConfirmDelete());
-        allowIntegerEditionProperty.setValue(initialGeneralPreferences.isAllowIntegerEditionBibtex());
+        confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
+        allowIntegerEditionProperty.setValue(initialGeneralPreferences.shouldAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(preferencesService.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());

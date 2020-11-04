@@ -85,7 +85,6 @@ public class GroupsParser {
      * Re-create a group instance from a textual representation.
      *
      * @param s           The result from the group's toString() method.
-     * @param fileMonitor
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */

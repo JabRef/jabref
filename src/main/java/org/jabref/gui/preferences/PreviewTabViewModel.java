@@ -23,10 +23,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.JabRefGUI;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -216,9 +216,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         preferences.storePreviewPreferences(newPreviewPreferences);
 
-        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+        for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
             // TODO: Find a better way to update preview
-            basePanel.closeBottomPane();
+            libraryTab.closeBottomPane();
             // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }

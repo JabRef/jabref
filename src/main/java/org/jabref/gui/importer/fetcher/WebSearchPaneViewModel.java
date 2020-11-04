@@ -101,7 +101,7 @@ public class WebSearchPaneViewModel {
             return;
         }
 
-        if (frame.getCurrentBasePanel() == null) {
+        if (frame.getCurrentLibraryTab() == null) {
             dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
@@ -120,7 +120,7 @@ public class WebSearchPaneViewModel {
         }
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentBasePanel().getBibDatabaseContext(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentLibraryTab().getBibDatabaseContext(), task);
         dialog.setTitle(activeFetcher.getName());
         dialog.showAndWait();
     }

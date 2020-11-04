@@ -23,6 +23,9 @@ public class DOITest {
     @Test
     public void acceptPlainShortDoi() {
         assertEquals("10/gf4gqc", new DOI("10/gf4gqc").getDOI());
+        assertEquals("10/1000", new DOI("10/1000").getDOI());
+        assertEquals("10/aaaa", new DOI("10/aaaa").getDOI());
+        assertEquals("10/adc", new DOI("10/adc").getDOI());
     }
 
     @Test
@@ -43,6 +46,9 @@ public class DOITest {
     @Test
     public void rejectEmbeddedShortDoi() {
         assertThrows(IllegalArgumentException.class, () -> new DOI("other stuff 10/gf4gqc end"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("10/2021/01"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("01/10/2021"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("https://www.abc.de/10/abcd"));
     }
 
     @Test
@@ -86,15 +92,24 @@ public class DOITest {
     @Test
     public void acceptURNPrefix() {
         assertEquals("10.123/456", new DOI("urn:10.123/456").getDOI());
-        assertEquals("10.123/456", new DOI("urn:doi:10.123/456").getDOI());
         assertEquals("10.123/456", new DOI("http://doi.org/urn:doi:10.123/456").getDOI());
         // : is also allowed as divider, will be replaced by RESOLVER
         assertEquals("10.123:456ABC/zyz", new DOI("http://doi.org/urn:doi:10.123:456ABC%2Fzyz").getDOI());
     }
 
     @Test
+    public void acceptShortcutShortDoi() {
+        assertEquals("10/d8dn", new DOI("https://doi.org/d8dn").getDOI());
+        assertEquals("10/d8dn", new DOI(" https://doi.org/d8dn  ").getDOI());
+        assertEquals("10/d8dn", new DOI("doi.org/d8dn").getDOI());
+        assertEquals("10/d8dn", new DOI("www.doi.org/d8dn").getDOI());
+        assertEquals("10/d8dn", new DOI("  doi.org/d8dn ").getDOI());
+    }
+
+    @Test
     public void acceptURNPrefixInShortDoi() {
         assertEquals("10/gf4gqc", new DOI("urn:10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("doi:10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("urn:doi:10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://doi.org/urn:doi:10/gf4gqc").getDOI());
         // : is also allowed as divider, will be replaced by RESOLVER
@@ -138,6 +153,12 @@ public class DOITest {
         assertEquals("10/gf4gqc", new DOI("https://dx.doi.org/10%2Fgf4gqc").getDOI());
         // other domains
         assertEquals("10/gf4gqc", new DOI("http://doi.acm.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("www.doi.acm.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("doi.acm.org/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI("/10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI(" /10/gf4gqc").getDOI());
+        assertEquals("10/gf4gqc", new DOI(" 10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://doi.acm.net/10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://doi.acm.com/10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://doi.acm.de/10/gf4gqc").getDOI());
@@ -147,6 +168,13 @@ public class DOITest {
         assertEquals("10/gf4gqc", new DOI("http://dx.doi.de/10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://dx.doi.org/10/gf4gqc").getDOI());
         assertEquals("10/gf4gqc", new DOI("http://doi.ieeecomputersociety.org/10/gf4gqc").getDOI());
+    }
+
+    @Test
+    public void rejectURLShortDoi() {
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.cs.utexas.edu/users/kaufmann/itp-trusted-extensions-aug-2010/summary/summary.pdf"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.cs.utexas.edu/users/kaufmann/itp-trusted-extensions-aug-20/10/summary/summary.pdf"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.boi.org/10/2010bingbong"));
     }
 
     @Test
