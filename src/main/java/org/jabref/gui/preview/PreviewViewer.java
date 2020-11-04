@@ -144,7 +144,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     "var markInstance = new Mark(document.getElementById(\"content\"));" +
                             "markInstance.unmark({" +
                             "  done: function(){" +
-                            "    markInstance.markRegExp(/" + pattern + "/gmi);" +
+                            "    markInstance.markRegExp(new RegExp('" + pattern + "', 'gmi'));" +
                             "    }" +
                             "  });"
             );
