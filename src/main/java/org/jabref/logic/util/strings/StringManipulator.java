@@ -81,7 +81,6 @@ public class StringManipulator {
      */
     public static ResultingStringState deleteUntilWordBoundary(int caretPosition, String text, Direction direction) {
         // Define cutout range
-
         int nextWordBoundary = getNextWordBoundary(caretPosition, text, direction);
 
         // Construct new string without cutout
