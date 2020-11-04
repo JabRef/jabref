@@ -499,7 +499,7 @@
       </else-if>
       <else>
         <choose>
-          <if type="article-journal article-magazine article-newspaper post-weblog review review-book">
+          <if type="article-journal article-magazine article-newspaper post-weblog review review-book" match="any">
             <text variable="title" font-style="italic"/>
           </if>
           <else-if type="paper-conference">
@@ -565,7 +565,7 @@
             </group>
           </group>
         </if>
-        <else-if type="post webpage">
+        <else-if type="post webpage" match="any">
           <!-- For post webpage, container-title is treated as publisher -->
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -1255,7 +1255,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="post webpage">
+        <else-if type="post webpage" match="any">
           <!-- For websites, treat container title like publisher -->
           <group delimiter="; ">
             <text variable="container-title" text-case="title"/>
