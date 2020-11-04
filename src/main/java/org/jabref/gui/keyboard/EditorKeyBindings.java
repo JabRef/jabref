@@ -58,21 +58,21 @@ public class EditorKeyBindings {
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
                     ResultingStringState res = StringManipulator.capitalize(pos, text);
                     focusedTextField.setText(res.text);
-                    focusedTextField.positionCaret(res.caretPos);
+                    focusedTextField.positionCaret(res.caretPosition);
                     event.consume();
                 } else if (binding == KeyBinding.EDITOR_LOWERCASE) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
                     ResultingStringState res = StringManipulator.lowercase(pos, text);
                     focusedTextField.setText(res.text);
-                    focusedTextField.positionCaret(res.caretPos);
+                    focusedTextField.positionCaret(res.caretPosition);
                     event.consume();
                 } else if (binding == KeyBinding.EDITOR_UPPERCASE) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
                     ResultingStringState res = StringManipulator.uppercase(pos, text);
                     focusedTextField.setText(res.text);
-                    focusedTextField.positionCaret(res.caretPos);
+                    focusedTextField.positionCaret(res.caretPosition);
                     event.consume();
                 } else if (binding == KeyBinding.EDITOR_KILL_LINE) {
                     int pos = focusedTextField.getCaretPosition();
@@ -84,14 +84,14 @@ public class EditorKeyBindings {
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
                     ResultingStringState res = StringManipulator.killWord(pos, text);
                     focusedTextField.setText(res.text);
-                    focusedTextField.positionCaret(res.caretPos);
+                    focusedTextField.positionCaret(res.caretPosition);
                     event.consume();
                 } else if (binding == KeyBinding.EDITOR_KILL_WORD_BACKWARD) {
                     int pos = focusedTextField.getCaretPosition();
                     String text = focusedTextField.getText(0, focusedTextField.getText().length());
                     ResultingStringState res = StringManipulator.backwardKillWord(pos, text);
                     focusedTextField.setText(res.text);
-                    focusedTextField.positionCaret(res.caretPos);
+                    focusedTextField.positionCaret(res.caretPosition);
                     event.consume();
                 }
             });

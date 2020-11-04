@@ -1,11 +1,11 @@
 package org.jabref.model.util;
 
 public class ResultingStringState {
-    public final int caretPos;
+    public final int caretPosition;
     public final String text;
 
-    public ResultingStringState(int pos, String text) {
-        this.caretPos = pos;
+    public ResultingStringState(int caretPosition, String text) {
+        this.caretPosition = caretPosition;
         this.text = text;
     }
 }

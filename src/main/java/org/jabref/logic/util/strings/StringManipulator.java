@@ -12,15 +12,32 @@ public class StringManipulator {
         CAPITALIZED
     }
 
-    private enum Direction {
-        NEXT, PREVIOUS
+    public enum Direction {
+        NEXT(1),
+        PREVIOUS(-1);
+
+        public final int OFFSET;
+
+        Direction(int offset) {
+            this.OFFSET = offset;
+        }
     }
 
-    private static ResultingStringState setWordCase(String text, int pos, LetterCase targetCase) {
+    /**
+     * Change word casing in a string from the given position to the next word boundary.
+     *
+     * @param text          The text to manipulate.
+     * @param caretPosition The index to start from.
+     * @param targetCase    The case mode the string should be changed to.
+     *
+     * @return              The resulting text and caret position.
+     */
+    private static ResultingStringState setWordCase(String text, int caretPosition, LetterCase targetCase) {
         StringBuilder result = new StringBuilder();
-        int i = pos;
 
-        // swallow whitespaces
+        int i = caretPosition;
+
+        // Swallow whitespaces
         while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
             result.append(text.charAt(i));
             i++;
@@ -29,8 +46,8 @@ public class StringManipulator {
             return new ResultingStringState(i, text);
         }
 
+        // Read the next word
         StringBuilder nextWord = new StringBuilder();
-        // read next word
         char currentChar = text.charAt(i);
         while ((Character.isLetterOrDigit(currentChar) || Character.toString(currentChar).equals("_"))) {
             nextWord.append(currentChar);
@@ -48,121 +65,140 @@ public class StringManipulator {
             case CAPITALIZED -> (new CapitalizeFormatter()).format(nextWord.toString());
         };
 
-        String res = text.substring(0, pos) + result.toString() + changedString + text.substring(i);
-        return new ResultingStringState(i, res);
+        return new ResultingStringState(
+                i,
+                text.substring(0, caretPosition) + result.toString() + changedString + text.substring(i));
     }
 
     /**
      * Delete all characters in a string from the given position to the next word boundary.
      *
-     * @param pos The index to start from.
-     * @param text The text to manipulate.
-     * @param dir The direction to search.
-     * @return The resulting text and caret position.
+     * @param caretPosition The index to start from.
+     * @param text          The text to manipulate.
+     * @param direction     The direction to search.
+     *
+     * @return              The resulting text and caret position.
      */
-    public static ResultingStringState deleteUntilWordBoundary(int pos, String text, Direction dir) {
-        StringBuilder res = new StringBuilder();
-        int offset;
-        int wordBreak;
-        switch (dir) {
-            case NEXT -> {
-                res.append(text, 0, pos);
-                offset = 1;
-                wordBreak = text.length();
+    public static ResultingStringState deleteUntilWordBoundary(int caretPosition, String text, Direction direction) {
+        // Define cutout range
+
+        int nextWordBoundary = getNextWordBoundary(caretPosition, text, direction);
+
+        // Construct new string without cutout
+        return switch (direction) {
+            case NEXT -> new ResultingStringState(
+                    caretPosition,
+                    text.substring(0, caretPosition) + text.substring(nextWordBoundary));
+            case PREVIOUS -> new ResultingStringState(
+                    nextWordBoundary,  // include breaking whitespace
+                    text.substring(0, nextWordBoundary) + text.substring(caretPosition));
+        };
+    }
+
+    /**
+     * Utility method to find the next whitespace position in string after text
+     * @param caretPosition The current caret Position
+     * @param text          The string to search in
+     * @param direction     The direction to move through string
+     *
+     * @return              The position of the next whitespace after a word
+     */
+    public static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
+        int i = caretPosition;
+
+        if (direction == Direction.PREVIOUS) {
+            // Swallow whitespaces
+            while (i >= 0 && Character.isWhitespace((text.charAt(i + direction.OFFSET)))) {
+                i += direction.OFFSET;
             }
-            case PREVIOUS -> {
-                res.append(text, pos, text.length());
-                offset = -1;
-                wordBreak = 0;
+
+            // Read next word
+            while (i > 0 && !Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
+                i += direction.OFFSET;
             }
-            default -> throw new AssertionError("Missing case in switch deleteUntilWordBoundary");
+        } else if (direction == Direction.NEXT) {
+            // Swallow whitespaces
+            while (i < text.length() && Character.isWhitespace(text.charAt(i))) {
+                i += direction.OFFSET;
+            }
+
+            // Read next word
+            while (i < text.length() && !Character.isWhitespace((text.charAt(i)))) {
+                i += direction.OFFSET;
+            }
         }
 
-        for (int i = pos; i < text.length() && i >= 0; i += offset) {
-            if (i == pos) {
-                // Swallow whitespace until we hit a word character or newline.
-                while (i < text.length()
-                        && i >= 0
-                        && !String.valueOf(text.charAt(i)).matches("\\w|[\\r\\n]")) {
-                    i += offset;
-                }
-            }
-            if (!(i < text.length() && i >= 0) || Character.isWhitespace(text.charAt(i))) {
-                wordBreak = i;
-                break;
-            }
-        }
-        int caretPosition;
-        if (dir == Direction.NEXT) {
-            res.append(text, wordBreak, text.length());
-            // Since we deleted forward, we're in the right place already.
-            caretPosition = pos;
+        return i;
 
-        } else {
-            // Since we deleted backwards, we need to move the caret appropriately.
-            // We need to protect against having stepped beyond the string during the while-loop.
-            if (wordBreak != -1) {
-                res.append(text, 0, wordBreak);
-                caretPosition = wordBreak;
-            } else {
-                caretPosition = 0;
-            }
-        }
-        return new ResultingStringState(caretPosition, res.toString());
+        /*
+        while (i > 0 && i <= text.length() && Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
+            i += direction.OFFSET;
+        } */
+
+        /* while (i > 0 && i < (text.length() - 1) && !Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
+            i += direction.OFFSET;
+        } */
+
+        // return i;
     }
 
     /**
      * Capitalize the word on the right side of the cursor.
      *
-     * @param pos the position of the cursor
-     * @param text String to analyze
-     * @return String The resulting text and caret position.
+     * @param caretPosition The position of the cursor
+     * @param text          The string to manipulate
+     *
+     * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState capitalize(int pos, String text) {
-        return setWordCase(text, pos, LetterCase.CAPITALIZED);
+    public static ResultingStringState capitalize(int caretPosition, String text) {
+        return setWordCase(text, caretPosition, LetterCase.CAPITALIZED);
     }
 
     /**
      * Make all characters in the word uppercase.
      *
-     * @param pos the position of the cursor
-     * @param text String to analyze
-     * @return String The resulting text and caret position.
+     * @param caretPosition The position of the cursor
+     * @param text          The string to manipulate
+     *
+     * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState uppercase(int pos, String text) {
-        return setWordCase(text, pos, LetterCase.UPPER);
+    public static ResultingStringState uppercase(int caretPosition, String text) {
+        return setWordCase(text, caretPosition, LetterCase.UPPER);
     }
 
     /**
      * Make all characters in the word lowercase.
      *
-     * @param pos the position of the cursor
-     * @param text String to analyze
-     * @return String The resulting text and caret position.
+     * @param caretPosition The position of the cursor
+     * @param text          The string to manipulate
+     *
+     * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState lowercase(int pos, String text) {
-        return setWordCase(text, pos, LetterCase.LOWER);
+    public static ResultingStringState lowercase(int caretPosition, String text) {
+        return setWordCase(text, caretPosition, LetterCase.LOWER);
     }
 
     /**
      * Remove the next word on the right side of the cursor.
      *
-     * @param pos the position of the cursor
-     * @param text String to analyze
-     * @return String The resulting text and caret position.
+     * @param caretPosition The position of the cursor
+     * @param text          The string to manipulate
+     *
+     * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState killWord(int pos, String text) {
-        return deleteUntilWordBoundary(pos, text, Direction.NEXT);
+    public static ResultingStringState killWord(int caretPosition, String text) {
+        return deleteUntilWordBoundary(caretPosition, text, Direction.NEXT);
     }
 
     /**
      * Remove the previous word on the left side of the cursor.
      *
-     * @param pos the position of the cursor
-     * @param text String to analyze
-     * @return String The resulting text and caret position.
+     * @param caretPosition The position of the cursor
+     * @param text          The string to manipulate
+     *
+     * @return String       The resulting text and caret position.
      */
-    public static ResultingStringState backwardKillWord(int pos, String text) {
-        return deleteUntilWordBoundary(pos, text, Direction.PREVIOUS);
+    public static ResultingStringState backwardKillWord(int caretPosition, String text) {
+        return deleteUntilWordBoundary(caretPosition, text, Direction.PREVIOUS);
     }
 }
