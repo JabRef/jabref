@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>American Physics Society</title>
+    <title>American Physical Society</title>
     <title-short>APS</title-short>
     <id>http://www.zotero.org/styles/american-physics-society</id>
     <link href="http://www.zotero.org/styles/american-physics-society" rel="self"/>
     <link href="http://www.zotero.org/styles/american-institute-of-physics" rel="template"/>
-    <link href="http://authors.aps.org/STYLE/ms.html#citations" rel="documentation"/>
+    <link href="https://journals.aps.org/prl/authors#techformat" rel="documentation"/>
     <author>
       <name>Richard Karnesky</name>
       <email>karnesky+zotero@gmail.com</email>
       <uri>http://arc.nucapt.northwestern.edu/Richard_Karnesky</uri>
+    </author>
+    <author>
+      <name>Brenton M. Wiernik</name>
     </author>
     <category citation-format="numeric"/>
     <category field="physics"/>
@@ -67,18 +70,24 @@
       <text macro="year-date"/>
     </group>
   </macro>
-  <macro name="edition">
-    <choose>
-      <if is-numeric="edition">
-        <group delimiter=" ">
-          <number variable="edition" form="ordinal"/>
-          <text term="edition" form="short"/>
-        </group>
-      </if>
-      <else>
-        <text variable="edition"/>
-      </else>
-    </choose>
+  <macro name="edition-volume">
+    <group delimiter=", ">
+      <choose>
+        <if is-numeric="edition">
+          <group delimiter=" ">
+            <number variable="edition" form="ordinal"/>
+            <text term="edition" form="short"/>
+          </group>
+        </if>
+        <else>
+          <text variable="edition"/>
+        </else>
+      </choose>
+      <group delimiter=" ">
+        <label variable="volume" form="short" text-case="capitalize-first"/>
+        <text variable="volume"/>
+      </group>
+    </group>
   </macro>
   <citation collapse="citation-number">
     <sort>
@@ -89,64 +98,114 @@
     </layout>
   </citation>
   <bibliography entry-spacing="0" second-field-align="flush">
+    <!-- Reference for book, chapter, report layouts: https://doi.org/10.1103/PhysRevX.10.011010 -->
+    <!-- Reference for arXiv: https://doi.org/10.1103/PhysRevX.10.011004 -->
     <layout suffix=".">
       <text variable="citation-number" prefix="[" suffix="]"/>
       <text macro="author" suffix=", "/>
       <choose>
-        <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+        <if type="bill book figure graphic legal_case legislation map motion_picture song treaty" match="any">
           <group delimiter=" ">
             <group delimiter=", ">
               <text variable="title" text-case="title" font-style="italic"/>
-              <text macro="edition"/>
+              <text macro="edition-volume"/>
             </group>
-            <group delimiter=", ">
-              <text macro="publisher"/>
-              <group delimiter=" ">
-                <label variable="page" form="short"/>
-                <text variable="page"/>
-              </group>
-            </group>
+            <text macro="publisher"/>
           </group>
         </if>
-        <else-if type="chapter paper-conference" match="any">
-          <group delimiter=" ">
-            <text term="in"/>
-            <group delimiter=", ">
-              <text variable="container-title" form="short" text-case="title" font-style="italic"/>
-              <text macro="editor"/>
-              <text macro="edition"/>
-            </group>
-            <group delimiter=", ">
-              <text macro="publisher"/>
-              <group delimiter=" ">
-                <label variable="page" form="short"/>
-                <text variable="page"/>
+        <else-if type="broadcast chapter entry entry-dictionary entry-encyclopedia paper-conference" match="any">
+          <group delimiter=", ">
+            <text variable="title" text-case="title" font-style="italic"/>
+            <group delimiter=" ">
+              <text term="in"/>
+              <group delimiter=", ">
+                <text variable="container-title" text-case="title" font-style="italic"/>
+                <text macro="editor"/>
+                <text macro="edition-volume"/>
+              </group>
+              <group delimiter=", ">
+                <text macro="publisher"/>
+                <group delimiter=" ">
+                  <label variable="page" form="short"/>
+                  <text variable="page"/>
+                </group>
               </group>
             </group>
           </group>
         </else-if>
         <else-if type="patent">
-          <group delimiter=" ">
-            <text variable="number"/>
-            <text macro="day-date" prefix="(" suffix=")"/>
+          <group delimiter=", ">
+            <text variable="title" text-case="title" font-style="italic"/>
+            <group delimiter=" ">
+              <text variable="number"/>
+              <text macro="day-date" prefix="(" suffix=")"/>
+            </group>
           </group>
         </else-if>
-        <else-if type="thesis">
+        <else-if type="thesis report" match="any">
           <group delimiter=", ">
             <text variable="title" text-case="title"/>
-            <text variable="genre"/>
+            <group delimiter=" ">
+              <text variable="genre"/>
+              <group delimiter=" ">
+                <text term="issue" form="short" text-case="capitalize-first"/>
+                <text variable="number"/>
+              </group>
+            </group>
             <text variable="publisher"/>
             <text macro="year-date"/>
           </group>
         </else-if>
+        <else-if type="article" match="any">
+          <group delimiter=", ">
+            <text variable="title" text-case="title" font-style="italic"/>
+            <choose>
+              <if variable="container-title">
+                <text variable="container-title"/>
+              </if>
+              <else>
+                <text variable="number"/>
+              </else>
+            </choose>
+          </group>
+        </else-if>
+        <else-if type="dataset interview manuscript pamphlet personal_communication post post-weblog speech webpage">
+          <!-- unpublished materials; guidelines call for 'enough information to be retrievable' -->
+          <!-- Based on arXiv format -->
+          <group delimiter=", ">
+            <text variable="title" text-case="title" font-style="italic"/>
+            <choose>
+              <if variable="DOI">
+                <text variable="DOI" prefix="https://doi.org/"/>
+              </if>
+              <else-if variable="URL">
+                <text variable="URL"/>
+              </else-if>
+              <else>
+                <text value="(unpublished)"/>
+              </else>
+            </choose>
+          </group>
+        </else-if>
         <else>
-          <group delimiter=" ">
-            <text variable="container-title" form="short" text-case="title"/>
-            <group delimiter=", ">
-              <text variable="volume" font-weight="bold"/>
-              <group delimiter=" ">
-                <text variable="page-first" form="short"/>
-                <text macro="year-date" prefix="(" suffix=")"/>
+          <!--article-journal article-magazine article-newspaper review review-book-->
+          <group delimiter=", ">
+            <text variable="title" text-case="title" font-style="italic"/>
+            <group delimiter=" ">
+              <text variable="container-title" form="short" text-case="title"/>
+              <group delimiter=", ">
+                <text variable="volume" font-weight="bold"/>
+                <group delimiter=" ">
+                  <choose>
+                    <if variable="number">
+                      <text variable="number"/>
+                    </if>
+                    <else>
+                      <text variable="page-first" form="short"/>
+                    </else>
+                  </choose>
+                  <text macro="year-date" prefix="(" suffix=")"/>
+                </group>
               </group>
             </group>
           </group>

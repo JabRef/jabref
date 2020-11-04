@@ -3,10 +3,14 @@ package org.jabref.gui.push;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
@@ -24,12 +28,17 @@ public class PushToApplicationSettings {
         this.application = (AbstractPushToApplication) application;
         this.dialogService = dialogService;
         settingsPane = new GridPane();
-        settingsPane.setHgap(10.0);
+        settingsPane.setHgap(4.0);
         settingsPane.setVgap(4.0);
 
         commandLabel = new Label();
         path = new TextField();
-        browse = new Button(Localization.lang("Browse"));
+        browse = new Button();
+        browse.setTooltip(new Tooltip(Localization.lang("Browse")));
+        browse.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
+        browse.getStyleClass().addAll("icon-button", "narrow");
+        browse.setPrefHeight(20.0);
+        browse.setPrefWidth(20.0);
 
         this.application.initParameters();
 
@@ -51,6 +60,13 @@ public class PushToApplicationSettings {
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
+
+        ColumnConstraints textConstraints = new ColumnConstraints();
+        ColumnConstraints pathConstraints = new ColumnConstraints();
+        pathConstraints.setHgrow(Priority.ALWAYS);
+        ColumnConstraints browseConstraints = new ColumnConstraints(20.0);
+        browseConstraints.setHgrow(Priority.NEVER);
+        settingsPane.getColumnConstraints().addAll(textConstraints, pathConstraints, browseConstraints);
     }
 
     /**

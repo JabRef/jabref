@@ -1,24 +1,31 @@
 package org.jabref.logic.journals;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
 
-    // We have over 15.000 abbreviations in the built-in lists
-    private final Set<Abbreviation> abbreviations = new HashSet<>(16000);
+    private final MVMap<String, String> fullToAbbreviation;
+    private final MVMap<String, String> abbreviationToFull;
+    private final List<Abbreviation> customAbbreviations;
 
-    public JournalAbbreviationRepository(Abbreviation... abbreviations) {
-        for (Abbreviation abbreviation : abbreviations) {
-            addEntry(abbreviation);
-        }
+    public JournalAbbreviationRepository(Path journalList) {
+        MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open();
+        this.fullToAbbreviation = store.openMap("FullToAbbreviation");
+        this.abbreviationToFull = store.openMap("AbbreviationToFull");
+        this.customAbbreviations = new ArrayList<>();
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -36,16 +43,19 @@ public class JournalAbbreviationRepository {
         return isAbbreviated && !isExpanded;
     }
 
-    public int size() {
-        return abbreviations.size();
-    }
-
     /**
      * Returns true if the given journal name is contained in the list either in its full form (e.g Physical Review
      * Letters) or its abbreviated form (e.g. Phys. Rev. Lett.).
      */
     public boolean isKnownName(String journalName) {
-        return abbreviations.stream().anyMatch(abbreviation -> isMatched(journalName.trim(), abbreviation));
+        String journal = journalName.trim();
+
+        boolean isKnown = customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation));
+        if (isKnown) {
+            return true;
+        }
+
+        return fullToAbbreviation.containsKey(journal) || abbreviationToFull.containsKey(journal);
     }
 
     /**
@@ -53,48 +63,71 @@ public class JournalAbbreviationRepository {
      * i.e. journals whose abbreviation is the same as the full name are not considered
      */
     public boolean isAbbreviatedName(String journalName) {
-        return abbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journalName.trim(), abbreviation));
+        String journal = journalName.trim();
+
+        return customAbbreviations.stream().anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation))
+                || abbreviationToFull.containsKey(journal);
     }
 
     /**
-     * Attempts to get the abbreviated name of the journal given. May contain dots.
+     * Attempts to get the abbreviation of the journal given.
      *
-     * @param journalName The journal name to abbreviate.
-     * @return The abbreviated name
+     * @param input The journal name (either abbreviated or full name).
      */
-    public Optional<Abbreviation> getAbbreviation(String journalName) {
-        return abbreviations.stream().filter(abbreviation -> isMatched(journalName.trim(), abbreviation)).findFirst();
+    public Optional<Abbreviation> get(String input) {
+        String journal = input.trim();
+
+        Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
+                                                                       .filter(abbreviation -> isMatched(journal, abbreviation))
+                                                                       .findAny();
+        if (customAbbreviation.isPresent()) {
+            return customAbbreviation;
+        }
+
+        return Optional.ofNullable(fullToAbbreviation.get(journal))
+                       .map(abbreviation -> new Abbreviation(journal, abbreviation))
+                       .or(() -> Optional.ofNullable(abbreviationToFull.get(journal)).map(fullName -> new Abbreviation(fullName, journal)));
     }
 
-    public void addEntry(Abbreviation abbreviation) {
+    public void addCustomAbbreviation(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
 
-        // Abbreviation equality is tested on name only, so we might have to remove an old abbreviation
-        abbreviations.remove(abbreviation);
-        abbreviations.add(abbreviation);
+        // We do not want to keep duplicates, thus remove the old abbreviation
+        // (abbreviation equality is tested on name only, so we cannot use a Set instead)
+        customAbbreviations.remove(abbreviation);
+        customAbbreviations.add(abbreviation);
     }
 
-    public void addEntries(Collection<Abbreviation> abbreviationsToAdd) {
-        abbreviationsToAdd.forEach(this::addEntry);
+    public List<Abbreviation> getCustomAbbreviations() {
+        return customAbbreviations;
     }
 
-    public Set<Abbreviation> getAbbreviations() {
-        return Collections.unmodifiableSet(abbreviations);
+    public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
+        abbreviationsToAdd.forEach(this::addCustomAbbreviation);
     }
 
     public Optional<String> getNextAbbreviation(String text) {
-        return getAbbreviation(text).map(abbreviation -> abbreviation.getNext(text));
+        return get(text).map(abbreviation -> abbreviation.getNext(text));
     }
 
     public Optional<String> getDefaultAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getAbbreviation);
+        return get(text).map(Abbreviation::getAbbreviation);
     }
 
     public Optional<String> getMedlineAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getMedlineAbbreviation);
+        return get(text).map(Abbreviation::getMedlineAbbreviation);
     }
 
     public Optional<String> getShortestUniqueAbbreviation(String text) {
-        return getAbbreviation(text).map(Abbreviation::getShortestUniqueAbbreviation);
+        return get(text).map(Abbreviation::getShortestUniqueAbbreviation);
+    }
+
+    public Set<String> getFullNames() {
+        return fullToAbbreviation.keySet();
+    }
+
+    public List<Abbreviation> getAllLoaded() {
+        return fullToAbbreviation.entrySet().stream().map(entry ->
+                new Abbreviation(entry.getKey(), entry.getValue())).collect(Collectors.toList());
     }
 }

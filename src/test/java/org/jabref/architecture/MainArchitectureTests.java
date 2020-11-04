@@ -1,114 +1,133 @@
 package org.jabref.architecture;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchIgnore;
+import com.tngtech.archunit.junit.ArchTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
-public class MainArchitectureTests {
+@AnalyzeClasses(packages = "org.jabref")
+class MainArchitectureTests {
 
-    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
-    private static final String PACKAGE_JAVAX_SWING = "javax.swing";
-    private static final String PACKAGE_JAVA_AWT = "java.awt";
-    private static final String PACKAGE_JAVA_FX = "javafx";
-    private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
-    private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
-    private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
-    private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
-    private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
-    private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
-    private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
-    private static final String EXCEPTION_CLASS_JAVA_FX_PAIR = "javafx.util.Pair";
+    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.gui.Globals";
+    private static final String PACKAGE_JAVAX_SWING = "javax.swing..";
+    private static final String PACKAGE_JAVA_AWT = "java.awt..";
+    private static final String PACKAGE_JAVA_FX = "javafx..";
+    private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui..";
+    private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic..";
+    private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model..";
 
-    private static Map<String, List<String>> exceptions;
-
-    @BeforeAll
-    static void setUp() {
-        exceptions = new HashMap<>();
-        // Add exceptions for the architectural test here
-        // Note that bending the architectural constraints should not be done inconsiderately
-
-        List<String> logicExceptions = new ArrayList<>(4);
-        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_AWT_GEOM);
-        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
-        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
-        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
-        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_PAIR);
-
-        List<String> modelExceptions = new ArrayList<>(4);
-        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
-        modelExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
-        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
-        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
-
-        exceptions.put(PACKAGE_ORG_JABREF_LOGIC, logicExceptions);
-        exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
+    @ArchTest
+    public static void doNotUseApacheCommonsLang3(JavaClasses classes) {
+        noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
+                   .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3")
+                   .check(classes);
     }
 
-    private static Stream<Arguments> getPackages() {
-
-        return Stream.of(
-                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT),
-                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING),
-                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_FX),
-                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI),
-                Arguments.of(PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS),
-
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT),
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING),
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_FX),
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI),
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC),
-                Arguments.of(PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS));
+    @ArchTest
+    public static void doNotUseSwing(JavaClasses classes) {
+        // This checks for all all Swing packages, but not the UndoManager
+        noClasses().should().accessClassesThat().resideInAnyPackage("javax.swing",
+                "javax.swing.border..",
+                "javax.swing.colorchooser..",
+                "javax.swing.event..",
+                "javax.swing.filechooser..",
+                "javax.swing.plaf..",
+                "javax.swing.table..",
+                "javax.swing.text..",
+                "javax.swing.tree.."
+        ).check(classes);
     }
 
-    @ParameterizedTest(name = "{index} -- is {0} independent of {1}?")
-    @MethodSource("getPackages")
-    void firstPackageIsIndependentOfSecondPackage(String firstPackage, String secondPackage) throws IOException {
-        Predicate<String> isExceptionPackage = (s) -> (s.startsWith("import " + secondPackage)
-                || s.startsWith("import static " + secondPackage))
-                && exceptions.getOrDefault(firstPackage, Collections.emptyList())
-                             .stream()
-                             .noneMatch(exception -> s.startsWith("import " + exception));
+    @ArchTest
+    public static void doNotUseJGoodies(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("com.jgoodies..")
+                   .check(classes);
+    }
 
-        Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
+    @ArchTest
+    public static void doNotUseGlazedLists(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("ca.odell.glazedlists..")
+                   .check(classes);
+    }
 
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main/"))) {
-            List<Path> files = pathStream
-                    .filter(p -> p.toString().endsWith(".java"))
-                    .filter(p -> {
-                        try {
-                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isPackage);
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    })
-                    .filter(p -> {
-                        try {
-                            return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isExceptionPackage);
-                        } catch (IOException e) {
-                            return false;
-                        }
-                    })
-                    .collect(Collectors.toList());
+    @ArchTest
+    public static void doNotUseGlyphsDirectly(JavaClasses classes) {
+        noClasses().that().resideOutsideOfPackage("org.jabref.gui.icon")
+                   .should().accessClassesThat().resideInAnyPackage("de.jensd.fx.glyphs", "de.jensd.fx.glyphs.materialdesignicons")
+                   .check(classes);
+    }
 
-            assertEquals(Collections.emptyList(), files, "The following classes are not allowed to depend on " + secondPackage);
-        }
+    @ArchTest
+    public static void doNotUseAssertJ(JavaClasses classes) {
+        noClasses().should().accessClassesThat().resideInAPackage("org.assertj..")
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUseJavaAWT(JavaClasses classes) {
+        noClasses().that().areNotAnnotatedWith(AllowedToUseAwt.class)
+                   .should().accessClassesThat().resideInAPackage(PACKAGE_JAVA_AWT)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUsePaths(JavaClasses classes) {
+        noClasses().should()
+                   .accessClassesThat()
+                   .belongToAnyOf(Paths.class)
+                   .because("Path.of(...) should be used instead")
+                   .check(classes);
+    }
+
+    @ArchTest
+    @ArchIgnore
+    // Fails currently
+    public static void respectLayeredArchitecture(JavaClasses classes) {
+        layeredArchitecture()
+                .layer("Gui").definedBy(PACKAGE_ORG_JABREF_GUI)
+                .layer("Logic").definedBy(PACKAGE_ORG_JABREF_LOGIC)
+                .layer("Model").definedBy(PACKAGE_ORG_JABREF_MODEL)
+                .layer("Cli").definedBy("org.jabref.cli..")
+                .layer("Migrations").definedBy("org.jabref.migrations..") // TODO: Move to logic
+                .layer("Preferences").definedBy("org.jabref.preferences..")
+                .layer("Styletester").definedBy("org.jabref.styletester..")
+
+                .whereLayer("Gui").mayOnlyBeAccessedByLayers("Preferences", "Cli") // TODO: Remove preferences here
+                .whereLayer("Logic").mayOnlyBeAccessedByLayers("Gui", "Cli", "Model", "Migrations", "Preferences")
+                .whereLayer("Model").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Cli", "Preferences")
+                .whereLayer("Cli").mayNotBeAccessedByAnyLayer()
+                .whereLayer("Migrations").mayOnlyBeAccessedByLayers("Logic")
+                .whereLayer("Preferences").mayOnlyBeAccessedByLayers("Gui", "Logic", "Migrations", "Styletester", "Cli") // TODO: Remove logic here
+
+                .check(classes);
+    }
+
+    @ArchTest
+    public static void doNotUseLogicInModel(JavaClasses classes) {
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .and().areNotAnnotatedWith(AllowedToUseLogic.class)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void restrictUsagesInModel(JavaClasses classes) {
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
+                   .check(classes);
+    }
+
+    @ArchTest
+    public static void restrictUsagesInLogic(JavaClasses classes) {
+        noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                   .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                   .orShould().dependOnClassesThat().haveFullyQualifiedName(CLASS_ORG_JABREF_GLOBALS)
+                   .check(classes);
     }
 }

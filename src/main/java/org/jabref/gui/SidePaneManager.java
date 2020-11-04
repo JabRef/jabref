@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jabref.Globals;
 import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;

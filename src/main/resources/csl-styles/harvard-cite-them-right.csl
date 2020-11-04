@@ -164,7 +164,7 @@
           </group>
         </group>
       </else-if>
-      <else-if type="article-newspaper article-magazine" match="none">
+      <else-if type="article-journal article-newspaper article-magazine" match="none">
         <group delimiter=" ">
           <group delimiter=", ">
             <choose>

@@ -2,15 +2,18 @@ package org.jabref.logic.net;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.support.DisabledOnCIServer;
 
+import kong.unirest.UnirestException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class URLDownloadTest {
@@ -90,5 +93,28 @@ public class URLDownloadTest {
 
         Path path = ftp.toTemporaryFile();
         assertNotNull(path);
+    }
+
+    @Test
+    public void testCheckConnectionSuccess() throws MalformedURLException {
+        URLDownload google = new URLDownload(new URL("http://www.google.com"));
+
+        assertTrue(google.canBeReached());
+    }
+
+    @Test
+    public void testCheckConnectionFail() throws MalformedURLException {
+        URLDownload nonsense = new URLDownload(new URL("http://nonsenseadddress"));
+
+        assertThrows(UnirestException.class, nonsense::canBeReached);
+    }
+
+    @Test
+    public void connectTimeoutIsNeverNull() throws MalformedURLException {
+        URLDownload urlDownload = new URLDownload(new URL("http://www.example.com"));
+        assertNotNull(urlDownload.getConnectTimeout(), "there's a non-null default by the constructor");
+
+        urlDownload.setConnectTimeout(null);
+        assertNotNull(urlDownload.getConnectTimeout(), "no null value can be set");
     }
 }

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.jabref.JabRefExecutorService;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -100,8 +100,8 @@ public class FulltextFetchers {
         return () -> {
             try {
                 return fetcher.findFullText(entry)
-                        .filter(url -> isPDF.test(url.toString()))
-                        .map(url -> new FetcherResult(fetcher.getTrustLevel(), url));
+                              .filter(url -> isPDF.test(url.toString()))
+                              .map(url -> new FetcherResult(fetcher.getTrustLevel(), url));
             } catch (IOException | FetcherException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
             }
@@ -111,7 +111,7 @@ public class FulltextFetchers {
 
     private List<Callable<Optional<FetcherResult>>> getCallables(BibEntry entry, Set<FulltextFetcher> fetchers) {
         return fetchers.stream()
-                .map(f -> getCallable(entry, f))
-                .collect(Collectors.toList());
+                       .map(f -> getCallable(entry, f))
+                       .collect(Collectors.toList());
     }
 }

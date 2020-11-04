@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="symbol" default-locale="en-GB">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="symbol" default-locale="en-GB" demote-non-dropping-particle="never">
   <info>
     <title>Acta Zoologica Academiae Scientiarum Hungaricae</title>
     <id>http://www.zotero.org/styles/acta-zoologica-academiae-scientiarum-hungaricae</id>

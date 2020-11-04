@@ -32,6 +32,7 @@ import org.jabref.logic.layout.format.AuthorLastFirstOxfordCommas;
 import org.jabref.logic.layout.format.AuthorNatBib;
 import org.jabref.logic.layout.format.AuthorOrgSci;
 import org.jabref.logic.layout.format.Authors;
+import org.jabref.logic.layout.format.CSLType;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBook4Authors;
@@ -73,6 +74,7 @@ import org.jabref.logic.layout.format.Replace;
 import org.jabref.logic.layout.format.RisAuthors;
 import org.jabref.logic.layout.format.RisKeywords;
 import org.jabref.logic.layout.format.RisMonth;
+import org.jabref.logic.layout.format.ShortMonthFormatter;
 import org.jabref.logic.layout.format.ToLowerCase;
 import org.jabref.logic.layout.format.ToUpperCase;
 import org.jabref.logic.layout.format.WrapContent;
@@ -262,7 +264,7 @@ class LayoutEntry {
             for (String part : parts) {
                 negated = part.startsWith("!");
                 field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
-                if (!(field.isPresent() ^ negated)) {
+                if (field.isPresent() == negated) {
                     break;
                 }
             }
@@ -279,7 +281,7 @@ class LayoutEntry {
             }
         }
 
-        if ((!(field.isPresent() ^ negated)) || ((type == LayoutHelper.IS_GROUP_START)
+        if ((field.isPresent() == negated) || ((type == LayoutHelper.IS_GROUP_START)
                 && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
         } else {
@@ -485,7 +487,7 @@ class LayoutEntry {
             case "Iso690NamesAuthors":
                 return new Iso690NamesAuthors();
             case "JournalAbbreviator":
-                return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(), prefs.getJournalAbbreviationPreferences());
+                return new JournalAbbreviator(prefs.getJournalAbbreviationRepository());
             case "LastPage":
                 return new LastPage();
             case "FormatChars": // For backward compatibility
@@ -539,14 +541,17 @@ class LayoutEntry {
                 return new WrapFileLinks(prefs.getFileLinkPreferences());
             case "Markdown":
                 return new MarkdownFormatter();
+            case "CSLType":
+                return new CSLType();
+            case "ShortMonth":
+                return new ShortMonthFormatter();
             default:
                 return null;
         }
     }
 
     /**
-     * Return an array of LayoutFormatters found in the given formatterName
-     * string (in order of appearance).
+     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
      */
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
@@ -677,5 +682,7 @@ class LayoutEntry {
         return result;
     }
 
-    public String getText() { return text; }
+    public String getText() {
+        return text;
+    }
 }

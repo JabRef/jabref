@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/molecular-biology-and-evolution</id>
     <link href="http://www.zotero.org/styles/molecular-biology-and-evolution" rel="self"/>
     <link href="http://www.zotero.org/styles/council-of-science-editors-author-date" rel="template"/>
-    <link href="http://www.oxfordjournals.org/our_journals/molbev/general_author_guidelines.html#References" rel="documentation"/>
+    <link href="https://academic.oup.com/mbe/pages/General_Author_Guidelines#References" rel="documentation"/>
     <author>
       <name>Julian Onions</name>
       <email>julian.onions@gmail.com</email>
@@ -79,7 +79,7 @@
     </date>
   </macro>
   <macro name="journal">
-    <text variable="container-title" form="short"/>
+    <text variable="container-title" form="short" font-style="italic"/>
     <choose>
       <if variable="URL">
         <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>

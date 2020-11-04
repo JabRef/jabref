@@ -13,7 +13,7 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
+          if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo ::set-output name=secretspresent::false
           else
             echo ::set-output name=secretspresent::true
@@ -27,7 +27,7 @@ jobs:
           echo "##[set-output name=branch;]$(echo ${{ github.event.pull_request.head.ref }})"
       - name: Delete folder on builds.jabref.org
         if: ${{ steps.checksecrets.outputs.secretspresent }}
-        uses: appleboy/ssh-action@v0.0.6
+        uses: appleboy/ssh-action@v0.1.3
         with:
           script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }} || true
           host: build-upload.jabref.org

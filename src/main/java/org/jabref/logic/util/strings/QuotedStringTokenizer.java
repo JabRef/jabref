@@ -13,14 +13,9 @@ public class QuotedStringTokenizer {
     private int index;
 
     /**
-     * @param content
-     *            The String to be tokenized.
-     * @param delimiters
-     *            The delimiter characters.
-     * @param quoteCharacter
-     *            The quoting character. Every character (including, but not
-     *            limited to, delimiters) that is preceded by this character is
-     *            not treated as a delimiter, but as a token component.
+     * @param content        The String to be tokenized.
+     * @param delimiters     The delimiter characters.
+     * @param quoteCharacter The quoting character. Every character (including, but not limited to, delimiters) that is preceded by this character is not treated as a delimiter, but as a token component.
      */
     public QuotedStringTokenizer(String content, String delimiters, char quoteCharacter) {
         this.content = content;

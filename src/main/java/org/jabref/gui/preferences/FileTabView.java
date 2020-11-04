@@ -1,6 +1,8 @@
 package org.jabref.gui.preferences;
 
-import javafx.application.Platform;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -8,19 +10,18 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.NewLineSeparator;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
@@ -32,22 +33,12 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private ComboBox<NewLineSeparator> newLineSeparator;
     @FXML private CheckBox alwaysReformatBib;
 
-    @FXML private TextField mainFileDir;
-    @FXML private CheckBox useBibLocationAsPrimary;
-    @FXML private Button autolinkRegexHelp;
-    @FXML private RadioButton autolinkFileStartsBibtex;
-    @FXML private RadioButton autolinkFileExactBibtex;
-    @FXML private RadioButton autolinkUseRegex;
-    @FXML private TextField autolinkRegexKey;
-    @FXML private CheckBox searchFilesOnOpen;
-    @FXML private CheckBox openBrowseOnCreate;
+    @FXML private SaveOrderConfigPanel exportOrderPanel;
 
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-
-    public FileTabView(JabRefPreferences preferences) {
+    public FileTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -55,11 +46,8 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
                   .load();
     }
 
-    @Override
-    public String getTabName() { return Localization.lang("File"); }
-
     public void initialize() {
-        this.viewModel = new FileTabViewModel(dialogService, preferences);
+        this.viewModel = new FileTabViewModel(preferences);
 
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
@@ -74,25 +62,37 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
         newLineSeparator.valueProperty().bindBidirectional(viewModel.selectedNewLineSeparatorProperty());
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
 
-        mainFileDir.textProperty().bindBidirectional(viewModel.mainFileDirProperty());
-        useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());
-        autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
-        autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
-        autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());
-        autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
-        autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
-        searchFilesOnOpen.selectedProperty().bindBidirectional(viewModel.searchFilesOnOpenProperty());
-        openBrowseOnCreate.selectedProperty().bindBidirectional(viewModel.openBrowseOnCreateProperty());
+        exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
+        exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
+        exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
+        exportOrderPanel.primarySortFieldsProperty().bind(viewModel.primarySortFieldsProperty());
+        exportOrderPanel.secondarySortFieldsProperty().bind(viewModel.secondarySortFieldsProperty());
+        exportOrderPanel.tertiarySortFieldsProperty().bind(viewModel.tertiarySortFieldsProperty());
+        exportOrderPanel.savePrimaryDescPropertySelected().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
+        exportOrderPanel.saveSecondaryDescPropertySelected().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
+        exportOrderPanel.saveTertiaryDescPropertySelected().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
+        exportOrderPanel.savePrimarySortSelectedValueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
+        exportOrderPanel.saveSecondarySortSelectedValueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
+        exportOrderPanel.saveTertiarySortSelectedValueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
 
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
-        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH), autolinkRegexHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE), autosaveLocalLibrariesHelp);
-
-        validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDir));
     }
 
-    public void mainFileDirBrowse() { viewModel.mainFileDirBrowse(); }
+    @Override
+    public String getTabName() {
+        return Localization.lang("File");
+    }
+
+    @Override
+    public boolean validateSettings() {
+        return true;
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 }

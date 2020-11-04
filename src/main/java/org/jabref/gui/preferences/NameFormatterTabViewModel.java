@@ -10,8 +10,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class NameFormatterTabViewModel implements PreferenceTabViewModel {
 
@@ -20,18 +21,20 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
     private final StringProperty addFormatterStringProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
+    private final NameFormatterPreferences initialNameFormatterPreferences;
 
-    NameFormatterTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    NameFormatterTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialNameFormatterPreferences = preferences.getNameFormatterPreferences();
     }
 
     @Override
     public void setValues() {
         formatterListProperty.clear();
-        List<String> names = preferences.getStringList(JabRefPreferences.NAME_FORMATER_KEY);
-        List<String> formats = preferences.getStringList(JabRefPreferences.NAME_FORMATTER_VALUE);
+        List<String> names = initialNameFormatterPreferences.getNameFormatterKey();
+        List<String> formats = initialNameFormatterPreferences.getNameFormatterValue();
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -53,8 +56,10 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
             formats.add(formatterListItem.getFormat());
         }
 
-        preferences.putStringList(JabRefPreferences.NAME_FORMATER_KEY, names);
-        preferences.putStringList(JabRefPreferences.NAME_FORMATTER_VALUE, formats);
+        NameFormatterPreferences newNameFormatterPreferences = new NameFormatterPreferences(
+                names,
+                formats);
+        preferences.storeNameFormatterPreferences(newNameFormatterPreferences);
     }
 
     public void addFormatter() {
@@ -69,17 +74,29 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
         }
     }
 
-    public void removeFormatter(NameFormatterItemModel formatter) { formatterListProperty.remove(formatter); }
+    public void removeFormatter(NameFormatterItemModel formatter) {
+        formatterListProperty.remove(formatter);
+    }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public ListProperty<NameFormatterItemModel> formatterListProperty() { return formatterListProperty; }
+    public ListProperty<NameFormatterItemModel> formatterListProperty() {
+        return formatterListProperty;
+    }
 
-    public StringProperty addFormatterNameProperty() { return addFormatterNameProperty; }
+    public StringProperty addFormatterNameProperty() {
+        return addFormatterNameProperty;
+    }
 
-    public StringProperty addFormatterStringProperty() { return addFormatterStringProperty; }
+    public StringProperty addFormatterStringProperty() {
+        return addFormatterStringProperty;
+    }
 }

@@ -134,7 +134,7 @@ public class ModsImporter extends Importer implements Parser {
         BibEntry entry = new BibEntry();
         Map<Field, String> fields = new HashMap<>();
         if (modsDefinition.getID() != null) {
-            entry.setCiteKey(modsDefinition.getID());
+            entry.setCitationKey(modsDefinition.getID());
         }
         if (modsDefinition.getModsGroup() != null) {
             parseModsGroup(fields, modsDefinition.getModsGroup(), entry);
@@ -179,7 +179,8 @@ public class ModsImporter extends Importer implements Parser {
 
             nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
 
-            originInfoDefinition.ifPresent(originInfo -> originInfo.getPlaceOrPublisherOrDateIssued().stream()
+            originInfoDefinition.ifPresent(originInfo -> originInfo
+                    .getPlaceOrPublisherOrDateIssued().stream()
                     .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
                             element.getValue())));
 
@@ -221,8 +222,8 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
-        if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
-            entry.setCiteKey(identifier.getValue());
+        if ("citekey".equals(type) && !entry.getCitationKey().isPresent()) {
+            entry.setCitationKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
             putIfValueNotNull(fields, FieldFactory.parseField(identifier.getType()), identifier.getValue());
@@ -278,11 +279,11 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseLocationAndUrl(Map<Field, String> fields, LocationDefinition locationDefinition) {
         List<String> locations = locationDefinition.getPhysicalLocation().stream()
-                .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
+                                                   .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
         putIfListIsNotEmpty(fields, locations, StandardField.LOCATION, ", ");
 
         List<String> urls = locationDefinition.getUrl().stream().map(UrlDefinition::getValue)
-                .collect(Collectors.toList());
+                                              .collect(Collectors.toList());
         putIfListIsNotEmpty(fields, urls, StandardField.URL, ", ");
     }
 
@@ -297,7 +298,7 @@ public class ModsImporter extends Importer implements Parser {
                 LanguageDefinition language = (LanguageDefinition) value;
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
                 List<String> languages = languageTerms.stream().map(LanguageTermDefinition::getValue)
-                        .collect(Collectors.toList());
+                                                      .collect(Collectors.toList());
                 putIfListIsNotEmpty(fields, languages, StandardField.LANGUAGE, ", ");
             }
         }
@@ -374,7 +375,7 @@ public class ModsImporter extends Importer implements Parser {
         List<String> places = new ArrayList<>();
         placeDefinition
                 .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                        .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
+                                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
@@ -397,7 +398,7 @@ public class ModsImporter extends Importer implements Parser {
 
                 case "dateIssued":
                     // The first 4 digits of dateIssued should be the year
-                    fields.put(StandardField.YEAR, date.getValue().substring(0, 4));
+                    fields.put(StandardField.YEAR, date.getValue().replaceAll("[^0-9]*", "").replaceAll("\\(\\d?\\d?\\d?\\d?.*\\)", "\1"));
                     break;
                 case "dateCreated":
                     // If there was no year in date issued, then take the year from date created
@@ -434,7 +435,9 @@ public class ModsImporter extends Importer implements Parser {
                 NamePartDefinition namePart = (NamePartDefinition) value;
                 String type = namePart.getAtType();
                 if ((type == null) && (namePart.getValue() != null)) {
-                    authors.add(namePart.getValue());
+                    String namePartValue = namePart.getValue();
+                    namePartValue = namePartValue.replaceAll(",$", "");
+                    authors.add(namePartValue);
                 } else if ("family".equals(type) && (namePart.getValue() != null)) {
                     // family should come first, so if family appears we can set the author then comes before
                     // we have to check if forename and family name are not empty in case it's the first author

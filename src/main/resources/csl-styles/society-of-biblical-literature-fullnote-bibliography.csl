@@ -33,6 +33,10 @@
   <locale xml:lang="en-US">
     <terms>
       <term name="editor" form="verb-short">ed.</term>
+      <term name="section" form="short">
+        <single>§</single>
+        <multiple>§§</multiple>
+      </term>
       <term name="translator" form="verb-short">trans.</term>
       <term name="translator" form="short">trans.</term>
       <term name="editortranslator" form="verb-short">ed. and trans.</term>
@@ -48,7 +52,7 @@
     </names>
   </macro>
   <macro name="editor-translator-verb-period">
-    <names variable="editor translator" delimiter=" ">
+    <names variable="editor translator" delimiter=". ">
       <label form="verb" text-case="capitalize-first" suffix=" "/>
       <name and="text" delimiter=", "/>
     </names>
@@ -498,7 +502,7 @@
                     <text value=" of"/>
                   </group>
                 </if>
-                <else-if type="chapter" variable="container-title" match="all">
+                <else-if type="chapter" variable="collection-title" match="all">
                   <!--SBL 6.2.23-->
                   <group>
                     <text term="volume" form="short" suffix=" "/>
@@ -549,7 +553,7 @@
                     <text value=" of"/>
                   </group>
                 </if>
-                <else-if type="chapter" variable="container-title" match="all">
+                <else-if type="chapter" variable="collection-title" match="all">
                   <!--SBL 6.2.23-->
                   <group>
                     <text term="volume" form="short" text-case="capitalize-first" suffix=" "/>

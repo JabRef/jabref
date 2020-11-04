@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -75,7 +74,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
+        Predicate<String> isDirectory = path -> Path.of(path).toFile().isDirectory();
         latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
@@ -110,7 +109,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
     public void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(latexFileDirectory.get())).build();
+                .withInitialDirectory(Path.of(latexFileDirectory.get())).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
@@ -122,7 +121,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
      * Run a recursive search in a background task.
      */
     public void searchButtonClicked() {
-        BackgroundTask.wrap(() -> searchDirectory(Paths.get(latexFileDirectory.get())))
+        BackgroundTask.wrap(() -> searchDirectory(Path.of(latexFileDirectory.get())))
                       .onRunning(() -> {
                           root.set(null);
                           noFilesFound.set(true);
@@ -205,7 +204,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Paths.get(latexFileDirectory.get())).showAndWait())
+                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get())).showAndWait())
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

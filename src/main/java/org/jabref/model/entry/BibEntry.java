@@ -15,13 +15,14 @@ import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.bibtex.FileFieldWriter;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -32,6 +33,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -39,17 +41,18 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.MultiKeyMap;
 
-import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Represents a BibTex / BibLaTeX entry.
- *
- * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCiteKey(String)} and {@link #withField(Field, String)}.
+ * <p>
+ * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}.
  */
+@AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
@@ -73,16 +76,26 @@ public class BibEntry implements Cloneable {
     private final MultiKeyMap<StandardField, Character, KeywordList> fieldsAsKeywords = new MultiKeyMap<>(StandardField.class);
 
     private final EventBus eventBus = new EventBus();
+
     private String id;
+
     private final ObjectProperty<EntryType> type = new SimpleObjectProperty<>(DEFAULT_TYPE);
 
     private ObservableMap<Field, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
-    private String parsedSerialization = "";
+
+    /**
+     * The part before the start of the entry
+     */
     private String commentsBeforeEntry = "";
 
     /**
+     * Stores the text "rendering" of the entry as read by the BibTeX reader. Includes comments.
+     */
+    private String parsedSerialization = "";
+
+    /**
      * Marks whether the complete serialization, which was read from file, should be used.
-     *
+     * <p>
      * Is set to <code>true</code>, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
@@ -123,7 +136,6 @@ public class BibEntry implements Cloneable {
      * @param targetField field name of the BibEntry
      * @param targetEntry type of the BibEntry
      * @param sourceEntry type of the cross-referenced BibEntry
-     *
      * @return the mapped field or null if there is no valid mapping available
      */
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
@@ -269,7 +281,7 @@ public class BibEntry implements Cloneable {
         }
 
         if (InternalField.KEY_FIELD.equals(field)) {
-            return getCiteKeyOptional();
+            return getCitationKey();
         }
 
         Optional<String> result = getFieldOrAlias.apply(this, field);
@@ -287,7 +299,10 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        return result.map(resultText -> BibDatabase.getText(resultText, database));
+
+        return (database == null || result.isEmpty()) ?
+                result :
+                Optional.of(database.resolveForStrings(result.get()));
     }
 
     /**
@@ -298,8 +313,8 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the BibTeX key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
-     *
+     * Sets this entry's identifier (ID). It is used internally  to distinguish different BibTeX entries. It is <emph>not</emph> the citation key. The BibTexKey is the {@link InternalField#KEY_FIELD}.
+     * <p>
      * The entry is also updated in the shared database - provided the database containing it doesn't veto the change.
      *
      * @param id The ID to be used
@@ -315,27 +330,32 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets the cite key AKA citation key AKA BibTeX key. Note: This is <emph>not</emph> the internal Id of this entry.
-     * The internal Id is always present, whereas the BibTeX key might not be present.
+     * Sets the citation key. Note: This is <emph>not</emph> the internal Id of this entry.
+     * The internal Id is always present, whereas the citation key might not be present.
      *
-     * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+     * @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
      */
-    public Optional<FieldChange> setCiteKey(String newCiteKey) {
-        return setField(InternalField.KEY_FIELD, newCiteKey);
+    public Optional<FieldChange> setCitationKey(String newKey) {
+        return setField(InternalField.KEY_FIELD, newKey);
     }
 
-    public BibEntry withCiteKey(String newCiteKey) {
-        setCiteKey(newCiteKey);
+    public BibEntry withCitationKey(String newKey) {
+        setCitationKey(newKey);
         this.setChanged(false);
         return this;
     }
 
-    public Optional<String> getCiteKeyOptional() {
-        return Optional.ofNullable(fields.get(InternalField.KEY_FIELD));
+    public Optional<String> getCitationKey() {
+        String key = fields.get(InternalField.KEY_FIELD);
+        if (StringUtil.isBlank(key)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(key);
+        }
     }
 
-    public boolean hasCiteKey() {
-        return this.getField(InternalField.KEY_FIELD).map(key -> !Strings.isNullOrEmpty(key)).orElse(false);
+    public boolean hasCitationKey() {
+        return getCitationKey().isPresent();
     }
 
     /**
@@ -357,7 +377,8 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets this entry's type.
+     * Sets this entry's type and sets the changed flag to true <br>
+     * If the new entry type equals the old entry type no changed flag is set.
      */
     public Optional<FieldChange> setType(EntryType newType, EntriesEventSource eventSource) {
         Objects.requireNonNull(newType);
@@ -376,8 +397,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns an set containing the names of all fields that are
-     * set for this particular entry.
+     * Returns an set containing the names of all fields that are set for this particular entry.
      *
      * @return a set of existing field names
      */
@@ -462,13 +482,17 @@ public class BibEntry implements Cloneable {
         return getField(StandardField.DOI).flatMap(DOI::parse);
     }
 
+    public Optional<ISBN> getISBN() {
+        return getField(StandardField.ISBN).flatMap(ISBN::parse);
+    }
+
     /**
      * Return the LaTeX-free contents of the given field or its alias an an Optional
-     *
+     * <p>
      * For details see also {@link #getFieldOrAlias(Field)}
      *
      * @param name the name of the field
-     * @return  the stored latex-free content of the field (or its alias)
+     * @return the stored latex-free content of the field (or its alias)
      */
     public Optional<String> getFieldOrAliasLatexFree(Field name) {
         return genericGetFieldOrAlias(name, BibEntry::getLatexFreeField);
@@ -611,6 +635,9 @@ public class BibEntry implements Cloneable {
     public Object clone() {
         BibEntry clone = new BibEntry(type.getValue());
         clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
+        clone.commentsBeforeEntry = commentsBeforeEntry;
+        clone.parsedSerialization = parsedSerialization;
+        clone.changed = changed;
         return clone;
     }
 
@@ -754,7 +781,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Keyword newValue,
-            Character keywordDelimiter) {
+                                                 Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceAll(keywordsToReplace, newValue);
 
@@ -812,7 +839,7 @@ public class BibEntry implements Cloneable {
     }
 
     /*
-    * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
+     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
         return commentsBeforeEntry;
@@ -820,7 +847,7 @@ public class BibEntry implements Cloneable {
 
     public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
         return getField(field).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
-                .orElse(Collections.emptyList());
+                              .orElse(Collections.emptyList());
     }
 
     public Optional<FieldChange> setEntryLinkList(Field field, List<ParsedEntryLink> list) {
@@ -877,7 +904,7 @@ public class BibEntry implements Cloneable {
     public Optional<String> getLatexFreeField(Field field) {
         if (InternalField.KEY_FIELD.equals(field)) {
             // the key field should not be converted
-            return getCiteKeyOptional();
+            return getCitationKey();
         } else if (InternalField.TYPE_HEADER.equals(field)) {
             return Optional.of(type.get().getDisplayName());
         } else if (latexFreeFields.containsKey(field)) {
@@ -931,20 +958,26 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);
     }
 
-    public ObjectBinding<String> getFieldBinding(Field field) {
+    public OptionalBinding<String> getFieldBinding(Field field) {
         if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {
-            return (ObjectBinding<String>) EasyBind.map(type, EntryType::getDisplayName);
-      }
-       return Bindings.valueAt(fields, field);
+            return EasyBind.wrapNullable(type).map(EntryType::getDisplayName);
+        }
+        return EasyBind.valueAt(fields, field);
     }
 
-    public ObjectBinding<String> getCiteKeyBinding() {
+    public OptionalBinding<String> getCiteKeyBinding() {
         return getFieldBinding(InternalField.KEY_FIELD);
     }
 
     public Optional<FieldChange> addFile(LinkedFile file) {
         List<LinkedFile> linkedFiles = getFiles();
         linkedFiles.add(file);
+        return setFiles(linkedFiles);
+    }
+
+    public Optional<FieldChange> addFile(int index, LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(index, file);
         return setFiles(linkedFiles);
     }
 

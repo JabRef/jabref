@@ -5,22 +5,20 @@ import java.nio.charset.Charset;
 import org.jabref.model.database.BibDatabaseMode;
 
 public class GeneralPreferences {
-        private final Charset defaultEncoding;
-        private final BibDatabaseMode defaultBibDatabaseMode;
+    private final Charset defaultEncoding;
+    private final BibDatabaseMode defaultBibDatabaseMode;
 
-        private final boolean warnAboutDuplicatesInInspection;
-        private final boolean confirmDelete;
-        private final boolean enforceLegalBibtexKey;
-        private final boolean allowIntegerEditionBibtex;
-        private final boolean memoryStickMode;
-        private final boolean collectTelemetry;
-        private final boolean showAdvancedHints;
+    private final boolean warnAboutDuplicatesInInspection;
+    private boolean confirmDelete;
+    private final boolean allowIntegerEditionBibtex;
+    private final boolean memoryStickMode;
+    private final boolean collectTelemetry;
+    private final boolean showAdvancedHints;
 
     public GeneralPreferences(Charset defaultEncoding,
                               BibDatabaseMode defaultBibDatabaseMode,
                               boolean warnAboutDuplicatesInInspection,
                               boolean confirmDelete,
-                              boolean enforceLegalBibtexKey,
                               boolean allowIntegerEditionBibtex,
                               boolean memoryStickMode,
                               boolean collectTelemetry,
@@ -29,7 +27,6 @@ public class GeneralPreferences {
         this.defaultBibDatabaseMode = defaultBibDatabaseMode;
         this.warnAboutDuplicatesInInspection = warnAboutDuplicatesInInspection;
         this.confirmDelete = confirmDelete;
-        this.enforceLegalBibtexKey = enforceLegalBibtexKey;
         this.allowIntegerEditionBibtex = allowIntegerEditionBibtex;
         this.memoryStickMode = memoryStickMode;
         this.collectTelemetry = collectTelemetry;
@@ -48,15 +45,16 @@ public class GeneralPreferences {
         return warnAboutDuplicatesInInspection;
     }
 
-    public boolean isConfirmDelete() {
+    public boolean shouldConfirmDelete() {
         return confirmDelete;
     }
 
-    public boolean isEnforceLegalBibtexKey() {
-        return enforceLegalBibtexKey;
+    public GeneralPreferences withConfirmDelete(boolean confirmDelete) {
+        this.confirmDelete = confirmDelete;
+        return this;
     }
 
-    public boolean isAllowIntegerEditionBibtex() {
+    public boolean shouldAllowIntegerEditionBibtex() {
         return allowIntegerEditionBibtex;
     }
 
@@ -64,11 +62,11 @@ public class GeneralPreferences {
         return memoryStickMode;
     }
 
-    public boolean isCollectTelemetry() {
+    public boolean shouldCollectTelemetry() {
         return collectTelemetry;
     }
 
-    public boolean isShowAdvancedHints() {
+    public boolean shouldShowAdvancedHints() {
         return showAdvancedHints;
     }
 }

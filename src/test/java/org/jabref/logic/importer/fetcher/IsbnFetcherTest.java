@@ -33,7 +33,7 @@ class IsbnFetcherTest {
 
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("9780134685991");
+        bibEntry.setCitationKey("9780134685991");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
         bibEntry.setField(StandardField.YEAR, "2018");
@@ -47,11 +47,6 @@ class IsbnFetcherTest {
     @Test
     void testName() {
         assertEquals("ISBN", fetcher.getName());
-    }
-
-    @Test
-    void testHelpPage() {
-        assertEquals("import-using-publication-identifiers/isbntobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

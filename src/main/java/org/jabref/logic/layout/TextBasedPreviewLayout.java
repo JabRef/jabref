@@ -56,6 +56,6 @@ public class TextBasedPreviewLayout implements PreviewLayout {
 
     @Override
     public String getName() {
-        return Localization.lang("Preview");
+        return Localization.lang("Customized preview style");
     }
 }

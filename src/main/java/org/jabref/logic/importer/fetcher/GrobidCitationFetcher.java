@@ -1,11 +1,13 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -20,13 +22,18 @@ import org.slf4j.LoggerFactory;
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
+
     private static final String GROBID_URL = "http://grobid.jabref.org:8070";
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new GrobidService(GROBID_URL));
+    }
+
+    GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {
         this.importFormatPreferences = importFormatPreferences;
-        this.grobidService = new GrobidService(GROBID_URL);
+        this.grobidService = grobidService;
     }
 
     /**
@@ -38,9 +45,14 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private Optional<String> parseUsingGrobid(String plainText) {
         try {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
+        } catch (SocketTimeoutException e) {
+            String msg = "Connection timed out.";
+            LOGGER.debug(msg, e);
+            throw new RuntimeException(msg, e);
         } catch (IOException e) {
-            LOGGER.debug("Could not process citation", e);
-            return Optional.empty();
+            String msg = "Could not process citation. " + e.getMessage();
+            LOGGER.debug(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
@@ -54,20 +66,28 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) {
-        return Arrays
-                .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                .map(String::trim)
-                .filter(str -> !str.isBlank())
-                .map(reference -> parseUsingGrobid(reference))
-                .flatMap(Optional::stream)
-                .map(reference -> parseBibToBibEntry(reference))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());
+    public List<BibEntry> performSearch(String query) throws FetcherException {
+        List<BibEntry> bibEntries = null;
+        try {
+            bibEntries = Arrays
+                    .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                    .map(String::trim)
+                    .filter(str -> !str.isBlank())
+                    .map(this::parseUsingGrobid)
+                    .flatMap(Optional::stream)
+                    .map(this::parseBibToBibEntry)
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            // un-wrap the wrapped exceptions
+            throw new FetcherException(e.getMessage(), e.getCause());
+        }
+        return bibEntries;
     }
 
     @Override
     public String getName() {
         return "GROBID";
     }
+
 }

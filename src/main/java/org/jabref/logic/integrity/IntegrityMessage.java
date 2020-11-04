@@ -6,9 +6,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
 public final class IntegrityMessage implements Cloneable {
-
     private final BibEntry entry;
-
     private final Field field;
     private final String message;
 
@@ -20,7 +18,7 @@ public final class IntegrityMessage implements Cloneable {
 
     @Override
     public String toString() {
-        return "[" + getEntry().getCiteKeyOptional().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
+        return "[" + getEntry().getCitationKey().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
     }
 
     public String getMessage() {

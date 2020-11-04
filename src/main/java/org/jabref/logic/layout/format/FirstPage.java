@@ -21,6 +21,5 @@ public class FirstPage implements LayoutFormatter {
         } else {
             return s;
         }
-
     }
 }

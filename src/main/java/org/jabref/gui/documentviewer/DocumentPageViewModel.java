@@ -9,6 +9,7 @@ public abstract class DocumentPageViewModel {
 
     /**
      * Renders this page and returns an image representation of itself.
+     *
      * @param width
      * @param height
      */

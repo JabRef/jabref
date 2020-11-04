@@ -77,7 +77,7 @@ public class BibTeXMLExporter extends Exporter {
         for (BibEntry bibEntry : entries) {
             Entry entry = new Entry();
 
-            bibEntry.getCiteKeyOptional().ifPresent(entry::setId);
+            bibEntry.getCitationKey().ifPresent(entry::setId);
 
             EntryType i = bibEntry.getType();
             if (StandardEntryType.Article.equals(i)) {
@@ -248,7 +248,6 @@ public class BibTeXMLExporter extends Exporter {
 
     private <T> List<Method> getListOfSetMethods(T entryType) {
         return Arrays.stream(entryType.getClass().getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("set")).collect(Collectors.toList());
+                     .filter(method -> method.getName().startsWith("set")).collect(Collectors.toList());
     }
-
 }

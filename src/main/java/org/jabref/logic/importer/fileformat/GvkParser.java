@@ -178,7 +178,6 @@ public class GvkParser implements Parser {
                 volume = getSubfield("e", datafield);
                 number = getSubfield("a", datafield);
                 pages = getSubfield("h", datafield);
-
             }
 
             // 036D seems to contain more information than the other fields
@@ -233,7 +232,6 @@ public class GvkParser implements Parser {
                 if (isbn13 != null) {
                     isbn = isbn13;
                 }
-
             }
 
             // Hochschulschriftenvermerk
@@ -492,5 +490,4 @@ public class GvkParser implements Parser {
     private String removeSortCharacters(String input) {
         return input.replaceAll("\\@", "");
     }
-
 }

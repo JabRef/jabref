@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
@@ -104,7 +104,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             numberSucessful++;
                             writeLogMessage(newFile, bw, localizedSucessMessage);
                             addResultToList(newFile, success, localizedSucessMessage);
-
                         } else {
 
                             updateMessage(localizedErrorMessage);
@@ -112,7 +111,6 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
                             addResultToList(newFile, success, localizedErrorMessage);
                         }
                     }
-
                 }
             }
             updateMessage(Localization.lang("Finished copying"));
@@ -137,5 +135,4 @@ public class CopyFilesTask extends Task<List<CopyFilesResultItemViewModel>> {
         CopyFilesResultItemViewModel result = new CopyFilesResultItemViewModel(newFile, success, logMessage);
         results.add(result);
     }
-
 }

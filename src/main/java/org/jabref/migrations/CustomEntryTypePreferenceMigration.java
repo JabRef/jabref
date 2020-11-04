@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypeBuilder;
@@ -37,12 +37,12 @@ class CustomEntryTypePreferenceMigration {
             number++;
         }
 
-        prefs.saveCustomEntryTypes();
+        prefs.saveCustomEntryTypes(Globals.entryTypesManager);
     }
 
     /**
      * Retrieves all deprecated information about the entry type in preferences, with the tag given by number.
-     *
+     * <p>
      * (old implementation which has been copied)
      */
     private static Optional<BibEntryType> getBibEntryType(int number) {

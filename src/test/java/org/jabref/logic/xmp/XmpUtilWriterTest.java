@@ -2,7 +2,6 @@ package org.jabref.logic.xmp;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +31,7 @@ class XmpUtilWriterTest {
 
     private void initBibEntries() {
         olly2018 = new BibEntry(StandardEntryType.Article);
-        olly2018.setCiteKey("Olly2018");
+        olly2018.setCitationKey("Olly2018");
         olly2018.setField(StandardField.AUTHOR, "Olly and Johannes");
         olly2018.setField(StandardField.TITLE, "Stefan's palace");
         olly2018.setField(StandardField.JOURNAL, "Test Journal");
@@ -63,7 +62,7 @@ class XmpUtilWriterTest {
         toral2006.setField(StandardField.URL, "www.url.de");
 
         vapnik2000 = new BibEntry(StandardEntryType.Book);
-        vapnik2000.setCiteKey("vapnik2000");
+        vapnik2000.setCitationKey("vapnik2000");
         vapnik2000.setField(StandardField.TITLE, "The Nature of Statistical Learning Theory");
         vapnik2000.setField(StandardField.PUBLISHER, "Springer Science + Business Media");
         vapnik2000.setField(StandardField.AUTHOR, "Vladimir N. Vapnik");
@@ -78,7 +77,7 @@ class XmpUtilWriterTest {
     void setUp() {
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
-        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
+        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
@@ -94,7 +93,7 @@ class XmpUtilWriterTest {
 
         // read a bib entry from the tests before
         BibEntry entry = vapnik2000;
-        entry.setCiteKey("WriteXMPTest");
+        entry.setCitationKey("WriteXMPTest");
         entry.setId("ID4711");
 
         // write the changed bib entry to the PDF
@@ -118,9 +117,9 @@ class XmpUtilWriterTest {
 
         List<BibEntry> entries = Arrays.asList(olly2018, vapnik2000, toral2006);
 
-        XmpUtilWriter.writeXmp(Paths.get(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
+        XmpUtilWriter.writeXmp(Path.of(pdfFile.toAbsolutePath().toString()), entries, null, xmpPreferences);
 
-        List<BibEntry> entryList = XmpUtilReader.readXmp(Paths.get(pdfFile.toAbsolutePath().toString()), xmpPreferences);
+        List<BibEntry> entryList = XmpUtilReader.readXmp(Path.of(pdfFile.toAbsolutePath().toString()), xmpPreferences);
         assertEquals(3, entryList.size());
     }
 

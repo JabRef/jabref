@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -10,9 +9,9 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
@@ -48,7 +47,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
      * @return class name
      */
     private static String pathToClass(String basePath, Path path) {
-        String className = FileUtil.relativize(path, Collections.singletonList(Paths.get(basePath))).toString();
+        String className = FileUtil.relativize(path, Collections.singletonList(Path.of(basePath))).toString();
         if (className != null) {
             int lastDot = className.lastIndexOf('.');
             if (lastDot < 0) {
@@ -121,7 +120,10 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
     public void saveToPrefs() {
         Globals.prefs.customImports.clear();
         Globals.prefs.customImports.addAll(importers);
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(), Globals.prefs.getXMPPreferences(), Globals.getFileUpdateMonitor());
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getXmpPreferences(),
+                Globals.getFileUpdateMonitor());
     }
 
     public ListProperty<CustomImporter> selectedImportersProperty() {

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -53,13 +52,13 @@ public class XmpExporter extends Exporter {
         // or write every entry to a separate file.
         if (file.getFileName().toString().trim().equals(XMP_SPLIT_DIRECTORY_INDICATOR)) {
             for (BibEntry entry : entries) {
-                // Avoid situations, where two cite keys are null
+                // Avoid situations, where two citation keys are null
                 Path entryFile;
                 String suffix = entry.getId() + "_" + entry.getField(InternalField.KEY_FIELD).orElse("null") + ".xmp";
                 if (file.getParent() == null) {
-                    entryFile = Paths.get(suffix);
+                    entryFile = Path.of(suffix);
                 } else {
-                    entryFile = Paths.get(file.getParent().toString() + "/" + suffix);
+                    entryFile = Path.of(file.getParent().toString() + "/" + suffix);
                 }
                 this.writeBibToXmp(entryFile, Collections.singletonList(entry), encoding);
             }

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
@@ -85,7 +84,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
             return false;
         }
 
-        Path p = Paths.get(location);
+        Path p = Path.of(location);
         String s = OS.NEWLINE + term;
         try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8,
                 create ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {

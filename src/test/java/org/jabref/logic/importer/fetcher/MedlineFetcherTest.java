@@ -20,7 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MedlineFetcherTest {
 
     private MedlineFetcher fetcher;
-    private BibEntry entryWijedasa, entryEndharti, bibEntryIchikawa, bibEntrySari;
+    private BibEntry entryWijedasa;
+    private BibEntry entryEndharti;
+    private BibEntry bibEntryIchikawa;
+    private BibEntry bibEntrySari;
 
     @BeforeEach
     public void setUp() throws InterruptedException {
@@ -131,13 +134,10 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-online-bibliographic-database/medline", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void testSearchByIDWijedasa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
+        assertTrue(fetchedEntry.isPresent());
+
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(entryWijedasa), fetchedEntry);
     }
@@ -145,6 +145,8 @@ public class MedlineFetcherTest {
     @Test
     public void testSearchByIDEndharti() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
+        assertTrue(fetchedEntry.isPresent());
+
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(entryEndharti), fetchedEntry);
     }
@@ -152,6 +154,8 @@ public class MedlineFetcherTest {
     @Test
     public void testSearchByIDIchikawa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
+        assertTrue(fetchedEntry.isPresent());
+
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(bibEntryIchikawa), fetchedEntry);
     }
@@ -159,6 +163,8 @@ public class MedlineFetcherTest {
     @Test
     public void testSearchByIDSari() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
+        assertTrue(fetchedEntry.isPresent());
+
         fetchedEntry.get().clearField(StandardField.ABSTRACT); // Remove abstract due to copyright
         assertEquals(Optional.of(bibEntrySari), fetchedEntry);
     }

@@ -1,5 +1,6 @@
 package org.jabref.gui.preview;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Objects;
@@ -15,14 +16,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.web.WebView;
 
-import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.ThemeLoader;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
@@ -81,10 +82,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
 
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
     private boolean registered;
 
-    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
         searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
@@ -114,18 +115,24 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             highlightSearchPattern();
         });
-
     }
 
-    public void setTheme(String theme) {
-        if (theme.equals(ThemeLoader.DARK_CSS)) {
+    public void setTheme(Theme theme) {
+        if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
-            // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
-            URL url = JabRefFrame.class.getResource(ThemeLoader.DARK_CSS);
+            // https://bugs.openjdk.java.net/browse/JDK-8240969
+            // TODO: Remove this workaround as soon as openjfx 16 is released
+            URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
             previewView.getEngine().setUserStyleSheetLocation(dataUrl);
+        } else if (theme.getType() != Theme.Type.LIGHT) {
+            try {
+                previewView.getEngine().setUserStyleSheetLocation(theme.getPath().toUri().toURL().toExternalForm());
+            } catch (MalformedURLException ex) {
+                LOGGER.error("Cannot set custom theme, invalid url", ex);
+            }
         }
     }
 
@@ -169,11 +176,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             observable.addListener(this);
         }
         update();
-
     }
 
     private void update() {
-        if (entry.isEmpty() || layout == null) {
+        if (entry.isEmpty() || (layout == null)) {
             // Nothing to do
             return;
         }
@@ -181,14 +187,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ExporterFactory.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
         BackgroundTask
-                      .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                      .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
-                      .onSuccess(this::setPreviewText)
-                      .onFailure(exception -> {
-                          LOGGER.error("Error while generating citation style", exception);
-                          setPreviewText(Localization.lang("Error while generating citation style"));
-                      })
-                      .executeWith(taskExecutor);
+                .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onSuccess(this::setPreviewText)
+                .onFailure(exception -> {
+                    LOGGER.error("Error while generating citation style", exception);
+                    setPreviewText(Localization.lang("Error while generating citation style"));
+                })
+                .executeWith(taskExecutor);
     }
 
     private void setPreviewText(String text) {
@@ -207,13 +213,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
 
         BackgroundTask
-                      .wrap(() -> {
-                          job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
-                          previewView.getEngine().print(job);
-                          job.endJob();
-                      })
-                      .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
-                      .executeWith(taskExecutor);
+                .wrap(() -> {
+                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCitationKey).orElse("NO ENTRY"));
+                    previewView.getEngine().print(job);
+                    job.endJob();
+                })
+                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
+                .executeWith(taskExecutor);
     }
 
     public void copyPreviewToClipBoard() {

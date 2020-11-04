@@ -5,10 +5,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
-import org.jabref.model.cleanup.Formatter;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -111,10 +112,12 @@ class FormatterTest {
                 Formatters.getAll().stream(),
                 // following formatters are not contained in the list of all formatters, because
                 // - the IdentityFormatter is not offered to the user,
-                // - the ProtectTermsFormatter needs more configuration
+                // - the ProtectTermsFormatter needs more configuration,
+                // - the TruncateFormatter needs setup,
                 Stream.of(
                         new IdentityFormatter(),
-                        new ProtectTermsFormatter(protectedTermsLoader)));
+                        new ProtectTermsFormatter(protectedTermsLoader),
+                        new TruncateFormatter(0)));
         // @formatter:on
     }
 }

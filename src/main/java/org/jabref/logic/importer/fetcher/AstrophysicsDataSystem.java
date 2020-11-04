@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -28,7 +29,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -49,7 +50,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
-    private static final String API_KEY = "tDueGIu6zl96OqkcCS5LOHboWbTgEEx8yAR7Etta";
+    private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
     private final ImportFormatPreferences preferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
@@ -74,7 +75,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     @Override
     public String getName() {
-        return "SAO/NASA Astrophysics Data System";
+        return "SAO/NASA ADS";
     }
 
     /**
@@ -131,7 +132,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return URL which points to a search URL for given identifier
      */
     @Override
-    public URL getURLForID(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
+    public URL getUrlForIdentifier(String identifier) throws FetcherException, URISyntaxException, MalformedURLException {
         String query = "doi:\"" + identifier + "\" OR " + "bibcode:\"" + identifier + "\"";
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
@@ -166,7 +167,9 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
              .ifPresent(abstractText -> entry.clearField(StandardField.ABSTRACT));
 
         entry.getField(StandardField.ABSTRACT)
-             .map(abstractText -> abstractText.replace("<P />", "").trim())
+             .map(abstractText -> abstractText.replace("<P />", ""))
+             .map(abstractText -> abstractText.replace("\\textbackslash", ""))
+             .map(abstractText -> abstractText.trim())
              .ifPresent(abstractText -> entry.setField(StandardField.ABSTRACT, abstractText));
         // The fetcher adds some garbage (number of found entries etc before)
         entry.setCommentsBeforeEntry("");
@@ -237,7 +240,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
         }
 
         try {
-            List<String> bibcodes = fetchBibcodes(getURLForID(identifier));
+            List<String> bibcodes = fetchBibcodes(getUrlForIdentifier(identifier));
             List<BibEntry> fetchedEntries = performSearchByIds(bibcodes);
 
             if (fetchedEntries.isEmpty()) {
@@ -258,8 +261,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     /**
      * @param identifiers bibcodes for which bibentries ahould be fetched
-     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested
-     * bibcodes
+     * @return list of bibentries matching the bibcodes. Can be empty and differ in size to the size of requested bibcodes
      */
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());

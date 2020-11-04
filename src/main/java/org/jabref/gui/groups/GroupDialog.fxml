@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-
 <DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
     <content>
@@ -60,7 +71,7 @@
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="keywordsRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Searching for keywords">
+                                 text="%Searching for a keyword">
                         <tooltip>
                             <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
                         </tooltip>
@@ -96,8 +107,8 @@
                             <TextField fx:id="keywordGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="keywordGroupCaseSensitive" text="Case sensitive"/>
-                            <CheckBox fx:id="keywordGroupRegex" text="Regular expression"/>
+                            <CheckBox fx:id="keywordGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="keywordGroupRegex" text="%Regular expression"/>
                         </HBox>
                     </VBox>
                     <VBox visible="${searchRadioButton.selected}" spacing="10.0">
@@ -106,13 +117,13 @@
                             <TextField fx:id="searchGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="searchGroupCaseSensitive" text="Case sensitive"/>
-                            <CheckBox fx:id="searchGroupRegex" text="Regular expression"/>
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression"/>
                         </HBox>
                     </VBox>
                     <VBox visible="${autoRadioButton.selected}" spacing="10.0">
                         <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
-                                     text="Generate groups from keywords in a BibTeX field"/>
+                                     text="%Generate groups from keywords in the following field"/>
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets left="20.0"/>
@@ -143,7 +154,7 @@
                             </HBox>
                         </VBox>
                         <RadioButton fx:id="autoGroupPersonsOption" toggleGroup="$autoGroupOptions"
-                                     text="Generate groups for author last names"/>
+                                     text="%Generate groups for author last names"/>
                         <VBox>
                             <padding>
                                 <Insets left="20.0"/>

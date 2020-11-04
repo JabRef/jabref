@@ -60,6 +60,16 @@ public abstract class SuggestionProvider<T> {
 
     protected abstract Equivalence<T> getEquivalence();
 
+    public Collection<T> getPossibleSuggestions() {
+        Comparator<T> comparator = getComparator().reversed();
+        Equivalence<T> equivalence = getEquivalence();
+        return getSource().map(equivalence::wrap) // Need to do a bit of acrobatic as there is no distinctBy method
+                          .distinct()
+                          .map(Equivalence.Wrapper::get)
+                          .sorted(comparator)
+                          .collect(Collectors.toList());
+    }
+
     /**
      * Get the comparator to order the suggestions
      */

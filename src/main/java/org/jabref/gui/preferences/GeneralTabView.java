@@ -10,7 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
@@ -20,7 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -32,7 +32,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
     @FXML private CheckBox inspectionWarningDuplicate;
     @FXML private CheckBox confirmDelete;
-    @FXML private CheckBox enforceLegalKeys;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
@@ -52,7 +51,7 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public GeneralTabView(JabRefPreferences preferences) {
+    public GeneralTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
@@ -61,7 +60,9 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     }
 
     @Override
-    public String getTabName() { return Localization.lang("General"); }
+    public String getTabName() {
+        return Localization.lang("General");
+    }
 
     public void initialize() {
         this.viewModel = new GeneralTabViewModel(dialogService, preferences);
@@ -86,7 +87,6 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
         inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());
         confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());
-        enforceLegalKeys.selectedProperty().bindBidirectional(viewModel.enforceLegalKeysProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());

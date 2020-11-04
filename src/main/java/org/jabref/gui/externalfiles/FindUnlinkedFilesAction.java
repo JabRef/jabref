@@ -25,5 +25,4 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
         FindUnlinkedFilesDialog dlg = new FindUnlinkedFilesDialog(database, jabRefFrame.getDialogService(), jabRefFrame.getUndoManager());
         dlg.showAndWait();
     }
-
 }

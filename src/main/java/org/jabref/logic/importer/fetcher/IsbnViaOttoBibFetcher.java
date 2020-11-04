@@ -39,7 +39,7 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
      * @return null, because the identifier is passed using form data. This method is not used.
      */
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         return null;
     }
 
@@ -58,13 +58,20 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
             throw new FetcherException("Could not ", e);
         }
         Element textArea = html.select("textarea").first();
+
+        // inspect the "no results" error message (if there is one)
+        Optional<Element> potentialErrorMessageDiv = Optional.ofNullable((html.select("div#flash-notice.notice.add-bottom").first()));
+        if (potentialErrorMessageDiv.isPresent() && potentialErrorMessageDiv.get().text().contains("No Results")) {
+            LOGGER.error("ISBN {} not found at ottobib", identifier);
+        }
+
         Optional<BibEntry> entry = Optional.empty();
         try {
             entry = BibtexParser.singleFromString(textArea.text(), importFormatPreferences, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
+        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry));
         return entry;
-
     }
 }

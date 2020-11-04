@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -51,10 +51,10 @@ public class ExportCommand extends SimpleCommand {
 
     @Override
     public void execute() {
-        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
-        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
+        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
 
         // Get list of exporters and sort before adding to file dialog
         List<Exporter> exporters = Globals.exportFactory.getExporters().stream()
@@ -82,16 +82,16 @@ public class ExportCommand extends SimpleCommand {
         List<BibEntry> entries;
         if (selectedOnly) {
             // Selected entries
-            entries = frame.getCurrentBasePanel().getSelectedEntries();
+            entries = frame.getCurrentLibraryTab().getSelectedEntries();
         } else {
             // All entries
-            entries = frame.getCurrentBasePanel().getDatabase().getEntries();
+            entries = frame.getCurrentLibraryTab().getDatabase().getEntries();
         }
 
         // Set the global variable for this database's file directory before exporting,
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
-        Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel()
+        Globals.prefs.fileDirForDatabase = frame.getCurrentLibraryTab()
                                                 .getBibDatabaseContext()
                                                 .getFileDirectories(Globals.prefs.getFilePreferences());
 
@@ -103,9 +103,9 @@ public class ExportCommand extends SimpleCommand {
         final List<BibEntry> finEntries = entries;
         BackgroundTask
                 .wrap(() -> {
-                    format.export(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                    format.export(frame.getCurrentLibraryTab().getBibDatabaseContext(),
                             file,
-                            frame.getCurrentBasePanel()
+                            frame.getCurrentLibraryTab()
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()

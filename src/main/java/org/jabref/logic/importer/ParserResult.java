@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -93,6 +92,15 @@ public class ParserResult {
         return entryTypes;
     }
 
+    public Optional<Path> getPath() {
+        return Optional.ofNullable(file);
+    }
+
+    /**
+     * @return the file object of the database file
+     * @deprecated use {@link #getPath()}} instead
+     */
+    @Deprecated
     public Optional<File> getFile() {
         return Optional.ofNullable(file).map(Path::toFile);
     }
@@ -134,7 +142,7 @@ public class ParserResult {
     }
 
     public String getErrorMessage() {
-        return warnings().stream().collect(Collectors.joining(" "));
+        return String.join(" ", warnings());
     }
 
     public BibDatabaseContext getDatabaseContext() {

@@ -54,7 +54,6 @@ public enum Language {
         }
 
         return Optional.of(locale);
-
     }
 
     public String getDisplayName() {

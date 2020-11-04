@@ -76,12 +76,12 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         cancelSearch();
 
         currentEntry = entry;
-        Optional<String> citeKey = entry.getCiteKeyOptional();
+        Optional<String> citeKey = entry.getCitationKey();
 
         if (citeKey.isPresent()) {
             startSearch(citeKey.get());
         } else {
-            searchError.set(Localization.lang("Selected entry does not have an associated BibTeX key."));
+            searchError.set(Localization.lang("Selected entry does not have an associated citation key."));
             status.set(Status.ERROR);
         }
     }

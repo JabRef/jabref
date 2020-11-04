@@ -21,7 +21,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
@@ -33,11 +33,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
@@ -61,7 +61,15 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     private long lastKeyPressTime;
     private String listSearchTerm;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+
+    public PreviewTabView(PreferencesService preferences) {
+        this.preferences = preferences;
+
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
+    }
 
     private class EditAction extends SimpleCommand {
 
@@ -75,34 +83,20 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         public void execute() {
             if (editArea != null) {
                 switch (command) {
-                    case COPY:
-                        editArea.copy();
-                        break;
-                    case CUT:
-                        editArea.cut();
-                        break;
-                    case PASTE:
-                        editArea.paste();
-                        break;
-                    case SELECT_ALL:
-                        editArea.selectAll();
-                        break;
+                    case COPY -> editArea.copy();
+                    case CUT -> editArea.cut();
+                    case PASTE -> editArea.paste();
+                    case SELECT_ALL -> editArea.selectAll();
                 }
                 editArea.requestFocus();
             }
         }
     }
 
-    public PreviewTabView(JabRefPreferences preferences) {
-        this.preferences = preferences;
-
-        ViewLoader.view(this)
-                  .root(this)
-                  .load();
-    }
-
     @Override
-    public String getTabName() { return Localization.lang("Entry preview"); }
+    public String getTabName() {
+        return Localization.lang("Entry preview");
+    }
 
     public void initialize() {
         this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager);
@@ -155,6 +149,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
+        ((PreviewViewer) previewTab.getContent()).setTheme(preferences.getTheme());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));
@@ -182,9 +177,10 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView.
-     * The ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
-     * @param list The ListView currently focused
+     * This is called, if a user starts typing some characters into the keyboard with focus on one ListView. The
+     * ListView will scroll to the next cell with the name of the PreviewLayout fitting those characters.
+     *
+     * @param list       The ListView currently focused
      * @param keypressed The pressed character
      */
 
@@ -205,13 +201,15 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
             .findFirst().ifPresent(list::scrollTo);
     }
 
-    private void dragOver(DragEvent event) { viewModel.dragOver(event); }
+    private void dragOver(DragEvent event) {
+        viewModel.dragOver(event);
+    }
 
     private void dragDetectedInAvailable(MouseEvent event) {
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.availableSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.availableListProperty(), selectedLayouts, dragboard);
+            viewModel.dragDetected(viewModel.availableListProperty(), viewModel.availableSelectionModelProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
@@ -220,7 +218,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         List<PreviewLayout> selectedLayouts = new ArrayList<>(viewModel.chosenSelectionModelProperty().getValue().getSelectedItems());
         if (!selectedLayouts.isEmpty()) {
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
-            viewModel.dragDetected(viewModel.chosenListProperty(), selectedLayouts, dragboard);
+            viewModel.dragDetected(viewModel.chosenListProperty(), viewModel.chosenSelectionModelProperty(), selectedLayouts, dragboard);
         }
         event.consume();
     }
@@ -237,13 +235,23 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         event.consume();
     }
 
-    public void toRightButtonAction() { viewModel.addToChosen(); }
+    public void toRightButtonAction() {
+        viewModel.addToChosen();
+    }
 
-    public void toLeftButtonAction() { viewModel.removeFromChosen(); }
+    public void toLeftButtonAction() {
+        viewModel.removeFromChosen();
+    }
 
-    public void sortUpButtonAction() { viewModel.selectedInChosenUp(); }
+    public void sortUpButtonAction() {
+        viewModel.selectedInChosenUp();
+    }
 
-    public void sortDownButtonAction() { viewModel.selectedInChosenDown(); }
+    public void sortDownButtonAction() {
+        viewModel.selectedInChosenDown();
+    }
 
-    public void resetDefaultButtonAction() { viewModel.resetDefaultLayout(); }
+    public void resetDefaultButtonAction() {
+        viewModel.resetDefaultLayout();
+    }
 }

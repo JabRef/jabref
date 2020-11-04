@@ -3,36 +3,43 @@ package org.jabref.gui.push;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.preferences.PreferencesService;
 
 public class PushToApplicationsManager {
 
     private final List<PushToApplication> applications;
+    private final List<Object> reconfigurableControls = new ArrayList<>();
 
     private final DialogService dialogService;
 
     private final PushToApplicationAction action;
-    private MenuItem menuItem;
-    private Button toolBarButton;
 
-    public PushToApplicationsManager(DialogService dialogService, StateManager stateManager) {
+    public PushToApplicationsManager(DialogService dialogService,
+                                     StateManager stateManager,
+                                     PreferencesService preferencesService) {
+
         this.dialogService = dialogService;
-        // Set up the current available choices:
-        applications = new ArrayList<>();
-        applications.add(new PushToEmacs(dialogService));
-        applications.add(new PushToLyx(dialogService));
-        applications.add(new PushToTexmaker(dialogService));
-        applications.add(new PushToTeXstudio(dialogService));
-        applications.add(new PushToVim(dialogService));
-        applications.add(new PushToWinEdt(dialogService));
 
-        this.action = new PushToApplicationAction(stateManager, this, dialogService);
+        // Set up the current available choices:
+        applications = List.of(
+                new PushToEmacs(dialogService),
+                new PushToLyx(dialogService),
+                new PushToTexmaker(dialogService),
+                new PushToTeXstudio(dialogService),
+                new PushToVim(dialogService),
+                new PushToWinEdt(dialogService));
+
+        this.action = new PushToApplicationAction(
+                getApplicationByName(preferencesService.getExternalApplicationsPreferences().getPushToApplicationName()),
+                stateManager,
+                dialogService);
     }
 
     public List<PushToApplication> getApplications() {
@@ -43,12 +50,8 @@ public class PushToApplicationsManager {
         return action;
     }
 
-    public void setMenuItem(MenuItem menuItem) {
-        this.menuItem = menuItem;
-    }
-
-    public void setToolBarButton(Button toolBarButton) {
-        this.toolBarButton = toolBarButton;
+    public void registerReconfigurable(Object object) {
+        this.reconfigurableControls.add(object);
     }
 
     public PushToApplicationSettings getSettings(PushToApplication application) {
@@ -70,17 +73,17 @@ public class PushToApplicationsManager {
                            .orElse(applications.get(0));
     }
 
-    public void updateApplicationAction() {
+    public void updateApplicationAction(PushToApplication application) {
         final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-        action.updateApplication(Globals.prefs.getActivePushToApplication(this));
+        this.action.updateApplication(application);
 
-        if (menuItem != null) {
-            factory.configureMenuItem(action.getActionInformation(), action, menuItem);
-        }
-
-        if (toolBarButton != null) {
-            factory.configureIconButton(action.getActionInformation(), action, toolBarButton);
-        }
+        reconfigurableControls.forEach(object -> {
+            if (object instanceof MenuItem) {
+                factory.configureMenuItem(action.getActionInformation(), action, (MenuItem) object);
+            } else if (object instanceof ButtonBase) {
+                factory.configureIconButton(action.getActionInformation(), action, (ButtonBase) object);
+            }
+        });
     }
 }

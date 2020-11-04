@@ -13,6 +13,6 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: 'This issue will be closed in 7 days due to inactivity :zzz: Please provide the requested information if the problem persists.'
-        stale-issue-label: 's: stale'
+        stale-issue-label: 'status: stale'
         days-before-stale: 30
-        only-labels: 's: waiting-for-customer-feedback'
+        only-labels: 'status: waiting-for-customer-feedback'

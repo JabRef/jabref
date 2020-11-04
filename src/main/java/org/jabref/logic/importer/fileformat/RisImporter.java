@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -24,6 +23,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -91,7 +91,7 @@ public class RisImporter extends Importer {
                 while (!done && (j < (lines.length - 1))) {
                     if ((lines[j + 1].length() >= 6) && !"  - ".equals(lines[j + 1].substring(2, 6))) {
                         if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))
-                            && !Character.isWhitespace(lines[j + 1].charAt(0))) {
+                                && !Character.isWhitespace(lines[j + 1].charAt(0))) {
                             current.append(' ');
                         }
                         current.append(lines[j + 1]);
@@ -204,17 +204,17 @@ public class RisImporter extends Importer {
                         }
                     } else if ("UR".equals(tag) || "L2".equals(tag) || "LK".equals(tag)) {
                         fields.put(StandardField.URL, value);
-                    } else if ((tagPriority = dateTags.indexOf(tag)) != -1 && value.length() >= 4) {
+                    } else if (((tagPriority = dateTags.indexOf(tag)) != -1) && (value.length() >= 4)) {
 
                         if (tagPriority < datePriority) {
                             String year = value.substring(0, 4);
 
                             try {
-                                    Year.parse(year, formatter);
-                                    // if the year is parsebale we have found a higher priority date
-                                    dateTag = tag;
-                                    dateValue = value;
-                                    datePriority = tagPriority;
+                                Year.parse(year, formatter);
+                                // if the year is parsebale we have found a higher priority date
+                                dateTag = tag;
+                                dateValue = value;
+                                datePriority = tagPriority;
                             } catch (DateTimeParseException ex) {
                                 // We can't parse the year, we ignore it
                             }
@@ -245,7 +245,7 @@ public class RisImporter extends Importer {
                     } else if ("TA".equals(tag)) {
                         fields.put(StandardField.TRANSLATOR, value);
 
-                    // fields for which there is no direct mapping in the bibtext standard
+                        // fields for which there is no direct mapping in the bibtext standard
                     } else if ("AV".equals(tag)) {
                         fields.put(new UnknownField("archive_location"), value);
                     } else if ("CN".equals(tag) || "VO".equals(tag)) {
@@ -307,17 +307,12 @@ public class RisImporter extends Importer {
             // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
             month.ifPresent(entry::setMonth);
             bibitems.add(entry);
-
         }
         return new ParserResult(bibitems);
-
     }
 
-    private void addDoi(Map<Field, String> hm, String val) {
-        String doi = val.toLowerCase(Locale.ENGLISH);
-        if (doi.startsWith("doi:")) {
-            doi = doi.replaceAll("(?i)doi:", "").trim();
-            hm.put(StandardField.DOI, doi);
-        }
-    }
+  private void addDoi(Map<Field, String> hm, String val) {
+      Optional<DOI> parsedDoi = DOI.parse(val);
+      parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.getDOI()));
+  }
 }

@@ -307,7 +307,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.entry.getCiteKeyOptional().orElse(null));
+            stack.push(context.entry.getCitationKey().orElse(null));
         });
 
         /*
@@ -685,8 +685,8 @@ public class VM implements Warn {
                     // end
                 }
 
-            // else if (str_pool[sp_ptr-1] = right_brace) then
-            // begin
+                // else if (str_pool[sp_ptr-1] = right_brace) then
+                // begin
             } else if (c[i - 1] == '}') {
                 // if (sp_brace_level > 0) then
                 if (braceLevel > 0) {

@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +41,7 @@ public class DocBook5ExporterTest {
 
     @BeforeEach
     void setUp() throws URISyntaxException {
-        xmlFile = Paths.get(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
+        xmlFile = Path.of(DocBook5ExporterTest.class.getResource("Docbook5ExportFormat.xml").toURI());
 
         List<TemplateExporter> customFormats = new ArrayList<>();
         LayoutFormatterPreferences layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -60,7 +59,7 @@ public class DocBook5ExporterTest {
         entry.setField(StandardField.TITLE, "my paper title");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb and Tobias Diez");
         entry.setField(StandardField.ISBN, "1-2-34");
-        entry.setCiteKey("mykey");
+        entry.setCitationKey("mykey");
         entry.setDate(new org.jabref.model.entry.Date(myDate));
         entries = Collections.singletonList(entry);
     }

@@ -16,8 +16,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -54,7 +54,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, Globals.stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(this.preferences.get(JabRefPreferences.FX_THEME));
+        previewView.setTheme(this.preferences.getTheme());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 
@@ -115,6 +115,10 @@ public class PreviewPanel extends VBox {
         }
     }
 
+    private void updateLayoutByPreferences(JabRefPreferences preferences) {
+        previewView.setLayout(preferences.getPreviewPreferences().getCurrentPreviewStyle());
+    }
+
     private void createKeyBindings() {
         previewView.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
@@ -132,15 +136,15 @@ public class PreviewPanel extends VBox {
 
     private ContextMenu createPopupMenu() {
         MenuItem copyPreview = new MenuItem(Localization.lang("Copy preview"), IconTheme.JabRefIcons.COPY.getGraphicNode());
-        copyPreview.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW));
+        keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(keyCombination -> copyPreview.setAccelerator(keyCombination));
         copyPreview.setOnAction(event -> previewView.copyPreviewToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> previewView.print());
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
-        previousPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
+        keyBindingRepository.getKeyCombination(KeyBinding.PREVIOUS_PREVIEW_LAYOUT).ifPresent(keyCombination -> previousPreviewLayout.setAccelerator(keyCombination));
         previousPreviewLayout.setOnAction(event -> this.previousPreviewStyle());
         MenuItem nextPreviewLayout = new MenuItem(Localization.lang("Next preview layout"));
-        nextPreviewLayout.setAccelerator(keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT));
+        keyBindingRepository.getKeyCombination(KeyBinding.NEXT_PREVIEW_LAYOUT).ifPresent(keyCombination -> nextPreviewLayout.setAccelerator(keyCombination));
         nextPreviewLayout.setOnAction(event -> this.nextPreviewStyle());
 
         ContextMenu menu = new ContextMenu();
@@ -153,6 +157,7 @@ public class PreviewPanel extends VBox {
     }
 
     public void setEntry(BibEntry entry) {
+        updateLayoutByPreferences(preferences);
         this.entry = entry;
         previewView.setEntry(entry);
     }
@@ -170,7 +175,8 @@ public class PreviewPanel extends VBox {
     }
 
     private void cyclePreview(int newPosition) {
-        PreviewPreferences previewPreferences = preferences.getPreviewPreferences()
+        PreviewPreferences previewPreferences = preferences
+                .getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
                 .build();

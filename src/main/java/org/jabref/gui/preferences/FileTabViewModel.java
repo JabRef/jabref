@@ -1,10 +1,7 @@
 package org.jabref.gui.preferences;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -16,18 +13,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.ImportExportPreferences;
 import org.jabref.preferences.NewLineSeparator;
-
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.jabref.preferences.PreferencesService;
 
 public class FileTabViewModel implements PreferenceTabViewModel {
 
@@ -40,157 +31,196 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty = new SimpleObjectProperty<>();
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
 
-    private final StringProperty mainFileDirProperty = new SimpleStringProperty("");
-    private final BooleanProperty useBibLocationAsPrimaryProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autolinkFileStartsBibtexProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autolinkFileExactBibtexProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autolinkUseRegexProperty = new SimpleBooleanProperty();
-    private final StringProperty autolinkRegexKeyProperty = new SimpleStringProperty("");
-    private final BooleanProperty searchFilesOnOpenProperty = new SimpleBooleanProperty();
-    private final BooleanProperty openBrowseOnCreateProperty = new SimpleBooleanProperty();
+    // SaveOrderConfigPanel
+    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    // ToDo: The single criterions should really be a map or a list.
+    private final ListProperty<Field> primarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> secondarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> tertiarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty savePrimaryDescPropertySelected = new SimpleBooleanProperty();
+    private final BooleanProperty saveSecondaryDescPropertySelected = new SimpleBooleanProperty();
+    private final BooleanProperty saveTertiaryDescPropertySelected = new SimpleBooleanProperty();
+    private final ObjectProperty<Field> savePrimarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveSecondarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<Field> saveTertiarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
 
     private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();
 
-    private final Validator mainFileDirValidator;
+    private final PreferencesService preferences;
+    private final SaveOrderConfig initialExportOrder;
+    private final ImportExportPreferences initialImportExportPreferences;
 
-    private final DialogService dialogService;
-    private final JabRefPreferences preferences;
-
-    public FileTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
-        this.dialogService = dialogService;
+    FileTabViewModel(PreferencesService preferences) {
         this.preferences = preferences;
-
-        mainFileDirValidator = new FunctionBasedValidator<>(
-                mainFileDirProperty,
-                input -> {
-                    Path path = Paths.get(mainFileDirProperty.getValue());
-                    return (Files.exists(path) && Files.isDirectory(path));
-                },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
-                        Localization.lang("File"),
-                        Localization.lang("External file links"),
-                        Localization.lang("Main file directory"),
-                        Localization.lang("Directory not found")
-                        )
-                )
-        );
+        this.initialExportOrder = preferences.loadExportSaveOrder();
+        this.initialImportExportPreferences = preferences.getImportExportPreferences();
     }
 
     @Override
     public void setValues() {
-        openLastStartupProperty.setValue(preferences.getBoolean(JabRefPreferences.OPEN_LAST_EDITED));
-        noWrapFilesProperty.setValue(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
-        resolveStringsAllProperty.setValue(preferences.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS)); // Flipped around
-        resolveStringsBibTexProperty.setValue(!resolveStringsAllProperty.getValue());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
+        openLastStartupProperty.setValue(preferences.shouldOpenLastFilesOnStartup());
+
+        noWrapFilesProperty.setValue(initialImportExportPreferences.getNonWrappableFields());
+        resolveStringsAllProperty.setValue(initialImportExportPreferences.shouldResolveStringsForAllStrings()); // Flipped around
+        resolveStringsBibTexProperty.setValue(initialImportExportPreferences.shouldResolveStringsForStandardBibtexFields());
+        resolveStringsExceptProperty.setValue(initialImportExportPreferences.getNonResolvableFields());
         newLineSeparatorListProperty.setValue(FXCollections.observableArrayList(NewLineSeparator.values()));
-        selectedNewLineSeparatorProperty.setValue(preferences.getNewLineSeparator());
-        alwaysReformatBibProperty.setValue(preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
+        selectedNewLineSeparatorProperty.setValue(initialImportExportPreferences.getNewLineSeparator());
 
-        mainFileDirProperty.setValue(preferences.getAsOptional(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX).orElse(""));
-        useBibLocationAsPrimaryProperty.setValue(preferences.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
-        if (preferences.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) { // Flipped around
-            autolinkUseRegexProperty.setValue(true);
-        } else if (preferences.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)) {
-            autolinkFileExactBibtexProperty.setValue(true);
+        alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
+
+        if (initialExportOrder.saveInOriginalOrder()) {
+            saveInOriginalProperty.setValue(true);
+        } else if (initialExportOrder.saveInSpecifiedOrder()) {
+            saveInSpecifiedOrderProperty.setValue(true);
         } else {
-            autolinkFileStartsBibtexProperty.setValue(true);
+            saveInTableOrderProperty.setValue(true);
         }
-        autolinkRegexKeyProperty.setValue(preferences.get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY));
-        searchFilesOnOpenProperty.setValue(preferences.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
-        openBrowseOnCreateProperty.setValue(preferences.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
 
-        autosaveLocalLibraries.setValue(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+        Set<Field> fieldNames = FieldFactory.getCommonFields();
+        primarySortFieldsProperty.addAll(fieldNames);
+        secondarySortFieldsProperty.addAll(fieldNames);
+        tertiarySortFieldsProperty.addAll(fieldNames);
+
+        savePrimarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(0).field);
+        saveSecondarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(1).field);
+        saveTertiarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(2).field);
+
+        savePrimaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(0).descending);
+        saveSecondaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(1).descending);
+        saveTertiaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(2).descending);
+
+        autosaveLocalLibraries.setValue(preferences.getShouldAutosave());
     }
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLastStartupProperty.getValue());
-        if (!noWrapFilesProperty.getValue().trim().equals(preferences.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
-            preferences.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, noWrapFilesProperty.getValue());
-        }
-        preferences.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAllProperty.getValue());
-        preferences.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, resolveStringsExceptProperty.getValue().trim());
-        resolveStringsExceptProperty.setValue(preferences.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
-        if (autolinkUseRegexProperty.getValue()) {
-            preferences.put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autolinkRegexKeyProperty.getValue());
-        }
-        preferences.setNewLineSeparator(selectedNewLineSeparatorProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, alwaysReformatBibProperty.getValue());
+        preferences.storeOpenLastFilesOnStartup(openLastStartupProperty.getValue());
 
-        preferences.put(StandardField.FILE.getName() + FilePreferences.DIR_SUFFIX, mainFileDirProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, useBibLocationAsPrimaryProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, autolinkUseRegexProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, autolinkFileExactBibtexProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, searchFilesOnOpenProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, openBrowseOnCreateProperty.getValue());
+        ImportExportPreferences newImportExportPreferences = new ImportExportPreferences(
+                noWrapFilesProperty.getValue().trim(),
+                resolveStringsBibTexProperty.getValue(),
+                resolveStringsAllProperty.getValue(),
+                resolveStringsExceptProperty.getValue().trim(),
+                selectedNewLineSeparatorProperty.getValue(),
+                alwaysReformatBibProperty.getValue());
+        preferences.storeImportExportPreferences(newImportExportPreferences);
 
-        preferences.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, autosaveLocalLibraries.getValue());
-    }
+        SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
+                saveInOriginalProperty.getValue(),
+                saveInSpecifiedOrderProperty.getValue(),
+                new SaveOrderConfig.SortCriterion(
+                        savePrimarySortSelectedValueProperty.get(),
+                        savePrimaryDescPropertySelected.getValue()),
+                new SaveOrderConfig.SortCriterion(
+                        saveSecondarySortSelectedValueProperty.get(),
+                        saveSecondaryDescPropertySelected.getValue()),
+                new SaveOrderConfig.SortCriterion(
+                        saveTertiarySortSelectedValueProperty.get(),
+                        saveTertiaryDescPropertySelected.getValue()));
+        preferences.storeExportSaveOrder(newSaveOrderConfig);
 
-    ValidationStatus mainFileDirValidationStatus() {
-        return mainFileDirValidator.getValidationStatus();
+        preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
 
     @Override
     public boolean validateSettings() {
-        ValidationStatus validationStatus = mainFileDirValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
-        }
-        return true;
+        return false;
     }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
-
-    public void mainFileDirBrowse() {
-        DirectoryDialogConfiguration dirDialogConfiguration =
-                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Paths.get(mainFileDirProperty.getValue())).build();
-        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)
-                .ifPresent(f -> mainFileDirProperty.setValue(f.toString()));
+    public List<String> getRestartWarnings() {
+        return null;
     }
 
     // General
 
-    public BooleanProperty openLastStartupProperty() { return openLastStartupProperty; }
+    public BooleanProperty openLastStartupProperty() {
+        return openLastStartupProperty;
+    }
 
-    public StringProperty noWrapFilesProperty() { return noWrapFilesProperty; }
+    public StringProperty noWrapFilesProperty() {
+        return noWrapFilesProperty;
+    }
 
-    public BooleanProperty resolveStringsBibTexProperty() { return resolveStringsBibTexProperty; }
+    public BooleanProperty resolveStringsBibTexProperty() {
+        return resolveStringsBibTexProperty;
+    }
 
-    public BooleanProperty resolveStringsAllProperty() { return resolveStringsAllProperty; }
+    public BooleanProperty resolveStringsAllProperty() {
+        return resolveStringsAllProperty;
+    }
 
-    public StringProperty resolvStringsExceptProperty() { return resolveStringsExceptProperty; }
+    public StringProperty resolvStringsExceptProperty() {
+        return resolveStringsExceptProperty;
+    }
 
-    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() { return newLineSeparatorListProperty; }
+    public ListProperty<NewLineSeparator> newLineSeparatorListProperty() {
+        return newLineSeparatorListProperty;
+    }
 
-    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() { return selectedNewLineSeparatorProperty; }
+    public ObjectProperty<NewLineSeparator> selectedNewLineSeparatorProperty() {
+        return selectedNewLineSeparatorProperty;
+    }
 
-    public BooleanProperty alwaysReformatBibProperty() { return alwaysReformatBibProperty; }
-
-    // External file links
-
-    public StringProperty mainFileDirProperty() { return mainFileDirProperty; }
-
-    public BooleanProperty useBibLocationAsPrimaryProperty() { return useBibLocationAsPrimaryProperty; }
-
-    public BooleanProperty autolinkFileStartsBibtexProperty() { return autolinkFileStartsBibtexProperty; }
-
-    public BooleanProperty autolinkFileExactBibtexProperty() { return autolinkFileExactBibtexProperty; }
-
-    public BooleanProperty autolinkUseRegexProperty() { return autolinkUseRegexProperty; }
-
-    public StringProperty autolinkRegexKeyProperty() { return autolinkRegexKeyProperty; }
-
-    public BooleanProperty searchFilesOnOpenProperty() { return searchFilesOnOpenProperty; }
-
-    public BooleanProperty openBrowseOnCreateProperty() { return openBrowseOnCreateProperty; }
+    public BooleanProperty alwaysReformatBibProperty() {
+        return alwaysReformatBibProperty;
+    }
 
     // Autosave
+    public BooleanProperty autosaveLocalLibrariesProperty() {
+        return autosaveLocalLibraries;
+    }
 
-    public BooleanProperty autosaveLocalLibrariesProperty() { return autosaveLocalLibraries; }
+    // SaveOrderConfigPanel
+
+    public BooleanProperty saveInOriginalProperty() {
+        return saveInOriginalProperty;
+    }
+
+    public BooleanProperty saveInTableOrderProperty() {
+        return saveInTableOrderProperty;
+    }
+
+    public BooleanProperty saveInSpecifiedOrderProperty() {
+        return saveInSpecifiedOrderProperty;
+    }
+
+    public ListProperty<Field> primarySortFieldsProperty() {
+        return primarySortFieldsProperty;
+    }
+
+    public ListProperty<Field> secondarySortFieldsProperty() {
+        return secondarySortFieldsProperty;
+    }
+
+    public ListProperty<Field> tertiarySortFieldsProperty() {
+        return tertiarySortFieldsProperty;
+    }
+
+    public ObjectProperty<Field> savePrimarySortSelectedValueProperty() {
+        return savePrimarySortSelectedValueProperty;
+    }
+
+    public ObjectProperty<Field> saveSecondarySortSelectedValueProperty() {
+        return saveSecondarySortSelectedValueProperty;
+    }
+
+    public ObjectProperty<Field> saveTertiarySortSelectedValueProperty() {
+        return saveTertiarySortSelectedValueProperty;
+    }
+
+    public BooleanProperty savePrimaryDescPropertySelected() {
+        return savePrimaryDescPropertySelected;
+    }
+
+    public BooleanProperty saveSecondaryDescPropertySelected() {
+        return saveSecondaryDescPropertySelected;
+    }
+
+    public BooleanProperty saveTertiaryDescPropertySelected() {
+        return saveTertiaryDescPropertySelected;
+    }
 }
-

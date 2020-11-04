@@ -2,8 +2,8 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -22,9 +22,9 @@ class EntryDeleteChangeViewModel extends DatabaseChangeViewModel {
     public EntryDeleteChangeViewModel(BibEntry entry) {
         super(Localization.lang("Deleted entry"));
 
-        this.name = entry.getCiteKeyOptional()
-            .map(key -> Localization.lang("Deleted entry") + ": '" + key + '\'')
-            .orElse(Localization.lang("Deleted entry"));
+        this.name = entry.getCitationKey()
+                         .map(key -> Localization.lang("Deleted entry") + ": '" + key + '\'')
+                         .orElse(Localization.lang("Deleted entry"));
         this.entry = entry;
     }
 

@@ -87,7 +87,6 @@ public class MSBibConverter {
 
         if (entry.getLatexFreeField(StandardField.TYPE).isPresent()) {
             result.thesisType = entry.getLatexFreeField(StandardField.TYPE).get();
-
         } else {
             if (entry.getType().equals(StandardEntryType.TechReport)) {
                 result.thesisType = "Tech. rep.";
@@ -139,5 +138,4 @@ public class MSBibConverter {
 
         return result;
     }
-
 }

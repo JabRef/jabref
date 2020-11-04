@@ -86,5 +86,4 @@ public class PdfXmpImporter extends Importer {
     public String getDescription() {
         return "Wraps the XMPUtility function to be used as an Importer.";
     }
-
 }

@@ -1,11 +1,11 @@
 package org.jabref.cli;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import org.jabref.gui.auximport.AuxParserResultViewModel;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.DefaultAuxParser;
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.strings.StringUtil;
 
@@ -23,7 +23,7 @@ public class AuxCommandLine {
 
         if (!auxFile.isEmpty() && (database != null)) {
             AuxParser auxParser = new DefaultAuxParser(database);
-            AuxParserResult result = auxParser.parse(Paths.get(auxFile));
+            AuxParserResult result = auxParser.parse(Path.of(auxFile));
             subDatabase = result.getGeneratedBibDatabase();
             // print statistics
             System.out.println(new AuxParserResultViewModel(result).getInformation(true));

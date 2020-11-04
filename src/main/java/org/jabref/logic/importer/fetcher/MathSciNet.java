@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.DoiCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -24,7 +25,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -57,7 +57,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
         if (mrNumberInEntry.isPresent()) {
             // We are lucky and already know the id, so use it instead
-            return getURLForID(mrNumberInEntry.get());
+            return getUrlForIdentifier(mrNumberInEntry.get());
         }
 
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mrlookup");
@@ -83,7 +83,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     @Override
-    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg1", "MR"); // search MR number
         uriBuilder.addParameter("s1", identifier); // identifier

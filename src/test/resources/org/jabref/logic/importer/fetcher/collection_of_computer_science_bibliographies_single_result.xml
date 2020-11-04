@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="http://liinwww.ira.uka.de/bibliography/rss.xsl"?>
+<rss version="2.0">
+    <channel xmlns:dc="http://purl.org/dc/elements/1.1/">
+        <title>CCSB: +"analyzing importance jabref features from user perspective"</title><link>http://liinwww.ira.uka.de/bibliography/#search</link><description>Search results in The Collection of Computer Science Bibliographies for query: +"analyzing importance jabref features from user perspective"</description><language>en</language><copyright>The data is available for noncommercial or private use only, harvesting is prohibited (the data may be obtained using other means and not this RSS feed).</copyright><webMaster>liinwwwa@ira.uka.de</webMaster><lastBuildDate>Mon,  09  Mar 2020 03:14:28 +0100</lastBuildDate><ttl>5760</ttl>
+        <item><description><p>Author: Martin K. Simon, Linus W. Dietz, Tobias Diez, Oliver Kopp; <br />Title: Analyzing the Importance of JabRef Features from the User Perspective; <br />Year: 2019; <br />URLs available (possible fulltext access); <br /></p></description>
+            <dc:date>2019</dc:date>
+            <link>http://liinwww.ira.uka.de/searchbib/index?query=djtxnchklctrttlfbgjtcgxggdrlgphh&amp;results=bibtex&amp;mode=dup&amp;rss=1</link>
+            <dc:title>Analyzing the Importance of JabRef Features from the User Perspective</dc:title>
+            <dc:creator>Martin K. Simon, Linus W. Dietz, Tobias Diez, Oliver Kopp</dc:creator>
+            <title>[2019] Analyzing the Importance of JabRef Features from the User Perspective (by: Martin K. Simon, Linus W. Dietz, Tobias Diez, Oliver Kopp)</title>
+        </item>
+    </channel></rss>

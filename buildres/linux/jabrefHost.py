@@ -5,19 +5,30 @@
 # than text, mode.
 
 import json
-import sys
+import logging
+import os
+import platform
+import shlex
+import shutil
 import struct
 import subprocess
-import shlex
-import logging
-import shutil
+import sys
 from pathlib import Path
 
 # We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
 script_dir = Path(__file__).resolve().parent.parent
-JABREF_PATH = script_dir / "bin/JabRef"
-if not JABREF_PATH.exists():
-    JABREF_PATH = shutil.which("jabref")
+relpath_path = script_dir / "bin/JabRef"
+lowercase_path = shutil.which("jabref")
+uppercase_path = shutil.which("JabRef")
+if relpath_path.exists():
+    JABREF_PATH = relpath_path
+elif lowercase_path is not None and os.path.exists(lowercase_path):
+    JABREF_PATH = Path(lowercase_path)
+elif uppercase_path is not None and os.path.exists(uppercase_path):
+    JABREF_PATH = Path(uppercase_path)
+else:
+    logging.error("Could not determine JABREF_PATH")
+    sys.exit(-1)
 
 logging_dir = Path.home() / ".mozilla/native-messaging-hosts/"
 if not logging_dir.exists():

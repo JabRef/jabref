@@ -1,4 +1,4 @@
-<tr id="\format{\bibtexkey}" class="entry">
+<tr id="\format{\citationkey}" class="entry">
 	<td>\format[Authors(LastFirst,InitialsNoSpace),HTMLChars]{\author}</td>
 	<td>\format[HTMLChars]{\title}</td>
 	<td>\year</td>

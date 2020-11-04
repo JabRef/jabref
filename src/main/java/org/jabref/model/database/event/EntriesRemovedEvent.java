@@ -22,10 +22,9 @@ public class EntriesRemovedEvent extends EntriesEvent {
 
     /**
      * @param bibEntries <code>List</code> of <code>BibEntry</code> objects which are being removed.
-     * @param location Location affected by this event
+     * @param location   Location affected by this event
      */
     public EntriesRemovedEvent(List<BibEntry> bibEntries, EntriesEventSource location) {
         super(bibEntries, location);
     }
-
 }
