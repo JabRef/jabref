@@ -135,8 +135,8 @@ public class StringManipulatorTest {
 
     @Test
     void testGetNextWordBoundary() {
-        int caretPosition = 10;
-        int expectedPosition = 6;
+        int caretPosition = 3;
+        int expectedPosition = 0;
         String input = "hello person";
         int result = StringManipulator.getNextWordBoundary(caretPosition, input, StringManipulator.Direction.PREVIOUS);
         assertEquals(expectedPosition, result);

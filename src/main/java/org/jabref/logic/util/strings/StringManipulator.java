@@ -12,7 +12,7 @@ public class StringManipulator {
         CAPITALIZED
     }
 
-    public enum Direction {
+    enum Direction {
         NEXT(1),
         PREVIOUS(-1);
 
@@ -88,7 +88,7 @@ public class StringManipulator {
         return switch (direction) {
             case NEXT -> new ResultingStringState(
                     caretPosition,
-                    text.substring(0, caretPosition) + text.substring(nextWordBoundary));
+                    text.substring(0, caretPosition) + text.substring(nextWordBoundary)); // Iclude whitespace
             case PREVIOUS -> new ResultingStringState(
                     nextWordBoundary,  // include breaking whitespace
                     text.substring(0, nextWordBoundary) + text.substring(caretPosition));
@@ -103,12 +103,12 @@ public class StringManipulator {
      *
      * @return              The position of the next whitespace after a word
      */
-    public static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
+    static int getNextWordBoundary(int caretPosition, String text, Direction direction) {
         int i = caretPosition;
 
         if (direction == Direction.PREVIOUS) {
             // Swallow whitespaces
-            while (i >= 0 && Character.isWhitespace((text.charAt(i + direction.OFFSET)))) {
+            while (i > 0 && Character.isWhitespace((text.charAt(i + direction.OFFSET)))) {
                 i += direction.OFFSET;
             }
 
@@ -129,17 +129,6 @@ public class StringManipulator {
         }
 
         return i;
-
-        /*
-        while (i > 0 && i <= text.length() && Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
-            i += direction.OFFSET;
-        } */
-
-        /* while (i > 0 && i < (text.length() - 1) && !Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
-            i += direction.OFFSET;
-        } */
-
-        // return i;
     }
 
     /**
