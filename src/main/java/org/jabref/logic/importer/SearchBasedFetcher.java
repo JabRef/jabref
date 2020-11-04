@@ -19,10 +19,6 @@ public interface SearchBasedFetcher extends WebFetcher {
      */
     List<BibEntry> performSearch(String query) throws FetcherException;
 
-    default boolean supportsPaging() {
-        return false;
-    }
-
     /**
      * This method is used to send complex queries using fielded search.
      *

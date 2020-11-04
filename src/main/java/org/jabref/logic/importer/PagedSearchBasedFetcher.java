@@ -18,9 +18,4 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     default int getPageSize() {
         return 20;
     }
-
-    @Override
-    default boolean supportsPaging() {
-        return true;
-    }
 }
